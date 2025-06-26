@@ -11,7 +11,7 @@
 
   <artifactId>jinahya-persistence</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
   <description>More about Persistence API</description>
@@ -28,6 +28,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <modules>
+    <module>jinahya-persistence-mapped</module>
+    <module>jinahya-persistence-mapped-test</module>
+  </modules>
 
   <scm>
     <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
@@ -67,6 +71,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>11.0.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>eclipselink</artifactId>
