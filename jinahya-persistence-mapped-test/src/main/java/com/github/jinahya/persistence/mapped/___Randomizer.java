@@ -2,8 +2,8 @@ package com.github.jinahya.persistence.mapped;
 
 import jakarta.annotation.Nonnull;
 
-abstract class __Randomizer<T> {
+interface ___Randomizer<T> {
 
     @Nonnull
-    public abstract T get();
+    T get();
 }

@@ -5,11 +5,11 @@ package com.github.jinahya.persistence.mapped;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdentityTest<
-        ENTITY extends __MappedEntityWithGeneratedIdentityTest<ENTITY, ID>, ID
+        ENTITY extends __MappedEntityWithGeneratedIdentity<ENTITY>
         >
-        extends __MappedEntityTest<ENTITY, ID> {
+        extends __MappedEntityTest<ENTITY, Long> {
 
-    protected __MappedEntityWithGeneratedIdentityTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
-        super(entityClass, idClass);
+    protected __MappedEntityWithGeneratedIdentityTest(final Class<ENTITY> entityClass) {
+        super(entityClass, Long.class);
     }
 }
