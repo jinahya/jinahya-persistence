@@ -3,7 +3,7 @@ package com.github.jinahya.persistence.mapped;
 public abstract class __DatabaseConstants {
 
     // ----------------------------------------------------------------------------------------------------------- MySQL
-    public abstract class __MySQL {
+    public abstract class __MySQLConstants {
 
         public static final long MIN_INT = Integer.MIN_VALUE;
 
@@ -14,7 +14,7 @@ public abstract class __DatabaseConstants {
         public static final long MAX_INT_UNSIGNED = 4_294_967_295L;
 
         // ------------------------------------------------------------------------------------------------ CONSTRUCTORS
-        protected __MySQL() {
+        protected __MySQLConstants() {
             super();
         }
     }
