@@ -1,5 +1,11 @@
 package com.github.jinahya.persistence.mapped;
 
+import jakarta.annotation.Nonnull;
+import uk.co.jemos.podam.api.DataProviderStrategy;
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+import uk.co.jemos.podam.api.RandomDataProviderStrategyImpl;
+
 import java.util.Objects;
 
 @SuppressWarnings({
@@ -13,6 +19,42 @@ public abstract class __MappedEntityRandomizer<ENTITY extends __MappedEntity<ENT
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new strategy.
+     *
+     * @return a new strategy.
+     * @see RandomDataProviderStrategyImpl#RandomDataProviderStrategyImpl()
+     */
+    protected DataProviderStrategy strategy() {
+        return new RandomDataProviderStrategyImpl();
+    }
+
+    /**
+     * Creates a new factory with a strategy from {@link #strategy()}.
+     *
+     * @return a new factory.
+     * @see PodamFactoryImpl#PodamFactoryImpl(DataProviderStrategy)
+     */
+    protected PodamFactory factory() {
+        return new PodamFactoryImpl(strategy());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Nonnull
+    @Override
+    public ENTITY get() {
+        final var factory = factory();
+        return ___RandomizerUtils.newRandomizedInstanceOf(entityClass)
+                .map(v -> factory.populatePojo(v))
+                .orElseGet(() -> factory.manufacturePojo(entityClass));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

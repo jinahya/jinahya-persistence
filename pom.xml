@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -28,6 +27,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <modules>
     <module>jinahya-persistence-mapped</module>
     <module>jinahya-persistence-mapped-test</module>
@@ -56,7 +56,8 @@
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.2.5</version.maven-surefire>
     <version.com.h2database>2.1.214</version.com.h2database>
-    <version.nl.jqno.equalsverifier>3.16.1</version.nl.jqno.equalsverifier>
+    <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
+    <version.nl.jqno.equalsverifier>4.0.3</version.nl.jqno.equalsverifier>
     <version.org.eclipse.persistence>4.0.1</version.org.eclipse.persistence>
     <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
     <version.org.hibernate.orm>6.2.2.Final</version.org.hibernate.orm>
@@ -80,6 +81,16 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>nl.jqno.equalsverifier</groupId>
+        <artifactId>equalsverifier-nodep</artifactId>
+        <version>${version.nl.jqno.equalsverifier}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>3.25.3</version>
+      </dependency>
+      <dependency>
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>eclipselink</artifactId>
         <version>${version.org.eclipse.persistence}</version>
@@ -100,6 +111,28 @@
         <version>${version.org.junit}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
+        <version>${version.org.mockito}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion><!-- dependencyConvergence -->
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.32</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.co.jemos.podam</groupId>
+        <artifactId>podam</artifactId>
+        <version>8.0.2.RELEASE</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -171,7 +204,7 @@
       <version>4.2.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency> <!-- Jakarta Expression Language; required by hibernate-validator -->
+    <dependency><!-- Jakarta Expression Language; required by hibernate-validator -->
       <groupId>org.glassfish.expressly</groupId>
       <artifactId>expressly</artifactId>
       <version>${version.org.glassfish.expressly}</version>
@@ -181,30 +214,6 @@
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <version>${version.org.hibernate.validator}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <version>${version.org.mockito}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion><!-- dependencyConvergence -->
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>nl.jqno.equalsverifier</groupId>
-      <artifactId>equalsverifier-nodep</artifactId>
-      <version>${version.nl.jqno.equalsverifier}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.32</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
