@@ -1,6 +1,9 @@
 package com.github.jinahya.persistence.mapped;
 
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.ToString;
 
 @Entity
@@ -10,22 +13,14 @@ import lombok.ToString;
         name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__, // "id__"
         column = @Column(name = MappedUser.COLUMN_NAME_ID, nullable = false, insertable = false, updatable = false)
 )
-class User extends __MappedEntity<User, Long> {
+class User2 extends __MappedEntityWithGeneratedIdentity<User2> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected User() {
+    protected User2() {
         super();
     }
 
-    @Override
-    protected Long getId__() {
-        return id__;
-    }
-
-    @Override
-    protected void setId__(final Long id__) {
-        this.id__ = id__;
-    }
+    // -----------------------------------------------------------------------------------------------------------------
 
     // -------------------------------------------------------------------------------------------------------------- id
     public Long getId() {
@@ -35,8 +30,4 @@ class User extends __MappedEntity<User, Long> {
     protected void setId(final Long id) {
         setId__(id);
     }
-
-    @Id
-    @Column(name = MappedUser.COLUMN_NAME_ID, nullable = false, insertable = false, updatable = false)
-    private Long id__;
 }

@@ -55,7 +55,6 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     @SuppressWarnings({
             "java:S100" // Method names should comply with a naming convention
     })
-    @Transient
     protected abstract ID getId__();
 
     @SuppressWarnings({

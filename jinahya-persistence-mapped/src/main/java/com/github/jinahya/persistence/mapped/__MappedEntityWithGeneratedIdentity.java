@@ -1,16 +1,51 @@
 package com.github.jinahya.persistence.mapped;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
+/**
+ * An abstract mapped-superclass whose {@link Id id} attribute is a {@link GeneratedValue generated}
+ * {@link GenerationType#IDENTITY identity}.
+ * <p>
+ * Subclasses might want to override the attribute for the actual column.
+ * {@snippet lang = "java":
+ *     @AttributeOverride(
+ *         name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__,
+ *         column = @Column(name = "id", nullable = false, insertable = false, updatable = false)
+ *     )
+ *}
+ *
+ * @param <SELF> self type parameter
+ * @see GeneratedValue
+ * @see GenerationType#IDENTITY
+ */
+@MappedSuperclass
+@SuppressWarnings({
+        "java:S101", // Class names should comply with a naming convention
+        "java:S115", // Constant names should comply with a naming convention
+        "java:S119", // Type parameter names should comply with a naming convention
+})
 public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedEntityWithGeneratedIdentity<SELF>>
         extends __MappedEntity<SELF, Long> {
 
+    protected static final String COLUMN_NAME_ID__ = "id__";
+
+    protected static final String ATTRIBUTE_NAME_ID__ = COLUMN_NAME_ID__;
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    /**
+     * Creates a new instance.
+     */
     protected __MappedEntityWithGeneratedIdentity() {
         super();
+    }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "id__=" + id__ +
+               '}';
     }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
@@ -27,7 +62,7 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
     // -----------------------------------------------------------------------------------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id__", nullable = false, insertable = false, updatable = false)
+    @Column(name = COLUMN_NAME_ID__, nullable = false, insertable = false, updatable = false)
     @SuppressWarnings({
             "java:S116", // Field names should comply with a naming convention
             "java:S1845" // Methods and field names should not be the same or differ only by capitalization
