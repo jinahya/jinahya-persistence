@@ -2,7 +2,6 @@ package com.github.jinahya.persistence.mapped.user_with_generated_identity;
 
 import com.github.jinahya.persistence.mapped.__MappedEntityTest;
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentityTest;
-import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,11 +40,8 @@ class User_Test extends __MappedEntityWithGeneratedIdentityTest<User> {
         }
 
         @Override
-        protected SingleTypeEqualsVerifierApi<User> equalsVerifier() {
-            return super.equalsVerifier()
-                    .suppress(Warning.SURROGATE_KEY)
-//                    .suppress(Warning.JPA_GETTER)
-                    ;
+        protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
+            return super.getEqualsVerifier();
         }
     }
 }

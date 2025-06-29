@@ -42,8 +42,8 @@ class User_Test extends __MappedEntityTest<User, String> {
         }
 
         @Override
-        protected SingleTypeEqualsVerifierApi<User> equalsVerifier() {
-            return super.equalsVerifier()
+        protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
+            return super.getEqualsVerifier()
                     .suppress(Warning.SURROGATE_KEY);
         }
     }

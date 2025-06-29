@@ -1,7 +1,5 @@
 package com.github.jinahya.persistence.mapped.user;
 
-import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

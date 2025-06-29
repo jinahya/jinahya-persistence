@@ -48,8 +48,8 @@ public abstract class __MappedEntityWithGeneratedUuidTest<ENTITY extends __Mappe
         }
 
         @Override
-        protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
-            return super.equalsVerifier()
+        protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
+            return super.getEqualsVerifier()
                     .suppress(Warning.SURROGATE_KEY)
                     // https://github.com/jqno/equalsverifier/issues/1092 // TODO: check!
                     .suppress(Warning.JPA_GETTER)

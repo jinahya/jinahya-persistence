@@ -79,12 +79,14 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         @DisplayName("equals/hashCode")
         @Test
         protected void _verify_equals() {
-            final var equalsVerifier = equalsVerifier();
+            final var equalsVerifier = getEqualsVerifier();
             equalsVerifier.verify();
         }
 
-        protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
-            return EqualsVerifier.forClass(entityClass);
+        protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
+            return EqualsVerifier.forClass(entityClass)
+//                    .suppress(Warning.STRICT_HASHCODE)
+                    ;
         }
     }
 
@@ -99,8 +101,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
             assertThatCode(() -> {
                 @SuppressWarnings({
                         "java:S117", // Local variable and method parameter names should comply with a naming convention
-                })
-                final var id__ = entityInstance.getId__();
+                }) final var id__ = entityInstance.getId__();
             })
                     .as("getId__()")
                     .doesNotThrowAnyException();
@@ -115,8 +116,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
             assertThatCode(() -> {
                 @SuppressWarnings({
                         "java:S117", // Local variable and method parameter names should comply with a naming convention
-                })
-                final var id__ = entityInstance.getId__();
+                }) final var id__ = entityInstance.getId__();
             })
                     .as("getId__()")
                     .doesNotThrowAnyException();

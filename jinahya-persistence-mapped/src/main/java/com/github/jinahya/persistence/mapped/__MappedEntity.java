@@ -34,17 +34,22 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
     // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
     @Override
+    @SuppressWarnings({
+            "java:S117" // Local variable and method parameter names should comply with a naming convention
+    })
     public final boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
-        if (false && obj != null && getClass() != obj.getClass()) {
-            return false;
-        }
         if (!(obj instanceof __MappedEntity<?, ?> that)) {
             return false;
         }
-        return Objects.equals(getId__(), that.getId__());
+        final var thisId__ = getId__();
+        final var thatId__ = that.getId__();
+        if (thisId__ == null && thatId__ == null) {
+            return true;
+        }
+        return Objects.equals(thisId__, thatId__);
     }
 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
