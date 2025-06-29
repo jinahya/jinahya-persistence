@@ -38,6 +38,9 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
         if (this == obj) {
             return true;
         }
+        if (false && obj != null && getClass() != obj.getClass()) {
+            return false;
+        }
         if (!(obj instanceof __MappedEntity<?, ?> that)) {
             return false;
         }
