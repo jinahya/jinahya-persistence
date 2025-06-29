@@ -1,19 +1,21 @@
-package com.github.jinahya.persistence.mapped;
+package com.github.jinahya.persistence.mapped.user;
 
+import com.github.jinahya.persistence.mapped.__MappedEntityTest;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class UserWithGeneratedIdentity_Test extends __MappedEntityTest<UserWithGeneratedIdentity, Long> {
+class User_Test extends __MappedEntityTest<User, String> {
 
-    UserWithGeneratedIdentity_Test() {
-        super(UserWithGeneratedIdentity.class, Long.class);
+    User_Test() {
+        super(User.class, String.class);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Nested
-    protected class ToStringTest extends __MappedEntityTest<UserWithGeneratedIdentity, Long>.ToStringTest {
+    protected class ToStringTest extends __MappedEntityTest<User, String>.ToStringTest {
 
         @Test
         @Override
@@ -28,8 +30,9 @@ class UserWithGeneratedIdentity_Test extends __MappedEntityTest<UserWithGenerate
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Nested
-    protected class EqualsTest extends __MappedEntityTest<UserWithGeneratedIdentity, Long>.EqualsTest {
+    protected class EqualsTest extends __MappedEntityTest<User, String>.EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test
@@ -39,11 +42,9 @@ class UserWithGeneratedIdentity_Test extends __MappedEntityTest<UserWithGenerate
         }
 
         @Override
-        protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equalsVerifier() {
+        protected SingleTypeEqualsVerifierApi<User> equalsVerifier() {
             return super.equalsVerifier()
-                    .suppress(Warning.SURROGATE_KEY)
-//                    .suppress(Warning.JPA_GETTER)
-                    ;
+                    .suppress(Warning.SURROGATE_KEY);
         }
     }
 }

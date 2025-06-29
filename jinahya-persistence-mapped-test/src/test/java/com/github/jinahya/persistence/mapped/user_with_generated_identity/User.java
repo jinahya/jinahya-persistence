@@ -1,33 +1,30 @@
-package com.github.jinahya.persistence.mapped;
+package com.github.jinahya.persistence.mapped.user_with_generated_identity;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Column;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.ToString;
 
 @Entity
 @Table(name = MappedUser.TABLE_NAME)
 @ToString(callSuper = true)
-@AttributeOverride(
-        name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__, // "id__"
-        column = @Column(name = MappedUser.COLUMN_NAME_ID, nullable = false, insertable = false, updatable = false)
-)
-class UserWithGeneratedIdentity extends __MappedEntityWithGeneratedIdentity<UserWithGeneratedIdentity> {
+class User extends __MappedEntityWithGeneratedIdentity<User> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected UserWithGeneratedIdentity() {
+    protected User() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
     // -------------------------------------------------------------------------------------------------------------- id
+    @Transient
     public Long getId() {
         return getId__();
     }
 
-    protected void setId(final Long id) {
+    void setId(final Long id) {
         setId__(id);
     }
 }

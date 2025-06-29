@@ -1,16 +1,17 @@
-package com.github.jinahya.persistence.mapped;
+package com.github.jinahya.persistence.mapped.user;
 
-import jakarta.persistence.*;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.ToString;
 
 @Entity
 @Table(name = MappedUser.TABLE_NAME)
 @ToString(callSuper = true)
-@AttributeOverride(
-        name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__, // "id__"
-        column = @Column(name = MappedUser.COLUMN_NAME_ID, nullable = false, insertable = false, updatable = false)
-)
-class User extends __MappedEntity<User, Long> {
+class User extends MappedUser<User> {
 
     // -----------------------------------------------------------------------------------------------------------------
     protected User() {
@@ -19,25 +20,26 @@ class User extends __MappedEntity<User, Long> {
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
-    protected Long getId__() {
+    protected String getId__() {
         return id__;
     }
 
     @Override
-    protected void setId__(final Long id__) {
+    protected void setId__(final String id__) {
         this.id__ = id__;
     }
 
     // -------------------------------------------------------------------------------------------------------------- id
-    public Long getId() {
+    public String getId() {
         return getId__();
     }
 
-    protected void setId(final Long id) {
+    protected void setId(final String id) {
         setId__(id);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Id
     @Column(name = MappedUser.COLUMN_NAME_ID, nullable = false, insertable = false, updatable = false)
-    private Long id__;
+    private String id__;
 }

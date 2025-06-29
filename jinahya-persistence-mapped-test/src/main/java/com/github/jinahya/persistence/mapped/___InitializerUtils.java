@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.mapped;
 
-import com.github.jinahya.persistence.mapped.util.JavaLangReflectUtils;
 import com.github.jinahya.persistence.mapped.util.JavaLangUtils;
 
 import java.util.Objects;
@@ -17,7 +16,6 @@ public final class ___InitializerUtils {
         return Optional.ofNullable(
                         JavaLangUtils.forAnyPostfixes(type, ___Initializer.class, "Initializer", "_Initializer")
                 )
-                .map(JavaLangReflectUtils::newInstanceOf)
                 .map(type::cast);
     }
 

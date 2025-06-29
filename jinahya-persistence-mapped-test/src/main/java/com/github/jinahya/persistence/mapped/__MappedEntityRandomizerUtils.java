@@ -18,8 +18,8 @@ public final class __MappedEntityRandomizerUtils {
      * @return an optional of the randomized entity; {@link Optional#empty() empty} when no randomizer found.
      */
     @Nonnull
-    public static <T extends __MappedEntity<T, ?>> Optional<T> newRandomizedInstanceOf(
-            @Nonnull final Class<T> entityClass) {
+    public static <T extends __MappedEntity<T, ?>>
+    Optional<T> newRandomizedInstanceOf(@Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
