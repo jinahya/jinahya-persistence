@@ -13,14 +13,14 @@ import lombok.ToString;
         name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__, // "id__"
         column = @Column(name = MappedUser.COLUMN_NAME_ID, nullable = false, insertable = false, updatable = false)
 )
-class User2 extends __MappedEntityWithGeneratedIdentity<User2> {
+class UserWithGeneratedIdentity extends __MappedEntityWithGeneratedIdentity<UserWithGeneratedIdentity> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected User2() {
+    protected UserWithGeneratedIdentity() {
         super();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
 
     // -------------------------------------------------------------------------------------------------------------- id
     public Long getId() {

@@ -17,6 +17,7 @@ class User extends __MappedEntity<User, Long> {
         super();
     }
 
+    // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
     protected Long getId__() {
         return id__;

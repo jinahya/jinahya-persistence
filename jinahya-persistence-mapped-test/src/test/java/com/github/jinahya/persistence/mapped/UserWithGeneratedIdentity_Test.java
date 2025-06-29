@@ -6,14 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class User2Test extends __MappedEntityTest<User2, Long> {
+class UserWithGeneratedIdentity_Test extends __MappedEntityTest<UserWithGeneratedIdentity, Long> {
 
-    User2Test() {
-        super(User2.class, Long.class);
+    UserWithGeneratedIdentity_Test() {
+        super(UserWithGeneratedIdentity.class, Long.class);
     }
 
     @Nested
-    protected class ToStringTest extends __MappedEntityTest.ToStringTest {
+    protected class ToStringTest extends __MappedEntityTest<UserWithGeneratedIdentity, Long>.ToStringTest {
 
         @Test
         @Override
@@ -29,7 +29,7 @@ class User2Test extends __MappedEntityTest<User2, Long> {
     }
 
     @Nested
-    protected class EqualsTest extends __MappedEntityTest.EqualsTest {
+    protected class EqualsTest extends __MappedEntityTest<UserWithGeneratedIdentity, Long>.EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test
@@ -39,10 +39,11 @@ class User2Test extends __MappedEntityTest<User2, Long> {
         }
 
         @Override
-        protected SingleTypeEqualsVerifierApi<User> equalsVerifier() {
+        protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equalsVerifier() {
             return super.equalsVerifier()
                     .suppress(Warning.SURROGATE_KEY)
-                    .suppress(Warning.JPA_GETTER);
+//                    .suppress(Warning.JPA_GETTER)
+                    ;
         }
     }
 }

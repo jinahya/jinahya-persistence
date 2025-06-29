@@ -6,9 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class UserTest extends __MappedEntityTest<User, Long> {
+class User_Test extends __MappedEntityTest<User, Long> {
 
-    UserTest() {
+    User_Test() {
         super(User.class, Long.class);
     }
 
