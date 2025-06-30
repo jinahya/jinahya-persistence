@@ -34,7 +34,7 @@ public final class ___RandomizerUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    ___RandomizerUtils() {
-        super();
+    private ___RandomizerUtils() {
+        throw new AssertionError("instantiation is not allowed");
     }
 }
