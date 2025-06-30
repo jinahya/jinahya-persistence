@@ -26,7 +26,6 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
     public static final String COLUMN_NAME_ID__ = "id__";
 
     public static final String ATTRIBUTE_NAME_ID__ = COLUMN_NAME_ID__;
-//    public static final String ATTRIBUTE_NAME_ID__ = "id__";
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
