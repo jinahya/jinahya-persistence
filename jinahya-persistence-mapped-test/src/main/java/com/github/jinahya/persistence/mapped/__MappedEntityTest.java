@@ -1,10 +1,13 @@
 package com.github.jinahya.persistence.mapped;
 
+import jakarta.persistence.Transient;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.beans.Introspector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -39,53 +42,39 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         super(entityClass, idClass);
     }
 
-    /**
-     * A nested test class for testing {@link Object#toString()} method of {@link #entityClass}.
-     */
-    @DisplayName("toString()")
-    @Nested
-    protected class __ToStringTest {
-
-        @DisplayName("newEntityInstance().")
-        @Test
-        protected void _NotBlank_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var entityInstance = newEntityInstance();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var string = entityInstance.toString();
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(string).isNotBlank();
-        }
-
-        @DisplayName("newRandomizedEntityInstance().")
-        @Test
-        protected void _NotBlank_NewRandomizedInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var entityInstance = newRandomizedEntityInstance();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var string = entityInstance.toString();
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(string).isNotBlank();
-        }
+    // -------------------------------------------------------------------------------------------------------- toString
+    @DisplayName("newEntityInstance().")
+    @Test
+    protected void _NotBlank_NewInstance() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var entityInstance = newEntityInstance();
+        // -------------------------------------------------------------------------------------------------------- when
+        final var string = entityInstance.toString();
+        // -------------------------------------------------------------------------------------------------------- then
+        assertThat(string).isNotBlank();
     }
 
-    /**
-     * A nested test class for testing {@link Object#equals(Object)} method of {@link #entityClass}.
-     */
+    @DisplayName("newRandomizedEntityInstance().")
+    @Test
+    protected void _NotBlank_NewRandomizedInstance() {
+        // --------------------------------------------------------------------------------------------------- given
+        final var entityInstance = newRandomizedEntityInstance();
+        // ---------------------------------------------------------------------------------------------------- when
+        final var string = entityInstance.toString();
+        // ---------------------------------------------------------------------------------------------------- then
+        assertThat(string).isNotBlank();
+    }
+
+    // ------------------------------------------------------------------------------------------------- equals/hashCode
     @DisplayName("equals/hashCode")
-    @Nested
-    protected class __EqualsTest {
+    @Test
+    protected void _verify_equals() {
+        final var equalsVerifier = getEqualsVerifier();
+        equalsVerifier.verify();
+    }
 
-        @DisplayName("equals/hashCode")
-        @Test
-        protected void _verify_equals() {
-            final var equalsVerifier = getEqualsVerifier();
-            equalsVerifier.verify();
-        }
-
-        protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
-            return EqualsVerifier.forClass(entityClass);
-        }
+    protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
+        return EqualsVerifier.forClass(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -143,5 +132,41 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
                     () -> entityInstance.setId__(newRandomizedIdInstance().orElse(null))
             ).doesNotThrowAnyException();
         }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("setXxx(getXxx())")
+    @Test
+    protected void __accessors() {
+        __MappedEntityTest_Utils.getEntityInstanceStream(entityClass).forEach(instance -> {
+            try {
+                final var info = Introspector.getBeanInfo(entityClass);
+                for (final var descriptor : info.getPropertyDescriptors()) {
+                    final var reader = descriptor.getReadMethod();
+                    if (reader == null) {
+                        continue;
+                    }
+                    if (!reader.canAccess(instance)) {
+                        reader.setAccessible(true);
+                    }
+                    if (reader.isAnnotationPresent(Transient.class)) {
+                        continue;
+                    }
+                    final var value = reader.invoke(instance);
+                    final var writer = descriptor.getWriteMethod();
+                    if (writer == null) {
+                        continue;
+                    }
+                    if (!writer.canAccess(instance)) {
+                        writer.setAccessible(true);
+                    }
+                    assertThatCode(() -> writer.invoke(instance, value))
+                            .as("%s(%s)", writer.getName(), value)
+                            .doesNotThrowAnyException();
+                }
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

@@ -20,7 +20,7 @@ class __DatabaseConstantsTest {
 
         @Test
         void __BIGINT_UNSIGNED() {
-            log.debug("MAX_BIGINT_UNSIGNED: {}", __DatabaseConstants.__MySQLConstants.MAX_BIGINT_UNSIGNED);
+            log.debug("MAX_BIGINT_UNSIGNED: {}", __DatabaseConstants.__MySQLConstants.MAX_BIGINT_UNSIGNED());
         }
     }
 

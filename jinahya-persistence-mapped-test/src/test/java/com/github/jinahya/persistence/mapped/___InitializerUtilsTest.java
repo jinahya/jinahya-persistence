@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ___InitializerUtilsTest {
 
-    static class Pojo {
+    private static class Pojo {
 
         private Pojo(final String name) {
             super();
@@ -21,7 +21,7 @@ class ___InitializerUtilsTest {
         private String name;
     }
 
-    static class PojoInitializer extends ___Initializer<Pojo> {
+    private static class PojoInitializer extends ___Initializer<Pojo> {
 
         PojoInitializer() {
             super(Pojo.class);

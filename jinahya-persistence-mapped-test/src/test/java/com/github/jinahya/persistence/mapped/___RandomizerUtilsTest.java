@@ -13,12 +13,12 @@ class ___RandomizerUtilsTest {
 
     @Getter
     @Setter
-    static class Pojo {
+    private static class Pojo {
 
         private String name;
     }
 
-    static class PojoRandomizer extends ___Randomizer<Pojo> {
+    private static class PojoRandomizer extends ___Randomizer<Pojo> {
 
         PojoRandomizer() {
             super(Pojo.class);

@@ -3,7 +3,6 @@ package com.github.jinahya.persistence.mapped;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -21,38 +20,31 @@ public abstract class __MappedEntityWithGeneratedUuidTest<ENTITY extends __Mappe
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Nested
-    protected class __ToStringTest extends __MappedEntityTest<ENTITY, UUID>.__ToStringTest {
-
-        @Test
-        @Override
-        protected void _NotBlank_NewInstance() {
-            super._NotBlank_NewInstance();
-        }
-
-        @Test
-        @Override
-        protected void _NotBlank_NewRandomizedInstance() {
-            super._NotBlank_NewRandomizedInstance();
-        }
+    @Test
+    @Override
+    protected void _NotBlank_NewInstance() {
+        super._NotBlank_NewInstance();
     }
 
-    @Nested
-    protected class __EqualsTest extends __MappedEntityTest<ENTITY, UUID>.__EqualsTest {
+    @Test
+    @Override
+    protected void _NotBlank_NewRandomizedInstance() {
+        super._NotBlank_NewRandomizedInstance();
+    }
 
-        @DisplayName("equals/hashCode")
-        @Test
-        @Override
-        protected void _verify_equals() {
-            super._verify_equals();
-        }
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("equals/hashCode")
+    @Test
+    @Override
+    protected void _verify_equals() {
+        super._verify_equals();
+    }
 
-        @Override
-        protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
-            return super.getEqualsVerifier()
-                    .suppress(Warning.SURROGATE_KEY)
-                    .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1092 // TODO: check!
-                    ;
-        }
+    @Override
+    protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
+        return super.getEqualsVerifier()
+                .suppress(Warning.SURROGATE_KEY)
+                .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1092 // TODO: check!
+                ;
     }
 }

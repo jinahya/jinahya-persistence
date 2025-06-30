@@ -7,8 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
 /**
- * An abstract mapped-superclass whose {@value __MappedEntityWithGeneratedUuid#ATTRIBUTE_NAME_ID__} attribute is a
- * {@link GeneratedValue} with {@link GenerationType#IDENTITY} strategy.
+ * An abstract mapped-superclass whose {@link __MappedEntityWithGeneratedIdentity#ATTRIBUTE_NAME_ID__ id__} attribute is
+ * a {@link GeneratedValue} with {@link GenerationType#IDENTITY} strategy.
  *
  * @param <SELF> self type parameter
  * @see GeneratedValue
@@ -26,6 +26,7 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
     public static final String COLUMN_NAME_ID__ = "id__";
 
     public static final String ATTRIBUTE_NAME_ID__ = COLUMN_NAME_ID__;
+//    public static final String ATTRIBUTE_NAME_ID__ = "id__";
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

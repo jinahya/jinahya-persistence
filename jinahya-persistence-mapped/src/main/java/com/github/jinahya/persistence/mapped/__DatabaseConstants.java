@@ -2,6 +2,9 @@ package com.github.jinahya.persistence.mapped;
 
 import java.math.BigInteger;
 
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 public abstract class __DatabaseConstants {
 
     // ----------------------------------------------------------------------------------------------------------- MySQL
@@ -120,13 +123,22 @@ public abstract class __DatabaseConstants {
 
         /**
          * The minimum value for {@code BIGINT UNSIGNED} columns,which is {@value}.
+         *
+         * @see #MAX_BIGINT_UNSIGNED()
          */
         public static final int MIN_BIGINT_UNSIGNED = 0;
 
         /**
-         * The maximum value for {@code BIGINT UNSIGNED} columns, which is {@value}.
+         * The maximum value for {@code BIGINT UNSIGNED} columns, which is {@code 0xFFFFFFFFFFFF}.
+         *
+         * @see #MIN_BIGINT_UNSIGNED
          */
-        public static final BigInteger MAX_BIGINT_UNSIGNED = new BigInteger("FFFFFFFFFFFFFFFF", 16);
+        @SuppressWarnings({
+                "java:S100" // Method names should comply with a naming convention
+        })
+        public static BigInteger MAX_BIGINT_UNSIGNED() {
+            return new BigInteger("FFFFFFFFFFFFFFFF", 16);
+        }
 
         // ------------------------------------------------------------------------------------------------ CONSTRUCTORS
 
@@ -205,9 +217,22 @@ public abstract class __DatabaseConstants {
          * The maximum value for {@code bigserial} columns, which is {@value}.
          */
         public static final long MAX_BIGSERIAL = Long.MAX_VALUE;
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        /**
+         * Creates a new instance.
+         */
+        protected __PostgreSQLConstants() {
+            super();
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    /**
+     * Creates a new instance.
+     */
     protected __DatabaseConstants() {
         super();
     }

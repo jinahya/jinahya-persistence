@@ -1,15 +1,14 @@
-package com.github.jinahya.persistence.mapped.user_with_string_id;
+package com.github.jinahya.persistence.mapped.user_with_generated_uuid;
 
-import com.github.jinahya.persistence.mapped.__MappedEntityTest;
-import nl.jqno.equalsverifier.Warning;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedUuidTest;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class UserTest extends __MappedEntityTest<User, String> {
+class UserTest extends __MappedEntityWithGeneratedUuidTest<User> {
 
     UserTest() {
-        super(User.class, String.class);
+        super(User.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -36,7 +35,6 @@ class UserTest extends __MappedEntityTest<User, String> {
     @Override
     protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
         return super.getEqualsVerifier()
-                .suppress(Warning.SURROGATE_KEY)
                 ;
     }
 }

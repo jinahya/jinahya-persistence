@@ -60,11 +60,22 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     }
 
     // ------------------------------------------------------------------------------------------------------------ id__
+
+    /**
+     * Returns the current value of {@link ID}.
+     *
+     * @return the current value of {@link ID}
+     */
     @SuppressWarnings({
             "java:S100" // Method names should comply with a naming convention
     })
     protected abstract ID getId__();
 
+    /**
+     * Replaces the current value of {@link ID} with the specified value.
+     *
+     * @param id__ new value for the {@link ID}.
+     */
     @SuppressWarnings({
             "java:S100", // Method names should comply with a naming convention
             "java:S117" // Local variable and method parameter names should comply with a naming convention
@@ -72,10 +83,10 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     protected abstract void setId__(ID id__);
 
     /**
-     * Replaces current value of {@code #id__} with the specified value, and returns {@code this}.
+     * Replaces current value of {@link ID} with the specified value, and returns {@code this} object.
      *
-     * @param id__ the value of {@code id__}.
-     * @return this object.
+     * @param id__ new value for the {@link ID}.
+     * @return {@code this} object.
      * @see #setId__(Object)
      */
     @Nonnull

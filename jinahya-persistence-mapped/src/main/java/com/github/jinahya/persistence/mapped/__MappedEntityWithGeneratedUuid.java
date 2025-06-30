@@ -9,8 +9,8 @@ import jakarta.persistence.MappedSuperclass;
 import java.util.UUID;
 
 /**
- * An abstract mapped-superclass whose {@link Id id} attribute is a {@link GeneratedValue generated}
- * {@link GenerationType#IDENTITY identity}.
+ * An abstract mapped-superclass whose {@link __MappedEntityWithGeneratedUuid#ATTRIBUTE_NAME_ID__ id__} attribute is a
+ * {@link GeneratedValue generated} {@link GenerationType#IDENTITY identity}.
  * <p>
  * Subclasses might want to override the attribute for the actual column.
  * {@snippet lang = "java":
@@ -22,7 +22,7 @@ import java.util.UUID;
  *
  * @param <SELF> self type parameter
  * @see GeneratedValue
- * @see GenerationType#IDENTITY
+ * @see GenerationType#UUID
  */
 @MappedSuperclass
 @SuppressWarnings({
@@ -33,6 +33,7 @@ import java.util.UUID;
 public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntityWithGeneratedUuid<SELF>>
         extends __MappedEntity<SELF, UUID> {
 
+    // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_ID__ = "id__";
 
     public static final String ATTRIBUTE_NAME_ID__ = COLUMN_NAME_ID__;
