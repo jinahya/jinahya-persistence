@@ -12,11 +12,17 @@ import java.util.Optional;
 public final class ___InitializerUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <T> Optional<___Initializer<T>> newInitializerInstanceOf(final Class<T> type) {
-        Objects.requireNonNull(type, "type is null");
+    static <T> Optional<Class<?>> getInitializerClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                        JavaLangUtils.forAnyPostfixes(type, ___Initializer.class, "Initializer", "_Initializer")
-                )
+                JavaLangUtils.forAnyPostfixes(type, ___Initializer.class, "Initializer", "_Initializer")
+        );
+    }
+
+    @SuppressWarnings({
+            "unchecked"
+    })
+    static <T> Optional<___Initializer<T>> newInitializerInstanceOf(final Class<T> type) {
+        return getInitializerClassOf(type)
                 .map(JavaLangReflectUtils::newInstanceOf)
                 .map(i -> (___Initializer<T>) i);
     }

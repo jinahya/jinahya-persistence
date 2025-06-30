@@ -77,7 +77,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
         return Mockito.spy(newRandomizedEntityInstance());
     }
 
-    // -------------------------------------------------------------------------------------------------------------- id
+    // --------------------------------------------------------------------------------------------------------- idClass
 
     /**
      * Returns a new instance of the {@link #idClass}.

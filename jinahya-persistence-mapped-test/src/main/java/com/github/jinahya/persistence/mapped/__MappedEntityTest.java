@@ -105,6 +105,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         void _DoesNotThrow_NewRandomized() {
             final var entityInstanceOptional = newRandomizedEntityInstance();
             assumeThat(entityInstanceOptional).isPresent();
+            @SuppressWarnings({
+                    "java:S3655" // Optional value should only be accessed after calling isPresent()
+            })
             final var entityInstance = entityInstanceOptional.get();
             assertThatCode(entityInstance::getId__).doesNotThrowAnyException();
         }
@@ -130,6 +133,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         void _DoesNotThrow_NewRandomized() {
             final var entityInstanceOptional = newRandomizedEntityInstance();
             assumeThat(entityInstanceOptional).isPresent();
+            @SuppressWarnings({
+                    "java:S3655" // Optional value should only be accessed after calling isPresent()
+            })
             final var entityInstance = entityInstanceOptional.get();
             assertThatCode(() -> entityInstance.setId__(null)).doesNotThrowAnyException();
             assertThatCode(() -> entityInstance.setId__(newIdInstance())).doesNotThrowAnyException();

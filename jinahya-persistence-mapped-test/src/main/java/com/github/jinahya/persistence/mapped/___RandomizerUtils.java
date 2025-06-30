@@ -6,13 +6,22 @@ import com.github.jinahya.persistence.mapped.util.JavaLangUtils;
 import java.util.Objects;
 import java.util.Optional;
 
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 public final class ___RandomizerUtils {
 
-    private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final Class<T> type) {
-        Objects.requireNonNull(type, "type is null");
+    static Optional<Class<?>> getRandomizerClassOf(final Class<?> type) {
         return Optional.ofNullable(
-                        JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
-                )
+                JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
+        );
+    }
+
+    @SuppressWarnings({
+            "unchecked"
+    })
+    static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final Class<T> type) {
+        return getRandomizerClassOf(type)
                 .map(JavaLangReflectUtils::newInstanceOf)
                 .map(i -> (___Randomizer<T>) i)
                 ;
