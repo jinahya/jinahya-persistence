@@ -13,7 +13,7 @@ class User_Test extends __MappedEntityWithGeneratedUuidTest<User> {
     }
 
     @Nested
-    protected class ToStringTest extends __MappedEntityWithGeneratedUuidTest<User>.ToStringTest {
+    protected class __ToStringTest extends __MappedEntityWithGeneratedUuidTest<User>.__ToStringTest {
 
         @Test
         @Override
@@ -29,7 +29,7 @@ class User_Test extends __MappedEntityWithGeneratedUuidTest<User> {
     }
 
     @Nested
-    protected class EqualsTest extends __MappedEntityWithGeneratedUuidTest<User>.EqualsTest {
+    protected class __EqualsTest extends __MappedEntityWithGeneratedUuidTest<User>.__EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test

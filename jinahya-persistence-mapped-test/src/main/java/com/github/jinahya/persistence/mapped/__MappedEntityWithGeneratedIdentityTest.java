@@ -22,7 +22,7 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nested
-    protected class ToStringTest extends __MappedEntityTest<ENTITY, Long>.__ToStringTest {
+    protected class __ToStringTest extends __MappedEntityTest<ENTITY, Long>.__ToStringTest {
 
         @Test
         @Override
@@ -38,7 +38,7 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<
     }
 
     @Nested
-    protected class EqualsTest extends __MappedEntityTest<ENTITY, Long>.__EqualsTest {
+    protected class __EqualsTest extends __MappedEntityTest<ENTITY, Long>.__EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test

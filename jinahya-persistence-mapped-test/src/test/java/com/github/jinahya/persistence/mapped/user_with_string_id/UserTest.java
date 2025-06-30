@@ -32,7 +32,7 @@ class UserTest extends __MappedEntityTest<User, String> {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nested
-    protected class EqualsTest extends __MappedEntityTest<User, String>.__EqualsTest {
+    protected class __EqualsTest extends __MappedEntityTest<User, String>.__EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test
@@ -44,7 +44,8 @@ class UserTest extends __MappedEntityTest<User, String> {
         @Override
         protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
             return super.getEqualsVerifier()
-                    .suppress(Warning.SURROGATE_KEY);
+                    .suppress(Warning.SURROGATE_KEY)
+                    ;
         }
     }
 }

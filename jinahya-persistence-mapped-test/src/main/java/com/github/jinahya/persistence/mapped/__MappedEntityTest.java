@@ -72,7 +72,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     /**
      * A nested test class for testing {@link Object#equals(Object)} method of {@link #entityClass}.
      */
-    @DisplayName("equals()")
+    @DisplayName("equals/hashCode")
     @Nested
     protected class __EqualsTest {
 
@@ -84,8 +84,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         }
 
         protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
-            return EqualsVerifier.forClass(entityClass)
-                    ;
+            return EqualsVerifier.forClass(entityClass);
         }
     }
 

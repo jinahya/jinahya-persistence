@@ -37,12 +37,6 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-    @Override
-    public String toString() {
-        return super.toString() + '{' +
-               "id__=" + id__ +
-               '}';
-    }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override

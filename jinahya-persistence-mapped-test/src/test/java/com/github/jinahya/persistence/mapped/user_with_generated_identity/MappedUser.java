@@ -4,6 +4,7 @@ import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 @MappedSuperclass
 @AttributeOverride(
@@ -25,4 +26,14 @@ abstract class MappedUser<SELF extends MappedUser<SELF>>
 
     // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_NAME_ID = "id";
+
+    // -------------------------------------------------------------------------------------------------------------- id
+    @Transient
+    public Long getId() {
+        return getId__();
+    }
+
+    void setId(final Long id) {
+        setId__(id);
+    }
 }
