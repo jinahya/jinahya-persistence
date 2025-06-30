@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 /**
  * A class for testing subclass of {@link __MappedEntity}.
@@ -22,6 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___MappedEntityTest<ENTITY, ID> {
+
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance to test the specified entity class.
@@ -40,7 +44,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      */
     @DisplayName("toString()")
     @Nested
-    protected class ToStringTest {
+    protected class __ToStringTest {
 
         @DisplayName("newEntityInstance().")
         @Test
@@ -70,16 +74,69 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      */
     @DisplayName("equals()")
     @Nested
-    protected class EqualsTest {
+    protected class __EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test
         protected void _verify_equals() {
-            equalsVerifier().verify();
+            final var equalsVerifier = getEqualsVerifier();
+            equalsVerifier.verify();
         }
 
-        protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
-            return EqualsVerifier.forClass(entityClass);
+        protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
+            return EqualsVerifier.forClass(entityClass)
+                    ;
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("getId__()<ID>")
+    @Nested
+    protected class GetId__Test {
+
+        @DisplayName("newEntityInstance().")
+        @Test
+        void _DoesNotThrow_New() {
+            final var entityInstance = newEntityInstance();
+            assertThatCode(entityInstance::getId__).doesNotThrowAnyException();
+        }
+
+        @DisplayName("newRandomizedEntityInstance().")
+        @Test
+        void _DoesNotThrow_NewRandomized() {
+            final var entityInstanceOptional = newRandomizedEntityInstance();
+            assumeThat(entityInstanceOptional).isPresent();
+            final var entityInstance = entityInstanceOptional.get();
+            assertThatCode(entityInstance::getId__).doesNotThrowAnyException();
+        }
+    }
+
+    @DisplayName("setId__(<ID>)")
+    @Nested
+    protected class SetId__Test {
+
+        @DisplayName("newEntityInstance().")
+        @Test
+        void _DoesNotThrow_New() {
+            final var entityInstance = newEntityInstance();
+            assertThatCode(() -> entityInstance.setId__(null)).doesNotThrowAnyException();
+            assertThatCode(() -> entityInstance.setId__(newIdInstance())).doesNotThrowAnyException();
+            assertThatCode(
+                    () -> entityInstance.setId__(newRandomizedIdInstance().orElse(null))
+            ).doesNotThrowAnyException();
+        }
+
+        @DisplayName("newRandomizedEntityInstance().")
+        @Test
+        void _DoesNotThrow_NewRandomized() {
+            final var entityInstanceOptional = newRandomizedEntityInstance();
+            assumeThat(entityInstanceOptional).isPresent();
+            final var entityInstance = entityInstanceOptional.get();
+            assertThatCode(() -> entityInstance.setId__(null)).doesNotThrowAnyException();
+            assertThatCode(() -> entityInstance.setId__(newIdInstance())).doesNotThrowAnyException();
+            assertThatCode(
+                    () -> entityInstance.setId__(newRandomizedIdInstance().orElse(null))
+            ).doesNotThrowAnyException();
         }
     }
 }

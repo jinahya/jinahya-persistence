@@ -2,7 +2,6 @@ package com.github.jinahya.persistence.mapped;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 
 import java.util.Objects;
 
@@ -16,6 +15,7 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
     /**
      * Creates a new instance.
      */
@@ -27,13 +27,16 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     @Override
     public String toString() {
         return super.toString() + '{' +
-                "id__=" + getId__() +
-                '}';
+               "id__=" + getId__() +
+               '}';
     }
 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
     // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
     @Override
+    @SuppressWarnings({
+            "java:S117" // Local variable and method parameter names should comply with a naming convention
+    })
     public final boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -41,7 +44,12 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
         if (!(obj instanceof __MappedEntity<?, ?> that)) {
             return false;
         }
-        return Objects.equals(getId__(), that.getId__());
+        final var thisId__ = getId__();
+        final var thatId__ = that.getId__();
+        if (thisId__ == null && thatId__ == null) {
+            return true;
+        }
+        return Objects.equals(thisId__, thatId__);
     }
 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
@@ -63,13 +71,20 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     })
     protected abstract void setId__(ID id__);
 
+    /**
+     * Replaces current value of {@code #id__} with the specified value, and returns {@code this}.
+     *
+     * @param id__ the value of {@code id__}.
+     * @return this object.
+     * @see #setId__(Object)
+     */
     @Nonnull
     @SuppressWarnings({
             "java:S100", // Method names should comply with a naming convention
             "java:S117", // Local variable and method parameter names should comply with a naming convention
             "unchecked"
     })
-    protected SELF id__(final ID id__) {
+    protected final SELF id__(final ID id__) {
         setId__(id__);
         return (SELF) this;
     }

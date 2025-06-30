@@ -12,13 +12,19 @@ import java.util.Optional;
 public final class ___InitializerUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <T> Optional<T> newInitializedInstanceOf(final Class<T> type) {
+    static <T> Optional<___Initializer<T>> newInitializerInstanceOf(final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
         return Optional.ofNullable(
                         JavaLangUtils.forAnyPostfixes(type, ___Initializer.class, "Initializer", "_Initializer")
                 )
                 .map(JavaLangReflectUtils::newInstanceOf)
-                .map(type::cast);
+                .map(i -> (___Initializer<T>) i);
+    }
+
+    public static <T> Optional<T> newInitializedInstanceOf(final Class<T> type) {
+        Objects.requireNonNull(type, "type is null");
+        return newInitializerInstanceOf(type)
+                .map(___Initializer::get);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

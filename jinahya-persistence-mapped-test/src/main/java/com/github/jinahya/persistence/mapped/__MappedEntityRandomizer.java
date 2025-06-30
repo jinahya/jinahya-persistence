@@ -51,10 +51,9 @@ public abstract class __MappedEntityRandomizer<ENTITY extends __MappedEntity<ENT
     @Nonnull
     @Override
     public ENTITY get() {
-        final var factory = factory();
-        return ___RandomizerUtils.newRandomizedInstanceOf(entityClass)
-                .map(v -> factory.populatePojo(v))
-                .orElseGet(() -> factory.manufacturePojo(entityClass));
+        return ___InitializerUtils.newInitializedInstanceOf(entityClass)
+                .map(o -> factory().populatePojo(o))
+                .orElseGet(() -> factory().manufacturePojo(entityClass));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

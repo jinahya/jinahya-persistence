@@ -1,12 +1,10 @@
 package com.github.jinahya.persistence.mapped;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -17,55 +15,44 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<
         >
         extends __MappedEntityTest<ENTITY, Long> {
 
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected __MappedEntityWithGeneratedIdentityTest(final Class<ENTITY> entityClass) {
         super(entityClass, Long.class);
     }
 
-    /**
-     * A nested test class for testing {@link Object#toString()} method of {@link #entityClass}.
-     */
-    @DisplayName("toString()")
+    // -----------------------------------------------------------------------------------------------------------------
     @Nested
-    protected class ToStringTest extends __MappedEntityTest<ENTITY, Long>.ToStringTest {
+    protected class ToStringTest extends __MappedEntityTest<ENTITY, Long>.__ToStringTest {
 
-        @DisplayName("newEntityInstance().")
         @Test
+        @Override
         protected void _NotBlank_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var entityInstance = newEntityInstance();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var string = entityInstance.toString();
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(string).isNotBlank();
+            super._NotBlank_NewInstance();
         }
 
-        @DisplayName("newRandomizedEntityInstance().")
         @Test
+        @Override
         protected void _NotBlank_NewRandomizedInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var entityInstance = newRandomizedEntityInstance();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var string = entityInstance.toString();
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(string).isNotBlank();
+            super._NotBlank_NewRandomizedInstance();
         }
     }
 
-    /**
-     * A nested test class for testing {@link Object#equals(Object)} method of {@link #entityClass}.
-     */
-    @DisplayName("equals()")
     @Nested
-    protected class EqualsTest extends __MappedEntityTest<ENTITY, Long>.EqualsTest {
+    protected class EqualsTest extends __MappedEntityTest<ENTITY, Long>.__EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test
+        @Override
         protected void _verify_equals() {
-            equalsVerifier().verify();
+            super._verify_equals();
         }
 
-        protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
-            return EqualsVerifier.forClass(entityClass);
+        @Override
+        protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
+            return super.getEqualsVerifier()
+                    .suppress(Warning.SURROGATE_KEY)
+                    .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1092 // TODO: check!
+                    ;
         }
     }
 }

@@ -11,16 +11,22 @@ public final class JavaLangUtils {
     @Nullable
     public static Class<?> forAnyPostfixes(@Nonnull final Class<?> type, final Class<?> supertype,
                                            @Nonnull final String... postfixes) {
-        assert type != null;
-        assert postfixes != null;
+        Objects.requireNonNull(type, "type is null");
+        if (Objects.requireNonNull(postfixes, "postfixes is null").length == 0) {
+            throw new IllegalArgumentException("postfixes is empty");
+        }
+        final String typeName = type.getName();
         return Arrays.stream(postfixes)
                 .filter(Objects::nonNull)
                 .map(String::strip)
                 .filter(v -> !v.isBlank())
-                .map(p -> type.getName() + p)
-                .map(n -> {
+                .<String>map((String postfix) -> {
+                    final var name = typeName + postfix;
+                    return name;
+                })
+                .map((String className) -> {
                     try {
-                        return Class.forName(n);
+                        return Class.forName(className);
                     } catch (final ClassNotFoundException cnfe) {
                         return null;
                     }

@@ -1,19 +1,20 @@
-package com.github.jinahya.persistence.mapped;
+package com.github.jinahya.persistence.mapped.user_with_generated_identity;
 
-import nl.jqno.equalsverifier.Warning;
+import com.github.jinahya.persistence.mapped.__MappedEntityTest;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentityTest;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class UserTest extends __MappedEntityTest<User, Long> {
+class User_Test extends __MappedEntityWithGeneratedIdentityTest<User> {
 
-    UserTest() {
-        super(User.class, Long.class);
+    User_Test() {
+        super(User.class);
     }
 
     @Nested
-    protected class ToStringTest extends __MappedEntityTest.ToStringTest {
+    protected class ToStringTest extends __MappedEntityTest<User, Long>.__ToStringTest {
 
         @Test
         @Override
@@ -29,7 +30,7 @@ class UserTest extends __MappedEntityTest<User, Long> {
     }
 
     @Nested
-    protected class EqualsTest extends __MappedEntityTest.EqualsTest {
+    protected class EqualsTest extends __MappedEntityWithGeneratedIdentityTest<User>.EqualsTest {
 
         @DisplayName("equals/hashCode")
         @Test
@@ -39,8 +40,8 @@ class UserTest extends __MappedEntityTest<User, Long> {
         }
 
         @Override
-        protected SingleTypeEqualsVerifierApi<User> equalsVerifier() {
-            return super.equalsVerifier().suppress(Warning.SURROGATE_KEY);
+        protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
+            return super.getEqualsVerifier();
         }
     }
 }

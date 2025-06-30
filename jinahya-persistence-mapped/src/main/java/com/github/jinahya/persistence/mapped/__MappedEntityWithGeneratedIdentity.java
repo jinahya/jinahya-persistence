@@ -1,18 +1,14 @@
 package com.github.jinahya.persistence.mapped;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 /**
- * An abstract mapped-superclass whose {@link Id id} attribute is a {@link GeneratedValue generated}
- * {@link GenerationType#IDENTITY identity}.
- * <p>
- * Subclasses might want to override the attribute for the actual column.
- * {@snippet lang = "java":
- *     @AttributeOverride(
- *         name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__,
- *         column = @Column(name = "id", nullable = false, insertable = false, updatable = false)
- *     )
- *}
+ * An abstract mapped-superclass whose {@value __MappedEntityWithGeneratedUuid#ATTRIBUTE_NAME_ID__} attribute is a
+ * {@link GeneratedValue} with {@link GenerationType#IDENTITY} strategy.
  *
  * @param <SELF> self type parameter
  * @see GeneratedValue
@@ -27,9 +23,9 @@ import jakarta.persistence.*;
 public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedEntityWithGeneratedIdentity<SELF>>
         extends __MappedEntity<SELF, Long> {
 
-    protected static final String COLUMN_NAME_ID__ = "id__";
+    public static final String COLUMN_NAME_ID__ = "id__";
 
-    protected static final String ATTRIBUTE_NAME_ID__ = COLUMN_NAME_ID__;
+    public static final String ATTRIBUTE_NAME_ID__ = COLUMN_NAME_ID__;
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
