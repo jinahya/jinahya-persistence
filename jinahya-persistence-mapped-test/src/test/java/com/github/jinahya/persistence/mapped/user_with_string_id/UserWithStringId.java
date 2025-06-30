@@ -5,12 +5,12 @@ import jakarta.persistence.Table;
 import lombok.ToString;
 
 @Entity
-@Table(name = MappedUser.TABLE_NAME)
+@Table(name = MappedUserWithStringId.TABLE_NAME)
 @ToString(callSuper = true)
-class User extends MappedUser<User> {
+class UserWithStringId extends MappedUserWithStringId<UserWithStringId> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected User() {
+    protected UserWithStringId() {
         super();
     }
 }

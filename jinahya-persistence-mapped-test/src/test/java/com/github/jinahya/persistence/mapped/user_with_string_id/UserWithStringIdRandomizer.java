@@ -5,10 +5,10 @@ import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class UserRandomizer extends __MappedEntityRandomizer<User, String> {
+class UserWithStringIdRandomizer extends __MappedEntityRandomizer<UserWithStringId, String> {
 
-    UserRandomizer() {
-        super(User.class, String.class);
+    UserWithStringIdRandomizer() {
+        super(UserWithStringId.class, String.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ class UserRandomizer extends __MappedEntityRandomizer<User, String> {
 
     @Nonnull
     @Override
-    public User get() {
+    public UserWithStringId get() {
         return super.get();
     }
 }

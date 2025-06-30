@@ -6,12 +6,12 @@ import jakarta.persistence.Table;
 import lombok.ToString;
 
 @Entity
-@Table(name = MappedUser.TABLE_NAME)
+@Table(name = MappedUserWithGeneratedIdentity.TABLE_NAME)
 @ToString(callSuper = true)
-class User extends __MappedEntityWithGeneratedIdentity<User> {
+class UserWithGeneratedIdentity extends __MappedEntityWithGeneratedIdentity<UserWithGeneratedIdentity> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected User() {
+    protected UserWithGeneratedIdentity() {
         super();
     }
 

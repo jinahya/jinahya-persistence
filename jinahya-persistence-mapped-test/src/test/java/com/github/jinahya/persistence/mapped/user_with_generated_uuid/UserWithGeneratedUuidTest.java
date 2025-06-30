@@ -5,10 +5,10 @@ import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class UserTest extends __MappedEntityWithGeneratedUuidTest<User> {
+class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuidTest<UserWithGeneratedUuid> {
 
-    UserTest() {
-        super(User.class);
+    UserWithGeneratedUuidTest() {
+        super(UserWithGeneratedUuid.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class UserTest extends __MappedEntityWithGeneratedUuidTest<User> {
     }
 
     @Override
-    protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
+    protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> getEqualsVerifier() {
         return super.getEqualsVerifier()
                 ;
     }

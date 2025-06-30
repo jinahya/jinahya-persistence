@@ -7,16 +7,38 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Objects;
+
 @MappedSuperclass
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class MappedUser<SELF extends MappedUser<SELF>> extends __MappedEntity<SELF, String> {
+abstract class MappedUserWithStringId<SELF extends MappedUserWithStringId<SELF>> extends __MappedEntity<SELF, String> {
 
     static final String TABLE_NAME = "user_with_string_id";
 
     // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_NAME_NAME = "name";
+
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+
+//    @Override
+//    public final boolean equals(final Object obj) {
+//        if (this == obj) {
+//            return true;
+//        }
+//        if (!(obj instanceof MappedUserWithStringId<?> that)) {
+//            return false;
+//        }
+//        return Objects.equals(getId__(), that.getId__());
+//    }
+//
+//    @Override
+//    public final int hashCode() {
+//        return Objects.hashCode(getId__());
+//    }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
@@ -51,6 +73,6 @@ abstract class MappedUser<SELF extends MappedUser<SELF>> extends __MappedEntity<
     @jakarta.annotation.Nonnull
     @NotNull
     @Id
-    @Column(name = MappedUser.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
+    @Column(name = MappedUserWithStringId.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
     private String name;
 }

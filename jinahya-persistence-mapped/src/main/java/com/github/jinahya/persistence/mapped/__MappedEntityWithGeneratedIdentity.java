@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
+import java.util.Objects;
+
 /**
  * An abstract mapped-superclass whose {@link __MappedEntityWithGeneratedIdentity#ATTRIBUTE_NAME_ID__ id__} attribute is
  * a {@link GeneratedValue} with {@link GenerationType#IDENTITY} strategy.
@@ -37,6 +39,26 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof __MappedEntityWithGeneratedIdentity<?> that)) {
+            return false;
+        }
+        final var thisId__ = getId__();
+        final var thatId__ = that.getId__();
+        if (thisId__ == null && thatId__ == null) {
+            return false;
+        }
+        return Objects.equals(thisId__, thatId__);
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hashCode(getId__());
+    }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override

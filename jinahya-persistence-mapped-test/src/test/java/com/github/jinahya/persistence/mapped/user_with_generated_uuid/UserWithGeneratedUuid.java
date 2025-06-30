@@ -8,12 +8,12 @@ import lombok.ToString;
 import java.util.UUID;
 
 @Entity
-@Table(name = MappedUser.TABLE_NAME)
+@Table(name = MappedUserWithGeneratedUuid.TABLE_NAME)
 @ToString(callSuper = true)
-class User extends __MappedEntityWithGeneratedUuid<User> {
+class UserWithGeneratedUuid extends __MappedEntityWithGeneratedUuid<UserWithGeneratedUuid> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected User() {
+    protected UserWithGeneratedUuid() {
         super();
     }
 

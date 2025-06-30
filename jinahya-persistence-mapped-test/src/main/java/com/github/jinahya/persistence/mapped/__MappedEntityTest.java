@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.mapped;
 
 import jakarta.persistence.Transient;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -74,7 +75,8 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
-        return EqualsVerifier.forClass(entityClass);
+        return EqualsVerifier.forClass(entityClass)
+                .suppress(Warning.STRICT_HASHCODE);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

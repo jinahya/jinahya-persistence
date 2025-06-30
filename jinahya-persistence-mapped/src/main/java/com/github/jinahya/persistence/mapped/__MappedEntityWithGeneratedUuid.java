@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -41,6 +42,28 @@ public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntit
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected __MappedEntityWithGeneratedUuid() {
         super();
+    }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof __MappedEntityWithGeneratedUuid<?> that)) {
+            return false;
+        }
+        final var thisId__ = getId__();
+        final var thatId__ = that.getId__();
+        if (thisId__ == null && thatId__ == null) {
+            return false;
+        }
+        return Objects.equals(thisId__, thatId__);
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hashCode(getId__());
     }
 
     // ------------------------------------------------------------------------------------------------------ super.id__

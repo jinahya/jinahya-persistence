@@ -9,7 +9,7 @@ import jakarta.persistence.MappedSuperclass;
 @AttributeOverride(
         name = __MappedEntityWithGeneratedUuid.ATTRIBUTE_NAME_ID__,
         column = @Column(
-                name = MappedUser.COLUMN_NAME_ID,
+                name = MappedUserWithGeneratedUuid.COLUMN_NAME_ID,
                 nullable = false,
                 insertable = false,
                 updatable = false
@@ -18,7 +18,7 @@ import jakarta.persistence.MappedSuperclass;
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class MappedUser<SELF extends MappedUser<SELF>>
+abstract class MappedUserWithGeneratedUuid<SELF extends MappedUserWithGeneratedUuid<SELF>>
         extends __MappedEntityWithGeneratedUuid<SELF> {
 
     static final String TABLE_NAME = "user_with_generated_uuid";

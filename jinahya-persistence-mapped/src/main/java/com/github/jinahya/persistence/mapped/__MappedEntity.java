@@ -37,7 +37,7 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     @SuppressWarnings({
             "java:S117" // Local variable and method parameter names should comply with a naming convention
     })
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -55,7 +55,7 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
     // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Objects.hashCode(getId__());
     }
 

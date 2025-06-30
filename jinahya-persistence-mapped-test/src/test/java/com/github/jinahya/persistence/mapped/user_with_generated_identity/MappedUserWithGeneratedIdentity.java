@@ -10,7 +10,7 @@ import jakarta.persistence.Transient;
 @AttributeOverride(
         name = __MappedEntityWithGeneratedIdentity.ATTRIBUTE_NAME_ID__,
         column = @Column(
-                name = MappedUser.COLUMN_NAME_ID,
+                name = MappedUserWithGeneratedIdentity.COLUMN_NAME_ID,
                 nullable = false,
                 insertable = false,
                 updatable = false
@@ -19,7 +19,7 @@ import jakarta.persistence.Transient;
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class MappedUser<SELF extends MappedUser<SELF>>
+abstract class MappedUserWithGeneratedIdentity<SELF extends MappedUserWithGeneratedIdentity<SELF>>
         extends __MappedEntityWithGeneratedIdentity<SELF> {
 
     static final String TABLE_NAME = "user_with_generated_identity";
