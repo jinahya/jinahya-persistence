@@ -44,6 +44,7 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<
     protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
         return super.getEqualsVerifier()
                 .suppress(Warning.SURROGATE_KEY)
+                .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1092 // TODO: check!
                 ;
     }
