@@ -1,7 +1,7 @@
 package com.github.jinahya.persistence.mapped;
 
-import com.github.jinahya.persistence.mapped.util.JavaLangReflectUtils;
-import com.github.jinahya.persistence.mapped.util.JavaLangUtils;
+import com.github.jinahya.persistence.mapped.util.__JavaLangReflectUtils;
+import com.github.jinahya.persistence.mapped.util.__JavaLangUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -14,7 +14,7 @@ public final class ___InitializerUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static <T> Optional<Class<?>> getInitializerClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                JavaLangUtils.forAnyPostfixes(type, ___Initializer.class, "Initializer", "_Initializer")
+                __JavaLangUtils.forAnyPostfixes(type, ___Initializer.class, "Initializer", "_Initializer")
         );
     }
 
@@ -23,7 +23,7 @@ public final class ___InitializerUtils {
     })
     static <T> Optional<___Initializer<T>> newInitializerInstanceOf(final Class<T> type) {
         return getInitializerClassOf(type)
-                .map(JavaLangReflectUtils::newInstanceOf)
+                .map(__JavaLangReflectUtils::newInstanceOf)
                 .map(i -> (___Initializer<T>) i);
     }
 

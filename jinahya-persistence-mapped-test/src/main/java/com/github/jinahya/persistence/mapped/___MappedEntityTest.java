@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.mapped;
 
-import com.github.jinahya.persistence.mapped.util.JavaLangReflectUtils;
+import com.github.jinahya.persistence.mapped.util.__JavaLangReflectUtils;
 import org.mockito.Mockito;
 
 import java.util.Objects;
@@ -42,7 +42,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      * @return a new instance of the {@link #entityClass}.
      */
     protected ENTITY newEntityInstance() {
-        return JavaLangReflectUtils.newInstanceOf(entityClass);
+        return __JavaLangReflectUtils.newInstanceOf(entityClass);
     }
 
     /**
@@ -86,7 +86,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      */
     protected ID newIdInstance() {
         return ___InitializerUtils.newInitializedInstanceOf(idClass)
-                .orElseGet(() -> JavaLangReflectUtils.newInstanceOf(idClass));
+                .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(idClass));
     }
 
     /**

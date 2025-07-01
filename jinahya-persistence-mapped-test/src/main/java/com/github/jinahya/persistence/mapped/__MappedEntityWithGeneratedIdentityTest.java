@@ -2,8 +2,6 @@ package com.github.jinahya.persistence.mapped;
 
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -20,26 +18,6 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void _NotBlank_NewInstance() {
-        super._NotBlank_NewInstance();
-    }
-
-    @Test
-    @Override
-    protected void _NotBlank_NewRandomizedInstance() {
-        super._NotBlank_NewRandomizedInstance();
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("equals/hashCode")
-    @Test
-    @Override
-    protected void _verify_equals() {
-        super._verify_equals();
-    }
-
     @Override
     protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
         return super.getEqualsVerifier()
