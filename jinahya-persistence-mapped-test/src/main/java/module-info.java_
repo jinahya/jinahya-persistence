@@ -1,0 +1,18 @@
+module com.github.jinahya.persistence.mapped.tests {
+
+    requires com.github.jinahya.persistence.mapped;
+
+    requires java.desktop;
+
+    requires transitive nl.jqno.equalsverifier;
+    requires transitive net.jodah.typetools;
+    requires transitive org.assertj.core;
+    requires transitive org.junit.jupiter.api;
+    requires transitive org.junit.jupiter.params;
+    requires transitive org.junit.platform.commons;
+    requires transitive org.junit.platform.engine;
+    requires transitive org.mockito.junit.jupiter;
+    requires transitive podam;
+
+    exports com.github.jinahya.persistence.mapped.tests;
+}
