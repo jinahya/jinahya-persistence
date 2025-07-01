@@ -32,7 +32,7 @@ public class __MappedEntityArgumentsProvider implements ArgumentsProvider {
 //                __MappedEntityTest.class,
 //                0
 //        );
-        return __MappedEntityTest_Utils.getEntityInstanceStream(entityClass.asSubclass(__MappedEntity.class)).map(
+        return __MappedEntityTestUtils.getEntityInstanceStream(entityClass.asSubclass(__MappedEntity.class)).map(
                 Arguments::of);
     }
 }

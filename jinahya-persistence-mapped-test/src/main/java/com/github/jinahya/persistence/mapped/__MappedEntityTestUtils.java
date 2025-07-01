@@ -10,7 +10,7 @@ import java.util.stream.Stream;
         "java:S101", // Class names should comply with a naming convention
         "java:S125", // Sections of code should not be commented out
 })
-public abstract class __MappedEntityTest_Utils {
+public abstract class __MappedEntityTestUtils {
 
     @SuppressWarnings({
             "java:S119" // Type parameter names should comply with a naming convention
@@ -48,7 +48,7 @@ public abstract class __MappedEntityTest_Utils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __MappedEntityTest_Utils() {
+    protected __MappedEntityTestUtils() {
         super();
     }
 }

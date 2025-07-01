@@ -83,6 +83,11 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>net.jodah</groupId>
+        <artifactId>typetools</artifactId>
+        <version>0.6.3</version>
+      </dependency>
+      <dependency>
         <groupId>nl.jqno.equalsverifier</groupId>
         <artifactId>equalsverifier-nodep</artifactId>
         <version>${version.nl.jqno.equalsverifier}</version>

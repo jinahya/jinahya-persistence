@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.mapped.util;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import net.jodah.typetools.TypeResolver;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.GenericDeclaration;
@@ -9,6 +10,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,9 @@ public final class __JavaLangReflectUtils {
         Objects.requireNonNull(type, "type is null");
         if (index < 0) {
             throw new IllegalArgumentException("negative index: " + index);
+        }
+        if (ThreadLocalRandom.current().nextBoolean()) {
+            return TypeResolver.resolveRawArguments(type, clazz)[index];
         }
         final var mapping = new HashMap<TypeVariable<?>, Class<?>>();
         var c = clazz;
