@@ -3,12 +3,5 @@ module com.github.jinahya.persistence.mapped.tests.test {
     requires com.github.jinahya.persistence.mapped;
     requires com.github.jinahya.persistence.mapped.tests;
 
-//    requires jakarta.annotation;
-//    requires jakarta.persistence;
-    requires jakarta.validation;
     requires static lombok;
-//    requires nl.jqno.equalsverifier;
-//    requires org.assertj.core;
-//    requires org.junit.jupiter.api;
-//    requires podam;
 }

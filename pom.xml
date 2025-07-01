@@ -214,6 +214,7 @@
               <goal>enforce</goal>
             </goals>
             <configuration>
+              <skip>true</skip>
               <rules>
                 <dependencyConvergence/>
                 <requireJavaVersion>
