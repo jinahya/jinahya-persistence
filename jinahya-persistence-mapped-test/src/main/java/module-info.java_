@@ -1,19 +1,16 @@
 module com.github.jinahya.persistence.mapped.tests {
-
-    requires transitive com.github.jinahya.persistence.mapped;
-
+    requires com.github.jinahya.persistence.mapped;
+    requires jakarta.annotation;
+    requires jakarta.persistence;
     requires java.desktop;
-
-    requires transitive jakarta.validation;
-
-    requires transitive nl.jqno.equalsverifier;
+    requires java.logging;
     requires net.jodah.typetools;
+    requires nl.jqno.equalsverifier;
     requires transitive org.assertj.core;
-    requires transitive org.junit.jupiter.api;
-    requires transitive org.junit.jupiter.params;
-    requires transitive org.junit.platform.commons;
-    requires transitive org.mockito.junit.jupiter;
-    requires transitive podam;
+    requires org.junit.jupiter.api;
+    requires org.junit.jupiter.params;
+    requires org.mockito;
+    requires podam;
 
     exports com.github.jinahya.persistence.mapped.tests;
 }
