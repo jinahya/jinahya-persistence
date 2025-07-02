@@ -122,7 +122,6 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -144,6 +143,30 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
                 .apply(getSaturation())
                 .apply(getLightless())
                 .apply(getAlpha());
+    }
+
+    // https://www.w3.org/TR/css-color-3/#hsl-color
+    private int f(final int n) {
+        final int h = getHue();
+        final int s = getSaturation();
+        final int l = getLightless();
+        final int k = (n + h / 30) % 12;
+        final int a = s * Math.min(l, 1 - l);
+//        return l - a * Math.max(-1, Math.min(Math.min(k - 3, 9 - k), 1));
+        return l - a * Math.clamp(Math.min(k - 3, 9 - k), -1, 1);
+    }
+
+    // https://www.w3.org/TR/css-color-3/#hsl-color
+    public <T extends __MappedRgba<T>> T toRgb(final T rgb) {
+        Objects.requireNonNull(rgb, "rgb is null");
+        rgb.setRed(f(0));
+        rgb.setGreen(f(8));
+        rgb.setBlue(f(4));
+        return rgb;
+    }
+
+    public <T extends __MappedRgba<T>> T toRgba(final T rgba) {
+        return toRgb(rgba).alphaAsDouble(getAlpha());
     }
 
     // ------------------------------------------------------------------------------------------------------------- hue

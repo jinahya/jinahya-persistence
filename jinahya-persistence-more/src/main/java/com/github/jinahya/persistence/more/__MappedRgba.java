@@ -7,11 +7,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serial;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Objects;
@@ -35,6 +38,14 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     public static final int MIN_COMPONENT = 0x00;
 
     public static final int MAX_COMPONENT = 0xFF;
+
+    public static final String DECIMAL_MIN_COMPONENT_AS_DOUBLE = "0.0d";
+
+    public static final String DECIMAL_MAX_COMPONENT_AS_DOUBLE = "1.0d";
+
+    public static final double MIN_COMPONENT_AS_DOUBLE = new BigInteger(DECIMAL_MIN_COMPONENT_AS_DOUBLE).doubleValue();
+
+    public static final double MAX_COMPONENT_AS_DOUBLE = new BigInteger(DECIMAL_MAX_COMPONENT_AS_DOUBLE).doubleValue();
 
     // ---------------------------------------------------------------------------------------------------------- value_
     public static final String COLUMN_NAME_VALUE_ = "value_";
@@ -172,6 +183,25 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         return (SELF) this;
     }
 
+    @DecimalMax(DECIMAL_MAX_COMPONENT_AS_DOUBLE)
+    @DecimalMin(DECIMAL_MIN_COMPONENT_AS_DOUBLE)
+    public double getRedAsDoubleAsDouble() {
+        return ((double) getRed()) / MAX_COMPONENT;
+    }
+
+    public void setRedAsDouble(final double redAsDouble) {
+        if (redAsDouble < MIN_COMPONENT_AS_DOUBLE || MAX_COMPONENT_AS_DOUBLE < redAsDouble) {
+            throw new IllegalArgumentException("invalid redAsDouble: " + redAsDouble);
+        }
+        setRed((int) (redAsDouble * MAX_COMPONENT));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public SELF redAsDouble(final double redAsDouble) {
+        setRedAsDouble(redAsDouble);
+        return (SELF) this;
+    }
+
     // ----------------------------------------------------------------------------------------------------------- green
     @Max(MAX_COMPONENT)
     @Min(MIN_COMPONENT)
@@ -188,6 +218,25 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                 .orElseGet(
                         () -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()
                 )[COMPONENT_INDEX_G] = (byte) (green & 0xFF);
+    }
+
+    @DecimalMax(DECIMAL_MAX_COMPONENT_AS_DOUBLE)
+    @DecimalMin(DECIMAL_MIN_COMPONENT_AS_DOUBLE)
+    public double getGreenAsDoubleAsDouble() {
+        return ((double) getGreen()) / MAX_COMPONENT;
+    }
+
+    public void setGreenAsDouble(final double greenAsDouble) {
+        if (greenAsDouble < MIN_COMPONENT_AS_DOUBLE || MAX_COMPONENT_AS_DOUBLE < greenAsDouble) {
+            throw new IllegalArgumentException("invalid greenAsDouble: " + greenAsDouble);
+        }
+        setGreen((int) (greenAsDouble * MAX_COMPONENT));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public SELF greenAsDouble(final double greenAsDouble) {
+        setGreenAsDouble(greenAsDouble);
+        return (SELF) this;
     }
 
     // ------------------------------------------------------------------------------------------------------------ blue
@@ -208,6 +257,25 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                 )[COMPONENT_INDEX_B] = (byte) (blue & 0xFF);
     }
 
+    @DecimalMax(DECIMAL_MAX_COMPONENT_AS_DOUBLE)
+    @DecimalMin(DECIMAL_MIN_COMPONENT_AS_DOUBLE)
+    public double getBlueAsDoubleAsDouble() {
+        return ((double) getBlue()) / MAX_COMPONENT;
+    }
+
+    public void setBlueAsDouble(final double blueAsDouble) {
+        if (blueAsDouble < MIN_COMPONENT_AS_DOUBLE || MAX_COMPONENT_AS_DOUBLE < blueAsDouble) {
+            throw new IllegalArgumentException("invalid blueAsDouble: " + blueAsDouble);
+        }
+        setBlue((int) (blueAsDouble * MAX_COMPONENT));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public SELF blueAsDouble(final double blueAsDouble) {
+        setBlueAsDouble(blueAsDouble);
+        return (SELF) this;
+    }
+
     // ----------------------------------------------------------------------------------------------------------- alpha
     @Max(MAX_COMPONENT)
     @Min(MIN_COMPONENT)
@@ -224,6 +292,30 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                 .orElseGet(
                         () -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()
                 )[COMPONENT_INDEX_A] = (byte) (alpha & 0xFF);
+    }
+
+    public SELF alpha(final int alpha) {
+        setAlpha(alpha);
+        return (SELF) this;
+    }
+
+    @DecimalMax(DECIMAL_MAX_COMPONENT_AS_DOUBLE)
+    @DecimalMin(DECIMAL_MIN_COMPONENT_AS_DOUBLE)
+    public double getAlphaAsDoubleAsDouble() {
+        return ((double) getAlpha()) / MAX_COMPONENT;
+    }
+
+    public void setAlphaAsDouble(final double alphaAsDouble) {
+        if (alphaAsDouble < MIN_COMPONENT_AS_DOUBLE || MAX_COMPONENT_AS_DOUBLE < alphaAsDouble) {
+            throw new IllegalArgumentException("invalid alphaAsDouble: " + alphaAsDouble);
+        }
+        setAlpha((int) (alphaAsDouble * MAX_COMPONENT));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public SELF alphaAsDouble(final double alphaAsDouble) {
+        setAlphaAsDouble(alphaAsDouble);
+        return (SELF) this;
     }
 
     // ---------------------------------------------------------------------------------------------------------- value_
