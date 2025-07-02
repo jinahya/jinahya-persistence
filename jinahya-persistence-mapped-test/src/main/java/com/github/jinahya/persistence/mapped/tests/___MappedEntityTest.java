@@ -119,7 +119,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      * @see Mockito#spy(Object)
      */
     protected Optional<ID> newRandomizedIdInstanceSpy() {
-        return Mockito.spy(newRandomizedIdInstance());
+        return newRandomizedIdInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
