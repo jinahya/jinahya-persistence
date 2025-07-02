@@ -65,6 +65,7 @@ buildNumber.properties
 # End of https://www.toptal.com/developers/gitignore/api/maven
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 *.iml
 .idea
 !.idea/codeStyles
