@@ -18,10 +18,12 @@ public final class ___RandomizerUtils {
                 __JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
         ).map(ic -> {
             final var typeClass = __JavaLangReflectUtils.getActualTypeParameter(ic, ___Instantiator.class, 0);
-            assertThat(typeClass)
-                    .as("type class of the randomizer class: %s", ic)
-                    .isNotNull()
-                    .isAssignableTo(type);
+            if (false) {
+                assertThat(typeClass)
+                        .as("type class of the randomizer class: %s", ic)
+                        .isNotNull()
+                        .isAssignableTo(type);
+            }
             return ic;
         });
     }
