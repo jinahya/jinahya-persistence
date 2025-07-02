@@ -17,7 +17,10 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.DoubleFunction;
+import java.util.function.IntFunction;
 
 @Embeddable
 @MappedSuperclass
@@ -128,19 +131,34 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
                '}';
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+    public <R> R apply(
+            final IntFunction<
+                    ? extends IntFunction<
+                            ? extends IntFunction<
+                                    ? extends DoubleFunction<
+                                            ? extends R>>>> function) {
+        Objects.requireNonNull(function, "function is null");
+        return function
+                .apply(getHue())
+                .apply(getSaturation())
+                .apply(getLightless())
+                .apply(getAlpha());
+    }
+
     // ------------------------------------------------------------------------------------------------------------- hue
     @Max(MAX_HUE)
     @Min(MIN_HUE)
     @Transient
     public int getHue() {
-        return (int) (getHueAsDouble() * MAX_HUE);
+        return ((int) (getHueAsDouble() * MAX_HUE)) % MAX_HUE;
     }
 
     public void setHue(final int hue) {
         if (hue < MIN_HUE || hue > MAX_HUE) {
             throw new IllegalArgumentException("invalid hue: " + hue);
         }
-        setHueAsDouble(hue / (double) MAX_HUE);
+        setHueAsDouble((hue % MAX_HUE) / (double) MAX_HUE);
     }
 
     @DecimalMax(DECIMAL_MAX_HUE_AS_DOUBLE)
