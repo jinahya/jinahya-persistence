@@ -24,7 +24,7 @@ public abstract class __MappedEntityRandomizer<ENTITY extends __MappedEntity<ENT
      * Creates a new instance for randomizing the specified entity class.
      *
      * @param entityClass the entity class to be randomized.
-     * @param idClass     the type of {@link ID>} of the {@code entityClass}.
+     * @param idClass     the type of {@link ID} of the {@code entityClass}.
      * @see #entityClass
      * @see #idClass
      */

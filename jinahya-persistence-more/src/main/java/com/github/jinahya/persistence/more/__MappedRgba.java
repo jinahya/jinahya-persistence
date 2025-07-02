@@ -14,7 +14,9 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.IntFunction;
 
 /**
  * .
@@ -106,12 +108,40 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         return String.format("%1$s%2$02x", toHexadecimalNotation6(), getAlpha());
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Applies all components to the specified function, and returns the result.
+     * <p>
+     * {@snippet lang = "java":
+     * final var color = entity.apply(r -> g -> b -> a -> new java.awt.Color(r, g, b, a));
+     *}
+     *
+     * @param function the function
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     */
+    public <R> R apply(
+            final IntFunction<
+                    ? extends IntFunction<
+                            ? extends IntFunction<
+                                    ? extends IntFunction<
+                                            ? extends R>>>> function) {
+        Objects.requireNonNull(function, "function is null");
+        return function
+                .apply(getRed())
+                .apply(getGreen())
+                .apply(getBlue())
+                .apply(getAlpha());
+    }
+
     // ------------------------------------------------------------------------------------------------------------- red
 
     /**
-     * Returns the current value of this color's <span style="color:red">red</span> component.
+     * Returns the current value of this color's <span style="color:red; -webkit-text-stroke: .5px black;">red</span>
+     * component.
      *
-     * @return the current value of the <span style="color:red">red</span> component
+     * @return the current value of the <span style="color:red; -webkit-text-stroke: .5px black;">red</span> component
      */
     @Max(MAX_COMPONENT)
     @Min(MIN_COMPONENT)
@@ -124,16 +154,22 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     }
 
     /**
-     * Replaces the current value of this color's <span style="color:red">red</span> component with the specified
-     * value.
+     * Replaces the current value of this color's <span style="color:red; -webkit-text-stroke: .5px black;">red</span>
+     * component with the specified value.
      *
-     * @param red new value for the <span style="color:red">red</span> component.
+     * @param red new value for the <span style="color:red; -webkit-text-stroke: .5px black;">red</span> component.
      */
     public void setRed(final int red) {
         Optional.ofNullable(getValue_())
                 .orElseGet(
                         () -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()
                 )[COMPONENT_INDEX_R] = (byte) (red & 0xFF);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public SELF red(final int red) {
+        setRed(red);
+        return (SELF) this;
     }
 
     // ----------------------------------------------------------------------------------------------------------- green
@@ -191,17 +227,17 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     }
 
     // ---------------------------------------------------------------------------------------------------------- value_
-    public byte[] getValue_() {
+    protected byte[] getValue_() {
         return value_;
     }
 
-    public void setValue_(final byte[] value_) {
+    protected void setValue_(final byte[] value_) {
         this.value_ = Optional.ofNullable(value_)
                 .map(v -> v.length == COLUMN_LENGTH_VALUE_ ? v : Arrays.copyOf(v, COLUMN_LENGTH_VALUE_))
                 .orElse(null);
     }
 
-    public SELF value_(final byte[] value_) {
+    protected SELF value_(final byte[] value_) {
         setValue_(value_);
         return (SELF) this;
     }
