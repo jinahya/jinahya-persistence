@@ -9,7 +9,7 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __MappedEntityInitializerUtils {
+public final class __MappedEntityInstantiatorUtils {
 
     /**
      * Returns an initialized instance of the specified entity class.
@@ -22,11 +22,11 @@ public final class __MappedEntityInitializerUtils {
     public static <T extends __MappedEntity<T, ?>> Optional<T> newInitializedInstanceOf(
             @Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return ___InitializerUtils.newInitializedInstanceOf(entityClass);
+        return ___InstantiatorUtils.newInitializedInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __MappedEntityInitializerUtils() {
+    private __MappedEntityInstantiatorUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

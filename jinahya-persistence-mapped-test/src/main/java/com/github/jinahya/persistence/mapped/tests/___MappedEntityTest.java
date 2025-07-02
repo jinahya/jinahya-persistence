@@ -86,7 +86,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      * @return a new instance of the {@link #idClass}.
      */
     protected ID newIdInstance() {
-        return ___InitializerUtils.newInitializedInstanceOf(idClass)
+        return ___InstantiatorUtils.newInitializedInstanceOf(idClass)
                 .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(idClass));
     }
 

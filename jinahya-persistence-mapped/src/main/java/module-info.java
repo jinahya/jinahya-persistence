@@ -4,4 +4,5 @@ module com.github.jinahya.persistence.mapped {
     requires transitive jakarta.persistence;
 
     exports com.github.jinahya.persistence.mapped;
+    opens com.github.jinahya.persistence.mapped to nl.jqno.equalsverifier;
 }

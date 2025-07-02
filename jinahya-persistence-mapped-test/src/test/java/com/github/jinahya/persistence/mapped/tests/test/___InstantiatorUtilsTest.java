@@ -1,13 +1,13 @@
 package com.github.jinahya.persistence.mapped.tests.test;
 
-import com.github.jinahya.persistence.mapped.tests.___Initializer;
-import com.github.jinahya.persistence.mapped.tests.___InitializerUtils;
+import com.github.jinahya.persistence.mapped.tests.___Instantiator;
+import com.github.jinahya.persistence.mapped.tests.___InstantiatorUtils;
 import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ___InitializerUtilsTest {
+class ___InstantiatorUtilsTest {
 
     private static class Pojo {
 
@@ -23,9 +23,9 @@ class ___InitializerUtilsTest {
         private String name;
     }
 
-    private static class PojoInitializer extends ___Initializer<Pojo> {
+    private static class PojoInstantiator extends ___Instantiator<Pojo> {
 
-        PojoInitializer() {
+        PojoInstantiator() {
             super(Pojo.class);
         }
 
@@ -38,7 +38,7 @@ class ___InitializerUtilsTest {
 
     @Test
     void __() {
-        final var randomized = ___InitializerUtils.newInitializedInstanceOf(Pojo.class);
+        final var randomized = ___InstantiatorUtils.newInitializedInstanceOf(Pojo.class);
         assertThat(randomized).hasValueSatisfying(v -> {
             assertThat(v.name).isEqualTo("name");
         });

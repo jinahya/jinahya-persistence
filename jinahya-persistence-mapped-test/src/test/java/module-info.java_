@@ -1,7 +1,0 @@
-open module com.github.jinahya.persistence.mapped.tests.test {
-    requires com.github.jinahya.persistence.mapped;
-    requires com.github.jinahya.persistence.mapped.tests;
-    requires jakarta.validation;
-    requires static lombok;
-    requires org.junit.jupiter;
-}

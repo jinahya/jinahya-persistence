@@ -6,6 +6,8 @@ import com.github.jinahya.persistence.mapped.tests.util.__JavaLangUtils;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -14,7 +16,14 @@ public final class ___RandomizerUtils {
     static Optional<Class<?>> getRandomizerClassOf(final Class<?> type) {
         return Optional.ofNullable(
                 __JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
-        );
+        ).map(ic -> {
+            final var typeClass = __JavaLangReflectUtils.getActualTypeParameter(ic, ___Instantiator.class, 0);
+            assertThat(typeClass)
+                    .as("type class of the randomizer class: %s", ic)
+                    .isNotNull()
+                    .isAssignableTo(type);
+            return ic;
+        });
     }
 
     @SuppressWarnings({

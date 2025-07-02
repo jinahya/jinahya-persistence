@@ -8,9 +8,17 @@ import uk.co.jemos.podam.api.RandomDataProviderStrategyImpl;
 
 import java.util.Objects;
 
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 public abstract class ___Randomizer<T> {
 
-    protected ___Randomizer(final Class<T> type) {
+    /**
+     * Creates a new instance for initializing a randomized instance of the specified class.
+     *
+     * @param type the class to be randomized.
+     */
+    protected ___Randomizer(@Nonnull final Class<T> type) {
         super();
         this.type = Objects.requireNonNull(type, "type is null");
     }
@@ -23,32 +31,38 @@ public abstract class ___Randomizer<T> {
      * @return a new strategy.
      * @see RandomDataProviderStrategyImpl#RandomDataProviderStrategyImpl()
      */
-    protected DataProviderStrategy strategy() {
+    @Nonnull
+    protected DataProviderStrategy getDataProviderStrategy() {
         return new RandomDataProviderStrategyImpl();
     }
 
     /**
-     * Creates a new factory with a strategy from {@link #strategy()}.
+     * Creates a new factory with a strategy from {@link #getDataProviderStrategy()}.
      *
      * @return a new factory.
      * @see PodamFactoryImpl#PodamFactoryImpl(DataProviderStrategy)
      */
-    protected PodamFactory factory() {
-        return new PodamFactoryImpl(strategy());
+    @Nonnull
+    protected PodamFactory getPodamFactory() {
+        return new PodamFactoryImpl(getDataProviderStrategy());
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a randomized instance of the {@link #type}.
      *
-     * @return {@inheritDoc}
+     * @return a randomized instance of the {@link #type}.
      */
     @Nonnull
     public T get() {
-        return ___InitializerUtils.newInitializedInstanceOf(type)
-                .map(o -> factory().populatePojo(o))
-                .orElseGet(() -> factory().manufacturePojo(type));
+        return ___InstantiatorUtils.newInitializedInstanceOf(type)
+                .map(o -> getPodamFactory().populatePojo(o))
+                .orElseGet(() -> getPodamFactory().manufacturePojo(type));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The type to be randomized.
+     */
     protected final Class<T> type;
 }

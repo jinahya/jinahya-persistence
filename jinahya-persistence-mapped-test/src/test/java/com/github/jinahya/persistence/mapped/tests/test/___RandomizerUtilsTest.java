@@ -3,8 +3,7 @@ package com.github.jinahya.persistence.mapped.tests.test;
 import com.github.jinahya.persistence.mapped.tests.___Randomizer;
 import com.github.jinahya.persistence.mapped.tests.___RandomizerUtils;
 import jakarta.annotation.Nonnull;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.Test;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -13,10 +12,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ___RandomizerUtilsTest {
 
-    @Getter
-    @Setter
     private static class Pojo {
 
+        public String getName() {
+            return name;
+        }
+
+        public void setName(final String name) {
+            this.name = name;
+        }
+
+        @NotBlank
         private String name;
     }
 
@@ -26,14 +32,16 @@ class ___RandomizerUtilsTest {
             super(Pojo.class);
         }
 
+        @Nonnull
         @Override
-        protected DataProviderStrategy strategy() {
-            return super.strategy();
+        protected DataProviderStrategy getDataProviderStrategy() {
+            return super.getDataProviderStrategy();
         }
 
+        @Nonnull
         @Override
-        protected PodamFactory factory() {
-            return super.factory();
+        protected PodamFactory getPodamFactory() {
+            return super.getPodamFactory();
         }
 
         @Nonnull

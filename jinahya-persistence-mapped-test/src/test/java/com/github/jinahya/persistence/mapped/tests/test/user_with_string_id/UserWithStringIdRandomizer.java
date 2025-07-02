@@ -12,15 +12,16 @@ class UserWithStringIdRandomizer extends __MappedEntityRandomizer<UserWithString
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
+    @Nonnull
     @Override
-    protected DataProviderStrategy strategy() {
-        return super.strategy();
+    protected DataProviderStrategy getDataProviderStrategy() {
+        return super.getDataProviderStrategy();
     }
 
+    @Nonnull
     @Override
-    protected PodamFactory factory() {
-        return super.factory();
+    protected PodamFactory getPodamFactory() {
+        return super.getPodamFactory();
     }
 
     @Nonnull

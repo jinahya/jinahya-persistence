@@ -12,6 +12,8 @@
   <artifactId>jinahya-persistence-mapped-test</artifactId>
 
   <properties>
+    <jakarta.inject.version>2.0.1</jakarta.inject.version>
+    <jakarta.cdi.version>3.0.0</jakarta.cdi.version>
   </properties>
 
   <dependencies>
@@ -24,6 +26,28 @@
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.interceptor</groupId>
+      <artifactId>jakarta.interceptor-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.inject</groupId>
+      <artifactId>jakarta.inject-api</artifactId>
+      <version>${jakarta.inject.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
+      <version>${jakarta.cdi.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
