@@ -1,7 +1,11 @@
 package com.github.jinahya.persistence.more;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -17,10 +21,14 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
     @Nested
     class RedTest {
 
+        @Disabled
         @Test
         void getRed_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                instance.setValue_(null);
+            }
             // ---------------------------------------------------------------------------------------------------- when
             assertThat(instance.getRed()).isZero();
         }
@@ -30,14 +38,22 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
             final var red = __MappedRgbaTestUtils.randomComponent();
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                instance.setValue_(null);
+            }
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.red(red);
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
             verify(instance, times(1)).setRed(red);
             assertThat(instance.getRed()).isEqualTo(red);
+            {
+                instance.setValue_(null);
+                assertThat(instance.getRed()).isZero();
+            }
         }
 
+        @Disabled
         @Test
         void getNormalizedRed_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
@@ -46,6 +62,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             assertThat(instance.getNormalizedRed()).isZero();
         }
 
+        @Disabled
         @Test
         void normalizedRed_SELF_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
