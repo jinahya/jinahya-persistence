@@ -13,11 +13,13 @@ public abstract class __DatabaseConstants {
      * Constants for MySQL.
      *
      * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
-     * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/data-types.html">Data Types</a> (MySQL Reference Manual)
+     * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/data-types.html">Data Types</a> (MySQL Reference
+     *         Manual)
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/storage-requirements.html">Data Type Storage
-     * Requirements</a>
-     * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/integer-types.html">Integer Types (Exact Value) - INTEGER,
-     * INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
+     *         Requirements</a>
+     * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/integer-types.html">Integer Types (Exact Value) -
+     *         INTEGER,
+     *         INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
      */
     public abstract class __MySQLConstants {
 
@@ -155,7 +157,8 @@ public abstract class __DatabaseConstants {
     /**
      * Constants for PostgreSQL.
      *
-     * @see <a href="https://www.postgresql.org/docs/current/datatype.html">Data Types</a> (PostgreSQL Reference Manual)
+     * @see <a href="https://www.postgresql.org/docs/current/datatype.html">Data Types</a> (PostgreSQL Reference
+     *         Manual)
      * @see <a href="https://www.postgresql.org/docs/current/datatype-numeric.html">Numberic Types</a>
      */
     public abstract static class __PostgreSQLConstants {

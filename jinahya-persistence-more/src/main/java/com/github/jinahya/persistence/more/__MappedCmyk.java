@@ -88,7 +88,8 @@ public abstract class __MappedCmyk<SELF extends __MappedCmyk<SELF>> extends ___M
      * Returns the current value of this color's <span style="color:cyan; -webkit-text-stroke: .5px black;">cyan</span>
      * component.
      *
-     * @return the current value of the <span style="color:cyan; -webkit-text-stroke: .5px black;">cyan</span> component
+     * @return the current value of the <span style="color:cyan; -webkit-text-stroke: .5px black;">cyan</span>
+     *         component
      */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
@@ -122,7 +123,7 @@ public abstract class __MappedCmyk<SELF extends __MappedCmyk<SELF>> extends ___M
      * black;">magenta</span> component.
      *
      * @return the current value of the <span style="color:magenta; -webkit-text-stroke: .5px black;">magenta</span>
-     * component
+     *         component
      */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
@@ -157,7 +158,7 @@ public abstract class __MappedCmyk<SELF extends __MappedCmyk<SELF>> extends ___M
      * black;">yellow</span> component.
      *
      * @return the current value of the <span style="color:yellow; -webkit-text-stroke: .5px black;">yellow</span>
-     * component
+     *         component
      */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
@@ -224,7 +225,7 @@ public abstract class __MappedCmyk<SELF extends __MappedCmyk<SELF>> extends ___M
      * component.
      *
      * @return the current value of the <span style="color:grey; -webkit-text-stroke: .5px black;">alpha</span>
-     * component
+     *         component
      */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
