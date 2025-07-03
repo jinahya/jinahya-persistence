@@ -99,14 +99,17 @@ public final class ___MappedColorUtils {
     public static <R> R rgbToHsl(
             final double r, final double g, final double b,
             final IntFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> f) {
-        if (r < __MappedRgba.MIN_COMPONENT_AS_DOUBLE || r > __MappedRgba.MAX_COMPONENT_AS_DOUBLE) {
+        if (r < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
+            r > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid r: " + r);
         }
-        if (g < __MappedRgba.MIN_COMPONENT_AS_DOUBLE || g > __MappedRgba.MAX_COMPONENT_AS_DOUBLE) {
+        if (g < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
+            g > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid g: " + g);
         }
-        if (b < __MappedRgba.MIN_COMPONENT_AS_DOUBLE || b > __MappedRgba.MAX_COMPONENT_AS_DOUBLE) {
-            throw new IllegalArgumentException("invalid b: " + b);
+        if (b < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
+            b > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
+            throw new IllegalArgumentException("invalid g: " + b);
         }
         Objects.requireNonNull(f, "f is null");
         final var min = Math.min(r, Math.min(g, b));
