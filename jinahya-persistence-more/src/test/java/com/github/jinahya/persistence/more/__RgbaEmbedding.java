@@ -88,7 +88,7 @@ class __RgbaEmbedding implements Serializable {
     @Valid
     @NotNull
     @AttributeOverride(
-            name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
+            name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
             column = @Column(name = COLUMN_NAME_FOREGROUND, nullable = true, insertable = true, updatable = true)
     )
     @Embedded
@@ -98,7 +98,7 @@ class __RgbaEmbedding implements Serializable {
     @Valid
     @NotNull
     @AttributeOverride(
-            name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
+            name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
             column = @Column(name = COLUMN_NAME_BACKGROUND, nullable = true, insertable = true, updatable = true)
     )
     @Embedded

@@ -12,12 +12,12 @@ import jakarta.persistence.Table;
 import java.io.Serial;
 
 @AttributeOverride(
-        name = __MappedSingleTableColor.ATTRIBUTE_NAME_VALUE__,
+        name = __MappedSingleTableColor.ATTRIBUTE_NAME_VALUE___,
         column = @Column(
                 name = __Rgba.COLUMN_NAME_VALUE___,
                 nullable = true,
                 insertable = true,
-                length = ___MappedColor.COLUMN_LENGTH_VALUE__
+                length = ___MappedColor.COLUMN_LENGTH_VALUE___
         )
 )
 @DiscriminatorColumn

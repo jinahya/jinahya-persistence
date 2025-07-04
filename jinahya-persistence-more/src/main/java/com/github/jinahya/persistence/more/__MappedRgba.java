@@ -137,7 +137,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
      */
-    public <R> R apply(
+    public <R> R applyComponents(
             final IntFunction< // r
                     ? extends IntFunction< // g
                             ? extends IntFunction< // b
@@ -150,7 +150,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                 .apply(getAlpha());
     }
 
-    public <R> R applyNormalized(
+    public <R> R applyNormalizedComponents(
             final DoubleFunction< // r
                     ? extends DoubleFunction< // g
                             ? extends DoubleFunction< // b
@@ -168,7 +168,8 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getRed() {
-        return (int) (getNormalizedRed() * ___MappedColorConstants.RGB_MAX_COMPONENT);
+//        return (int) (getNormalizedRed() * ___MappedColorConstants.RGB_MAX_COMPONENT);
+        return (int) getComponent___(COMPONENT_INDEX_R);
     }
 
     public void setRed(final int red) {
@@ -176,7 +177,8 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             red > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid red: " + red);
         }
-        setNormalizedRed(red / (double) ___MappedColorConstants.RGB_MAX_COMPONENT);
+//        setNormalizedRed(red / (double) ___MappedColorConstants.RGB_MAX_COMPONENT);
+        setComponent___(COMPONENT_INDEX_R, red);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -188,7 +190,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedRed() {
-        return getComponent_(COMPONENT_INDEX_R);
+        return getRed() / (double) ___MappedColorConstants.RGB_MAX_COMPONENT;
     }
 
     public void setNormalizedRed(final double normalizedRed) {
@@ -196,7 +198,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedRed > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized red: " + normalizedRed);
         }
-        setComponent_(COMPONENT_INDEX_R, normalizedRed);
+        setRed((int) (normalizedRed * ___MappedColorConstants.RGB_MAX_COMPONENT));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -210,7 +212,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getGreen() {
-        return (int) (getNormalizedGreen() * ___MappedColorConstants.RGB_MAX_COMPONENT);
+        return (int) getComponent___(COMPONENT_INDEX_G);
     }
 
     public void setGreen(final int green) {
@@ -218,7 +220,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             green > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid green: " + green);
         }
-        setNormalizedGreen(green / (double) ___MappedColorConstants.RGB_MAX_COMPONENT);
+        setComponent___(COMPONENT_INDEX_G, green);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -230,7 +232,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedGreen() {
-        return getComponent_(COMPONENT_INDEX_G);
+        return getGreen() / (double) ___MappedColorConstants.RGB_MAX_COMPONENT;
     }
 
     public void setNormalizedGreen(final double normalizedGreen) {
@@ -238,7 +240,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedGreen > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized green: " + normalizedGreen);
         }
-        setComponent_(COMPONENT_INDEX_G, normalizedGreen);
+        setGreen((int) (normalizedGreen * ___MappedColorConstants.RGB_MAX_COMPONENT));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -252,7 +254,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getBlue() {
-        return (int) (getNormalizedBlue() * ___MappedColorConstants.RGB_MAX_COMPONENT);
+        return (int) getComponent___(COMPONENT_INDEX_B);
     }
 
     public void setBlue(final int blue) {
@@ -260,7 +262,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             blue > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid blue: " + blue);
         }
-        setNormalizedBlue(blue / (double) ___MappedColorConstants.RGB_MAX_COMPONENT);
+        setComponent___(COMPONENT_INDEX_B, blue);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -272,7 +274,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedBlue() {
-        return getComponent_(COMPONENT_INDEX_B);
+        return getBlue() / (double) ___MappedColorConstants.RGB_MAX_COMPONENT;
     }
 
     public void setNormalizedBlue(final double normalizedBlue) {
@@ -280,7 +282,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedBlue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized blue: " + normalizedBlue);
         }
-        setComponent_(COMPONENT_INDEX_B, normalizedBlue);
+        setBlue((int) (normalizedBlue * ___MappedColorConstants.RGB_MAX_COMPONENT));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -294,7 +296,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getAlpha() {
-        return (int) (getNormalizedAlpha() * ___MappedColorConstants.RGB_MAX_COMPONENT);
+        return (int) getComponent___(COMPONENT_INDEX_A);
     }
 
     public void setAlpha(final int alpha) {
@@ -302,7 +304,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             alpha > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid alpha: " + alpha);
         }
-        setNormalizedAlpha(alpha / (double) ___MappedColorConstants.RGB_MAX_COMPONENT);
+        setComponent___(COMPONENT_INDEX_A, alpha);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -314,7 +316,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedAlpha() {
-        return getComponent_(COMPONENT_INDEX_A);
+        return getAlpha() / (double) ___MappedColorConstants.RGB_MAX_COMPONENT;
     }
 
     public void setNormalizedAlpha(final double normalizedAlpha) {
@@ -322,7 +324,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        setComponent_(COMPONENT_INDEX_A, normalizedAlpha);
+        setAlpha((int) (normalizedAlpha * ___MappedColorConstants.RGB_MAX_COMPONENT));
     }
 
     @SuppressWarnings({"unchecked"})

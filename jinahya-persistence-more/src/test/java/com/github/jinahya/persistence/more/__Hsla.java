@@ -9,12 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @AttributeOverride(
-        name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
+        name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
         column = @Column(
                 name = __Hsla.COLUMN_NAME_VALUE___,
                 nullable = true,
                 insertable = true,
-                length = __MappedHsla.COLUMN_LENGTH_VALUE__
+                length = __MappedHsla.COLUMN_LENGTH_VALUE___
         )
 )
 @Entity
