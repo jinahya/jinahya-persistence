@@ -4,7 +4,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
@@ -28,7 +27,6 @@ import java.util.function.IntFunction;
  * @param <SELF> .
  * @see <a href="https://www.w3.org/TR/css-color-4/">CSS Color Module Level 4</a>
  */
-@Embeddable
 @MappedSuperclass
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
@@ -87,7 +85,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                '}';
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------- hexadecimalNotations
     @Nonnull
     public String toHexadecimalNotation(final int digits) {
         return switch (digits) {
@@ -120,6 +118,45 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    public <T extends __MappedHsla<T>> T toHsl(@Nonnull final T hsl) {
+        Objects.requireNonNull(hsl, "hsl is null");
+        return ___MappedColorUtils.rgbToHsl(
+                getNormalizedRed(),
+                getNormalizedGreen(),
+                getNormalizedBlue(),
+                h -> s -> l -> {
+                    return hsl.hue(h).normalizedSaturation(s).normalizedLightness(l);
+                }
+        );
+    }
+
+    @Nonnull
+    public <T extends __MappedHsla<T>> T toHsla(@Nonnull final T hsla) {
+        return toHsla(hsla).normalizedAlpha(getNormalizedAlpha());
+    }
+
+    @Nonnull
+    public <T extends __MappedHsla<T>> SELF fromHsl(@Nonnull final T hsl) {
+        Objects.requireNonNull(hsl, "hsl is null");
+        return ___MappedColorUtils.hslToRgb(
+                hsl.getHue(),
+                hsl.getNormalizedSaturation(),
+                hsl.getNormalizedLightness(),
+                r -> g -> b -> {
+                    return normalizedRed(r)
+                            .normalizedGreen(g)
+                            .normalizedBlue(b);
+                }
+        );
+    }
+
+    @Nonnull
+    public <T extends __MappedHsla<T>> SELF fromHsla(@Nonnull final T hsla) {
+        return fromHsl(hsla).normalizedAlpha(hsla.getNormalizedAlpha());
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Applies all components to the specified function, and returns the result.
@@ -138,8 +175,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                             ? extends IntFunction< // b
                                     ? extends IntFunction< // a
                                             ? extends R>>>> function) {
-        Objects.requireNonNull(function, "function is null");
-        return function
+        return Objects.requireNonNull(function, "function is null")
                 .apply(getRed())
                 .apply(getGreen())
                 .apply(getBlue())
@@ -152,8 +188,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                             ? extends DoubleFunction< // b
                                     ? extends DoubleFunction< // a
                                             ? extends R>>>> function) {
-        Objects.requireNonNull(function, "function is null");
-        return function
+        return Objects.requireNonNull(function, "function is null")
                 .apply(getNormalizedRed())
                 .apply(getNormalizedGreen())
                 .apply(getNormalizedBlue())
@@ -350,6 +385,15 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     protected SELF value_(final byte[] value_) {
         setValue_(value_);
         return (SELF) this;
+    }
+
+    /**
+     * Sets {@value #ATTRIBUTE_NAME_VALUE_} attribute to {@code null}.
+     *
+     * @return this object.
+     */
+    public SELF resetValue_() {
+        return value_(null);
     }
 
     // --------------------------------------------------------------------------------------------------------- buffer_

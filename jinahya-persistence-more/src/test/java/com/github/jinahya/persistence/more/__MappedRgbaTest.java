@@ -1,7 +1,6 @@
 package com.github.jinahya.persistence.more;
 
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +17,71 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         super(colorClass);
     }
 
+    @Test
+    void __() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var instance = newColorInstance();
+        final var red = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
+        final var green = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
+        final var blue = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
+        final var alpha = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
+        // -------------------------------------------------------------------------------------------------------- when
+        if (red != null) {
+            instance.setRed(red);
+        }
+        if (green != null) {
+            instance.setGreen(green);
+        }
+        if (blue != null) {
+            instance.setBlue(blue);
+        }
+        if (alpha != null) {
+            instance.setAlpha(alpha);
+        }
+        // -------------------------------------------------------------------------------------------------------- then
+        assertThat(instance.getRed()).isEqualTo(
+                red == null ? 0 : red
+        );
+        assertThat(instance.getGreen()).isEqualTo(
+                green == null ? 0 : green
+        );
+        assertThat(instance.getBlue()).isEqualTo(
+                blue == null ? 0 : blue
+        );
+        assertThat(instance.getAlpha()).isEqualTo(
+                alpha == null ? 0 : alpha
+        );
+        assertThat(instance.getNormalizedRed()).isEqualTo(
+                red == null ? .0d : red / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+        );
+        assertThat(instance.getNormalizedGreen()).isEqualTo(
+                green == null ? .0d : green / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+        );
+        assertThat(instance.getNormalizedBlue()).isEqualTo(
+                blue == null ? .0d : blue / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+        );
+        assertThat(instance.getNormalizedAlpha()).isEqualTo(
+                alpha == null ? .0d : alpha / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nested
+    class ValueTest {
+
+        @Test
+        void resetValue__() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstance();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.resetValue_();
+            // ---------------------------------------------------------------------------------------------------- then
+            assertThat(result).isSameAs(instance);
+            assertThat(instance.getValue_()).isNull();
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Nested
     class RedTest {
 

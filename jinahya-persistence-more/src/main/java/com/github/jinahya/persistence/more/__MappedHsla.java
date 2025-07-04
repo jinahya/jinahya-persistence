@@ -4,7 +4,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
@@ -22,7 +21,6 @@ import java.util.Optional;
 import java.util.function.DoubleFunction;
 import java.util.function.IntFunction;
 
-@Embeddable
 @MappedSuperclass
 public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___MappedColor<SELF> {
 
@@ -161,11 +159,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_HUE_NORMALIZED)
     @Transient
     public double getNormalizedHue() {
-        return ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_H,
-                COMPONENT_LENGTH
-        ).getDouble();
+        return buffer_().getDouble(VALUE_OFFSET_H);
     }
 
     public void setNormalizedHue(final double normalizedHue) {
@@ -173,11 +167,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedHue > ___MappedColorConstants.HSL_MAX_HUE_NORMALIZED) {
             throw new IllegalArgumentException("invalid hue: " + normalizedHue);
         }
-        ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_H,
-                COMPONENT_LENGTH
-        ).putDouble(normalizedHue);
+        buffer_().putDouble(VALUE_OFFSET_H, normalizedHue);
     }
 
     public SELF normalizedHue(final double normalizedHue) {
@@ -210,11 +200,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_SATURATION_NORMALIZED)
     @Transient
     public double getNormalizedSaturation() {
-        return ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_S,
-                COMPONENT_LENGTH
-        ).getDouble();
+        return buffer_().getDouble(VALUE_OFFSET_S);
     }
 
     public void setNormalizedSaturation(final double normalizedSaturation) {
@@ -222,11 +208,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedSaturation > ___MappedColorConstants.HSL_MAX_SATURATION_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized saturation: " + normalizedSaturation);
         }
-        ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_S,
-                COMPONENT_LENGTH
-        ).putDouble(normalizedSaturation);
+        buffer_().putDouble(VALUE_OFFSET_S, normalizedSaturation);
     }
 
     public SELF normalizedSaturation(final double normalizedSaturation) {
@@ -259,11 +241,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_LIGHTNESS_NORMALIZED)
     @Transient
     public double getNormalizedLightness() {
-        return ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_L,
-                COMPONENT_LENGTH
-        ).getDouble();
+        return buffer_().getDouble(VALUE_OFFSET_L);
     }
 
     public void setNormalizedLightness(final double normalizedLightness) {
@@ -271,11 +249,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedLightness > ___MappedColorConstants.HSL_MAX_LIGHTNESS_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized lightness: " + normalizedLightness);
         }
-        ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_L,
-                COMPONENT_LENGTH
-        ).putDouble(normalizedLightness);
+        buffer_().putDouble(VALUE_OFFSET_L, normalizedLightness);
     }
 
     public SELF normalizedLightness(final double normalizedLightness) {
@@ -296,11 +270,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_ALPHA_NORMALIZED)
     @Transient
     public double getNormalizedAlpha() {
-        return ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_A,
-                COMPONENT_LENGTH
-        ).getDouble();
+        return buffer_().getDouble(VALUE_OFFSET_A);
     }
 
     /**
@@ -315,11 +285,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedAlpha > ___MappedColorConstants.HSL_MAX_ALPHA_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        ByteBuffer.wrap(
-                Optional.ofNullable(getValue_()).orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_()),
-                VALUE_OFFSET_A,
-                COMPONENT_LENGTH
-        ).putDouble(normalizedAlpha);
+        buffer_().putDouble(VALUE_OFFSET_A, normalizedAlpha);
     }
 
     public SELF normalizedAlpha(final double normalizedAlpha) {
@@ -337,6 +303,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
         this.value_ = Optional.ofNullable(value_)
                 .map(v -> v.length == COLUMN_LENGTH_VALUE_ ? v : Arrays.copyOf(v, COLUMN_LENGTH_VALUE_))
                 .orElse(null);
+        buffer_ = null;
     }
 
     @Nonnull
@@ -345,10 +312,32 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
         return (SELF) this;
     }
 
+    /**
+     * Sets {@value #ATTRIBUTE_NAME_VALUE_} attribute to {@code null}.
+     *
+     * @return this object.
+     */
+    public SELF resetValue_() {
+        return value_(null);
+    }
+
+    // --------------------------------------------------------------------------------------------------------- buffer_
+    @Nonnull
+    private ByteBuffer buffer_() {
+        return Optional.ofNullable(buffer_)
+                .orElseGet(() -> ByteBuffer.wrap(
+                        Optional.ofNullable(value_)
+                                .orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_())
+                ));
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @Nullable
     @Size(min = SIZE_MIN_VALUE_, max = SIZE_MAX_VALUE_)
     @Basic(optional = true)
     @Column(name = "value_", nullable = true, insertable = true, updatable = true, length = COLUMN_LENGTH_VALUE_)
     private byte[] value_;
+
+    @Transient
+    private transient ByteBuffer buffer_;
 }
