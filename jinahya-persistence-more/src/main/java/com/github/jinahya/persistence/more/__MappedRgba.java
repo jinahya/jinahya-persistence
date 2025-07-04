@@ -1,23 +1,15 @@
 package com.github.jinahya.persistence.more;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 
 import java.io.Serial;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.DoubleFunction;
 import java.util.function.IntFunction;
 
@@ -34,33 +26,19 @@ import java.util.function.IntFunction;
         "java:S116", // Field names should comply with a naming convention
         "java:S117"  // Local variable and method parameter names should comply with a naming convention
 })
-public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___MappedColor<SELF> {
+public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___MappedColor2<SELF> {
 
     @Serial
     private static final long serialVersionUID = -5905278228337798453L;
 
-    // ---------------------------------------------------------------------------------------------------------- value_
-    public static final String COLUMN_NAME_VALUE_ = "value_";
-
-    public static final int COLUMN_LENGTH_VALUE_ = 32; // = r(8) + g(8) + b(8) + a(8)
-
-    public static final String ATTRIBUTE_NAME_VALUE_ = COLUMN_NAME_VALUE_;
-
-    public static final int SIZE_MIN_VALUE_ = COLUMN_LENGTH_VALUE_;
-
-    public static final int SIZE_MAX_VALUE_ = SIZE_MIN_VALUE_;
-
     // -----------------------------------------------------------------------------------------------------------------
-    protected static final int COMPONENT_LENGTH = Double.BYTES;
+    protected static final int COMPONENT_INDEX_R = 0;
 
-    // -----------------------------------------------------------------------------------------------------------------
-    protected static final int VALUE_OFFSET_R = 0;
+    protected static final int COMPONENT_INDEX_G = 1;
 
-    protected static final int VALUE_OFFSET_G = VALUE_OFFSET_R + COMPONENT_LENGTH;
+    protected static final int COMPONENT_INDEX_B = 2;
 
-    protected static final int VALUE_OFFSET_B = VALUE_OFFSET_G + COMPONENT_LENGTH;
-
-    protected static final int VALUE_OFFSET_A = VALUE_OFFSET_B + COMPONENT_LENGTH;
+    protected static final int COMPONENT_INDEX_A = 3;
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
@@ -74,16 +52,6 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-
-    @Override
-    public String toString() {
-        return super.toString() + '{' +
-               "value_=" +
-               Optional.ofNullable(value_)
-                       .map(v -> HexFormat.of().withPrefix("0x").formatHex(v))
-                       .orElse(null) +
-               '}';
-    }
 
     // -------------------------------------------------------------------------------------------- hexadecimalNotations
     @Nonnull
@@ -217,18 +185,18 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.RGB_DECIMAL_MAX_COMPONENT_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.RGB_DECIMAL_MIN_COMPONENT_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedRed() {
-        return buffer_().getDouble(VALUE_OFFSET_R);
+        return getComponent_(COMPONENT_INDEX_R);
     }
 
     public void setNormalizedRed(final double normalizedRed) {
-        if (normalizedRed < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
-            normalizedRed > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
+        if (normalizedRed < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedRed > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized red: " + normalizedRed);
         }
-        buffer_().putDouble(VALUE_OFFSET_R, normalizedRed);
+        setComponent_(COMPONENT_INDEX_R, normalizedRed);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -259,18 +227,18 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.RGB_DECIMAL_MAX_COMPONENT_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.RGB_DECIMAL_MIN_COMPONENT_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedGreen() {
-        return buffer_().getDouble(VALUE_OFFSET_G);
+        return getComponent_(COMPONENT_INDEX_G);
     }
 
     public void setNormalizedGreen(final double normalizedGreen) {
-        if (normalizedGreen < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
-            normalizedGreen > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
+        if (normalizedGreen < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedGreen > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized green: " + normalizedGreen);
         }
-        buffer_().putDouble(VALUE_OFFSET_G, normalizedGreen);
+        setComponent_(COMPONENT_INDEX_G, normalizedGreen);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -301,18 +269,18 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.RGB_DECIMAL_MAX_COMPONENT_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.RGB_DECIMAL_MIN_COMPONENT_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedBlue() {
-        return buffer_().getDouble(VALUE_OFFSET_B);
+        return getComponent_(COMPONENT_INDEX_B);
     }
 
     public void setNormalizedBlue(final double normalizedBlue) {
-        if (normalizedBlue < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
-            normalizedBlue > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
+        if (normalizedBlue < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedBlue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized blue: " + normalizedBlue);
         }
-        buffer_().putDouble(VALUE_OFFSET_B, normalizedBlue);
+        setComponent_(COMPONENT_INDEX_B, normalizedBlue);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -343,18 +311,18 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.RGB_DECIMAL_MAX_COMPONENT_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.RGB_DECIMAL_MIN_COMPONENT_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedAlpha() {
-        return buffer_().getDouble(VALUE_OFFSET_A);
+        return getComponent_(COMPONENT_INDEX_A);
     }
 
     public void setNormalizedAlpha(final double normalizedAlpha) {
-        if (normalizedAlpha < ___MappedColorConstants.RGB_MIN_COMPONENT_NORMALIZED ||
-            normalizedAlpha > ___MappedColorConstants.RGB_MAX_COMPONENT_NORMALIZED) {
+        if (normalizedAlpha < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        buffer_().putDouble(VALUE_OFFSET_A, normalizedAlpha);
+        setComponent_(COMPONENT_INDEX_A, normalizedAlpha);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -362,57 +330,4 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
         setNormalizedAlpha(normalizedAlpha);
         return (SELF) this;
     }
-
-    // ---------------------------------------------------------------------------------------------------------- value_
-
-    /**
-     * Returns current value of {@value #ATTRIBUTE_NAME_VALUE_} attribute.
-     *
-     * @return current value of {@value #ATTRIBUTE_NAME_VALUE_} attribute.
-     */
-    protected byte[] getValue_() {
-        return value_;
-    }
-
-    protected void setValue_(final byte[] value_) {
-        this.value_ = Optional.ofNullable(value_)
-                .map(v -> v.length == COLUMN_LENGTH_VALUE_ ? v : Arrays.copyOf(v, COLUMN_LENGTH_VALUE_))
-                .orElse(null);
-        buffer_ = null;
-    }
-
-    @SuppressWarnings({"unchecked"})
-    protected SELF value_(final byte[] value_) {
-        setValue_(value_);
-        return (SELF) this;
-    }
-
-    /**
-     * Sets {@value #ATTRIBUTE_NAME_VALUE_} attribute to {@code null}.
-     *
-     * @return this object.
-     */
-    public SELF resetValue_() {
-        return value_(null);
-    }
-
-    // --------------------------------------------------------------------------------------------------------- buffer_
-    @Nonnull
-    private ByteBuffer buffer_() {
-        return Optional.ofNullable(buffer_)
-                .orElseGet(() -> ByteBuffer.wrap(
-                        Optional.ofNullable(value_)
-                                .orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_())
-                ));
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Nullable
-    @Size(min = SIZE_MIN_VALUE_, max = SIZE_MAX_VALUE_)
-    @Basic(optional = true)
-    @Column(name = "value_", nullable = true, insertable = true, updatable = true)
-    private byte[] value_;
-
-    @Transient
-    private transient ByteBuffer buffer_;
 }

@@ -2,21 +2,16 @@ package com.github.jinahya.persistence.more;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-final class __MappedRgbaTestUtils {
+final class __MappedColorTestUtils {
 
-    // -----------------------------------------------------------------------------------------------------------------
-    static int randomComponent() {
-        return ThreadLocalRandom.current().nextInt(___MappedColorConstants.RGB_MAX_COMPONENT + 1);
-    }
-
-    static double randomNormalizedComponent() {
+    static double randomComponent() {
         return ThreadLocalRandom.current().nextDouble(
                 ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE
         );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __MappedRgbaTestUtils() {
+    private __MappedColorTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

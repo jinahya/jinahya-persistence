@@ -4,7 +4,7 @@ import org.mockito.Mockito;
 
 import java.util.Objects;
 
-abstract class ___MappedColorTest<T extends ___MappedColor<T>> {
+abstract class ___MappedColorTest<T extends ___MappedColor2<T>> {
 
     ___MappedColorTest(final Class<T> colorClass) {
         super();

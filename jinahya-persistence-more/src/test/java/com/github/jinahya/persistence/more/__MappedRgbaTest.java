@@ -74,10 +74,10 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.resetValue_();
+            final var result = instance.resetValue__();
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
-            assertThat(instance.getValue_()).isNull();
+            assertThat(instance.getValue__()).isNull();
         }
     }
 
@@ -91,7 +91,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
             if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue_(null);
+                instance.setValue__(null);
             }
             // ---------------------------------------------------------------------------------------------------- when
             assertThat(instance.getRed()).isZero();
@@ -103,7 +103,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             final var instance = newColorInstanceSpy();
             final var red = __MappedRgbaTestUtils.randomComponent();
             if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue_(null);
+                instance.setValue__(null);
             }
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.red(red);
@@ -112,7 +112,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             verify(instance, times(1)).setRed(red);
             assertThat(instance.getRed()).isEqualTo(red);
             {
-                instance.setValue_(null);
+                instance.setValue__(null);
                 assertThat(instance.getRed()).isZero();
             }
         }

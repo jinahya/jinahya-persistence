@@ -3,10 +3,8 @@ package com.github.jinahya.persistence.more;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static com.github.jinahya.persistence.more.__MappedHslaTestUtils.randomNormalizedHue;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

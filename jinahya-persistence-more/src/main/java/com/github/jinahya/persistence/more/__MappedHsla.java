@@ -1,54 +1,31 @@
 package com.github.jinahya.persistence.more;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 
 import java.io.Serial;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.HexFormat;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.DoubleFunction;
 import java.util.function.IntFunction;
 
 @MappedSuperclass
-public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___MappedColor<SELF> {
+public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___MappedColor2<SELF> {
 
     @Serial
     private static final long serialVersionUID = 4172783566899888893L;
 
-    // ---------------------------------------------------------------------------------------------------------- value_
-    public static final String COLUMN_NAME_VALUE_ = "value_";
-
-    public static final int COLUMN_LENGTH_VALUE_ = 32; // h(8) + s(8) + l(8) + a(8)
-
-    public static final String ATTRIBUTE_NAME_VALUE_ = "value_";
-
-    public static final int SIZE_MIN_VALUE_ = COLUMN_LENGTH_VALUE_;
-
-    public static final int SIZE_MAX_VALUE_ = SIZE_MIN_VALUE_;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    protected static final int COMPONENT_LENGTH = Double.BYTES;
-
     // -----------------------------------------------------------------------------------------------------------------
     private static final int VALUE_OFFSET_H = 0;
 
-    private static final int VALUE_OFFSET_S = VALUE_OFFSET_H + COMPONENT_LENGTH;
+    private static final int VALUE_OFFSET_S = 1;
 
-    private static final int VALUE_OFFSET_L = VALUE_OFFSET_S + COMPONENT_LENGTH;
+    private static final int VALUE_OFFSET_L = 2;
 
-    private static final int VALUE_OFFSET_A = VALUE_OFFSET_L + COMPONENT_LENGTH;
+    private static final int VALUE_OFFSET_A = 3;
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
@@ -62,13 +39,6 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-    @Override
-    public String toString() {
-        return super.toString() + '{' +
-               "value_=" +
-               Optional.ofNullable(getValue_()).map(v -> HexFormat.of().withPrefix("0x").formatHex(v)).orElse(null) +
-               '}';
-    }
 
     // -----------------------------------------------------------------------------------------------------------------
     public <R> R apply(
@@ -155,19 +125,19 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.HSL_DECIMAL_MAX_HUE_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_HUE_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedHue() {
-        return buffer_().getDouble(VALUE_OFFSET_H);
+        return getComponent_(VALUE_OFFSET_H);
     }
 
     public void setNormalizedHue(final double normalizedHue) {
-        if (normalizedHue < ___MappedColorConstants.HSL_MIN_HUE_NORMALIZED ||
-            normalizedHue > ___MappedColorConstants.HSL_MAX_HUE_NORMALIZED) {
+        if (normalizedHue < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedHue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid hue: " + normalizedHue);
         }
-        buffer_().putDouble(VALUE_OFFSET_H, normalizedHue);
+        setComponent_(VALUE_OFFSET_H, normalizedHue);
     }
 
     public SELF normalizedHue(final double normalizedHue) {
@@ -196,19 +166,19 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.HSL_DECIMAL_MAX_SATURATION_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_SATURATION_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedSaturation() {
-        return buffer_().getDouble(VALUE_OFFSET_S);
+        return getComponent_(VALUE_OFFSET_S);
     }
 
     public void setNormalizedSaturation(final double normalizedSaturation) {
-        if (normalizedSaturation < ___MappedColorConstants.HSL_MIN_SATURATION_NORMALIZED ||
-            normalizedSaturation > ___MappedColorConstants.HSL_MAX_SATURATION_NORMALIZED) {
+        if (normalizedSaturation < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedSaturation > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized saturation: " + normalizedSaturation);
         }
-        buffer_().putDouble(VALUE_OFFSET_S, normalizedSaturation);
+        setComponent_(VALUE_OFFSET_S, normalizedSaturation);
     }
 
     public SELF normalizedSaturation(final double normalizedSaturation) {
@@ -237,19 +207,19 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
         return (SELF) this;
     }
 
-    @DecimalMax(___MappedColorConstants.HSL_DECIMAL_MAX_LIGHTNESS_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_LIGHTNESS_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedLightness() {
-        return buffer_().getDouble(VALUE_OFFSET_L);
+        return getComponent_(VALUE_OFFSET_L);
     }
 
     public void setNormalizedLightness(final double normalizedLightness) {
-        if (normalizedLightness < ___MappedColorConstants.HSL_MIN_LIGHTNESS_NORMALIZED ||
-            normalizedLightness > ___MappedColorConstants.HSL_MAX_LIGHTNESS_NORMALIZED) {
+        if (normalizedLightness < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedLightness > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized lightness: " + normalizedLightness);
         }
-        buffer_().putDouble(VALUE_OFFSET_L, normalizedLightness);
+        setComponent_(VALUE_OFFSET_L, normalizedLightness);
     }
 
     public SELF normalizedLightness(final double normalizedLightness) {
@@ -266,11 +236,11 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
      * @return the current value of the <span style="color:grey; -webkit-text-stroke: .5px black;">alpha</span>
      *         component.
      */
-    @DecimalMax(___MappedColorConstants.HSL_DECIMAL_MAX_ALPHA_NORMALIZED)
-    @DecimalMin(___MappedColorConstants.HSL_DECIMAL_MIN_ALPHA_NORMALIZED)
+    @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedAlpha() {
-        return buffer_().getDouble(VALUE_OFFSET_A);
+        return getComponent_(VALUE_OFFSET_A);
     }
 
     /**
@@ -281,63 +251,15 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
      *                        black;">normalizedAlpha</span> component.
      */
     public void setNormalizedAlpha(final double normalizedAlpha) {
-        if (normalizedAlpha < ___MappedColorConstants.HSL_MIN_ALPHA_NORMALIZED ||
-            normalizedAlpha > ___MappedColorConstants.HSL_MAX_ALPHA_NORMALIZED) {
+        if (normalizedAlpha < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
+            normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        buffer_().putDouble(VALUE_OFFSET_A, normalizedAlpha);
+        setComponent_(VALUE_OFFSET_A, normalizedAlpha);
     }
 
     public SELF normalizedAlpha(final double normalizedAlpha) {
         setNormalizedAlpha(normalizedAlpha);
         return (SELF) this;
     }
-
-    // ---------------------------------------------------------------------------------------------------------- value_
-    @Nullable
-    protected byte[] getValue_() {
-        return value_;
-    }
-
-    protected void setValue_(@Nonnull final byte[] value_) {
-        this.value_ = Optional.ofNullable(value_)
-                .map(v -> v.length == COLUMN_LENGTH_VALUE_ ? v : Arrays.copyOf(v, COLUMN_LENGTH_VALUE_))
-                .orElse(null);
-        buffer_ = null;
-    }
-
-    @Nonnull
-    protected SELF value_(@Nullable final byte[] value_) {
-        setValue_(value_);
-        return (SELF) this;
-    }
-
-    /**
-     * Sets {@value #ATTRIBUTE_NAME_VALUE_} attribute to {@code null}.
-     *
-     * @return this object.
-     */
-    public SELF resetValue_() {
-        return value_(null);
-    }
-
-    // --------------------------------------------------------------------------------------------------------- buffer_
-    @Nonnull
-    private ByteBuffer buffer_() {
-        return Optional.ofNullable(buffer_)
-                .orElseGet(() -> ByteBuffer.wrap(
-                        Optional.ofNullable(value_)
-                                .orElseGet(() -> value_(new byte[COLUMN_LENGTH_VALUE_]).getValue_())
-                ));
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Nullable
-    @Size(min = SIZE_MIN_VALUE_, max = SIZE_MAX_VALUE_)
-    @Basic(optional = true)
-    @Column(name = "value_", nullable = true, insertable = true, updatable = true, length = COLUMN_LENGTH_VALUE_)
-    private byte[] value_;
-
-    @Transient
-    private transient ByteBuffer buffer_;
 }

@@ -9,33 +9,40 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = __RgbaEmbedded.TABLE_NAME)
-class __RgbaEmbedded implements Serializable {
+@Table(name = __RgbaEmbedding.TABLE_NAME)
+class __RgbaEmbedding implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6808370949221505641L;
 
     // -----------------------------------------------------------------------------------------------------------------
-    static final String TABLE_NAME = "__rgba_embedded";
+    static final String TABLE_NAME = "__rgba_embedding";
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------------------- id
     static final String COLUMN_NAME_ID = "id";
 
+    // ------------------------------------------------------------------------------------------------------ foreground
     static final String COLUMN_NAME_FOREGROUND = "foreground";
+
+    // ------------------------------------------------------------------------------------------------------ background
 
     static final String COLUMN_NAME_BACKGROUND = "background";
 
-    // -----------------------------------------------------------------------------------------------------------------
-    protected __RgbaEmbedded() {
+    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    protected __RgbaEmbedding() {
         super();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------------------- id
     public Long getId() {
         return id;
     }
@@ -44,29 +51,29 @@ class __RgbaEmbedded implements Serializable {
         this.id = id;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------ foreground
     @Nonnull
-    public __Rgba getForeground() {
+    public __EmbeddableRgba getForeground() {
         if (foreground == null) {
-            foreground = new __Rgba();
+            foreground = new __EmbeddableRgba();
         }
         return foreground;
     }
 
-    public void setForeground(final __Rgba foreground) {
+    public void setForeground(@Nonnull final __EmbeddableRgba foreground) {
         this.foreground = foreground;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------ background
     @Nonnull
-    public __Rgba getBackground() {
+    public __EmbeddableRgba getBackground() {
         if (foreground == null) {
-            foreground = new __Rgba();
+            foreground = new __EmbeddableRgba();
         }
         return background;
     }
 
-    public void setBackground(final __Rgba background) {
+    public void setBackground(@Nonnull final __EmbeddableRgba background) {
         this.background = background;
     }
 
@@ -77,17 +84,23 @@ class __RgbaEmbedded implements Serializable {
     private Long id;
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    @Valid
+    @NotNull
     @AttributeOverride(
-            name = __MappedRgba.ATTRIBUTE_NAME_VALUE_,
+            name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
             column = @Column(name = COLUMN_NAME_FOREGROUND, nullable = true, insertable = true, updatable = true)
     )
     @Embedded
-    private __Rgba foreground;
+    private __EmbeddableRgba foreground;
 
+    @Nonnull
+    @Valid
+    @NotNull
     @AttributeOverride(
-            name = __MappedRgba.ATTRIBUTE_NAME_VALUE_,
+            name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
             column = @Column(name = COLUMN_NAME_BACKGROUND, nullable = true, insertable = true, updatable = true)
     )
     @Embedded
-    private __Rgba background;
+    private __EmbeddableRgba background;
 }

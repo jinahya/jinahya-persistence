@@ -11,7 +11,7 @@ final class __MappedHslaTestUtils {
 
     static double randomNormalizedHue() {
         return ThreadLocalRandom.current().nextDouble(
-                ___MappedColorConstants.HSL_MAX_HUE_NORMALIZED + Double.MIN_VALUE);
+                ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ final class __MappedHslaTestUtils {
 
     static double randomNormalizedSaturation() {
         return ThreadLocalRandom.current().nextDouble(
-                ___MappedColorConstants.HSL_MAX_SATURATION_NORMALIZED + Double.MIN_VALUE);
+                ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ final class __MappedHslaTestUtils {
 
     static double randomNormalizedLightness() {
         return ThreadLocalRandom.current().nextDouble(
-                ___MappedColorConstants.HSL_MAX_LIGHTNESS_NORMALIZED + Double.MIN_VALUE);
+                ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ final class __MappedHslaTestUtils {
 
     static double randomNormalizedAlpha() {
         return ThreadLocalRandom.current().nextDouble(
-                ___MappedColorConstants.HSL_MAX_ALPHA_NORMALIZED + Double.MIN_VALUE);
+                ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

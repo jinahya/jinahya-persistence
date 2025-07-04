@@ -2,7 +2,6 @@ package com.github.jinahya.persistence.more;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,13 +10,16 @@ import jakarta.persistence.Table;
 
 import java.io.Serial;
 
-@Embeddable
-@AttributeOverride(
-        name = __MappedRgba.ATTRIBUTE_NAME_VALUE_,
-        column = @Column(name = __Rgba.COLUMN_NAME_VALUE__, nullable = true, insertable = true,
-                         length = __MappedRgba.COLUMN_LENGTH_VALUE_)
-)
 @Entity
+@AttributeOverride(
+        name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
+        column = @Column(
+                name = __Rgba.COLUMN_NAME_VALUE__,
+                nullable = true,
+                insertable = true,
+                length = __MappedRgba.COLUMN_LENGTH_VALUE__
+        )
+)
 @Table(name = __Rgba.TABLE_NAME)
 class __Rgba extends __MappedRgba<__Rgba> {
 
@@ -30,7 +32,7 @@ class __Rgba extends __MappedRgba<__Rgba> {
     // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_NAME_ID = "id";
 
-    static final String COLUMN_NAME_VALUE__ = "value__";
+    static final String COLUMN_NAME_VALUE__ = "value___";
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __Rgba() {
