@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -86,5 +87,47 @@ class ___MappedColorUtilsTest {
                     return null;
                 }
         );
+    }
+
+    @MethodSource({"hslAndRgb"})
+    @ParameterizedTest(name = "{index}: h: {0}, s: {1}, l: {2}, r: {3}, g: {4}, b: {5}")
+    void rgbToHslToRgb__(final int hue, final double saturation, final double lightness,
+                         final double red, final double green, final double blue) {
+        ___MappedColorUtils.rgbToHsl(
+                red, green, blue,
+                h -> s -> l -> {
+                    log.info("h: {}, s: {}, l: {}", h, s, l);
+                    assertThat(h).as("h").isEqualTo(hue);
+                    assertThat(s).as("s").isEqualTo(saturation);
+                    assertThat(l).as("l").isEqualTo(lightness);
+                    ___MappedColorUtils.hslToRgb(h, s, l, r -> g -> b -> {
+                        assertThat(r).isEqualTo(red);
+                        assertThat(g).isEqualTo(green);
+                        assertThat(b).isEqualTo(blue);
+                        return null;
+                    });
+                    return null;
+                }
+        );
+    }
+
+    @MethodSource({"hslAndRgb"})
+    @ParameterizedTest(name = "{index}: h: {0}, s: {1}, l: {2}, r: {3}, g: {4}, b: {5}")
+    void hslToRgbToHsl__(final int hue, final double saturation, final double lightness,
+                         final double red, final double green, final double blue) {
+        ___MappedColorUtils.hslToRgb(
+                hue, saturation, lightness, r -> g -> b -> {
+                    log.info("r: {}, g: {}, b:{}", r, g, b);
+                    assertThat(r).as("r").isEqualTo(red);
+                    assertThat(g).as("g").isEqualTo(green);
+                    assertThat(b).as("b").isEqualTo(blue);
+                    ___MappedColorUtils.rgbToHsl(r, g, b, h -> s -> l -> {
+                        assertThat(r).isEqualTo(red);
+                        assertThat(g).isEqualTo(green);
+                        assertThat(b).isEqualTo(blue);
+                        return null;
+                    });
+                    return null;
+                });
     }
 }

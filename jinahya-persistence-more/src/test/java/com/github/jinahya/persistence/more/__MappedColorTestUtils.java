@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 final class __MappedColorTestUtils {
 
-    static double randomComponent() {
+    static double randomNormalizedComponent() {
         return ThreadLocalRandom.current().nextDouble(
                 ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE
         );

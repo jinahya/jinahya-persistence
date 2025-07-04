@@ -59,7 +59,9 @@ abstract class __MappedHslaTest<T extends __MappedHsla<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
             verify(instance, times(1)).setNormalizedHue(normalizedHue);
-//            assertThat(instance.getNormalizedHue()).isEqualTo(normalizedHue);
+            if (false) {
+                assertThat(instance.getNormalizedHue()).isEqualTo(normalizedHue);
+            }
         }
     }
 

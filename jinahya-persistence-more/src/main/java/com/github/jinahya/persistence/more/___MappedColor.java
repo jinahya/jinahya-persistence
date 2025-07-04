@@ -159,40 +159,40 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
         return (SELF) this;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    @Nonnull
-    @Transient
-    public double[] getNormalizedComponents___() {
-        final var components = new double[NUMBER_OF_COMPONENTS___];
-        for (int i = 0; i < components.length; i++) {
-            components[i] = (float) getNormalizedComponent___(i);
-        }
-        return components;
-    }
-
-    protected void setNormalizedComponents___(@Nonnull final double[] normalizedComponents___) {
-        Objects.requireNonNull(normalizedComponents___, "normalizedComponents___ is null");
-        final var l = Math.min(NUMBER_OF_COMPONENTS___, normalizedComponents___.length);
-        for (int i = 0; i < l; i++) {
-            setNormalizedComponent___(i, normalizedComponents___[i]);
-        }
-//        for (int i = l; i < NUMBER_OF_COMPONENTS_; i++) {
-//            setComponent_(i, 0);
+//    // -----------------------------------------------------------------------------------------------------------------
+//    @Nonnull
+//    @Transient
+//    public double[] getNormalizedComponents___() {
+//        final var components = new double[NUMBER_OF_COMPONENTS___];
+//        for (int i = 0; i < components.length; i++) {
+//            components[i] = (float) getNormalizedComponent___(i);
 //        }
-    }
-
-    @Nonnull
-    public double[] getNormalizedComponents___(@Nonnull final double[] normalizedComponents_) {
-        Objects.requireNonNull(normalizedComponents_, "normalizedComponents_ is null");
-        System.arraycopy(
-                getNormalizedComponents___(),
-                0,
-                normalizedComponents_,
-                0,
-                normalizedComponents_.length
-        );
-        return normalizedComponents_;
-    }
+//        return components;
+//    }
+//
+//    protected void setNormalizedComponents___(@Nonnull final double[] normalizedComponents___) {
+//        Objects.requireNonNull(normalizedComponents___, "normalizedComponents___ is null");
+//        final var l = Math.min(NUMBER_OF_COMPONENTS___, normalizedComponents___.length);
+//        for (int i = 0; i < l; i++) {
+//            setNormalizedComponent___(i, normalizedComponents___[i]);
+//        }
+////        for (int i = l; i < NUMBER_OF_COMPONENTS_; i++) {
+////            setComponent_(i, 0);
+////        }
+//    }
+//
+//    @Nonnull
+//    public double[] getNormalizedComponents___(@Nonnull final double[] normalizedComponents_) {
+//        Objects.requireNonNull(normalizedComponents_, "normalizedComponents_ is null");
+//        System.arraycopy(
+//                getNormalizedComponents___(),
+//                0,
+//                normalizedComponents_,
+//                0,
+//                normalizedComponents_.length
+//        );
+//        return normalizedComponents_;
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nullable

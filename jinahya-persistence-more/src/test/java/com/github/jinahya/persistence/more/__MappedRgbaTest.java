@@ -133,7 +133,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void normalizedRed_SELF_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedRed = __MappedRgbaTestUtils.randomNormalizedComponent();
+            final var normalizedRed = __MappedColorTestUtils.randomNormalizedComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.normalizedRed(normalizedRed);
             // ---------------------------------------------------------------------------------------------------- then
@@ -180,7 +180,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void normalizedGreen_SELF_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedGreen = __MappedRgbaTestUtils.randomNormalizedComponent();
+            final var normalizedGreen = __MappedColorTestUtils.randomNormalizedComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.normalizedGreen(normalizedGreen);
             // ---------------------------------------------------------------------------------------------------- then
@@ -229,7 +229,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void normalizedBlue_SELF_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedBlue = __MappedRgbaTestUtils.randomNormalizedComponent();
+            final var normalizedBlue = __MappedColorTestUtils.randomNormalizedComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.normalizedBlue(normalizedBlue);
             // ---------------------------------------------------------------------------------------------------- then
@@ -278,7 +278,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void normalizedAlpha_SELF_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedAlpha = __MappedRgbaTestUtils.randomNormalizedComponent();
+            final var normalizedAlpha = __MappedColorTestUtils.randomNormalizedComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.normalizedAlpha(normalizedAlpha);
             // ---------------------------------------------------------------------------------------------------- then
