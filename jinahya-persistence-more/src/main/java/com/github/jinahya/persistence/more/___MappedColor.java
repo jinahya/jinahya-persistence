@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @MappedSuperclass
-public abstract class ___MappedColor2<SELF extends ___MappedColor2<SELF>> implements Serializable {
+public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 7382750834467647159L;
@@ -47,7 +47,7 @@ public abstract class ___MappedColor2<SELF extends ___MappedColor2<SELF>> implem
     /**
      * Creates a new instance.
      */
-    protected ___MappedColor2() {
+    protected ___MappedColor() {
         super();
     }
 

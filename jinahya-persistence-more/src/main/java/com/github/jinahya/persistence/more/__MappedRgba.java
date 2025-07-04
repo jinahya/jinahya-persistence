@@ -26,7 +26,7 @@ import java.util.function.IntFunction;
         "java:S116", // Field names should comply with a naming convention
         "java:S117"  // Local variable and method parameter names should comply with a naming convention
 })
-public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___MappedColor2<SELF> {
+public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___MappedColor<SELF> {
 
     @Serial
     private static final long serialVersionUID = -5905278228337798453L;

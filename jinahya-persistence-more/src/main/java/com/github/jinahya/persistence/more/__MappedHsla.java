@@ -13,7 +13,7 @@ import java.util.function.DoubleFunction;
 import java.util.function.IntFunction;
 
 @MappedSuperclass
-public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___MappedColor2<SELF> {
+public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___MappedColor<SELF> {
 
     @Serial
     private static final long serialVersionUID = 4172783566899888893L;

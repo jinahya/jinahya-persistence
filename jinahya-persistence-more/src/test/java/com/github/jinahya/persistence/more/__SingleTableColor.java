@@ -2,27 +2,35 @@ package com.github.jinahya.persistence.more;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.Serial;
+
 @AttributeOverride(
-        name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
+        name = __MappedSingleTableColor.ATTRIBUTE_NAME_VALUE__,
         column = @Column(
-                name = __Hsla.COLUMN_NAME_VALUE___,
+                name = __Rgba.COLUMN_NAME_VALUE___,
                 nullable = true,
                 insertable = true,
-                length = __MappedHsla.COLUMN_LENGTH_VALUE__
+                length = ___MappedColor.COLUMN_LENGTH_VALUE__
         )
 )
+@DiscriminatorColumn
 @Entity
-@Table(name = __Hsla.TABLE_NAME)
-class __Hsla extends __MappedHsla<__Hsla> {
+@Table(name = __SingleTableColor.TABLE_NAME)
+abstract class __SingleTableColor<SELF extends __SingleTableColor<SELF>>
+        extends __MappedSingleTableColor<SELF> {
+
+    @Serial
+    private static final long serialVersionUID = -1501644535823083731L;
 
     // -----------------------------------------------------------------------------------------------------------------
-    static final String TABLE_NAME = "__hsla";
+    static final String TABLE_NAME = "__single_table_color";
 
     // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_NAME_ID = "id";
@@ -30,7 +38,7 @@ class __Hsla extends __MappedHsla<__Hsla> {
     static final String COLUMN_NAME_VALUE___ = "value___";
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __Hsla() {
+    protected __SingleTableColor() {
         super();
     }
 

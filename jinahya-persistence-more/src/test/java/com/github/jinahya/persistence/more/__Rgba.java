@@ -10,16 +10,16 @@ import jakarta.persistence.Table;
 
 import java.io.Serial;
 
-@Entity
 @AttributeOverride(
         name = __MappedRgba.ATTRIBUTE_NAME_VALUE__,
         column = @Column(
-                name = __Rgba.COLUMN_NAME_VALUE__,
+                name = __Rgba.COLUMN_NAME_VALUE___,
                 nullable = true,
                 insertable = true,
                 length = __MappedRgba.COLUMN_LENGTH_VALUE__
         )
 )
+@Entity
 @Table(name = __Rgba.TABLE_NAME)
 class __Rgba extends __MappedRgba<__Rgba> {
 
@@ -32,7 +32,7 @@ class __Rgba extends __MappedRgba<__Rgba> {
     // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_NAME_ID = "id";
 
-    static final String COLUMN_NAME_VALUE__ = "value___";
+    static final String COLUMN_NAME_VALUE___ = "value___";
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __Rgba() {

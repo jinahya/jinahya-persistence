@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.beans.Introspector;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -27,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         "java:S5960" // Assertions should not be used in production code
 })
 public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
-        extends ___MappedEntityTest<ENTITY, ID> {
+        extends ___MappedTest<ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -40,7 +41,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      * @see #idClass
      */
     protected __MappedEntityTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
-        super(entityClass, idClass);
+        super(entityClass);
+        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+        this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
 
     // -------------------------------------------------------------------------------------------------------- toString
@@ -136,4 +139,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
             throw new RuntimeException(e);
         }
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected final Class<ENTITY> entityClass;
+
+    protected final Class<ID> idClass;
 }

@@ -18,8 +18,7 @@ import java.util.Optional;
 
 @Embeddable
 @MappedSuperclass
-public abstract class __MappedCmyk<SELF extends __MappedCmyk<SELF>> implements
-                                                                    java.io.Serializable {
+public abstract class __MappedCmyk<SELF extends __MappedCmyk<SELF>> implements java.io.Serializable {
 
     @Serial
     private static final long serialVersionUID = -5905278228337798453L;
