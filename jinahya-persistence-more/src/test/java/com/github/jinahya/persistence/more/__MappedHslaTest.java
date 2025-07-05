@@ -29,6 +29,25 @@ abstract class __MappedHslaTest<T extends __MappedHsla<T>> extends ___MappedColo
 
         @DisplayName("hue(hue)<SELF>")
         @Test
+        void setHue__() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var hue = __MappedHslaTestUtils.randomHue();
+            // ---------------------------------------------------------------------------------------------------- when
+            instance.setHue(hue);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setComponent___(
+                    __MappedHsla.COMPONENT_INDEX_H,
+                    hue
+            );
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedHsla.COMPONENT_INDEX_H,
+                    hue / (double) ___MappedColorConstants.HSL_MAX_HUE
+            );
+        }
+
+        @DisplayName("hue(hue)<SELF>")
+        @Test
         void hue__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();

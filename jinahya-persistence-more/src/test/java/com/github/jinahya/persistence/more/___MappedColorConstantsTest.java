@@ -39,25 +39,25 @@ class ___MappedColorConstantsTest {
         @Disabled("fails, obviously")
         @Test
         void saturation__() {
-            for (int s = ___MappedColorConstants.HSL_MIN_SATURATION;
-                 s <= ___MappedColorConstants.HSL_MAX_SATURATION; s++) {
-                final var saturation = s;
-                final var normalized = s / (double) ___MappedColorConstants.HSL_MAX_SATURATION;
-                final var actual = (int) (normalized * ___MappedColorConstants.HSL_MAX_SATURATION);
-                assertThat(actual).isEqualTo(saturation);
-            }
+//            for (int s = ___MappedColorConstants.HSL_MIN_SATURATION;
+//                 s <= ___MappedColorConstants.HSL_MAX_SATURATION; s++) {
+//                final var saturation = s;
+//                final var normalized = s / (double) ___MappedColorConstants.HSL_MAX_SATURATION;
+//                final var actual = (int) (normalized * ___MappedColorConstants.HSL_MAX_SATURATION);
+//                assertThat(actual).isEqualTo(saturation);
+//            }
         }
 
         @Disabled("fails, obviously")
         @Test
         void lightness__() {
-            for (int l = ___MappedColorConstants.HSL_MIN_LIGHTNESS;
-                 l <= ___MappedColorConstants.HSL_MAX_SATURATION; l++) {
-                final var lightness = l;
-                final var normalized = l / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS;
-                final var actual = (int) (normalized * ___MappedColorConstants.HSL_MAX_LIGHTNESS);
-                assertThat(actual).isEqualTo(lightness);
-            }
+//            for (int l = ___MappedColorConstants.HSL_MIN_LIGHTNESS;
+//                 l <= ___MappedColorConstants.HSL_MAX_SATURATION; l++) {
+//                final var lightness = l;
+//                final var normalized = l / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS;
+//                final var actual = (int) (normalized * ___MappedColorConstants.HSL_MAX_LIGHTNESS);
+//                assertThat(actual).isEqualTo(lightness);
+//            }
         }
     }
 }

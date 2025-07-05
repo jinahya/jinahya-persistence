@@ -11,9 +11,10 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.HexFormat;
-import java.util.Objects;
 import java.util.Optional;
 
 @MappedSuperclass
@@ -85,7 +86,8 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
         this.value___ = Optional.ofNullable(value__)
                 .map(v -> v.length == COLUMN_LENGTH_VALUE___ ? v : Arrays.copyOf(v, COLUMN_LENGTH_VALUE___))
                 .orElse(null);
-        buffer___ = null;
+        longBuffer___ = null;
+        doubleBuffer___ = null;
     }
 
     @SuppressWarnings({"unchecked"})
@@ -104,36 +106,51 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
         return value__(null);
     }
 
-    // --------------------------------------------------------------------------------------------------------- buffer_
+    // --------------------------------------------------------------------------------------------------- longBuffer___
     @Nonnull
-    ByteBuffer buffer_() {
-        return Optional.ofNullable(buffer___)
-                .orElseGet(() -> ByteBuffer.wrap(
-                        Optional.ofNullable(value___)
-                                .orElseGet(() -> value__(new byte[COLUMN_LENGTH_VALUE___]).getValue___())
-                ));
+    private LongBuffer longBuffer_() {
+        return Optional.ofNullable(longBuffer___).orElseGet(
+                () -> ByteBuffer
+                        .wrap(
+                                Optional.ofNullable(value___)
+                                        .orElseGet(() -> value__(new byte[COLUMN_LENGTH_VALUE___]).getValue___())
+                        )
+                        .asLongBuffer()
+        );
+    }
+
+    // ------------------------------------------------------------------------------------------------- doubleBuffer___
+    @Nonnull
+    private DoubleBuffer doubleBuffer_() {
+        return Optional.ofNullable(doubleBuffer___).orElseGet(
+                () -> ByteBuffer
+                        .wrap(
+                                Optional.ofNullable(value___)
+                                        .orElseGet(() -> value__(new byte[COLUMN_LENGTH_VALUE___]).getValue___())
+                        )
+                        .asDoubleBuffer()
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected int offset___(final int index___) {
+    private int requireValidIndex___(final int index___) {
         if (index___ < MIN_NORMALIZED_INDEX___ || index___ > MAX_NORMALIZED_INDEX___) {
             throw new IllegalArgumentException("invalid index___: " + index___);
         }
-        return index___ * COMPONENT_LENGTH___;
+        return index___;
     }
 
     protected long getComponent___(final int index___) {
-        return buffer_().getLong(offset___(index___));
+        return longBuffer_().get(
+                requireValidIndex___(index___)
+        );
     }
 
     protected void setComponent___(final int index___, final long component___) {
-        if (index___ < MIN_NORMALIZED_INDEX___ || index___ > MAX_NORMALIZED_INDEX___) {
-            throw new IllegalArgumentException("invalid index___: " + index___);
-        }
-        if (component___ < 0L) {
-            throw new IllegalArgumentException("negative component: " + component___);
-        }
-        buffer_().putLong(offset___(index___), component___);
+        longBuffer_().put(
+                requireValidIndex___(index___),
+                component___
+        );
     }
 
     protected SELF component___(final int index___, final long component___) {
@@ -143,19 +160,24 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
 
     // -----------------------------------------------------------------------------------------------------------------
     protected double getNormalizedComponent___(final int index___) {
-        return buffer_().getDouble(offset___(index___));
+        return doubleBuffer_().get(
+                requireValidIndex___(index___)
+        );
     }
 
-    protected void setNormalizedComponent___(final int index_, final double normalizedComponent___) {
+    protected void setNormalizedComponent___(final int index___, final double normalizedComponent___) {
         if (normalizedComponent___ < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedComponent___ > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized: " + normalizedComponent___);
         }
-        buffer_().putDouble(offset___(index_), normalizedComponent___);
+        doubleBuffer_().put(
+                requireValidIndex___(index___),
+                normalizedComponent___
+        );
     }
 
-    protected SELF normalizedComponents___(final int index_, final double normalizedComponents___) {
-        setNormalizedComponent___(index_, normalizedComponents___);
+    protected SELF normalizedComponents___(final int index___, final double normalizedComponents___) {
+        setNormalizedComponent___(index___, normalizedComponents___);
         return (SELF) this;
     }
 
@@ -176,9 +198,8 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
 //        for (int i = 0; i < l; i++) {
 //            setNormalizedComponent___(i, normalizedComponents___[i]);
 //        }
-////        for (int i = l; i < NUMBER_OF_COMPONENTS_; i++) {
-////            setComponent_(i, 0);
-////        }
+
+    /// /        for (int i = l; i < NUMBER_OF_COMPONENTS_; i++) { /            setComponent_(i, 0); /        }
 //    }
 //
 //    @Nonnull
@@ -202,5 +223,8 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
     private byte[] value___;
 
     @Transient
-    private transient ByteBuffer buffer___;
+    private transient LongBuffer longBuffer___;
+
+    @Transient
+    private transient DoubleBuffer doubleBuffer___;
 }

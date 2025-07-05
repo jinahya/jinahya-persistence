@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.more;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class __HslaTest extends __MappedHslaTest<__Hsla> {
@@ -20,6 +21,18 @@ class __HslaTest extends __MappedHslaTest<__Hsla> {
             final var hsla1 = __MappedHslaTestUtils.randomizedInstance(__Hsla::new);
             final var rgba = __MappedRgbaTestUtils.randomizedInstance(__Rgba::new);
             final var result = hsla1.toRgb(rgba);
+            {
+                ___MappedColorUtils.hslToRgb(
+                        hsla1.getHue(),
+                        hsla1.getNormalizedSaturation(),
+                        hsla1.getNormalizedLightness(),
+                        r -> g -> b -> {
+                            assertThat(r).isEqualTo(rgba.getNormalizedRed());
+                            assertThat(g).isEqualTo(rgba.getNormalizedGreen());
+                            assertThat(b).isEqualTo(rgba.getNormalizedBlue());
+                            return null;
+                        });
+            }
             assertThat(result).isSameAs(rgba);
             final var hsla2 = new __Hsla().fromRgb(rgba);
             assertThat(hsla2.getHue()).isEqualTo(hsla1.getHue());

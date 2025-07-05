@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.more;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,54 +15,6 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
     // -----------------------------------------------------------------------------------------------------------------
     __MappedRgbaTest(final Class<T> colorClass) {
         super(colorClass);
-    }
-
-    @Test
-    void __() {
-        // ------------------------------------------------------------------------------------------------------- given
-        final var instance = newColorInstance();
-        final var red = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
-        final var green = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
-        final var blue = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
-        final var alpha = ThreadLocalRandom.current().nextBoolean() ? null : __MappedRgbaTestUtils.randomComponent();
-        // -------------------------------------------------------------------------------------------------------- when
-        if (red != null) {
-            instance.setRed(red);
-        }
-        if (green != null) {
-            instance.setGreen(green);
-        }
-        if (blue != null) {
-            instance.setBlue(blue);
-        }
-        if (alpha != null) {
-            instance.setAlpha(alpha);
-        }
-        // -------------------------------------------------------------------------------------------------------- then
-        assertThat(instance.getRed()).isEqualTo(
-                red == null ? 0 : red
-        );
-        assertThat(instance.getGreen()).isEqualTo(
-                green == null ? 0 : green
-        );
-        assertThat(instance.getBlue()).isEqualTo(
-                blue == null ? 0 : blue
-        );
-        assertThat(instance.getAlpha()).isEqualTo(
-                alpha == null ? 0 : alpha
-        );
-        assertThat(instance.getNormalizedRed()).isEqualTo(
-                red == null ? .0d : red / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
-        assertThat(instance.getNormalizedGreen()).isEqualTo(
-                green == null ? .0d : green / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
-        assertThat(instance.getNormalizedBlue()).isEqualTo(
-                blue == null ? .0d : blue / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
-        assertThat(instance.getNormalizedAlpha()).isEqualTo(
-                alpha == null ? .0d : alpha / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -82,11 +33,11 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("red")
     @Nested
     class RedTest {
 
-        @Disabled
+        @DisplayName("newInstance.getRed()Zero")
         @Test
         void getRed_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
@@ -94,200 +45,367 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             if (ThreadLocalRandom.current().nextBoolean()) {
                 instance.setValue___(null);
             }
-            // ---------------------------------------------------------------------------------------------------- when
+            // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getRed()).isZero();
-        }
-
-        @DisplayName("read(read)<SELF>")
-        @Test
-        void red_SELF_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstanceSpy();
-            final var red = __MappedRgbaTestUtils.randomComponent();
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue___(null);
-            }
-            // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.red(red);
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setRed(red);
-            assertThat(instance.getRed()).isEqualTo(red);
-            {
-                instance.setValue___(null);
-                assertThat(instance.getRed()).isZero();
-            }
-        }
-
-        @Disabled
-        @Test
-        void getNormalizedRed_Zero_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
             assertThat(instance.getNormalizedRed()).isZero();
         }
 
-        @Disabled
+        @DisplayName("setRed(r) -> setNormalizedComponent(1, r / 255.0)")
         @Test
-        void normalizedRed_SELF_NewInstance() {
+        void setRed__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedRed = __MappedColorTestUtils.randomNormalizedComponent();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.normalizedRed(normalizedRed);
+            instance.setRed(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_R,
+                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+            );
+        }
+
+        @DisplayName("red(r)<SELF> -> setRed(r)")
+        @Test
+        void red_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.red(expected);
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setNormalizedRed(normalizedRed);
-            final var actual = instance.getNormalizedRed();
-            assertThat(actual).isEqualTo(normalizedRed);
+            verify(instance, times(1)).setRed(expected);
         }
     }
 
+    @DisplayName("normalizedRed")
+    @Nested
+    class NormalizedRedTest {
+
+        @Test
+        void _Zero_NewInstance() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstance();
+            // ----------------------------------------------------------------------------------------------- when/then
+            assertThat(instance.getNormalizedRed()).isZero();
+        }
+
+        @DisplayName("""
+                setNormalizedRed(r)
+                -> setComponent(1, r)
+                , setNormalizedComponent(1, r / 255.0)""")
+        @Test
+        void setNormalizedRed__() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            instance.setNormalizedRed(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_R,
+                    expected
+            );
+            verify(instance, times(1)).setComponent___(
+                    __MappedRgba.COMPONENT_INDEX_R,
+                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            );
+        }
+
+        @DisplayName("normalizedRed(r)<SELF> -> setNormalizedRed(r)")
+        @Test
+        void normalizedRed_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.normalizedRed(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            assertThat(result).isSameAs(instance);
+            verify(instance, times(1)).setNormalizedRed(expected);
+        }
+    }
+
+    @DisplayName("green")
     @Nested
     class GreenTest {
 
+        @DisplayName("newInstance.getGreen()Zero")
         @Test
         void getGreen_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                instance.setValue___(null);
+            }
+            // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getGreen()).isZero();
-        }
-
-        @Test
-        void green_SELF_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstanceSpy();
-            final var green = __MappedRgbaTestUtils.randomComponent();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.green(green);
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setGreen(green);
-            assertThat(instance.getGreen()).isEqualTo(green);
-        }
-
-        @Test
-        void getNormalizedGreen_Zero_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
             assertThat(instance.getNormalizedGreen()).isZero();
         }
 
+        @DisplayName("setGreen(r) -> setNormalizedComponent(1, r / 255.0)")
         @Test
-        void normalizedGreen_SELF_NewInstance() {
+        void setGreen__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedGreen = __MappedColorTestUtils.randomNormalizedComponent();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.normalizedGreen(normalizedGreen);
+            instance.setGreen(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_G,
+                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+            );
+        }
+
+        @DisplayName("green(r)<SELF> -> setGreen(r)")
+        @Test
+        void green_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.green(expected);
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setNormalizedGreen(normalizedGreen);
-            final var actual = instance.getNormalizedGreen();
-            if (false) {
-                assertThat(actual).isEqualTo(normalizedGreen);
-            }
+            verify(instance, times(1)).setGreen(expected);
         }
     }
 
+    @DisplayName("normalizedGreen")
+    @Nested
+    class NormalizedGreenTest {
+
+        @Test
+        void _Zero_NewInstance() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstance();
+            // ----------------------------------------------------------------------------------------------- when/then
+            assertThat(instance.getNormalizedGreen()).isZero();
+        }
+
+        @DisplayName("""
+                setNormalizedGreen(r)
+                -> setComponent(1, r)
+                , setNormalizedComponent(1, r / 255.0)""")
+        @Test
+        void setNormalizedGreen__() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            instance.setNormalizedGreen(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_G,
+                    expected
+            );
+            verify(instance, times(1)).setComponent___(
+                    __MappedRgba.COMPONENT_INDEX_G,
+                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            );
+        }
+
+        @DisplayName("normalizedGreen(r)<SELF> -> setNormalizedGreen(r)")
+        @Test
+        void normalizedGreen_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.normalizedGreen(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            assertThat(result).isSameAs(instance);
+            verify(instance, times(1)).setNormalizedGreen(expected);
+        }
+    }
+
+    @DisplayName("blue")
     @Nested
     class BlueTest {
 
+        @DisplayName("newInstance.getBlue()Zero")
         @Test
         void getBlue_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                instance.setValue___(null);
+            }
+            // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getBlue()).isZero();
-        }
-
-        @Test
-        void blue_SELF_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstanceSpy();
-            final var blue = __MappedRgbaTestUtils.randomComponent();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.blue(blue);
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setBlue(blue);
-            assertThat(instance.getBlue()).isEqualTo(blue);
-        }
-
-        @Test
-        void getNormalizedBlue_Zero_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
             assertThat(instance.getNormalizedBlue()).isZero();
         }
 
+        @DisplayName("setBlue(r) -> setNormalizedComponent(1, r / 255.0)")
         @Test
-        void normalizedBlue_SELF_NewInstance() {
+        void setBlue__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedBlue = __MappedColorTestUtils.randomNormalizedComponent();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.normalizedBlue(normalizedBlue);
+            instance.setBlue(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_B,
+                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+            );
+        }
+
+        @DisplayName("blue(r)<SELF> -> setBlue(r)")
+        @Test
+        void blue_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.blue(expected);
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setNormalizedBlue(normalizedBlue);
-            final var actual = instance.getNormalizedBlue();
-            if (false) {
-                assertThat(actual).isEqualTo(normalizedBlue);
-            }
+            verify(instance, times(1)).setBlue(expected);
         }
     }
 
+    @DisplayName("normalizedBlue")
+    @Nested
+    class NormalizedBlueTest {
+
+        @Test
+        void _Zero_NewInstance() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstance();
+            // ----------------------------------------------------------------------------------------------- when/then
+            assertThat(instance.getNormalizedBlue()).isZero();
+        }
+
+        @DisplayName("""
+                setNormalizedBlue(r)
+                -> setComponent(1, r)
+                , setNormalizedComponent(1, r / 255.0)""")
+        @Test
+        void setNormalizedBlue__() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            instance.setNormalizedBlue(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_B,
+                    expected
+            );
+            verify(instance, times(1)).setComponent___(
+                    __MappedRgba.COMPONENT_INDEX_B,
+                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            );
+        }
+
+        @DisplayName("normalizedBlue(r)<SELF> -> setNormalizedBlue(r)")
+        @Test
+        void normalizedBlue_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.normalizedBlue(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            assertThat(result).isSameAs(instance);
+            verify(instance, times(1)).setNormalizedBlue(expected);
+        }
+    }
+
+    @DisplayName("alpha")
     @Nested
     class AlphaTest {
 
+        @DisplayName("newInstance.getAlpha()Zero")
         @Test
         void getAlpha_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                instance.setValue___(null);
+            }
+            // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getAlpha()).isZero();
-        }
-
-        @Test
-        void alpha_SELF_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstanceSpy();
-            final var alpha = __MappedRgbaTestUtils.randomComponent();
-            // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.alpha(alpha);
-            // ---------------------------------------------------------------------------------------------------- then
-            assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setAlpha(alpha);
-            assertThat(instance.getAlpha()).isEqualTo(alpha);
-        }
-
-        @Test
-        void getNormalizedAlpha_Zero_NewInstance() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var instance = newColorInstance();
-            // ---------------------------------------------------------------------------------------------------- when
             assertThat(instance.getNormalizedAlpha()).isZero();
         }
 
+        @DisplayName("setAlpha(r) -> setNormalizedComponent(1, r / 255.0)")
         @Test
-        void normalizedAlpha_SELF_NewInstance() {
+        void setAlpha__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var normalizedAlpha = __MappedColorTestUtils.randomNormalizedComponent();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.normalizedAlpha(normalizedAlpha);
+            instance.setAlpha(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_A,
+                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+            );
+        }
+
+        @DisplayName("alpha(r)<SELF> -> setAlpha(r)")
+        @Test
+        void alpha_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedRgbaTestUtils.randomComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.alpha(expected);
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
-            verify(instance, times(1)).setNormalizedAlpha(normalizedAlpha);
-            final var actual = instance.getNormalizedAlpha();
-            if (false) {
-                assertThat(actual).isEqualTo(normalizedAlpha);
-            }
+            verify(instance, times(1)).setAlpha(expected);
+        }
+    }
+
+    @DisplayName("normalizedAlpha")
+    @Nested
+    class NormalizedAlphaTest {
+
+        @Test
+        void _Zero_NewInstance() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstance();
+            // ----------------------------------------------------------------------------------------------- when/then
+            assertThat(instance.getNormalizedAlpha()).isZero();
+        }
+
+        @DisplayName("""
+                setNormalizedAlpha(r)
+                -> setComponent(1, r)
+                , setNormalizedComponent(1, r / 255.0)""")
+        @Test
+        void setNormalizedAlpha__() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            instance.setNormalizedAlpha(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            verify(instance, times(1)).setNormalizedComponent___(
+                    __MappedRgba.COMPONENT_INDEX_A,
+                    expected
+            );
+            verify(instance, times(1)).setComponent___(
+                    __MappedRgba.COMPONENT_INDEX_A,
+                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            );
+        }
+
+        @DisplayName("normalizedAlpha(r)<SELF> -> setNormalizedAlpha(r)")
+        @Test
+        void normalizedAlpha_SELF_() {
+            // --------------------------------------------------------------------------------------------------- given
+            final var instance = newColorInstanceSpy();
+            final var expected = __MappedColorTestUtils.randomNormalizedComponent();
+            // ---------------------------------------------------------------------------------------------------- when
+            final var result = instance.normalizedAlpha(expected);
+            // ---------------------------------------------------------------------------------------------------- then
+            assertThat(result).isSameAs(instance);
+            verify(instance, times(1)).setNormalizedAlpha(expected);
         }
     }
 }

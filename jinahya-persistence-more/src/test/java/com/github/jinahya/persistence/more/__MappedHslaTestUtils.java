@@ -33,7 +33,7 @@ final class __MappedHslaTestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static int randomLightness() {
         return ThreadLocalRandom.current().nextInt(
-                ___MappedColorConstants.HSL_MAX_LIGHTNESS + 1
+               ___MappedColorConstants.HSL_MAX_LIGHTNESS + 1
         );
     }
 

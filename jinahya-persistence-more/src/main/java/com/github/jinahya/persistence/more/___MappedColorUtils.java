@@ -19,15 +19,18 @@ public final class ___MappedColorUtils {
      * <p>
      * {@snippet lang = "java":
      * hslToRgb(
-     *         h, s, l,
+     *         hue, s, l,
      *         r -> g -> b -> {
+     *             assert r >= 0 && r <= 1;
+     *             assert g >= 0 && g <= 1;
+     *             assert b >= 0 && b <= 1;
      *             return null;
      *         }
      * );
      *}
      *
-     * @param h   a value of {@code hue} between {@value ___MappedColorConstants#HSL_MIN_HUE} and
-     *            {@value ___MappedColorConstants#HSL_MAX_HUE}, both inclusive.
+     * @param hue a value of {@code hue} between {@value __MappedHsla#HSL_MIN_HUE} and
+     *            {@value __MappedHsla#HSL_MAX_HUE}, both inclusive.
      * @param s   a normalized value of {@code saturation} between
      *            {@value ___MappedColorConstants#MIN_COMPONENT_NORMALIZED} and
      *            {@value ___MappedColorConstants#MAX_COMPONENT_NORMALIZED}, both inclusive.
@@ -44,10 +47,10 @@ public final class ___MappedColorUtils {
      */
     // https://www.w3.org/TR/css-color-3/#hsl-color
     public static <R> R hslToRgb(
-            final int h, final double s, final double l,
+            final int hue, final double s, final double l,
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> f) {
-        if (h < ___MappedColorConstants.HSL_MIN_HUE || h > ___MappedColorConstants.HSL_MAX_HUE) {
-            throw new IllegalArgumentException("invalid h: " + h);
+        if (hue < ___MappedColorConstants.HSL_MIN_HUE || hue > ___MappedColorConstants.HSL_MAX_HUE) {
+            throw new IllegalArgumentException("invalid hue: " + hue);
         }
         if (s < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             s > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
@@ -58,10 +61,31 @@ public final class ___MappedColorUtils {
             throw new IllegalArgumentException("invalid l: " + l);
         }
         Objects.requireNonNull(f, "f is null");
-        final var f0 = hslToRgb__(0, h, s, l);
-        final var f8 = hslToRgb__(8, h, s, l);
-        final var f4 = hslToRgb__(4, h, s, l);
-        return f.apply(f0).apply(f8).apply(f4);
+        final var h = hue % ___MappedColorConstants.HSL_MAX_HUE;
+        final var r = hslToRgb__(0, hue, s, l);
+        final var g = hslToRgb__(8, hue, s, l);
+        final var b = hslToRgb__(4, hue, s, l);
+        return f.apply(r).apply(g).apply(b);
+    }
+
+    public static <R> R hslToRgb(
+            final int hue, final int saturation, final int lightness,
+            final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> f) {
+        if (hue < ___MappedColorConstants.HSL_MIN_HUE || hue > ___MappedColorConstants.HSL_MAX_HUE) {
+            throw new IllegalArgumentException("invalid hue: " + hue);
+        }
+        if (saturation < ___MappedColorConstants.HSL_MIN_SATURATION ||
+            saturation > ___MappedColorConstants.HSL_MAX_SATURATION) {
+            throw new IllegalArgumentException("invalid saturation: " + saturation);
+        }
+        if (lightness < ___MappedColorConstants.HSL_MIN_LIGHTNESS ||
+            lightness > ___MappedColorConstants.HSL_MAX_LIGHTNESS) {
+            throw new IllegalArgumentException("invalid lightness: " + lightness);
+        }
+        Objects.requireNonNull(f, "f is null");
+        final var s = saturation / (double) ___MappedColorConstants.HSL_MAX_SATURATION;
+        final var l = lightness / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS;
+        return hslToRgb(hue, s, l, f);
     }
 
     /**
@@ -135,6 +159,7 @@ public final class ___MappedColorUtils {
                 h += 360;
             }
         }
+        assert h >= ___MappedColorConstants.HSL_MIN_HUE && h <= ___MappedColorConstants.HSL_MAX_HUE;
         final double l;
         {
             l = (max + min) / 2;

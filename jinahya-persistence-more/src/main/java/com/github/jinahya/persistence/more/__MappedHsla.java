@@ -19,7 +19,8 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     private static final long serialVersionUID = 4172783566899888893L;
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static final int COMPONENT_INDEX_H = 0;
+    // -----------------------------------------------------------------------------------------------------------------
+    static final int COMPONENT_INDEX_H = 0;
 
     private static final int COMPONENT_INDEX_S = COMPONENT_INDEX_H + 1;
 
@@ -84,7 +85,10 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
                 getHue(),
                 getNormalizedSaturation(),
                 getNormalizedLightness(),
-                r -> g -> b -> rgb.normalizedRed(r).normalizedGreen(g).normalizedBlue(b)
+                r -> g -> b -> {
+//                    return rgb.normalizedRed(r).normalizedGreen(g).normalizedBlue(b);
+                    return null;
+                }
         );
     }
 
@@ -119,8 +123,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @Min(___MappedColorConstants.HSL_MIN_HUE)
     @Transient
     public int getHue() {
-//        return (int) (getNormalizedHue() * ___MappedColorConstants.HSL_MAX_HUE);
-        return (int) buffer_().getLong(BYTE_OFFSET_H);
+        return (int) getComponent___(COMPONENT_INDEX_H);
     }
 
     /**
@@ -133,8 +136,14 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
         if (hue < ___MappedColorConstants.HSL_MIN_HUE || hue > ___MappedColorConstants.HSL_MAX_HUE) {
             throw new IllegalArgumentException("invalid hue: " + hue);
         }
-//        setNormalizedHue(hue / (double) ___MappedColorConstants.HSL_MAX_HUE);
-        buffer_().putLong(BYTE_OFFSET_H, hue);
+        setComponent___(
+                COMPONENT_INDEX_H,
+                hue
+        );
+        setNormalizedComponent___(
+                COMPONENT_INDEX_H,
+                hue / (double) ___MappedColorConstants.HSL_MAX_HUE
+        );
     }
 
     public SELF hue(final int hue) {
@@ -146,8 +155,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedHue() {
-//        return getComponent_(COMPONENT_INDEX_H);
-        return getHue() / (double) ___MappedColorConstants.HSL_MAX_HUE;
+        return getNormalizedComponent___(COMPONENT_INDEX_H);
     }
 
     public void setNormalizedHue(final double normalizedHue) {
@@ -155,8 +163,10 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedHue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid hue: " + normalizedHue);
         }
-//        setComponent_(COMPONENT_INDEX_H, normalizedHue);
-        setHue((int) (normalizedHue * ___MappedColorConstants.HSL_MAX_HUE));
+        setNormalizedComponent___(
+                COMPONENT_INDEX_H,
+                normalizedHue
+        );
     }
 
     public SELF normalizedHue(final double normalizedHue) {
@@ -170,7 +180,8 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @Transient
     public int getSaturation() {
 //        return (int) (getNormalizedSaturation() * ___MappedColorConstants.HSL_MAX_SATURATION);
-        return (int) buffer_().getLong(BYTE_OFFSET_S);
+//        return (int) longBuffer_().getLong(BYTE_OFFSET_S);
+        return 0;
     }
 
     public void setSaturation(final int saturation) {
@@ -179,7 +190,8 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             throw new IllegalArgumentException("invalid saturation: " + saturation);
         }
 //        setNormalizedSaturation(saturation / (double) ___MappedColorConstants.HSL_MAX_SATURATION);
-        buffer_().putLong(BYTE_OFFSET_S, saturation);
+//        longBuffer_().putLong(BYTE_OFFSET_S, saturation);
+
     }
 
     public SELF saturation(final int saturation) {
@@ -215,7 +227,8 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @Transient
     public int getLightness() {
 //        return (int) (getNormalizedLightness() * ___MappedColorConstants.HSL_MAX_LIGHTNESS);
-        return (int) buffer_().getLong(BYTE_OFFSET_L);
+//        return (int) longBuffer_().getLong(BYTE_OFFSET_L);
+        return 0;
     }
 
     public void setLightness(final int lightness) {
@@ -224,7 +237,8 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             throw new IllegalArgumentException("invalid lightness: " + lightness);
         }
 //        setNormalizedLightness(lightness / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS);
-        buffer_().putLong(BYTE_OFFSET_L, lightness);
+//        longBuffer_().putLong(BYTE_OFFSET_L, lightness);
+
     }
 
     public SELF lightness(final int lightness) {
@@ -261,7 +275,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
      * component.
      *
      * @return the current value of the <span style="color:grey; -webkit-text-stroke: .5px black;">alpha</span>
-     *         component.
+     * component.
      */
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
