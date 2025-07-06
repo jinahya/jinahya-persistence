@@ -11,23 +11,6 @@ public final class ___MappedColorConstants {
 
     public static final double MAX_COMPONENT_NORMALIZED = 1.0d;
 
-    // ------------------------------------------------------------------------------------------------------------- HSL
-    public static final int HSL_MIN_HUE = 0;
-
-    public static final int HSL_MAX_HUE = 360;
-
-    public static final int HSL_MIN_SATURATION = 0;
-
-    public static final int HSL_MAX_SATURATION = 100;
-
-    public static final int HSL_MIN_LIGHTNESS = 0;
-
-    public static final int HSL_MAX_LIGHTNESS = 100;
-
-    public static final int HSL_MIN_ALPHA = 0;
-
-    public static final int HSL_MAX_ALPHA = 100;
-
     // ------------------------------------------------------------------------------------------------------------- RGB
     public static final int RGB_MIN_COMPONENT = 0;
 

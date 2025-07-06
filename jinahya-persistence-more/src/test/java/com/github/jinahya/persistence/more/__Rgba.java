@@ -11,17 +11,17 @@ import jakarta.persistence.Table;
 import java.io.Serial;
 
 @AttributeOverride(
-        name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
+        name = __MappedRgb.ATTRIBUTE_NAME_VALUE_,
         column = @Column(
                 name = __Rgba.COLUMN_NAME_VALUE___,
                 nullable = true,
                 insertable = true,
-                length = __MappedRgba.COLUMN_LENGTH_VALUE___
+                length = __MappedRgb.COLUMN_LENGTH_VALUE_
         )
 )
 @Entity
 @Table(name = __Rgba.TABLE_NAME)
-class __Rgba extends __MappedRgba<__Rgba> {
+class __Rgba extends __MappedRgb<__Rgba> {
 
     @Serial
     private static final long serialVersionUID = 6264342671001204962L;

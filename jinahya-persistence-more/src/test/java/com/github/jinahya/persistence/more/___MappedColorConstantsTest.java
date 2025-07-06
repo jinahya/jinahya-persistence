@@ -28,10 +28,10 @@ class ___MappedColorConstantsTest {
         @Disabled("fails, obviously")
         @Test
         void hue__() {
-            for (int h = ___MappedColorConstants.HSL_MIN_HUE; h <= ___MappedColorConstants.HSL_MAX_HUE; h++) {
+            for (int h = __MappedHsl.MIN_HUE; h <= __MappedHsl.MAX_HUE; h++) {
                 final var hue = h;
-                final var normalized = h / (double) ___MappedColorConstants.HSL_MAX_HUE;
-                final var actual = (int) (normalized * ___MappedColorConstants.HSL_MAX_HUE);
+                final var normalized = h / (double) __MappedHsl.MAX_HUE;
+                final var actual = (int) (normalized * __MappedHsl.MAX_HUE);
                 assertThat(actual).isEqualTo(h);
             }
         }

@@ -26,7 +26,7 @@ import java.util.function.IntFunction;
         "java:S116", // Field names should comply with a naming convention
         "java:S117"  // Local variable and method parameter names should comply with a naming convention
 })
-public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___MappedColor<SELF> {
+public abstract class __MappedRgb<SELF extends __MappedRgb<SELF>> extends ___MappedColor<SELF> {
 
     @Serial
     private static final long serialVersionUID = -5905278228337798453L;
@@ -47,7 +47,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     /**
      * Creates a new instance.
      */
-    protected __MappedRgba() {
+    protected __MappedRgb() {
         super();
     }
 
@@ -87,7 +87,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
-    public <T extends __MappedHsla<T>> T toHsl(@Nonnull final T hsl) {
+    public <T extends __MappedHsl<T>> T toHsl(@Nonnull final T hsl) {
         Objects.requireNonNull(hsl, "hsl is null");
         return ___MappedColorUtils.rgbToHsl(
                 getNormalizedRed(),
@@ -100,12 +100,12 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     }
 
     @Nonnull
-    public <T extends __MappedHsla<T>> T toHsla(@Nonnull final T hsla) {
+    public <T extends __MappedHsl<T>> T toHsla(@Nonnull final T hsla) {
         return toHsla(hsla).normalizedAlpha(getNormalizedAlpha());
     }
 
     @Nonnull
-    public <T extends __MappedHsla<T>> SELF fromHsl(@Nonnull final T hsl) {
+    public <T extends __MappedHsl<T>> SELF fromHsl(@Nonnull final T hsl) {
         Objects.requireNonNull(hsl, "hsl is null");
         return ___MappedColorUtils.hslToRgb(
                 hsl.getHue(),
@@ -121,7 +121,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     }
 
     @Nonnull
-    public <T extends __MappedHsla<T>> SELF fromHsla(@Nonnull final T hsla) {
+    public <T extends __MappedHsl<T>> SELF fromHsla(@Nonnull final T hsla) {
         return fromHsl(hsla).normalizedAlpha(hsla.getNormalizedAlpha());
     }
 
@@ -169,7 +169,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getRed() {
-        return (int) getComponent___(COMPONENT_INDEX_R);
+        return (int) getComponent(COMPONENT_INDEX_R);
     }
 
     public void setRed(final int red) {
@@ -177,7 +177,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             red > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid red: " + red);
         }
-        setComponent___(
+        setComponent(
                 COMPONENT_INDEX_R,
                 red
         );
@@ -214,7 +214,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getGreen() {
-        return (int) getComponent___(COMPONENT_INDEX_G);
+        return (int) getComponent(COMPONENT_INDEX_G);
     }
 
     public void setGreen(final int green) {
@@ -222,7 +222,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             green > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid green: " + green);
         }
-        setComponent___(COMPONENT_INDEX_G, green);
+        setComponent(COMPONENT_INDEX_G, green);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -256,7 +256,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getBlue() {
-        return (int) getComponent___(COMPONENT_INDEX_B);
+        return (int) getComponent(COMPONENT_INDEX_B);
     }
 
     public void setBlue(final int blue) {
@@ -264,7 +264,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             blue > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid blue: " + blue);
         }
-        setComponent___(
+        setComponent(
                 COMPONENT_INDEX_B,
                 blue
         );
@@ -303,7 +303,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @Min(___MappedColorConstants.RGB_MIN_COMPONENT)
     @Transient
     public int getAlpha() {
-        return (int) getComponent___(COMPONENT_INDEX_A);
+        return (int) getComponent(COMPONENT_INDEX_A);
     }
 
     public void setAlpha(final int alpha) {
@@ -311,7 +311,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             alpha > ___MappedColorConstants.RGB_MAX_COMPONENT) {
             throw new IllegalArgumentException("invalid alpha: " + alpha);
         }
-        setComponent___(COMPONENT_INDEX_A, alpha);
+        setComponent(COMPONENT_INDEX_A, alpha);
     }
 
     @SuppressWarnings({"unchecked"})

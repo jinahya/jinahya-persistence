@@ -16,8 +16,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = __RgbaEmbedding.TABLE_NAME)
-class __RgbaEmbedding implements Serializable {
+@Table(name = __RgbEmbedding.TABLE_NAME)
+class __RgbEmbedding implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6808370949221505641L;
@@ -38,7 +38,7 @@ class __RgbaEmbedding implements Serializable {
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __RgbaEmbedding() {
+    protected __RgbEmbedding() {
         super();
     }
 
@@ -53,27 +53,27 @@ class __RgbaEmbedding implements Serializable {
 
     // ------------------------------------------------------------------------------------------------------ foreground
     @Nonnull
-    public __EmbeddableRgba getForeground() {
+    public __EmbeddableRgb getForeground() {
         if (foreground == null) {
-            foreground = new __EmbeddableRgba();
+            foreground = new __EmbeddableRgb();
         }
         return foreground;
     }
 
-    public void setForeground(@Nonnull final __EmbeddableRgba foreground) {
+    public void setForeground(@Nonnull final __EmbeddableRgb foreground) {
         this.foreground = foreground;
     }
 
     // ------------------------------------------------------------------------------------------------------ background
     @Nonnull
-    public __EmbeddableRgba getBackground() {
+    public __EmbeddableRgb getBackground() {
         if (foreground == null) {
-            foreground = new __EmbeddableRgba();
+            foreground = new __EmbeddableRgb();
         }
         return background;
     }
 
-    public void setBackground(@Nonnull final __EmbeddableRgba background) {
+    public void setBackground(@Nonnull final __EmbeddableRgb background) {
         this.background = background;
     }
 
@@ -88,19 +88,19 @@ class __RgbaEmbedding implements Serializable {
     @Valid
     @NotNull
     @AttributeOverride(
-            name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
+            name = __MappedRgb.ATTRIBUTE_NAME_VALUE_,
             column = @Column(name = COLUMN_NAME_FOREGROUND, nullable = true, insertable = true, updatable = true)
     )
     @Embedded
-    private __EmbeddableRgba foreground;
+    private __EmbeddableRgb foreground;
 
     @Nonnull
     @Valid
     @NotNull
     @AttributeOverride(
-            name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
+            name = __MappedRgb.ATTRIBUTE_NAME_VALUE_,
             column = @Column(name = COLUMN_NAME_BACKGROUND, nullable = true, insertable = true, updatable = true)
     )
     @Embedded
-    private __EmbeddableRgba background;
+    private __EmbeddableRgb background;
 }

@@ -5,13 +5,13 @@ import jakarta.persistence.Embeddable;
 import java.io.Serial;
 
 @Embeddable
-class __EmbeddableRgba extends __MappedRgba<__EmbeddableRgba> {
+class __EmbeddableRgb extends __MappedRgb<__EmbeddableRgb> {
 
     @Serial
     private static final long serialVersionUID = -8852209211143307505L;
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __EmbeddableRgba() {
+    protected __EmbeddableRgb() {
         super();
     }
 }

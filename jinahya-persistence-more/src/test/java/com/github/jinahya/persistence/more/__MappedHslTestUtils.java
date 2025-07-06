@@ -8,18 +8,18 @@ final class __MappedHslTestUtils {
     // ------------------------------------------------------------------------------------------------------------- hue
     static int randomHue() {
         return ThreadLocalRandom.current().nextInt(
-                ___MappedColorConstants.HSL_MAX_HUE + 1
+                __MappedHsl.MAX_HUE + 1
         );
     }
 
     static double randomNormalizedHue() {
-        return randomHue() / (double) ___MappedColorConstants.HSL_MAX_HUE;
+        return randomHue() / (double) __MappedHsl.MAX_HUE;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     static int randomSaturation() {
         return ThreadLocalRandom.current().nextInt(
-                ___MappedColorConstants.HSL_MAX_SATURATION + 1
+                __MappedHsl.MAX_SATURATION + 1
         );
     }
 
@@ -31,7 +31,7 @@ final class __MappedHslTestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static int randomLightness() {
         return ThreadLocalRandom.current().nextInt(
-                ___MappedColorConstants.HSL_MAX_LIGHTNESS + 1
+                __MappedHsl.MAX_LIGHTNESS + 1
         );
     }
 
@@ -44,16 +44,17 @@ final class __MappedHslTestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static int randomAlpha() {
         return ThreadLocalRandom.current().nextInt(
-                ___MappedColorConstants.HSL_MIN_ALPHA, ___MappedColorConstants.HSL_MAX_ALPHA + 1
+                __MappedHsl.MIN_ALPHA,
+                __MappedHsl.MAX_ALPHA + 1
         );
     }
 
     static double randomNormalizedAlpha() {
-        return randomAlpha() / (double) ___MappedColorConstants.HSL_MAX_ALPHA;
+        return randomAlpha() / (double) __MappedHsl.MAX_ALPHA;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <T extends __MappedHsla<T>> T randomizedInstance(final Supplier<? extends T> instantiator) {
+    static <T extends __MappedHsl<T>> T randomizedInstance(final Supplier<? extends T> instantiator) {
         final var instance = instantiator.get();
         instance.setHue(randomHue());
         instance.setSaturation(randomSaturation());

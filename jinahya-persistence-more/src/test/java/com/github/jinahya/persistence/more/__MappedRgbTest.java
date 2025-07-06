@@ -4,16 +4,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColorTest<T> {
+abstract class __MappedRgbTest<T extends __MappedRgb<T>> extends ___MappedColorTest<T> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    __MappedRgbaTest(final Class<T> colorClass) {
+    __MappedRgbTest(final Class<T> colorClass) {
         super(colorClass);
     }
 
@@ -26,10 +24,9 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = instance.resetValue__();
+            final var result = instance.resetValue_();
             // ---------------------------------------------------------------------------------------------------- then
             assertThat(result).isSameAs(instance);
-            assertThat(instance.getValue___()).isNull();
         }
     }
 
@@ -42,9 +39,6 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void getRed_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue___(null);
-            }
             // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getRed()).isZero();
             assertThat(instance.getNormalizedRed()).isZero();
@@ -55,11 +49,11 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void setRed__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             instance.setRed(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(__MappedRgba.COMPONENT_INDEX_R, expected);
+            verify(instance, times(1)).setComponent(__MappedRgb.COMPONENT_INDEX_R, expected);
         }
 
         @DisplayName("red(r)<SELF> -> setRed(r)")
@@ -67,7 +61,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void red_SELF_() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.red(expected);
             // ---------------------------------------------------------------------------------------------------- then
@@ -128,9 +122,6 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void getGreen_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue___(null);
-            }
             // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getGreen()).isZero();
             assertThat(instance.getNormalizedGreen()).isZero();
@@ -141,12 +132,12 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void setGreen__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             instance.setGreen(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_G,
+            verify(instance, times(1)).setComponent(
+                    __MappedRgb.COMPONENT_INDEX_G,
                     expected
             );
         }
@@ -156,7 +147,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void green_SELF_() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.green(expected);
             // ---------------------------------------------------------------------------------------------------- then
@@ -217,9 +208,6 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void getBlue_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue___(null);
-            }
             // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getBlue()).isZero();
             assertThat(instance.getNormalizedBlue()).isZero();
@@ -230,12 +218,12 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void setBlue__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             instance.setBlue(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_B,
+            verify(instance, times(1)).setComponent(
+                    __MappedRgb.COMPONENT_INDEX_B,
                     expected
             );
         }
@@ -245,7 +233,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void blue_SELF_() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.blue(expected);
             // ---------------------------------------------------------------------------------------------------- then
@@ -306,9 +294,6 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void getAlpha_Zero_NewInstance() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstance();
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                instance.setValue___(null);
-            }
             // ----------------------------------------------------------------------------------------------- when/then
             assertThat(instance.getAlpha()).isZero();
             assertThat(instance.getNormalizedAlpha()).isZero();
@@ -319,12 +304,12 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void setAlpha__() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             instance.setAlpha(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_A,
+            verify(instance, times(1)).setComponent(
+                    __MappedRgb.COMPONENT_INDEX_A,
                     expected
             );
         }
@@ -334,7 +319,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
         void alpha_SELF_() {
             // --------------------------------------------------------------------------------------------------- given
             final var instance = newColorInstanceSpy();
-            final var expected = __MappedRgbaTestUtils.randomComponent();
+            final var expected = __MappedRgbTestUtils.randomComponent();
             // ---------------------------------------------------------------------------------------------------- when
             final var result = instance.alpha(expected);
             // ---------------------------------------------------------------------------------------------------- then

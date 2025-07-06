@@ -9,17 +9,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @AttributeOverride(
-        name = __MappedRgba.ATTRIBUTE_NAME_VALUE___,
+        name = __MappedRgb.ATTRIBUTE_NAME_VALUE_,
         column = @Column(
                 name = __Hsla.COLUMN_NAME_VALUE___,
                 nullable = true,
                 insertable = true,
-                length = __MappedHsla.COLUMN_LENGTH_VALUE___
+                length = __MappedHsl.COLUMN_LENGTH_VALUE_
         )
 )
 @Entity
 @Table(name = __Hsla.TABLE_NAME)
-class __Hsla extends __MappedHsla<__Hsla> {
+class __Hsla extends __MappedHsl<__Hsla> {
 
     // -----------------------------------------------------------------------------------------------------------------
     static final String TABLE_NAME = "__hsla";

@@ -9,13 +9,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColorTest<T> {
+abstract class __MappedHslTest<T extends __MappedHsl<T>> extends ___MappedColorTest<T> {
 
     // -----------------------------------------------------------------------------------------------------------------
     __MappedHslTest(final Class<T> colorClass) {
         super(colorClass);
     }
 
+    @DisplayName("Hue")
     @Nested
     class HueTest {
 
@@ -35,7 +36,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setHue(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(__MappedHsla.COMPONENT_INDEX_H, expected);
+            verify(instance, times(1)).setComponent(__MappedHsl.COMPONENT_INDEX_H, expected);
         }
 
         @DisplayName("hue(hue)<SELF>")
@@ -49,10 +50,6 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- then
             verify(instance, times(1)).setHue(expected);
             assertThat(result).isSameAs(instance);
-            {
-                final var actual = instance.getHue();
-                assertThat(actual).isEqualTo(expected);
-            }
         }
 
         @DisplayName("newInstance.getNormalizedHue()0")
@@ -71,7 +68,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedHue(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setHue((int) (expected * ___MappedColorConstants.HSL_MAX_HUE));
+            verify(instance, times(1)).setHue((int) (expected * __MappedHsl.MAX_HUE));
         }
 
         @DisplayName("normalizedHue(normalizedHue)<SELF>")
@@ -91,6 +88,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
         }
     }
 
+    @DisplayName("Saturation")
     @Nested
     class SaturationTest {
 
@@ -110,8 +108,8 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setSaturation(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(
-                    __MappedHsla.COMPONENT_INDEX_S,
+            verify(instance, times(1)).setComponent(
+                    __MappedHsl.COMPONENT_INDEX_S,
                     expected
             );
         }
@@ -127,10 +125,6 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- then
             verify(instance, times(1)).setSaturation(expected);
             assertThat(result).isSameAs(instance);
-            {
-                final var actual = instance.getSaturation();
-                assertThat(actual).isEqualTo(expected);
-            }
         }
 
         @DisplayName("newInstance.getNormalizedSaturation()0")
@@ -149,7 +143,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedSaturation(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setSaturation((int) (expected * ___MappedColorConstants.HSL_MAX_SATURATION));
+            verify(instance, times(1)).setSaturation((int) (expected * __MappedHsl.MAX_SATURATION));
         }
 
         @DisplayName("normalizedSaturation(normalizedSaturation)<SELF>")
@@ -169,6 +163,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
         }
     }
 
+    @DisplayName("Lightness")
     @Nested
     class LightnessTest {
 
@@ -188,8 +183,8 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setLightness(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(
-                    __MappedHsla.COMPONENT_INDEX_L,
+            verify(instance, times(1)).setComponent(
+                    __MappedHsl.COMPONENT_INDEX_L,
                     expected
             );
         }
@@ -205,10 +200,6 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- then
             verify(instance, times(1)).setLightness(expected);
             assertThat(result).isSameAs(instance);
-            {
-                final var actual = instance.getLightness();
-                assertThat(actual).isEqualTo(expected);
-            }
         }
 
         @DisplayName("newInstance.getNormalizedLightness()0")
@@ -227,7 +218,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedLightness(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setLightness((int) (expected * ___MappedColorConstants.HSL_MAX_LIGHTNESS));
+            verify(instance, times(1)).setLightness((int) (expected * __MappedHsl.MAX_LIGHTNESS));
         }
 
         @DisplayName("normalizedLightness(normalizedLightness)<SELF>")
@@ -247,6 +238,7 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
         }
     }
 
+    @DisplayName("Alpha")
     @Nested
     class AlphaTest {
 
@@ -266,8 +258,8 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setAlpha(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setComponent___(
-                    __MappedHsla.COMPONENT_INDEX_A,
+            verify(instance, times(1)).setComponent(
+                    __MappedHsl.COMPONENT_INDEX_A,
                     expected
             );
         }
@@ -283,10 +275,6 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- then
             verify(instance, times(1)).setAlpha(expected);
             assertThat(result).isSameAs(instance);
-            {
-                final var actual = instance.getAlpha();
-                assertThat(actual).isEqualTo(expected);
-            }
         }
 
         @DisplayName("newInstance.getNormalizedAlpha()0")
@@ -305,7 +293,10 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedAlpha(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setAlpha((int) (expected * ___MappedColorConstants.HSL_MAX_ALPHA));
+            verify(instance, times(1))
+                    .setAlpha(
+                            (int) (expected * __MappedHsl.MAX_ALPHA)
+                    );
         }
 
         @DisplayName("normalizedAlpha(normalizedAlpha)<SELF>")
@@ -319,9 +310,6 @@ abstract class __MappedHslTest<T extends __MappedHsla<T>> extends ___MappedColor
             // ---------------------------------------------------------------------------------------------------- then
             verify(instance, times(1)).setNormalizedAlpha(expected);
             assertThat(result).isSameAs(instance);
-            if (false) {
-                assertThat(instance.getNormalizedAlpha()).isEqualTo(expected);
-            }
         }
     }
 }

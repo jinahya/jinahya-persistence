@@ -8,7 +8,7 @@ final class __MappedColorTestUtils {
 
     static int randomHue() {
         return ThreadLocalRandom.current().nextInt(
-                ___MappedColorConstants.HSL_MIN_HUE, ___MappedColorConstants.HSL_MAX_HUE + 1
+                __MappedHsl.MIN_HUE, __MappedHsl.MAX_HUE + 1
         );
     }
 

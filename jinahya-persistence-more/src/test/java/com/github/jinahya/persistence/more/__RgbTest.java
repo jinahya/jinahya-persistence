@@ -1,8 +1,8 @@
 package com.github.jinahya.persistence.more;
 
-class __RgbaTest extends __MappedRgbaTest<__Rgba> {
+class __RgbTest extends __MappedRgbTest<__Rgba> {
 
-    __RgbaTest() {
+    __RgbTest() {
         super(__Rgba.class);
     }
 }

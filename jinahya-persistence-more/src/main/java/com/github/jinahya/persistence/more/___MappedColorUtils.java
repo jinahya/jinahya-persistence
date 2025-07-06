@@ -29,8 +29,8 @@ public final class ___MappedColorUtils {
      * );
      *}
      *
-     * @param hue a value of {@code hue} between {@value __MappedHsla#HSL_MIN_HUE} and
-     *            {@value __MappedHsla#HSL_MAX_HUE}, both inclusive.
+     * @param hue a value of {@code hue} between {@value __MappedHsl#MIN_HUE} and
+     *            {@value __MappedHsl#MAX_HUE}, both inclusive.
      * @param s   a normalized value of {@code saturation} between
      *            {@value ___MappedColorConstants#MIN_COMPONENT_NORMALIZED} and
      *            {@value ___MappedColorConstants#MAX_COMPONENT_NORMALIZED}, both inclusive.
@@ -49,7 +49,7 @@ public final class ___MappedColorUtils {
     public static <R> R hslToRgb(
             final int hue, final double s, final double l,
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> f) {
-        if (hue < ___MappedColorConstants.HSL_MIN_HUE || hue > ___MappedColorConstants.HSL_MAX_HUE) {
+        if (hue < __MappedHsl.MIN_HUE || hue > __MappedHsl.MAX_HUE) {
             throw new IllegalArgumentException("invalid hue: " + hue);
         }
         if (s < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
@@ -61,7 +61,7 @@ public final class ___MappedColorUtils {
             throw new IllegalArgumentException("invalid l: " + l);
         }
         Objects.requireNonNull(f, "f is null");
-        final var h = hue % ___MappedColorConstants.HSL_MAX_HUE;
+        final var h = hue % __MappedHsl.MAX_HUE;
         final var r = hslToRgb__(0, hue, s, l);
         final var g = hslToRgb__(8, hue, s, l);
         final var b = hslToRgb__(4, hue, s, l);
@@ -71,20 +71,20 @@ public final class ___MappedColorUtils {
     public static <R> R hslToRgb(
             final int hue, final int saturation, final int lightness,
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> f) {
-        if (hue < ___MappedColorConstants.HSL_MIN_HUE || hue > ___MappedColorConstants.HSL_MAX_HUE) {
+        if (hue < __MappedHsl.MIN_HUE || hue > __MappedHsl.MAX_HUE) {
             throw new IllegalArgumentException("invalid hue: " + hue);
         }
-        if (saturation < ___MappedColorConstants.HSL_MIN_SATURATION ||
-            saturation > ___MappedColorConstants.HSL_MAX_SATURATION) {
+        if (saturation < __MappedHsl.MIN_SATURATION ||
+            saturation > __MappedHsl.MAX_SATURATION) {
             throw new IllegalArgumentException("invalid saturation: " + saturation);
         }
-        if (lightness < ___MappedColorConstants.HSL_MIN_LIGHTNESS ||
-            lightness > ___MappedColorConstants.HSL_MAX_LIGHTNESS) {
+        if (lightness < __MappedHsl.MIN_LIGHTNESS ||
+            lightness > __MappedHsl.MAX_LIGHTNESS) {
             throw new IllegalArgumentException("invalid lightness: " + lightness);
         }
         Objects.requireNonNull(f, "f is null");
-        final var s = saturation / (double) ___MappedColorConstants.HSL_MAX_SATURATION;
-        final var l = lightness / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS;
+        final var s = saturation / (double) __MappedHsl.MAX_SATURATION;
+        final var l = lightness / (double) __MappedHsl.MAX_LIGHTNESS;
         return hslToRgb(hue, s, l, f);
     }
 
@@ -112,8 +112,8 @@ public final class ___MappedColorUtils {
      *            {@value ___MappedColorConstants#MIN_COMPONENT_NORMALIZED} and
      *            {@value ___MappedColorConstants#MAX_COMPONENT_NORMALIZED}, both inclusive.
      * @param f   the function to be applied with, in currying, a
-     *            {@code hue}([{@value ___MappedColorConstants#HSL_MIN_HUE}..{@value
-     *            ___MappedColorConstants#HSL_MAX_HUE}]), a
+     *            {@code hue}([{@value __MappedHsl#MIN_HUE}..{@value
+     *            __MappedHsl#MAX_HUE}]), a
      *            {@code saturation}({@value ___MappedColorConstants#MIN_COMPONENT_NORMALIZED}..{@value
      *            ___MappedColorConstants#MAX_COMPONENT_NORMALIZED}]), and a
      *            {@code lightness}([{@value ___MappedColorConstants#MIN_COMPONENT_NORMALIZED}..{@value
@@ -159,7 +159,7 @@ public final class ___MappedColorUtils {
                 h += 360;
             }
         }
-        assert h >= ___MappedColorConstants.HSL_MIN_HUE && h <= ___MappedColorConstants.HSL_MAX_HUE;
+        assert h >= __MappedHsl.MIN_HUE && h <= __MappedHsl.MAX_HUE;
         final double l;
         {
             l = (max + min) / 2;
@@ -172,7 +172,7 @@ public final class ___MappedColorUtils {
                 s = 1 - Math.abs(2 * l - 1);
             }
         }
-        assert h >= ___MappedColorConstants.HSL_MIN_HUE && h <= ___MappedColorConstants.HSL_MAX_HUE;
+        assert h >= __MappedHsl.MIN_HUE && h <= __MappedHsl.MAX_HUE;
         assert s >= ___MappedColorConstants.MIN_COMPONENT_NORMALIZED &&
                s <= ___MappedColorConstants.MAX_COMPONENT_NORMALIZED;
         assert l >= ___MappedColorConstants.MIN_COMPONENT_NORMALIZED &&
