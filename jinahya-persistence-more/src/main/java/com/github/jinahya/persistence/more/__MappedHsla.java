@@ -19,23 +19,13 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     private static final long serialVersionUID = 4172783566899888893L;
 
     // -----------------------------------------------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------------------------------------------
     static final int COMPONENT_INDEX_H = 0;
 
-    private static final int COMPONENT_INDEX_S = COMPONENT_INDEX_H + 1;
+    static final int COMPONENT_INDEX_S = COMPONENT_INDEX_H + 1;
 
-    private static final int COMPONENT_INDEX_L = COMPONENT_INDEX_S + 1;
+    static final int COMPONENT_INDEX_L = COMPONENT_INDEX_S + 1;
 
-    private static final int COMPONENT_INDEX_A = COMPONENT_INDEX_L + 1;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final int BYTE_OFFSET_H = 0;
-
-    private static final int BYTE_OFFSET_S = BYTE_OFFSET_H + Long.BYTES;
-
-    private static final int BYTE_OFFSET_L = BYTE_OFFSET_S + Long.BYTES;
-
-    private static final int BYTE_OFFSET_A = BYTE_OFFSET_L + Long.BYTES;
+    static final int COMPONENT_INDEX_A = COMPONENT_INDEX_L + 1;
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
@@ -55,14 +45,14 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             final IntFunction< // h
                     ? extends IntFunction< // s
                             ? extends IntFunction< // l
-                                    ? extends DoubleFunction< // a
+                                    ? extends IntFunction< // a
                                             ? extends R>>>> function) {
         Objects.requireNonNull(function, "function is null");
         return function
                 .apply(getHue())
                 .apply(getSaturation())
                 .apply(getLightness())
-                .apply(getNormalizedAlpha());
+                .apply(getAlpha());
     }
 
     public <R> R applyNormalizedComponents(
@@ -79,37 +69,15 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public <T extends __MappedRgba<T>> T toRgb(final T rgb) {
-        Objects.requireNonNull(rgb, "rgb is null");
-        return ___MappedColorUtils.hslToRgb(
-                getHue(),
-                getNormalizedSaturation(),
-                getNormalizedLightness(),
-                r -> g -> b -> {
-//                    return rgb.normalizedRed(r).normalizedGreen(g).normalizedBlue(b);
-                    return null;
-                }
+    public <R> R toRgb(
+            final DoubleFunction<
+                    ? extends DoubleFunction<
+                            ? extends DoubleFunction<
+                                    ? extends R>>> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyComponents(
+                h -> s -> l -> a -> __MappedHslUtils.hslToRgb(h, s, l, function)
         );
-    }
-
-    public <T extends __MappedRgba<T>> T toRgba(final T rgba) {
-        return toRgb(rgba)
-                .normalizedAlpha(getNormalizedAlpha());
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    public <T extends __MappedRgba<T>> SELF fromRgb(final T rgb) {
-        Objects.requireNonNull(rgb, "rgb is null");
-        return rgb.applyNormalizedComponents(r -> g -> b -> a -> {
-            return ___MappedColorUtils.rgbToHsl(
-                    r, g, b,
-                    h -> s -> l -> hue(h).normalizedSaturation(s).normalizedLightness(l));
-        });
-    }
-
-    public <T extends __MappedRgba<T>> SELF fromRgba(final T rgba) {
-        return fromRgb(rgba)
-                .normalizedAlpha(rgba.getNormalizedAlpha());
     }
 
     // ------------------------------------------------------------------------------------------------------------- hue
@@ -123,7 +91,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @Min(___MappedColorConstants.HSL_MIN_HUE)
     @Transient
     public int getHue() {
-        return (int) getComponent___(COMPONENT_INDEX_H);
+        return getComponent___(COMPONENT_INDEX_H);
     }
 
     /**
@@ -140,10 +108,6 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
                 COMPONENT_INDEX_H,
                 hue
         );
-        setNormalizedComponent___(
-                COMPONENT_INDEX_H,
-                hue / (double) ___MappedColorConstants.HSL_MAX_HUE
-        );
     }
 
     public SELF hue(final int hue) {
@@ -155,7 +119,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedHue() {
-        return getNormalizedComponent___(COMPONENT_INDEX_H);
+        return getHue() / (double) ___MappedColorConstants.HSL_MAX_HUE;
     }
 
     public void setNormalizedHue(final double normalizedHue) {
@@ -163,9 +127,8 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedHue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid hue: " + normalizedHue);
         }
-        setNormalizedComponent___(
-                COMPONENT_INDEX_H,
-                normalizedHue
+        setHue(
+                (int) (normalizedHue * ___MappedColorConstants.HSL_MAX_HUE)
         );
     }
 
@@ -179,9 +142,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @Min(___MappedColorConstants.HSL_MIN_SATURATION)
     @Transient
     public int getSaturation() {
-//        return (int) (getNormalizedSaturation() * ___MappedColorConstants.HSL_MAX_SATURATION);
-//        return (int) longBuffer_().getLong(BYTE_OFFSET_S);
-        return 0;
+        return getComponent___(COMPONENT_INDEX_S);
     }
 
     public void setSaturation(final int saturation) {
@@ -189,9 +150,10 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             saturation > ___MappedColorConstants.HSL_MAX_SATURATION) {
             throw new IllegalArgumentException("invalid saturation: " + saturation);
         }
-//        setNormalizedSaturation(saturation / (double) ___MappedColorConstants.HSL_MAX_SATURATION);
-//        longBuffer_().putLong(BYTE_OFFSET_S, saturation);
-
+        setComponent___(
+                COMPONENT_INDEX_S,
+                saturation
+        );
     }
 
     public SELF saturation(final int saturation) {
@@ -203,7 +165,6 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedSaturation() {
-//        return getComponent_(COMPONENT_INDEX_S);
         return getSaturation() / (double) ___MappedColorConstants.HSL_MAX_SATURATION;
     }
 
@@ -212,7 +173,6 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedSaturation > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized saturation: " + normalizedSaturation);
         }
-//        setComponent_(COMPONENT_INDEX_S, normalizedSaturation);
         setSaturation((int) (normalizedSaturation * ___MappedColorConstants.HSL_MAX_SATURATION));
     }
 
@@ -226,9 +186,7 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @Min(___MappedColorConstants.HSL_MIN_LIGHTNESS)
     @Transient
     public int getLightness() {
-//        return (int) (getNormalizedLightness() * ___MappedColorConstants.HSL_MAX_LIGHTNESS);
-//        return (int) longBuffer_().getLong(BYTE_OFFSET_L);
-        return 0;
+        return getComponent___(COMPONENT_INDEX_L);
     }
 
     public void setLightness(final int lightness) {
@@ -236,9 +194,10 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             lightness > ___MappedColorConstants.HSL_MAX_LIGHTNESS) {
             throw new IllegalArgumentException("invalid lightness: " + lightness);
         }
-//        setNormalizedLightness(lightness / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS);
-//        longBuffer_().putLong(BYTE_OFFSET_L, lightness);
-
+        setComponent___(
+                COMPONENT_INDEX_L,
+                lightness
+        );
     }
 
     public SELF lightness(final int lightness) {
@@ -250,7 +209,6 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedLightness() {
-//        return getComponent_(COMPONENT_INDEX_L);
         return getLightness() / (double) ___MappedColorConstants.HSL_MAX_LIGHTNESS;
     }
 
@@ -259,8 +217,9 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
             normalizedLightness > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized lightness: " + normalizedLightness);
         }
-//        setComponent_(COMPONENT_INDEX_L, normalizedLightness);
-        setLightness((int) (normalizedLightness * ___MappedColorConstants.HSL_MAX_LIGHTNESS));
+        setLightness(
+                (int) (normalizedLightness * ___MappedColorConstants.HSL_MAX_LIGHTNESS)
+        );
     }
 
     public SELF normalizedLightness(final double normalizedLightness) {
@@ -269,34 +228,39 @@ public abstract class __MappedHsla<SELF extends __MappedHsla<SELF>> extends ___M
     }
 
     // ----------------------------------------------------------------------------------------------------------- alpha
+    @Max(___MappedColorConstants.HSL_MAX_ALPHA)
+    @Min(___MappedColorConstants.HSL_MIN_ALPHA)
+    @Transient
+    public int getAlpha() {
+        return getComponent___(COMPONENT_INDEX_A);
+    }
 
-    /**
-     * Returns the current value of this color's <span style="color:grey; -webkit-text-stroke: .5px black;">alpha</span>
-     * component.
-     *
-     * @return the current value of the <span style="color:grey; -webkit-text-stroke: .5px black;">alpha</span>
-     * component.
-     */
+    public void setAlpha(final int alpha) {
+        if (alpha < ___MappedColorConstants.HSL_MIN_ALPHA ||
+            alpha > ___MappedColorConstants.HSL_MAX_ALPHA) {
+            throw new IllegalArgumentException("invalid alpha: " + alpha);
+        }
+        setComponent___(COMPONENT_INDEX_A, alpha);
+    }
+
+    public SELF alpha(final int alpha) {
+        setAlpha(alpha);
+        return (SELF) this;
+    }
+
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
     public double getNormalizedAlpha() {
-        return getNormalizedComponent___(COMPONENT_INDEX_A);
+        return getAlpha() / (double) ___MappedColorConstants.HSL_MAX_ALPHA;
     }
 
-    /**
-     * Replaces the current value of this color's <span style="color:grey; -webkit-text-stroke: .5px
-     * black;">normalizedAlpha</span> component with the specified value.
-     *
-     * @param normalizedAlpha new value for the <span style="color:grey; -webkit-text-stroke: .5px
-     *                        black;">normalizedAlpha</span> component.
-     */
     public void setNormalizedAlpha(final double normalizedAlpha) {
         if (normalizedAlpha < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        setNormalizedComponent___(COMPONENT_INDEX_A, normalizedAlpha);
+        setAlpha((int) (normalizedAlpha * ___MappedColorConstants.HSL_MAX_ALPHA));
     }
 
     public SELF normalizedAlpha(final double normalizedAlpha) {

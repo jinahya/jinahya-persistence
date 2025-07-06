@@ -24,6 +24,10 @@ public final class ___MappedColorConstants {
 
     public static final int HSL_MAX_LIGHTNESS = 100;
 
+    public static final int HSL_MIN_ALPHA = 0;
+
+    public static final int HSL_MAX_ALPHA = 100;
+
     // ------------------------------------------------------------------------------------------------------------- RGB
     public static final int RGB_MIN_COMPONENT = 0;
 

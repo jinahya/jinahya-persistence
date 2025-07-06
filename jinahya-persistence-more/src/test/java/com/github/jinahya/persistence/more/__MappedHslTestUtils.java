@@ -3,9 +3,9 @@ package com.github.jinahya.persistence.more;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
-final class __MappedHslaTestUtils {
+final class __MappedHslTestUtils {
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------- hue
     static int randomHue() {
         return ThreadLocalRandom.current().nextInt(
                 ___MappedColorConstants.HSL_MAX_HUE + 1
@@ -13,9 +13,7 @@ final class __MappedHslaTestUtils {
     }
 
     static double randomNormalizedHue() {
-        return ThreadLocalRandom.current().nextDouble(
-                ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE
-        );
+        return randomHue() / (double) ___MappedColorConstants.HSL_MAX_HUE;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -33,7 +31,7 @@ final class __MappedHslaTestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static int randomLightness() {
         return ThreadLocalRandom.current().nextInt(
-               ___MappedColorConstants.HSL_MAX_LIGHTNESS + 1
+                ___MappedColorConstants.HSL_MAX_LIGHTNESS + 1
         );
     }
 
@@ -44,9 +42,14 @@ final class __MappedHslaTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    static int randomAlpha() {
+        return ThreadLocalRandom.current().nextInt(
+                ___MappedColorConstants.HSL_MIN_ALPHA, ___MappedColorConstants.HSL_MAX_ALPHA + 1
+        );
+    }
+
     static double randomNormalizedAlpha() {
-        return ThreadLocalRandom.current().nextDouble(
-                ___MappedColorConstants.MAX_COMPONENT_NORMALIZED + Double.MIN_VALUE);
+        return randomAlpha() / (double) ___MappedColorConstants.HSL_MAX_ALPHA;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -60,7 +63,7 @@ final class __MappedHslaTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __MappedHslaTestUtils() {
+    private __MappedHslTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -59,10 +59,7 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setRed(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
-                    __MappedRgba.COMPONENT_INDEX_R,
-                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-            );
+            verify(instance, times(1)).setComponent___(__MappedRgba.COMPONENT_INDEX_R, expected);
         }
 
         @DisplayName("red(r)<SELF> -> setRed(r)")
@@ -103,13 +100,8 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedRed(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
-                    __MappedRgba.COMPONENT_INDEX_R,
-                    expected
-            );
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_R,
-                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            verify(instance, times(1)).setRed(
+                    (int) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
             );
         }
 
@@ -153,9 +145,9 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setGreen(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
+            verify(instance, times(1)).setComponent___(
                     __MappedRgba.COMPONENT_INDEX_G,
-                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+                    expected
             );
         }
 
@@ -197,13 +189,8 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedGreen(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
-                    __MappedRgba.COMPONENT_INDEX_G,
-                    expected
-            );
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_G,
-                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            verify(instance, times(1)).setGreen(
+                    (int) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
             );
         }
 
@@ -247,9 +234,9 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setBlue(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
+            verify(instance, times(1)).setComponent___(
                     __MappedRgba.COMPONENT_INDEX_B,
-                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+                    expected
             );
         }
 
@@ -291,13 +278,8 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedBlue(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
-                    __MappedRgba.COMPONENT_INDEX_B,
-                    expected
-            );
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_B,
-                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            verify(instance, times(1)).setBlue(
+                    (int) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
             );
         }
 
@@ -341,9 +323,9 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setAlpha(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
+            verify(instance, times(1)).setComponent___(
                     __MappedRgba.COMPONENT_INDEX_A,
-                    expected / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
+                    expected
             );
         }
 
@@ -385,13 +367,8 @@ abstract class __MappedRgbaTest<T extends __MappedRgba<T>> extends ___MappedColo
             // ---------------------------------------------------------------------------------------------------- when
             instance.setNormalizedAlpha(expected);
             // ---------------------------------------------------------------------------------------------------- then
-            verify(instance, times(1)).setNormalizedComponent___(
-                    __MappedRgba.COMPONENT_INDEX_A,
-                    expected
-            );
-            verify(instance, times(1)).setComponent___(
-                    __MappedRgba.COMPONENT_INDEX_A,
-                    (long) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
+            verify(instance, times(1)).setAlpha(
+                    (int) (expected * ___MappedColorConstants.RGB_MAX_COMPONENT)
             );
         }
 

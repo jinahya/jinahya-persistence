@@ -181,10 +181,6 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                 COMPONENT_INDEX_R,
                 red
         );
-        setNormalizedComponent___(
-                COMPONENT_INDEX_R,
-                red / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
     }
 
     @SuppressWarnings({"unchecked"})
@@ -196,7 +192,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     public double getNormalizedRed() {
-        return getNormalizedComponent___(COMPONENT_INDEX_R);
+        return getRed() / (double) ___MappedColorConstants.RGB_MAX_COMPONENT;
     }
 
     public void setNormalizedRed(final double normalizedRed) {
@@ -204,14 +200,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedRed > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized red: " + normalizedRed);
         }
-        setNormalizedComponent___(
-                COMPONENT_INDEX_R,
-                normalizedRed
-        );
-        setComponent___(
-                COMPONENT_INDEX_R,
-                (long) (normalizedRed * ___MappedColorConstants.RGB_MAX_COMPONENT)
-        );
+        setRed((int) (normalizedRed * ___MappedColorConstants.RGB_MAX_COMPONENT));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -234,7 +223,6 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             throw new IllegalArgumentException("invalid green: " + green);
         }
         setComponent___(COMPONENT_INDEX_G, green);
-        setNormalizedComponent___(COMPONENT_INDEX_G, green / (double) ___MappedColorConstants.RGB_MAX_COMPONENT);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -254,8 +242,7 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedGreen > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized green: " + normalizedGreen);
         }
-        setNormalizedComponent___(COMPONENT_INDEX_G, normalizedGreen);
-        setComponent___(COMPONENT_INDEX_G, (long) (normalizedGreen * ___MappedColorConstants.RGB_MAX_COMPONENT));
+        setGreen((int) (normalizedGreen * ___MappedColorConstants.RGB_MAX_COMPONENT));
     }
 
     @SuppressWarnings({"unchecked"})
@@ -281,10 +268,6 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
                 COMPONENT_INDEX_B,
                 blue
         );
-        setNormalizedComponent___(
-                COMPONENT_INDEX_B,
-                blue / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
     }
 
     @SuppressWarnings({"unchecked"})
@@ -304,13 +287,8 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedBlue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized blue: " + normalizedBlue);
         }
-        setNormalizedComponent___(
-                COMPONENT_INDEX_B,
-                normalizedBlue
-        );
-        setComponent___(
-                COMPONENT_INDEX_B,
-                (long) (normalizedBlue * ___MappedColorConstants.RGB_MAX_COMPONENT)
+        setBlue(
+                (int) (normalizedBlue * ___MappedColorConstants.RGB_MAX_COMPONENT)
         );
     }
 
@@ -334,10 +312,6 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             throw new IllegalArgumentException("invalid alpha: " + alpha);
         }
         setComponent___(COMPONENT_INDEX_A, alpha);
-        setNormalizedComponent___(
-                COMPONENT_INDEX_A,
-                alpha / (double) ___MappedColorConstants.RGB_MAX_COMPONENT
-        );
     }
 
     @SuppressWarnings({"unchecked"})
@@ -357,10 +331,8 @@ public abstract class __MappedRgba<SELF extends __MappedRgba<SELF>> extends ___M
             normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        setNormalizedComponent___(COMPONENT_INDEX_A, normalizedAlpha);
-        setComponent___(
-                COMPONENT_INDEX_A,
-                (long) (normalizedAlpha * ___MappedColorConstants.RGB_MAX_COMPONENT)
+        setAlpha(
+                (int) (normalizedAlpha * ___MappedColorConstants.RGB_MAX_COMPONENT)
         );
     }
 
