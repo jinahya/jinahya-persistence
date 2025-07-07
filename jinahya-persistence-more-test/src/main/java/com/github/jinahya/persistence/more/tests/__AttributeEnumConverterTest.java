@@ -9,7 +9,7 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public class __AttributeEnumConverterTest<
+public abstract class __AttributeEnumConverterTest<
         CONVERTER extends __AttributeEnumConverter<E, ATTRIBUTE>,
         E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>,
         ATTRIBUTE> {
