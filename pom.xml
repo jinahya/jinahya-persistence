@@ -33,6 +33,7 @@
     <module>jinahya-persistence-mapped</module>
     <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
+    <module>jinahya-persistence-more-test</module>
   </modules>
 
   <scm>
