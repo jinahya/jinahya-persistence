@@ -30,7 +30,7 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
 
     protected static final int NUMBER_OF_COMPONENTS_ = 5;
 
-    protected static final int COMPONENT_LENGTH_ = Integer.BYTES;
+    protected static final int COMPONENT_LENGTH_ = Float.BYTES;
 
     public static final int COLUMN_LENGTH_VALUE_ = NUMBER_OF_COMPONENTS_ * COMPONENT_LENGTH_;
 
@@ -75,26 +75,26 @@ public abstract class ___MappedColor<SELF extends ___MappedColor<SELF>> implemen
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private int requireValidIndex(final int index) {
+    protected float getComponent(final int index) {
         if (index < MIN_COMPONENT_INDEX_ || index > MAX_COMPONENT_INDEX_) {
             throw new IllegalArgumentException("invalid index: " + index);
         }
-        return index;
-    }
-
-    protected int getComponent(final int index) {
         return Optional.ofNullable(buffer_)
-                .map(b -> b.get(requireValidIndex(index)))
-                .orElse(0);
+                .map(b -> b.get(index))
+                .map(Float::intBitsToFloat)
+                .orElse(.0f);
     }
 
-    protected void setComponent(final int index, final int value) {
+    protected void setComponent(final int index, final float value) {
+        if (index < MIN_COMPONENT_INDEX_ || index > MAX_COMPONENT_INDEX_) {
+            throw new IllegalArgumentException("invalid index: " + index);
+        }
         Optional.ofNullable(buffer_)
                 .orElseGet(() -> ByteBuffer
                         .wrap(Optional.ofNullable(value_).orElseGet(() -> new byte[COLUMN_LENGTH_VALUE_]))
                         .asIntBuffer()
                 )
-                .put(requireValidIndex(index), value);
+                .put(index, Float.floatToRawIntBits(value));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

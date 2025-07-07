@@ -16,19 +16,19 @@ final class __MappedHslUtils {
      * <p>
      * {@snippet lang = "java":
      * hwbToRgb(
-     *         hue,
-     *         whiteness,
-     *         blackness,
+     *         hue,       // [0..360]
+     *         whiteness, // [0..100]
+     *         blackness, // [0..100]
      *         r -> g -> b -> {
      *             assert r >= 0.0d && r <= 1.0d;
      *             assert g >= 0.0d && g <= 1.0d;
      *             assert b >= 0.0d && b <= 1.0d;
-     *             final var red   = (int) Math.round(r * 255);
+     *             final var   red = (int) Math.round(r * 255);
      *             final var green = (int) Math.round(g * 255);
-     *             final var blue  = (int) Math.round(b * 255);
-     *             assert red   >= 0 && red   <= 255;
+     *             final var  blue = (int) Math.round(b * 255);
+     *             assert   red >= 0 &&   red <= 255;
      *             assert green >= 0 && green <= 255;
-     *             assert blue  >= 0 && blue  <= 255;
+     *             assert  blue >= 0 &&  blue <= 255;
      *             return null;
      *         }
      * );
@@ -47,6 +47,8 @@ final class __MappedHslUtils {
      * @return the result of the {@code function}.
      */
     // https://www.w3.org/TR/css-color-3/#hsl-color
+    // https://www.rapidtables.com/convert/color/hsl-to-rgb.html
+    // https://colordesigner.io/convert/hsltorgb
     static <R> R hslToRgb(
             final int hue, final int saturation, final int lightness,
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> function) {

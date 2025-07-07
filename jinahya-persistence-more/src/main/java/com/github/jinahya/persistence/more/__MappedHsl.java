@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.more;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
@@ -10,7 +11,6 @@ import jakarta.validation.constraints.Min;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
-import java.util.function.IntFunction;
 
 @MappedSuperclass
 public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___MappedColor<SELF> {
@@ -62,10 +62,10 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
 
     // -----------------------------------------------------------------------------------------------------------------
     public <R> R applyComponents(
-            final IntFunction< // h
-                    ? extends IntFunction< // s
-                            ? extends IntFunction< // l
-                                    ? extends IntFunction< // a
+            @Nonnull final DoubleFunction< // h
+                    ? extends DoubleFunction< // s
+                            ? extends DoubleFunction< // l
+                                    ? extends DoubleFunction< // a
                                             ? extends R>>>> function) {
         Objects.requireNonNull(function, "function is null");
         return function
@@ -76,28 +76,17 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     }
 
     public <R> R applyNormalizedComponents(
-            final DoubleFunction< // h
+            @Nonnull final DoubleFunction< // h
                     ? extends DoubleFunction< // s
                             ? extends DoubleFunction< // l
-                                    ? extends DoubleFunction<? extends R>>>> function) {
+                                    ? extends DoubleFunction< // a
+                                            ? extends R>>>> function) {
         Objects.requireNonNull(function, "function is null");
         return function
                 .apply(getNormalizedHue())
                 .apply(getNormalizedSaturation())
                 .apply(getNormalizedLightness())
                 .apply(getNormalizedAlpha());
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    public <R> R toRgb(
-            final DoubleFunction<
-                    ? extends DoubleFunction<
-                            ? extends DoubleFunction<
-                                    ? extends R>>> function) {
-        Objects.requireNonNull(function, "function is null");
-        return applyComponents(
-                h -> s -> l -> a -> __MappedHslUtils.hslToRgb(h, s, l, function)
-        );
     }
 
     // ------------------------------------------------------------------------------------------------------------- hue
@@ -110,7 +99,7 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @Max(MAX_HUE)
     @Min(MIN_HUE)
     @Transient
-    public int getHue() {
+    public float getHue() {
         return getComponent(COMPONENT_INDEX_H);
     }
 
@@ -120,7 +109,7 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
      * @param hue new value for the {@code hue} component between {@value __MappedHsl#MIN_HUE} and
      *            {@value __MappedHsl#MAX_HUE}, both inclusive.
      */
-    public void setHue(final int hue) {
+    public void setHue(final float hue) {
         if (hue < MIN_HUE || hue > MAX_HUE) {
             throw new IllegalArgumentException("invalid hue: " + hue);
         }
@@ -130,7 +119,8 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
         );
     }
 
-    public SELF hue(final int hue) {
+    @SuppressWarnings("unchecked")
+    public SELF hue(final float hue) {
         setHue(hue);
         return (SELF) this;
     }
@@ -138,21 +128,20 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedHue() {
-        return getHue() / (double) MAX_HUE;
+    public float getNormalizedHue() {
+        return getHue() / MAX_HUE;
     }
 
-    public void setNormalizedHue(final double normalizedHue) {
+    public void setNormalizedHue(final float normalizedHue) {
         if (normalizedHue < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedHue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid hue: " + normalizedHue);
         }
-        setHue(
-                (int) (normalizedHue * MAX_HUE)
-        );
+        setHue(normalizedHue * MAX_HUE);
     }
 
-    public SELF normalizedHue(final double normalizedHue) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedHue(final float normalizedHue) {
         setNormalizedHue(normalizedHue);
         return (SELF) this;
     }
@@ -161,11 +150,11 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @Max(MAX_SATURATION)
     @Min(MIN_SATURATION)
     @Transient
-    public int getSaturation() {
+    public float getSaturation() {
         return getComponent(COMPONENT_INDEX_S);
     }
 
-    public void setSaturation(final int saturation) {
+    public void setSaturation(final float saturation) {
         if (saturation < MIN_SATURATION ||
             saturation > MAX_SATURATION) {
             throw new IllegalArgumentException("invalid saturation: " + saturation);
@@ -176,7 +165,8 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
         );
     }
 
-    public SELF saturation(final int saturation) {
+    @SuppressWarnings("unchecked")
+    public SELF saturation(final float saturation) {
         setSaturation(saturation);
         return (SELF) this;
     }
@@ -184,32 +174,33 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedSaturation() {
-        return getSaturation() / (double) MAX_SATURATION;
+    public float getNormalizedSaturation() {
+        return getSaturation() / MAX_SATURATION;
     }
 
-    public void setNormalizedSaturation(final double normalizedSaturation) {
+    public void setNormalizedSaturation(final float normalizedSaturation) {
         if (normalizedSaturation < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedSaturation > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized saturation: " + normalizedSaturation);
         }
-        setSaturation((int) (normalizedSaturation * MAX_SATURATION));
+        setSaturation(normalizedSaturation * MAX_SATURATION);
     }
 
-    public SELF normalizedSaturation(final double normalizedSaturation) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedSaturation(final float normalizedSaturation) {
         setNormalizedSaturation(normalizedSaturation);
         return (SELF) this;
     }
 
-    // ------------------------------------------------------------------------------------------------------ lightness
+    // ------------------------------------------------------------------------------------------------------- lightness
     @Max(MAX_LIGHTNESS)
     @Min(MIN_LIGHTNESS)
     @Transient
-    public int getLightness() {
+    public float getLightness() {
         return getComponent(COMPONENT_INDEX_L);
     }
 
-    public void setLightness(final int lightness) {
+    public void setLightness(final float lightness) {
         if (lightness < MIN_LIGHTNESS ||
             lightness > MAX_LIGHTNESS) {
             throw new IllegalArgumentException("invalid lightness: " + lightness);
@@ -220,7 +211,8 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
         );
     }
 
-    public SELF lightness(final int lightness) {
+    @SuppressWarnings("unchecked")
+    public SELF lightness(final float lightness) {
         setLightness(lightness);
         return (SELF) this;
     }
@@ -228,21 +220,22 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedLightness() {
-        return getLightness() / (double) MAX_LIGHTNESS;
+    public float getNormalizedLightness() {
+        return getLightness() / MAX_LIGHTNESS;
     }
 
-    public void setNormalizedLightness(final double normalizedLightness) {
+    public void setNormalizedLightness(final float normalizedLightness) {
         if (normalizedLightness < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedLightness > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized lightness: " + normalizedLightness);
         }
         setLightness(
-                (int) (normalizedLightness * MAX_LIGHTNESS)
+                normalizedLightness * MAX_LIGHTNESS
         );
     }
 
-    public SELF normalizedLightness(final double normalizedLightness) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedLightness(final float normalizedLightness) {
         setNormalizedLightness(normalizedLightness);
         return (SELF) this;
     }
@@ -251,18 +244,18 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @Max(MAX_ALPHA)
     @Min(MIN_ALPHA)
     @Transient
-    public int getAlpha() {
+    public float getAlpha() {
         return getComponent(COMPONENT_INDEX_A);
     }
 
-    public void setAlpha(final int alpha) {
-        if (alpha < MIN_ALPHA ||
-            alpha > MAX_ALPHA) {
+    public void setAlpha(final float alpha) {
+        if (alpha < MIN_ALPHA || alpha > MAX_ALPHA) {
             throw new IllegalArgumentException("invalid alpha: " + alpha);
         }
         setComponent(COMPONENT_INDEX_A, alpha);
     }
 
+    @SuppressWarnings("unchecked")
     public SELF alpha(final int alpha) {
         setAlpha(alpha);
         return (SELF) this;
@@ -271,19 +264,20 @@ public abstract class __MappedHsl<SELF extends __MappedHsl<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedAlpha() {
-        return getAlpha() / (double) MAX_ALPHA;
+    public float getNormalizedAlpha() {
+        return getAlpha() / MAX_ALPHA;
     }
 
-    public void setNormalizedAlpha(final double normalizedAlpha) {
+    public void setNormalizedAlpha(final float normalizedAlpha) {
         if (normalizedAlpha < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
         }
-        setAlpha((int) (normalizedAlpha * MAX_ALPHA));
+        setAlpha(normalizedAlpha * MAX_ALPHA);
     }
 
-    public SELF normalizedAlpha(final double normalizedAlpha) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedAlpha(final float normalizedAlpha) {
         setNormalizedAlpha(normalizedAlpha);
         return (SELF) this;
     }

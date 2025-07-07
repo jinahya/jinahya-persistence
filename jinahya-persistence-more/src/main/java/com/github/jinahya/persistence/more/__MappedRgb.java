@@ -86,46 +86,6 @@ public abstract class __MappedRgb<SELF extends __MappedRgb<SELF>> extends ___Map
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Nonnull
-    public <T extends __MappedHsl<T>> T toHsl(@Nonnull final T hsl) {
-        Objects.requireNonNull(hsl, "hsl is null");
-        return ___MappedColorUtils.rgbToHsl(
-                getNormalizedRed(),
-                getNormalizedGreen(),
-                getNormalizedBlue(),
-                h -> s -> l -> {
-                    return hsl.hue(h).normalizedSaturation(s).normalizedLightness(l);
-                }
-        );
-    }
-
-    @Nonnull
-    public <T extends __MappedHsl<T>> T toHsla(@Nonnull final T hsla) {
-        return toHsla(hsla).normalizedAlpha(getNormalizedAlpha());
-    }
-
-    @Nonnull
-    public <T extends __MappedHsl<T>> SELF fromHsl(@Nonnull final T hsl) {
-        Objects.requireNonNull(hsl, "hsl is null");
-        return ___MappedColorUtils.hslToRgb(
-                hsl.getHue(),
-                hsl.getNormalizedSaturation(),
-                hsl.getNormalizedLightness(),
-                r -> g -> b -> {
-//                    return normalizedRed(r)
-//                            .normalizedGreen(g)
-//                            .normalizedBlue(b);
-                    return null;
-                }
-        );
-    }
-
-    @Nonnull
-    public <T extends __MappedHsl<T>> SELF fromHsla(@Nonnull final T hsla) {
-        return fromHsl(hsla).normalizedAlpha(hsla.getNormalizedAlpha());
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Applies all components to the specified function, and returns the result.

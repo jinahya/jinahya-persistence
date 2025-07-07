@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Min;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
-import java.util.function.IntFunction;
 
 @MappedSuperclass
 public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___MappedColor<SELF> {
@@ -78,10 +77,10 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
 
     // -----------------------------------------------------------------------------------------------------------------
     public <R> R applyComponents(
-            final IntFunction< // h
-                    ? extends IntFunction< // s
-                            ? extends IntFunction< // l
-                                    ? extends IntFunction< // a
+            final DoubleFunction< // h
+                    ? extends DoubleFunction< // s
+                            ? extends DoubleFunction< // l
+                                    ? extends DoubleFunction< // a
                                             ? extends R>>>> function) {
         Objects.requireNonNull(function, "function is null");
         return function
@@ -104,18 +103,6 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
                 .apply(getNormalizedAlpha());
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    public <R> R toRgb(
-            final DoubleFunction<
-                    ? extends DoubleFunction<
-                            ? extends DoubleFunction<
-                                    ? extends R>>> function) {
-        Objects.requireNonNull(function, "function is null");
-        return applyComponents(
-                h -> s -> l -> a -> __MappedHwbUtils.hwbToRgb(h, s, l, function)
-        );
-    }
-
     // ------------------------------------------------------------------------------------------------------------- hue
 
     /**
@@ -126,7 +113,7 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
     @Max(HWB_MAX_HUE)
     @Min(HWB_MIN_HUE)
     @Transient
-    public int getHue() {
+    public float getHue() {
         return getComponent(COMPONENT_INDEX_H);
     }
 
@@ -136,7 +123,7 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
      * @param hue new value for the {@code hue} component between {@value __MappedHwb#HWB_MIN_HUE} and
      *            {@value __MappedHwb#HWB_MAX_HUE}, both inclusive.
      */
-    public void setHue(final int hue) {
+    public void setHue(final float hue) {
         if (hue < HWB_MIN_HUE || hue > HWB_MAX_HUE) {
             throw new IllegalArgumentException("invalid hue: " + hue);
         }
@@ -146,7 +133,8 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
         );
     }
 
-    public SELF hue(final int hue) {
+    @SuppressWarnings("unchecked")
+    public SELF hue(final float hue) {
         setHue(hue);
         return (SELF) this;
     }
@@ -154,44 +142,41 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedHue() {
-        return getHue() / (double) HWB_MAX_HUE;
+    public float getNormalizedHue() {
+        return getHue() / HWB_MAX_HUE;
     }
 
-    public void setNormalizedHue(final double normalizedHue) {
+    public void setNormalizedHue(final float normalizedHue) {
         if (normalizedHue < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedHue > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid hue: " + normalizedHue);
         }
-        setHue(
-                (int) (normalizedHue * HWB_MAX_HUE)
-        );
+        setHue(normalizedHue * HWB_MAX_HUE);
     }
 
-    public SELF normalizedHue(final double normalizedHue) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedHue(final float normalizedHue) {
         setNormalizedHue(normalizedHue);
         return (SELF) this;
     }
 
-    // ------------------------------------------------------------------------------------------------------ whiteness
+    // ------------------------------------------------------------------------------------------------------- whiteness
     @Max(HWB_MAX_WHITENESS)
     @Min(HWB_MIN_WHITENESS)
     @Transient
-    public int getWhiteness() {
+    public float getWhiteness() {
         return getComponent(COMPONENT_INDEX_S);
     }
 
-    public void setWhiteness(final int whiteness) {
+    public void setWhiteness(final float whiteness) {
         if (whiteness < HWB_MIN_WHITENESS ||
             whiteness > HWB_MAX_WHITENESS) {
             throw new IllegalArgumentException("invalid whiteness: " + whiteness);
         }
-        setComponent(
-                COMPONENT_INDEX_S,
-                whiteness
-        );
+        setComponent(COMPONENT_INDEX_S, whiteness);
     }
 
+    @SuppressWarnings("unchecked")
     public SELF whiteness(final int whiteness) {
         setWhiteness(whiteness);
         return (SELF) this;
@@ -200,43 +185,42 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedWhiteness() {
-        return getWhiteness() / (double) HWB_MAX_WHITENESS;
+    public float getNormalizedWhiteness() {
+        return getWhiteness() / HWB_MAX_WHITENESS;
     }
 
-    public void setNormalizedWhiteness(final double normalizedWhiteness) {
+    public void setNormalizedWhiteness(final float normalizedWhiteness) {
         if (normalizedWhiteness < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedWhiteness > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized whiteness: " + normalizedWhiteness);
         }
-        setWhiteness((int) (normalizedWhiteness * HWB_MAX_WHITENESS));
+        setWhiteness(normalizedWhiteness * HWB_MAX_WHITENESS);
     }
 
-    public SELF normalizedWhiteness(final double normalizedWhiteness) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedWhiteness(final float normalizedWhiteness) {
         setNormalizedWhiteness(normalizedWhiteness);
         return (SELF) this;
     }
 
-    // ------------------------------------------------------------------------------------------------------ blackness
+    // ------------------------------------------------------------------------------------------------------- blackness
     @Max(HWB_MAX_BLACKNESS)
     @Min(HWB_MIN_BLACKNESS)
     @Transient
-    public int getBlackness() {
+    public float getBlackness() {
         return getComponent(COMPONENT_INDEX_L);
     }
 
-    public void setBlackness(final int blackness) {
+    public void setBlackness(final float blackness) {
         if (blackness < HWB_MIN_BLACKNESS ||
             blackness > HWB_MAX_BLACKNESS) {
             throw new IllegalArgumentException("invalid blackness: " + blackness);
         }
-        setComponent(
-                COMPONENT_INDEX_L,
-                blackness
-        );
+        setComponent(COMPONENT_INDEX_L, blackness);
     }
 
-    public SELF blackness(final int blackness) {
+    @SuppressWarnings("unchecked")
+    public SELF blackness(final float blackness) {
         setBlackness(blackness);
         return (SELF) this;
     }
@@ -244,21 +228,20 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedBlackness() {
-        return getBlackness() / (double) HWB_MAX_BLACKNESS;
+    public float getNormalizedBlackness() {
+        return getBlackness() / HWB_MAX_BLACKNESS;
     }
 
-    public void setNormalizedBlackness(final double normalizedBlackness) {
+    public void setNormalizedBlackness(final float normalizedBlackness) {
         if (normalizedBlackness < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedBlackness > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized blackness: " + normalizedBlackness);
         }
-        setBlackness(
-                (int) (normalizedBlackness * HWB_MAX_BLACKNESS)
-        );
+        setBlackness(normalizedBlackness * HWB_MAX_BLACKNESS);
     }
 
-    public SELF normalizedBlackness(final double normalizedBlackness) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedBlackness(final float normalizedBlackness) {
         setNormalizedBlackness(normalizedBlackness);
         return (SELF) this;
     }
@@ -267,18 +250,18 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
     @Max(HWB_MAX_ALPHA)
     @Min(HWB_MIN_ALPHA)
     @Transient
-    public int getAlpha() {
+    public float getAlpha() {
         return getComponent(COMPONENT_INDEX_A);
     }
 
-    public void setAlpha(final int alpha) {
-        if (alpha < HWB_MIN_ALPHA ||
-            alpha > HWB_MAX_ALPHA) {
+    public void setAlpha(final float alpha) {
+        if (alpha < HWB_MIN_ALPHA || alpha > HWB_MAX_ALPHA) {
             throw new IllegalArgumentException("invalid alpha: " + alpha);
         }
         setComponent(COMPONENT_INDEX_A, alpha);
     }
 
+    @SuppressWarnings("unchecked")
     public SELF alpha(final int alpha) {
         setAlpha(alpha);
         return (SELF) this;
@@ -287,11 +270,11 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
     @DecimalMax(___MappedColorConstants.DECIMAL_MAX_COMPONENT_NORMALIZED)
     @DecimalMin(___MappedColorConstants.DECIMAL_MIN_COMPONENT_NORMALIZED)
     @Transient
-    public double getNormalizedAlpha() {
-        return getAlpha() / (double) HWB_MAX_ALPHA;
+    public float getNormalizedAlpha() {
+        return getAlpha() / HWB_MAX_ALPHA;
     }
 
-    public void setNormalizedAlpha(final double normalizedAlpha) {
+    public void setNormalizedAlpha(final float normalizedAlpha) {
         if (normalizedAlpha < ___MappedColorConstants.MIN_COMPONENT_NORMALIZED ||
             normalizedAlpha > ___MappedColorConstants.MAX_COMPONENT_NORMALIZED) {
             throw new IllegalArgumentException("invalid normalized alpha: " + normalizedAlpha);
@@ -299,7 +282,8 @@ public abstract class __MappedHwb<SELF extends __MappedHwb<SELF>> extends ___Map
         setAlpha((int) (normalizedAlpha * HWB_MAX_ALPHA));
     }
 
-    public SELF normalizedAlpha(final double normalizedAlpha) {
+    @SuppressWarnings("unchecked")
+    public SELF normalizedAlpha(final float normalizedAlpha) {
         setNormalizedAlpha(normalizedAlpha);
         return (SELF) this;
     }
