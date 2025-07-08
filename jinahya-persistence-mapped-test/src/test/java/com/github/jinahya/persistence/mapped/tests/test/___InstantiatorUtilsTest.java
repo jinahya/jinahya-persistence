@@ -38,7 +38,7 @@ class ___InstantiatorUtilsTest {
 
     @Test
     void __() {
-        final var randomized = ___InstantiatorUtils.newInitializedInstanceOf(Pojo.class);
+        final var randomized = ___InstantiatorUtils.newInstanceOf(Pojo.class);
         assertThat(randomized).hasValueSatisfying(v -> {
             assertThat(v.name).isEqualTo("name");
         });

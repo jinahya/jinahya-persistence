@@ -21,7 +21,7 @@ public final class ___MappedInstantiatorUtils {
     @Nonnull
     public static <T extends ___Mapped<T>> Optional<T> newInitializedInstanceOf(@Nonnull final Class<T> typeClass) {
         Objects.requireNonNull(typeClass, "typeClass is null");
-        return ___InstantiatorUtils.newInitializedInstanceOf(typeClass);
+        return ___InstantiatorUtils.newInstanceOf(typeClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -71,6 +71,12 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Tests accessors against the specified instance.
+     *
+     * @param entityInstance the instance to test.
+     */
     protected void __accessors(final ENTITY entityInstance) {
         try {
             final var info = Introspector.getBeanInfo(entityClass);

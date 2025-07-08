@@ -19,10 +19,10 @@ public final class __MappedEntityInstantiatorUtils {
      * @return an optional of the initialized entity; {@link Optional#empty() empty} when no initializer found.
      */
     @Nonnull
-    public static <T extends __MappedEntity<T, ?>> Optional<T> newInitializedInstanceOf(
+    public static <T extends __MappedEntity<T, ?>> Optional<T> newInstanceOf(
             @Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return ___InstantiatorUtils.newInitializedInstanceOf(entityClass);
+        return ___InstantiatorUtils.newInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

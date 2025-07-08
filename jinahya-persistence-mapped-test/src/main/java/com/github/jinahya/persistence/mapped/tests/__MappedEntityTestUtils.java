@@ -41,7 +41,7 @@ public abstract class __MappedEntityTestUtils {
     Stream<ENTITY> getEntityInstanceStream(final Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         return Stream.of(
-                __MappedEntityInstantiatorUtils.newInitializedInstanceOf(entityClass)
+                __MappedEntityInstantiatorUtils.newInstanceOf(entityClass)
                         .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(entityClass)),
                 __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass)
                         .orElse(null)

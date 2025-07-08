@@ -1,10 +1,8 @@
 package com.github.jinahya.persistence.more;
 
-import jakarta.persistence.AttributeConverter;
 import jakarta.validation.constraints.NotNull;
 
-public interface __AttributeEnum<E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
-        extends AttributeConverter<ATTRIBUTE, ATTRIBUTE> {
+public interface __AttributeEnum<E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE> {
 
     interface __OfString<E extends Enum<E> & __OfString<E>> extends __AttributeEnum<E, String> {
 
