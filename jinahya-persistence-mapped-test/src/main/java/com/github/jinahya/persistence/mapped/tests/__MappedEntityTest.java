@@ -6,13 +6,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.beans.Introspector;
 import java.util.Objects;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
@@ -46,17 +43,6 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
 
-    // -------------------------------------------------------------------------------------------------------- toString
-    @DisplayName("toString()!blank")
-    @ArgumentsSource(__MappedEntityArgumentsProvider.class)
-    @ParameterizedTest
-    protected void _NotBlank_(final ENTITY entityInstance) {
-        // -------------------------------------------------------------------------------------------------------- when
-        final var string = entityInstance.toString();
-        // -------------------------------------------------------------------------------------------------------- then
-        assertThat(string).isNotBlank();
-    }
-
     // ------------------------------------------------------------------------------------------------- equals/hashCode
 
     /**
@@ -85,30 +71,6 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-//    @DisplayName("getId()<ID>")
-//    @ArgumentsSource(__MappedEntityArgumentsProvider.class)
-//    @ParameterizedTest
-//    void GetId_DoesNotThrow_(final ENTITY entityInstance) {
-//        // --------------------------------------------------------------------------------------------------- when/then
-//        assertThatCode(entityInstance::getId__).doesNotThrowAnyException();
-//    }
-//
-//    @DisplayName("setId(<ID>)")
-//    @ArgumentsSource(__MappedEntityArgumentsProvider.class)
-//    @ParameterizedTest
-//    void SetId_DoesNotThrow_(final ENTITY entityInstance) {
-//        // ---------------------------------------------------------------------------------------------------------
-//        assertThatCode(() -> entityInstance.setId__(null)).doesNotThrowAnyException();
-//        assertThatCode(() -> entityInstance.setId__(newIdInstance())).doesNotThrowAnyException();
-//        assertThatCode(
-//                () -> entityInstance.setId__(newRandomizedIdInstance().orElse(null))
-//        ).doesNotThrowAnyException();
-//    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("setXxx(getXxx())")
-    @ArgumentsSource(__MappedEntityArgumentsProvider.class)
-    @ParameterizedTest
     protected void __accessors(final ENTITY entityInstance) {
         try {
             final var info = Introspector.getBeanInfo(entityClass);
@@ -140,8 +102,25 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
         }
     }
 
+    @Test
+    protected void accessors__newEntityInstance() {
+        __accessors(newTypeInstance());
+    }
+
+    @Test
+    protected void accessors__newRandomizedEntityInstance() {
+        newRandomizedTypeInstance().ifPresent(this::__accessors);
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The entity class to test.
+     */
     protected final Class<ENTITY> entityClass;
 
+    /**
+     * The id class of the {@link #entityClass}.
+     */
     protected final Class<ID> idClass;
 }

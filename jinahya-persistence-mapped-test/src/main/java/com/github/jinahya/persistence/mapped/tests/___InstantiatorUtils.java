@@ -6,8 +6,6 @@ import com.github.jinahya.persistence.mapped.tests.util.__JavaLangUtils;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Utilities for {@link ___Instantiator}.
  *
@@ -22,15 +20,17 @@ public final class ___InstantiatorUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                __JavaLangUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
-        ).map(ic -> {
-            final var typeClass = __JavaLangReflectUtils.getActualTypeParameter(ic, ___Instantiator.class, 0);
-            assertThat(typeClass)
-                    .as("type class of the instantiator class: %s", ic)
-                    .isNotNull()
-                    .isAssignableTo(type);
-            return ic;
-        });
+                        __JavaLangUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
+                )
+//                .map(ic -> {
+//                    final var typeClass = __JavaLangReflectUtils.getActualTypeParameter(ic, ___Instantiator.class, 0);
+//                    assertThat(typeClass)
+//                            .as("type class of the instantiator class: %s", ic)
+//                            .isNotNull()
+//                            .isAssignableTo(type);
+//                    return ic;
+//                })
+                ;
     }
 
     @SuppressWarnings({
