@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ___RandomizerUtilsTest {
 
-    private static class Pojo {
+     static class Pojo {
 
         public String getName() {
             return name;

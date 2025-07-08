@@ -27,7 +27,7 @@ public final class __JavaLangReflectUtils {
         if (index < 0) {
             throw new IllegalArgumentException("negative index: " + index);
         }
-        if (ThreadLocalRandom.current().nextBoolean()) {
+        if (false && ThreadLocalRandom.current().nextBoolean()) {
             final var rawArguments = TypeResolver.resolveRawArguments(type, clazz);
             if (index >= rawArguments.length) {
                 throw new IllegalArgumentException(

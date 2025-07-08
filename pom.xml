@@ -57,10 +57,10 @@
     <sonar.organization>jinahya-github</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
-    <version.maven-surefire>3.2.5</version.maven-surefire>
+    <version.maven-surefire>3.5.3</version.maven-surefire>
     <version.com.h2database>2.1.214</version.com.h2database>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
-    <version.nl.jqno.equalsverifier>4.0.3</version.nl.jqno.equalsverifier>
+    <version.nl.jqno.equalsverifier>4.0.5</version.nl.jqno.equalsverifier>
     <version.org.eclipse.persistence>4.0.1</version.org.eclipse.persistence>
     <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
     <version.org.hibernate.orm>6.2.2.Final</version.org.hibernate.orm>
@@ -79,7 +79,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.5.6</version>
+        <version>1.5.18</version>
       </dependency>
       <dependency>
         <groupId>jakarta.platform</groupId>
@@ -174,7 +174,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.6.3</version>
+          <version>3.11.2</version>
           <configuration>
             <doclint>all</doclint>
             <tags>
@@ -195,11 +195,22 @@
               </tag>
             </tags>
           </configuration>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <goals>
+                <goal>test-aggregate</goal>
+              </goals>
+              <configuration>
+                <show>package</show>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>4.0.0-M13</version>
+          <version>4.0.0-M16</version>
         </plugin>
         <plugin><!-- used by maven-site-plugin -->
           <groupId>org.apache.maven.plugins</groupId>
@@ -209,7 +220,10 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
-          <version>2.16.2</version>
+          <version>2.18.0</version>
+          <configuration>
+            <processDependencyManagement>false</processDependencyManagement>
+          </configuration>
         </plugin>
         <!--        <plugin>-->
         <!--          <groupId>org.jacoco</groupId>-->
@@ -222,32 +236,33 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.4.1</version>
+        <version>3.6.0</version>
+        <configuration>
+          <!--              <skip>true</skip>-->
+          <rules>
+            <dependencyConvergence/>
+            <requireJavaVersion>
+              <version>[17.0.0,)</version>
+            </requireJavaVersion>
+            <requireMavenVersion>
+              <version>[3.6.3,)</version>
+            </requireMavenVersion>
+          </rules>
+        </configuration>
         <executions>
           <execution>
             <id>enforce</id>
             <goals>
               <goal>enforce</goal>
             </goals>
-            <configuration>
-              <!--              <skip>true</skip>-->
-              <rules>
-                <dependencyConvergence/>
-                <requireJavaVersion>
-                  <version>[17.0.0,)</version>
-                </requireJavaVersion>
-                <requireMavenVersion>
-                  <version>[3.6.3,)</version>
-                </requireMavenVersion>
-              </rules>
-            </configuration>
           </execution>
         </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <!-- https://central.sonatype.com/artifact/org.apache.maven.plugins/maven-compiler-plugin/versions -->
+        <version>3.14.0</version>
         <configuration>
           <compilerArgs>
             <arg>-Xlint</arg>
@@ -257,7 +272,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.4.0</version>
+        <version>3.4.2</version>
         <configuration>
           <archive>
             <!-- https://dzone.com/articles/automatic-module-name-calling-all-java-library-maintainers -->
@@ -276,7 +291,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>2.4.0</version>
+        <version>2.6.0</version>
         <configuration>
           <licenseName>apache_v2</licenseName>
         </configuration>
@@ -284,7 +299,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tidy-maven-plugin</artifactId>
-        <version>1.2.0</version>
+        <version>1.4.0</version>
         <executions>
           <execution>
             <id>validate</id>
@@ -321,26 +336,58 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.8.4.0</version>
+        <version>4.9.3.2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>3.3.2</version>
+        <version>3.6.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.6.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.9.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <reportSets>
+          <reportSet><!-- by default, id = "default" -->
+            <reports><!-- select non-aggregate reports -->
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet><!-- by default, id = "default" -->
+            <reports><!-- select non-aggregate reports -->
+              <report>test-javadoc</report>
+            </reports>
+            <configuration>
+              <show>package</show>
+            </configuration>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>true</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>test-aggregate</id>
+            <inherited>true</inherited>
+            <reports>
+              <report>test-aggregate</report>
+            </reports>
+            <configuration>
+              <show>package</show>
+            </configuration>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -352,7 +399,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.21.2</version>
+        <version>3.27.0</version>
         <configuration>
           <targetJdk>${maven.compiler.source}</targetJdk>
           <skipEmptyReport>false</skipEmptyReport> <!-- https://issues.apache.org/jira/browse/MPMD-225 -->

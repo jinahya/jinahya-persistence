@@ -8,6 +8,12 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Utilities for {@link ___Randomizer}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see ___Randomizer
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -17,13 +23,11 @@ public final class ___RandomizerUtils {
         return Optional.ofNullable(
                 __JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
         ).map(ic -> {
-            final var typeClass = __JavaLangReflectUtils.getActualTypeParameter(ic, ___Instantiator.class, 0);
-            if (false) {
-                assertThat(typeClass)
-                        .as("type class of the randomizer class: %s", ic)
-                        .isNotNull()
-                        .isAssignableTo(type);
-            }
+            final var typeClass = __JavaLangReflectUtils.getActualTypeParameter(ic, ___Randomizer.class, 0);
+            assertThat(typeClass)
+                    .as("type class of the randomizer class: %s", ic)
+                    .isNotNull()
+                    .isAssignableTo(type);
             return ic;
         });
     }

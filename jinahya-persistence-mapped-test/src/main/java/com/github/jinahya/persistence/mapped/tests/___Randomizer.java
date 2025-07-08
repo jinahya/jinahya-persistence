@@ -8,10 +8,19 @@ import uk.co.jemos.podam.api.RandomDataProviderStrategyImpl;
 
 import java.util.Objects;
 
+/**
+ * An abstract class for randomizing a specific class.
+ *
+ * @param <T> type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see ___Instantiator
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class ___Randomizer<T> {
+
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance for initializing a randomized instance of the specified class.
