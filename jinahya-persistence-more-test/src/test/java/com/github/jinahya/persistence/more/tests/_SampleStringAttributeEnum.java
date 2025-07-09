@@ -8,6 +8,7 @@ enum _SampleStringAttributeEnum implements __SampleStringAttributeEnum<_SampleSt
 
     B("SOME");
 
+    // ----------------------------------------------------------------------------------------------------- CONSTRUCTORS
     _SampleStringAttributeEnum(final String attributeValue) {
         this.attributeValue = attributeValue;
     }
@@ -16,11 +17,13 @@ enum _SampleStringAttributeEnum implements __SampleStringAttributeEnum<_SampleSt
         this(null);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Override
     public String attributeValue() {
         return Optional.ofNullable(attributeValue)
                 .orElseGet(__SampleStringAttributeEnum.super::attributeValue);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     private final String attributeValue;
 }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -72,6 +71,7 @@
     <version.org.junit.jupiter>${version.org.junit}</version.org.junit.jupiter>
     <version.org.junit.platform>1.9.1</version.org.junit.platform>
     <version.org.mockito>5.18.0</version.org.mockito>
+    <version.org.projectlombok>1.18.38</version.org.projectlombok>
   </properties>
 
   <dependencyManagement>
@@ -156,7 +156,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.38</version>
+        <version>${version.org.projectlombok}</version>
       </dependency>
       <dependency>
         <groupId>uk.co.jemos.podam</groupId>
@@ -264,6 +264,13 @@
         <!-- https://central.sonatype.com/artifact/org.apache.maven.plugins/maven-compiler-plugin/versions -->
         <version>3.14.0</version>
         <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${version.org.projectlombok}</version>
+            </path>
+          </annotationProcessorPaths>
           <compilerArgs>
             <arg>-Xlint</arg>
           </compilerArgs>

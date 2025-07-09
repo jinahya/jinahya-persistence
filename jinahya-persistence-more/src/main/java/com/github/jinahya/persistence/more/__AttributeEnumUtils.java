@@ -9,11 +9,11 @@ import java.util.Objects;
 })
 public final class __AttributeEnumUtils {
 
-    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE> E valueOfAttributeValue(
-            final Class<E> enumClass, final ATTRIBUTE attributeValue) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
+    ENUM valueOfAttributeValue(final Class<ENUM> enumClass, final ATTRIBUTE attributeValue) {
         Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(attributeValue, "attributeValue is null");
-        for (final E enumConstant : enumClass.getEnumConstants()) {
+        for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             if (Objects.equals(enumConstant.attributeValue(), attributeValue)) {
                 return enumConstant;
             }
@@ -23,14 +23,14 @@ public final class __AttributeEnumUtils {
         );
     }
 
-    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE> E valueOfAttributeValue(
-            final ATTRIBUTE attributeValue, final Class<? extends E>... enumClasses) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
+    ENUM valueOfAttributeValue(final ATTRIBUTE attributeValue, final Class<? extends ENUM>... enumClasses) {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         if (Objects.requireNonNull(enumClasses, "enumClasses is null").length == 0) {
             throw new IllegalArgumentException("enumClasses is empty");
         }
         for (final var enumClass : enumClasses) {
-            for (final E enumConstant : enumClass.getEnumConstants()) {
+            for (final ENUM enumConstant : enumClass.getEnumConstants()) {
                 if (Objects.equals(enumConstant.attributeValue(), attributeValue)) {
                     return enumConstant;
                 }
