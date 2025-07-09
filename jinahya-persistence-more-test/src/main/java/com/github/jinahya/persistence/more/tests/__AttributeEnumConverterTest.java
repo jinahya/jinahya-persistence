@@ -17,24 +17,35 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class __AttributeEnumConverterTest<
-        CONVERTER extends __AttributeEnumConverter<E, ATTRIBUTE>,
-        E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>,
+        CONVERTER extends __AttributeEnumConverter<ENUM, ATTRIBUTE>,
+        ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>,
         ATTRIBUTE
         >
-        extends ___AttributeEnumTest<E, ATTRIBUTE> {
+        extends ___AttributeEnumTest<ENUM, ATTRIBUTE> {
 
     /**
      * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfString}.
      *
      * @param <CONVERTER> converter type parameter
-     * @param <E> entity type parameter
+     * @param <ENUM>      entity type parameter
+     * @see #converterClass
+     * @see #enumClass
      */
     public abstract static class __OfString<
-            CONVERTER extends __AttributeEnumConverter.__OfString<E>,
-            E extends Enum<E> & __AttributeEnum.__OfString<E>>
-            extends __AttributeEnumConverterTest<CONVERTER, E, String> {
+            CONVERTER extends __AttributeEnumConverter.__OfString<ENUM>,
+            ENUM extends Enum<ENUM> & __AttributeEnum.__OfString<ENUM>
+            >
+            extends __AttributeEnumConverterTest<CONVERTER, ENUM, String> {
 
-        protected __OfString(final Class<CONVERTER> converterClass, final Class<E> enumClass) {
+        /**
+         * {@inheritDoc}
+         *
+         * @param converterClass {@inheritDoc}.
+         * @param enumClass      {@inheritDoc}.
+         * @see #converterClass
+         * @see #enumClass
+         */
+        protected __OfString(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
             super(converterClass, enumClass, String.class);
         }
     }
@@ -47,7 +58,7 @@ public abstract class __AttributeEnumConverterTest<
      * @param converterClass the converter class to test.
      * @see #converterClass
      */
-    protected __AttributeEnumConverterTest(final Class<CONVERTER> converterClass, final Class<E> enumClass,
+    protected __AttributeEnumConverterTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass,
                                            final Class<ATTRIBUTE> attributeClass) {
         super(enumClass, attributeClass);
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");

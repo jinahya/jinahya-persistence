@@ -4,6 +4,12 @@ import jakarta.persistence.AttributeConverter;
 
 import java.util.Objects;
 
+/**
+ * An abstract attribute converter for converting between {@link ENUM} type and {@link ATTRIBUTE} type.
+ *
+ * @param <ENUM>      enum type parameter
+ * @param <ATTRIBUTE> attribute type parameter
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
@@ -11,9 +17,20 @@ import java.util.Objects;
 public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
         implements AttributeConverter<ENUM, ATTRIBUTE> {
 
+    /**
+     * An abstract attribute converter for converting between {@link ENUM} and attribute of {@link String} type.
+     *
+     * @param <ENUM> enum type parameter
+     */
     public abstract static class __OfString<ENUM extends Enum<ENUM> & __AttributeEnum.__OfString<ENUM>>
             extends __AttributeEnumConverter<ENUM, String> {
 
+        /**
+         * Creates a new instance for the specified enum class.
+         *
+         * @param enumClass the enum class.
+         * @see #enumClass
+         */
         protected __OfString(final Class<ENUM> enumClass) {
             super(enumClass, String.class);
         }

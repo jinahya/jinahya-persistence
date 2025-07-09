@@ -6,11 +6,11 @@ import com.github.jinahya.persistence.more.__AttributeEnumConverter;
         "java:S119" // Type parameter names should comply with a naming convention
 })
 abstract class __SampleIntegerAttributeEnumConverter<
-        E extends Enum<E> & __SampleIntegerAttributeEnum<E>
+        ENUM extends Enum<ENUM> & __SampleIntegerAttributeEnum<ENUM>
         >
-        extends __AttributeEnumConverter<E, Integer> {
+        extends __AttributeEnumConverter<ENUM, Integer> {
 
-    __SampleIntegerAttributeEnumConverter(final Class<E> enumClass) {
+    __SampleIntegerAttributeEnumConverter(final Class<ENUM> enumClass) {
         super(enumClass, Integer.class);
     }
 }

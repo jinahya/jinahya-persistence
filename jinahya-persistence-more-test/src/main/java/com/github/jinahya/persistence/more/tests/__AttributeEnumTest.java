@@ -59,11 +59,10 @@ public abstract class __AttributeEnumTest<ENUM extends Enum<ENUM> & __AttributeE
     @DisplayName("no duplicates in all attributeValues")
     @Test
     protected void attributeValues_NoDuplicates_AllEnumConstants() {
-        applyAttributeValueStream(s -> {
+        acceptAttributeValueStream(s -> {
             assertThat(s)
                     .as("attributeValues of %s", enumClass)
                     .doesNotHaveDuplicates();
-            return null;
         });
     }
 }

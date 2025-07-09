@@ -20,42 +20,6 @@ public interface __AttributeEnum<ENUM extends Enum<ENUM> & __AttributeEnum<ENUM,
         }
     }
 
-//    interface ___OfInt<E extends Enum<E> & ___OfInt<E>> {
-//
-//        static <E extends Enum<E> & ___OfInt<E>> E valueOfAttributeValue(
-//                final Class<? extends E> enumClass, final int attributeValueAsInt) {
-//            Objects.requireNonNull(enumClass, "enumClass is null");
-//            for (final E enumConstant : enumClass.getEnumConstants()) {
-//                if (Objects.equals(enumConstant.getAttributeValueAsInt(), attributeValueAsInt)) {
-//                    return enumConstant;
-//                }
-//            }
-//            throw new IllegalArgumentException(
-//                    "no enum constant, of " + enumClass + ", for attributeValueAsInt: " + attributeValueAsInt
-//            );
-//        }
-//
-//        int getAttributeValueAsInt();
-//    }
-//
-//    interface ___OfLong<E extends Enum<E> & ___OfLong<E>> {
-//
-//        static <E extends Enum<E> & ___OfLong<E>> E valueOfAttributeValue(
-//                final Class<? extends E> enumClass, final long attributeValueAsLong) {
-//            Objects.requireNonNull(enumClass, "enumClass is null");
-//            for (final E enumConstant : enumClass.getEnumConstants()) {
-//                if (Objects.equals(enumConstant.getAttributeValueAsLong(), attributeValueAsLong)) {
-//                    return enumConstant;
-//                }
-//            }
-//            throw new IllegalArgumentException(
-//                    "no enum constant, of " + enumClass + ", for attributeValueAsLong: " + attributeValueAsLong
-//            );
-//        }
-//
-//        long getAttributeValueAsLong();
-//    }
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
