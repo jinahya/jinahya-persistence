@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * A class for testing subclass of {@link __AttributeEnum}.
  *
- * @param <ENUM>         enum type parameter
+ * @param <ENUM>      enum type parameter
  * @param <ATTRIBUTE> attribute type parameter
  */
 @SuppressWarnings({

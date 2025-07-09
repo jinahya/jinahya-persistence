@@ -18,8 +18,7 @@ public abstract class __DatabaseConstants {
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/storage-requirements.html">Data Type Storage
      *         Requirements</a>
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/integer-types.html">Integer Types (Exact Value) -
-     *         INTEGER,
-     *         INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
+     *         INTEGER, INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
      */
     public abstract class __MySQLConstants {
 
