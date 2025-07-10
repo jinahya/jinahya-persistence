@@ -22,7 +22,7 @@ public final class __MappedEntityInstantiatorUtils {
     public static <T extends __MappedEntity<T, ?>> Optional<T> newInstanceOf(
             @Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return ___InstantiatorUtils.newInstanceOf(entityClass);
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

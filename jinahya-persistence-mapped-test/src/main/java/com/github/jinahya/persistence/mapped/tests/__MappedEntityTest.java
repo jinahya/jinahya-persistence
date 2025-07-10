@@ -28,8 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
-        extends ___MappedTest<ENTITY> {
+public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -42,7 +41,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      * @see #idClass
      */
     protected __MappedEntityTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
-        super(entityClass);
+        super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
@@ -126,24 +125,25 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
 
     // -----------------------------------------------------------------------------------------------------------------
     protected ENTITY newEntityInstance() {
-        return super.newTypeInstance();
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
+                .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(entityClass));
     }
 
     protected ENTITY newEntityInstanceSpy() {
-        return Mockito.spy(newTypeInstance());
+        return Mockito.spy(newEntityInstance());
     }
 
     protected Optional<ENTITY> newRandomizedEntityInstance() {
-        return super.newRandomizedTypeInstance();
+        return ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
-        return Mockito.spy(newRandomizedTypeInstance());
+        return Mockito.spy(newRandomizedEntityInstance());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     protected ID newIdInstance() {
-        return ___InstantiatorUtils.newInstanceOf(idClass)
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
                 .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(idClass));
     }
 

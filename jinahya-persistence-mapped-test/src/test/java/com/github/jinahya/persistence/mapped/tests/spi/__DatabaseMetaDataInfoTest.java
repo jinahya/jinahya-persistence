@@ -11,7 +11,7 @@ class __DatabaseMetaDataInfoTest {
         final var loaded = __DatabaseMetaDataInfo.load();
         assertThat(loaded).hasValueSatisfying(v -> {
             assertThat(v.getCatalog()).isEqualTo(__DatabaseMetaDataInfoImpl.CATALOG);
-            assertThat(v.getCatalog()).isEqualTo(__DatabaseMetaDataInfoImpl.CATALOG);
+            assertThat(v.getSchema()).isEqualTo(__DatabaseMetaDataInfoImpl.SCHEMA);
         });
     }
 }

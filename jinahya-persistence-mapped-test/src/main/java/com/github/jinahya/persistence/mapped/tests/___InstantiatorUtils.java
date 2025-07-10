@@ -54,7 +54,7 @@ public final class ___InstantiatorUtils {
      * @param <T>  class type parameter
      * @return an optional of the initialized instance; {@link Optional#empty() empty} when no instantiator found.
      */
-    public static <T> Optional<T> newInstanceOf(final Class<T> type) {
+    public static <T> Optional<T> newInstantiatedInstanceOf(final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
         return newInstantiatorInstanceOf(type)
                 .map(___Instantiator::get);

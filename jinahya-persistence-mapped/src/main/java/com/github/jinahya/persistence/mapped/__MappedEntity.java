@@ -10,7 +10,7 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> extends ___Mapped<SELF> {
+public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> {
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 

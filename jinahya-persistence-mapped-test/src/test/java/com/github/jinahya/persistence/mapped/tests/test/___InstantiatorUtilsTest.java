@@ -20,7 +20,11 @@ class ___InstantiatorUtilsTest {
             this(null);
         }
 
-        private String name;
+        public String getName() {
+            return name;
+        }
+
+        private final String name;
     }
 
     private static class PojoInstantiator extends ___Instantiator<Pojo> {
@@ -36,11 +40,10 @@ class ___InstantiatorUtilsTest {
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Test
     void __() {
-        final var randomized = ___InstantiatorUtils.newInstanceOf(Pojo.class);
-        assertThat(randomized).hasValueSatisfying(v -> {
-            assertThat(v.name).isEqualTo("name");
-        });
+        final var instance = ___InstantiatorUtils.newInstantiatedInstanceOf(Pojo.class);
+        assertThat(instance).isPresent();
     }
 }

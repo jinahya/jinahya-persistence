@@ -63,7 +63,7 @@ public abstract class ___Randomizer<T> {
      */
     @Nonnull
     public T get() {
-        return ___InstantiatorUtils.newInstanceOf(type)
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(type)
                 .map(o -> getPodamFactory().populatePojo(o))
                 .orElseGet(() -> getPodamFactory().manufacturePojo(type));
     }

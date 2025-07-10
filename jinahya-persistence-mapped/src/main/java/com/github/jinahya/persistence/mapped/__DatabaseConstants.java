@@ -5,7 +5,7 @@ import java.math.BigInteger;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __DatabaseConstants {
+public final class __DatabaseConstants {
 
     // ----------------------------------------------------------------------------------------------------------- MySQL
 
@@ -20,7 +20,7 @@ public abstract class __DatabaseConstants {
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/integer-types.html">Integer Types (Exact Value) -
      *         INTEGER, INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
      */
-    public abstract class __MySQLConstants {
+    public static final class __MySQLConstants {
 
         // ----------------------------------------------------------------------------------------------------- TINYINT
 
@@ -146,8 +146,8 @@ public abstract class __DatabaseConstants {
         /**
          * Creates a new instance.
          */
-        protected __MySQLConstants() {
-            super();
+        private __MySQLConstants() {
+            throw new AssertionError("instantiation is not allowed");
         }
     }
 
@@ -160,7 +160,7 @@ public abstract class __DatabaseConstants {
      *         Manual)
      * @see <a href="https://www.postgresql.org/docs/current/datatype-numeric.html">Numberic Types</a>
      */
-    public abstract static class __PostgreSQLConstants {
+    public static final class __PostgreSQLConstants {
 
         // ---------------------------------------------------------------------------------------------------- smallint
         public static final int MIN_SMALLINT = Short.MIN_VALUE;
@@ -225,8 +225,8 @@ public abstract class __DatabaseConstants {
         /**
          * Creates a new instance.
          */
-        protected __PostgreSQLConstants() {
-            super();
+        private __PostgreSQLConstants() {
+            throw new AssertionError("instantiation is not allowed");
         }
     }
 
@@ -235,7 +235,7 @@ public abstract class __DatabaseConstants {
     /**
      * Creates a new instance.
      */
-    protected __DatabaseConstants() {
-        super();
+    private __DatabaseConstants() {
+        throw new AssertionError("instantiation is not allowed");
     }
 }
