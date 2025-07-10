@@ -12,55 +12,55 @@ class _PersistenceProducer extends __PersistenceProducer {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Local__
+    @Memory__
     @Produces
     @Override
-    protected EntityManagerFactory produceLocalEntityManagerFactory() {
-        return super.produceLocalEntityManagerFactory();
+    protected EntityManagerFactory produceMemoryEntityManagerFactory() {
+        return super.produceMemoryEntityManagerFactory();
     }
 
     @Override
-    protected void disposeLocalEntityManagerFactory(
-            @Local__ @Disposes final EntityManagerFactory entityManagerFactory) {
-        super.disposeLocalEntityManagerFactory(entityManagerFactory);
+    protected void disposeMemoryEntityManagerFactory(
+            @Memory__ @Disposes final EntityManagerFactory entityManagerFactory) {
+        super.disposeMemoryEntityManagerFactory(entityManagerFactory);
     }
 
-    @Local__
+    @Memory__
     @Produces
     @Override
-    protected EntityManager produceLocalEntityManager(
-            @Local__ final EntityManagerFactory eEntityManagerFactory) {
-        return super.produceLocalEntityManager(eEntityManagerFactory);
+    protected EntityManager produceMemoryEntityManager(
+            @Memory__ final EntityManagerFactory eEntityManagerFactory) {
+        return super.produceMemoryEntityManager(eEntityManagerFactory);
     }
 
     @Override
-    protected void disposeLocalEntityManager(@Local__ @Disposes final EntityManager entityManager) {
-        super.disposeLocalEntityManager(entityManager);
+    protected void disposeMemoryEntityManager(@Memory__ @Disposes final EntityManager entityManager) {
+        super.disposeMemoryEntityManager(entityManager);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Remote__
     @Produces
     @Override
-    protected EntityManagerFactory produceRemoteEntityManagerFactory() {
-        return super.produceRemoteEntityManagerFactory();
+    protected EntityManagerFactory producePhysicalEntityManagerFactory() {
+        return super.producePhysicalEntityManagerFactory();
     }
 
     @Override
-    protected void disposeRemoteEntityManagerFactory(
+    protected void disposePhysicalEntityManagerFactory(
             @Remote__ @Disposes final EntityManagerFactory entityManagerFactory) {
-        super.disposeRemoteEntityManagerFactory(entityManagerFactory);
+        super.disposePhysicalEntityManagerFactory(entityManagerFactory);
     }
 
     @Remote__
     @Produces
     @Override
-    protected EntityManager produceRemoteEntityManager(@Remote__ final EntityManagerFactory entityManagerFactory) {
-        return super.produceRemoteEntityManager(entityManagerFactory);
+    protected EntityManager producePhysicalEntityManager(@Remote__ final EntityManagerFactory entityManagerFactory) {
+        return super.producePhysicalEntityManager(entityManagerFactory);
     }
 
     @Override
-    protected void disposeRemoteEntityManager(@Remote__ @Disposes final EntityManager entityManager) {
-        super.disposeRemoteEntityManager(entityManager);
+    protected void disposePhysicalEntityManager(@Remote__ @Disposes final EntityManager entityManager) {
+        super.disposePhysicalEntityManager(entityManager);
     }
 }

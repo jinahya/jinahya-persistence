@@ -18,7 +18,7 @@ public abstract class __PersistenceProducer {
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
-    public @interface Local__ {
+    public @interface Memory__ {
 
     }
 
@@ -29,50 +29,50 @@ public abstract class __PersistenceProducer {
 
     }
 
-    static final String PERSISTENCE_UNIT_NAME_LOCAL__ = "localPU";
+    static final String PERSISTENCE_UNIT_NAME_MEMORY__ = "memoryPU";
 
-    static final String PERSISTENCE_UNIT_NAME_REMOTE__ = "remotePU";
+    static final String PERSISTENCE_UNIT_NAME_PHYSICAL__ = "physicalPU";
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __PersistenceProducer() {
         super();
     }
 
-    // ----------------------------------------------------------------------------------------------------------- local
-    @Local__
-    protected EntityManagerFactory produceLocalEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_LOCAL__);
+    // ---------------------------------------------------------------------------------------------------------- memory
+    @Memory__
+    protected EntityManagerFactory produceMemoryEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_MEMORY__);
     }
 
-    protected void disposeLocalEntityManagerFactory(@Local__ final EntityManagerFactory entityManagerFactory) {
+    protected void disposeMemoryEntityManagerFactory(@Memory__ final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
-    @Local__
-    protected EntityManager produceLocalEntityManager(final EntityManagerFactory entityManagerFactory) {
+    @Memory__
+    protected EntityManager produceMemoryEntityManager(final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeLocalEntityManager(@Local__ final EntityManager entityManager) {
+    protected void disposeMemoryEntityManager(@Memory__ final EntityManager entityManager) {
         entityManager.close();
     }
 
     // ---------------------------------------------------------------------------------------------------------- remote
     @Remote__
-    protected EntityManagerFactory produceRemoteEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_REMOTE__);
+    protected EntityManagerFactory producePhysicalEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_PHYSICAL__);
     }
 
-    protected void disposeRemoteEntityManagerFactory(@Remote__ final EntityManagerFactory entityManagerFactory) {
+    protected void disposePhysicalEntityManagerFactory(@Remote__ final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
     @Remote__
-    protected EntityManager produceRemoteEntityManager(final EntityManagerFactory entityManagerFactory) {
+    protected EntityManager producePhysicalEntityManager(final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeRemoteEntityManager(@Remote__ final EntityManager entityManager) {
+    protected void disposePhysicalEntityManager(@Remote__ final EntityManager entityManager) {
         entityManager.close();
     }
 }

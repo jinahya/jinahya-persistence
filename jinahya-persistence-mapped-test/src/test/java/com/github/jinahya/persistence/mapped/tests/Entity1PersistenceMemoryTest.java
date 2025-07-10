@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-class Entity1PersistenceInMemoryTest extends _MappedEntityPersistenceInMemoryTest<Entity1, Long> {
+class Entity1PersistenceMemoryTest extends _MappedEntityPersistenceMemoryTest<Entity1, Long> {
 
-    Entity1PersistenceInMemoryTest() {
+    Entity1PersistenceMemoryTest() {
         super(Entity1.class, Long.class);
     }
 
