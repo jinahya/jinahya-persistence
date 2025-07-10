@@ -1,14 +1,18 @@
 package com.github.jinahya.persistence.mapped.tests;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.Transient;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.beans.Introspector;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -65,6 +69,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      * @see EqualsVerifier#forClass(Class)
      * @see #_verify_equals()
      */
+    @Nonnull
     protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
         return EqualsVerifier.forClass(entityClass)
                 ;
@@ -77,7 +82,8 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      *
      * @param entityInstance the instance to test.
      */
-    protected void __accessors(final ENTITY entityInstance) {
+    protected void __accessors(@Nonnull final ENTITY entityInstance) {
+        Objects.requireNonNull(entityInstance, "entityInstance is null");
         try {
             final var info = Introspector.getBeanInfo(entityClass);
             for (final var descriptor : info.getPropertyDescriptors()) {
@@ -110,12 +116,47 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
 
     @Test
     protected void accessors__newEntityInstance() {
-        __accessors(newTypeInstance());
+        __accessors(newEntityInstance());
     }
 
     @Test
     protected void accessors__newRandomizedEntityInstance() {
-        newRandomizedTypeInstance().ifPresent(this::__accessors);
+        newRandomizedEntityInstance().ifPresent(this::__accessors);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected ENTITY newEntityInstance() {
+        return super.newTypeInstance();
+    }
+
+    protected ENTITY newEntityInstanceSpy() {
+        return Mockito.spy(newTypeInstance());
+    }
+
+    protected Optional<ENTITY> newRandomizedEntityInstance() {
+        return super.newRandomizedTypeInstance();
+    }
+
+    protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
+        return Mockito.spy(newRandomizedTypeInstance());
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected ID newIdInstance() {
+        return ___InstantiatorUtils.newInstanceOf(idClass)
+                .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(idClass));
+    }
+
+    protected ID newIdInstanceSpy() {
+        return Mockito.spy(newIdInstance());
+    }
+
+    protected Optional<ID> newRandomizedIdInstance() {
+        return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
+    }
+
+    protected Optional<ID> newRandomizedIdInstanceSpy() {
+        return Mockito.spy(newRandomizedIdInstance());
     }
 
     // -----------------------------------------------------------------------------------------------------------------

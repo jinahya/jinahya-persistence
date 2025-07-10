@@ -55,30 +55,4 @@ public final class __MappedEntityJdbcUtils {
                 consumer
         );
     }
-
-//    public static <ENTITY extends __MappedEntity<ENTITY, ?>>
-//    void acceptEachColumnName(@Nonnull final Connection connection,
-//                              @Nonnull final __DatabaseMetaDataInfo databaseMetaDataInfo,
-//                              @Nonnull final Class<ENTITY> entityClass,
-//                              @Nonnull final Consumer<? super String> consumer)
-//            throws SQLException {
-//        Objects.requireNonNull(connection, "connection is null");
-//        Objects.requireNonNull(entityClass, "entityClass is null");
-//        Objects.requireNonNull(databaseMetaDataInfo, "databaseMetaDataInfo is null");
-//        Objects.requireNonNull(consumer, "consumer is null");
-//        final var table = entityClass.getAnnotation(Table.class);
-//        if (table == null) {
-//            throw new IllegalArgumentException("entityClass does not have @Table annotation: " + entityClass);
-//        }
-//        final var catalog = databaseMetaDataInfo.getCatalog();
-//        final var schemaPattern = databaseMetaDataInfo.getSchema();
-//        final var tableNamePattern = table.name();
-//        acceptEachColumnName(
-//                connection,
-//                catalog,
-//                schemaPattern,
-//                tableNamePattern,
-//                consumer
-//        );
-//    }
 }

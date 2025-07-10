@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.mapped.tests.util;
 
+import jakarta.annotation.Nonnull;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
@@ -12,15 +13,16 @@ import java.util.function.Function;
 
 public final class __JakartaValidationTestUtils {
 
-    public static <T> Set<ConstraintViolation<T>> validate(Validator validator, final T object,
-                                                           final Class<?>... groups) {
+    public static <T> Set<ConstraintViolation<T>> validate(@Nonnull final Validator validator, @Nonnull final T object,
+                                                           @Nonnull final Class<?>... groups) {
         Objects.requireNonNull(validator, "validator is null");
         Objects.requireNonNull(object, "object is null");
         Objects.requireNonNull(groups, "groups is null");
         return validator.validate(object, groups);
     }
 
-    public static <T> T requireValid(final Validator validator, final T object, final Class<?>... groups) {
+    public static <T> T requireValid(@Nonnull final Validator validator, @Nonnull final T object,
+                                     @Nonnull final Class<?>... groups) {
         Objects.requireNonNull(validator, "validator is null");
         Objects.requireNonNull(object, "object is null");
         Objects.requireNonNull(groups, "groups is null");
@@ -32,7 +34,6 @@ public final class __JakartaValidationTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
     public static <R> R applyValidationFactory(final Function<? super ValidatorFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         try (var factory = Validation.buildDefaultValidatorFactory()) {

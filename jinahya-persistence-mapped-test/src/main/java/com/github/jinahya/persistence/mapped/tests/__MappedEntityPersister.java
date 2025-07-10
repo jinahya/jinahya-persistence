@@ -1,29 +1,21 @@
 package com.github.jinahya.persistence.mapped.tests;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
-import com.github.jinahya.persistence.mapped.tests.util.__JakartaValidationTestUtils;
 import jakarta.persistence.EntityManager;
 
-import java.util.Objects;
-
-public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ENTITY, ?>> {
+@SuppressWarnings({
+        "java:S101", // Class names should comply with a naming convention
+        "java:S119" // Type parameter names should comply with a naming convention
+})
+public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ENTITY, ?>> extends ___Persister<ENTITY> {
 
     protected __MappedEntityPersister(final Class<ENTITY> entityClass) {
-        super();
-        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+        super(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected ENTITY persist(final EntityManager entityManager, final ENTITY entityInstance) {
-        Objects.requireNonNull(entityManager, "entityManager is null");
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
-        __JakartaValidationTestUtils.requireValid(entityInstance);
-        entityManager.persist(entityInstance);
-        entityManager.flush(); // required?
-        __JakartaValidationTestUtils.requireValid(entityInstance);
-        return entityInstance;
+    @Override
+    public ENTITY persist(final EntityManager entityManager, final ENTITY entityInstance) {
+        return super.persist(entityManager, entityInstance);
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    protected final Class<ENTITY> entityClass;
 }
