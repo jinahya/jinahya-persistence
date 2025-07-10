@@ -134,7 +134,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     protected Optional<ENTITY> newRandomizedEntityInstance() {
-        return ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
+        return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
