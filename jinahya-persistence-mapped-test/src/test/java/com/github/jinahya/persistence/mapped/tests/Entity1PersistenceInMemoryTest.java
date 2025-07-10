@@ -11,9 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 })
 @ExtendWith(WeldJunit5AutoExtension.class)
 @Slf4j
-class Entity1PersistenceTest extends _MappedEntityPersistenceTest<Entity1, Long> {
+class Entity1PersistenceInMemoryTest extends _MappedEntityPersistenceInmemoryTest<Entity1, Long> {
 
-    Entity1PersistenceTest() {
+    Entity1PersistenceInMemoryTest() {
         super(Entity1.class, Long.class);
     }
 
@@ -26,11 +26,13 @@ class Entity1PersistenceTest extends _MappedEntityPersistenceTest<Entity1, Long>
 
     @Override
     protected void persistingEntityInstance(final Entity1 entityInstance) {
+        log.debug("persisting {}", entityInstance);
         super.persistingEntityInstance(entityInstance);
     }
 
     @Override
-    protected void persistedEntityInstance(Entity1 entityInstance) {
+    protected void persistedEntityInstance(final Entity1 entityInstance) {
+        log.debug("persisted {}", entityInstance);
         super.persistedEntityInstance(entityInstance);
     }
 }

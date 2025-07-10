@@ -17,6 +17,13 @@ public class Entity1 extends __MappedEntity<Entity1, Long> {
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "id=" + id +
+               '}';
+    }
+
+    @Override
     public final boolean equals(final Object obj) {
         return super.equals(obj);
     }

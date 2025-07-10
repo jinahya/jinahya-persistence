@@ -8,30 +8,59 @@ import jakarta.persistence.EntityManagerFactory;
 class _PersistenceProducer extends __PersistenceProducer {
 
     _PersistenceProducer() {
-        super("testPU");
+        super();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @InMemory
     @Produces
     @Override
-    protected EntityManagerFactory produceEntityManagerFactory() {
-        return super.produceEntityManagerFactory();
+    protected EntityManagerFactory produceInMemoryEntityManagerFactory() {
+        return super.produceInMemoryEntityManagerFactory();
     }
 
     @Override
-    protected void disposeEntityManagerFactory(@Disposes final EntityManagerFactory entityManagerFactory) {
-        super.disposeEntityManagerFactory(entityManagerFactory);
+    protected void disposeInMemoryEntityManagerFactory(
+            @InMemory @Disposes final EntityManagerFactory inMemoryEntityManagerFactory) {
+        super.disposeInMemoryEntityManagerFactory(inMemoryEntityManagerFactory);
+    }
+
+    @InMemory
+    @Produces
+    @Override
+    protected EntityManager produceInMemoryEntityManager(
+            @InMemory final EntityManagerFactory inMemoryEntityManagerFactory) {
+        return super.produceInMemoryEntityManager(inMemoryEntityManagerFactory);
+    }
+
+    @Override
+    protected void disposeInMemoryEntityManager(@InMemory @Disposes final EntityManager inMemoryEntityManager) {
+        super.disposeInMemoryEntityManager(inMemoryEntityManager);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @OnDisk
     @Produces
     @Override
-    protected EntityManager produceEntityManager(final EntityManagerFactory entityManagerFactory) {
-        return super.produceEntityManager(entityManagerFactory);
+    protected EntityManagerFactory produceOnDiskEntityManagerFactory() {
+        return super.produceOnDiskEntityManagerFactory();
     }
 
     @Override
-    protected void disposeEntityManager(@Disposes final EntityManager entityManager) {
-        super.disposeEntityManager(entityManager);
+    protected void disposeOnDiskEntityManagerFactory(
+            @OnDisk @Disposes final EntityManagerFactory onDiskEntityManagerFactory) {
+        super.disposeOnDiskEntityManagerFactory(onDiskEntityManagerFactory);
+    }
+
+    @OnDisk
+    @Produces
+    @Override
+    protected EntityManager produceOnDiskEntityManager(@OnDisk final EntityManagerFactory onDiskEntityManagerFactory) {
+        return super.produceOnDiskEntityManager(onDiskEntityManagerFactory);
+    }
+
+    @Override
+    protected void disposeOnDiskEntityManager(@OnDisk @Disposes final EntityManager onDiskEntityManager) {
+        super.disposeOnDiskEntityManager(onDiskEntityManager);
     }
 }

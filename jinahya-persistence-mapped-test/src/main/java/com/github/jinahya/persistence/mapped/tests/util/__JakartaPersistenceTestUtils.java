@@ -85,12 +85,6 @@ public final class __JakartaPersistenceTestUtils {
         return Optional.empty();
     }
 
-
-
-
-
-
-
     public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
                                                         final Function<? super EntityManager, ? extends R> function,
                                                         final boolean rollback) {
@@ -110,6 +104,21 @@ public final class __JakartaPersistenceTestUtils {
             transaction.rollback();
             throw new RuntimeException("failed to apply " + function + " and rollback: " + rollback, e);
         }
+    }
+
+    public static void acceptEntityManagerInTransaction(final EntityManager entityManager,
+                                                        final Consumer<? super EntityManager> consumer,
+                                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        applyEntityManagerInTransaction(
+                entityManager,
+                em -> {
+                    consumer.accept(em);
+                    return null;
+                },
+                rollback
+        );
     }
 
     public static <R> R applyConnection(final EntityManager entityManager,
@@ -192,11 +201,6 @@ public final class __JakartaPersistenceTestUtils {
     public static String entityName(final EntityManager entityManager, final Class<?> entityClass) {
         return entityManager.getMetamodel().entity(entityClass).getName();
     }
-
-
-
-
-
 
     // -----------------------------------------------------------------------------------------------------------------
     private __JakartaPersistenceTestUtils() {
