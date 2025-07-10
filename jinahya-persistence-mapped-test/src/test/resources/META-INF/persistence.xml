@@ -19,31 +19,30 @@
   #L%
   -->
 
+<!-- https://jakarta.ee/xml/ns/persistence/ -->
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
-             version="3.0">
-  <persistence-unit name="coPU">
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="3.2">
+  <persistence-unit name="testPU">
     <description>Persistence Unit for Oracle Customer Orders Schema</description>
-    <provider>${persistence.provider}</provider>
-    <class>com.github.jinahya.oracle.sample.schemas.co.Customer</class>
-    <class>com.github.jinahya.oracle.sample.schemas.co.Inventory</class>
-    <class>com.github.jinahya.oracle.sample.schemas.co.Order</class>
-    <class>com.github.jinahya.oracle.sample.schemas.co.OrderItem</class>
-    <class>com.github.jinahya.oracle.sample.schemas.co.Product</class>
-    <class>com.github.jinahya.oracle.sample.schemas.co.Shipment</class>
-    <class>com.github.jinahya.oracle.sample.schemas.co.Store</class>
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.mapped.tests.Entity1</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
-      <property name="jakarta.persistence.jdbc.driver" value="oracle.jdbc.driver.OracleDriver"/>
-      <property name="jakarta.persistence.jdbc.url" value="jdbc:oracle:thin:@//localhost:1521/freepdb1"/>
-      <property name="jakarta.persistence.jdbc.user" value="co"/>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+<!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
       <!--      <property name="eclipselink.weaving" value="true"/>-->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
       <property name="hibernate.format_sql" value="true"/>
       <property name="hibernate.highlight_sql" value="true"/>

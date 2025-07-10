@@ -58,13 +58,18 @@
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.3</version.maven-surefire>
     <version.com.h2database>2.1.214</version.com.h2database>
+    <!-- https://central.sonatype.com/namespace/jakarta.platform -->
+    <version.jakarta.platform>11.0.0</version.jakarta.platform>
+    <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
+    <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
     <version.nl.jqno.equalsverifier>4.0.5</version.nl.jqno.equalsverifier>
-    <version.org.eclipse.persistence>4.0.1</version.org.eclipse.persistence>
+    <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
+    <version.org.eclipse.persistence>4.0.7</version.org.eclipse.persistence>
     <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
     <version.org.hibernate.orm>6.2.2.Final</version.org.hibernate.orm>
     <version.org.hibernate.validator>8.0.0.Final</version.org.hibernate.validator>
-    <version.org.jboss.weld>5.1.0.Final</version.org.jboss.weld>
+    <version.org.jboss.weld>5.0.1.Final</version.org.jboss.weld>
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
     <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/5.13.2/versions -->
     <version.org.junit>5.13.2</version.org.junit>
@@ -82,11 +87,16 @@
         <version>1.5.18</version>
       </dependency>
       <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>2.3.232</version>
+      </dependency>
+      <dependency>
         <groupId>jakarta.platform</groupId>
         <artifactId>jakarta.jakartaee-bom</artifactId>
         <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
         <!--        <version>11.0.0</version>-->
-        <version>10.0.0</version>
+        <version>${version.jakarta.jakartaee-bom}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -114,18 +124,33 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
-        <artifactId>eclipselink</artifactId>
+        <artifactId>org.eclipse.persistence.jpa</artifactId>
         <version>${version.org.eclipse.persistence}</version>
       </dependency>
       <dependency>
-        <groupId>org.hibernate.orm</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>${version.org.hibernate.orm}</version>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+        <version>${version.org.eclipse.persistence}</version>
       </dependency>
       <dependency>
-        <groupId>org.hibernate.orm</groupId>
-        <artifactId>hibernate-jpamodelgen</artifactId>
-        <version>${version.org.hibernate.orm}</version>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>${version.org.hibernate.validator}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-test-utils</artifactId>
+        <version>${version.org.hibernate.validator}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.expressly</groupId>
+        <artifactId>expressly</artifactId>
+        <version>5.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-junit5</artifactId>
+        <version>${version.org.jboss.weld}</version>
       </dependency>
       <dependency>
         <groupId>org.junit</groupId>
@@ -141,18 +166,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!--      <dependency>-->
-      <!--        <groupId>org.mockito</groupId>-->
-      <!--        <artifactId>mockito-junit-jupiter</artifactId>-->
-      <!--        <version>${version.org.mockito}</version>-->
-      <!--        <scope>test</scope>-->
-      <!--        <exclusions>-->
-      <!--          <exclusion>&lt;!&ndash; dependencyConvergence &ndash;&gt;-->
-      <!--            <groupId>org.junit.jupiter</groupId>-->
-      <!--            <artifactId>junit-jupiter-api</artifactId>-->
-      <!--          </exclusion>-->
-      <!--        </exclusions>-->
-      <!--      </dependency>-->
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
@@ -165,8 +178,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <dependencies>
-  </dependencies>
 
   <build>
     <pluginManagement>
@@ -177,6 +188,12 @@
           <version>3.11.2</version>
           <configuration>
             <doclint>all</doclint>
+            <links>
+              <link>https://docs.oracle.com/en/java/javase/${maven.compiler.release}/docs/api/</link>
+              <link>https://jakarta.ee/specifications/platform/11/apidocs/</link>
+              <link>https://static.javadoc.io/nl.jqno.equalsverifier/equalsverifier/${version.nl.jqno.equalsverifier}/
+              </link>
+            </links>
             <tags>
               <tag>
                 <name>apiNote</name>
@@ -269,6 +286,11 @@
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
               <version>${version.org.projectlombok}</version>
+            </path>
+            <path>
+              <groupId>org.eclipse.persistence</groupId>
+              <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+              <version>${version.org.eclipse.persistence}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
@@ -470,18 +492,18 @@
         </dependency>
       </dependencies>
     </profile>
-    <profile>
-      <id>hibernate</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.hibernate.orm</groupId>
-          <artifactId>hibernate-core</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
+<!--    <profile>-->
+<!--      <id>hibernate</id>-->
+<!--      <activation>-->
+<!--        <activeByDefault>true</activeByDefault>-->
+<!--      </activation>-->
+<!--      <dependencies>-->
+<!--        <dependency>-->
+<!--          <groupId>org.hibernate.orm</groupId>-->
+<!--          <artifactId>hibernate-core</artifactId>-->
+<!--          <scope>test</scope>-->
+<!--        </dependency>-->
+<!--      </dependencies>-->
+<!--    </profile>-->
   </profiles>
 </project>

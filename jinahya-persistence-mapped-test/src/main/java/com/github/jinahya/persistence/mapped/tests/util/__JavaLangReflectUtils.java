@@ -3,14 +3,22 @@ package com.github.jinahya.persistence.mapped.tests.util;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Optional;
 
 public final class __JavaLangReflectUtils {
 
-    private static final Logger logger = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
+    public static Optional<Field> findField(final Class<?> type, final String name) {
+        for (var c = type; c != null; c = c.getSuperclass()) {
+            try {
+                return Optional.of(c.getDeclaredField(name));
+            } catch (final NoSuchFieldException nsme) {
+                // ignore
+            }
+        }
+        return Optional.empty();
+    }
 
 //    @Deprecated
 //    // https://stackoverflow.com/a/25974010/330457
@@ -79,7 +87,7 @@ public final class __JavaLangReflectUtils {
             }
             return constructor.newInstance();
         } catch (final ReflectiveOperationException roe) {
-            logger.log(Level.SEVERE, roe, () -> "failed to initialize a new instance of " + type);
+//            logger.log(Level.SEVERE, roe, () -> "failed to initialize a new instance of " + type);
             return null;
         }
     }
