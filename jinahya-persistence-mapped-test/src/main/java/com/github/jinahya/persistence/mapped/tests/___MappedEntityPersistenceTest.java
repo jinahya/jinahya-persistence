@@ -17,11 +17,11 @@ import static org.assertj.core.api.Assumptions.assumeThat;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___MappedEntityTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected ___MappedEntityPersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    ___MappedEntityPersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 
@@ -107,7 +107,8 @@ public abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEnti
         });
     }
 
-    protected abstract EntityManagerFactory getEntityManagerFactory();
+    // -----------------------------------------------------------------------------------------------------------------
+    abstract EntityManagerFactory getEntityManagerFactory();
 
-    protected abstract EntityManager getEntityManager();
+    abstract EntityManager getEntityManager();
 }

@@ -18,62 +18,61 @@ public abstract class __PersistenceProducer {
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
-    public @interface InMemory {
+    public @interface Local__ {
 
     }
 
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
-    public @interface OnDisk {
+    public @interface Remote__ {
 
     }
 
-    protected static final String PERSISTENCE_UNIT_NAME_IN_MEMORY = "inMemoryPU";
+    static final String PERSISTENCE_UNIT_NAME_LOCAL__ = "localPU";
 
-    protected static final String PERSISTENCE_UNIT_NAME_ON_DISK = "onDiskPU";
+    static final String PERSISTENCE_UNIT_NAME_REMOTE__ = "remotePU";
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __PersistenceProducer() {
         super();
     }
 
-    // -------------------------------------------------------------------------------------------------------- InMemory
-    @InMemory
-    protected EntityManagerFactory produceInMemoryEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_IN_MEMORY);
+    // ----------------------------------------------------------------------------------------------------------- local
+    @Local__
+    protected EntityManagerFactory produceLocalEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_LOCAL__);
     }
 
-    protected void disposeInMemoryEntityManagerFactory(
-            @InMemory final EntityManagerFactory inMemoryEntityManagerFactory) {
-        inMemoryEntityManagerFactory.close();
+    protected void disposeLocalEntityManagerFactory(@Local__ final EntityManagerFactory entityManagerFactory) {
+        entityManagerFactory.close();
     }
 
-    @InMemory
-    protected EntityManager produceInMemoryEntityManager(final EntityManagerFactory inMemoryEntityManagerFactory) {
-        return inMemoryEntityManagerFactory.createEntityManager();
+    @Local__
+    protected EntityManager produceLocalEntityManager(final EntityManagerFactory entityManagerFactory) {
+        return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeInMemoryEntityManager(@InMemory final EntityManager inMemoryEntityManager) {
-        inMemoryEntityManager.close();
+    protected void disposeLocalEntityManager(@Local__ final EntityManager entityManager) {
+        entityManager.close();
     }
 
-    // ---------------------------------------------------------------------------------------------------------- OnDisk
-    @OnDisk
-    protected EntityManagerFactory produceOnDiskEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_ON_DISK);
+    // ---------------------------------------------------------------------------------------------------------- remote
+    @Remote__
+    protected EntityManagerFactory produceRemoteEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_REMOTE__);
     }
 
-    protected void disposeOnDiskEntityManagerFactory(@OnDisk final EntityManagerFactory onDiskEntityManagerFactory) {
-        onDiskEntityManagerFactory.close();
+    protected void disposeRemoteEntityManagerFactory(@Remote__ final EntityManagerFactory entityManagerFactory) {
+        entityManagerFactory.close();
     }
 
-    @OnDisk
-    protected EntityManager produceOnDiskEntityManager(final EntityManagerFactory onDiskEntityManagerFactory) {
-        return onDiskEntityManagerFactory.createEntityManager();
+    @Remote__
+    protected EntityManager produceRemoteEntityManager(final EntityManagerFactory entityManagerFactory) {
+        return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeOnDiskEntityManager(@OnDisk final EntityManager onDiskEntityManager) {
-        onDiskEntityManager.close();
+    protected void disposeRemoteEntityManager(@Remote__ final EntityManager entityManager) {
+        entityManager.close();
     }
 }

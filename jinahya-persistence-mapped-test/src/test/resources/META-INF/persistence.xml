@@ -24,7 +24,7 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="3.2">
-  <persistence-unit name="inMemoryPU">
+  <persistence-unit name="localPU">
     <description>Persistence Unit for Oracle Customer Orders Schema</description>
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.github.jinahya.persistence.mapped.tests.Entity1</class>
@@ -50,7 +50,7 @@
       <property name="hibernate.use_sql_comment" value="true"/>
     </properties>
   </persistence-unit>
-  <persistence-unit name="onDiskPU">
+  <persistence-unit name="remoteU">
     <description>Persistence Unit for Oracle Customer Orders Schema</description>
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.github.jinahya.persistence.mapped.tests.Entity1</class>

@@ -21,21 +21,21 @@ public abstract class __MappedEntityPersistenceInMemoryTest<ENTITY extends __Map
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override
-    protected final EntityManagerFactory getEntityManagerFactory() {
+    final EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
     }
 
     @Override
-    protected final EntityManager getEntityManager() {
+    final EntityManager getEntityManager() {
         return entityManager;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__PersistenceProducer.InMemory
+    @__PersistenceProducer.Local__
     @Inject
     private EntityManagerFactory entityManagerFactory;
 
-    @__PersistenceProducer.InMemory
+    @__PersistenceProducer.Local__
     @Inject
     private EntityManager entityManager;
 }
