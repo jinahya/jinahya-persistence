@@ -1,13 +1,14 @@
-package com.github.jinahya.persistence.mapped.tests;
+package com.github.jinahya.persistence.mapped.tests.entity02;
 
+import com.github.jinahya.persistence.mapped.tests._MappedEntityTest;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class Entity1Test extends _MappedEntityTest<Entity1, Long> {
+public class Entity02Test extends _MappedEntityTest<Entity02, Long> {
 
-    Entity1Test() {
-        super(Entity1.class, Long.class);
+    protected Entity02Test() {
+        super(Entity02.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -18,7 +19,7 @@ class Entity1Test extends _MappedEntityTest<Entity1, Long> {
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<Entity1> getEqualsVerifier() {
+    protected SingleTypeEqualsVerifierApi<Entity02> getEqualsVerifier() {
         return super.getEqualsVerifier()
                 .suppress(Warning.SURROGATE_KEY);
     }

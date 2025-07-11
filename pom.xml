@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -57,7 +58,8 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.3</version.maven-surefire>
-    <version.com.h2database>2.1.214</version.com.h2database>
+    <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
+    <version.com.h2database>2.3.232</version.com.h2database>
     <!-- https://central.sonatype.com/namespace/jakarta.platform -->
     <version.jakarta.platform>11.0.0</version.jakarta.platform>
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
@@ -67,7 +69,9 @@
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
     <version.org.eclipse.persistence>4.0.7</version.org.eclipse.persistence>
     <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
-    <version.org.hibernate.orm>6.2.2.Final</version.org.hibernate.orm>
+    <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-platform/versions -->
+    <!--    <version.org.hibernate.orm>6.2.2.Final</version.org.hibernate.orm>-->
+    <version.org.hibernate.orm>7.0.5.Final</version.org.hibernate.orm>
     <version.org.hibernate.validator>8.0.0.Final</version.org.hibernate.validator>
     <version.org.jboss.weld>5.0.1.Final</version.org.jboss.weld>
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
@@ -89,7 +93,7 @@
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>2.3.232</version>
+        <version>${version.com.h2database}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.platform</groupId>
@@ -131,6 +135,13 @@
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
         <version>${version.org.eclipse.persistence}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-platform</artifactId>
+        <version>${version.org.hibernate.orm}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.hibernate.validator</groupId>
@@ -492,18 +503,18 @@
         </dependency>
       </dependencies>
     </profile>
-<!--    <profile>-->
-<!--      <id>hibernate</id>-->
-<!--      <activation>-->
-<!--        <activeByDefault>true</activeByDefault>-->
-<!--      </activation>-->
-<!--      <dependencies>-->
-<!--        <dependency>-->
-<!--          <groupId>org.hibernate.orm</groupId>-->
-<!--          <artifactId>hibernate-core</artifactId>-->
-<!--          <scope>test</scope>-->
-<!--        </dependency>-->
-<!--      </dependencies>-->
-<!--    </profile>-->
+    <!--    <profile>-->
+    <!--      <id>hibernate</id>-->
+    <!--      <activation>-->
+    <!--        <activeByDefault>true</activeByDefault>-->
+    <!--      </activation>-->
+    <!--      <dependencies>-->
+    <!--        <dependency>-->
+    <!--          <groupId>org.hibernate.orm</groupId>-->
+    <!--          <artifactId>hibernate-core</artifactId>-->
+    <!--          <scope>test</scope>-->
+    <!--        </dependency>-->
+    <!--      </dependencies>-->
+    <!--    </profile>-->
   </profiles>
 </project>

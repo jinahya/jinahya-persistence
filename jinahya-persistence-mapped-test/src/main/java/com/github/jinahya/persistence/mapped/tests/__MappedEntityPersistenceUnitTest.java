@@ -10,11 +10,11 @@ import jakarta.persistence.EntityManagerFactory;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class __MappedEntityPersistenceMemoryTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityPersistenceUnitTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___MappedEntityPersistenceTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __MappedEntityPersistenceMemoryTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    protected __MappedEntityPersistenceUnitTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 
@@ -31,11 +31,11 @@ public abstract class __MappedEntityPersistenceMemoryTest<ENTITY extends __Mappe
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__PersistenceProducer.Memory__
+    @__PersistenceProducer.Unit__
     @Inject
     private EntityManagerFactory entityManagerFactory;
 
-    @__PersistenceProducer.Memory__
+    @__PersistenceProducer.Unit__
     @Inject
     private EntityManager entityManager;
 }

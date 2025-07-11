@@ -14,11 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class _MappedEntityPersistenceMemoryTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
-        extends __MappedEntityPersistenceMemoryTest<ENTITY, ID> {
+public abstract class _MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+        extends __MappedEntityPersistenceIntegrationIT<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected _MappedEntityPersistenceMemoryTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    protected _MappedEntityPersistenceIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 }

@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests;
+package com.github.jinahya.persistence.mapped.tests.entity01;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.persistence.Column;
@@ -9,10 +9,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = Entity1.TABLE_NAME)
-public class Entity1 extends __MappedEntity<Entity1, Long> {
+@Table(name = Entity01.TABLE_NAME)
+public class Entity01 extends __MappedEntity<Entity01, Long> {
 
-    public static final String TABLE_NAME = "entity1";
+    public static final String TABLE_NAME = "entity01";
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected Entity01() {
+        super();
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
 

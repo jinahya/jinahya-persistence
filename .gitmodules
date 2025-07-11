@@ -1,12 +1,3 @@
 [submodule ".idea/codeStyles"]
 	path = .idea/codeStyles
 	url = git@github.com:onacit/dot-idea-codestyles.git
-[submodule "ext/eclipselink"]
-	path = ext/eclipselink
-	url = git@github.com:eclipse-ee4j/eclipselink.git
-[submodule "ext/hibernate-orm"]
-	path = ext/hibernate-orm
-	url = git@github.com:hibernate/hibernate-orm.git
-[submodule "ext/openjpa"]
-	path = ext/openjpa
-	url = git@github.com:apache/openjpa.git

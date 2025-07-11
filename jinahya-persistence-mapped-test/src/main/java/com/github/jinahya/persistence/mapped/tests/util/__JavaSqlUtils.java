@@ -67,17 +67,16 @@ public class __JavaSqlUtils {
                 columnNamePattern
         )) {
             while (resultSet.next()) {
-                final var tableName = resultSet.getString(COLUMN_LABEL_COLUMN_NAME);
-                consumer.accept(tableName);
+                final var columnName = resultSet.getString(COLUMN_LABEL_COLUMN_NAME);
+                consumer.accept(columnName);
             }
         }
     }
 
-    public static <T extends Collection<? super String>> T addAllColumnNames(@Nonnull final Connection connection,
-                                                                             @Nullable final String catalog,
-                                                                             @Nullable final String schemaPattern,
-                                                                             @Nonnull final String tableNamePattern,
-                                                                             @Nonnull final T collection)
+    public static <C extends Collection<? super String>>
+    C addAllColumnNames(@Nonnull final Connection connection, @Nullable final String catalog,
+                        @Nullable final String schemaPattern, @Nonnull final String tableNamePattern,
+                        @Nonnull final C collection)
             throws SQLException {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");

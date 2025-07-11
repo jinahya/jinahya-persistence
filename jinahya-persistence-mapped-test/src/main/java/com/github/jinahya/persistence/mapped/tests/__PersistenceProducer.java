@@ -18,61 +18,62 @@ public abstract class __PersistenceProducer {
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
-    public @interface Memory__ {
+    public @interface Unit__ {
 
     }
 
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
-    public @interface Remote__ {
+    public @interface Integration__ {
 
     }
 
-    static final String PERSISTENCE_UNIT_NAME_MEMORY__ = "memoryPU";
+    public static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "unitPU";
 
-    static final String PERSISTENCE_UNIT_NAME_PHYSICAL__ = "physicalPU";
+    public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __PersistenceProducer() {
         super();
     }
 
-    // ---------------------------------------------------------------------------------------------------------- memory
-    @Memory__
-    protected EntityManagerFactory produceMemoryEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_MEMORY__);
+    // ------------------------------------------------------------------------------------------------------------ unit
+    @Unit__
+    protected EntityManagerFactory produceUnitEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_UNIT_PU);
     }
 
-    protected void disposeMemoryEntityManagerFactory(@Memory__ final EntityManagerFactory entityManagerFactory) {
+    protected void disposeUnitEntityManagerFactory(@Unit__ final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
-    @Memory__
-    protected EntityManager produceMemoryEntityManager(final EntityManagerFactory entityManagerFactory) {
+    @Unit__
+    protected EntityManager produceUnitEntityManager(final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeMemoryEntityManager(@Memory__ final EntityManager entityManager) {
+    protected void disposeUnitEntityManager(@Unit__ final EntityManager entityManager) {
         entityManager.close();
     }
 
-    // ---------------------------------------------------------------------------------------------------------- remote
-    @Remote__
-    protected EntityManagerFactory producePhysicalEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_PHYSICAL__);
+    // ----------------------------------------------------------------------------------------------------- integration
+    @Integration__
+    protected EntityManagerFactory produceIntegrationEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_INTEGRATION_PU);
     }
 
-    protected void disposePhysicalEntityManagerFactory(@Remote__ final EntityManagerFactory entityManagerFactory) {
+    protected void disposeIntegrationEntityManagerFactory(
+            @Integration__ final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
-    @Remote__
-    protected EntityManager producePhysicalEntityManager(final EntityManagerFactory entityManagerFactory) {
+    @Integration__
+    protected EntityManager produceIntegrationEntityManager(final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposePhysicalEntityManager(@Remote__ final EntityManager entityManager) {
+    protected void disposeIntegrationEntityManager(@Integration__ final EntityManager entityManager) {
         entityManager.close();
     }
 }

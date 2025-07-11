@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+
+<configuration>
+  <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
+  <import class="ch.qos.logback.core.ConsoleAppender"/>
+
+  <appender name="STDOUT" class="ConsoleAppender">
+    <encoder class="PatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%kvp- %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+  <logger name="com.github.jinahya" level="debug"/>
+<!--  <logger name="org.jboss.weld" level="info"/>-->
+<!--  <logger name="org.hibernate.boot.internal" level="info"/>-->
+<!--  <logger name="org.hibernate.boot.model.internal" level="info"/>-->
+<!--  <logger name="org.hibernate.boot.model.relational" level="info"/>-->
+<!--  <logger name="org.hibernate.cache.internal" level="info"/>-->
+<!--  <logger name="org.hibernate.cfg" level="info"/>-->
+<!--  <logger name="org.hibernate.engine.jdbc.env.spi" level="info"/>-->
+<!--  <logger name="org.hibernate.integrator.internal" level="info"/>-->
+<!--  <logger name="org.hibernate.internal" level="info"/>-->
+<!--  <logger name="org.hibernate.engine.jdbc.env.internal" level="info"/>-->
+<!--  <logger name="org.hibernate.jpa" level="info"/>-->
+<!--  <logger name="org.hibernate.mapping" level="info"/>-->
+<!--  <logger name="org.hibernate.orm.connections.pooling" level="info"/>-->
+<!--  <logger name="org.hibernate.persister.entity" level="info"/>-->
+<!--  <logger name="org.hibernate.query.sqm.function" level="info"/>-->
+<!--  <logger name="org.hibernate.type" level="info"/>-->
+
+</configuration>

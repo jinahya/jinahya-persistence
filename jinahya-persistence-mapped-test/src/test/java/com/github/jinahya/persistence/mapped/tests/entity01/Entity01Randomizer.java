@@ -1,13 +1,14 @@
-package com.github.jinahya.persistence.mapped.tests;
+package com.github.jinahya.persistence.mapped.tests.entity01;
 
+import com.github.jinahya.persistence.mapped.tests.__MappedEntityRandomizer;
 import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class Entity1Randomizer extends __MappedEntityRandomizer<Entity1, Long> {
+class Entity01Randomizer extends __MappedEntityRandomizer<Entity01, Long> {
 
-    Entity1Randomizer() {
-        super(Entity1.class, Long.class);
+    Entity01Randomizer() {
+        super(Entity01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -25,7 +26,9 @@ class Entity1Randomizer extends __MappedEntityRandomizer<Entity1, Long> {
 
     @Nonnull
     @Override
-    public Entity1 get() {
-        return super.get();
+    public Entity01 get() {
+        final var value = super.get();
+        value.setId(null);
+        return value;
     }
 }

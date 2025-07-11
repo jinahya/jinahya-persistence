@@ -4,9 +4,9 @@ import jakarta.annotation.Nullable;
 
 public class __DatabaseMetaDataInfoImpl implements __DatabaseMetaDataInfo {
 
-    static final String CATALOG = "catalog";
+    static final String CATALOG = "UNNAMED";
 
-    static final String SCHEMA = "schema";
+    static final String SCHEMA = "PUBLIC";
 
     @Nullable
     @Override

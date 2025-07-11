@@ -3,11 +3,23 @@ package com.github.jinahya.persistence.mapped.tests.util;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
 
 public final class __JavaLangReflectUtils {
+
+    public static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
+                                                                    final Class<A> annotationType) {
+        for (var c = type; c != null; c = c.getSuperclass()) {
+            final var annotation = c.getAnnotation(annotationType);
+            if (annotation != null) {
+                return Optional.of(annotation);
+            }
+        }
+        return Optional.empty();
+    }
 
     public static Optional<Field> findField(final Class<?> type, final String name) {
         for (var c = type; c != null; c = c.getSuperclass()) {
