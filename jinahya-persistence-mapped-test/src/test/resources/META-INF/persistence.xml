@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   #%L
-  mysql-employees-persistece
+  jinahya-persistence-mapped-test
   %%
-  Copyright (C) 2024 Jinahya, Inc.
+  Copyright (C) 2024 - 2025 Jinahya, Inc.
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
+  
        http://www.apache.org/licenses/LICENSE-2.0
-
+  
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,9 +37,6 @@
       <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
-      <!-- jinahya.persistence -->
-      <property name="jinahya.persistence.default_catalog" value="catalog"/>
-      <property name="jinahya.persistence.default_schema" value="public"/>
       <!-- eclipselink -->
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
@@ -56,6 +53,9 @@
       <property name="hibernate.highlight_sql" value="true"/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.default_catalog" value="catalog"/>
+      <property name="jinahya.persistence.default_schema" value="public"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="integrationPU">
@@ -72,9 +72,6 @@
       <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
-      <!-- jinahya.persistence -->
-      <!--      <property name="jinahya.persistence.default_catalog" value="catalog"/>-->
-      <!--      <property name="jinahya.persistence.default_schema" value="public"/>-->
       <!-- eclipselink -->
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
@@ -91,6 +88,9 @@
       <property name="hibernate.highlight_sql" value="true"/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.default_catalog" value="catalog"/>
+      <property name="jinahya.persistence.default_schema" value="public"/>
     </properties>
   </persistence-unit>
 </persistence>

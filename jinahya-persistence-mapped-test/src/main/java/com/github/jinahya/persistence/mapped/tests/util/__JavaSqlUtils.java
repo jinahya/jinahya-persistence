@@ -1,5 +1,25 @@
 package com.github.jinahya.persistence.mapped.tests.util;
 
+/*-
+ * #%L
+ * jinahya-persistence-mapped-test
+ * %%
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -54,8 +74,7 @@ public class __JavaSqlUtils {
     public static void acceptEachColumnName(@Nonnull final Connection connection,
                                             @Nullable final String catalog, @Nullable final String schemaPattern,
                                             @Nonnull final String tableNamePattern,
-                                            @Nonnull final Consumer<? super String> consumer)
-            throws SQLException {
+                                            @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
         Objects.requireNonNull(consumer, "consumer is null");
@@ -70,14 +89,21 @@ public class __JavaSqlUtils {
                 final var columnName = resultSet.getString(COLUMN_LABEL_COLUMN_NAME);
                 consumer.accept(columnName);
             }
+        } catch (final SQLException sqle) {
+            throw new RuntimeException(
+                    "failed to get columns" +
+                    "; catalog: " + catalog +
+                    "; schemaPattern: " + schemaPattern +
+                    "; tableNamePattern: " + tableNamePattern,
+                    sqle
+            );
         }
     }
 
     public static <C extends Collection<? super String>>
     C addAllColumnNames(@Nonnull final Connection connection, @Nullable final String catalog,
                         @Nullable final String schemaPattern, @Nonnull final String tableNamePattern,
-                        @Nonnull final C collection)
-            throws SQLException {
+                        @Nonnull final C collection) {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
         Objects.requireNonNull(collection, "collection is null");

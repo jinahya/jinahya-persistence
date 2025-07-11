@@ -1,9 +1,28 @@
 package com.github.jinahya.persistence.mapped.tests;
 
+/*-
+ * #%L
+ * jinahya-persistence-mapped-test
+ * %%
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import com.github.jinahya.persistence.mapped.tests.util.__JakartaPersistenceTestUtils;
 import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaSqlUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
@@ -13,8 +32,6 @@ import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
