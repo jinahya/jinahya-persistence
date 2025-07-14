@@ -28,6 +28,7 @@ import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -73,12 +74,27 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
+
+    /**
+     * Applies an injected instance of {@link EntityManagerFactory} to the specified function, and returns the result.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @see #acceptEntityManagerFactory(Consumer)
+     */
     protected final <R> R applyEntityManagerFactory(
             final Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply(getEntityManagerFactory());
     }
 
+    /**
+     * Accepts an injected instance of {@link EntityManagerFactory} to the specified consumer.
+     *
+     * @param consumer the consumer.
+     * @see #applyEntityManagerFactory(Function)
+     */
     protected final void acceptEntityManagerFactory(final Consumer<? super EntityManagerFactory> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerFactory(emf -> {
@@ -87,15 +103,39 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
         });
     }
 
+    /**
+     * Applies an unmodified map of properties of the injected instance of {@link EntityManagerFactory}.
+     *
+     * @return an unmodified map of properties of the injected instance of {@link EntityManagerFactory}.
+     */
     protected final Map<String, Object> getEntityManagerProperties() {
-        return applyEntityManagerFactory(EntityManagerFactory::getProperties);
+        return Collections.unmodifiableMap(
+                applyEntityManagerFactory(
+                        EntityManagerFactory::getProperties
+                )
+        );
     }
 
     // -------=------------------------------------------------------------------------------------------- entityManager
+
+    /**
+     * Applies an injected instance of {@link EntityManager} to the specified function, and returns the result.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @see #acceptEntityManager(Consumer)
+     */
     protected final <R> R applyEntityManager(final Function<? super EntityManager, ? extends R> function) {
         return function.apply(getEntityManager());
     }
 
+    /**
+     * Accepts an injected instance of {@link EntityManager} to the specified consumer.
+     *
+     * @param consumer the consumer.
+     * @see #applyEntityManager(Function)
+     */
     protected final void acceptEntityManager(final Consumer<? super EntityManager> consumer) {
         applyEntityManager(em -> {
             consumer.accept(em);

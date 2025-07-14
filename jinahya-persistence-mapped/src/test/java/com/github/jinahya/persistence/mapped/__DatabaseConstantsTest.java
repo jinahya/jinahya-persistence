@@ -25,6 +25,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
+@SuppressWarnings({
+        "java:S3577" // Test classes should comply with a naming convention
+})
 class __DatabaseConstantsTest {
 
     /**

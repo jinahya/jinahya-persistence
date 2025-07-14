@@ -80,6 +80,7 @@
     <version.org.junit.platform>1.9.1</version.org.junit.platform>
     <version.org.mockito>5.18.0</version.org.mockito>
     <version.org.projectlombok>1.18.38</version.org.projectlombok>
+    <version.org.slf4j>2.0.17</version.org.slf4j>
   </properties>
 
   <dependencyManagement>
@@ -180,6 +181,13 @@
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>${version.org.projectlombok}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-bom</artifactId>
+        <version>${version.org.slf4j}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>uk.co.jemos.podam</groupId>

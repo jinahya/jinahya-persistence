@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,9 +57,9 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     @Test
     protected void _Mapped_AllTableColumnNames() {
         final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
-        final var catalog = applyEntityManagerFactory(___MappedEntityPersistenceTestUtils::getDefaultCatalog)
+        final var catalog = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultCatalog)
                 .orElseGet(table::catalog);
-        final var schema = applyEntityManagerFactory(___MappedEntityPersistenceTestUtils::getDefaultSchema)
+        final var schema = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = applyConnectionInTransactionAndRollback(
                 c -> ___JavaSqlTestUtils.addAllColumnNames(
@@ -70,14 +71,19 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
                 )
         );
         assertThat(tableColumnNames)
-                .as("table column names for " + entityClass + "; catalog: " + catalog + "; schema: " + schema +
-                    "; table: " + table.name())
+                .as("table column names for " + entityClass +
+                    "; catalog: " + catalog +
+                    "; schema: " + schema +
+                    "; table: " + table.name()
+                )
                 .isNotEmpty();
-        final var attributeColumnNames = applyEntityManagerFactory(
-                emf -> __MappedEntityPersistenceTestUtils.addAllAttributeColumNames(
-                        emf,
-                        entityClass,
-                        new ArrayList<>()
+        final var attributeColumnNames = Collections.unmodifiableList(
+                applyEntityManagerFactory(
+                        emf -> __MappedEntityPersistenceTestUtils.addAllAttributeColumNames(
+                                emf,
+                                entityClass,
+                                new ArrayList<>()
+                        )
                 )
         );
         assertThat(attributeColumnNames)
@@ -94,6 +100,45 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     @DisplayName("all entity columns are mapped")
     @Test
     protected void _Mapped_AllEntityColumnColumnNames() {
+        final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
+        final var catalog = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultCatalog)
+                .orElseGet(table::catalog);
+        final var schema = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultSchema)
+                .orElseGet(table::schema);
+        final var tableColumnNames = Collections.unmodifiableList(
+                applyConnectionInTransactionAndRollback(
+                        c -> ___JavaSqlTestUtils.addAllColumnNames(
+                                c,
+                                catalog,
+                                schema,
+                                table.name(),
+                                new ArrayList<>()
+                        )
+                )
+        );
+        assertThat(tableColumnNames)
+                .as("table column names for " + entityClass +
+                    "; catalog: " + catalog +
+                    "; schema: " + schema +
+                    "; table: " + table.name()
+                )
+                .isNotEmpty();
+        final var attributeColumnNames = applyEntityManagerFactory(
+                emf -> __MappedEntityPersistenceTestUtils.addAllAttributeColumNames(
+                        emf,
+                        entityClass,
+                        new ArrayList<>()
+                )
+        );
+        assertThat(attributeColumnNames)
+                .as("attribute column names for " + entityClass)
+                .isNotEmpty();
+        // -------------------------------------------------------------------------------------------------------------
+        attributeColumnNames.removeAll(tableColumnNames);
+        // -------------------------------------------------------------------------------------------------------------
+        assertThat(attributeColumnNames)
+                .as("remaining entity column names for " + entityClass)
+                .isEmpty();
     }
 
     // -----------------------------------------------------------------------------------------------------------------

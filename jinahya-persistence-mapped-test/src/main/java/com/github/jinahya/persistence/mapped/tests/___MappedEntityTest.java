@@ -59,7 +59,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
     // -----------------------------------------------------------------------------------------------------------------
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-                .orElseGet(() -> ___JavaLangReflectUtils.newInstanceOf(entityClass));
+                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass));
     }
 
     protected ENTITY newEntityInstanceSpy() {
@@ -77,7 +77,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
     // -----------------------------------------------------------------------------------------------------------------
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
-                .orElseGet(() -> ___JavaLangReflectUtils.newInstanceOf(idClass));
+                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass));
     }
 
     protected ID newIdInstanceSpy() {

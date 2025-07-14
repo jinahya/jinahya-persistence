@@ -44,7 +44,10 @@ import java.sql.SQLException;
 public class __PersistenceProducerTest {
 
     @Test
-    public void __() {
+    @SuppressWarnings({
+            "java:S100" // Method names should comply with a naming convention
+    })
+    public void printDatabaseInfo__() {
         ___JakartaPersistenceTestUtils.applyConnection(
                 entityManager,
                 c -> {

@@ -102,7 +102,7 @@ public class __MappedEntityPersistenceTestUtils {
                 }
             }
         }
-        final var field = ___JavaLangReflectUtils.findField(beanClass, propertyDescriptor.getName());
+        final var field = ___JavaLangReflectTestUtils.findField(beanClass, propertyDescriptor.getName());
         if (field.isPresent()) {
             final var result = ___JakartaPersistenceTestUtils.getColumnName(field.get());
             if (result.isPresent()) {

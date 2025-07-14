@@ -26,7 +26,7 @@ import jakarta.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class ___JavaLangUtils {
+public final class ___JavaLangTestUtils {
 
     @Nullable
     public static Class<?> forAnyPostfixes(@Nonnull final Class<?> type, final Class<?> supertype,
@@ -58,7 +58,7 @@ public final class ___JavaLangUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JavaLangUtils() {
+    private ___JavaLangTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

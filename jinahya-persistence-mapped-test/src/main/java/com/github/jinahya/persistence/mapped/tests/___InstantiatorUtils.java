@@ -37,7 +37,7 @@ public final class ___InstantiatorUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                ___JavaLangUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
+                ___JavaLangTestUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
         );
     }
 
@@ -46,7 +46,7 @@ public final class ___InstantiatorUtils {
     })
     static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> type) {
         return getInstantiatorClassOf(type)
-                .map(___JavaLangReflectUtils::newInstanceOf)
+                .map(___JavaLangReflectTestUtils::newInstanceOf)
                 .map(i -> (___Instantiator<T>) i);
     }
 

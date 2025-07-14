@@ -25,6 +25,12 @@ import jakarta.persistence.EntityManager;
 
 import java.util.Objects;
 
+/**
+ * An abstract class for persisting instances of a specific subclass of {@link __MappedEntity}.
+ *
+ * @param <ENTITY> entity type parameter
+ * @param <ID>     id type of the {@link ENTITY}
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119" // Type parameter names should comply with a naming convention
@@ -32,6 +38,14 @@ import java.util.Objects;
 public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___Persister<ENTITY> {
 
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    /**
+     * Creates a new instance for persisting instances of the specified entity class.
+     *
+     * @param entityClass the entity class.
+     * @param idClass     the class of {@link ID}.
+     */
     protected __MappedEntityPersister(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass);
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
@@ -39,10 +53,17 @@ public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ENTI
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
+    @SuppressWarnings({
+            "java:S1185" // Overriding methods should do more than simply call the same method in the super class
+    })
     public ENTITY persist(final EntityManager entityManager, final ENTITY entityInstance) {
         return super.persist(entityManager, entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The class of {@link ID}.
+     */
     protected final Class<ID> idClass;
 }

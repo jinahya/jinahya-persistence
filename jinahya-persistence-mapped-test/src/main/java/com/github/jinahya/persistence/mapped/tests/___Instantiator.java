@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.tests;
 
 import jakarta.annotation.Nonnull;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -37,6 +38,10 @@ import java.util.Objects;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class ___Instantiator<T> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance for initializing the specified class.

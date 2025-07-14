@@ -50,12 +50,12 @@ public final class __DatabaseConstants {
         public static final int MIN_TINYINT = Byte.MIN_VALUE;
 
         /**
-         * The maximum value for {@code TINYINT} columns,which is {@value}.
+         * The maximum value for {@code TINYINT} columns, which is {@value}.
          */
         public static final int MAX_TINYINT = Byte.MAX_VALUE;
 
         /**
-         * The minimum value for {@code TINYINT UNSIGNED} columns,which is {@value}.
+         * The minimum value for {@code TINYINT UNSIGNED} columns, which is {@value}.
          */
         public static final int MIN_TINYINT_UNSIGNED = 0x00;
 
@@ -72,12 +72,12 @@ public final class __DatabaseConstants {
         public static final int MIN_SMALLINT = Short.MIN_VALUE;
 
         /**
-         * The maximum value for {@code SMALLINT} columns,which is {@value}.
+         * The maximum value for {@code SMALLINT} columns, which is {@value}.
          */
         public static final int MAX_SMALLINT = Short.MAX_VALUE;
 
         /**
-         * The minimum value for {@code SMALLINT UNSIGNED} columns,which is {@value}.
+         * The minimum value for {@code SMALLINT UNSIGNED} columns, which is {@value}.
          */
         public static final int MIN_SMALLINT_UNSIGNED = 0x0000;
 
@@ -94,12 +94,12 @@ public final class __DatabaseConstants {
         public static final int MIN_MEDIUMINT = -8388608;
 
         /**
-         * The maximum value for {@code MEDIUMINT} columns,which is {@value}.
+         * The maximum value for {@code MEDIUMINT} columns, which is {@value}.
          */
         public static final int MAX_MEDIUMINT = +8388607;
 
         /**
-         * The minimum value for {@code MEDIUMINT UNSIGNED} columns,which is {@value}.
+         * The minimum value for {@code MEDIUMINT UNSIGNED} columns, which is {@value}.
          */
         public static final int MIN_MEDIUMINT_UNSIGNED = 0;
 
@@ -116,12 +116,12 @@ public final class __DatabaseConstants {
         public static final int MIN_INT = Integer.MIN_VALUE;
 
         /**
-         * The maximum value for {@code INT} columns,which is {@value}.
+         * The maximum value for {@code INT} columns, which is {@value}.
          */
         public static final int MAX_INT = Integer.MAX_VALUE;
 
         /**
-         * The minimum value for {@code INT UNSIGNED} columns,which is {@value}.
+         * The minimum value for {@code INT UNSIGNED} columns, which is {@value}.
          */
         public static final int MIN_INT_UNSIGNED = 0x00000000;
 
@@ -138,12 +138,12 @@ public final class __DatabaseConstants {
         public static final long MIN_BIGINT = Long.MIN_VALUE;
 
         /**
-         * The maximum value for {@code BIGINT} columns,which is {@value}.
+         * The maximum value for {@code BIGINT} columns, which is {@value}.
          */
         public static final long MAX_BIGINT = Long.MAX_VALUE;
 
         /**
-         * The minimum value for {@code BIGINT UNSIGNED} columns,which is {@value}.
+         * The minimum value for {@code BIGINT UNSIGNED} columns, which is {@value}.
          *
          * @see #MAX_BIGINT_UNSIGNED()
          */
@@ -167,6 +167,30 @@ public final class __DatabaseConstants {
          * Creates a new instance.
          */
         private __MySQLConstants() {
+            throw new AssertionError("instantiation is not allowed");
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * .
+     *
+     * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+     * @see <a href="https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Data-Types.html">Data
+     *         Types</a> (Oracle Database / SQL Language Reference)
+     */
+    public static final class __OracleConstants {
+
+        public static final int MIN_NUMBER_PRECISION = 1;
+
+        public static final int MAX_NUMBER_PRECISION = 38;
+
+        public static final int MIN_NUMBER_SCALE = -84;
+
+        public static final int MAX_NUMBER_SCALE = 128;
+
+        private __OracleConstants() {
             throw new AssertionError("instantiation is not allowed");
         }
     }

@@ -32,6 +32,9 @@ import java.util.function.Function;
 
 public final class ___OrgHibernateOrmTestUtils {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
     public static <R> R applyConnection(@Nonnull final EntityManager entityManager,
                                         @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");

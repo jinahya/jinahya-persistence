@@ -23,6 +23,8 @@ package com.github.jinahya.persistence.mapped.tests;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -31,6 +33,9 @@ import java.util.function.Consumer;
 
 public final class ___JavaSqlTestUtils {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_LABEL_TABLE_NAME = "TABLE_NAME";
 
     static final String COLUMN_LABEL_COLUMN_NAME = "COLUMN_NAME";
@@ -115,24 +120,22 @@ public final class ___JavaSqlTestUtils {
         final var databaseMetaData = connection.getMetaData();
         final var databaseProductName = databaseMetaData.getDatabaseProductName();
         final var databaseProductVersion = databaseMetaData.getDatabaseProductVersion();
-        System.out.println("databaseProductName = " + databaseProductName);
-        System.out.println("databaseProductVersion = " + databaseProductVersion);
-        try (var resultSet = databaseMetaData.getCatalogs()) {
-            while (resultSet.next()) {
-                final var tableCat = resultSet.getString("TABLE_CAT");
-                System.out.println("TABLE_CAT: " + tableCat);
-                try (var resultSet2 = databaseMetaData.getSchemas(tableCat, null)) {
-                    while (resultSet2.next()) {
-                        final var schema = resultSet2.getString("TABLE_SCHEM");
-                        System.out.println("\tTABLE_SCHEM: " + schema);
+        try (var catalogs = databaseMetaData.getCatalogs()) {
+            while (catalogs.next()) {
+                final var tableCat = catalogs.getString("TABLE_CAT");
+                logger.log(Level.INFO, "TABLE_CAT: {0}", tableCat);
+                try (var schemas = databaseMetaData.getSchemas(tableCat, null)) {
+                    while (schemas.next()) {
+                        final var schema = schemas.getString("TABLE_SCHEM");
+                        logger.log(Level.INFO, "\t{0}.TABLE_SCHEM: {1}", tableCat, schema);
                     }
                 }
             }
         }
-        try (var resultSet = databaseMetaData.getSchemas()) {
-            while (resultSet.next()) {
-                final var tbleSchem = resultSet.getString("TABLE_SCHEM");
-                System.out.println("TABLE_SCHEM: " + tbleSchem);
+        try (var schemas = databaseMetaData.getSchemas()) {
+            while (schemas.next()) {
+                final var tableSchem = schemas.getString("TABLE_SCHEM");
+                logger.log(Level.INFO, "TABLE_SCHEM: {0}", tableSchem);
             }
         }
     }

@@ -29,12 +29,12 @@ import java.util.Optional;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-final class ___MappedEntityPersistenceTestUtils {
+final class __PersistenceProducerUtils {
 
     static Optional<String> getDefaultCatalog(final EntityManagerFactory entityManagerFactory) {
         return Optional.ofNullable(
                 (String) entityManagerFactory.getProperties().get(
-                        ___MappedEntityPersistenceConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
+                        __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
                 )
         );
     }
@@ -42,13 +42,13 @@ final class ___MappedEntityPersistenceTestUtils {
     static Optional<String> getDefaultSchema(final EntityManagerFactory entityManagerFactory) {
         return Optional.ofNullable(
                 (String) entityManagerFactory.getProperties().get(
-                        ___MappedEntityPersistenceConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
+                        __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
                 )
         );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___MappedEntityPersistenceTestUtils() {
+    private __PersistenceProducerUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

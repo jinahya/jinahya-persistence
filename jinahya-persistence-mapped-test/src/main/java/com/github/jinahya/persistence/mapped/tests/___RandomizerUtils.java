@@ -36,7 +36,7 @@ public final class ___RandomizerUtils {
 
     static Optional<Class<?>> getRandomizerClassOf(final Class<?> type) {
         return Optional.ofNullable(
-                ___JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
+                ___JavaLangTestUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
         );
     }
 
@@ -45,7 +45,7 @@ public final class ___RandomizerUtils {
     })
     static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final Class<T> type) {
         return getRandomizerClassOf(type)
-                .map(___JavaLangReflectUtils::newInstanceOf)
+                .map(___JavaLangReflectTestUtils::newInstanceOf)
                 .map(i -> (___Randomizer<T>) i)
                 ;
     }

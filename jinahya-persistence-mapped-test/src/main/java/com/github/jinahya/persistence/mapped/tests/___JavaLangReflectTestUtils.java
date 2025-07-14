@@ -25,10 +25,40 @@ import jakarta.annotation.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class ___JavaLangReflectUtils {
+public final class ___JavaLangReflectTestUtils {
+
+    private static final Method AUTO_CLOSEABLE_CLOSE;
+
+    static {
+        try {
+            AUTO_CLOSEABLE_CLOSE = AutoCloseable.class.getMethod("close");
+        } catch (final NoSuchMethodException nsme) {
+            throw new ExceptionInInitializerError(
+                    "failed to find the AutoCloseable#close method; " + nsme.getLocalizedMessage()
+            );
+        }
+    }
+
+    @SuppressWarnings({
+            "unchecked"
+    })
+    public static <T extends AutoCloseable> T uncloseable(@Nonnull final T closeable) {
+        Objects.requireNonNull(closeable, "closeable is null");
+        return (T) Proxy.newProxyInstance(
+                closeable.getClass().getClassLoader(),
+                new Class[]{AutoCloseable.class},
+                (p, m, a) -> {
+                    if (AUTO_CLOSEABLE_CLOSE.equals(m)) {
+                        throw new UnsupportedOperationException("this instance is not closeable");
+                    }
+                    return m.invoke(closeable, a);
+                });
+    }
 
     public static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
                                                                     final Class<A> annotationType) {
@@ -125,7 +155,7 @@ public final class ___JavaLangReflectUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JavaLangReflectUtils() {
+    private ___JavaLangReflectTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

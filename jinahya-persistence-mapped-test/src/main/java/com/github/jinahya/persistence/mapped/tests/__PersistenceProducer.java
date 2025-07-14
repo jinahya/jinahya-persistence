@@ -42,12 +42,25 @@ import java.lang.annotation.Target;
 })
 public class __PersistenceProducer {
 
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({
+            ElementType.ANNOTATION_TYPE,
+            ElementType.PARAMETER,
+            ElementType.FIELD,
+            ElementType.METHOD,
+            ElementType.TYPE
+    })
+    @interface Persistence__ {
+
+    }
+
     /**
      * A qualifier for unit tests.
      */
+    @Persistence__
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
+//    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
     public @interface Unit__ {
 
     }
@@ -55,9 +68,10 @@ public class __PersistenceProducer {
     /**
      * A qualifier for integration tests.
      */
+    @Persistence__
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
+//    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
     public @interface Integration__ {
 
     }

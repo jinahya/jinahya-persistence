@@ -33,7 +33,8 @@ public final class ___PersisterUtils {
 
     static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> entityClass) {
         return Optional.ofNullable(
-                ___JavaLangUtils.forAnyPostfixes(entityClass, __MappedEntityPersister.class, "Persister", "_Persister")
+                ___JavaLangTestUtils.forAnyPostfixes(entityClass, __MappedEntityPersister.class, "Persister",
+                                                     "_Persister")
         );
     }
 
@@ -42,7 +43,7 @@ public final class ___PersisterUtils {
     })
     static <T> Optional<___Persister<T>> newPersisterInstanceOf(final Class<T> entityClass) {
         return getPersisterClassOf(entityClass)
-                .map(___JavaLangReflectUtils::newInstanceOf)
+                .map(___JavaLangReflectTestUtils::newInstanceOf)
                 .map(i -> (___Persister<T>) i);
     }
 

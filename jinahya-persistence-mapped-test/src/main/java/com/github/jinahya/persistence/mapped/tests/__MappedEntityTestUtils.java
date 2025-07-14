@@ -35,7 +35,7 @@ public class __MappedEntityTestUtils {
     public static <ENTITY extends __MappedEntity<ENTITY, ?>, R>
     Table getTableAnnotation(@Nonnull final Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return ___JavaLangReflectUtils.findAnnotation(entityClass, Table.class).orElseThrow(
+        return ___JavaLangReflectTestUtils.findAnnotation(entityClass, Table.class).orElseThrow(
                 () -> new IllegalArgumentException("unable to get @Table from " + entityClass)
         );
     }
