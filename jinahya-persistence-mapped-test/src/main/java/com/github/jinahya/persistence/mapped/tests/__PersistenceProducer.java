@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.mapped.tests;
  * #L%
  */
 
+import jakarta.enterprise.inject.Disposes;
+import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Qualifier;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -30,11 +32,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An abstract provider class for EntityManagerFactory and EntityManager.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __PersistenceProducer {
+public class __PersistenceProducer {
 
+    /**
+     * A qualifier for unit tests.
+     */
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
@@ -42,6 +52,9 @@ public abstract class __PersistenceProducer {
 
     }
 
+    /**
+     * A qualifier for integration tests.
+     */
     @Qualifier
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD})
@@ -54,46 +67,51 @@ public abstract class __PersistenceProducer {
     public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __PersistenceProducer() {
+    public __PersistenceProducer() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------------------ unit
     @Unit__
-    protected EntityManagerFactory produceUnitEntityManagerFactory() {
+    @Produces
+    public EntityManagerFactory produceUnitEntityManagerFactory() {
         return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_UNIT_PU);
     }
 
-    protected void disposeUnitEntityManagerFactory(@Unit__ final EntityManagerFactory entityManagerFactory) {
+    public void disposeUnitEntityManagerFactory(@Unit__ @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
     @Unit__
-    protected EntityManager produceUnitEntityManager(final EntityManagerFactory entityManagerFactory) {
+    @Produces
+    public EntityManager produceUnitEntityManager(@Unit__ final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeUnitEntityManager(@Unit__ final EntityManager entityManager) {
+    public void disposeUnitEntityManager(@Unit__ @Disposes final EntityManager entityManager) {
         entityManager.close();
     }
 
     // ----------------------------------------------------------------------------------------------------- integration
     @Integration__
-    protected EntityManagerFactory produceIntegrationEntityManagerFactory() {
+    @Produces
+    public EntityManagerFactory produceIntegrationEntityManagerFactory() {
         return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_INTEGRATION_PU);
     }
 
-    protected void disposeIntegrationEntityManagerFactory(
-            @Integration__ final EntityManagerFactory entityManagerFactory) {
+    public void disposeIntegrationEntityManagerFactory(
+            @Integration__ @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
     @Integration__
-    protected EntityManager produceIntegrationEntityManager(final EntityManagerFactory entityManagerFactory) {
+    @Produces
+    public EntityManager produceIntegrationEntityManager(
+            @Integration__ final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
-    protected void disposeIntegrationEntityManager(@Integration__ final EntityManager entityManager) {
+    public void disposeIntegrationEntityManager(@Integration__ @Disposes final EntityManager entityManager) {
         entityManager.close();
     }
 }

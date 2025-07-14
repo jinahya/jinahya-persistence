@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaSqlUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Table;
@@ -44,7 +43,7 @@ public final class __MappedEntityJdbcUtils {
         assert connection != null;
         assert tableNamePattern != null;
         assert consumer != null;
-        __JavaSqlUtils.acceptEachColumnName(
+        ___JavaSqlTestUtils.acceptEachColumnName(
                 connection,
                 catalog,
                 schemaPattern,

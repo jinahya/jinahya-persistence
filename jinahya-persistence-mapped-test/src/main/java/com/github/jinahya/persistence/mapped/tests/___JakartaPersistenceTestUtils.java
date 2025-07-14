@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -39,11 +39,10 @@ import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 
-public final class __JakartaPersistenceTestUtils {
+public final class ___JakartaPersistenceTestUtils {
 
-    public static <X>
-    void acceptEachAttributeName(@Nonnull final ManagedType<X> managedType,
-                                 @Nonnull final Consumer<? super String> consumer) {
+    public static <X> void acceptEachAttributeName(@Nonnull final ManagedType<X> managedType,
+                                                   @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(managedType, "managedType is null");
         Objects.requireNonNull(consumer, "consumer is null");
         managedType.getAttributes()
@@ -59,7 +58,8 @@ public final class __JakartaPersistenceTestUtils {
         return collection;
     }
 
-    public static Optional<String> getColumnName(@Nonnull final Method method) {
+    // -----------------------------------------------------------------------------------------------------------------
+    static Optional<String> getColumnName(@Nonnull final Method method) {
         Objects.requireNonNull(method, "method is null");
         {
             final var column = method.getAnnotation(Column.class);
@@ -82,7 +82,7 @@ public final class __JakartaPersistenceTestUtils {
         return Optional.empty();
     }
 
-    public static Optional<String> getColumnName(@Nonnull final Field field) {
+    static Optional<String> getColumnName(@Nonnull final Field field) {
         Objects.requireNonNull(field, "field is null");
         {
             final var column = field.getAnnotation(Column.class);
@@ -158,8 +158,12 @@ public final class __JakartaPersistenceTestUtils {
             }
             return result;
         } catch (final Exception e) {
-            transaction.rollback();
-            throw new RuntimeException(e);
+            try {
+                return ___OrgHibernateOrmTestUtils.applyConnection(entityManager, function);
+            } catch (final Exception e2) {
+                transaction.rollback();
+                throw new RuntimeException("failed to apply " + function + " and rollback: " + rollback, e2);
+            }
         }
     }
 
@@ -223,7 +227,7 @@ public final class __JakartaPersistenceTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __JakartaPersistenceTestUtils() {
+    private ___JakartaPersistenceTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

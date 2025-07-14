@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -28,7 +28,7 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class __JavaLangReflectUtils {
+public final class ___JavaLangReflectUtils {
 
     public static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
                                                                     final Class<A> annotationType) {
@@ -125,7 +125,7 @@ public final class __JavaLangReflectUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __JavaLangReflectUtils() {
+    private ___JavaLangReflectUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -21,8 +21,6 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
-import com.github.jinahya.persistence.mapped.tests.util.__JakartaPersistenceTestUtils;
-import com.github.jinahya.persistence.mapped.tests.util.__OrgHibernateOrmTestUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -30,7 +28,6 @@ import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -109,7 +106,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     protected final <R> R applyEntityManagerInTransaction(final Function<? super EntityManager, ? extends R> function,
                                                           final boolean rollback) {
         return applyEntityManager(em -> {
-            return __JakartaPersistenceTestUtils.applyEntityManagerInTransaction(em, function, rollback);
+            return ___JakartaPersistenceTestUtils.applyEntityManagerInTransaction(em, function, rollback);
         });
     }
 
@@ -158,7 +155,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
                     } catch (final PersistenceException pe) {
                         // empty
                     }
-                    return __OrgHibernateOrmTestUtils.applyConnection(em, function);
+                    return ___OrgHibernateOrmTestUtils.applyConnection(em, function);
                 },
                 rollback
         );
@@ -190,44 +187,6 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
                     return null;
                 }
         );
-    }
-
-    //        @Disabled
-    @Test
-    void __() {
-        acceptConnectionInTransactionAndRollback(c -> {
-            try {
-                final var m = c.getMetaData();
-                try (var r = m.getCatalogs()) {
-                    while (r.next()) {
-                        System.out.println("TABLE_CAT: " + r.getString("TABLE_CAT"));
-                    }
-                }
-                try (var r = m.getSchemas()) {
-                    while (r.next()) {
-                        System.out.println("TABLE_SCHEM: " + r.getString("TABLE_SCHEM"));
-                    }
-                }
-                try (var r = m.getTables(null, null, "%", null)) {
-                    while (r.next()) {
-                        System.out.println("TABLE_CAT: " + r.getString("TABLE_CAT"));
-                        System.out.println("TABLE_SCHEM: " + r.getString("TABLE_SCHEM"));
-                        System.out.println("TABLE_NAME: " + r.getString("TABLE_NAME"));
-                    }
-                }
-                try (var r = m.getColumns(null, null, "%", "%")) {
-                    while (r.next()) {
-                        System.out.println("TABLE_CAT: " + r.getString("TABLE_CAT"));
-                        System.out.println("TABLE_SCHEM: " + r.getString("TABLE_SCHEM"));
-                        System.out.println("TABLE_NAME: " + r.getString("TABLE_NAME"));
-                        System.out.println("COLUMN_NAME: " + r.getString("COLUMN_NAME"));
-                        System.out.println();
-                    }
-                }
-            } catch (final SQLException sqle) {
-
-            }
-        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------

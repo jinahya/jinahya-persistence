@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.entity01;
+package com.github.jinahya.persistence.mapped.tests.examples.entity01;
 
 /*-
  * #%L
@@ -20,27 +20,33 @@ package com.github.jinahya.persistence.mapped.tests.entity01;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests._MappedEntityTest;
-import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
-import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import com.github.jinahya.persistence.mapped.tests._MappedEntityPersistenceIT;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
-public class Entity01Test extends _MappedEntityTest<Entity01, Long> {
+@Slf4j
+class Entity01PersistenceIT extends _MappedEntityPersistenceIT<Entity01, Long> {
 
-    protected Entity01Test() {
+    Entity01PersistenceIT() {
         super(Entity01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Test
     @Override
-    protected void _verify_equals() {
-        super._verify_equals();
+    protected void persistEntityInstance() {
+        super.persistEntityInstance();
     }
 
-    @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<Entity01> getEqualsVerifier() {
-        return super.getEqualsVerifier()
-                .suppress(Warning.SURROGATE_KEY);
+    protected void persistingEntityInstance(final Entity01 entityInstance) {
+        log.debug("persisting {}", entityInstance);
+        super.persistingEntityInstance(entityInstance);
+    }
+
+    @Override
+    protected void persistedEntityInstance(final Entity01 entityInstance) {
+        log.debug("persisted {}", entityInstance);
+        super.persistedEntityInstance(entityInstance);
     }
 }

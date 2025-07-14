@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.entity01;
+package com.github.jinahya.persistence.mapped.tests.examples.entity01;
 
 /*-
  * #%L

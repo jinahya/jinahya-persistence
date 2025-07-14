@@ -21,27 +21,33 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaSqlUtils;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@AddBeanClasses({
+        __PersistenceProducer.class
+})
+@ExtendWith(WeldJunit5AutoExtension.class)
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class __MappedEntityPersistenceIntegrationIT<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___MappedEntityPersistenceTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __MappedEntityPersistenceIntegrationIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    protected __MappedEntityPersistenceIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 
@@ -55,7 +61,7 @@ public abstract class __MappedEntityPersistenceIntegrationIT<ENTITY extends __Ma
         final var schema = applyEntityManagerFactory(___MappedEntityPersistenceTestUtils::getDefaultSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = applyConnectionInTransactionAndRollback(
-                c -> __JavaSqlUtils.addAllColumnNames(
+                c -> ___JavaSqlTestUtils.addAllColumnNames(
                         c,
                         catalog,
                         schema,
@@ -64,7 +70,8 @@ public abstract class __MappedEntityPersistenceIntegrationIT<ENTITY extends __Ma
                 )
         );
         assertThat(tableColumnNames)
-                .as("table column names for " + entityClass)
+                .as("table column names for " + entityClass + "; catalog: " + catalog + "; schema: " + schema +
+                    "; table: " + table.name())
                 .isNotEmpty();
         final var attributeColumnNames = applyEntityManagerFactory(
                 emf -> __MappedEntityPersistenceTestUtils.addAllAttributeColumNames(

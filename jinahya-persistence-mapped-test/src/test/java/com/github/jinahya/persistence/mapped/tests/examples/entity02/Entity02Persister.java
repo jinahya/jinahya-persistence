@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests;
+package com.github.jinahya.persistence.mapped.tests.examples.entity02;
 
 /*-
  * #%L
@@ -20,18 +20,18 @@ package com.github.jinahya.persistence.mapped.tests;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntity;
+import com.github.jinahya.persistence.mapped.tests.__MappedEntityPersister;
+import jakarta.persistence.EntityManager;
 
-@SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
-        "java:S119", // Type parameter names should comply with a naming convention
-        "java:S6813" // Field dependency injection should be avoided
-})
-public abstract class _MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
-        extends __MappedEntityPersistenceIT<ENTITY, ID> {
+class Entity02Persister extends __MappedEntityPersister<Entity02, Long> {
+
+    Entity02Persister() {
+        super(Entity02.class, Long.class);
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected _MappedEntityPersistenceIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
-        super(entityClass, idClass);
+    @Override
+    public Entity02 persist(final EntityManager entityManager, final Entity02 entityInstance) {
+        return super.persist(entityManager, entityInstance);
     }
 }

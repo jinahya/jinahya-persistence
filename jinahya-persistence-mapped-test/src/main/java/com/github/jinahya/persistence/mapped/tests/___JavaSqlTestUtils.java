@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class __JavaSqlUtils {
+public final class ___JavaSqlTestUtils {
 
     static final String COLUMN_LABEL_TABLE_NAME = "TABLE_NAME";
 
@@ -109,5 +109,36 @@ public class __JavaSqlUtils {
         Objects.requireNonNull(collection, "collection is null");
         acceptEachColumnName(connection, catalog, schemaPattern, tableNamePattern, collection::add);
         return collection;
+    }
+
+    public static void printDatabaseInfo(final Connection connection) throws SQLException {
+        final var databaseMetaData = connection.getMetaData();
+        final var databaseProductName = databaseMetaData.getDatabaseProductName();
+        final var databaseProductVersion = databaseMetaData.getDatabaseProductVersion();
+        System.out.println("databaseProductName = " + databaseProductName);
+        System.out.println("databaseProductVersion = " + databaseProductVersion);
+        try (var resultSet = databaseMetaData.getCatalogs()) {
+            while (resultSet.next()) {
+                final var tableCat = resultSet.getString("TABLE_CAT");
+                System.out.println("TABLE_CAT: " + tableCat);
+                try (var resultSet2 = databaseMetaData.getSchemas(tableCat, null)) {
+                    while (resultSet2.next()) {
+                        final var schema = resultSet2.getString("TABLE_SCHEM");
+                        System.out.println("\tTABLE_SCHEM: " + schema);
+                    }
+                }
+            }
+        }
+        try (var resultSet = databaseMetaData.getSchemas()) {
+            while (resultSet.next()) {
+                final var tbleSchem = resultSet.getString("TABLE_SCHEM");
+                System.out.println("TABLE_SCHEM: " + tbleSchem);
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private ___JavaSqlTestUtils() {
+        throw new AssertionError("instantiation is not allowed");
     }
 }

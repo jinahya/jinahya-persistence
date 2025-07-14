@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.entity01;
+package com.github.jinahya.persistence.mapped.tests.examples.entity01;
 
 /*-
  * #%L
@@ -20,33 +20,35 @@ package com.github.jinahya.persistence.mapped.tests.entity01;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests._MappedEntityPersistenceIT;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
+import com.github.jinahya.persistence.mapped.tests.__MappedEntityRandomizer;
+import jakarta.annotation.Nonnull;
+import uk.co.jemos.podam.api.DataProviderStrategy;
+import uk.co.jemos.podam.api.PodamFactory;
 
-@Slf4j
-class Entity01PersistenceIT extends _MappedEntityPersistenceIT<Entity01, Long> {
+class Entity01Randomizer extends __MappedEntityRandomizer<Entity01, Long> {
 
-    Entity01PersistenceIT() {
+    Entity01Randomizer() {
         super(Entity01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
+    @Nonnull
     @Override
-    protected void persistEntityInstance() {
-        super.persistEntityInstance();
+    protected DataProviderStrategy getDataProviderStrategy() {
+        return super.getDataProviderStrategy();
     }
 
+    @Nonnull
     @Override
-    protected void persistingEntityInstance(final Entity01 entityInstance) {
-        log.debug("persisting {}", entityInstance);
-        super.persistingEntityInstance(entityInstance);
+    protected PodamFactory getPodamFactory() {
+        return super.getPodamFactory();
     }
 
+    @Nonnull
     @Override
-    protected void persistedEntityInstance(final Entity01 entityInstance) {
-        log.debug("persisted {}", entityInstance);
-        super.persistedEntityInstance(entityInstance);
+    public Entity01 get() {
+        final var value = super.get();
+        value.setId(null);
+        return value;
     }
 }

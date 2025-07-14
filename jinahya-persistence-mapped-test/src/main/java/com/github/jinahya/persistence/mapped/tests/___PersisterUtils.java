@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.mapped.tests;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangUtils;
 import jakarta.persistence.EntityManager;
 
 import java.util.Objects;
@@ -35,7 +33,7 @@ public final class ___PersisterUtils {
 
     static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> entityClass) {
         return Optional.ofNullable(
-                __JavaLangUtils.forAnyPostfixes(entityClass, __MappedEntityPersister.class, "Persister", "_Persister")
+                ___JavaLangUtils.forAnyPostfixes(entityClass, __MappedEntityPersister.class, "Persister", "_Persister")
         );
     }
 
@@ -44,7 +42,7 @@ public final class ___PersisterUtils {
     })
     static <T> Optional<___Persister<T>> newPersisterInstanceOf(final Class<T> entityClass) {
         return getPersisterClassOf(entityClass)
-                .map(__JavaLangReflectUtils::newInstanceOf)
+                .map(___JavaLangReflectUtils::newInstanceOf)
                 .map(i -> (___Persister<T>) i);
     }
 

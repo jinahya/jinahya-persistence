@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -30,7 +30,7 @@ import java.sql.Connection;
 import java.util.Objects;
 import java.util.function.Function;
 
-public final class __OrgHibernateOrmTestUtils {
+public final class ___OrgHibernateOrmTestUtils {
 
     public static <R> R applyConnection(@Nonnull final EntityManager entityManager,
                                         @Nonnull final Function<? super Connection, ? extends R> function) {
@@ -59,7 +59,7 @@ public final class __OrgHibernateOrmTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __OrgHibernateOrmTestUtils() {
+    private ___OrgHibernateOrmTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

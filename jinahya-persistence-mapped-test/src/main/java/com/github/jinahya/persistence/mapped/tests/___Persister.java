@@ -20,7 +20,6 @@ package com.github.jinahya.persistence.mapped.tests;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.util.__JakartaValidationTestUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
@@ -50,10 +49,10 @@ public abstract class ___Persister<ENTITY> {
     public ENTITY persist(final EntityManager entityManager, final ENTITY entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        __JakartaValidationTestUtils.requireValid(entityInstance);
+        ___JakartaValidationTestUtils.requireValid(entityInstance);
         entityManager.persist(entityInstance);
         entityManager.flush(); // required?
-        __JakartaValidationTestUtils.requireValid(entityInstance);
+        ___JakartaValidationTestUtils.requireValid(entityInstance);
         return entityInstance;
     }
 

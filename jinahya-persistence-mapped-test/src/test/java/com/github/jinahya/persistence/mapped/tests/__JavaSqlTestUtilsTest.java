@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped.tests.util;
  * #L%
  */
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class __JavaSqlTestUtils {
+class __JavaSqlTestUtilsTest {
 
     @Nested
     class AcceptEachTableNameTest {
@@ -56,13 +57,13 @@ class __JavaSqlTestUtils {
                 final var resultSet = mock(ResultSet.class);
                 final var removableTableNames = new ArrayList<>(tableNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableTableNames.isEmpty());
-                when(resultSet.getString(__JavaSqlUtils.COLUMN_LABEL_TABLE_NAME))
+                when(resultSet.getString(___JavaSqlTestUtils.COLUMN_LABEL_TABLE_NAME))
                         .thenAnswer((Answer<String>) i -> removableTableNames.removeFirst());
                 when(databaseMetaData.getTables(catalog, schema, null, null)).thenReturn(resultSet);
             }
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
-            __JavaSqlUtils.acceptEachTableName(
+            ___JavaSqlTestUtils.acceptEachTableName(
                     connection,
                     catalog,
                     schema,
@@ -91,19 +92,19 @@ class __JavaSqlTestUtils {
                 final var resultSet = mock(ResultSet.class);
                 final var removableTableNames = new ArrayList<>(tableNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableTableNames.isEmpty());
-                when(resultSet.getString(__JavaSqlUtils.COLUMN_LABEL_TABLE_NAME))
+                when(resultSet.getString(___JavaSqlTestUtils.COLUMN_LABEL_TABLE_NAME))
                         .thenAnswer((Answer<String>) i -> removableTableNames.removeFirst());
                 when(databaseMetaData.getTables(catalog, schema, null, null)).thenReturn(resultSet);
             }
             // ---------------------------------------------------------------------------------------------------- when
-            final var collection = __JavaSqlUtils.addAllTableNames(
+            final var collection = ___JavaSqlTestUtils.addAllTableNames(
                     connection,
                     catalog,
                     schema,
                     new ArrayList<>()
             );
             // ---------------------------------------------------------------------------------------------------- then
-            assertThat(collection).isEqualTo(tableNames);
+            Assertions.assertThat(collection).isEqualTo(tableNames);
         }
     }
 
@@ -124,13 +125,13 @@ class __JavaSqlTestUtils {
                 final var resultSet = mock(ResultSet.class);
                 final var removableColumnNames = new ArrayList<>(columnNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableColumnNames.isEmpty());
-                when(resultSet.getString(__JavaSqlUtils.COLUMN_LABEL_COLUMN_NAME))
+                when(resultSet.getString(___JavaSqlTestUtils.COLUMN_LABEL_COLUMN_NAME))
                         .thenAnswer((Answer<String>) i -> removableColumnNames.removeFirst());
                 when(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")).thenReturn(resultSet);
             }
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
-            __JavaSqlUtils.acceptEachColumnName(
+            ___JavaSqlTestUtils.acceptEachColumnName(
                     connection,
                     catalog,
                     schemaPattern,
@@ -162,12 +163,13 @@ class __JavaSqlTestUtils {
                 final var resultSet = mock(ResultSet.class);
                 final var removableColumnNames = new ArrayList<>(columnNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableColumnNames.isEmpty());
-                when(resultSet.getString(__JavaSqlUtils.COLUMN_LABEL_COLUMN_NAME))
+                when(resultSet.getString(
+                        ___JavaSqlTestUtils.COLUMN_LABEL_COLUMN_NAME))
                         .thenAnswer((Answer<String>) i -> removableColumnNames.removeFirst());
                 when(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")).thenReturn(resultSet);
             }
             // ---------------------------------------------------------------------------------------------------- when
-            final var collection = __JavaSqlUtils.addAllColumnNames(
+            final var collection = ___JavaSqlTestUtils.addAllColumnNames(
                     connection,
                     catalog,
                     schemaPattern,
@@ -175,7 +177,7 @@ class __JavaSqlTestUtils {
                     new ArrayList<>()
             );
             // ---------------------------------------------------------------------------------------------------- then
-            assertThat(collection).isEqualTo(columnNames);
+            Assertions.assertThat(collection).isEqualTo(columnNames);
         }
     }
 }

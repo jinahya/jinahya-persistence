@@ -28,8 +28,8 @@
     <description>Persistence Unit on In-Memory DB</description>
     <!--        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-    <class>com.github.jinahya.persistence.mapped.tests.entity01.Entity01</class>
-    <class>com.github.jinahya.persistence.mapped.tests.entity02.Entity02</class>
+    <class>com.github.jinahya.persistence.mapped.tests.examples.entity01.Entity01</class>
+    <class>com.github.jinahya.persistence.mapped.tests.examples.entity02.Entity02</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
@@ -54,16 +54,16 @@
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
       <!-- jinahya.persistence -->
-      <property name="jinahya.persistence.default_catalog" value="catalog"/>
-      <property name="jinahya.persistence.default_schema" value="public"/>
+      <property name="jinahya.persistence.default_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.default_schema" value="PUBLIC"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="integrationPU">
     <description>Persistence Unit for Physical Database</description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-    <class>com.github.jinahya.persistence.mapped.tests.entity01.Entity01</class>
-    <class>com.github.jinahya.persistence.mapped.tests.entity02.Entity02</class>
+    <class>com.github.jinahya.persistence.mapped.tests.examples.entity01.Entity01</class>
+    <class>com.github.jinahya.persistence.mapped.tests.examples.entity02.Entity02</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
@@ -89,8 +89,8 @@
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
       <!-- jinahya.persistence -->
-      <property name="jinahya.persistence.default_catalog" value="catalog"/>
-      <property name="jinahya.persistence.default_schema" value="public"/>
+      <property name="jinahya.persistence.default_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.default_schema" value="PUBLIC"/>
     </properties>
   </persistence-unit>
 </persistence>

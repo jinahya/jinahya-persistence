@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.entity02;
+package com.github.jinahya.persistence.mapped.tests.examples.entity02;
 
 /*-
  * #%L
@@ -20,18 +20,33 @@ package com.github.jinahya.persistence.mapped.tests.entity02;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.__MappedEntityPersister;
-import jakarta.persistence.EntityManager;
+import com.github.jinahya.persistence.mapped.tests._MappedEntityPersistenceIT;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
-class Entity02Persister extends __MappedEntityPersister<Entity02, Long> {
+@Slf4j
+class Entity02PersistenceIT extends _MappedEntityPersistenceIT<Entity02, Long> {
 
-    Entity02Persister() {
+    Entity02PersistenceIT() {
         super(Entity02.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Test
     @Override
-    public Entity02 persist(final EntityManager entityManager, final Entity02 entityInstance) {
-        return super.persist(entityManager, entityInstance);
+    protected void persistEntityInstance() {
+        super.persistEntityInstance();
+    }
+
+    @Override
+    protected void persistingEntityInstance(final Entity02 entityInstance) {
+        log.debug("persisting {}", entityInstance);
+        super.persistingEntityInstance(entityInstance);
+    }
+
+    @Override
+    protected void persistedEntityInstance(final Entity02 entityInstance) {
+        log.debug("persisted {}", entityInstance);
+        super.persistedEntityInstance(entityInstance);
     }
 }

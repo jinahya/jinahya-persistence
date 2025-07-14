@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Transient;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -148,7 +147,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     // -----------------------------------------------------------------------------------------------------------------
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-                .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(entityClass));
+                .orElseGet(() -> ___JavaLangReflectUtils.newInstanceOf(entityClass));
     }
 
     protected ENTITY newEntityInstanceSpy() {
@@ -166,7 +165,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     // -----------------------------------------------------------------------------------------------------------------
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
-                .orElseGet(() -> __JavaLangReflectUtils.newInstanceOf(idClass));
+                .orElseGet(() -> ___JavaLangReflectUtils.newInstanceOf(idClass));
     }
 
     protected ID newIdInstanceSpy() {

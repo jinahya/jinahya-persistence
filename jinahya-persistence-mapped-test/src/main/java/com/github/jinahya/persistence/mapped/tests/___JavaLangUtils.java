@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -26,7 +26,7 @@ import jakarta.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class __JavaLangUtils {
+public final class ___JavaLangUtils {
 
     @Nullable
     public static Class<?> forAnyPostfixes(@Nonnull final Class<?> type, final Class<?> supertype,
@@ -58,7 +58,7 @@ public final class __JavaLangUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __JavaLangUtils() {
+    private ___JavaLangUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -20,9 +20,6 @@ package com.github.jinahya.persistence.mapped.tests;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangUtils;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -39,7 +36,7 @@ public final class ___RandomizerUtils {
 
     static Optional<Class<?>> getRandomizerClassOf(final Class<?> type) {
         return Optional.ofNullable(
-                __JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
+                ___JavaLangUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
         );
     }
 
@@ -48,7 +45,7 @@ public final class ___RandomizerUtils {
     })
     static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final Class<T> type) {
         return getRandomizerClassOf(type)
-                .map(__JavaLangReflectUtils::newInstanceOf)
+                .map(___JavaLangReflectUtils::newInstanceOf)
                 .map(i -> (___Randomizer<T>) i)
                 ;
     }

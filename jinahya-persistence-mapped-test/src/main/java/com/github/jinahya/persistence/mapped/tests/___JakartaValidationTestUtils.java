@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.util;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
-public final class __JakartaValidationTestUtils {
+public final class ___JakartaValidationTestUtils {
 
     public static <T> Set<ConstraintViolation<T>> validate(@Nonnull final Validator validator, @Nonnull final T object,
                                                            @Nonnull final Class<?>... groups) {
@@ -77,7 +77,7 @@ public final class __JakartaValidationTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __JakartaValidationTestUtils() {
+    private ___JakartaValidationTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

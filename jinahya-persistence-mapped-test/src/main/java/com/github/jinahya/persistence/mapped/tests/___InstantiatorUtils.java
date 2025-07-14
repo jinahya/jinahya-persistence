@@ -20,9 +20,6 @@ package com.github.jinahya.persistence.mapped.tests;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangUtils;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -40,7 +37,7 @@ public final class ___InstantiatorUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                __JavaLangUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
+                ___JavaLangUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
         );
     }
 
@@ -49,7 +46,7 @@ public final class ___InstantiatorUtils {
     })
     static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> type) {
         return getInstantiatorClassOf(type)
-                .map(__JavaLangReflectUtils::newInstanceOf)
+                .map(___JavaLangReflectUtils::newInstanceOf)
                 .map(i -> (___Instantiator<T>) i);
     }
 

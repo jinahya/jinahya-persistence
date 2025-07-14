@@ -21,8 +21,6 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
-import com.github.jinahya.persistence.mapped.tests.util.__JakartaPersistenceTestUtils;
-import com.github.jinahya.persistence.mapped.tests.util.__JavaLangReflectUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
@@ -89,7 +87,7 @@ public class __MappedEntityPersistenceTestUtils {
         {
             final var readMethod = propertyDescriptor.getReadMethod();
             if (readMethod != null) {
-                final var result = __JakartaPersistenceTestUtils.getColumnName(readMethod);
+                final var result = ___JakartaPersistenceTestUtils.getColumnName(readMethod);
                 if (result.isPresent()) {
                     return result;
                 }
@@ -98,15 +96,15 @@ public class __MappedEntityPersistenceTestUtils {
         {
             final var writeMethod = propertyDescriptor.getWriteMethod();
             if (writeMethod != null) {
-                final var result = __JakartaPersistenceTestUtils.getColumnName(writeMethod);
+                final var result = ___JakartaPersistenceTestUtils.getColumnName(writeMethod);
                 if (result.isPresent()) {
                     return result;
                 }
             }
         }
-        final var field = __JavaLangReflectUtils.findField(beanClass, propertyDescriptor.getName());
+        final var field = ___JavaLangReflectUtils.findField(beanClass, propertyDescriptor.getName());
         if (field.isPresent()) {
-            final var result = __JakartaPersistenceTestUtils.getColumnName(field.get());
+            final var result = ___JakartaPersistenceTestUtils.getColumnName(field.get());
             if (result.isPresent()) {
                 return result;
             }
@@ -130,7 +128,7 @@ public class __MappedEntityPersistenceTestUtils {
         }
         final var propertyDescriptors = Arrays.stream(beanInfo.getPropertyDescriptors())
                 .collect(Collectors.toMap(FeatureDescriptor::getName, Function.identity()));
-        __JakartaPersistenceTestUtils.acceptEachAttributeName(entityType, an -> {
+        ___JakartaPersistenceTestUtils.acceptEachAttributeName(entityType, an -> {
             final var propertyDescriptor = propertyDescriptors.get(an);
             if (propertyDescriptor != null) {
                 getAttributeColumnName(entityClass, propertyDescriptor).ifPresent(consumer);

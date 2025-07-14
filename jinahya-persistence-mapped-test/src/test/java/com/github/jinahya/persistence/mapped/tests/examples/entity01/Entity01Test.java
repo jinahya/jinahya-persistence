@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.entity02;
+package com.github.jinahya.persistence.mapped.tests.examples.entity01;
 
 /*-
  * #%L
@@ -20,36 +20,27 @@ package com.github.jinahya.persistence.mapped.tests.entity02;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.__MappedEntityRandomizer;
+import com.github.jinahya.persistence.mapped.tests._MappedEntityTest;
 import jakarta.annotation.Nonnull;
-import uk.co.jemos.podam.api.DataProviderStrategy;
-import uk.co.jemos.podam.api.PodamFactory;
+import nl.jqno.equalsverifier.Warning;
+import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class Entity02Randomizer extends __MappedEntityRandomizer<Entity02, Long> {
+public class Entity01Test extends _MappedEntityTest<Entity01, Long> {
 
-    Entity02Randomizer() {
-        super(Entity02.class, Long.class);
+    protected Entity01Test() {
+        super(Entity01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Nonnull
     @Override
-    protected DataProviderStrategy getDataProviderStrategy() {
-        return super.getDataProviderStrategy();
+    protected void _verify_equals() {
+        super._verify_equals();
     }
 
     @Nonnull
     @Override
-    protected PodamFactory getPodamFactory() {
-        return super.getPodamFactory();
-    }
-
-    @Nonnull
-    @Override
-    public Entity02 get() {
-        final var value = super.get();
-        value.setId(null);
-        assert value.getId() == null;
-        return value;
+    protected SingleTypeEqualsVerifierApi<Entity01> getEqualsVerifier() {
+        return super.getEqualsVerifier()
+                .suppress(Warning.SURROGATE_KEY);
     }
 }
