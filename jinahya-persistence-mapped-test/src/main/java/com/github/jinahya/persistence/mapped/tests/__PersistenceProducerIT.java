@@ -29,11 +29,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.sql.SQLException;
 
-/**
- * An abstract provider class for EntityManagerFactory and EntityManager.
- *
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- */
 @AddBeanClasses({
         __PersistenceProducer.class
 })

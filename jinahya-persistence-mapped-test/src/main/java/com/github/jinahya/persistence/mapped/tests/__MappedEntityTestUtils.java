@@ -28,16 +28,18 @@ import java.util.Objects;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
+        "java:S119", // Type parameter names should comply with a naming convention
         "java:S125", // Sections of code should not be commented out
 })
 public class __MappedEntityTestUtils {
 
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>, R>
+    static <ENTITY extends __MappedEntity<ENTITY, ?>>
     Table getTableAnnotation(@Nonnull final Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return ___JavaLangReflectTestUtils.findAnnotation(entityClass, Table.class).orElseThrow(
-                () -> new IllegalArgumentException("unable to get @Table from " + entityClass)
-        );
+        return ___JavaLangReflectTestUtils.findAnnotation(entityClass, Table.class)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("unable to get @Table from " + entityClass)
+                );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
