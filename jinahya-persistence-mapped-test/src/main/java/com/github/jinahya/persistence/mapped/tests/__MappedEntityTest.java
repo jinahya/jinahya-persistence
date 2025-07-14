@@ -37,7 +37,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
- * A class for testing subclass of {@link __MappedEntity}.
+ * A class for testing a specific subclass of {@link __MappedEntity}.
  *
  * @param <ENTITY> entity type parameter
  * @param <ID>     id type parameter
@@ -145,37 +145,56 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a new instance of {@link #entityClass}.
+     *
+     * @return a new instance of {@link #entityClass}.
+     */
+    @Nonnull
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
                 .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass));
     }
 
+    /**
+     * Returns a new spy object of {@link #newEntityInstance()}.
+     *
+     * @return a new spy object of {@link #newEntityInstance()}.
+     */
+    @Nonnull
     protected ENTITY newEntityInstanceSpy() {
         return Mockito.spy(newEntityInstance());
     }
 
+    @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
+    @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
         return Mockito.spy(newRandomizedEntityInstance());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
                 .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass));
     }
 
+    @Nonnull
     protected ID newIdInstanceSpy() {
         return Mockito.spy(newIdInstance());
     }
 
+    @Nonnull
     protected Optional<ID> newRandomizedIdInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
     }
 
+    @Nonnull
     protected Optional<ID> newRandomizedIdInstanceSpy() {
         return Mockito.spy(newRandomizedIdInstance());
     }
@@ -183,12 +202,12 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The entity class to test.
+     * The class of {@link ENTITY}.
      */
     protected final Class<ENTITY> entityClass;
 
     /**
-     * The id class of the {@link #entityClass}.
+     * The class of {@link ID}.
      */
     protected final Class<ID> idClass;
 }

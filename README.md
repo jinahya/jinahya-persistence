@@ -1,3 +1,3 @@
-# persistence-more
+# jinahya-persistence
 
-More about Persistence API
+Modules for the Jakarta Persistence API.

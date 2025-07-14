@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -139,7 +138,7 @@ public final class ___JavaLangReflectTestUtils {
             "java:S112", // Generic exceptions should never be thrown
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
-    @Nullable
+    @Nonnull
     public static <T> T newInstanceOf(@Nonnull final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
         try {
@@ -149,8 +148,7 @@ public final class ___JavaLangReflectTestUtils {
             }
             return constructor.newInstance();
         } catch (final ReflectiveOperationException roe) {
-//            logger.log(Level.SEVERE, roe, () -> "failed to initialize a new instance of " + type);
-            return null;
+            throw new RuntimeException("failed to initialize a new instance of " + type, roe);
         }
     }
 

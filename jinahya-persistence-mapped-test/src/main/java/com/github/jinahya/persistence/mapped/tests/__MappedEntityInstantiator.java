@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.mapped.tests;
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -39,8 +38,6 @@ import java.util.Objects;
 })
 public abstract class __MappedEntityInstantiator<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___Instantiator<ENTITY> {
-
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

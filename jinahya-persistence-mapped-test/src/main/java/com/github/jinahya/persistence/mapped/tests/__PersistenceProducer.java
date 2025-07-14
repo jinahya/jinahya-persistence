@@ -27,13 +27,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * An abstract provider class for EntityManagerFactory and EntityManager.
+ * A class for providing persistence resources.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -55,10 +56,11 @@ public class __PersistenceProducer {
     }
 
     /**
-     * A qualifier for unit tests.
+     * A qualifier for the {@value __PersistenceProducer#PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit.
      */
     @Persistence__
     @Qualifier
+    @Documented
     @Retention(RetentionPolicy.RUNTIME)
 //    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
     public @interface Unit__ {
@@ -66,42 +68,75 @@ public class __PersistenceProducer {
     }
 
     /**
-     * A qualifier for integration tests.
+     * A qualifier for the {@value __PersistenceProducer#PERSISTENCE_UNIT_NAME_INTEGRATION_PU} persistence unit.
      */
     @Persistence__
     @Qualifier
+    @Documented
     @Retention(RetentionPolicy.RUNTIME)
 //    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
     public @interface Integration__ {
 
     }
 
-    public static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "unitPU";
+    static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "unitPU";
 
-    public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
+    static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
 
     // -----------------------------------------------------------------------------------------------------------------
-    public __PersistenceProducer() {
+
+    /**
+     * Creates a new instance.
+     */
+    protected __PersistenceProducer() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------------------ unit
+
+    /**
+     * Produces an entity manager factory for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit.
+     *
+     * @return an entity manager factory for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit
+     * @see #disposeUnitEntityManagerFactory(EntityManagerFactory)
+     * @see #produceUnitEntityManager(EntityManagerFactory)
+     */
     @Unit__
     @Produces
     public EntityManagerFactory produceUnitEntityManagerFactory() {
         return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_UNIT_PU);
     }
 
+    /**
+     * Disposes the specified entity manager factory produced by {@link #produceUnitEntityManagerFactory()} method.
+     *
+     * @param entityManagerFactory the entity manager factory to dispose.
+     * @see #produceUnitEntityManagerFactory()
+     */
     public void disposeUnitEntityManagerFactory(@Unit__ @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
+    /**
+     * Produces an entity manager for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit.
+     *
+     * @return an entity manager for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit
+     * @see #disposeUnitEntityManager(EntityManager)
+     * @see #produceUnitEntityManagerFactory()
+     */
     @Unit__
     @Produces
     public EntityManager produceUnitEntityManager(@Unit__ final EntityManagerFactory entityManagerFactory) {
         return entityManagerFactory.createEntityManager();
     }
 
+    /**
+     * Disposes the specified entity manager produced by {@link #produceUnitEntityManager(EntityManagerFactory)}
+     * method.
+     *
+     * @param entityManager the entity manager to dispose.
+     * @see #produceUnitEntityManager(EntityManagerFactory)
+     */
     public void disposeUnitEntityManager(@Unit__ @Disposes final EntityManager entityManager) {
         entityManager.close();
     }
