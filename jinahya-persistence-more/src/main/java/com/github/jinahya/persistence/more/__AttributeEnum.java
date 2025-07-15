@@ -60,7 +60,7 @@ import jakarta.validation.constraints.NotNull;
  *         <p>
  *         @Override public Integer attributeValue() { return attributeValue; }
  *         <p>
- *         @jakarta.annotation.Nonnull private final Integer attributeValue; }}
+ * @jakarta.annotation.Nonnull private final Integer attributeValue; }}
  */
 @SuppressWarnings({
         "java:S114", // Interface names should comply with a naming convention
@@ -69,7 +69,7 @@ import jakarta.validation.constraints.NotNull;
 public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF, ATTRIBUTE>, ATTRIBUTE> {
 
     /**
-     * An interface for defining enum constants with string attribute values.
+     * An interface for defining enum constants with attribute values of string.
      *
      * @param <SELF> self type parameter
      */

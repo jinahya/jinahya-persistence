@@ -33,10 +33,14 @@ import java.util.Objects;
 public final class __AttributeEnumUtils {
 
     @Nullable
-    private static <ENUM extends __AttributeEnum<?, ?>>
-    ENUM valueOfAttributeValue_(final Class<? extends ENUM> enumClass, final Object attributeValue) {
-        assert enumClass.isEnum();
-        for (final ENUM enumConstant : enumClass.getEnumConstants()) {
+    private static <E extends Enum<E> & __AttributeEnum<E, ?>>
+    E valueOfAttributeValue_(@Nonnull final Class<E> enumClass, @Nonnull final Object attributeValue) {
+//        assert enumClass != null;
+//        assert enumClass.isEnum();
+        assert attributeValue != null;
+        Objects.requireNonNull(enumClass, "enumClass is null");
+//        Objects.requireNonNull(attributeValue, "attributeValue is null");
+        for (final E enumConstant : enumClass.getEnumConstants()) {
             if (Objects.equals(enumConstant.attributeValue(), attributeValue)) {
                 return enumConstant;
             }
@@ -44,9 +48,20 @@ public final class __AttributeEnumUtils {
         return null;
     }
 
-    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
-    ENUM valueOfAttributeValue(final Class<ENUM> enumClass, final ATTRIBUTE attributeValue) {
-        Objects.requireNonNull(enumClass, "enumClass is null");
+    /**
+     * Finds the value of the specified enum class that has the specified attribute value.
+     *
+     * @param enumClass      the enum class.
+     * @param attributeValue the attribute value.
+     * @param <E>            enum type parameter
+     * @param <ATTRIBUTE>    attribute type parameter
+     * @return the enum constant, of {@code enumClass}, that has the specified attribute value
+     * @see #valueOfAttributeValue(Object, List)
+     */
+    @Nonnull
+    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
+    E valueOfAttributeValue(@Nonnull final Class<E> enumClass, @Nonnull final ATTRIBUTE attributeValue) {
+//        Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         final var value = valueOfAttributeValue_(enumClass, attributeValue);
         if (value != null) {
@@ -57,25 +72,31 @@ public final class __AttributeEnumUtils {
         );
     }
 
+    /**
+     * Finds the value from all enum classes that has the specified attribute value.
+     *
+     * @param attributeValue the attribute value.
+     * @param enumClasses    enum classes.
+     * @param <ENUM>         enum type parameter
+     * @param <ATTRIBUTE>    attribute type parameter
+     * @return the enum constant, of the first matched class of {@code enumClasses}, that has the specified attribute
+     *         value
+     * @see #valueOfAttributeValue(Class, Object)
+     */
     @Nonnull
-    public static <ENUM extends __AttributeEnum<?, ATTRIBUTE>, ATTRIBUTE>
-    ENUM valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
-                               @Nonnull final List<Class<? extends ENUM>> enumClasses) {
+    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
+    E valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
+                           @Nonnull final List<Class<E>> enumClasses) {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
-        if (Objects.requireNonNull(enumClasses, "enumClasses is null").isEmpty()) {
-            throw new IllegalArgumentException("enumClasses is empty");
-        }
+        Objects.requireNonNull(enumClasses, "enumClasses is null");
         for (final var enumClass : enumClasses) {
-            if (!enumClass.isEnum()) {
-                throw new IllegalArgumentException("not an enum class: " + enumClass);
-            }
             final var value = valueOfAttributeValue_(enumClass, attributeValue);
             if (value != null) {
                 return value;
             }
         }
         throw new IllegalArgumentException(
-                "no enum constant, of " + enumClasses + ", for attributeValue: " + attributeValue
+                "no enum constant, in any of " + enumClasses + ", for attributeValue: " + attributeValue
         );
     }
 

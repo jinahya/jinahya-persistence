@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
 
+import static com.github.jinahya.persistence.more.__AttributeEnumUtils.valueOfAttributeValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -36,12 +38,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 })
 class __AttributeEnumUtilsTest {
 
+    // -----------------------------------------------------------------------------------------------------------------
     @SuppressWarnings({
             "java:S114", // Interface names should comply with a naming convention
             "java:S119" // Type parameter names should comply with a naming convention
     })
-    private interface __SomeAttributeEnum<ENUM extends Enum<ENUM> & __SomeAttributeEnum<ENUM>>
-            extends __AttributeEnum.__OfString<ENUM> {
+    private interface __SomeAttributeEnum<E extends Enum<E> & __SomeAttributeEnum<E>>
+            extends __AttributeEnum.__OfString<E> {
 
     }
 
@@ -66,22 +69,42 @@ class __AttributeEnumUtilsTest {
 
         @EnumSource(_SomeAttributeEnum1.class)
         @ParameterizedTest
-        void __1A(final _SomeAttributeEnum1 enumConstant) {
-            final var actual = __AttributeEnumUtils.valueOfAttributeValue(
+        void __1(final _SomeAttributeEnum1 enumConstant) {
+            final var actual = valueOfAttributeValue(
                     _SomeAttributeEnum1.class,
                     enumConstant.attributeValue()
             );
             assertThat(actual).isSameAs(enumConstant);
         }
 
+        @Test
+        void _IllegalArgumentException_1C() {
+            assertThatThrownBy(() -> {
+                valueOfAttributeValue(
+                        _SomeAttributeEnum1.class,
+                        "C"
+                );
+            }).isInstanceOf(IllegalArgumentException.class);
+        }
+
         @EnumSource(_SomeAttributeEnum2.class)
         @ParameterizedTest
-        void __2A(final _SomeAttributeEnum2 enumConstant) {
-            final var actual = __AttributeEnumUtils.valueOfAttributeValue(
+        void __2(final _SomeAttributeEnum2 enumConstant) {
+            final var actual = valueOfAttributeValue(
                     _SomeAttributeEnum2.class,
                     enumConstant.attributeValue()
             );
             assertThat(actual).isSameAs(enumConstant);
+        }
+
+        @Test
+        void _IllegalArgumentException_2A() {
+            assertThatThrownBy(() -> {
+                valueOfAttributeValue(
+                        _SomeAttributeEnum2.class,
+                        "A"
+                );
+            }).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -91,36 +114,63 @@ class __AttributeEnumUtilsTest {
     class ValueOfAttributeValue_WithMultipleEnumClasses_Test {
 
         private static final List<Class<? extends __SomeAttributeEnum<?>>> ENUM_CLASSES =
-                List.of(_SomeAttributeEnum1.class, _SomeAttributeEnum2.class);
+                List.of(
+                        _SomeAttributeEnum1.class,
+                        _SomeAttributeEnum2.class
+                );
 
+        @DisplayName("(a, 1, 2) -> 1.A")
         @Test
         void __A() {
-            final var actual = __AttributeEnumUtils.valueOfAttributeValue("A", ENUM_CLASSES);
+            final var actual = valueOfAttributeValue("A", ENUM_CLASSES);
             assertThat(actual).isSameAs(_SomeAttributeEnum1.A);
         }
 
+        @DisplayName("(B, 1, 2) -> 1.B")
         @Test
         void __B1() {
-            final var actual = __AttributeEnumUtils.valueOfAttributeValue("B", ENUM_CLASSES);
+            final var actual = valueOfAttributeValue("B", ENUM_CLASSES);
             assertThat(actual).isSameAs(_SomeAttributeEnum1.B);
         }
 
+        @DisplayName("(B, 2, 1) -> 2.B")
         @Test
         void __B2() {
-            final var actual = __AttributeEnumUtils.valueOfAttributeValue("B", ENUM_CLASSES.reversed());
+            final var actual = valueOfAttributeValue("B", ENUM_CLASSES.reversed());
             assertThat(actual).isSameAs(_SomeAttributeEnum2.B);
         }
 
+        @DisplayName("(C, 1, 2) -> 2.C")
         @Test
         void __C() {
-            final var actual = __AttributeEnumUtils.valueOfAttributeValue("C", ENUM_CLASSES);
+            final var actual = valueOfAttributeValue("C", ENUM_CLASSES);
             assertThat(actual).isSameAs(_SomeAttributeEnum2.C);
         }
 
+        @DisplayName("(D, , ) -> IllegalArgumentException")
         @Test
         void __D() {
-            assertThatThrownBy(() -> __AttributeEnumUtils.valueOfAttributeValue("D", ENUM_CLASSES))
+            assertThatThrownBy(() -> valueOfAttributeValue("D", ENUM_CLASSES))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        // -------------------------------------------------------------------------------------------------------------
+        @SuppressWarnings({"unchecked"})
+        private interface __SomeOtherAttributeEnum extends __SomeAttributeEnum {
+
+        }
+
+        @Disabled
+        @Test
+        void __X() {
+            __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOfAttributeValue(
+                    "X",
+                    List.of(
+                            _SomeAttributeEnum1.class,
+                            _SomeAttributeEnum2.class,
+                            __SomeOtherAttributeEnum.class
+                    )
+            );
         }
     }
 }

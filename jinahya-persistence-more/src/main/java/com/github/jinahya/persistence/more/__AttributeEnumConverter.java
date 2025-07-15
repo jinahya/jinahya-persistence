@@ -38,7 +38,7 @@ public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __Attri
         implements AttributeConverter<ENUM, ATTRIBUTE> {
 
     /**
-     * An abstract attribute converter for converting between {@link ENUM} and attribute of {@link String} type.
+     * An abstract attribute converter for converting between {@link ENUM} and {@link String} attribute type.
      *
      * @param <ENUM> enum type parameter
      */
