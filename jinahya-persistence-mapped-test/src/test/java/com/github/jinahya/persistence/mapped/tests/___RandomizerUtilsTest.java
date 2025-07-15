@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.test;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.mapped.tests.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.___Randomizer;
-import com.github.jinahya.persistence.mapped.tests.___RandomizerUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.Test;

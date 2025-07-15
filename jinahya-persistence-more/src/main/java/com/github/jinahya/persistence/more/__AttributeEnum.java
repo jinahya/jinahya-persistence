@@ -23,44 +23,11 @@ package com.github.jinahya.persistence.more;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * An interface for defining enum constants with attribute values.
- * <p>
- * For example, you can define an enum constant with a string attribute value.
- * {@snippet lang = java:
+ * An interface for defining enum constants with a specific type of attribute values.
  *
  * @param <SELF>      self type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @jakarta.persistence.Entity class MyEntity {
- *         <p>
- *         @jakarta.annotation.Nullable public Integer getPayGrade() { return payGrade; }
- *         <p>
- *         public void setPayGrade(@jakarta.annotation.Nullable final Integer payGrade) { this.payGrade = payGrade; }
- *         <p>
- *         @jakarta.annotation.Nullable @jakarta.persistence.Transient public PayGrade getPayGradeAsEnum() { return
- *         java.util.Optional.ofNullable(getPayGrade()) .map(v ->
- *         __AttributeEnumUtils.valueOfAttributeValue(PayGrade.class, v)) .orElse(null); }
- *         <p>
- *         public void setPayGradeAsEnum(@jakarta.annotation.Nullable final PayGrade payGradeAsEnum) { setPayGrade(
- *         java.util.Optional.ofNullable(payGradeAsEnum) .map(__AttributeEnum::attributeValue) .orElse(null) ); }
- *         <p>
- *         @jakarta.annotation.Nullable @jakarta.persistence.Basic(optional = true) @jakarta.persistence.Column(name =
- *         "pay_grade", nullable = true) private Integer payGrade; // maps to an UNSIGNED INTEGER column }
- *         <p>
- *         public enum PayGrade implements __AttributeEnum<PayGrade, Integer> {
- *         <p>
- *         // ...
- *         <p>
- *         E8(8),
- *         <p>
- *         E9(9);
- *         <p>
- *         PayGrade(@jakarta.annotation.Nonnull final Integer attributeValue) { this.attributeValue =
- *         java.util.Objects.requireNonNull(attributeValue, "attributeValue is null"); }
- *         <p>
- *         @Override public Integer attributeValue() { return attributeValue; }
- *         <p>
- * @jakarta.annotation.Nonnull private final Integer attributeValue; }}
  */
 @SuppressWarnings({
         "java:S114", // Interface names should comply with a naming convention
@@ -69,7 +36,7 @@ import jakarta.validation.constraints.NotNull;
 public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF, ATTRIBUTE>, ATTRIBUTE> {
 
     /**
-     * An interface for defining enum constants with attribute values of string.
+     * An interface for defining enum constants with attribute values of string attribute values.
      *
      * @param <SELF> self type parameter
      */
@@ -86,8 +53,9 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
          *         {@link Enum#name() this.name()}.
          */
         @Override
+        @SuppressWarnings({"unchecked"})
         default String attributeValue() {
-            return ((Enum<?>) this).name();
+            return ((SELF) this).name();
         }
     }
 

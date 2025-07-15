@@ -29,7 +29,7 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class ___JavaLangReflectTestUtils {
+final class ___JavaLangReflectTestUtils {
 
     private static final Method AUTO_CLOSEABLE_CLOSE;
 
@@ -139,7 +139,7 @@ public final class ___JavaLangReflectTestUtils {
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
     @Nonnull
-    public static <T> T newInstanceOf(@Nonnull final Class<T> type) {
+    static <T> T newInstanceOf(@Nonnull final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
         try {
             final var constructor = type.getDeclaredConstructor();

@@ -25,25 +25,25 @@ import jakarta.persistence.AttributeConverter;
 import java.util.Objects;
 
 /**
- * An abstract attribute converter for converting between {@link ENUM} type and {@link ATTRIBUTE} type.
+ * An abstract attribute converter for converting between {@link E} type and {@link ATTRIBUTE} type.
  *
- * @param <ENUM>      enum type parameter
+ * @param <E>      enum type parameter
  * @param <ATTRIBUTE> attribute type parameter
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
-        implements AttributeConverter<ENUM, ATTRIBUTE> {
+public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
+        implements AttributeConverter<E, ATTRIBUTE> {
 
     /**
-     * An abstract attribute converter for converting between {@link ENUM} and {@link String} attribute type.
+     * An abstract attribute converter for converting between {@link E} and {@link String} attribute type.
      *
-     * @param <ENUM> enum type parameter
+     * @param <E> enum type parameter
      */
-    public abstract static class __OfString<ENUM extends Enum<ENUM> & __AttributeEnum.__OfString<ENUM>>
-            extends __AttributeEnumConverter<ENUM, String> {
+    public abstract static class __OfString<E extends Enum<E> & __AttributeEnum.__OfString<E>>
+            extends __AttributeEnumConverter<E, String> {
 
         /**
          * Creates a new instance for the specified enum class.
@@ -51,7 +51,7 @@ public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __Attri
          * @param enumClass the enum class.
          * @see #enumClass
          */
-        protected __OfString(final Class<ENUM> enumClass) {
+        protected __OfString(final Class<E> enumClass) {
             super(enumClass, String.class);
         }
     }
@@ -61,12 +61,12 @@ public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __Attri
     /**
      * Creates a new instance for the specified enum class.
      *
-     * @param enumClass      a class of {@link ENUM}.
+     * @param enumClass      a class of {@link E}.
      * @param attributeClass a class of {@link ATTRIBUTE}
      * @see #enumClass
      * @see #attributeClass
      */
-    protected __AttributeEnumConverter(final Class<ENUM> enumClass, final Class<ATTRIBUTE> attributeClass) {
+    protected __AttributeEnumConverter(final Class<E> enumClass, final Class<ATTRIBUTE> attributeClass) {
         super();
         this.enumClass = Objects.requireNonNull(enumClass, "enumClass is null");
         this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
@@ -81,7 +81,7 @@ public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __Attri
      * @return a database column value; {@code null} when {@code attribute} is {@code null}.
      */
     @Override
-    public ATTRIBUTE convertToDatabaseColumn(final ENUM attribute) {
+    public ATTRIBUTE convertToDatabaseColumn(final E attribute) {
         if (attribute == null) {
             return null;
         }
@@ -95,7 +95,7 @@ public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __Attri
      * @return an entity attribute; {@code null} when {@code dbData} is {@code null}.
      */
     @Override
-    public ENUM convertToEntityAttribute(final ATTRIBUTE dbData) {
+    public E convertToEntityAttribute(final ATTRIBUTE dbData) {
         if (dbData == null) {
             return null;
         }
@@ -105,9 +105,9 @@ public abstract class __AttributeEnumConverter<ENUM extends Enum<ENUM> & __Attri
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class of {@link ENUM}.
+     * The class of {@link E}.
      */
-    protected final Class<ENUM> enumClass;
+    protected final Class<E> enumClass;
 
     /**
      * The class of {@link ATTRIBUTE}.

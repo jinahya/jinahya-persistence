@@ -21,34 +21,42 @@ package com.github.jinahya.persistence.more.tests;
  */
 
 import com.github.jinahya.persistence.more.__AttributeEnum;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * A class for testing subclass of {@link __AttributeEnum}.
+ * An abstract base class for testing {@link __AttributeEnum} implementations.
  *
- * @param <ENUM>      enum type parameter
+ * @param <E>         entity type parameter
  * @param <ATTRIBUTE> attribute type parameter
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeEnumTest<ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
-        extends ___AttributeEnumTest<ENUM, ATTRIBUTE> {
+public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE> {
 
-    public abstract static class __OfStringTest<ENUM extends Enum<ENUM> & __AttributeEnum.__OfString<ENUM>>
-            extends __AttributeEnumTest<ENUM, String> {
+    /**
+     * An abstract base class for testing {@link __AttributeEnum.__OfString} implementations.
+     *
+     * @param <E> enum type parameter
+     */
+    public abstract static class __OfStringTest<E extends Enum<E> & __AttributeEnum.__OfString<E>>
+            extends __AttributeEnumTest<E, String> {
 
         /**
-         * Creates a new instance for testing the specified enum class.
+         * Creates a new instance for testing specific enum types.
          *
          * @param enumClass the enum class to test.
-         * @see #enumClass
          */
-        protected __OfStringTest(final Class<ENUM> enumClass) {
+        protected __OfStringTest(final Class<E> enumClass) {
             super(enumClass, String.class);
         }
     }
@@ -56,33 +64,110 @@ public abstract class __AttributeEnumTest<ENUM extends Enum<ENUM> & __AttributeE
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance for testing the specified enum class.
+     * Creates a new instance for testing specific enum types.
      *
-     * @param enumClass the enum class to test.
-     * @see #enumClass
+     * @param enumClass      the enum class to test.
+     * @param attributeClass the type of entity attribute.
      */
-    protected __AttributeEnumTest(final Class<ENUM> enumClass, final Class<ATTRIBUTE> attributeClass) {
-        super(enumClass, attributeClass);
+    protected __AttributeEnumTest(final Class<E> enumClass, final Class<ATTRIBUTE> attributeClass) {
+        super();
+        this.enumClass = Objects.requireNonNull(enumClass, "enumClass is null");
+        this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("no nulls in all attributeValues")
     @Test
-    protected void attributeValue_NotNull_EachEnumConstant() {
-        acceptEnumConstantAndAttributeValue((ec, av) -> {
-            assertThat(av)
-                    .as("attributeValue of %s: %s", ec, av)
-                    .isNotNull();
-        });
+    protected void _NoNullAttributeValue_() {
+        __AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue(
+                enumClass,
+                (ec, av) -> {
+                    assertThat(av)
+                            .as("attribute values of %s", ec)
+                            .isNotNull();
+                }
+        );
     }
 
-    @DisplayName("no duplicates in all attributeValues")
     @Test
-    protected void attributeValues_NoDuplicates_AllEnumConstants() {
-        acceptAttributeValueStream(s -> {
-            assertThat(s)
-                    .as("attributeValues of %s", enumClass)
-                    .doesNotHaveDuplicates();
-        });
+    protected void _NoDuplicateAttributeValue_() {
+        __AttributeEnumTestUtils.acceptAttributeValueStream(
+                enumClass,
+                s -> {
+                    assertThat(s)
+                            .as("attribute values of %s", enumClass)
+                            .doesNotHaveDuplicates();
+                }
+        );
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Accepts each pair of enum constant and attribute value to the specified consumer.
+     *
+     * @param consumer the consumer.
+     */
+    protected void acceptEachEnumConstantAndAttributeValue(final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
+        __AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
+    }
+
+    /**
+     * Applies a stream of all enum constants, of {@link #enumClass}, to the specified function, and returns the
+     * result.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @see #acceptEnumConstantStream(Consumer)
+     */
+    protected final <R> R applyEnumConstantStream(final Function<? super Stream<E>, ? extends R> function) {
+        return __AttributeEnumTestUtils.applyEnumConstantStream(enumClass, function);
+    }
+
+    /**
+     * Accepts a stream of all enum constants, of {@link #enumClass}, to the specified consumer.
+     *
+     * @param consumer the consumer.
+     * @see #applyEnumConstantStream(Function)
+     */
+    protected final void acceptEnumConstantStream(final Consumer<? super Stream<E>> consumer) {
+        __AttributeEnumTestUtils.acceptEnumConstantStream(enumClass, consumer);
+    }
+
+    /**
+     * Applies a stream of all attribute values, of {@link #enumClass}, to the specified function, and returns the
+     * result.
+     *
+     * @param function the function.
+     * @see #acceptAttributeValueStream(Consumer)
+     */
+    protected final <R> R applyAttributeValueStream(final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
+        return __AttributeEnumTestUtils.applyAttributeValueStream(enumClass, function);
+    }
+
+    /**
+     * Accepts a stream of all attribute values, of {@link #enumClass}, to the specified consumer.
+     *
+     * @param consumer the consumer.
+     * @see #applyAttributeValueStream(Function)
+     */
+    protected final void acceptAttributeValueStream(final Consumer<? super Stream<ATTRIBUTE>> consumer) {
+        __AttributeEnumTestUtils.acceptAttributeValueStream(enumClass, consumer);
+    }
+
+    // ------------------------------------------------------------------------------------------------------- enumClass
+
+    // -------------------------------------------------------------------------------------------------- attributeClass
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The class of {@link E} type.
+     */
+    protected final Class<E> enumClass;
+
+    /**
+     * The class of {@link ATTRIBUTE} type.
+     */
+    protected final Class<ATTRIBUTE> attributeClass;
 }

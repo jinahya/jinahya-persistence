@@ -57,19 +57,49 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a new instance of {@link #entityClass}.
+     *
+     * @return a new instance of {@link #entityClass}.
+     * @see ___InstantiatorUtils#newInstantiatedInstanceOf(Class)
+     * @see ___JavaLangReflectTestUtils#newInstanceOf(Class)
+     * @see #newEntityInstanceSpy()
+     */
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
                 .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass));
     }
 
+    /**
+     * Returns a new spy object of a new instance of {@link #entityClass}.
+     *
+     * @return a new spy object of a new instance of {@link #entityClass}.
+     * @see #newEntityInstance()
+     */
     protected ENTITY newEntityInstanceSpy() {
         return Mockito.spy(newEntityInstance());
     }
 
+    /**
+     * Returns a new randomized instance of {@link #entityClass}.
+     *
+     * @return a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty} when no randomizer for
+     *         the {@link #entityClass} found.
+     * @see __MappedEntityRandomizerUtils#newRandomizedInstanceOf(Class)
+     * @see #newRandomizedEntityInstanceSpy()
+     */
     protected Optional<ENTITY> newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
+    /**
+     * Returns a new spy object of a new randomized instance of {@link #entityClass}.
+     *
+     * @return a new spy object of a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty}
+     *         when no randomizer for the {@link #entityClass} found.
+     * @see #newRandomizedEntityInstance()
+     */
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
         return Mockito.spy(newRandomizedEntityInstance());
     }

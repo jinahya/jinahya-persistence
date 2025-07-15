@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.test;
+package com.github.jinahya.persistence.mapped.tests;
 
 /*-
  * #%L
@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.mapped.tests.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.tests.___Instantiator;
-import com.github.jinahya.persistence.mapped.tests.___InstantiatorUtils;
 import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 

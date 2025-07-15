@@ -26,7 +26,7 @@ import com.github.jinahya.persistence.more.__AttributeEnum;
         "java:S114", // Interface names should comply with a naming convention
         "java:S119" // Type parameter names should comply with a naming convention
 })
-interface __SampleStringAttributeEnum<ENUM extends Enum<ENUM> & __SampleStringAttributeEnum<ENUM>>
-        extends __AttributeEnum.__OfString<ENUM> {
+interface __SampleStringAttributeEnum<E extends Enum<E> & __SampleStringAttributeEnum<E>>
+        extends __AttributeEnum.__OfString<E> {
 
 }
