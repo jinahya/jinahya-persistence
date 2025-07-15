@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
+import static com.github.jinahya.persistence.more.tests.__AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue;
+import static com.github.jinahya.persistence.more.tests.__AttributeEnumTestUtils.acceptEnumConstantStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings({
@@ -100,12 +102,15 @@ public abstract class __AttributeEnumConverterTest<
         @Test
         void __NotNull() {
             final var converterInstance = newConverterInstance();
-            acceptEnumConstantStream(s -> {
-                s.forEach(ec -> {
-                    final var actual = converterInstance.convertToDatabaseColumn(ec);
-                    assertThat(actual).isEqualTo(ec.attributeValue());
-                });
-            });
+            acceptEnumConstantStream(
+                    enumClass,
+                    s -> {
+                        s.forEach(ec -> {
+                            final var actual = converterInstance.convertToDatabaseColumn(ec);
+                            assertThat(actual).isEqualTo(ec.attributeValue());
+                        });
+                    }
+            );
         }
     }
 
@@ -124,10 +129,13 @@ public abstract class __AttributeEnumConverterTest<
         @Test
         void __NotNull() {
             final var converterInstance = newConverterInstance();
-            acceptEachEnumConstantAndAttributeValue((ec, av) -> {
-                final var actual = converterInstance.convertToEntityAttribute(av);
-                assertThat(actual).isEqualTo(ec);
-            });
+            acceptEachEnumConstantAndAttributeValue(
+                    enumClass,
+                    (ec, av) -> {
+                        final var actual = converterInstance.convertToEntityAttribute(av);
+                        assertThat(actual).isEqualTo(ec);
+                    }
+            );
         }
     }
 
