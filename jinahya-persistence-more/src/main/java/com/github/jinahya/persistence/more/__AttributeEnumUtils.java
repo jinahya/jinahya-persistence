@@ -33,14 +33,16 @@ import java.util.Objects;
 public final class __AttributeEnumUtils {
 
     @Nullable
-    private static <E extends Enum<E> & __AttributeEnum<E, ?>>
-    E valueOfAttributeValue_(@Nonnull final Class<E> enumClass, @Nonnull final Object attributeValue) {
+    private static <ENUM extends __AttributeEnum<?, ?>>
+    ENUM valueOfAttributeValue_(@Nonnull final Class<? extends ENUM> enumClass, @Nonnull final Object attributeValue) {
 //        assert enumClass != null;
 //        assert enumClass.isEnum();
         assert attributeValue != null;
-        Objects.requireNonNull(enumClass, "enumClass is null");
+        if (!Objects.requireNonNull(enumClass, "enumClass is null").isEnum()) {
+            throw new IllegalArgumentException("not an enum class: " + enumClass);
+        }
 //        Objects.requireNonNull(attributeValue, "attributeValue is null");
-        for (final E enumConstant : enumClass.getEnumConstants()) {
+        for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             if (Objects.equals(enumConstant.attributeValue(), attributeValue)) {
                 return enumConstant;
             }
@@ -84,12 +86,18 @@ public final class __AttributeEnumUtils {
      * @see #valueOfAttributeValue(Class, Object)
      */
     @Nonnull
-    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
-    E valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
-                           @Nonnull final List<Class<E>> enumClasses) {
+    public static <ENUM extends __AttributeEnum<? extends Enum<?>, ATTRIBUTE>, ATTRIBUTE>
+    ENUM valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
+                               @Nonnull final List<Class<? extends ENUM>> enumClasses) {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         Objects.requireNonNull(enumClasses, "enumClasses is null");
         for (final var enumClass : enumClasses) {
+//            if (enumClass == null) {
+//                throw new IllegalArgumentException("null in enum classes: " + enumClasses);
+//            }
+//            if (!enumClass.isEnum()) {
+//                throw new IllegalArgumentException("not an enum class: " + enumClass);
+//            }
             final var value = valueOfAttributeValue_(enumClass, attributeValue);
             if (value != null) {
                 return value;
