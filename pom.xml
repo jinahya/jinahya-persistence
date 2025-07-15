@@ -383,6 +383,13 @@
               </formats>
             </configuration>
           </execution>
+          <execution>
+            <id>default-report-aggregate</id>
+            <goals>
+              <goal>report-aggregate</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
         </executions>
       </plugin>
     </plugins>
