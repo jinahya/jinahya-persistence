@@ -362,6 +362,7 @@
         </executions>
       </plugin>
       <plugin>
+        <!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage/ -->
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
@@ -389,6 +390,11 @@
               <goal>report-aggregate</goal>
             </goals>
             <phase>verify</phase>
+            <configuration>
+              <dataFileIncludes>
+                <dataFileInclude>**/jacoco.exec</dataFileInclude>
+              </dataFileIncludes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -482,17 +488,17 @@
           </reportSet>
         </reportSets>
       </plugin>
-      <!--      <plugin>-->
-      <!--        <groupId>org.jacoco</groupId>-->
-      <!--        <artifactId>jacoco-maven-plugin</artifactId>-->
-      <!--        <reportSets>-->
-      <!--          <reportSet>-->
-      <!--            <reports>-->
-      <!--              <report>report</report>-->
-      <!--            </reports>-->
-      <!--          </reportSet>-->
-      <!--        </reportSets>-->
-      <!--      </plugin>-->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
     </plugins>
   </reporting>
 
