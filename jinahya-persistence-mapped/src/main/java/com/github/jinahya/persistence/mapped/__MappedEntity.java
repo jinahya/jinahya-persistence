@@ -1,8 +1,27 @@
 package com.github.jinahya.persistence.mapped;
 
+/*-
+ * #%L
+ * jinahya-persistence-mapped
+ * %%
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 
 import java.util.Objects;
 
@@ -16,6 +35,7 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
     /**
      * Creates a new instance.
      */
@@ -27,50 +47,75 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     @Override
     public String toString() {
         return super.toString() + '{' +
-                "id__=" + getId__() +
-                '}';
+               "id__=" + getId__() +
+               '}';
     }
 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
     // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
     @Override
-    public final boolean equals(final Object obj) {
+    @SuppressWarnings({
+            "java:S117" // Local variable and method parameter names should comply with a naming convention
+    })
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
         if (!(obj instanceof __MappedEntity<?, ?> that)) {
             return false;
         }
-        return Objects.equals(getId__(), that.getId__());
+        final var thisId__ = getId__();
+        final var thatId__ = that.getId__();
+        if (thisId__ == null && thatId__ == null) {
+            return false;
+        }
+        return Objects.equals(thisId__, thatId__);
     }
 
     // https://jqno.nl/equalsverifier/manual/jpa-entities/
     // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return Objects.hashCode(getId__());
     }
 
     // ------------------------------------------------------------------------------------------------------------ id__
+
+    /**
+     * Returns the current value of {@link ID}.
+     *
+     * @return the current value of {@link ID}
+     */
     @SuppressWarnings({
             "java:S100" // Method names should comply with a naming convention
     })
-    @Transient
     protected abstract ID getId__();
 
+    /**
+     * Replaces the current value of {@link ID} with the specified value.
+     *
+     * @param id__ new value for the {@link ID}.
+     */
     @SuppressWarnings({
             "java:S100", // Method names should comply with a naming convention
             "java:S117" // Local variable and method parameter names should comply with a naming convention
     })
     protected abstract void setId__(ID id__);
 
+    /**
+     * Replaces current value of {@link ID} with the specified value, and returns {@code this} object.
+     *
+     * @param id__ new value for the {@link ID}.
+     * @return {@code this} object.
+     * @see #setId__(Object)
+     */
     @Nonnull
     @SuppressWarnings({
             "java:S100", // Method names should comply with a naming convention
             "java:S117", // Local variable and method parameter names should comply with a naming convention
             "unchecked"
     })
-    protected SELF id__(final ID id__) {
+    protected final SELF id__(final ID id__) {
         setId__(id__);
         return (SELF) this;
     }
