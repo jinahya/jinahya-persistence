@@ -35,13 +35,10 @@ public final class __AttributeEnumUtils {
     @Nullable
     private static <ENUM extends __AttributeEnum<?, ?>>
     ENUM valueOfAttributeValue_(@Nonnull final Class<? extends ENUM> enumClass, @Nonnull final Object attributeValue) {
-//        assert enumClass != null;
-//        assert enumClass.isEnum();
-        assert attributeValue != null;
         if (!Objects.requireNonNull(enumClass, "enumClass is null").isEnum()) {
             throw new IllegalArgumentException("not an enum class: " + enumClass);
         }
-//        Objects.requireNonNull(attributeValue, "attributeValue is null");
+        assert attributeValue != null;
         for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             if (Objects.equals(enumConstant.attributeValue(), attributeValue)) {
                 return enumConstant;

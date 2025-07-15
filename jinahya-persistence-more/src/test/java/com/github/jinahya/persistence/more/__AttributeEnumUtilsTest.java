@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings({
+        "java:S114", // Interface names should comply with a naming convention
         "java:S3577" // Test classes should comply with a naming convention
 })
 class __AttributeEnumUtilsTest {
@@ -160,6 +161,7 @@ class __AttributeEnumUtilsTest {
         }
 
         @Test
+        @SuppressWarnings({"unchecked"})
         void __X() {
             assertThatThrownBy(() -> {
                 __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOfAttributeValue(
