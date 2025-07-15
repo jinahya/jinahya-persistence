@@ -85,6 +85,7 @@ public final class __AttributeEnumUtils {
      *         value
      * @see #valueOfAttributeValue(Class, Object)
      */
+    // https://stackoverflow.com/q/79701562/330457
     @Nonnull
     public static <ENUM extends __AttributeEnum<? extends Enum<?>, ATTRIBUTE>, ATTRIBUTE>
     ENUM valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
@@ -92,12 +93,9 @@ public final class __AttributeEnumUtils {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         Objects.requireNonNull(enumClasses, "enumClasses is null");
         for (final var enumClass : enumClasses) {
-//            if (enumClass == null) {
-//                throw new IllegalArgumentException("null in enum classes: " + enumClasses);
-//            }
-//            if (!enumClass.isEnum()) {
-//                throw new IllegalArgumentException("not an enum class: " + enumClass);
-//            }
+            if (enumClass == null) {
+                throw new IllegalArgumentException("null in enum classes: " + enumClasses);
+            }
             final var value = valueOfAttributeValue_(enumClass, attributeValue);
             if (value != null) {
                 return value;

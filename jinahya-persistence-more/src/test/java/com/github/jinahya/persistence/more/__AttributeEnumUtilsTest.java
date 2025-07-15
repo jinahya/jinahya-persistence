@@ -20,7 +20,6 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -160,17 +159,18 @@ class __AttributeEnumUtilsTest {
 
         }
 
-        @Disabled
         @Test
         void __X() {
-            __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOfAttributeValue(
-                    "X",
-                    List.of(
-                            _SomeAttributeEnum1.class,
-                            _SomeAttributeEnum2.class,
-                            __SomeOtherAttributeEnum.class
-                    )
-            );
+            assertThatThrownBy(() -> {
+                __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOfAttributeValue(
+                        "X",
+                        List.of(
+                                _SomeAttributeEnum1.class,
+                                _SomeAttributeEnum2.class,
+                                __SomeOtherAttributeEnum.class
+                        )
+                );
+            }).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }
