@@ -1,0 +1,233 @@
+package com.github.jinahya.persistence.mapped.test;
+
+/*-
+ * #%L
+ * jinahya-persistence-mapped-test
+ * %%
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.ManagedType;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.function.LongFunction;
+
+public final class ___JakartaPersistenceTestUtils {
+
+    public static <X> void acceptEachAttributeName(@Nonnull final ManagedType<X> managedType,
+                                                   @Nonnull final Consumer<? super String> consumer) {
+        Objects.requireNonNull(managedType, "managedType is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        managedType.getAttributes()
+                .stream()
+                .map(Attribute::getName)
+                .forEach(consumer);
+    }
+
+    public static <X, C extends Collection<? super String>>
+    C addAllAttributeNames(@Nonnull final ManagedType<X> managedType, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachAttributeName(managedType, collection::add);
+        return collection;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static Optional<String> getColumnName(@Nonnull final Method method) {
+        Objects.requireNonNull(method, "method is null");
+        {
+            final var column = method.getAnnotation(Column.class);
+            if (column != null) {
+                final var name = column.name();
+                if (!name.isBlank()) {
+                    return Optional.of(name);
+                }
+            }
+        }
+        {
+            final var column = method.getAnnotation(JoinColumn.class);
+            if (column != null) {
+                final var name = column.name();
+                if (!name.isBlank()) {
+                    return Optional.of(name);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    static Optional<String> getColumnName(@Nonnull final Field field) {
+        Objects.requireNonNull(field, "field is null");
+        {
+            final var column = field.getAnnotation(Column.class);
+            if (column != null) {
+                final var name = column.name();
+                if (!name.isBlank()) {
+                    return Optional.of(name);
+                }
+            }
+        }
+        {
+            final var column = field.getAnnotation(JoinColumn.class);
+            if (column != null) {
+                final var name = column.name();
+                if (!name.isBlank()) {
+                    return Optional.of(name);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
+                                                        final Function<? super EntityManager, ? extends R> function,
+                                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(function, "function is null");
+        final var transaction = entityManager.getTransaction();
+        transaction.begin();
+        try {
+            final R result = function.apply(entityManager);
+            if (rollback) {
+                transaction.rollback();
+            } else {
+                transaction.commit();
+            }
+            return result;
+        } catch (final Exception e) {
+            transaction.rollback();
+            throw new RuntimeException("failed to apply " + function + " and rollback: " + rollback, e);
+        }
+    }
+
+    public static void acceptEntityManagerInTransaction(final EntityManager entityManager,
+                                                        final Consumer<? super EntityManager> consumer,
+                                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        applyEntityManagerInTransaction(
+                entityManager,
+                em -> {
+                    consumer.accept(em);
+                    return null;
+                },
+                rollback
+        );
+    }
+
+    public static <R> R applyConnection(final EntityManager entityManager,
+                                        final Function<? super Connection, ? extends R> function,
+                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(function, "function is null");
+        final var transaction = entityManager.getTransaction();
+        transaction.begin();
+        try {
+            final var connection = entityManager.unwrap(Connection.class);
+            final R result = function.apply(connection);
+            if (rollback) {
+                transaction.rollback();
+            } else {
+                transaction.commit();
+            }
+            return result;
+        } catch (final Exception e) {
+            try {
+                return ___OrgHibernateOrmTestUtils.applyConnection(entityManager, function);
+            } catch (final Exception e2) {
+                transaction.rollback();
+                throw new RuntimeException("failed to apply " + function + " and rollback: " + rollback, e2);
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static long count(final EntityManager entityManager, final Class<?> entityClass) {
+        final var builder = entityManager.getCriteriaBuilder();
+        final var criteria = builder.createQuery(Long.class);
+        final var root = criteria.from(entityClass);
+        criteria.select(builder.count(root));
+        final var typed = entityManager.createQuery(criteria);
+        return typed.getSingleResult();
+    }
+
+    public static <R> R applyCount(final EntityManager entityManager, final Class<?> entityClass,
+                                   final LongFunction<? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return function.apply(count(entityManager, entityClass));
+    }
+
+    public static <R> R applyCountAndRandomIndex(final EntityManager entityManager, final Class<?> entityClass,
+                                                 final LongFunction<? extends LongFunction<? extends R>> function) {
+        final var count = count(entityManager, entityClass);
+        if (count == 0L) {
+            return null;
+        }
+        assert count > 0L;
+        final var index = ThreadLocalRandom.current().nextLong(count);
+        return function.apply(count).apply(index);
+    }
+
+    public static void acceptCountAndRandomIndex(final EntityManager entityManager, final Class<?> entityClass,
+                                                 final LongFunction<? extends LongConsumer> function) {
+        applyCountAndRandomIndex(entityManager, entityClass, c -> i -> {
+            function.apply(c).accept(i);
+            return null;
+        });
+    }
+
+    public static <T> Optional<T> selectRandom(final EntityManager entityManager, final Class<T> entityClass) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        return applyCountAndRandomIndex(
+                entityManager,
+                entityClass,
+                c -> i -> {
+                    final var builder = entityManager.getCriteriaBuilder();
+                    final var query = builder.createQuery(entityClass);
+                    query.from(entityClass);
+                    return Optional.of(
+                            entityManager.createQuery(query)
+                                    .setFirstResult(Math.toIntExact(i))
+                                    .setMaxResults(1)
+                                    .getSingleResult()
+                    );
+                }
+        );
+    }
+
+    public static String entityName(final EntityManager entityManager, final Class<?> entityClass) {
+        return entityManager.getMetamodel().entity(entityClass).getName();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private ___JakartaPersistenceTestUtils() {
+        throw new AssertionError("instantiation is not allowed");
+    }
+}

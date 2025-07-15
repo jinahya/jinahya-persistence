@@ -1,6 +1,6 @@
-open module com.github.jinahya.persistence.mapped.tests.test {
+open module com.github.jinahya.persistence.mapped.test.test {
     requires com.github.jinahya.persistence.mapped;
-    requires com.github.jinahya.persistence.mapped.tests;
+    requires com.github.jinahya.persistence.mapped.test;
     requires jakarta.annotation;
     requires jakarta.cdi;
 //    requires jakarta.cdi.lang.model;
@@ -14,5 +14,5 @@ open module com.github.jinahya.persistence.mapped.tests.test {
     requires org.junit.jupiter.api;
     requires podam;
 
-//    exports com.github.jinahya.persistence.mapped.tests;
+//    exports com.github.jinahya.persistence.mapped.test;
 }
