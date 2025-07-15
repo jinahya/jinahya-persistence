@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.test.user_with_string_id;
+package com.github.jinahya.persistence.mapped.tests.examples.user_with_string_id;
 
 /*-
  * #%L

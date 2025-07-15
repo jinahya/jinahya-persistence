@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.mapped.tests._MappedEntityTest;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import org.junit.jupiter.api.Test;
 
 public class Entity01Test extends _MappedEntityTest<Entity01, Long> {
 
@@ -31,16 +32,29 @@ public class Entity01Test extends _MappedEntityTest<Entity01, Long> {
         super(Entity01.class, Long.class);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
     @Override
-    protected void _verify_equals() {
-        super._verify_equals();
+    public final boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Test
+    @Override
+    protected void equals_verify() {
+        super.equals_verify();
     }
 
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<Entity01> getEqualsVerifier() {
         return super.getEqualsVerifier()
+                .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY);
     }
 }

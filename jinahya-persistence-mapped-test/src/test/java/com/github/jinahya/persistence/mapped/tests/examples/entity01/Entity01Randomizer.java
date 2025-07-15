@@ -25,10 +25,12 @@ import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class Entity01Randomizer extends __MappedEntityRandomizer<Entity01, Long> {
 
     Entity01Randomizer() {
-        super(Entity01.class, Long.class);
+        super(Entity01.class, Long.class, "id");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -48,7 +50,8 @@ class Entity01Randomizer extends __MappedEntityRandomizer<Entity01, Long> {
     @Override
     public Entity01 get() {
         final var value = super.get();
-        value.setId(null);
+//        value.setId(null);
+        assertThat(value.getId()).isNull();
         return value;
     }
 }

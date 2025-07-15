@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.tests.test.user_with_string_id;
+package com.github.jinahya.persistence.mapped.tests.examples.user_with_string_id;
 
 /*-
  * #%L
@@ -24,11 +24,19 @@ import com.github.jinahya.persistence.mapped.tests.__MappedEntityTest;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import org.junit.jupiter.api.Test;
 
 class UserWithStringIdTest extends __MappedEntityTest<UserWithStringId, String> {
 
     UserWithStringIdTest() {
         super(UserWithStringId.class, String.class);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Test
+    @Override
+    protected void equals_verify() {
+        super.equals_verify();
     }
 
     @Nonnull

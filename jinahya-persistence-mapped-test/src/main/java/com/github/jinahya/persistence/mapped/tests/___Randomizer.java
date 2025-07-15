@@ -21,12 +21,17 @@ package com.github.jinahya.persistence.mapped.tests;
  */
 
 import jakarta.annotation.Nonnull;
+import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
+import uk.co.jemos.podam.api.DefaultClassInfoStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 import uk.co.jemos.podam.api.RandomDataProviderStrategyImpl;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * An abstract class for randomizing a specific class.
@@ -45,11 +50,18 @@ public abstract class ___Randomizer<T> {
     /**
      * Creates a new instance for initializing a randomized instance of the specified class.
      *
-     * @param type the class to be randomized.
+     * @param type           the class to be randomized.
+     * @param excludedFields fields to be excluded from randomization.
      */
-    protected ___Randomizer(@Nonnull final Class<T> type) {
+    protected ___Randomizer(@Nonnull final Class<T> type, @Nonnull final String... excludedFields) {
         super();
         this.type = Objects.requireNonNull(type, "type is null");
+        this.excludedFields = Arrays
+                .stream(Objects.requireNonNull(excludedFields, "excludedFields is null"))
+                .filter(Objects::nonNull)
+                .map(String::strip)
+                .filter(v -> !v.isBlank())
+                .collect(Collectors.toSet());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -70,10 +82,25 @@ public abstract class ___Randomizer<T> {
      *
      * @return a new factory.
      * @see PodamFactoryImpl#PodamFactoryImpl(DataProviderStrategy)
+     * @see PodamFactory#setClassStrategy(ClassInfoStrategy)
+     * @see #getClassInfoStrategy() ;
      */
     @Nonnull
     protected PodamFactory getPodamFactory() {
-        return new PodamFactoryImpl(getDataProviderStrategy());
+        final var factory = new PodamFactoryImpl(getDataProviderStrategy());
+        factory.setClassStrategy(getClassInfoStrategy());
+        return factory;
+    }
+
+    /**
+     * Creates a new class info strategy which excludes {@link #excludedFields}.
+     *
+     * @return a new class info strategy which excludes {@link #excludedFields}
+     */
+    protected ClassInfoStrategy getClassInfoStrategy() {
+        final var classInfoStrategy = DefaultClassInfoStrategy.getInstance();
+        excludedFields.forEach(v -> classInfoStrategy.addExcludedField(type, v));
+        return classInfoStrategy;
     }
 
     /**
@@ -94,4 +121,9 @@ public abstract class ___Randomizer<T> {
      * The type to be randomized.
      */
     protected final Class<T> type;
+
+    /**
+     * The fields to be excluded from randomization.
+     */
+    protected final Set<String> excludedFields;
 }

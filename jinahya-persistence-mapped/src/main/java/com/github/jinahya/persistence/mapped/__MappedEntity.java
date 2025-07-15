@@ -67,7 +67,7 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
         final var thisId__ = getId__();
         final var thatId__ = that.getId__();
         if (thisId__ == null && thatId__ == null) {
-//            return false;
+            return false;
         }
         return Objects.equals(thisId__, thatId__);
     }

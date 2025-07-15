@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.mapped.tests._MappedEntityTest;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import org.junit.jupiter.api.Test;
 
 public class Entity02Test extends _MappedEntityTest<Entity02, Long> {
 
@@ -32,15 +33,17 @@ public class Entity02Test extends _MappedEntityTest<Entity02, Long> {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Test
     @Override
-    protected void _verify_equals() {
-        super._verify_equals();
+    protected void equals_verify() {
+        super.equals_verify();
     }
 
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<Entity02> getEqualsVerifier() {
         return super.getEqualsVerifier()
+                .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY);
     }
 }
