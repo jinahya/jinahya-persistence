@@ -367,13 +367,13 @@
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>default-prepare-agent</id>
+            <id>prepare-agent</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
           </execution>
           <execution>
-            <id>default-report</id>
+            <id>report</id>
             <goals>
               <goal>report</goal>
             </goals>
@@ -385,7 +385,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>default-report-aggregate</id>
+            <id>report-aggregate</id>
             <goals>
               <goal>report-aggregate</goal>
             </goals>
