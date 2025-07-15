@@ -258,10 +258,16 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
+          <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/sonar-maven-plugin/versions -->
           <version>2.18.0</version>
           <configuration>
             <processDependencyManagement>false</processDependencyManagement>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>4.0.0.4121</version>
         </plugin>
         <plugin>
           <groupId>org.jacoco</groupId>
@@ -391,9 +397,9 @@
             </goals>
             <phase>verify</phase>
             <configuration>
-              <dataFileIncludes>
-                <dataFileInclude>**/jacoco.exec</dataFileInclude>
-              </dataFileIncludes>
+<!--              <dataFileIncludes>-->
+<!--                <dataFileInclude>**/jacoco.exec</dataFileInclude>-->
+<!--              </dataFileIncludes>-->
             </configuration>
           </execution>
         </executions>
