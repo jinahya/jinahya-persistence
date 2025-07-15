@@ -24,6 +24,10 @@ import com.github.jinahya.persistence.more.__AttributeEnum;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -97,60 +101,60 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
         );
     }
 
-//    // -----------------------------------------------------------------------------------------------------------------
-//
-//    /**
-//     * Accepts each pair of enum constant and attribute value to the specified consumer.
-//     *
-//     * @param consumer the consumer.
-//     */
-//    protected void acceptEachEnumConstantAndAttributeValue(final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
-//        __AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
-//    }
-//
-//    /**
-//     * Applies a stream of all enum constants, of {@link #enumClass}, to the specified function, and returns the
-//     * result.
-//     *
-//     * @param function the function.
-//     * @param <R>      result type parameter
-//     * @return the result of the {@code function}.
-//     * @see #acceptEnumConstantStream(Consumer)
-//     */
-//    protected final <R> R applyEnumConstantStream(final Function<? super Stream<E>, ? extends R> function) {
-//        return __AttributeEnumTestUtils.applyEnumConstantStream(enumClass, function);
-//    }
-//
-//    /**
-//     * Accepts a stream of all enum constants, of {@link #enumClass}, to the specified consumer.
-//     *
-//     * @param consumer the consumer.
-//     * @see #applyEnumConstantStream(Function)
-//     */
-//    protected final void acceptEnumConstantStream(final Consumer<? super Stream<E>> consumer) {
-//        __AttributeEnumTestUtils.acceptEnumConstantStream(enumClass, consumer);
-//    }
-//
-//    /**
-//     * Applies a stream of all attribute values, of {@link #enumClass}, to the specified function, and returns the
-//     * result.
-//     *
-//     * @param function the function.
-//     * @see #acceptAttributeValueStream(Consumer)
-//     */
-//    protected final <R> R applyAttributeValueStream(final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
-//        return __AttributeEnumTestUtils.applyAttributeValueStream(enumClass, function);
-//    }
-//
-//    /**
-//     * Accepts a stream of all attribute values, of {@link #enumClass}, to the specified consumer.
-//     *
-//     * @param consumer the consumer.
-//     * @see #applyAttributeValueStream(Function)
-//     */
-//    protected final void acceptAttributeValueStream(final Consumer<? super Stream<ATTRIBUTE>> consumer) {
-//        __AttributeEnumTestUtils.acceptAttributeValueStream(enumClass, consumer);
-//    }
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Accepts each pair of enum constant and attribute value to the specified consumer.
+     *
+     * @param consumer the consumer.
+     */
+    protected void acceptEachEnumConstantAndAttributeValue(final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
+        __AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
+    }
+
+    /**
+     * Applies a stream of all enum constants, of {@link #enumClass}, to the specified function, and returns the
+     * result.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @see #acceptEnumConstantStream(Consumer)
+     */
+    protected final <R> R applyEnumConstantStream(final Function<? super Stream<E>, ? extends R> function) {
+        return __AttributeEnumTestUtils.applyEnumConstantStream(enumClass, function);
+    }
+
+    /**
+     * Accepts a stream of all enum constants, of {@link #enumClass}, to the specified consumer.
+     *
+     * @param consumer the consumer.
+     * @see #applyEnumConstantStream(Function)
+     */
+    protected final void acceptEnumConstantStream(final Consumer<? super Stream<E>> consumer) {
+        __AttributeEnumTestUtils.acceptEnumConstantStream(enumClass, consumer);
+    }
+
+    /**
+     * Applies a stream of all attribute values, of {@link #enumClass}, to the specified function, and returns the
+     * result.
+     *
+     * @param function the function.
+     * @see #acceptAttributeValueStream(Consumer)
+     */
+    protected final <R> R applyAttributeValueStream(final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
+        return __AttributeEnumTestUtils.applyAttributeValueStream(enumClass, function);
+    }
+
+    /**
+     * Accepts a stream of all attribute values, of {@link #enumClass}, to the specified consumer.
+     *
+     * @param consumer the consumer.
+     * @see #applyAttributeValueStream(Function)
+     */
+    protected final void acceptAttributeValueStream(final Consumer<? super Stream<ATTRIBUTE>> consumer) {
+        __AttributeEnumTestUtils.acceptAttributeValueStream(enumClass, consumer);
+    }
 
     // ------------------------------------------------------------------------------------------------------- enumClass
 

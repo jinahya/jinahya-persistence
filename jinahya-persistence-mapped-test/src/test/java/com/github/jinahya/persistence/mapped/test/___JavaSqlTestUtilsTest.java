@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 
 class ___JavaSqlTestUtilsTest {
 
+    @DisplayName("acceptEachTableName(connection, catalog, schema, consumer)")
     @Nested
     class AcceptEachTableNameTest {
 
@@ -77,8 +78,9 @@ class ___JavaSqlTestUtilsTest {
         }
     }
 
+    @DisplayName("addAllTableName(connection, catalog, schema, consumer)")
     @Nested
-    class AddEachTableNameTest {
+    class AddAllTableNamesTest {
 
         @Test
         void __() throws SQLException {
@@ -104,10 +106,11 @@ class ___JavaSqlTestUtilsTest {
                     new ArrayList<>()
             );
             // ---------------------------------------------------------------------------------------------------- then
-            Assertions.assertThat(collection).isEqualTo(tableNames);
+            assertThat(collection).isEqualTo(tableNames);
         }
     }
 
+    @DisplayName("acceptEachColumnName(connection, catalog, schemaPattern, tableNamePattern, consumer)")
     @Nested
     class AcceptEachColumnNameTest {
 
@@ -146,6 +149,7 @@ class ___JavaSqlTestUtilsTest {
         }
     }
 
+    @DisplayName("addAllColumnName(connection, catalog, schemaPattern, tableNamePattern, consumer)")
     @Nested
     class AddAllColumnNameTest {
 
@@ -177,7 +181,7 @@ class ___JavaSqlTestUtilsTest {
                     new ArrayList<>()
             );
             // ---------------------------------------------------------------------------------------------------- then
-            Assertions.assertThat(collection).isEqualTo(columnNames);
+            assertThat(collection).isEqualTo(columnNames);
         }
     }
 }

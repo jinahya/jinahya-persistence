@@ -28,11 +28,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static com.github.jinahya.persistence.more.test.__AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue;
-import static com.github.jinahya.persistence.more.test.__AttributeEnumTestUtils.acceptEnumConstantStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
         "java:S112", // Generic exceptions should never be thrown
         "java:S119", // Type parameter names should comply with a naming convention
@@ -103,7 +102,6 @@ public abstract class __AttributeEnumConverterTest<
         void __NotNull() {
             final var converterInstance = newConverterInstance();
             acceptEnumConstantStream(
-                    enumClass,
                     s -> {
                         s.forEach(ec -> {
                             final var actual = converterInstance.convertToDatabaseColumn(ec);
@@ -129,17 +127,20 @@ public abstract class __AttributeEnumConverterTest<
         @Test
         void __NotNull() {
             final var converterInstance = newConverterInstance();
-            acceptEachEnumConstantAndAttributeValue(
-                    enumClass,
-                    (ec, av) -> {
-                        final var actual = converterInstance.convertToEntityAttribute(av);
-                        assertThat(actual).isEqualTo(ec);
-                    }
-            );
+            acceptEachEnumConstantAndAttributeValue((ec, av) -> {
+                final var actual = converterInstance.convertToEntityAttribute(av);
+                assertThat(actual).isEqualTo(ec);
+            });
         }
     }
 
     // -------------------------------------------------------------------------------------------------- converterClass
+
+    /**
+     * Creates a new instance of {@link #converterClass}.
+     *
+     * @return a new instance of {@link #converterClass}.
+     */
     protected CONVERTER newConverterInstance() {
         try {
             final var constructor = converterClass.getDeclaredConstructor();
