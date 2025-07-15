@@ -386,7 +386,6 @@
             <configuration>
               <formats>
                 <format>XML</format>
-                <format>HTML</format>
               </formats>
             </configuration>
           </execution>
@@ -396,11 +395,6 @@
               <goal>report-aggregate</goal>
             </goals>
             <phase>verify</phase>
-            <configuration>
-<!--              <dataFileIncludes>-->
-<!--                <dataFileInclude>**/jacoco.exec</dataFileInclude>-->
-<!--              </dataFileIncludes>-->
-            </configuration>
           </execution>
         </executions>
       </plugin>
