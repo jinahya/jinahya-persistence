@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -71,7 +72,7 @@
     <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-platform/versions -->
     <!--    <version.org.hibernate.orm>6.2.2.Final</version.org.hibernate.orm>-->
     <version.org.hibernate.orm>7.0.6.Final</version.org.hibernate.orm>
-<!--    <version.org.hibernate.validator>8.0.0.Final</version.org.hibernate.validator>-->
+    <!--    <version.org.hibernate.validator>8.0.0.Final</version.org.hibernate.validator>-->
     <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>
     <version.org.jboss.weld>5.0.1.Final</version.org.jboss.weld>
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
@@ -157,7 +158,7 @@
       <dependency>
         <groupId>org.glassfish.expressly</groupId>
         <artifactId>expressly</artifactId>
-<!--        <version>5.0.0</version>-->
+        <!--        <version>5.0.0</version>-->
         <version>6.0.0</version>
       </dependency>
       <dependency>
@@ -262,11 +263,12 @@
             <processDependencyManagement>false</processDependencyManagement>
           </configuration>
         </plugin>
-        <!--        <plugin>-->
-        <!--          <groupId>org.jacoco</groupId>-->
-        <!--          <artifactId>jacoco-maven-plugin</artifactId>-->
-        <!--          <version>0.8.12</version>-->
-        <!--        </plugin>-->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <!-- https://central.sonatype.com/artifact/org.jacoco/jacoco-maven-plugin/versions -->
+          <version>0.8.13</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -277,7 +279,7 @@
         <configuration>
           <!--              <skip>true</skip>-->
           <rules>
-            <dependencyConvergence />
+            <dependencyConvergence/>
             <requireJavaVersion>
               <version>[17.0.0,)</version>
             </requireJavaVersion>
@@ -359,24 +361,24 @@
           </execution>
         </executions>
       </plugin>
-      <!--      <plugin>-->
-      <!--        <groupId>org.jacoco</groupId>-->
-      <!--        <artifactId>jacoco-maven-plugin</artifactId>-->
-      <!--        <executions>-->
-      <!--          <execution>-->
-      <!--            <id>default-prepare-agent</id>-->
-      <!--            <goals>-->
-      <!--              <goal>prepare-agent</goal>-->
-      <!--            </goals>-->
-      <!--          </execution>-->
-      <!--          <execution>-->
-      <!--            <id>default-report</id>-->
-      <!--            <goals>-->
-      <!--              <goal>report</goal>-->
-      <!--            </goals>-->
-      <!--          </execution>-->
-      <!--        </executions>-->
-      <!--      </plugin>-->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
