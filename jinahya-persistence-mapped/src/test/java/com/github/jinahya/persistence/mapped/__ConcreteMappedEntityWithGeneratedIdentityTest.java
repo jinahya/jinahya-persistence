@@ -29,6 +29,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class __ConcreteMappedEntityWithGeneratedIdentityTest {
 
+    __ConcreteMappedEntityWithGeneratedIdentityTest() {
+        super();
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("toString()!blank")
     @Test
@@ -38,6 +42,7 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
         assertThat(string).isNotBlank();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("equals/hashCode")
     @Test
     void equals_verify_() {
