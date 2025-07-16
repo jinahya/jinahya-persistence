@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class __ConcreteMappedEntityTest {
+class __ConcreteMappedEntityWithGeneratedIdentityTest {
 
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("toString()!blank")
@@ -54,7 +54,7 @@ class __ConcreteMappedEntityTest {
 //        assertThat(instance1).isEqualTo(instance2);
 //        assertThat(instance2).isEqualTo(instance1);
         EqualsVerifier
-                .forClass(__ConcreteMappedEntity.class)
+                .forClass(__ConcreteMappedEntityWithGeneratedIdentity.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
                 .verify();

@@ -28,7 +28,7 @@ import jakarta.persistence.MappedSuperclass;
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class MappedUserWithStringId<SELF extends MappedUserWithStringId<SELF>> extends __MappedEntity<SELF, String> {
+abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF>> extends __MappedEntity<SELF, String> {
 
     static final String TABLE_NAME = "user_with_string_id";
 
@@ -36,7 +36,7 @@ abstract class MappedUserWithStringId<SELF extends MappedUserWithStringId<SELF>>
     static final String COLUMN_NAME_NAME = "name";
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    MappedUserWithStringId() {
+    _MappedUserWithStringId() {
         super();
     }
 
@@ -92,7 +92,7 @@ abstract class MappedUserWithStringId<SELF extends MappedUserWithStringId<SELF>>
     @jakarta.validation.constraints.NotNull
     @jakarta.persistence.Id
     @jakarta.persistence.Column(
-            name = MappedUserWithStringId.COLUMN_NAME_NAME,
+            name = _MappedUserWithStringId.COLUMN_NAME_NAME,
             nullable = false,
             insertable = true,
             updatable = false
