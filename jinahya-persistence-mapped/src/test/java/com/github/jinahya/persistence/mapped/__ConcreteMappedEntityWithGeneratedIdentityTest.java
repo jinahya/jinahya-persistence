@@ -57,6 +57,7 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
                 .forClass(__ConcreteMappedEntityWithGeneratedIdentity.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
+//                .suppress(Warning.JPA_GETTER) // IS THIS CRUCIAL?
                 .verify();
     }
 
