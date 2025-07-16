@@ -22,6 +22,11 @@ package com.github.jinahya.persistence.mapped;
 
 import java.math.BigInteger;
 
+/**
+ * Constants for databases.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -30,7 +35,7 @@ public final class __DatabaseConstants {
     // ----------------------------------------------------------------------------------------------------------- MySQL
 
     /**
-     * Constants for MySQL.
+     * Constants for the MySQL.
      *
      * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/data-types.html">Data Types</a> (MySQL Reference
@@ -40,7 +45,7 @@ public final class __DatabaseConstants {
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/integer-types.html">Integer Types (Exact Value) -
      *         INTEGER, INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
      */
-    public static final class __MySQLConstants {
+    public static final class __MySqlConstants {
 
         // ----------------------------------------------------------------------------------------------------- TINYINT
 
@@ -166,7 +171,7 @@ public final class __DatabaseConstants {
         /**
          * Creates a new instance.
          */
-        private __MySQLConstants() {
+        private __MySqlConstants() {
             throw new AssertionError("instantiation is not allowed");
         }
     }
@@ -174,7 +179,7 @@ public final class __DatabaseConstants {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * .
+     * Constants for the Oracle.
      *
      * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
      * @see <a href="https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Data-Types.html">Data
@@ -198,13 +203,13 @@ public final class __DatabaseConstants {
     // ------------------------------------------------------------------------------------------------------ PostgreSQL
 
     /**
-     * Constants for PostgreSQL.
+     * Constants for the PostgreSQL.
      *
      * @see <a href="https://www.postgresql.org/docs/current/datatype.html">Data Types</a> (PostgreSQL Reference
      *         Manual)
      * @see <a href="https://www.postgresql.org/docs/current/datatype-numeric.html">Numberic Types</a>
      */
-    public static final class __PostgreSQLConstants {
+    public static final class __PostgreSqlConstants {
 
         // ---------------------------------------------------------------------------------------------------- smallint
         public static final int MIN_SMALLINT = Short.MIN_VALUE;
@@ -269,7 +274,7 @@ public final class __DatabaseConstants {
         /**
          * Creates a new instance.
          */
-        private __PostgreSQLConstants() {
+        private __PostgreSqlConstants() {
             throw new AssertionError("instantiation is not allowed");
         }
     }

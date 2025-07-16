@@ -25,6 +25,13 @@ import jakarta.persistence.MappedSuperclass;
 
 import java.util.Objects;
 
+/**
+ * An abstract mapped superclass for entities.
+ *
+ * @param <SELF> self type parameter
+ * @param <ID>   id type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -44,6 +51,12 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
+
+    /**
+     * Returns a string representation of this object.
+     *
+     * @return a string representation of this object.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +
