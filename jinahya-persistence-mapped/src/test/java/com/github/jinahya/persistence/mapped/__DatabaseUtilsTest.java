@@ -30,18 +30,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __DatabaseConstantsTest {
+class __DatabaseUtilsTest {
 
     @Test
     void constructors__() throws ReflectiveOperationException {
         {
-            final var constructor = __DatabaseConstants.class.getDeclaredConstructor();
+            final var constructor = __DatabaseUtils.class.getDeclaredConstructor();
             if (!constructor.canAccess(null)) {
                 constructor.setAccessible(true);
             }
             assertThatThrownBy(constructor::newInstance).isInstanceOf(ReflectiveOperationException.class);
         }
-        for (final var declaredClass : __DatabaseConstants.class.getDeclaredClasses()) {
+        for (final var declaredClass : __DatabaseUtils.class.getDeclaredClasses()) {
             final var constructor = declaredClass.getDeclaredConstructor();
             if (!constructor.canAccess(null)) {
                 constructor.setAccessible(true);
@@ -50,42 +50,23 @@ class __DatabaseConstantsTest {
         }
     }
 
-    @Test
-    void fields__() throws IllegalAccessException {
-        for (final var declaredClass : __DatabaseConstants.class.getDeclaredClasses()) {
-            for (final var declaredField : declaredClass.getDeclaredFields()) {
-                final var value = declaredField.get(null);
-                log.debug("{}.{}: {}", declaredClass.getSimpleName(), declaredField.getName(), value);
-            }
-        }
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * A class for testing {@link __DatabaseUtils.__MySqlUtils}.
+     */
+    @Nested
+    class __MySqlUtilsTest {
+
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * A class for testing {@link __DatabaseConstants.__MySqlConstants}.
+     * A class for testing {@link __DatabaseUtils.__PostgreSqlUtils}.
      */
     @Nested
-    class __MySqlConstantsTest {
-
-        @Test
-        void __BIGINT() {
-            log.debug("MAX_BIGINT: {}", __DatabaseConstants.__MySqlConstants.MAX_BIGINT);
-        }
-
-        @Test
-        void __BIGINT_UNSIGNED() {
-            log.debug("MAX_BIGINT_UNSIGNED: {}", __DatabaseConstants.__MySqlConstants.MAX_BIGINT_UNSIGNED());
-        }
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * A class for testing {@link __DatabaseConstants.__PostgreSqlConstants}.
-     */
-    @Nested
-    class __PostgreSqlConstantsTest {
+    class __PostgresSqlUtilsTest {
 
     }
 }
