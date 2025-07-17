@@ -21,47 +21,21 @@ package com.github.jinahya.persistence.mapped;
  */
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 
-/**
- * Just a concrete implementation of {@link __MappedEntity} for testing coverage.
- *
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- */
 @Entity
 @SuppressWarnings({
         "java:S116" // Field names should comply with a naming convention
 })
-class __ConcreteMappedEntity extends __MappedEntity<__ConcreteMappedEntity, Long> {
+class __ConcreteMappedEntityWithGeneratedIdentity
+        extends __MappedEntityWithGeneratedIdentity<__ConcreteMappedEntityWithGeneratedIdentity> {
 
-    protected __ConcreteMappedEntity() {
+    protected __ConcreteMappedEntityWithGeneratedIdentity() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
-    @Override
-    public final boolean equals(final Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
-
     // ------------------------------------------------------------------------------------------------------ super.id__
-    @Override
-    protected Long getId__() {
-        return id__;
-    }
-
-    @Override
-    protected void setId__(final Long id__) {
-        this.id__ = id__;
-    }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Id
-    private Long id__;
 }

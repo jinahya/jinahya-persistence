@@ -27,7 +27,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class __ConcreteMappedEntityTest {
+class __ConcreteMappedEntityWithGeneratedIdentityTest {
+
+    __ConcreteMappedEntityWithGeneratedIdentityTest() {
+        super();
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("toString()!blank")
@@ -38,6 +42,7 @@ class __ConcreteMappedEntityTest {
         assertThat(string).isNotBlank();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("equals/hashCode")
     @Test
     void equals_verify_() {
@@ -54,9 +59,10 @@ class __ConcreteMappedEntityTest {
 //        assertThat(instance1).isEqualTo(instance2);
 //        assertThat(instance2).isEqualTo(instance1);
         EqualsVerifier
-                .forClass(__ConcreteMappedEntity.class)
+                .forClass(__ConcreteMappedEntityWithGeneratedIdentity.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
+                .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1102
                 .verify();
     }
 

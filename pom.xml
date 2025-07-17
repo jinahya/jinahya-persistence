@@ -14,9 +14,9 @@
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
-  <description>More about Persistence API</description>
+  <description>Jinahya Persistence</description>
   <url>https://github.com/jinahya/${project.artifactId}</url>
-  <inceptionYear>2024</inceptionYear>
+  <inceptionYear>2025</inceptionYear>
   <organization>
     <name>Jinahya, Inc.</name>
     <url>https://jinahya.com</url>

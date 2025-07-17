@@ -31,23 +31,24 @@ package com.github.jinahya.persistence.mapped;
 public final class __DatabaseUtils {
 
     // ----------------------------------------------------------------------------------------------------------- MySQL
+
+    /**
+     * Utilities for the MySQL.
+     */
     public static final class __MySqlUtils {
 
-        // ------------------------------------------------------------------------------------------------ CONSTRUCTORS
-
-        /**
-         * Creates a new instance.
-         */
         private __MySqlUtils() {
             throw new AssertionError("instantiation is not allowed");
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------- Oracle
 
+    /**
+     * Utilities for the Oracle.
+     */
     public static final class __OracleUtils {
 
-        // ------------------------------------------------------------------------------------------------ CONSTRUCTORS
         private __OracleUtils() {
             throw new AssertionError("instantiation is not allowed");
         }
@@ -55,23 +56,17 @@ public final class __DatabaseUtils {
 
     // ------------------------------------------------------------------------------------------------------ PostgreSQL
 
+    /**
+     * Utilities for the PostgreSQL.
+     */
     public static final class __PostgreSqlUtils {
 
-        // ------------------------------------------------------------------------------------------------ CONSTRUCTORS
-
-        /**
-         * Creates a new instance.
-         */
         private __PostgreSqlUtils() {
             throw new AssertionError("instantiation is not allowed");
         }
     }
 
-    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-
-    /**
-     * Creates a new instance.
-     */
+    // -----------------------------------------------------------------------------------------------------------------
     private __DatabaseUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

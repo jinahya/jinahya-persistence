@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.mapped.test;
 
 import jakarta.annotation.Nonnull;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -39,14 +38,12 @@ import java.util.Objects;
 })
 public abstract class ___Instantiator<T> {
 
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance for initializing the specified class.
+     * Creates a new instance for instantiating the specified class.
      *
-     * @param type the class to be initialized.
+     * @param type the class to be instantiated.
      * @see #type
      */
     protected ___Instantiator(@Nonnull final Class<T> type) {
@@ -57,7 +54,7 @@ public abstract class ___Instantiator<T> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Initializes a new instance of {@link #type}.
+     * Instantiates a new instance of {@link #type}.
      *
      * @return a new instance of {@link #type}.
      */
@@ -66,21 +63,13 @@ public abstract class ___Instantiator<T> {
             "java:S112" // Generic exceptions should never be thrown
     })
     public T get() {
-        try {
-            final var constructor = type.getDeclaredConstructor();
-            if (!constructor.canAccess(null)) {
-                constructor.setAccessible(true);
-            }
-            return constructor.newInstance();
-        } catch (final ReflectiveOperationException roe) {
-            throw new RuntimeException("failed to initialize a new instance of " + type, roe);
-        }
+        return ___JavaLangReflectTestUtils.newInstanceOf(type);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class to be initialized.
+     * The class to be instantiated.
      */
-    private final Class<T> type;
+    protected final Class<T> type;
 }

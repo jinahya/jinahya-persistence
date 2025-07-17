@@ -32,7 +32,7 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___InstantiatorUtils {
+public final class ___InstantiatorUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
@@ -71,7 +71,7 @@ final class ___InstantiatorUtils {
      * @param <T>  class type parameter
      * @return an optional of the initialized instance; {@link Optional#empty() empty} when no instantiator found.
      */
-    static <T> Optional<T> newInstantiatedInstanceOf(final Class<T> type) {
+    public static <T> Optional<T> newInstantiatedInstanceOf(final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
         return newInstantiatorInstanceOf(type)
                 .map(___Instantiator::get);
