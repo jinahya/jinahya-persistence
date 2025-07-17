@@ -26,8 +26,9 @@
              version="3.2">
   <persistence-unit name="unitPU">
     <description>Persistence Unit for an In-Memory DB</description>
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+<!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+    <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.UserWithStringId</class>
@@ -62,8 +63,9 @@
   </persistence-unit>
   <persistence-unit name="integrationPU">
     <description>Persistence Unit for a Physical Database</description>
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+<!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+    <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.UserWithStringId</class>

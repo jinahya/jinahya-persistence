@@ -55,8 +55,10 @@
     <maven.compiler.testRelease>${maven.compiler.testTarget}</maven.compiler.testRelease>
     <sonar.organization>jinahya-github</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-<!--    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>-->
-<!--    <sonar.language>java</sonar.language>-->
+    <sonar.coverage.jacoco.xmlReportPaths>
+      target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-mapped/target/site/jacoco/jacoco.xml,jinahya-persistence-mapped-test/target/site/jacoco/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.language>java</sonar.language>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.3</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
@@ -77,8 +79,8 @@
     <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>
     <version.org.jboss.weld>5.0.1.Final</version.org.jboss.weld>
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
-    <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/5.13.2/versions -->
-    <version.org.junit>5.13.2</version.org.junit>
+    <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/versions -->
+    <version.org.junit>5.13.3</version.org.junit>
     <version.org.junit.jupiter>${version.org.junit}</version.org.junit.jupiter>
     <version.org.junit.platform>1.9.1</version.org.junit.platform>
     <version.org.mockito>5.18.0</version.org.mockito>
@@ -311,15 +313,20 @@
         <version>3.14.0</version>
         <configuration>
           <annotationProcessorPaths>
+            <!--            <path>-->
+            <!--              <groupId>org.eclipse.persistence</groupId>-->
+            <!--              <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>-->
+            <!--              <version>${version.org.eclipse.persistence}</version>-->
+            <!--            </path>-->
+            <path>
+              <groupId>org.hibernate.orm</groupId>
+              <artifactId>hibernate-jpamodelgen</artifactId>
+              <version>${version.org.hibernate.orm}</version>
+            </path>
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
               <version>${version.org.projectlombok}</version>
-            </path>
-            <path>
-              <groupId>org.eclipse.persistence</groupId>
-              <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-              <version>${version.org.eclipse.persistence}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
@@ -525,6 +532,9 @@
     </profile>
     <profile>
       <id>eclipselink</id>
+      <properties>
+        <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.eclipse.persistence</groupId>
@@ -533,18 +543,21 @@
         </dependency>
       </dependencies>
     </profile>
-    <!--    <profile>-->
-    <!--      <id>hibernate</id>-->
-    <!--      <activation>-->
-    <!--        <activeByDefault>true</activeByDefault>-->
-    <!--      </activation>-->
-    <!--      <dependencies>-->
-    <!--        <dependency>-->
-    <!--          <groupId>org.hibernate.orm</groupId>-->
-    <!--          <artifactId>hibernate-core</artifactId>-->
-    <!--          <scope>test</scope>-->
-    <!--        </dependency>-->
-    <!--      </dependencies>-->
-    <!--    </profile>-->
+    <profile>
+      <id>hibernate</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.hibernate.orm</groupId>
+          <artifactId>hibernate-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 </project>
