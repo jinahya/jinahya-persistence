@@ -40,6 +40,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({
+        "java:S3577" // Test classes should comply with a naming convention
+})
 class ___JavaSqlTestUtilsTest {
 
     @DisplayName("acceptEachTableName(connection, catalog, schema, consumer)")

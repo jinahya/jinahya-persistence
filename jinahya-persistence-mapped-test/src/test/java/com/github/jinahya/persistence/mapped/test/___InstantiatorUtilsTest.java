@@ -25,6 +25,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings({
+        "java:S3577" // Test classes should comply with a naming convention
+})
 class ___InstantiatorUtilsTest {
 
     private static class Pojo {

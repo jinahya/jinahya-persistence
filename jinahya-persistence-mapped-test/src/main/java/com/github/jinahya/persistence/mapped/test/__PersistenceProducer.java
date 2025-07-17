@@ -79,9 +79,15 @@ public class __PersistenceProducer {
 
     }
 
-    static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "unitPU";
+    /**
+     * The name of the persistence unit for unit tests.
+     */
+    public static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "unitPU";
 
-    static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
+    /**
+     * The name of the persistence unit for integration tests.
+     */
+    public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
 
     // -----------------------------------------------------------------------------------------------------------------
 

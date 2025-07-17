@@ -28,6 +28,9 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings({
+        "java:S3577" // Test classes should comply with a naming convention
+})
 class ___RandomizerUtilsTest {
 
     private static class Pojo {
