@@ -60,5 +60,8 @@ public class __PersistenceProducerIT {
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.Integration__
     @Inject
+    @SuppressWarnings({
+            "java:S6813" // Field dependency injection should be avoided
+    })
     private EntityManager entityManager;
 }
