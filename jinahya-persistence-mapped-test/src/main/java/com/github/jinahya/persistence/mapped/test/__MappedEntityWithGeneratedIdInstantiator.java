@@ -20,11 +20,11 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedPrimaryKey;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedId;
 import jakarta.annotation.Nonnull;
 
 /**
- * An abstract class for instantiating subclasses of {@link __MappedEntityWithGeneratedPrimaryKey}.
+ * An abstract class for instantiating subclasses of {@link __MappedEntityWithGeneratedId}.
  *
  * @param <ENTITY> entity type parameter
  * @param <ID>     id type parameter
@@ -34,8 +34,8 @@ import jakarta.annotation.Nonnull;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedPrimaryKeyInstantiator<
-        ENTITY extends __MappedEntityWithGeneratedPrimaryKey<ENTITY, ID>,
+public abstract class __MappedEntityWithGeneratedIdInstantiator<
+        ENTITY extends __MappedEntityWithGeneratedId<ENTITY, ID>,
         ID
         >
         extends __MappedEntityInstantiator<ENTITY, ID> {
@@ -50,8 +50,8 @@ public abstract class __MappedEntityWithGeneratedPrimaryKeyInstantiator<
      * @see #entityClass
      * @see #idClass
      */
-    protected __MappedEntityWithGeneratedPrimaryKeyInstantiator(final Class<ENTITY> entityClass,
-                                                                final Class<ID> idClass) {
+    protected __MappedEntityWithGeneratedIdInstantiator(final Class<ENTITY> entityClass,
+                                                        final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 

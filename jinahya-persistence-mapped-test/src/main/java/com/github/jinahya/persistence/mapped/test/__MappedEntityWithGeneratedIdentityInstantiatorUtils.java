@@ -34,13 +34,13 @@ public final class __MappedEntityWithGeneratedIdentityInstantiatorUtils {
      * Returns an initialized instance of the specified entity class.
      *
      * @param entityClass the entity class to be initialized.
-     * @param <T>         entity type parameter
+     * @param <ENTITY>    entity type parameter
      * @return an optional of the initialized entity; {@link Optional#empty() empty} when no initializer found.
      */
     @Nonnull
-    public static <T extends __MappedEntityWithGeneratedIdentity<T>> Optional<T> newInstanceOf(
-            @Nonnull final Class<T> entityClass) {
-        return __MappedEntityWithGeneratedPrimaryKeyInstantiatorUtils.newInstanceOf(entityClass);
+    public static <ENTITY extends __MappedEntityWithGeneratedIdentity<ENTITY>>
+    Optional<ENTITY> newInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
+        return __MappedEntityWithGeneratedIdInstantiatorUtils.newInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -34,7 +34,7 @@ import java.util.UUID;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntityWithGeneratedUuid<SELF>>
-        extends __MappedEntityWithGeneratedPrimaryKey<SELF, UUID> {
+        extends __MappedEntityWithGeneratedId<SELF, UUID> {
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 

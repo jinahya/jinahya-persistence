@@ -49,7 +49,7 @@ public final class __MappedEntityWithGeneratedIdentityRandomizerUtils {
     })
     public static <ENTITY extends __MappedEntityWithGeneratedIdentity<ENTITY>>
     Optional<ENTITY> newRandomizedInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
-        return __MappedEntityWithGeneratedPrimaryKeyRandomizerUtils.newRandomizedInstanceOf(entityClass);
+        return __MappedEntityWithGeneratedIdRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

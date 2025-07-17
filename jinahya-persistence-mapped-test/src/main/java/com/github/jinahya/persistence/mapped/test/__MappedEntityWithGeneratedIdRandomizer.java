@@ -20,13 +20,13 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedPrimaryKey;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedId;
 import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
 /**
- * An abstract class for randomizing subclasses of {@link __MappedEntityWithGeneratedPrimaryKey}.
+ * An abstract class for randomizing subclasses of {@link __MappedEntityWithGeneratedId}.
  *
  * @param <ENTITY> entity type parameter
  * @param <ID>     id type parameter
@@ -35,8 +35,8 @@ import uk.co.jemos.podam.api.PodamFactory;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedPrimaryKeyRandomizer<
-        ENTITY extends __MappedEntityWithGeneratedPrimaryKey<ENTITY, ID>,
+public abstract class __MappedEntityWithGeneratedIdRandomizer<
+        ENTITY extends __MappedEntityWithGeneratedId<ENTITY, ID>,
         ID
         >
         extends __MappedEntityRandomizer<ENTITY, ID> {
@@ -50,9 +50,9 @@ public abstract class __MappedEntityWithGeneratedPrimaryKeyRandomizer<
      * @see #entityClass
      * @see #idClass
      */
-    protected __MappedEntityWithGeneratedPrimaryKeyRandomizer(@Nonnull final Class<ENTITY> entityClass,
-                                                              @Nonnull final Class<ID> idClass,
-                                                              @Nonnull final String... excludedFields) {
+    protected __MappedEntityWithGeneratedIdRandomizer(@Nonnull final Class<ENTITY> entityClass,
+                                                      @Nonnull final Class<ID> idClass,
+                                                      @Nonnull final String... excludedFields) {
         super(entityClass, idClass, excludedFields);
     }
 

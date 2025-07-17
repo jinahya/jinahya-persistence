@@ -37,10 +37,7 @@ import jakarta.persistence.Transient;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedPrimaryKey<
-        SELF extends __MappedEntityWithGeneratedPrimaryKey<SELF, ID>,
-        ID
-        >
+public abstract class __MappedEntityWithGeneratedId<SELF extends __MappedEntityWithGeneratedId<SELF, ID>, ID>
         extends __MappedEntity<SELF, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -55,7 +52,7 @@ public abstract class __MappedEntityWithGeneratedPrimaryKey<
     /**
      * Creates a new instance.
      */
-    protected __MappedEntityWithGeneratedPrimaryKey() {
+    protected __MappedEntityWithGeneratedId() {
         super();
     }
 
@@ -71,19 +68,9 @@ public abstract class __MappedEntityWithGeneratedPrimaryKey<
         return super.toString();
     }
 
-//    @Override
-//    public final boolean equals(final Object obj) {
-//        return super.equals(obj);
-//    }
-//
-//    @Override
-//    public final int hashCode() {
-//        return super.hashCode();
-//    }
-
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedEntityWithGeneratedPrimaryKey<?, ?>)) {
+        if (!(obj instanceof __MappedEntityWithGeneratedId<?, ?>)) {
             return false;
         }
         return super.equals(obj);
@@ -104,6 +91,12 @@ public abstract class __MappedEntityWithGeneratedPrimaryKey<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the generated id.
+     *
+     * @return the generated id.
+     */
     @Transient
     public final ID getGeneratedId__() {
         return getId__();

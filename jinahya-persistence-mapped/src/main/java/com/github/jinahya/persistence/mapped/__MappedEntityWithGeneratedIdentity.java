@@ -32,7 +32,7 @@ import jakarta.persistence.MappedSuperclass;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedEntityWithGeneratedIdentity<SELF>>
-        extends __MappedEntityWithGeneratedPrimaryKey<SELF, Long> {
+        extends __MappedEntityWithGeneratedId<SELF, Long> {
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 

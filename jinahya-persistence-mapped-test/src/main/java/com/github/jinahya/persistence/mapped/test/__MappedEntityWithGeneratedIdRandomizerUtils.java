@@ -20,27 +20,27 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedPrimaryKey;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedId;
 import jakarta.annotation.Nonnull;
 
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Utilities for {@link __MappedEntityWithGeneratedPrimaryKeyRandomizer}.
+ * Utilities for {@link __MappedEntityWithGeneratedIdRandomizer}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __MappedEntityWithGeneratedPrimaryKeyRandomizerUtils {
+public final class __MappedEntityWithGeneratedIdRandomizerUtils {
 
     static String[] prependId__(final String... excludedFields) {
         Objects.requireNonNull(excludedFields, "excludedFields is null");
         final var result = new String[excludedFields.length + 1];
         System.arraycopy(excludedFields, 0, result, 1, excludedFields.length);
-        result[0] = __MappedEntityWithGeneratedPrimaryKey.ATTRIBUTE_NAME_ID__;
+        result[0] = __MappedEntityWithGeneratedId.ATTRIBUTE_NAME_ID__;
         return result;
     }
 
@@ -56,13 +56,13 @@ public final class __MappedEntityWithGeneratedPrimaryKeyRandomizerUtils {
     @SuppressWarnings({
             "java:S119" // Type parameter names should comply with a naming convention
     })
-    public static <ENTITY extends __MappedEntityWithGeneratedPrimaryKey<ENTITY, ?>>
+    public static <ENTITY extends __MappedEntityWithGeneratedId<ENTITY, ?>>
     Optional<ENTITY> newRandomizedInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __MappedEntityWithGeneratedPrimaryKeyRandomizerUtils() {
+    private __MappedEntityWithGeneratedIdRandomizerUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
