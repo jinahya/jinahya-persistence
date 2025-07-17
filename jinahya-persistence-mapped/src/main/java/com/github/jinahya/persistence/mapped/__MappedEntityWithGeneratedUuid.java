@@ -64,7 +64,7 @@ public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntit
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
-    protected final UUID getId__() {
+    protected /* final */ UUID getId__() {
         return id__;
     }
 

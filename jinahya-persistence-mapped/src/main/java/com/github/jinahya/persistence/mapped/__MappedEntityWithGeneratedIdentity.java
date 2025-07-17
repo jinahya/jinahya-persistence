@@ -62,7 +62,7 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
-    protected final Long getId__() {
+    protected /* final */ Long getId__() {
         return id__;
     }
 

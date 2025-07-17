@@ -65,7 +65,7 @@ class __ConcreteMappedEntityWithGeneratedUuidTest {
                 .forClass(__ConcreteMappedEntityWithGeneratedUuid.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
-                .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1102
+//                .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1102
                 .verify();
     }
 
