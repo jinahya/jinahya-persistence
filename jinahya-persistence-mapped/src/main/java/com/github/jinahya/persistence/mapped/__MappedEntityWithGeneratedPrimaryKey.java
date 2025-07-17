@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped;
  */
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 /**
  * An abstract mapped superclass for entities with generated primary keys.
@@ -28,6 +29,8 @@ import jakarta.persistence.MappedSuperclass;
  * @param <SELF> self type parameter
  * @param <ID>   id type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a14790">11.1.21.
+ *         GeneratedValue Annotation</a> (Jakarta Persistence 3.2 Specification Document)
  */
 @MappedSuperclass
 @SuppressWarnings({
@@ -68,13 +71,26 @@ public abstract class __MappedEntityWithGeneratedPrimaryKey<
         return super.toString();
     }
 
+//    @Override
+//    public final boolean equals(final Object obj) {
+//        return super.equals(obj);
+//    }
+//
+//    @Override
+//    public final int hashCode() {
+//        return super.hashCode();
+//    }
+
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof __MappedEntityWithGeneratedPrimaryKey<?, ?>)) {
+            return false;
+        }
         return super.equals(obj);
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return super.hashCode();
     }
 
@@ -85,5 +101,11 @@ public abstract class __MappedEntityWithGeneratedPrimaryKey<
     @Override
     protected final void setId__(final ID id__) {
         throw new UnsupportedOperationException("setting id__ is not allowed");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Transient
+    public final ID getGeneratedId__() {
+        return getId__();
     }
 }

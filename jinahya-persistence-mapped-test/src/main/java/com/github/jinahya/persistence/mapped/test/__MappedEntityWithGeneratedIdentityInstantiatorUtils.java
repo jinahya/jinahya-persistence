@@ -20,16 +20,15 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntity;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
 import jakarta.annotation.Nonnull;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __MappedEntityInstantiatorUtils {
+public final class __MappedEntityWithGeneratedIdentityInstantiatorUtils {
 
     /**
      * Returns an initialized instance of the specified entity class.
@@ -39,13 +38,13 @@ public final class __MappedEntityInstantiatorUtils {
      * @return an optional of the initialized entity; {@link Optional#empty() empty} when no initializer found.
      */
     @Nonnull
-    public static <T extends __MappedEntity<T, ?>> Optional<T> newInstanceOf(@Nonnull final Class<T> entityClass) {
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass);
+    public static <T extends __MappedEntityWithGeneratedIdentity<T>> Optional<T> newInstanceOf(
+            @Nonnull final Class<T> entityClass) {
+        return __MappedEntityWithGeneratedPrimaryKeyInstantiatorUtils.newInstanceOf(entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __MappedEntityInstantiatorUtils() {
+    private __MappedEntityWithGeneratedIdentityInstantiatorUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

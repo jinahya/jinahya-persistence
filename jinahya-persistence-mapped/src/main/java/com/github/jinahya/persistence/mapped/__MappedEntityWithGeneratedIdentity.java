@@ -47,6 +47,19 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    @Override
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof __MappedEntityWithGeneratedIdentity<?> that)) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
     protected final Long getId__() {

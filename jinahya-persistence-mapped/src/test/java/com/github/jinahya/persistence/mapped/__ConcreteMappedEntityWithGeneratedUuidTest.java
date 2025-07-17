@@ -25,12 +25,14 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class __ConcreteMappedEntityWithGeneratedIdentityTest {
+class __ConcreteMappedEntityWithGeneratedUuidTest {
 
-    __ConcreteMappedEntityWithGeneratedIdentityTest() {
+    __ConcreteMappedEntityWithGeneratedUuidTest() {
         super();
     }
 
@@ -38,7 +40,7 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
     @DisplayName("toString()!blank")
     @Test
     void toString_NotBlank_() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
+        final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
         final var string = instance.toString();
         assertThat(string).isNotBlank();
     }
@@ -60,7 +62,7 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
 //        assertThat(instance1).isEqualTo(instance2);
 //        assertThat(instance2).isEqualTo(instance1);
         EqualsVerifier
-                .forClass(__ConcreteMappedEntityWithGeneratedIdentity.class)
+                .forClass(__ConcreteMappedEntityWithGeneratedUuid.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
                 .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1102
@@ -70,15 +72,15 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
     // -----------------------------------------------------------------------------------------------------------------
     @Test
     void getId____() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
+        final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
         final var id__ = instance.getId__();
     }
 
     @Test
     void id____() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
+        final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
         assertThatThrownBy(() -> {
-            final var result = instance.id__(0L);
+            final var result = instance.id__(UUID.randomUUID());
         }).isInstanceOf(UnsupportedOperationException.class);
     }
 }

@@ -175,6 +175,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Applies a connection, unwrapped from the {@link #applyEntityManager(Function) entity manager}, to the specified
      * function, and returns the result.

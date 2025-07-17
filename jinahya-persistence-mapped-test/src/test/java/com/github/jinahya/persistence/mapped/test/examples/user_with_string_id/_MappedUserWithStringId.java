@@ -28,7 +28,8 @@ import jakarta.persistence.MappedSuperclass;
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF>> extends __MappedEntity<SELF, String> {
+abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF>>
+        extends __MappedEntity<SELF, String> {
 
     static final String TABLE_NAME = "user_with_string_id";
 
