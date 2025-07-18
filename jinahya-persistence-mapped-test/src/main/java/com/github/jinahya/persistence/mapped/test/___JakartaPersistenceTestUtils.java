@@ -251,11 +251,13 @@ public final class ___JakartaPersistenceTestUtils {
             @Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
+        logger.log(System.Logger.Level.DEBUG, "count of {0}: {1}", entityClass, count);
         if (count == 0L) {
             return null;
         }
         assert count > 0L;
         final var index = ThreadLocalRandom.current().nextLong(count);
+        logger.log(System.Logger.Level.DEBUG, "index: {0}", entityClass, index);
         return function.apply(count).apply(index);
     }
 

@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -32,8 +33,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 @AddBeanClasses({
         __PersistenceProducer.class
@@ -139,6 +142,30 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
         assertThat(attributeColumnNames)
                 .as("remaining entity column names for " + entityClass)
                 .isEmpty();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Test
+    protected void selectRandomEntityInstance() {
+        final var entityInstance = applyEntityManager(
+                em -> ___JakartaPersistenceTestUtils.selectRandom(em, entityClass)
+        );
+        assumeThat(entityInstance)
+                .as("randomly selected entity instance of %s", entityClass)
+                .isNotEmpty();
+        selectedRandomEntityInstances(entityInstance.get());
+    }
+
+    /**
+     * Notifies, by the {@link #selectRandomEntityInstance()} method, that the specified entity instance has been
+     * selected.
+     *
+     * @param entityInstance the entity instance.
+     * @see #selectRandomEntityInstance()
+     */
+    protected void selectedRandomEntityInstances(@Nonnull final ENTITY entityInstance) {
+        Objects.requireNonNull(entityInstance, "entityInstance is null");
+        ___JakartaValidationTestUtils.requireValid(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
