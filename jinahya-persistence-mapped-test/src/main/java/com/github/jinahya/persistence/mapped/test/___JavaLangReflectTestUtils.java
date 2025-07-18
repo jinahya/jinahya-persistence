@@ -31,11 +31,11 @@ import java.util.Optional;
 
 final class ___JavaLangReflectTestUtils {
 
-    private static final Method AUTO_CLOSEABLE_CLOSE;
+    private static final Method AUTO_CLOSEABLE_CLOSE_METHOD;
 
     static {
         try {
-            AUTO_CLOSEABLE_CLOSE = AutoCloseable.class.getMethod("close");
+            AUTO_CLOSEABLE_CLOSE_METHOD = AutoCloseable.class.getMethod("close");
         } catch (final NoSuchMethodException nsme) {
             throw new ExceptionInInitializerError(
                     "failed to find the AutoCloseable#close method; " + nsme.getLocalizedMessage()
@@ -43,6 +43,7 @@ final class ___JavaLangReflectTestUtils {
         }
     }
 
+    @Deprecated(forRemoval = true)
     @SuppressWarnings({
             "unchecked"
     })
@@ -50,13 +51,31 @@ final class ___JavaLangReflectTestUtils {
         Objects.requireNonNull(closeable, "closeable is null");
         return (T) Proxy.newProxyInstance(
                 closeable.getClass().getClassLoader(),
+//                AutoCloseable.class.getClassLoader(),
+//                Proxy.class.getClassLoader(),
                 new Class[]{AutoCloseable.class},
                 (p, m, a) -> {
-                    if (AUTO_CLOSEABLE_CLOSE.equals(m)) {
+                    if (m == AUTO_CLOSEABLE_CLOSE_METHOD) {
                         throw new UnsupportedOperationException("this instance is not closeable");
                     }
                     return m.invoke(closeable, a);
                 });
+    }
+
+    @Deprecated(forRemoval = true)
+    public static <T extends AutoCloseable, U extends T>
+    U uncloseable(@Nonnull final T closeable, final Class<U> type) {
+        Objects.requireNonNull(closeable, "closeable is null");
+        final var proxy = Proxy.newProxyInstance(
+                closeable.getClass().getClassLoader(),
+                new Class[]{AutoCloseable.class},
+                (p, m, a) -> {
+                    if (m == AUTO_CLOSEABLE_CLOSE_METHOD) {
+                        throw new UnsupportedOperationException("this instance is not closeable");
+                    }
+                    return m.invoke(closeable, a);
+                });
+        return type.cast(proxy);
     }
 
     public static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,

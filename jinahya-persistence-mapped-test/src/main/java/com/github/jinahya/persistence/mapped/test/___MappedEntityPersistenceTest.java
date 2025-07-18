@@ -24,7 +24,6 @@ import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -50,6 +49,14 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Persists {@link #newRandomizedEntityInstance() a new randomized instance} of {@link #entityClass}.
+     *
+     * @see #newRandomizedEntityInstance()
+     * @see #persistingEntityInstance(__MappedEntity)
+     * @see #persistedEntityInstance(__MappedEntity)
+     */
     @Test
     protected void persistEntityInstance() {
         acceptEntityManagerInTransactionAndRollback(em -> {
@@ -57,7 +64,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
             assumeThat(entityInstanceOptional)
                     .as("optional of randomized entity instance of %s", entityClass)
                     .isNotEmpty();
-            final ENTITY entityInstance = entityInstanceOptional.get();
+            final var entityInstance = entityInstanceOptional.get();
             persistingEntityInstance(entityInstance);
             em.persist(entityInstance);
             em.flush();
@@ -65,12 +72,24 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
         });
     }
 
-    protected void persistingEntityInstance(final ENTITY entityInstance) {
-        // empty
+    /**
+     * Notifies that the specified entity instance is about to be persisted.
+     *
+     * @param entityInstance the entity instance.
+     * @return given {@code entityInstance}.
+     */
+    protected ENTITY persistingEntityInstance(final ENTITY entityInstance) {
+        Objects.requireNonNull(entityInstance, "entityInstance is null");
+        return entityInstance;
     }
 
+    /**
+     * Notifies that the specified entity instance has been persisted.
+     *
+     * @param entityInstance the entity instance.
+     */
     protected void persistedEntityInstance(final ENTITY entityInstance) {
-        // empty
+        Objects.requireNonNull(entityInstance, "entityInstance is null");
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
@@ -177,8 +196,8 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Applies a connection, unwrapped from the {@link #applyEntityManager(Function) entity manager}, to the specified
-     * function, and returns the result.
+     * Applies a connection, unwrapped from the specified {@link #applyEntityManager(Function) entity manager}, to the
+     * specified function, and returns the result.
      *
      * @param function the function.
      * @param rollback {@code true} for rollback; {@code false} otherwise.
@@ -190,15 +209,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerInTransaction(
-                em -> {
-                    try {
-                        final var connection = em.unwrap(Connection.class);
-                        return function.apply(connection);
-                    } catch (final PersistenceException pe) {
-                        // empty
-                    }
-                    return ___OrgHibernateOrmTestUtils.applyConnection(em, function);
-                },
+                em -> ___JakartaPersistenceTestUtils.applyConnection(em, function),
                 rollback
         );
     }

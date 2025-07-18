@@ -52,8 +52,7 @@ public class __PersistenceProducerIT {
                         throw new RuntimeException("failed to print database info", sqle);
                     }
                     return null;
-                },
-                true
+                }
         );
     }
 

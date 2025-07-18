@@ -54,7 +54,7 @@ public abstract class ___Instantiator<T> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Instantiates a new instance of {@link #type}.
+     * Instantiates {@link #type}.
      *
      * @return a new instance of {@link #type}.
      */
@@ -69,7 +69,7 @@ public abstract class ___Instantiator<T> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class to be instantiated.
+     * The class to instantiate.
      */
     protected final Class<T> type;
 }

@@ -75,7 +75,7 @@ final class ___OrgHibernateOrmTestUtils {
                     new Class[]{returningWorkClass},
                     (p, m, a) -> {
                         if (m.equals(executeMethod)) {
-                            final Connection connection = (Connection) a[0];
+                            final var connection = (Connection) a[0];
                             return function.apply(connection);
                         }
                         return null;
