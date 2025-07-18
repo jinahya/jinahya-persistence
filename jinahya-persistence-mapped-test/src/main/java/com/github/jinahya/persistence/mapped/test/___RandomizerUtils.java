@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,26 +36,32 @@ import java.util.Optional;
 })
 public final class ___RandomizerUtils {
 
-    static Optional<Class<?>> getRandomizerClassOf(final Class<?> type) {
+    @Nonnull
+    static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> type) {
         return Optional.ofNullable(
                 ___JavaLangTestUtils.forAnyPostfixes(type, ___Randomizer.class, "Randomizer", "_Randomizer")
         );
     }
 
+    @Nonnull
     @SuppressWarnings({
             "unchecked"
     })
-    static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final Class<T> type) {
+    static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(@Nonnull final Class<T> type) {
         return getRandomizerClassOf(type)
                 .map(___JavaLangReflectTestUtils::newInstanceOf)
-                .map(i -> (___Randomizer<T>) i)
-                ;
+                .map(i -> (___Randomizer<T>) i);
     }
 
-    public static <T> Optional<T> newRandomizedInstanceOf(final Class<T> type) {
+    @Nonnull
+    public static <T> T newRandomizedInstanceOf(@Nonnull final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
-        return newRandomizerInstanceOf(type)
-                .map(___Randomizer::get);
+        return Objects.requireNonNull(
+                newRandomizerInstanceOf(type)
+                        .orElseThrow(() -> new IllegalArgumentException("no randomizer for " + type))
+                        .get(),
+                "null returned from the randomizer of " + type
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

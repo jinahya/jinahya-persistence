@@ -31,7 +31,6 @@ import org.mockito.Mockito;
 
 import java.beans.Introspector;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -105,7 +104,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     @DisplayName("toString()!blank <- newRandomizedEntityInstance()")
     @Test
     protected void toString_NotBlank_newRandomizedEntityInstance() {
-        newRandomizedEntityInstance().ifPresent(this::toString_NotBlank_);
+        accessors__(newRandomizedEntityInstance());
     }
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
@@ -193,7 +192,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      */
     @Test
     protected void accessors__newRandomizedEntityInstance() {
-        newRandomizedEntityInstance().ifPresent(this::accessors__);
+        accessors__(newRandomizedEntityInstance());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -220,12 +219,12 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     @Nonnull
-    protected Optional<ENTITY> newRandomizedEntityInstance() {
+    protected ENTITY newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
     @Nonnull
-    protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
+    protected ENTITY newRandomizedEntityInstanceSpy() {
         return Mockito.spy(newRandomizedEntityInstance());
     }
 
@@ -242,12 +241,12 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
     }
 
     @Nonnull
-    protected Optional<ID> newRandomizedIdInstance() {
+    protected ID newRandomizedIdInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
     }
 
     @Nonnull
-    protected Optional<ID> newRandomizedIdInstanceSpy() {
+    protected ID newRandomizedIdInstanceSpy() {
         return Mockito.spy(newRandomizedIdInstance());
     }
 

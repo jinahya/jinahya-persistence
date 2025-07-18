@@ -22,7 +22,10 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 
 @MappedSuperclass
 @SuppressWarnings({
@@ -89,14 +92,9 @@ abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @jakarta.annotation.Nonnull
-    @jakarta.validation.constraints.NotNull
-    @jakarta.persistence.Id
-    @jakarta.persistence.Column(
-            name = _MappedUserWithStringId.COLUMN_NAME_NAME,
-            nullable = false,
-            insertable = true,
-            updatable = false
-    )
+    @Nonnull
+    @NotNull
+    @Id
+    @Column(name = _MappedUserWithStringId.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
     private String name;
 }

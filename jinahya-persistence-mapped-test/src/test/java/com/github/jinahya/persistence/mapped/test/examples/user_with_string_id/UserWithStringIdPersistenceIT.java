@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.test.examples.entity01;
+package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
 
 /*-
  * #%L
@@ -20,18 +20,11 @@ package com.github.jinahya.persistence.mapped.test.examples.entity01;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
-import jakarta.persistence.EntityManager;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityPersistenceIT;
 
-class Entity01Persister extends __MappedEntityPersister<Entity01, Long> {
+class UserWithStringIdPersistenceIT extends __MappedEntityPersistenceIT<UserWithStringId, String> {
 
-    Entity01Persister() {
-        super(Entity01.class, Long.class);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Override
-    public void persist(final EntityManager entityManager, final Entity01 entityInstance) {
-        super.persist(entityManager, entityInstance);
+    UserWithStringIdPersistenceIT() {
+        super(UserWithStringId.class, String.class);
     }
 }

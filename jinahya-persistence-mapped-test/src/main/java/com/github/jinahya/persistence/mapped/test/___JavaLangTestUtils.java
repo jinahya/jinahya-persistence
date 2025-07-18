@@ -40,10 +40,7 @@ public final class ___JavaLangTestUtils {
                 .filter(Objects::nonNull)
                 .map(String::strip)
                 .filter(v -> !v.isBlank())
-                .<String>map((String postfix) -> {
-                    final var name = typeName + postfix;
-                    return name;
-                })
+                .<String>map((String postfix) -> typeName + postfix)
                 .map((String className) -> {
                     try {
                         return Class.forName(className);

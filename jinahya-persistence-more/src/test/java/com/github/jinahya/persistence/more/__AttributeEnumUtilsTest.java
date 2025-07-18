@@ -155,23 +155,21 @@ class __AttributeEnumUtilsTest {
         }
 
         // -------------------------------------------------------------------------------------------------------------
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings({"rawtypes"})
         private interface __SomeOtherAttributeEnum extends __SomeAttributeEnum {
 
         }
 
         @Test
-        @SuppressWarnings({"unchecked"})
+        @SuppressWarnings({"unchecked", "rawtypes"})
         void __X() {
+            final var enumClasses = List.of(
+                    _SomeAttributeEnum1.class,
+                    _SomeAttributeEnum2.class,
+                    __SomeOtherAttributeEnum.class
+            );
             assertThatThrownBy(() -> {
-                __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOfAttributeValue(
-                        "X",
-                        List.of(
-                                _SomeAttributeEnum1.class,
-                                _SomeAttributeEnum2.class,
-                                __SomeOtherAttributeEnum.class
-                        )
-                );
+                __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOfAttributeValue("X", enumClasses);
             }).isInstanceOf(IllegalArgumentException.class);
         }
     }

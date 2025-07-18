@@ -65,6 +65,7 @@ class ___JavaSqlTestUtilsTest {
                         .thenAnswer((Answer<String>) i -> removableTableNames.removeFirst());
                 when(databaseMetaData.getTables(catalog, schema, null, null)).thenReturn(resultSet);
             }
+            @SuppressWarnings("unchecked")
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
             ___JavaSqlTestUtils.acceptEachTableName(
@@ -135,6 +136,7 @@ class ___JavaSqlTestUtilsTest {
                         .thenAnswer((Answer<String>) i -> removableColumnNames.removeFirst());
                 when(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")).thenReturn(resultSet);
             }
+            @SuppressWarnings("unchecked")
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
             ___JavaSqlTestUtils.acceptEachColumnName(

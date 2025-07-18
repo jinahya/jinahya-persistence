@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 import java.util.Objects;
@@ -33,8 +34,12 @@ public final class ___PersisterUtils {
 
     static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> entityClass) {
         return Optional.ofNullable(
-                ___JavaLangTestUtils.forAnyPostfixes(entityClass, __MappedEntityPersister.class, "Persister",
-                                                     "_Persister")
+                ___JavaLangTestUtils.forAnyPostfixes(
+                        entityClass,
+                        __MappedEntityPersister.class,
+                        "Persister",
+                        "_Persister"
+                )
         );
     }
 
@@ -47,13 +52,14 @@ public final class ___PersisterUtils {
                 .map(i -> (___Persister<T>) i);
     }
 
+    @Nonnull
     public static <T> T newPersistedInstanceOf(final EntityManager entityManager, final Class<T> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass)
-                .orElseThrow(() -> new RuntimeException("failed to get random instance of " + entityClass));
-        return newPersisterInstanceOf(entityClass)
-                .map(p -> p.persist(entityManager, entityInstance))
-                .orElseThrow(() -> new RuntimeException("failed to get persister instance of " + entityClass));
+        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
+        newPersisterInstanceOf(entityClass)
+                .orElseThrow(() -> new RuntimeException("empty persister instance of " + entityClass))
+                .persist(entityManager, entityInstance);
+        return entityInstance;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

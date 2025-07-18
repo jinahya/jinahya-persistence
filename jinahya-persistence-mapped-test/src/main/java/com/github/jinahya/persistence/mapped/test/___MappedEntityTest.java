@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import org.mockito.Mockito;
 
 import java.util.Objects;
@@ -84,12 +85,12 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
     /**
      * Returns a new randomized instance of {@link #entityClass}.
      *
-     * @return a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty} when no randomizer for
-     *         the {@link #entityClass} found.
+     * @return a new randomized instance of {@link #entityClass}.
      * @see __MappedEntityRandomizerUtils#newRandomizedInstanceOf(Class)
      * @see #newRandomizedEntityInstanceSpy()
      */
-    protected Optional<ENTITY> newRandomizedEntityInstance() {
+    @Nonnull
+    protected ENTITY newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
@@ -100,7 +101,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      *         when no randomizer for the {@link #entityClass} found.
      * @see #newRandomizedEntityInstance()
      */
-    protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
+    protected ENTITY newRandomizedEntityInstanceSpy() {
         return Mockito.spy(newRandomizedEntityInstance());
     }
 
@@ -114,11 +115,11 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
         return Mockito.spy(newIdInstance());
     }
 
-    protected Optional<ID> newRandomizedIdInstance() {
+    protected ID newRandomizedIdInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
     }
 
-    protected Optional<ID> newRandomizedIdInstanceSpy() {
+    protected ID newRandomizedIdInstanceSpy() {
         return Mockito.spy(newRandomizedIdInstance());
     }
 

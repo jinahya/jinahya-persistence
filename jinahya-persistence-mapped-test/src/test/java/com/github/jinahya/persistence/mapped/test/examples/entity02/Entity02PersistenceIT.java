@@ -39,9 +39,9 @@ class Entity02PersistenceIT extends _MappedEntityPersistenceIT<Entity02, Long> {
     }
 
     @Override
-    protected Entity02 persistingEntityInstance(final Entity02 entityInstance) {
+    protected void persistingEntityInstance(final Entity02 entityInstance) {
         log.debug("persisting {}", entityInstance);
-        return super.persistingEntityInstance(entityInstance);
+        super.persistingEntityInstance(entityInstance);
     }
 
     @Override

@@ -44,41 +44,6 @@ import java.util.stream.Collectors;
 })
 public class __MappedEntityPersistenceTestUtils {
 
-//    public static <ENTITY extends __MappedEntity<ENTITY, ?>>
-//    void acceptEachDatabaseColumnName(@Nonnull final Connection connection,
-//                                      @Nonnull final Class<ENTITY> entityClass,
-//                                      @Nonnull final Consumer<? super String> consumer) {
-//        Objects.requireNonNull(connection, "connection is null");
-//        Objects.requireNonNull(entityClass, "entityClass is null");
-//        Objects.requireNonNull(consumer, "consumer is null");
-//        __MappedEntityTestUtils.acceptTableInfo(entityClass, c -> s -> t -> {
-//            try {
-//                __JavaSqlUtils.acceptEachColumnName(connection, c, s, t, consumer);
-//            } catch (final SQLException sqle) {
-//                throw new RuntimeException(
-//                        "failed to get table column names" +
-//                        "; entity class: " + entityClass +
-//                        "; catalog: " + c +
-//                        "; schema: " + s +
-//                        "; table: " + t,
-//                        sqle
-//                );
-//            }
-//        });
-//    }
-//
-//    public static <ENTITY extends __MappedEntity<ENTITY, ?>, C extends Collection<? super String>>
-//    C addAllDatabaseColumnName(@Nonnull final Connection connection, @Nonnull final Class<ENTITY> entityClass,
-//                               @Nonnull C collection) {
-//        Objects.requireNonNull(connection, "connection is null");
-//        Objects.requireNonNull(entityClass, "entityClass is null");
-//        Objects.requireNonNull(collection, "collection is null");
-//        acceptEachDatabaseColumnName(
-//                connection,
-//                entityClass, collection::add);
-//        return collection;
-//    }
-
     // -----------------------------------------------------------------------------------------------------------------
     static Optional<String> getAttributeColumnName(@Nonnull Class<?> beanClass,
                                                    @Nonnull final PropertyDescriptor propertyDescriptor) {

@@ -41,6 +41,7 @@ class ___JakartaPersistenceTestUtilsTest {
     class AcceptEachAttributeNameTest {
 
         @Test
+        @SuppressWarnings({"unchecked"})
         void __() {
             final var managedType = mock(ManagedType.class);
             final var attributeNames = List.of("x", "a", "b", "c");
@@ -51,6 +52,7 @@ class ___JakartaPersistenceTestUtilsTest {
                         return attribute;
                     }).collect(Collectors.toCollection(LinkedHashSet::new));
             when(managedType.getAttributes()).thenReturn(attributes);
+            @SuppressWarnings("Convert2Lambda")
             final Consumer<String> consumer = spy(
                     new Consumer<String>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override
@@ -126,6 +128,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var transaction = mock(EntityTransaction.class);
             when(entityManager.getTransaction()).thenReturn(transaction);
             final var expected = new Object();
+            //noinspection Convert2Lambda
             final var function = (Function<EntityManager, Object>) spy(
                     new Function<EntityManager, Object>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override
@@ -158,6 +161,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var entityManager = mock(EntityManager.class);
             final var transaction = mock(EntityTransaction.class);
             when(entityManager.getTransaction()).thenReturn(transaction);
+            //noinspection Convert2Lambda
             final var function = (Function<EntityManager, Object>) spy(
                     new Function<EntityManager, Object>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override
@@ -192,6 +196,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var entityManager = mock(EntityManager.class);
             final var transaction = mock(EntityTransaction.class);
             when(entityManager.getTransaction()).thenReturn(transaction);
+            //noinspection Convert2Lambda
             final var consumer = (Consumer<EntityManager>) spy(
                     new Consumer<EntityManager>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override

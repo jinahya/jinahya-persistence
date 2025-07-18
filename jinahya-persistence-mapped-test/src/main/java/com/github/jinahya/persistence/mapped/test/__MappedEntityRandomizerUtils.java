@@ -24,7 +24,6 @@ import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Utilities for {@link __MappedEntityRandomizer}.
@@ -41,7 +40,7 @@ public final class __MappedEntityRandomizerUtils {
      *
      * @param entityClass the entity class to be randomized.
      * @param <ENTITY>    entity type parameter
-     * @return an optional of the randomized entity; {@link Optional#empty() empty} when no randomizer found.
+     * @return a randomized instance of {@code entityClass}.
      * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
      */
     @Nonnull
@@ -49,7 +48,7 @@ public final class __MappedEntityRandomizerUtils {
             "java:S119" // Type parameter names should comply with a naming convention
     })
     public static <ENTITY extends __MappedEntity<ENTITY, ?>>
-    Optional<ENTITY> newRandomizedInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
+    ENTITY newRandomizedInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
     }

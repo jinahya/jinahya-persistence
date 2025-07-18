@@ -33,8 +33,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.assertj.core.api.Assumptions.assumeThat;
-
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
@@ -60,11 +58,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     @Test
     protected void persistEntityInstance() {
         acceptEntityManagerInTransactionAndRollback(em -> {
-            final var entityInstanceOptional = newRandomizedEntityInstance();
-            assumeThat(entityInstanceOptional)
-                    .as("optional of randomized entity instance of %s", entityClass)
-                    .isNotEmpty();
-            final var entityInstance = entityInstanceOptional.get();
+            final var entityInstance = newRandomizedEntityInstance();
             persistingEntityInstance(entityInstance);
             em.persist(entityInstance);
             em.flush();
@@ -76,11 +70,9 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
      * Notifies that the specified entity instance is about to be persisted.
      *
      * @param entityInstance the entity instance.
-     * @return given {@code entityInstance}.
      */
-    protected ENTITY persistingEntityInstance(final ENTITY entityInstance) {
+    protected void persistingEntityInstance(final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        return entityInstance;
     }
 
     /**
