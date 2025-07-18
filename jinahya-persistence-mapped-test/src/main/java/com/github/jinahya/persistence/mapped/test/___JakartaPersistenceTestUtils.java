@@ -257,7 +257,7 @@ public final class ___JakartaPersistenceTestUtils {
         }
         assert count > 0L;
         final var index = ThreadLocalRandom.current().nextLong(count);
-        logger.log(System.Logger.Level.DEBUG, "index: {0}", entityClass, index);
+        logger.log(System.Logger.Level.DEBUG, "index: {0}", index);
         return function.apply(count).apply(index);
     }
 

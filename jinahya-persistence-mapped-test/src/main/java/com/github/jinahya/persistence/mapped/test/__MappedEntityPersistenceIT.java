@@ -31,6 +31,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
@@ -49,6 +51,8 @@ import static org.assertj.core.api.Assumptions.assumeThat;
 })
 public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
         extends ___MappedEntityPersistenceTest<ENTITY, ID> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __MappedEntityPersistenceIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
@@ -165,6 +169,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
      */
     protected void selectedRandomEntityInstances(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
+        logger.log(Level.DEBUG, "selected entity instance: {0}", entityInstance);
         ___JakartaValidationTestUtils.requireValid(entityInstance);
     }
 
