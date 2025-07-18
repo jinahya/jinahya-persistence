@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.test.examples.entity02;
+package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
 
 /*-
  * #%L
@@ -20,27 +20,19 @@ package com.github.jinahya.persistence.mapped.test.examples.entity02;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test._MappedEntityPersistenceTest;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
+import jakarta.persistence.EntityManager;
 
-@Slf4j
-class Entity02PersistenceTest extends _MappedEntityPersistenceTest<Entity02, Long> {
+class UserWithStringIdPersister extends __MappedEntityPersister<UserWithStringId, String> {
 
-    Entity02PersistenceTest() {
-        super(Entity02.class, Long.class);
+    UserWithStringIdPersister() {
+        super(UserWithStringId.class, String.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void persistEntityInstance() {
-        super.persistEntityInstance();
-    }
 
     @Override
-    protected void persistedEntityInstance(final Entity02 entityInstance) {
-        log.debug("persisted {}", entityInstance);
-        super.persistedEntityInstance(entityInstance);
+    public void persist(final EntityManager entityManager, final UserWithStringId entityInstance) {
+        super.persist(entityManager, entityInstance);
     }
 }

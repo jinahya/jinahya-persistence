@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -52,14 +53,13 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
      * Persists {@link #newRandomizedEntityInstance() a new randomized instance} of {@link #entityClass}.
      *
      * @see #newRandomizedEntityInstance()
-     * @see #persistingEntityInstance(__MappedEntity)
      * @see #persistedEntityInstance(__MappedEntity)
      */
+    @DisplayName("persist random entity instance")
     @Test
     protected void persistEntityInstance() {
         acceptEntityManagerInTransactionAndRollback(em -> {
-            final var entityInstance = newRandomizedEntityInstance();
-            persistingEntityInstance(entityInstance);
+            final var entityInstance = __MappedEntityPersisterUtils.newPersistedInstanceOf(em, entityClass);
             em.persist(entityInstance);
             em.flush();
             persistedEntityInstance(entityInstance);
@@ -67,21 +67,13 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
     }
 
     /**
-     * Notifies that the specified entity instance is about to be persisted.
-     *
-     * @param entityInstance the entity instance.
-     */
-    protected void persistingEntityInstance(final ENTITY entityInstance) {
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
-    }
-
-    /**
-     * Notifies that the specified entity instance has been persisted.
+     * Notifies, by the {@link #persistEntityInstance()} method, that the specified entity instance has been persisted.
      *
      * @param entityInstance the entity instance.
      */
     protected void persistedEntityInstance(final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
+        ___JakartaValidationTestUtils.requireValid(entityInstance);
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory

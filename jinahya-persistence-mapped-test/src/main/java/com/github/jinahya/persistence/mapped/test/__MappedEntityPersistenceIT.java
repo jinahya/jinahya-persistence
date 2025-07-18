@@ -149,6 +149,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("selects random entity instance")
     @Test
     protected void selectRandomEntityInstance() {
         final var entityInstance = applyEntityManager(
