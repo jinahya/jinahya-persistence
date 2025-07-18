@@ -52,12 +52,12 @@ class __ConcreteMappedEntity extends __MappedEntity<__ConcreteMappedEntity, Long
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
-    protected Long getId__() {
+    protected final Long getId__() {
         return id__;
     }
 
     @Override
-    protected void setId__(final Long id__) {
+    protected final void setId__(final Long id__) {
         this.id__ = id__;
     }
 
