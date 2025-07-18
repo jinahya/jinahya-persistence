@@ -55,7 +55,7 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTI
      * @see #newRandomizedEntityInstance()
      * @see #persistedEntityInstance(__MappedEntity)
      */
-    @DisplayName("persist random entity instance")
+    @DisplayName("persist a random entity instance")
     @Test
     protected void persistEntityInstance() {
         acceptEntityManagerInTransactionAndRollback(em -> {
