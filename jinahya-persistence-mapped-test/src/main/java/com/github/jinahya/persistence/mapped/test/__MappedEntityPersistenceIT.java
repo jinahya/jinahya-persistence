@@ -60,7 +60,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("all table columns are mapped")
+    @DisplayName("assert that all table columns are mapped")
     @Test
     protected void _Mapped_AllTableColumnNames() {
         final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
@@ -104,7 +104,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
                 .isEmpty();
     }
 
-    @DisplayName("all entity columns are mapped")
+    @DisplayName("assert that all entity columns are mapped")
     @Test
     protected void _Mapped_AllEntityColumnColumnNames() {
         final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
