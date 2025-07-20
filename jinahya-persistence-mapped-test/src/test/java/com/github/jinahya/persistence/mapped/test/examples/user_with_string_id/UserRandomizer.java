@@ -20,30 +20,33 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityTest;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityRandomizer;
 import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
-import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.Test;
+import uk.co.jemos.podam.api.DataProviderStrategy;
+import uk.co.jemos.podam.api.PodamFactory;
 
-class UserWithStringIdTest extends __MappedEntityTest<UserWithStringId, String> {
+class UserRandomizer extends __MappedEntityRandomizer<User, String> {
 
-    UserWithStringIdTest() {
-        super(UserWithStringId.class, String.class);
+    UserRandomizer() {
+        super(User.class, String.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
+    @Nonnull
     @Override
-    protected void equals_verify() {
-        super.equals_verify();
+    protected DataProviderStrategy getDataProviderStrategy() {
+        return super.getDataProviderStrategy();
     }
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithStringId> getEqualsVerifier() {
-        return super.getEqualsVerifier()
-                .suppress(Warning.SURROGATE_KEY)
-                ;
+    protected PodamFactory getPodamFactory() {
+        return super.getPodamFactory();
+    }
+
+    @Nonnull
+    @Override
+    public User get() {
+        return super.get();
     }
 }

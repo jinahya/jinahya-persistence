@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
+package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id;
 
 /*-
  * #%L
@@ -20,84 +20,87 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 
 @MappedSuperclass
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF>>
-        extends __MappedEntity<SELF, String> {
+//abstract class _MappedIdForUser<SELF extends _MappedIdForUser<SELF>> implements Serializable {
+abstract class _MappedIdForUser implements Serializable {
 
-    static final String TABLE_NAME = "user_with_string_id";
-
-    // -----------------------------------------------------------------------------------------------------------------
-    static final String COLUMN_NAME_NAME = "name";
+    @Serial
+    private static final long serialVersionUID = -5865164757838263094L;
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    _MappedUserWithStringId() {
+    _MappedIdForUser() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
+
     @Override
     public String toString() {
         return super.toString() + '{' +
                "name=" + name +
+               ",age=" + age +
                '}';
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (!(obj instanceof _MappedUserWithStringId<?>)) {
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof _MappedIdForUser that)) {
             return false;
         }
-        return super.equals(obj);
+        return Objects.equals(name, that.name) &&
+               Objects.equals(age, that.age);
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    // ------------------------------------------------------------------------------------------------------ super.id__
-    @Override
-    protected String getId__() {
-        return name;
-    }
-
-    @Override
-    protected void setId__(final String id__) {
-        this.name = id__;
-    }
-
-    // -------------------------------------------------------------------------------------------------------------- id
-    @Nonnull
-    public String getName() {
-        return getId__();
-    }
-
-    public void setName(@Nonnull final String name) {
-        setId__(name);
-    }
-
-    @SuppressWarnings({
-            "unchecked"
-    })
-    public SELF name(@Nonnull final String name) {
-        setName(name);
-        return (SELF) this;
+    public final int hashCode() {
+        return Objects.hash(name, age);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@Nonnull final String name) {
+        this.name = name;
+    }
+
+    @Nonnull
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(@Nonnull final Integer age) {
+        this.age = age;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    @Nonnull
     @NotNull
-    @Id
-    @Column(name = _MappedUserWithStringId.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
+    @Basic(optional = false)
+    @Column(name = _MappedUser.COLUMN_NAME_NAME, nullable = false, insertable = true,
+            updatable = false)
     private String name;
+
+    @Nonnull
+    @NotNull
+    @Basic(optional = false)
+    @Column(name = _MappedUser.COLUMN_NAME_AGE, nullable = false, insertable = true,
+            updatable = false)
+    private Integer age;
 }

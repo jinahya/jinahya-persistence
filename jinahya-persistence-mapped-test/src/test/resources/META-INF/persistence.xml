@@ -31,7 +31,9 @@
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
-    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.UserWithStringId</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUser</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.User</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.User</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
@@ -50,7 +52,7 @@
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
-      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+<!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
       <property name="hibernate.format_sql" value="true"/>
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.highlight_sql" value="true"/>
@@ -69,7 +71,9 @@
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
-    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.UserWithStringId</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUser</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.User</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.User</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
@@ -88,7 +92,7 @@
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
-      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+<!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
       <property name="hibernate.format_sql" value="true"/>
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.highlight_sql" value="true"/>

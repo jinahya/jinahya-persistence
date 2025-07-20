@@ -113,7 +113,10 @@ public final class ___JakartaPersistenceTestUtils {
     public static <C extends Collection<? super String>>
     C addAllEntityTableNames(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachEntityTableName(entityManagerFactory, collection::add);
+        acceptEachEntityTableName(
+                entityManagerFactory,
+                collection::add
+        );
         return collection;
     }
 

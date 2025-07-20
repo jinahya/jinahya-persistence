@@ -104,7 +104,7 @@ public class __PersistenceProducerIT {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("assert all database tables mapped")
+    @DisplayName("check all database tables mapped")
     @Test
     protected void checkAllDatabaseTablesMapped__() {
         final var databaseTableNames = ___JakartaPersistenceTestUtils.applyConnection(

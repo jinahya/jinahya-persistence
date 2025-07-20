@@ -20,32 +20,30 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.ToString;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityTest;
+import jakarta.annotation.Nonnull;
+import nl.jqno.equalsverifier.Warning;
+import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import org.junit.jupiter.api.Test;
 
-@Entity
-@Table(name = _MappedUserWithStringId.TABLE_NAME)
-@ToString(callSuper = true)
-class UserWithStringId extends _MappedUserWithStringId<UserWithStringId> {
+class UserTest extends __MappedEntityTest<User, String> {
+
+    UserTest() {
+        super(User.class, String.class);
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected UserWithStringId() {
-        super();
+    @Test
+    @Override
+    protected void equals_verify() {
+        super.equals_verify();
     }
 
-    // ------------------------------------------------------------------------------------------------ java.lang.Object
-
+    @Nonnull
     @Override
-    public final boolean equals(final Object obj) {
-        if (false && !(obj instanceof UserWithStringId)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
+    protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
+        return super.getEqualsVerifier()
+                .suppress(Warning.SURROGATE_KEY)
+                ;
     }
 }

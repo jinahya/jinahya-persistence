@@ -22,9 +22,9 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityPersistenceTest;
 
-class UserWithStringIdPersistenceTest extends __MappedEntityPersistenceTest<UserWithStringId, String> {
+class UserPersistenceTest extends __MappedEntityPersistenceTest<User, String> {
 
-    UserWithStringIdPersistenceTest() {
-        super(UserWithStringId.class, String.class);
+    UserPersistenceTest() {
+        super(User.class, String.class);
     }
 }

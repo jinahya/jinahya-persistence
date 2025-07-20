@@ -20,19 +20,11 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
-import jakarta.persistence.EntityManager;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityPersistenceIT;
 
-class UserWithStringIdPersister extends __MappedEntityPersister<UserWithStringId, String> {
+class UserPersistenceIT extends __MappedEntityPersistenceIT<User, String> {
 
-    UserWithStringIdPersister() {
-        super(UserWithStringId.class, String.class);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    @Override
-    public void persist(final EntityManager entityManager, final UserWithStringId entityInstance) {
-        super.persist(entityManager, entityInstance);
+    UserPersistenceIT() {
+        super(User.class, String.class);
     }
 }

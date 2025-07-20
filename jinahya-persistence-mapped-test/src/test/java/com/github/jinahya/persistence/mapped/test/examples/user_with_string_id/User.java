@@ -20,33 +20,32 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityRandomizer;
-import jakarta.annotation.Nonnull;
-import uk.co.jemos.podam.api.DataProviderStrategy;
-import uk.co.jemos.podam.api.PodamFactory;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.ToString;
 
-class UserWithStringIdRandomizer extends __MappedEntityRandomizer<UserWithStringId, String> {
-
-    UserWithStringIdRandomizer() {
-        super(UserWithStringId.class, String.class);
-    }
+@Entity
+@Table(name = _MappedUser.TABLE_NAME)
+@ToString(callSuper = true)
+class User extends _MappedUser<User> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Nonnull
-    @Override
-    protected DataProviderStrategy getDataProviderStrategy() {
-        return super.getDataProviderStrategy();
+    protected User() {
+        super();
     }
 
-    @Nonnull
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+
     @Override
-    protected PodamFactory getPodamFactory() {
-        return super.getPodamFactory();
+    public final boolean equals(final Object obj) {
+        if (false && !(obj instanceof User)) {
+            return false;
+        }
+        return super.equals(obj);
     }
 
-    @Nonnull
     @Override
-    public UserWithStringId get() {
-        return super.get();
+    public final int hashCode() {
+        return super.hashCode();
     }
 }

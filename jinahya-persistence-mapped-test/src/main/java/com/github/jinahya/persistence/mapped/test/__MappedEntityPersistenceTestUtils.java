@@ -108,7 +108,11 @@ public class __MappedEntityPersistenceTestUtils {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachAttributeColumName(entityManagerFactory, entityClass, collection::add);
+        acceptEachAttributeColumName(
+                entityManagerFactory,
+                entityClass,
+                collection::add
+        );
         return collection;
     }
 

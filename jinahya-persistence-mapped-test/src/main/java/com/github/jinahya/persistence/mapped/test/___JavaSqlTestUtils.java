@@ -110,7 +110,13 @@ public final class ___JavaSqlTestUtils {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachColumnName(connection, catalog, schemaPattern, tableNamePattern, collection::add);
+        acceptEachColumnName(
+                connection,
+                catalog,
+                schemaPattern,
+                tableNamePattern,
+                collection::add
+        );
         return collection;
     }
 
