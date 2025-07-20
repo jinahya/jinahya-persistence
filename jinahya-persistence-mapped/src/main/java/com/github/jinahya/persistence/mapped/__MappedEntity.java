@@ -20,7 +20,6 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
 import java.util.Objects;
@@ -28,8 +27,7 @@ import java.util.Objects;
 /**
  * An abstract mapped superclass for entities.
  *
- * @param <SELF> self type parameter
- * @param <ID>   id type parameter
+ * @param <ID> id type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @MappedSuperclass
@@ -37,7 +35,7 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> {
+public abstract class __MappedEntity<ID> {
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
@@ -74,7 +72,7 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof __MappedEntity<?, ?> that)) {
+        if (!(obj instanceof __MappedEntity<?> that)) {
             return false;
         }
         final var thisId__ = getId__();
@@ -114,22 +112,4 @@ public abstract class __MappedEntity<SELF extends __MappedEntity<SELF, ID>, ID> 
             "java:S117" // Local variable and method parameter names should comply with a naming convention
     })
     protected abstract void setId__(ID id__);
-
-    /**
-     * Replaces current value of {@link ID} with the specified value, and returns {@code this} object.
-     *
-     * @param id__ new value for the {@link ID}.
-     * @return {@code this} object.
-     * @see #setId__(Object)
-     */
-    @Nonnull
-    @SuppressWarnings({
-            "java:S100", // Method names should comply with a naming convention
-            "java:S117", // Local variable and method parameter names should comply with a naming convention
-            "unchecked"
-    })
-    protected final SELF id__(final ID id__) {
-        setId__(id__);
-        return (SELF) this;
-    }
 }

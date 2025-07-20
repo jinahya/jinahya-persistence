@@ -26,7 +26,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class __ConcreteMappedEntityWithGeneratedIdentityTest {
 
@@ -60,13 +59,5 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
     void getId____() {
         final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
         final var id__ = instance.getId__();
-    }
-
-    @Test
-    void id____() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
-        assertThatThrownBy(() -> {
-            final var result = instance.id__(0L);
-        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }

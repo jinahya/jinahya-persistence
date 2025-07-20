@@ -20,30 +20,19 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityTest;
-import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
-import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.Test;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
+import jakarta.persistence.EntityManager;
 
-class UserTest extends __MappedEntityTest<User, String> {
+class UserWithStringIdPersister extends __MappedEntityPersister<UserWithStringId, String> {
 
-    UserTest() {
-        super(User.class, String.class);
+    UserWithStringIdPersister() {
+        super(UserWithStringId.class, String.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void equals_verify() {
-        super.equals_verify();
-    }
 
-    @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
-        return super.getEqualsVerifier()
-                .suppress(Warning.SURROGATE_KEY)
-                ;
+    public void persist(final EntityManager entityManager, final UserWithStringId entityInstance) {
+        super.persist(entityManager, entityInstance);
     }
 }

@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdentityRandomizer<
-        ENTITY extends __MappedEntityWithGeneratedIdentity<ENTITY>
+        ENTITY extends __MappedEntityWithGeneratedIdentity
         >
         extends __MappedEntityRandomizer<ENTITY, Long> {
 

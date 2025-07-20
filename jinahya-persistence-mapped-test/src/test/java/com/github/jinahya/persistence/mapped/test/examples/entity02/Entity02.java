@@ -32,7 +32,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = Entity02.TABLE_NAME)
-public class Entity02 extends __MappedEntity<Entity02, Long> {
+public class Entity02 extends __MappedEntity<Long> {
 
     public static final String TABLE_NAME = "entity02";
 

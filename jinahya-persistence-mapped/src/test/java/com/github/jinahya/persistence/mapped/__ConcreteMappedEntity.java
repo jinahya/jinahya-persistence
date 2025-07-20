@@ -32,7 +32,7 @@ import jakarta.persistence.Id;
 @SuppressWarnings({
         "java:S116" // Field names should comply with a naming convention
 })
-class __ConcreteMappedEntity extends __MappedEntity<__ConcreteMappedEntity, Long> {
+class __ConcreteMappedEntity extends __MappedEntity<Long> {
 
     protected __ConcreteMappedEntity() {
         super();

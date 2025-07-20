@@ -38,7 +38,7 @@ public final class __MappedEntityWithGeneratedIdentityInstantiatorUtils {
      * @return an optional of the initialized entity; {@link Optional#empty() empty} when no initializer found.
      */
     @Nonnull
-    public static <ENTITY extends __MappedEntityWithGeneratedIdentity<ENTITY>>
+    public static <ENTITY extends __MappedEntityWithGeneratedIdentity>
     Optional<ENTITY> newInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
         return __MappedEntityWithGeneratedIdInstantiatorUtils.newInstanceOf(entityClass);
     }

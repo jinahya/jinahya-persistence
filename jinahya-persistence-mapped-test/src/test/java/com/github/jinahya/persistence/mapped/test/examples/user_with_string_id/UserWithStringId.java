@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id;
+package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
 
 /*-
  * #%L
@@ -25,19 +25,20 @@ import jakarta.persistence.Table;
 import lombok.ToString;
 
 @Entity
-@Table(name = _MappedUser.TABLE_NAME)
+@Table(name = _MappedUserWithStringId.TABLE_NAME)
 @ToString(callSuper = true)
-class User extends _MappedUser<User, UserId> {
+class UserWithStringId extends _MappedUserWithStringId {
 
-    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected User() {
+    // -----------------------------------------------------------------------------------------------------------------
+    protected UserWithStringId() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
+
     @Override
     public final boolean equals(final Object obj) {
-        if (false && !(obj instanceof User)) {
+        if (false && !(obj instanceof UserWithStringId)) {
             return false;
         }
         return super.equals(obj);

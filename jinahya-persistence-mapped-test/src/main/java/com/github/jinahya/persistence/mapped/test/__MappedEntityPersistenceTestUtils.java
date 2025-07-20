@@ -24,6 +24,8 @@ import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.metamodel.Metamodel;
 
 import java.beans.BeanInfo;
 import java.beans.FeatureDescriptor;
@@ -77,14 +79,40 @@ public class __MappedEntityPersistenceTestUtils {
         return Optional.empty();
     }
 
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>>
-    void acceptEachAttributeColumName(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                      @Nonnull final Class<ENTITY> entityClass,
-                                      @Nonnull final Consumer<? super String> consumer) {
+    static void acceptEachAttributeColumName2(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                              @Nonnull final Class<?> clazz,
+                                              @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
-        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(clazz, "clazz is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        final var entityType = entityManagerFactory.getMetamodel().entity(entityClass);
+        final var entityType = entityManagerFactory.getMetamodel().entity(clazz);
+        final BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(clazz);
+        } catch (final IntrospectionException ie) {
+            throw new RuntimeException("failed to introspect " + clazz, ie);
+        }
+        final var propertyDescriptors = Arrays.stream(beanInfo.getPropertyDescriptors())
+                .collect(Collectors.toMap(FeatureDescriptor::getName, Function.identity()));
+        ___JakartaPersistenceTestUtils.acceptEachAttributeName(
+                entityType,
+                an -> {
+                    final var propertyDescriptor = propertyDescriptors.get(an);
+                    if (propertyDescriptor != null) {
+                        getAttributeColumnName(clazz, propertyDescriptor).ifPresent(consumer);
+                    }
+                }
+        );
+    }
+
+    private static void acceptEachAttributeColumName2(@Nonnull final Metamodel metamodel,
+                                                      @Nonnull final Class<?> entityClass,
+                                                      @Nonnull final ManagedType<?> managedType,
+                                                      @Nonnull final Consumer<? super String> consumer) {
+        Objects.requireNonNull(metamodel, "metamodel is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(managedType, "managedType is null");
+        Objects.requireNonNull(consumer, "consumer is null");
         final BeanInfo beanInfo;
         try {
             beanInfo = Introspector.getBeanInfo(entityClass);
@@ -93,15 +121,57 @@ public class __MappedEntityPersistenceTestUtils {
         }
         final var propertyDescriptors = Arrays.stream(beanInfo.getPropertyDescriptors())
                 .collect(Collectors.toMap(FeatureDescriptor::getName, Function.identity()));
-        ___JakartaPersistenceTestUtils.acceptEachAttributeName(entityType, an -> {
-            final var propertyDescriptor = propertyDescriptors.get(an);
-            if (propertyDescriptor != null) {
-                getAttributeColumnName(entityClass, propertyDescriptor).ifPresent(consumer);
-            }
-        });
+        ___JakartaPersistenceTestUtils.acceptEachAttributeName(
+                managedType,
+                an -> {
+                    final var propertyDescriptor = propertyDescriptors.get(an);
+                    if (propertyDescriptor != null) {
+                        getAttributeColumnName(entityClass, propertyDescriptor).ifPresent(consumer);
+                        // Embeddable
+                        final var type = propertyDescriptor.getPropertyType();
+                        try {
+                            final var managedType2 = metamodel.managedType(type);
+                            acceptEachAttributeColumName2(metamodel, type, managedType2, consumer);
+                        } catch (final IllegalArgumentException iae) {
+                            // ignore
+                        }
+                    }
+                }
+        );
     }
 
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>, C extends Collection<? super String>>
+    public static <ENTITY extends __MappedEntity<?>>
+    void acceptEachAttributeColumName(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                      @Nonnull final Class<ENTITY> entityClass,
+                                      @Nonnull final Consumer<? super String> consumer) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        final var metamodel = entityManagerFactory.getMetamodel();
+        final var entityType = metamodel.entity(entityClass); // IllegalArgumentException
+        if (true) {
+            acceptEachAttributeColumName2(metamodel, entityClass, entityType, consumer);
+        }
+        final BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(entityClass);
+        } catch (final IntrospectionException ie) {
+            throw new RuntimeException("failed to introspect " + entityClass, ie);
+        }
+        final var propertyDescriptors = Arrays.stream(beanInfo.getPropertyDescriptors())
+                .collect(Collectors.toMap(FeatureDescriptor::getName, Function.identity()));
+        ___JakartaPersistenceTestUtils.acceptEachAttributeName(
+                entityType,
+                an -> {
+                    final var propertyDescriptor = propertyDescriptors.get(an);
+                    if (propertyDescriptor != null) {
+                        getAttributeColumnName(entityClass, propertyDescriptor).ifPresent(consumer);
+                    }
+                }
+        );
+    }
+
+    public static <ENTITY extends __MappedEntity<?>, C extends Collection<? super String>>
     C addAllAttributeColumNames(@Nonnull final EntityManagerFactory entityManagerFactory,
                                 @Nonnull final Class<ENTITY> entityClass,
                                 @Nonnull final C collection) {
@@ -117,7 +187,7 @@ public class __MappedEntityPersistenceTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>>
+    public static <ENTITY extends __MappedEntity<?>>
     void acceptEachAttributeName(@Nonnull final EntityManagerFactory entityManagerFactory,
                                  @Nonnull final Class<ENTITY> entityClass,
                                  @Nonnull final Consumer<? super String> consumer) {
@@ -132,7 +202,7 @@ public class __MappedEntityPersistenceTestUtils {
                 .forEach(consumer);
     }
 
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>, C extends Collection<? super String>>
+    public static <ENTITY extends __MappedEntity<?>, C extends Collection<? super String>>
     C addAllAttributeNames(@Nonnull final EntityManagerFactory entityManagerFactory,
                            @Nonnull final Class<ENTITY> entityClass, @Nonnull final C collection) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");

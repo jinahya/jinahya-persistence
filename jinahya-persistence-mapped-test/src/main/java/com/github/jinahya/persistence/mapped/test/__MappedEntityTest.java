@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID> {
+public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

@@ -25,10 +25,7 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class __ConcreteMappedEntityWithGeneratedUuidTest {
 
@@ -61,13 +58,5 @@ class __ConcreteMappedEntityWithGeneratedUuidTest {
     void getId____() {
         final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
         final var id__ = instance.getId__();
-    }
-
-    @Test
-    void id____() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
-        assertThatThrownBy(() -> {
-            final var result = instance.id__(UUID.randomUUID());
-        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }

@@ -39,7 +39,7 @@ import java.util.function.Function;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
         extends ___MappedEntityTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------

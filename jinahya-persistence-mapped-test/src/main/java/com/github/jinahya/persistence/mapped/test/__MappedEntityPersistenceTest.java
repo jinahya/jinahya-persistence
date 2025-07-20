@@ -37,7 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
         extends ___MappedEntityPersistenceTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------

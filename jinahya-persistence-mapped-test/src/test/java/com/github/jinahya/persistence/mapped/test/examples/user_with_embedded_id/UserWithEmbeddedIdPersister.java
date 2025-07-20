@@ -3,15 +3,15 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
 import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
 import jakarta.persistence.EntityManager;
 
-class UserPersister extends __MappedEntityPersister<User, UserId> {
+class UserWithEmbeddedIdPersister extends __MappedEntityPersister<UserWithEmbeddedId, IdForUserWithEmbeddedId> {
 
-    UserPersister() {
-        super(User.class, UserId.class);
+    UserWithEmbeddedIdPersister() {
+        super(UserWithEmbeddedId.class, IdForUserWithEmbeddedId.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public void persist(final EntityManager entityManager, final User entityInstance) {
+    public void persist(final EntityManager entityManager, final UserWithEmbeddedId entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }

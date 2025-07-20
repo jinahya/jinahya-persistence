@@ -36,7 +36,7 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityInstantiator<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityInstantiator<ENTITY extends __MappedEntity<ID>, ID>
         extends ___Instantiator<ENTITY> {
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -31,8 +31,7 @@ import jakarta.validation.constraints.NotNull;
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class _MappedUser<SELF extends _MappedUser<SELF>>
-        extends __MappedEntity<SELF, String> {
+abstract class _MappedUserWithStringId extends __MappedEntity<String> {
 
     static final String TABLE_NAME = "user_with_string_id";
 
@@ -40,7 +39,7 @@ abstract class _MappedUser<SELF extends _MappedUser<SELF>>
     static final String COLUMN_NAME_NAME = "name";
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    _MappedUser() {
+    _MappedUserWithStringId() {
         super();
     }
 
@@ -54,7 +53,7 @@ abstract class _MappedUser<SELF extends _MappedUser<SELF>>
 
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof _MappedUser<?>)) {
+        if (!(obj instanceof _MappedUserWithStringId)) {
             return false;
         }
         return super.equals(obj);
@@ -86,18 +85,10 @@ abstract class _MappedUser<SELF extends _MappedUser<SELF>>
         setId__(name);
     }
 
-    @SuppressWarnings({
-            "unchecked"
-    })
-    public SELF name(@Nonnull final String name) {
-        setName(name);
-        return (SELF) this;
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
     @NotNull
     @Id
-    @Column(name = _MappedUser.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
+    @Column(name = _MappedUserWithStringId.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
     private String name;
 }

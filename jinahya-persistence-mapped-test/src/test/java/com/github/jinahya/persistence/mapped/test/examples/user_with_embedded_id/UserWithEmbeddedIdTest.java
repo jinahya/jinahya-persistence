@@ -6,10 +6,10 @@ import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.Test;
 
-class UserTest extends __MappedEntityTest<User, UserId> {
+class UserWithEmbeddedIdTest extends __MappedEntityTest<UserWithEmbeddedId, IdForUserWithEmbeddedId> {
 
-    UserTest() {
-        super(User.class, UserId.class);
+    UserWithEmbeddedIdTest() {
+        super(UserWithEmbeddedId.class, IdForUserWithEmbeddedId.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ class UserTest extends __MappedEntityTest<User, UserId> {
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<User> getEqualsVerifier() {
+    protected SingleTypeEqualsVerifierApi<UserWithEmbeddedId> getEqualsVerifier() {
         return super.getEqualsVerifier()
                 .suppress(Warning.SURROGATE_KEY)
                 ;

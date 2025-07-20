@@ -39,7 +39,7 @@ import java.util.Optional;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID> {
+abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -98,7 +98,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      * Returns a new spy object of a new randomized instance of {@link #entityClass}.
      *
      * @return a new spy object of a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty}
-     *         when no randomizer for the {@link #entityClass} found.
+     * when no randomizer for the {@link #entityClass} found.
      * @see #newRandomizedEntityInstance()
      */
     protected ENTITY newRandomizedEntityInstanceSpy() {

@@ -54,11 +54,4 @@ class __ConcreteMappedEntityTest {
         final var instance = new __ConcreteMappedEntity();
         final var id__ = instance.getId__();
     }
-
-    @Test
-    void id____() {
-        final var instance = new __ConcreteMappedEntity();
-        final var result = instance.id__(0L);
-        assertThat(result).isSameAs(instance);
-    }
 }

@@ -133,7 +133,10 @@ public final class ___JakartaPersistenceTestUtils {
                                                    @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(managedType, "managedType is null");
         Objects.requireNonNull(consumer, "consumer is null");
+        final var attributes = managedType.getAttributes();
+        final var declaredAttributes = managedType.getDeclaredAttributes();
         managedType.getAttributes()
+//        managedType.getDeclaredAttributes()
                 .stream()
                 .map(Attribute::getName)
                 .forEach(consumer);
@@ -151,7 +154,10 @@ public final class ___JakartaPersistenceTestUtils {
     public static <X, C extends Collection<? super String>>
     C addAllAttributeNames(@Nonnull final ManagedType<X> managedType, @Nonnull final C collection) {
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachAttributeName(managedType, collection::add);
+        acceptEachAttributeName(
+                managedType,
+                collection::add
+        );
         return collection;
     }
 

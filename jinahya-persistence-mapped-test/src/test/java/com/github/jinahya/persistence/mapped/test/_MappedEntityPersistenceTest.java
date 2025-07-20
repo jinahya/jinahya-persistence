@@ -27,7 +27,7 @@ import com.github.jinahya.persistence.mapped.__MappedEntity;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class _MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class _MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
         extends __MappedEntityPersistenceTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------

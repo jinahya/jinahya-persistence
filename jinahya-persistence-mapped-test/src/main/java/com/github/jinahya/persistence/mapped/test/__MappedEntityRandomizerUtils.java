@@ -47,7 +47,7 @@ public final class __MappedEntityRandomizerUtils {
     @SuppressWarnings({
             "java:S119" // Type parameter names should comply with a naming convention
     })
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>>
+    public static <ENTITY extends __MappedEntity<?>>
     ENTITY newRandomizedInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(entityClass);

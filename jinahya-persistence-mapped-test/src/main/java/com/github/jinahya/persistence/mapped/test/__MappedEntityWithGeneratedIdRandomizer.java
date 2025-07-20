@@ -36,7 +36,7 @@ import uk.co.jemos.podam.api.PodamFactory;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdRandomizer<
-        ENTITY extends __MappedEntityWithGeneratedId<ENTITY, ID>,
+        ENTITY extends __MappedEntityWithGeneratedId<ID>,
         ID
         >
         extends __MappedEntityRandomizer<ENTITY, ID> {

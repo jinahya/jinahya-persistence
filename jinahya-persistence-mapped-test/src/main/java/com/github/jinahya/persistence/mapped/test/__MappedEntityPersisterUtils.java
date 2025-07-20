@@ -29,7 +29,7 @@ import jakarta.persistence.EntityManager;
 })
 public final class __MappedEntityPersisterUtils {
 
-    public static <ENTITY extends __MappedEntity<ENTITY, ?>>
+    public static <ENTITY extends __MappedEntity<?>>
     ENTITY newPersistedInstanceOf(final EntityManager entityManager, final Class<ENTITY> entityClass) {
         return ___PersisterUtils.newPersistedInstanceOf(entityManager, entityClass);
     }

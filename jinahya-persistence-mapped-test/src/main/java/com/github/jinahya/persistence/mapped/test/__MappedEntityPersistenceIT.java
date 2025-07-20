@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assumptions.assumeThat;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ID>, ID>
         extends ___MappedEntityPersistenceTest<ENTITY, ID> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
