@@ -89,18 +89,15 @@ abstract class _MappedIdForUser implements Serializable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
     @Nonnull
     @NotNull
     @Basic(optional = false)
-    @Column(name = _MappedUser.COLUMN_NAME_NAME, nullable = false, insertable = true,
-            updatable = false)
+    @Column(name = _MappedUser.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
     private String name;
 
     @Nonnull
     @NotNull
     @Basic(optional = false)
-    @Column(name = _MappedUser.COLUMN_NAME_AGE, nullable = false, insertable = true,
-            updatable = false)
+    @Column(name = _MappedUser.COLUMN_NAME_AGE, nullable = false, insertable = true, updatable = false)
     private Integer age;
 }

@@ -21,10 +21,14 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 @MappedSuperclass
 @SuppressWarnings({
@@ -52,7 +56,7 @@ abstract class _MappedUser<
     @Override
     public String toString() {
         return super.toString() + '{' +
-               "id__=" + id__ +
+               "id__=" + id +
                '}';
     }
 
@@ -70,19 +74,43 @@ abstract class _MappedUser<
     }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
-    @Override
     protected ID getId__() {
-        return id__;
+        return getId();
     }
 
-    @Override
     protected void setId__(final ID id__) {
-        this.id__ = id__;
+        setId(id__);
+    }
+
+    // -------------------------------------------------------------------------------------------------------------- id
+    public ID getId() {
+        return id;
+    }
+
+    public void setId(final ID id) {
+        this.id = id;
+    }
+
+    public final SELF id(final ID id) {
+        setId(id);
+        return (SELF) this;
+    }
+
+    public final ID getIdOrElseSetAndGet(@Nonnull final Supplier<? extends ID> supplier) {
+        return Optional.ofNullable(getId())
+                .orElseGet(
+                        () -> id(
+                                Objects.requireNonNull(
+                                        Objects.requireNonNull(supplier, "supplier is null").get(),
+                                        "null returned from " + supplier
+                                )
+                        ).getId()
+                );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @EmbeddedId
-    @Valid
+//    @Valid
     @NotNull
-    private ID id__;
+    private ID id;
 }

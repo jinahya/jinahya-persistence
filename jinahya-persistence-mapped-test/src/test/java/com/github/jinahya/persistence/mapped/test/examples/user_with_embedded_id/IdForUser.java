@@ -20,10 +20,12 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
  * #L%
  */
 
+import jakarta.persistence.Embeddable;
 import lombok.ToString;
 
 import java.io.Serial;
 
+@Embeddable
 @ToString(callSuper = true)
 class IdForUser extends _MappedIdForUser {
 
