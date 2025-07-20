@@ -31,7 +31,7 @@
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
-    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUser</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.UserId</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.User</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.User</class>
     <shared-cache-mode>NONE</shared-cache-mode>
@@ -71,7 +71,7 @@
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
-    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUser</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.UserId</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.User</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.User</class>
     <shared-cache-mode>NONE</shared-cache-mode>

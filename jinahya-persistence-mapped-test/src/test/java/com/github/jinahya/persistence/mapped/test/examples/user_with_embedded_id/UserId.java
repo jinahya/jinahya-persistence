@@ -27,13 +27,13 @@ import java.io.Serial;
 
 @Embeddable
 @ToString(callSuper = true)
-class IdForUser extends _MappedIdForUser {
+class UserId extends _MappedUserId {
 
     @Serial
     private static final long serialVersionUID = 7137484531059857534L;
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected IdForUser() {
+    protected UserId() {
         super();
     }
 

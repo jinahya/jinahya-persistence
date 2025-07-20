@@ -3,10 +3,10 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
 import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
 import jakarta.persistence.EntityManager;
 
-class UserPersister extends __MappedEntityPersister<User, IdForUser> {
+class UserPersister extends __MappedEntityPersister<User, UserId> {
 
     UserPersister() {
-        super(User.class, IdForUser.class);
+        super(User.class, UserId.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

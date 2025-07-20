@@ -27,7 +27,7 @@ import lombok.ToString;
 @Entity
 @Table(name = _MappedUser.TABLE_NAME)
 @ToString(callSuper = true)
-class User extends _MappedUser<User, IdForUser> {
+class User extends _MappedUser<User, UserId> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected User() {

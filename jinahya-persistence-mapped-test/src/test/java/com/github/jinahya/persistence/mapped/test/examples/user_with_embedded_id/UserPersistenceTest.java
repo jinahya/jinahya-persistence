@@ -2,9 +2,9 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityPersistenceTest;
 
-class UserPersistenceTest extends __MappedEntityPersistenceTest<User, IdForUser> {
+class UserPersistenceTest extends __MappedEntityPersistenceTest<User, UserId> {
 
     UserPersistenceTest() {
-        super(User.class, IdForUser.class);
+        super(User.class, UserId.class);
     }
 }

@@ -23,25 +23,26 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
-@MappedSuperclass
+//@MappedSuperclass
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
 //abstract class _MappedIdForUser<SELF extends _MappedIdForUser<SELF>> implements Serializable {
-abstract class _MappedIdForUser implements Serializable {
+abstract class _MappedUserId implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -5865164757838263094L;
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    _MappedIdForUser() {
+    _MappedUserId() {
         super();
     }
 
@@ -57,7 +58,7 @@ abstract class _MappedIdForUser implements Serializable {
 
     @Override
     public final boolean equals(final Object obj) {
-        if (!(obj instanceof _MappedIdForUser that)) {
+        if (!(obj instanceof _MappedUserId that)) {
             return false;
         }
         return Objects.equals(name, that.name) &&
@@ -90,12 +91,13 @@ abstract class _MappedIdForUser implements Serializable {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
-    @NotNull
+    @NotBlank
     @Basic(optional = false)
     @Column(name = _MappedUser.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
     private String name;
 
     @Nonnull
+    @PositiveOrZero
     @NotNull
     @Basic(optional = false)
     @Column(name = _MappedUser.COLUMN_NAME_AGE, nullable = false, insertable = true, updatable = false)

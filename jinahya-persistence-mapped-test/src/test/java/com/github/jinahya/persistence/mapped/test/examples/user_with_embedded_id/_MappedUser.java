@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 })
 abstract class _MappedUser<
         SELF extends _MappedUser<SELF, ID>,
-        ID extends _MappedIdForUser
+        ID extends _MappedUserId
         >
         extends __MappedEntity<SELF, ID> {
 
