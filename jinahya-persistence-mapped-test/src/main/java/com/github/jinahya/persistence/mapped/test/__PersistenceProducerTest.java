@@ -20,8 +20,12 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Startup;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.Test;
@@ -34,16 +38,27 @@ import java.sql.SQLException;
 })
 @ExtendWith(WeldJunit5AutoExtension.class)
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "java:S100", // Method names should comply with a naming convention
+        "java:S101", // Class names should comply with a naming convention
+        "java:S6813" // Field dependency injection should be avoided
 })
 public class __PersistenceProducerTest {
 
+    // -----------------------------------------------------------------------------------------------------------------
+    @PostConstruct
+    protected void doOnPostConstruct() {
+        catalog = __PersistenceProducerUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
+        schema = __PersistenceProducerUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
+    }
+
+    // https://stackoverflow.com/a/72628439/330457
+    private void onStartup(@Observes final Startup startup) {
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Test
-    @SuppressWarnings({
-            "java:S100" // Method names should comply with a naming convention
-    })
     public void printDatabaseInfo__() {
-        ___JakartaPersistenceTestUtils.applyConnection(
+        ___JakartaPersistenceTestUtils.acceptConnection(
                 entityManager,
                 c -> {
                     try {
@@ -51,7 +66,6 @@ public class __PersistenceProducerTest {
                     } catch (final SQLException sqle) {
                         throw new RuntimeException("failed to print database info", sqle);
                     }
-                    return null;
                 }
         );
     }
@@ -59,8 +73,13 @@ public class __PersistenceProducerTest {
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.Unit__
     @Inject
-    @SuppressWarnings({
-            "java:S6813" // Field dependency injection should be avoided
-    })
+    private EntityManagerFactory entityManagerFactory;
+
+    @__PersistenceProducer.Unit__
+    @Inject
     private EntityManager entityManager;
+
+    private String catalog;
+
+    private String schema;
 }

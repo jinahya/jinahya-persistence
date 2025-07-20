@@ -31,6 +31,7 @@ import java.util.UUID;
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
+        "java:S116", // Field names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntityWithGeneratedUuid<SELF>>

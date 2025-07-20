@@ -29,6 +29,7 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
+        "java:S116", // Field names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedEntityWithGeneratedIdentity<SELF>>
@@ -46,10 +47,9 @@ public abstract class __MappedEntityWithGeneratedIdentity<SELF extends __MappedE
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-
     @Override
     public final boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedEntityWithGeneratedIdentity<?> that)) {
+        if (!(obj instanceof __MappedEntityWithGeneratedIdentity<?>)) {
             return false;
         }
         return super.equals(obj);

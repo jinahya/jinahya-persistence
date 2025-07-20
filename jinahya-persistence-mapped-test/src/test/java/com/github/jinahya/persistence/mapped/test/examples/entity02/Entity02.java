@@ -62,12 +62,12 @@ public class Entity02 extends __MappedEntity<Entity02, Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    protected final Long getId__() {
+    protected Long getId__() {
         return getId();
     }
 
     @Override
-    protected final void setId__(final Long id__) {
+    protected void setId__(final Long id__) {
         setId(id__);
     }
 

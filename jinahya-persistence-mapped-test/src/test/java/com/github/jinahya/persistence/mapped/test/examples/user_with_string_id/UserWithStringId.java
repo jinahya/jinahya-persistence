@@ -33,4 +33,19 @@ class UserWithStringId extends _MappedUserWithStringId<UserWithStringId> {
     protected UserWithStringId() {
         super();
     }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (false && !(obj instanceof UserWithStringId)) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
 }

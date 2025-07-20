@@ -53,23 +53,26 @@ abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof _MappedUserWithStringId<?>)) {
+            return false;
+        }
         return super.equals(obj);
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return super.hashCode();
     }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
-    protected final String getId__() {
+    protected String getId__() {
         return name;
     }
 
     @Override
-    protected final void setId__(final String id__) {
+    protected void setId__(final String id__) {
         this.name = id__;
     }
 

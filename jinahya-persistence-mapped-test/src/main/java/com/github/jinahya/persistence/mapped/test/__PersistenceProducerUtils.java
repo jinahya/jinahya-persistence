@@ -47,6 +47,15 @@ final class __PersistenceProducerUtils {
         );
     }
 
+    static Optional<String[]> getDefaultTypes(final EntityManagerFactory entityManagerFactory) {
+        return Optional.ofNullable(
+                        (String) entityManagerFactory.getProperties().get(
+                                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
+                        )
+                )
+                .map(v -> v.split(","));
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     private __PersistenceProducerUtils() {
         throw new AssertionError("instantiation is not allowed");

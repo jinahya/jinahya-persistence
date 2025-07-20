@@ -42,6 +42,7 @@ public final class ___JavaSqlTestUtils {
 
     public static void acceptEachTableName(@Nonnull final Connection connection,
                                            @Nonnull final String catalog, @Nonnull final String schema,
+                                           @Nullable final String[] types,
                                            @Nonnull final Consumer<? super String> consumer)
             throws SQLException {
         Objects.requireNonNull(connection, "connection is null");
@@ -49,7 +50,6 @@ public final class ___JavaSqlTestUtils {
         Objects.requireNonNull(schema, "schema is null");
         Objects.requireNonNull(consumer, "consumer is null");
         final String tableNamePattern = null;
-        final String[] types = null;
         try (var resultSet = connection.getMetaData().getTables(
                 catalog,
                 schema,
@@ -63,16 +63,14 @@ public final class ___JavaSqlTestUtils {
         }
     }
 
-    public static <T extends Collection<? super String>> T addAllTableNames(@Nonnull final Connection connection,
+    public static <C extends Collection<? super String>> C addAllTableNames(@Nonnull final Connection connection,
                                                                             @Nonnull final String catalog,
                                                                             @Nonnull final String schema,
-                                                                            @Nonnull final T collection)
+                                                                            @Nullable final String[] types,
+                                                                            @Nonnull final C collection)
             throws SQLException {
-        Objects.requireNonNull(connection, "connection is null");
-        Objects.requireNonNull(catalog, "catalog is null");
-        Objects.requireNonNull(schema, "schema is null");
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachTableName(connection, catalog, schema, collection::add);
+        acceptEachTableName(connection, catalog, schema, types, collection::add);
         return collection;
     }
 

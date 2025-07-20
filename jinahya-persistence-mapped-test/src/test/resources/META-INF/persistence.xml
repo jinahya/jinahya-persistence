@@ -26,7 +26,7 @@
              version="3.2">
   <persistence-unit name="unitPU">
     <description>Persistence Unit for an In-Memory DB</description>
-<!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+    <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
@@ -59,11 +59,12 @@
       <!-- jinahya.persistence -->
       <property name="jinahya.persistence.default_catalog" value="UNNAMED"/>
       <property name="jinahya.persistence.default_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.default_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="integrationPU">
     <description>Persistence Unit for a Physical Database</description>
-<!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+    <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
@@ -96,6 +97,7 @@
       <!-- jinahya.persistence -->
       <property name="jinahya.persistence.default_catalog" value="UNNAMED"/>
       <property name="jinahya.persistence.default_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.default_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
 </persistence>

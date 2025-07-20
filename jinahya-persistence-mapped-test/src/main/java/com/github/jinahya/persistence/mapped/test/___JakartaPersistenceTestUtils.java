@@ -24,11 +24,15 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 import jakarta.validation.constraints.PositiveOrZero;
 
+import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -48,6 +52,70 @@ import java.util.function.LongFunction;
 public final class ___JakartaPersistenceTestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // ----------------------------------------------------------------------------------------------------------- types
+    public static void acceptEachEntityType(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                            @Nonnull final Consumer<? super EntityType<?>> consumer) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        entityManagerFactory.getMetamodel().getEntities().forEach(consumer);
+    }
+
+    public static <C extends Collection<? super EntityType<?>>>
+    C addAllEntityTypes(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachEntityType(
+                entityManagerFactory,
+                collection::add
+        );
+        return collection;
+    }
+
+    public static void acceptEachEntityJavaType(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                                @Nonnull final Consumer<? super Class<?>> consumer) {
+        Objects.requireNonNull(consumer, "consumer is null");
+        acceptEachEntityType(
+                entityManagerFactory,
+                et -> consumer.accept(et.getJavaType())
+        );
+    }
+
+    public static <C extends Collection<? super Class<?>>>
+    C addAllEntityJavaTypes(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachEntityJavaType(
+                entityManagerFactory,
+                collection::add
+        );
+        return collection;
+    }
+
+    public static void acceptEachEntityTableName(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                                 @Nonnull final Consumer<? super String> consumer) {
+        Objects.requireNonNull(consumer, "consumer is null");
+        acceptEachEntityJavaType(
+                entityManagerFactory,
+                jt -> {
+                    final var tableName = ___JavaLangReflectTestUtils.findAnnotation(jt, Table.class)
+                            .map(Table::name)
+                            .map(String::strip)
+                            .filter(v -> !v.isBlank())
+                            .orElse(null);
+                    if (tableName == null) {
+                        logger.log(Level.DEBUG, "no table name found for {0}", jt);
+                        return;
+                    }
+                    consumer.accept(tableName);
+                }
+        );
+    }
+
+    public static <C extends Collection<? super String>>
+    C addAllEntityTableNames(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachEntityTableName(entityManagerFactory, collection::add);
+        return collection;
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -251,13 +319,13 @@ public final class ___JakartaPersistenceTestUtils {
             @Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
-        logger.log(System.Logger.Level.DEBUG, "count of {0}: {1}", entityClass, count);
+        logger.log(Level.DEBUG, "count of {0}: {1}", entityClass, count);
         if (count == 0L) {
             return null;
         }
         assert count > 0L;
         final var index = ThreadLocalRandom.current().nextLong(count);
-        logger.log(System.Logger.Level.DEBUG, "random index: {0}", index);
+        logger.log(Level.DEBUG, "random index: {0}", index);
         return function.apply(count).apply(index);
     }
 

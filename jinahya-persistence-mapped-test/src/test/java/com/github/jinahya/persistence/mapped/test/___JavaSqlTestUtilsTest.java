@@ -72,6 +72,7 @@ class ___JavaSqlTestUtilsTest {
                     connection,
                     catalog,
                     schema,
+                    null,
                     consumer
             );
             // ---------------------------------------------------------------------------------------------------- then
@@ -107,6 +108,7 @@ class ___JavaSqlTestUtilsTest {
                     connection,
                     catalog,
                     schema,
+                    null,
                     new ArrayList<>()
             );
             // ---------------------------------------------------------------------------------------------------- then

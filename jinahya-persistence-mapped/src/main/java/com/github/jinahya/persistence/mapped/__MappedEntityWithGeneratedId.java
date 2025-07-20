@@ -34,7 +34,10 @@ import jakarta.persistence.Transient;
  */
 @MappedSuperclass
 @SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
+        "java:S115", // Constant names should comply with a naming convention
+        "java:s117", // Local variable and method parameter names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedId<SELF extends __MappedEntityWithGeneratedId<SELF, ID>, ID>

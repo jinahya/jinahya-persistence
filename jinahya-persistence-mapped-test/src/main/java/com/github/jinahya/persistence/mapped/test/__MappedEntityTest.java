@@ -131,7 +131,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      */
     @Nonnull
     protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
-        return EqualsVerifier.forClass(entityClass);
+        return EqualsVerifier.forClass(entityClass)
+//                .withRedefinedSuperclass()
+                ;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
