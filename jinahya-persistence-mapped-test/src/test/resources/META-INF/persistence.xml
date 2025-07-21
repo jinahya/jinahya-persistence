@@ -52,7 +52,7 @@
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
-<!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
       <property name="hibernate.format_sql" value="true"/>
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.highlight_sql" value="true"/>
@@ -92,7 +92,7 @@
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
-<!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
       <property name="hibernate.format_sql" value="true"/>
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.highlight_sql" value="true"/>

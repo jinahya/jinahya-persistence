@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  */
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 class UserWithStringIdPersister extends __MappedEntityPersister<UserWithStringId, String> {
@@ -32,7 +33,7 @@ class UserWithStringIdPersister extends __MappedEntityPersister<UserWithStringId
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override
-    public void persist(final EntityManager entityManager, final UserWithStringId entityInstance) {
+    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final UserWithStringId entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }

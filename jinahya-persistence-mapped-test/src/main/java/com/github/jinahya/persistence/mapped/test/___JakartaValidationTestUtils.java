@@ -31,21 +31,60 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * Utilities for the Jakarta Validation.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see <a href="https://beanvalidation.org/">Jakarta Validation</a>
+ */
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 public final class ___JakartaValidationTestUtils {
 
+    private static <T> T requireNonNullObject(final T object) {
+        return Objects.requireNonNull(object, "object is null");
+    }
+
+    private static Class<?>[] requireNonNullGroups(final Class<?>... groups) {
+        return Objects.requireNonNull(groups, "groups is null");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Validates the specified object using the specified validator and groups.
+     *
+     * @param validator the validator.
+     * @param object    the object to validate.
+     * @param groups    the validation groups.
+     * @param <T>       object type parameter
+     * @return a set of constraint violations of the {@code object}; {@code empty} if the {@code object} is valid.
+     */
+    @Nonnull
     public static <T> Set<ConstraintViolation<T>> validate(@Nonnull final Validator validator, @Nonnull final T object,
                                                            @Nonnull final Class<?>... groups) {
         Objects.requireNonNull(validator, "validator is null");
-        Objects.requireNonNull(object, "object is null");
-        Objects.requireNonNull(groups, "groups is null");
-        return validator.validate(object, groups);
+//        Objects.requireNonNull(object, "object is null");
+//        Objects.requireNonNull(groups, "groups is null");
+        return validator.validate(
+                requireNonNullObject(object),
+                requireNonNullGroups(groups)
+        );
     }
 
+    /**
+     * Verifies that the specified object is valid using the specified validator and groups.
+     *
+     * @param validator the validator.
+     * @param object    the object to validate.
+     * @param groups    the validation groups.
+     * @param <T>       object type parameter
+     * @return given {@code object}.
+     * @throws ConstraintViolationException if the {@code object} is invalid.
+     */
     public static <T> T requireValid(@Nonnull final Validator validator, @Nonnull final T object,
                                      @Nonnull final Class<?>... groups) {
-        Objects.requireNonNull(validator, "validator is null");
-        Objects.requireNonNull(object, "object is null");
-        Objects.requireNonNull(groups, "groups is null");
         final var violations = validate(validator, object, groups);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -54,25 +93,67 @@ public final class ___JakartaValidationTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <R> R applyValidationFactory(final Function<? super ValidatorFactory, ? extends R> function) {
+
+    /**
+     * Applies the specified function to the default validator factory.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     */
+    public static <R> R applyValidationFactory(
+            @Nonnull final Function<? super ValidatorFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         try (var factory = Validation.buildDefaultValidatorFactory()) {
             return function.apply(factory);
         }
     }
 
-    public static <R> R applyValidator(final Function<? super Validator, ? extends R> function) {
+    /**
+     * Applies the specified function to the default validator.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     */
+    public static <R> R applyValidator(@Nonnull final Function<? super Validator, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyValidationFactory(f -> function.apply(f.getValidator()));
     }
 
+    /**
+     * Validates the specified object using the default validator and specified groups.
+     *
+     * @param object the object to validate.
+     * @param groups the validation groups.
+     * @param <T>    object type parameter
+     * @return a set of constraint violations of the {@code object}; {@code empty} if the {@code object} is valid.
+     * @see #validate(Validator, Object, Class...)
+     */
     public static <T> Set<ConstraintViolation<T>> validate(final T object, final Class<?>... groups) {
+//        Objects.requireNonNull(object, "object is null");
+//        Objects.requireNonNull(groups, "groups is null");
+        requireNonNullObject(object);
+        requireNonNullGroups(groups);
         return applyValidator(v -> validate(v, object, groups));
     }
 
-    public static <T> T requireValid(final T object, final Class<?>... groups) {
-        Objects.requireNonNull(object, "object is null");
-        Objects.requireNonNull(groups, "groups is null");
+    /**
+     * Verifies that the specified object is valid using the default validator and specified validation groups.
+     *
+     * @param object the object to validate.
+     * @param groups the validation groups.
+     * @param <T>    object type parameter
+     * @return given {@code object}.
+     * @throws ConstraintViolationException if the {@code object} is invalid.
+     * @see #requireValid(Validator, Object, Class...)
+     */
+    @Nonnull
+    public static <T> T requireValid(@Nonnull final T object, @Nonnull final Class<?>... groups) {
+//        Objects.requireNonNull(object, "object is null");
+//        Objects.requireNonNull(groups, "groups is null");
+        requireNonNullObject(object);
+        requireNonNullGroups(groups);
         return applyValidator(v -> requireValid(v, object, groups));
     }
 

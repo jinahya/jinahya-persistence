@@ -46,6 +46,11 @@ import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 
+/**
+ * Utilities for the Jakarta Persistence API.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })

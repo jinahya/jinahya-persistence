@@ -67,9 +67,9 @@ public abstract class ___Randomizer<T> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Creates a new strategy.
+     * Creates a new data provider strategy.
      *
-     * @return a new strategy.
+     * @return a new data provider strategy.
      * @see RandomDataProviderStrategyImpl#RandomDataProviderStrategyImpl()
      */
     @Nonnull
@@ -78,12 +78,14 @@ public abstract class ___Randomizer<T> {
     }
 
     /**
-     * Creates a new factory with a strategy from {@link #getDataProviderStrategy()}.
+     * Creates a new factory created with a data infor strategy from the
+     * {@link #getDataProviderStrategy() dataProviderStrategy} method, and set with a class info strategy from the
+     * {@link #getClassInfoStrategy() classInfoStrategy} method.
      *
      * @return a new factory.
      * @see PodamFactoryImpl#PodamFactoryImpl(DataProviderStrategy)
+     * @see #getClassInfoStrategy()
      * @see PodamFactory#setClassStrategy(ClassInfoStrategy)
-     * @see #getClassInfoStrategy() ;
      */
     @Nonnull
     protected PodamFactory getPodamFactory() {

@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 import java.util.Objects;
@@ -56,7 +57,7 @@ public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ID>,
     @SuppressWarnings({
             "java:S1185" // Overriding methods should do more than simply call the same method in the super class
     })
-    public void persist(final EntityManager entityManager, final ENTITY entityInstance) {
+    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final ENTITY entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 

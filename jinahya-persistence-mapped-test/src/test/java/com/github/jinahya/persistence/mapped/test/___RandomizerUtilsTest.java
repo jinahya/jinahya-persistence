@@ -79,7 +79,7 @@ class ___RandomizerUtilsTest {
         // -------------------------------------------------------------------------------------------------------- when
         final var instance = ___RandomizerUtils.newRandomizedInstanceOf(Pojo.class);
         // -------------------------------------------------------------------------------------------------------- then
-        assertThat(instance).satisfies(v -> {
+        assertThat(instance).hasValueSatisfying(v -> {
             assertThat(v.name).isNotBlank();
         });
     }

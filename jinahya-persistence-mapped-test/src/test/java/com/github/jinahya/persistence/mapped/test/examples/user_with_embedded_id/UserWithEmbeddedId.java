@@ -75,7 +75,8 @@ class UserWithEmbeddedId extends _MappedUserWithEmbeddedId<IdForUserWithEmbedded
         this.id = id;
     }
 
-    public IdForUserWithEmbeddedId getIdOrElseSetAndGet(@Nonnull final Supplier<? extends IdForUserWithEmbeddedId> supplier) {
+    public IdForUserWithEmbeddedId getIdOrElseSetAndGet(
+            @Nonnull final Supplier<? extends IdForUserWithEmbeddedId> supplier) {
         return Optional.ofNullable(getId())
                 .orElseGet(
                         () -> {

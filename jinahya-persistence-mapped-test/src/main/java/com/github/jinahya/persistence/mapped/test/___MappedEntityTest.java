@@ -90,7 +90,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
      * @see #newRandomizedEntityInstanceSpy()
      */
     @Nonnull
-    protected ENTITY newRandomizedEntityInstance() {
+    protected Optional<ENTITY> newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
@@ -98,11 +98,11 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
      * Returns a new spy object of a new randomized instance of {@link #entityClass}.
      *
      * @return a new spy object of a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty}
-     * when no randomizer for the {@link #entityClass} found.
+     *         when no randomizer for the {@link #entityClass} found.
      * @see #newRandomizedEntityInstance()
      */
-    protected ENTITY newRandomizedEntityInstanceSpy() {
-        return Mockito.spy(newRandomizedEntityInstance());
+    protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
+        return newRandomizedEntityInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -115,12 +115,12 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
         return Mockito.spy(newIdInstance());
     }
 
-    protected ID newRandomizedIdInstance() {
+    protected Optional<ID> newRandomizedIdInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
     }
 
-    protected ID newRandomizedIdInstanceSpy() {
-        return Mockito.spy(newRandomizedIdInstance());
+    protected Optional<ID> newRandomizedIdInstanceSpy() {
+        return newRandomizedIdInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

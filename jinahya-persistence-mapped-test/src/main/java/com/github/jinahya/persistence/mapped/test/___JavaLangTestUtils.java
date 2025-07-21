@@ -26,11 +26,24 @@ import jakarta.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 public final class ___JavaLangTestUtils {
 
+    /**
+     * Finds a sibling class of the specified type, which (optionally) extends the specified supertype and has any of
+     * the specified postfixes.
+     *
+     * @param type      the type.
+     * @param supertype the supertype; {@code null} to ignore.
+     * @param postfixes the postfix candidates.
+     * @return the sibling class meets given conditions; {@code null} when not found.
+     */
     @Nullable
-    public static Class<?> forAnyPostfixes(@Nonnull final Class<?> type, final Class<?> supertype,
-                                           @Nonnull final String... postfixes) {
+    public static Class<?> siblingClassForPostfix(@Nonnull final Class<?> type,
+                                                  @Nullable final Class<?> supertype,
+                                                  @Nonnull final String... postfixes) {
         Objects.requireNonNull(type, "type is null");
         if (Objects.requireNonNull(postfixes, "postfixes is null").length == 0) {
             throw new IllegalArgumentException("postfixes is empty");

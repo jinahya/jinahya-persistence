@@ -32,10 +32,10 @@ import java.util.Optional;
 })
 public final class ___PersisterUtils {
 
-    static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> entityClass) {
+    static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                ___JavaLangTestUtils.forAnyPostfixes(
-                        entityClass,
+                ___JavaLangTestUtils.siblingClassForPostfix(
+                        type,
                         __MappedEntityPersister.class,
                         "Persister",
                         "_Persister"
@@ -46,18 +46,18 @@ public final class ___PersisterUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    static <T> Optional<___Persister<T>> newPersisterInstanceOf(final Class<T> entityClass) {
-        return getPersisterClassOf(entityClass)
+    static <T> Optional<___Persister<T>> newPersisterInstanceOf(final Class<T> type) {
+        return getPersisterClassOf(type)
                 .map(___JavaLangReflectTestUtils::newInstanceOf)
                 .map(i -> (___Persister<T>) i);
     }
 
     @Nonnull
-    public static <T> T newPersistedInstanceOf(final EntityManager entityManager, final Class<T> entityClass) {
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
-        newPersisterInstanceOf(entityClass)
-                .orElseThrow(() -> new RuntimeException("empty persister instance of " + entityClass))
+    public static <T> T newPersistedInstanceOf(final EntityManager entityManager, final Class<T> type) {
+        Objects.requireNonNull(type, "type is null");
+        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(type).orElseThrow();
+        newPersisterInstanceOf(type)
+                .orElseThrow(() -> new RuntimeException("not persister instance for " + type))
                 .persist(entityManager, entityInstance);
         return entityInstance;
     }
