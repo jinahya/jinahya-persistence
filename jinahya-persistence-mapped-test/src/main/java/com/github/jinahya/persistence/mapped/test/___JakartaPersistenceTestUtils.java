@@ -267,7 +267,7 @@ final class ___JakartaPersistenceTestUtils {
             return function.apply(entityManager.unwrap(Connection.class));
         } catch (final Exception e1) {
             try {
-                return ___OrgHibernateOrmTestUtils.applyConnection(
+                return ___HibernateTestUtils.applyConnection(
                         entityManager,
                         function
                 );

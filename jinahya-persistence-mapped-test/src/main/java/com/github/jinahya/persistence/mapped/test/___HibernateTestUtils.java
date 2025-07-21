@@ -32,7 +32,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___OrgHibernateOrmTestUtils {
+final class ___HibernateTestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ final class ___OrgHibernateOrmTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___OrgHibernateOrmTestUtils() {
+    private ___HibernateTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
