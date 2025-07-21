@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public final class ___JavaSqlTestUtils {
+final class ___JavaSqlTestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -40,10 +40,10 @@ public final class ___JavaSqlTestUtils {
 
     static final String COLUMN_LABEL_COLUMN_NAME = "COLUMN_NAME";
 
-    public static void acceptEachTableName(@Nonnull final Connection connection,
-                                           @Nonnull final String catalog, @Nonnull final String schema,
-                                           @Nullable final String[] types,
-                                           @Nonnull final Consumer<? super String> consumer)
+    static void acceptEachTableName(@Nonnull final Connection connection,
+                                    @Nonnull final String catalog, @Nonnull final String schema,
+                                    @Nullable final String[] types,
+                                    @Nonnull final Consumer<? super String> consumer)
             throws SQLException {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(catalog, "catalog is null");
@@ -63,21 +63,21 @@ public final class ___JavaSqlTestUtils {
         }
     }
 
-    public static <C extends Collection<? super String>> C addAllTableNames(@Nonnull final Connection connection,
-                                                                            @Nonnull final String catalog,
-                                                                            @Nonnull final String schema,
-                                                                            @Nullable final String[] types,
-                                                                            @Nonnull final C collection)
+    static <C extends Collection<? super String>> C addAllTableNames(@Nonnull final Connection connection,
+                                                                     @Nonnull final String catalog,
+                                                                     @Nonnull final String schema,
+                                                                     @Nullable final String[] types,
+                                                                     @Nonnull final C collection)
             throws SQLException {
         Objects.requireNonNull(collection, "collection is null");
         acceptEachTableName(connection, catalog, schema, types, collection::add);
         return collection;
     }
 
-    public static void acceptEachColumnName(@Nonnull final Connection connection,
-                                            @Nullable final String catalog, @Nullable final String schemaPattern,
-                                            @Nonnull final String tableNamePattern,
-                                            @Nonnull final Consumer<? super String> consumer) {
+    static void acceptEachColumnName(@Nonnull final Connection connection,
+                                     @Nullable final String catalog, @Nullable final String schemaPattern,
+                                     @Nonnull final String tableNamePattern,
+                                     @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
         Objects.requireNonNull(consumer, "consumer is null");
@@ -103,7 +103,7 @@ public final class ___JavaSqlTestUtils {
         }
     }
 
-    public static <C extends Collection<? super String>>
+    static <C extends Collection<? super String>>
     C addAllColumnNames(@Nonnull final Connection connection, @Nullable final String catalog,
                         @Nullable final String schemaPattern, @Nonnull final String tableNamePattern,
                         @Nonnull final C collection) {
@@ -120,7 +120,7 @@ public final class ___JavaSqlTestUtils {
         return collection;
     }
 
-    public static void printDatabaseInfo(final Connection connection) throws SQLException {
+    static void printDatabaseInfo(final Connection connection) throws SQLException {
         final var databaseMetaData = connection.getMetaData();
         final var databaseProductName = databaseMetaData.getDatabaseProductName();
         final var databaseProductVersion = databaseMetaData.getDatabaseProductVersion();

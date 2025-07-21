@@ -26,10 +26,15 @@ import jakarta.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Test utilities for the {@link java.lang} package.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class ___JavaLangTestUtils {
+final class ___JavaLangTestUtils {
 
     /**
      * Finds a sibling class of the specified type, which (optionally) extends the specified supertype and has any of
@@ -41,9 +46,9 @@ public final class ___JavaLangTestUtils {
      * @return the sibling class meets given conditions; {@code null} when not found.
      */
     @Nullable
-    public static Class<?> siblingClassForPostfix(@Nonnull final Class<?> type,
-                                                  @Nullable final Class<?> supertype,
-                                                  @Nonnull final String... postfixes) {
+    static Class<?> siblingClassForPostfix(@Nonnull final Class<?> type,
+                                           @Nullable final Class<?> supertype,
+                                           @Nonnull final String... postfixes) {
         Objects.requireNonNull(type, "type is null");
         if (Objects.requireNonNull(postfixes, "postfixes is null").length == 0) {
             throw new IllegalArgumentException("postfixes is empty");

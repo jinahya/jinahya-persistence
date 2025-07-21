@@ -47,7 +47,7 @@ final class ___JavaLangReflectTestUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    public static <T extends AutoCloseable> T uncloseable(@Nonnull final T closeable) {
+    static <T extends AutoCloseable> T uncloseable(@Nonnull final T closeable) {
         Objects.requireNonNull(closeable, "closeable is null");
         return (T) Proxy.newProxyInstance(
                 closeable.getClass().getClassLoader(),
@@ -63,7 +63,7 @@ final class ___JavaLangReflectTestUtils {
     }
 
     @Deprecated(forRemoval = true)
-    public static <T extends AutoCloseable, U extends T>
+    static <T extends AutoCloseable, U extends T>
     U uncloseable(@Nonnull final T closeable, final Class<U> type) {
         Objects.requireNonNull(closeable, "closeable is null");
         final var proxy = Proxy.newProxyInstance(
@@ -78,8 +78,16 @@ final class ___JavaLangReflectTestUtils {
         return type.cast(proxy);
     }
 
-    public static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
-                                                                    final Class<A> annotationType) {
+    /**
+     * Finds the annotation of the specified type on the specified class and its superclasses.
+     *
+     * @param type           the class
+     * @param annotationType the annotation type
+     * @param <A>            annotation type parameter
+     * @return an optional of the annotation; {@link Optional#empty() empty} when no annotation found
+     */
+    static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
+                                                             final Class<A> annotationType) {
         for (var c = type; c != null; c = c.getSuperclass()) {
             final var annotation = c.getAnnotation(annotationType);
             if (annotation != null) {
@@ -89,7 +97,14 @@ final class ___JavaLangReflectTestUtils {
         return Optional.empty();
     }
 
-    public static Optional<Field> findField(final Class<?> type, final String name) {
+    /**
+     * Finds the field of the specified name on the specified class and its superclasses.
+     *
+     * @param type the class.
+     * @param name the field name
+     * @return an optional of the field; {@link Optional#empty() empty} when no field found.
+     */
+    static Optional<Field> findField(final Class<?> type, final String name) {
         for (var c = type; c != null; c = c.getSuperclass()) {
             try {
                 return Optional.of(c.getDeclaredField(name));
@@ -100,6 +115,13 @@ final class ___JavaLangReflectTestUtils {
         return Optional.empty();
     }
 
+    /**
+     * Creates a new instance of the specified class.
+     *
+     * @param type the class.
+     * @param <T>  class type parameter.
+     * @return a new instance of {@code type}.
+     */
     @SuppressWarnings({
             "java:S112", // Generic exceptions should never be thrown
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
