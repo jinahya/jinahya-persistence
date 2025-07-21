@@ -52,7 +52,7 @@ public abstract class __AttributeEnumConverterTest<
      * @see #converterClass
      * @see #enumClass
      */
-    public abstract static class __OfString<
+    public abstract static class __OfStringTest<
             CONVERTER extends __AttributeEnumConverter.__OfString<E>,
             E extends Enum<E> & __AttributeEnum.__OfString<E>
             >
@@ -66,7 +66,7 @@ public abstract class __AttributeEnumConverterTest<
          * @see #converterClass
          * @see #enumClass
          */
-        protected __OfString(final Class<CONVERTER> converterClass, final Class<E> enumClass) {
+        protected __OfStringTest(final Class<CONVERTER> converterClass, final Class<E> enumClass) {
             super(converterClass, enumClass, String.class);
         }
     }
