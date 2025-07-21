@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -31,7 +32,7 @@ public abstract class _MappedEntityPersistenceIT<ENTITY extends __MappedEntity<I
         extends __MappedEntityPersistenceIT<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected _MappedEntityPersistenceIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    protected _MappedEntityPersistenceIT(@Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 }

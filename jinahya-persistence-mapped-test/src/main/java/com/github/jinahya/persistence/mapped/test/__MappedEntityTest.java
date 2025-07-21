@@ -60,7 +60,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @see #entityClass
      * @see #idClass
      */
-    protected __MappedEntityTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    protected __MappedEntityTest(@Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");

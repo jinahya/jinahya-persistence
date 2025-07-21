@@ -47,7 +47,7 @@ public abstract class __MappedEntityWithGeneratedIdentityInstantiator<
      * @see #entityClass
      * @see #idClass
      */
-    protected __MappedEntityWithGeneratedIdentityInstantiator(final Class<ENTITY> entityClass) {
+    protected __MappedEntityWithGeneratedIdentityInstantiator(@Nonnull final Class<ENTITY> entityClass) {
         super(entityClass, Long.class);
     }
 
