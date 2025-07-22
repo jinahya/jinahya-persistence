@@ -22,12 +22,16 @@ package com.github.jinahya.persistence.mapped.test;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -85,6 +89,65 @@ final class ___HibernateTestUtils {
             return (R) doReturningWorkMethod.invoke(sessionInstance, returningWorkProxy);
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException("failed to work with hibernate", roe);
+        }
+    }
+
+    static void a() {
+        try {
+            final var sessionFactoryClass = Class.forName("org.hibernate.SessionFactory");
+        } catch (final ReflectiveOperationException roe) {
+            throw new RuntimeException("", roe);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static List<String> getEntityColumnNames(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                             @Nonnull final Class<?> entityClass) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        try {
+            // ---------------------------------------------------------------------------------------------------------
+            final var mappingMetamodelClass = Class.forName("org.hibernate.metamodel.MappingMetamodel");
+            final var mappingMetamodel = mappingMetamodelClass.cast(entityManagerFactory.getMetamodel());
+            // ---------------------------------------------------------------------------------------------------------
+            final var getEntityDescriptorMethod = mappingMetamodelClass.getMethod("getEntityDescriptor", Class.class);
+            final var entityDescriptor = getEntityDescriptorMethod.invoke(mappingMetamodel, entityClass);
+            // ---------------------------------------------------------------------------------------------------------
+            final var entityMappingTypeClass = Class.forName("org.hibernate.metamodel.mapping.EntityMappingType");
+            final var getEntityPersisterMethod = entityMappingTypeClass.getMethod("getEntityPersister");
+            final var entityPersister = getEntityPersisterMethod.invoke(entityDescriptor);
+            // ---------------------------------------------------------------------------------------------------------
+            final var abstractEntityPersisterClass =
+                    Class.forName("org.hibernate.persister.entity.AbstractEntityPersister");
+            final var abstractEntityPersister = abstractEntityPersisterClass.cast(entityPersister);
+            // ---------------------------------------------------------------------------------------------------------
+            final var getIdentifierColumNamesMethod =
+                    abstractEntityPersisterClass.getMethod("getIdentifierColumnNames");
+            final var identifierColumnNames = (String[]) getIdentifierColumNamesMethod.invoke(abstractEntityPersister);
+            // ---------------------------------------------------------------------------------------------------------
+            final var getPropertyNamesMethod = abstractEntityPersisterClass.getMethod("getPropertyNames");
+            final var propertyNames = (String[]) getPropertyNamesMethod.invoke(abstractEntityPersister);
+            // ---------------------------------------------------------------------------------------------------------
+            final var toColumnsMethod = abstractEntityPersisterClass.getMethod("toColumns", String.class);
+            final var propertyColumnNames = Arrays.stream(propertyNames).flatMap(pn -> {
+                try {
+                    return Arrays.stream((String[]) toColumnsMethod.invoke(abstractEntityPersister, pn));
+                } catch (final ReflectiveOperationException e) {
+                    throw new RuntimeException(
+                            "failed to invoke " + toColumnsMethod + " with " + abstractEntityPersister + " and " + pn,
+                            e
+                    );
+                }
+            }).toArray(String[]::new);
+            // ---------------------------------------------------------------------------------------------------------
+            return Stream.concat(
+                            Arrays.stream(identifierColumnNames),
+                            Arrays.stream(propertyColumnNames)
+                    )
+                    .distinct()
+                    .toList();
+        } catch (final ReflectiveOperationException roe) {
+            throw new RuntimeException("failed to get entity column names for " + entityClass, roe);
         }
     }
 

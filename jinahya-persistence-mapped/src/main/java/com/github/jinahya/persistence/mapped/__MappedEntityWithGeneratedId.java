@@ -29,7 +29,7 @@ import jakarta.persistence.Transient;
  * @param <ID> id type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a14790">11.1.21.
- * GeneratedValue Annotation</a> (Jakarta Persistence 3.2 Specification Document)
+ *         GeneratedValue Annotation</a> (Jakarta Persistence 3.2 Specification Document)
  */
 @MappedSuperclass
 @SuppressWarnings({

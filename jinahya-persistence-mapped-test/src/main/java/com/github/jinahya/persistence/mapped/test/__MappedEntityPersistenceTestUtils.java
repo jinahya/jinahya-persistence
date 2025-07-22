@@ -141,9 +141,9 @@ public class __MappedEntityPersistenceTestUtils {
     }
 
     public static <ENTITY extends __MappedEntity<?>>
-    void acceptEachAttributeColumName(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                      @Nonnull final Class<ENTITY> entityClass,
-                                      @Nonnull final Consumer<? super String> consumer) {
+    void acceptEntityColumName(@Nonnull final EntityManagerFactory entityManagerFactory,
+                               @Nonnull final Class<ENTITY> entityClass,
+                               @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(consumer, "consumer is null");
@@ -172,13 +172,22 @@ public class __MappedEntityPersistenceTestUtils {
     }
 
     public static <ENTITY extends __MappedEntity<?>, C extends Collection<? super String>>
-    C addAllAttributeColumNames(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                @Nonnull final Class<ENTITY> entityClass,
-                                @Nonnull final C collection) {
+    C addAllEntityColumNames(@Nonnull final EntityManagerFactory entityManagerFactory,
+                             @Nonnull final Class<ENTITY> entityClass,
+                             @Nonnull final C collection) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachAttributeColumName(
+
+        if (true) {
+            if (___JakartaPersistenceTestUtils.isEclipseLink()) {
+                collection.addAll(___EclipseLinkTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
+            } else if (___JakartaPersistenceTestUtils.isHibernate()) {
+                collection.addAll(___HibernateTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
+            }
+            return collection;
+        }
+        acceptEntityColumName(
                 entityManagerFactory,
                 entityClass,
                 collection::add

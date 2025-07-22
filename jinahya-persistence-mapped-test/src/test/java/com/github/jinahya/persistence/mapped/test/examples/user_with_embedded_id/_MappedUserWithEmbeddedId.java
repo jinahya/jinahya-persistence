@@ -35,7 +35,7 @@ abstract class _MappedUserWithEmbeddedId<ID extends _MappedIdForUserWithEmbedded
     // -----------------------------------------------------------------------------------------------------------------
     static final String COLUMN_NAME_NAME = "name";
 
-    static final String COLUMN_NAME_AGE = "age";
+    static final String COLUMN_NAME_AGE = "age_check";
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     _MappedUserWithEmbeddedId() {

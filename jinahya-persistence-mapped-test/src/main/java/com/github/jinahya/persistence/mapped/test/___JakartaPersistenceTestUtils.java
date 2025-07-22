@@ -30,6 +30,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.spi.PersistenceProviderResolverHolder;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.lang.System.Logger.Level;
@@ -386,6 +387,23 @@ final class ___JakartaPersistenceTestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static String entityName(final EntityManager entityManager, final Class<?> entityClass) {
         return entityManager.getMetamodel().entity(entityClass).getName();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static boolean isEclipseLink() {
+        return PersistenceProviderResolverHolder
+                .getPersistenceProviderResolver()
+                .getPersistenceProviders()
+                .stream()
+                .anyMatch(pp -> pp.getClass().getName().startsWith("org.eclipse.persistence"));
+    }
+
+    static boolean isHibernate() {
+        return PersistenceProviderResolverHolder
+                .getPersistenceProviderResolver()
+                .getPersistenceProviders()
+                .stream()
+                .anyMatch(pp -> pp.getClass().getName().startsWith("org.hibernate"));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
