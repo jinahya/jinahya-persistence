@@ -50,19 +50,13 @@ final class ___EclipseLinkTestUtils {
                     Class.forName("org.eclipse.persistence.jpa.JpaEntityManagerFactory");
             final var getDatabaseSessionMethod = jpaEntityManagerFactoryClass.getMethod("getDatabaseSession");
             final var databaseSession = getDatabaseSessionMethod.invoke(entityManagerFactoryImpl);
-
-//            final var abstractSessionClass = Class.forName("org.eclipse.persistence.sessions.AbstractSession");
-//            final var getDescriptorMethod = abstractSessionClass.getMethod("getDescriptor", Class.class);
             final var sessionClass = Class.forName("org.eclipse.persistence.sessions.Session");
             final var getDescriptorMethod = sessionClass.getMethod("getDescriptor", Class.class);
             final var descriptor = getDescriptorMethod.invoke(databaseSession, entityClass);
-
             final var classDescriptorClass = Class.forName("org.eclipse.persistence.descriptors.ClassDescriptor");
             final var getMappingsMethod = classDescriptorClass.getMethod("getMappings");
             final var mappings = getMappingsMethod.invoke(descriptor);
-
             final var databaseMappingClass = Class.forName("org.eclipse.persistence.mappings.DatabaseMapping");
-
             final var getFieldsMethod = databaseMappingClass.getMethod("getFields");
             final var databaseFieldClass = Class.forName("org.eclipse.persistence.internal.helper.DatabaseField");
             final var getNameMethod = databaseFieldClass.getMethod("getName");

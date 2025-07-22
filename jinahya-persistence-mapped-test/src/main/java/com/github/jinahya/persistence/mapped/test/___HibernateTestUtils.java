@@ -41,24 +41,12 @@ final class ___HibernateTestUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Return the result of the specified function applied with a connection, unwrapped from the specified entity
-     * manager.
-     * <p>
-     * Equivalent to:
-     * {@snippet lang = "java":
-     *     entityManager.unwrap(Session.class).doReturningWork(function::apply);
-     *}
+     * Return the result of the specified function applied to a connection unwrapped from the specified entity manager.
      *
      * @param entityManager an entity manager.
      * @param function      the function to be applied with a connection.
      * @param <R>           result type parameter
      * @return the result of the {@code function}.
-     * @see <a
-     *         href="https://docs.jboss.org/hibernate/orm/current/javadocs/org/hibernate/Session.html">org.hibernate.Session</a>
-     * @see <a
-     *         href="https://docs.jboss.org/hibernate/orm/current/javadocs/org/hibernate/jdbc/ReturningWork.html">org.hibernate.jdbc.ReturningWork</a>
-     * @see <a
-     *         href="https://docs.jboss.org/hibernate/orm/current/javadocs/org/hibernate/SharedSessionContract.html#doReturningWork(org.hibernate.jdbc.ReturningWork)">org.hibernate.SharedSessionContract#doReturningWork(org.hibernate.jdbc.ReturningWork)</a>
      */
     @SuppressWarnings({"unchecked"})
     // https://stackoverflow.com/a/44214469/330457
@@ -68,13 +56,10 @@ final class ___HibernateTestUtils {
         Objects.requireNonNull(function, "function is null");
         try {
             final Class<?> sessionClass = Class.forName("org.hibernate.Session");
-            // [ final var session = entityManager.unwrap(Session.class); ]
             final Object sessionInstance = entityManager.unwrap(sessionClass);
             final Class<?> returningWorkClass = Class.forName("org.hibernate.jdbc.ReturningWork");
             final Method executeMethod = returningWorkClass.getMethod("execute", Connection.class);
-            // [ final var returningWork = c -> function.apply(connection); ]
             final Object returningWorkProxy = Proxy.newProxyInstance(
-//                    MethodHandles.lookup().lookupClass().getClassLoader(),
                     returningWorkClass.getClassLoader(),
                     new Class[]{returningWorkClass},
                     (p, m, a) -> {
@@ -83,20 +68,12 @@ final class ___HibernateTestUtils {
                             return function.apply(connection);
                         }
                         return null;
-                    });
+                    }
+            );
             final Method doReturningWorkMethod = sessionClass.getMethod("doReturningWork", returningWorkClass);
-            // [return session.doReturningWork(returningWork);]
             return (R) doReturningWorkMethod.invoke(sessionInstance, returningWorkProxy);
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException("failed to work with hibernate", roe);
-        }
-    }
-
-    static void a() {
-        try {
-            final var sessionFactoryClass = Class.forName("org.hibernate.SessionFactory");
-        } catch (final ReflectiveOperationException roe) {
-            throw new RuntimeException("", roe);
         }
     }
 

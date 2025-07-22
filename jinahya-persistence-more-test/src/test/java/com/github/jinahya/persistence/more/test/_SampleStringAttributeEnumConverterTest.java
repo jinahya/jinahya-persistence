@@ -22,9 +22,9 @@ package com.github.jinahya.persistence.more.test;
 
 class _SampleStringAttributeEnumConverterTest
         extends __AttributeEnumConverterTest.__OfStringTest<
-                _SampleStringAttributeEnumConverter,
-                _SampleStringAttributeEnum
-                > {
+        _SampleStringAttributeEnumConverter,
+        _SampleStringAttributeEnum
+        > {
 
     _SampleStringAttributeEnumConverterTest() {
         super(_SampleStringAttributeEnumConverter.class, _SampleStringAttributeEnum.class);
