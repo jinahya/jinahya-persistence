@@ -22,10 +22,9 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
 import jakarta.annotation.Nonnull;
+import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * An abstract class for randomizing subclasses of
@@ -52,8 +51,7 @@ public abstract class __MappedEntityWithGeneratedIdentityRandomizer<
      */
     protected __MappedEntityWithGeneratedIdentityRandomizer(@Nonnull final Class<ENTITY> entityClass,
                                                             @Nonnull final String... excludedFields) {
-        super(entityClass, Long.class,
-              __MappedEntityWithGeneratedIdRandomizerUtils.prependId__(excludedFields));
+        super(entityClass, Long.class, __MappedEntityWithGeneratedIdRandomizerUtils.prependId__(excludedFields));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -77,11 +75,13 @@ public abstract class __MappedEntityWithGeneratedIdentityRandomizer<
 
     @Nonnull
     @Override
+    protected ClassInfoStrategy getClassInfoStrategy() {
+        return super.getClassInfoStrategy();
+    }
+
+    @Nonnull
+    @Override
     public ENTITY get() {
-        final var value = super.get();
-//        assertThat(value.getGeneratedId__())
-//                .as("generatedId__ of %s", value)
-//                .isNull();
-        return value;
+        return super.get();
     }
 }

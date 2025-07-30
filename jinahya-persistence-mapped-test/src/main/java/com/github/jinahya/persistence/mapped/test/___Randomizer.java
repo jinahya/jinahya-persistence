@@ -99,6 +99,7 @@ public abstract class ___Randomizer<T> {
      *
      * @return a new class info strategy which excludes {@link #excludedFields}
      */
+    @Nonnull
     protected ClassInfoStrategy getClassInfoStrategy() {
         final var classInfoStrategy = DefaultClassInfoStrategy.getInstance();
         excludedFields.forEach(v -> classInfoStrategy.addExcludedField(type, v));
