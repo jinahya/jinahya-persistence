@@ -91,15 +91,15 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
         throw new UnsupportedOperationException("setting id__ is not allowed");
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Returns the generated id.
-     *
-     * @return the generated id.
-     */
-    @Transient
-    public final ID getGeneratedId__() {
-        return getId__();
-    }
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    /**
+//     * Returns the generated id.
+//     *
+//     * @return the generated id.
+//     */
+//    @Transient
+//    public final ID getGeneratedId__() {
+//        return getId__();
+//    }
 }

@@ -79,9 +79,9 @@ public abstract class __MappedEntityWithGeneratedIdentityRandomizer<
     @Override
     public ENTITY get() {
         final var value = super.get();
-        assertThat(value.getGeneratedId__())
-                .as("generatedId__ of %s", value)
-                .isNull();
+//        assertThat(value.getGeneratedId__())
+//                .as("generatedId__ of %s", value)
+//                .isNull();
         return value;
     }
 }
