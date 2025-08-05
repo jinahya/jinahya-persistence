@@ -34,13 +34,13 @@ class Entity01PersistenceTest extends _MappedEntityPersistenceTest<Entity01, Lon
     // -----------------------------------------------------------------------------------------------------------------
     @Test
     @Override
-    protected void persistEntityInstance() {
-        super.persistEntityInstance();
+    protected void __persistEntityInstance() {
+        super.__persistEntityInstance();
     }
 
     @Override
-    protected void persistedEntityInstance(final Entity01 entityInstance) {
+    protected void __persistEntityInstance(final Entity01 entityInstance) {
         log.debug("persisted {}", entityInstance);
-        super.persistedEntityInstance(entityInstance);
+        super.__persistEntityInstance(entityInstance);
     }
 }
