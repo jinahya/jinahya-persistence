@@ -260,12 +260,14 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>,
     protected final <R> R applyConnectionInTransactionAndRollback(
             @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return applyConnectionInTransaction(function, true);
+        return applyConnectionInTransaction(
+                function,
+                true
+        );
     }
 
     /**
-     * Accepts a connection, unwrapped from an entity manager, in transaction, to the specified consumer, and rolls
-     * back.
+     * Accepts a connection, unwrapped from an entity manager, in transaction, to the specified consumer, and rolls back.
      *
      * @param consumer the consumer.
      * @see #applyConnectionInTransactionAndRollback(Function)
