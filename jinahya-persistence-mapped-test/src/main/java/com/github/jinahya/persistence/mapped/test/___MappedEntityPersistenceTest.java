@@ -46,6 +46,32 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>,
         super(entityClass, idClass);
     }
 
+//    // -----------------------------------------------------------------------------------------------------------------
+//    protected <T extends __MappedEntity<?>, R> R applyNewPersistEntityInstanceOf(
+//            @Nonnull final Class<T> entityClass,
+//            @Nonnull final Function<
+//                    ? super EntityManager,
+//                    ? extends Function<
+//                            ? super T,
+//                            ? extends R>> function) {
+//        Objects.requireNonNull(entityClass, "entityClass is null");
+//        Objects.requireNonNull(function, "function is null");
+//        return applyEntityManagerInTransactionAndRollback(em -> {
+//            final var entityInstance = __MappedEntityPersisterUtils.newPersistedInstanceOf(em, entityClass);
+//            return function.apply(em).apply(entityInstance);
+//        });
+//    }
+//
+//    protected <R> R applyNewPersistEntityInstance(
+//            @Nonnull final Function<
+//                    ? super EntityManager,
+//                    ? extends Function<
+//                            ? super ENTITY,
+//                            ? extends R>> function) {
+//        Objects.requireNonNull(function, "function is null");
+//        return applyNewPersistEntityInstanceOf(entityClass, function);
+//    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -267,7 +293,8 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>,
     }
 
     /**
-     * Accepts a connection, unwrapped from an entity manager, in transaction, to the specified consumer, and rolls back.
+     * Accepts a connection, unwrapped from an entity manager, in transaction, to the specified consumer, and rolls
+     * back.
      *
      * @param consumer the consumer.
      * @see #applyConnectionInTransactionAndRollback(Function)
