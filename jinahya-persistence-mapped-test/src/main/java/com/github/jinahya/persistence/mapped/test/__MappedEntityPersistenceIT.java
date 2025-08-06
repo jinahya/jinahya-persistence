@@ -80,9 +80,9 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     @Test
     protected void _Mapped_AllTableColumnNames() {
         final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
-        final var catalog = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultCatalog)
+        final var catalog = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultCatalog)
                 .orElseGet(table::catalog);
-        final var schema = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultSchema)
+        final var schema = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = applyConnectionInTransactionAndRollback(
                 c -> ___JavaSqlTestUtils.addAllColumnNames(
@@ -146,9 +146,9 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     @Test
     protected void _Mapped_AllEntityColumnColumnNames() {
         final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
-        final var catalog = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultCatalog)
+        final var catalog = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultCatalog)
                 .orElseGet(table::catalog);
-        final var schema = applyEntityManagerFactory(__PersistenceProducerUtils::getDefaultSchema)
+        final var schema = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = Collections.unmodifiableList(
                 applyConnectionInTransactionAndRollback(

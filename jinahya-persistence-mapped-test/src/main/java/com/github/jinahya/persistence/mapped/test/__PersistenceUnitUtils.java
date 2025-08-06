@@ -29,7 +29,7 @@ import java.util.Optional;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-final class __PersistenceProducerUtils {
+final class __PersistenceUnitUtils {
 
     static Optional<String> getDefaultCatalog(final EntityManagerFactory entityManagerFactory) {
         return Optional.ofNullable(
@@ -57,7 +57,7 @@ final class __PersistenceProducerUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __PersistenceProducerUtils() {
+    private __PersistenceUnitUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
