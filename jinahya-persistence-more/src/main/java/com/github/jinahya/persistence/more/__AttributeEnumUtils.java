@@ -60,15 +60,14 @@ public final class __AttributeEnumUtils {
     @Nonnull
     public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
     E valueOfAttributeValue(@Nonnull final Class<E> enumClass, @Nonnull final ATTRIBUTE attributeValue) {
-//        Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         final var value = valueOfAttributeValue_(enumClass, attributeValue);
-        if (value != null) {
-            return value;
+        if (value == null) {
+            throw new IllegalArgumentException(
+                    "no enum constant, of " + enumClass + ", for attributeValue: " + attributeValue
+            );
         }
-        throw new IllegalArgumentException(
-                "no enum constant, of " + enumClass + ", for attributeValue: " + attributeValue
-        );
+        return value;
     }
 
     /**

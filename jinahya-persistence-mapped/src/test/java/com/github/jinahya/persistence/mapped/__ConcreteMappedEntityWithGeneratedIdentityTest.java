@@ -26,7 +26,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class __ConcreteMappedEntityWithGeneratedIdentityTest {
 
@@ -47,18 +46,6 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
     @DisplayName("equals/hashCode")
     @Test
     void equals_verify_() {
-//        final var instance1 = new __ConcreteMappedEntity();
-//        {
-//            assertThat(instance1).isEqualTo(instance1);
-//            assertThat(instance1).isNotEqualTo(new Object());
-//        }
-//        final var instance2 = new __ConcreteMappedEntity();
-//        assertThat(instance1).isNotEqualTo(instance2);
-//        assertThat(instance2).isNotEqualTo(instance1);
-//        instance1.setId__(0L);
-//        instance2.setId__(0L);
-//        assertThat(instance1).isEqualTo(instance2);
-//        assertThat(instance2).isEqualTo(instance1);
         EqualsVerifier
                 .forClass(__ConcreteMappedEntityWithGeneratedIdentity.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
@@ -72,13 +59,5 @@ class __ConcreteMappedEntityWithGeneratedIdentityTest {
     void getId____() {
         final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
         final var id__ = instance.getId__();
-    }
-
-    @Test
-    void id____() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedIdentity();
-        assertThatThrownBy(() -> {
-            final var result = instance.id__(0L);
-        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }

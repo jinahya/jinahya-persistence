@@ -1,5 +1,25 @@
 package com.github.jinahya.persistence.mapped.test;
 
+/*-
+ * #%L
+ * jinahya-persistence-mapped-test
+ * %%
+ * Copyright (C) 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.metamodel.Attribute;
@@ -41,6 +61,7 @@ class ___JakartaPersistenceTestUtilsTest {
     class AcceptEachAttributeNameTest {
 
         @Test
+        @SuppressWarnings({"unchecked"})
         void __() {
             final var managedType = mock(ManagedType.class);
             final var attributeNames = List.of("x", "a", "b", "c");
@@ -51,6 +72,7 @@ class ___JakartaPersistenceTestUtilsTest {
                         return attribute;
                     }).collect(Collectors.toCollection(LinkedHashSet::new));
             when(managedType.getAttributes()).thenReturn(attributes);
+            @SuppressWarnings("Convert2Lambda")
             final Consumer<String> consumer = spy(
                     new Consumer<String>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override
@@ -126,6 +148,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var transaction = mock(EntityTransaction.class);
             when(entityManager.getTransaction()).thenReturn(transaction);
             final var expected = new Object();
+            //noinspection Convert2Lambda
             final var function = (Function<EntityManager, Object>) spy(
                     new Function<EntityManager, Object>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override
@@ -158,6 +181,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var entityManager = mock(EntityManager.class);
             final var transaction = mock(EntityTransaction.class);
             when(entityManager.getTransaction()).thenReturn(transaction);
+            //noinspection Convert2Lambda
             final var function = (Function<EntityManager, Object>) spy(
                     new Function<EntityManager, Object>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override
@@ -192,6 +216,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var entityManager = mock(EntityManager.class);
             final var transaction = mock(EntityTransaction.class);
             when(entityManager.getTransaction()).thenReturn(transaction);
+            //noinspection Convert2Lambda
             final var consumer = (Consumer<EntityManager>) spy(
                     new Consumer<EntityManager>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
                         @Override

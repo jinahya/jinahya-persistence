@@ -26,7 +26,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 @AddBeanClasses({
         __PersistenceProducer.class
@@ -37,12 +44,60 @@ import org.junit.jupiter.api.extension.ExtendWith;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
         extends ___MappedEntityPersistenceTest<ENTITY, ID> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
     protected __MappedEntityPersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+//    @Test
+//    void a() {
+//        final DatabaseSessionImpl databaseSession = ((EntityManagerFactoryImpl) entityManagerFactory).getDatabaseSession();
+
+    /// /        final org.eclipse.persistence.sessions.Session databaseSession = /
+    /// ((org.eclipse.persistence.internal.jpa.EntityManagerImpl) entityManager.getDelegate()).getSession();
+//        final var descriptor = databaseSession.getDescriptor(entityClass);
+//        final var mappings = descriptor.getMappings();
+//        mappings.forEach(mapping -> {
+//            logger.log(System.Logger.Level.DEBUG, "mapping: {0}", mapping);
+//            logger.log(System.Logger.Level.DEBUG, "\t attributeName: {0}", mapping.getAttributeName());
+//            logger.log(System.Logger.Level.DEBUG, "\t field.name: {0}",
+//                       Optional.ofNullable(mapping.getField()).map(DatabaseField::getName).orElse(null));
+//            mapping.getFields().forEach(f -> {
+//                logger.log(System.Logger.Level.DEBUG, "\t field: {0}", f);
+//                logger.log(System.Logger.Level.DEBUG, "\t\t name: {0}", f.getName());
+//                logger.log(System.Logger.Level.DEBUG, "\t\t type: {0}", f.getType());
+//            });
+//        });
+//    }
+
+    @DisplayName("__HibernateTestUtils")
+    @Nested
+    class __HibernateTestUtilsTest {
+
+        @DisplayName("getEntityColumnNames(entityManagerFactory, entityClass)")
+        @Test
+        @SuppressWarnings({
+                "java:S100", // Method names should comply with a naming convention
+                "java:S125"  // Sections of code should not be commented out
+        })
+        void getEntityColumnNames__() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            final var m = ___HibernateTestUtils.class.getDeclaredMethod(
+                    "getEntityColumnNames",
+                    EntityManagerFactory.class,
+                    Class.class
+            );
+            m.setAccessible(true);
+            final var columnNames = (List<String>) m.invoke(null, getEntityManagerFactory(), entityClass);
+            for (final var columnName : columnNames) {
+                logger.log(System.Logger.Level.DEBUG, "column name: " + columnName);
+            }
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------

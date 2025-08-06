@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import org.mockito.Mockito;
 
 import java.util.Objects;
@@ -38,7 +39,7 @@ import java.util.Optional;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID> {
+abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -84,11 +85,11 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
     /**
      * Returns a new randomized instance of {@link #entityClass}.
      *
-     * @return a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty} when no randomizer for
-     *         the {@link #entityClass} found.
+     * @return a new randomized instance of {@link #entityClass}.
      * @see __MappedEntityRandomizerUtils#newRandomizedInstanceOf(Class)
      * @see #newRandomizedEntityInstanceSpy()
      */
+    @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
@@ -101,7 +102,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
      * @see #newRandomizedEntityInstance()
      */
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
-        return Mockito.spy(newRandomizedEntityInstance());
+        return newRandomizedEntityInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -119,7 +120,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID
     }
 
     protected Optional<ID> newRandomizedIdInstanceSpy() {
-        return Mockito.spy(newRandomizedIdInstance());
+        return newRandomizedIdInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -48,7 +48,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, ID>, ID> {
+public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -60,7 +60,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      * @see #entityClass
      * @see #idClass
      */
-    protected __MappedEntityTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    protected __MappedEntityTest(@Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
@@ -132,7 +132,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
      */
     @Nonnull
     protected SingleTypeEqualsVerifierApi<ENTITY> getEqualsVerifier() {
-        return EqualsVerifier.forClass(entityClass);
+        return EqualsVerifier.forClass(entityClass)
+//                .withRedefinedSuperclass()
+                ;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -226,7 +228,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
 
     @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
-        return Mockito.spy(newRandomizedEntityInstance());
+        return newRandomizedEntityInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -248,7 +250,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ENTITY, I
 
     @Nonnull
     protected Optional<ID> newRandomizedIdInstanceSpy() {
-        return Mockito.spy(newRandomizedIdInstance());
+        return newRandomizedIdInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

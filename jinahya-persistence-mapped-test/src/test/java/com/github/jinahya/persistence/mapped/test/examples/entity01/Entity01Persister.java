@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test.examples.entity01;
  */
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityPersister;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 class Entity01Persister extends __MappedEntityPersister<Entity01, Long> {
@@ -31,7 +32,7 @@ class Entity01Persister extends __MappedEntityPersister<Entity01, Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public Entity01 persist(final EntityManager entityManager, final Entity01 entityInstance) {
-        return super.persist(entityManager, entityInstance);
+    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final Entity01 entityInstance) {
+        super.persist(entityManager, entityInstance);
     }
 }

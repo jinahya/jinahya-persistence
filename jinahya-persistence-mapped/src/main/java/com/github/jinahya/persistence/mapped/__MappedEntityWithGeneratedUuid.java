@@ -31,10 +31,10 @@ import java.util.UUID;
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
+        "java:S116", // Field names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntityWithGeneratedUuid<SELF>>
-        extends __MappedEntityWithGeneratedId<SELF, UUID> {
+public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWithGeneratedId<UUID> {
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
@@ -51,7 +51,7 @@ public abstract class __MappedEntityWithGeneratedUuid<SELF extends __MappedEntit
 
     @Override
     public final boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedEntityWithGeneratedUuid<?>)) {
+        if (!(obj instanceof __MappedEntityWithGeneratedUuid)) {
             return false;
         }
         return super.equals(obj);

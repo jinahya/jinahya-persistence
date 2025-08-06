@@ -33,7 +33,7 @@ import java.util.Objects;
 })
 public class __MappedEntityTestUtils {
 
-    static <ENTITY extends __MappedEntity<ENTITY, ?>>
+    static <ENTITY extends __MappedEntity<?>>
     Table getTableAnnotation(@Nonnull final Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         return ___JavaLangReflectTestUtils.findAnnotation(entityClass, Table.class)

@@ -47,7 +47,7 @@ final class ___JavaLangReflectTestUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    public static <T extends AutoCloseable> T uncloseable(@Nonnull final T closeable) {
+    static <T extends AutoCloseable> T uncloseable(@Nonnull final T closeable) {
         Objects.requireNonNull(closeable, "closeable is null");
         return (T) Proxy.newProxyInstance(
                 closeable.getClass().getClassLoader(),
@@ -63,7 +63,7 @@ final class ___JavaLangReflectTestUtils {
     }
 
     @Deprecated(forRemoval = true)
-    public static <T extends AutoCloseable, U extends T>
+    static <T extends AutoCloseable, U extends T>
     U uncloseable(@Nonnull final T closeable, final Class<U> type) {
         Objects.requireNonNull(closeable, "closeable is null");
         final var proxy = Proxy.newProxyInstance(
@@ -78,8 +78,16 @@ final class ___JavaLangReflectTestUtils {
         return type.cast(proxy);
     }
 
-    public static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
-                                                                    final Class<A> annotationType) {
+    /**
+     * Finds the annotation of the specified type on the specified class and its superclasses.
+     *
+     * @param type           the class
+     * @param annotationType the annotation type
+     * @param <A>            annotation type parameter
+     * @return an optional of the annotation; {@link Optional#empty() empty} when no annotation found
+     */
+    static <A extends Annotation> Optional<A> findAnnotation(final Class<?> type,
+                                                             final Class<A> annotationType) {
         for (var c = type; c != null; c = c.getSuperclass()) {
             final var annotation = c.getAnnotation(annotationType);
             if (annotation != null) {
@@ -89,7 +97,14 @@ final class ___JavaLangReflectTestUtils {
         return Optional.empty();
     }
 
-    public static Optional<Field> findField(final Class<?> type, final String name) {
+    /**
+     * Finds the field of the specified name on the specified class and its superclasses.
+     *
+     * @param type the class.
+     * @param name the field name
+     * @return an optional of the field; {@link Optional#empty() empty} when no field found.
+     */
+    static Optional<Field> findField(final Class<?> type, final String name) {
         for (var c = type; c != null; c = c.getSuperclass()) {
             try {
                 return Optional.of(c.getDeclaredField(name));
@@ -100,59 +115,13 @@ final class ___JavaLangReflectTestUtils {
         return Optional.empty();
     }
 
-//    @Deprecated
-//    // https://stackoverflow.com/a/25974010/330457
-//    @Nullable
-//    public static Class<?> getActualTypeParameter(@Nonnull final Class<?> clazz,
-//                                                  @Nonnull final Class<?> type, final int index) {
-//        Objects.requireNonNull(clazz, "clazz is null");
-//        Objects.requireNonNull(type, "type is null");
-//        if (index < 0) {
-//            throw new IllegalArgumentException("negative index: " + index);
-//        }
-//        if (true || ThreadLocalRandom.current().nextBoolean()) {
-//            final var rawArguments = TypeResolver.resolveRawArguments(type, clazz);
-//            if (index >= rawArguments.length) {
-//                throw new IllegalArgumentException(
-//                        "index(" + index + ") is greater than or equal to the number of type parameters: " +
-//                        rawArguments.length
-//                );
-//            }
-//            return rawArguments[index];
-//        }
-//        final var mapping = new HashMap<TypeVariable<?>, Class<?>>();
-//        for (var c = clazz; c != null; ) {
-//            final var genericSuperclass = c.getGenericSuperclass();
-//            if (genericSuperclass instanceof ParameterizedType parameterizedType) {
-//                final var rawType = parameterizedType.getRawType();
-//                if (rawType == type) {
-//                    final var actualTypeArguments = parameterizedType.getActualTypeArguments();
-//                    if (index < actualTypeArguments.length) {
-//                        final var actualTypeArgument = actualTypeArguments[index];
-//                        if (actualTypeArgument instanceof Class<?>) {
-//                            return (Class<?>) actualTypeArgument;
-//                        } else {
-//                            return mapping.get(actualTypeArgument);
-//                        }
-//                    }
-//                }
-//                final var typeParameters = ((GenericDeclaration) (parameterizedType.getRawType())).getTypeParameters();
-//                final var actualTypeArguments = parameterizedType.getActualTypeArguments();
-//                for (int i = 0; i < typeParameters.length; i++) {
-//                    if (actualTypeArguments[i] instanceof Class<?>) {
-//                        mapping.put(typeParameters[i], (Class<?>) actualTypeArguments[i]);
-//                    } else {
-//                        mapping.put(typeParameters[i], mapping.get((TypeVariable<?>) actualTypeArguments[i]));
-//                    }
-//                }
-//                c = (Class<?>) rawType;
-//            } else {
-//                c = c.getSuperclass();
-//            }
-//        }
-//        return null;
-//    }
-
+    /**
+     * Creates a new instance of the specified class.
+     *
+     * @param type the class.
+     * @param <T>  class type parameter.
+     * @return a new instance of {@code type}.
+     */
     @SuppressWarnings({
             "java:S112", // Generic exceptions should never be thrown
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields

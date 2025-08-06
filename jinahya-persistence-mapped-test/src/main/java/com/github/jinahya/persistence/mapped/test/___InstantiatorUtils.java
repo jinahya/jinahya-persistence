@@ -35,41 +35,33 @@ import java.util.Optional;
 public final class ___InstantiatorUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
+    private static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                ___JavaLangTestUtils.forAnyPostfixes(type, ___Instantiator.class, "Instantiator", "_Instantiator")
+                ___JavaLangTestUtils.siblingClassForPostfix(
+                        type,
+                        ___Instantiator.class,
+                        "Instantiator",
+                        "_Instantiator"
+                )
         );
     }
 
     @SuppressWarnings({
             "unchecked"
     })
-    static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> type) {
+    private static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> type) {
         return getInstantiatorClassOf(type)
                 .map(___JavaLangReflectTestUtils::newInstanceOf)
                 .map(i -> (___Instantiator<T>) i);
     }
 
     /**
-     * Creates a new instance of the specified class, which implements {@link ___Instantiator}, and has a postfix of
-     * either {@code "Instantiator"} or {@code "_Instantiator"}, after the fully qualified name of the specified class.
-     * <p>
-     * {@snippet lang = "java":
-     * class MyPojo {
-     * }
+     * Instantiates a new instance of the specified class, who has a sibling instantiator class which implements
+     * {@link ___Instantiator}, and has a postfix of either {@code "Instantiator"} or {@code "_Instantiator"}.
      *
-     * class MyPojoInstantiator implements Instantiator<MyPojo> {
-     *
-     *     @Override
-     *     public MyPojo get() {
-     *         return new MyPojo();
-     *     }
-     * }
-     *}
-     *
-     * @param type the class to be initialized.
+     * @param type the class to be instantiated.
      * @param <T>  class type parameter
-     * @return an optional of the initialized instance; {@link Optional#empty() empty} when no instantiator found.
+     * @return an optional of the instantiated instance; {@link Optional#empty() empty} when no instantiator found.
      */
     public static <T> Optional<T> newInstantiatedInstanceOf(final Class<T> type) {
         Objects.requireNonNull(type, "type is null");

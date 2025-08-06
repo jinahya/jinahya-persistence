@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedId;
 import jakarta.annotation.Nonnull;
+import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
@@ -36,7 +37,7 @@ import uk.co.jemos.podam.api.PodamFactory;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdRandomizer<
-        ENTITY extends __MappedEntityWithGeneratedId<ENTITY, ID>,
+        ENTITY extends __MappedEntityWithGeneratedId<ID>,
         ID
         >
         extends __MappedEntityRandomizer<ENTITY, ID> {
@@ -73,6 +74,12 @@ public abstract class __MappedEntityWithGeneratedIdRandomizer<
     })
     protected PodamFactory getPodamFactory() {
         return super.getPodamFactory();
+    }
+
+    @Nonnull
+    @Override
+    protected ClassInfoStrategy getClassInfoStrategy() {
+        return super.getClassInfoStrategy();
     }
 
     @Nonnull

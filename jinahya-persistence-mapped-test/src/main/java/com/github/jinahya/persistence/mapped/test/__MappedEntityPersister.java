@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 import java.util.Objects;
@@ -35,7 +36,7 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S119" // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ENTITY, ID>, ID>
+public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ID>, ID>
         extends ___Persister<ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
@@ -56,8 +57,8 @@ public abstract class __MappedEntityPersister<ENTITY extends __MappedEntity<ENTI
     @SuppressWarnings({
             "java:S1185" // Overriding methods should do more than simply call the same method in the super class
     })
-    public ENTITY persist(final EntityManager entityManager, final ENTITY entityInstance) {
-        return super.persist(entityManager, entityInstance);
+    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final ENTITY entityInstance) {
+        super.persist(entityManager, entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

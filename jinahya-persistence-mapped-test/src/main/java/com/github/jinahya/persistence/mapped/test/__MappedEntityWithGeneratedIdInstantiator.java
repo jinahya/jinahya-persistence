@@ -35,7 +35,7 @@ import jakarta.annotation.Nonnull;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdInstantiator<
-        ENTITY extends __MappedEntityWithGeneratedId<ENTITY, ID>,
+        ENTITY extends __MappedEntityWithGeneratedId<ID>,
         ID
         >
         extends __MappedEntityInstantiator<ENTITY, ID> {

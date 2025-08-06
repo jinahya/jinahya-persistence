@@ -43,17 +43,15 @@ public abstract class ___Persister<ENTITY> {
      *
      * @param entityManager  the entity manager to use.
      * @param entityInstance the instance of {@link ENTITY} to persist.
-     * @return given {@code entityInstance}.
      * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
      */
-    public ENTITY persist(final EntityManager entityManager, final ENTITY entityInstance) {
+    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         ___JakartaValidationTestUtils.requireValid(entityInstance);
         entityManager.persist(entityInstance);
         entityManager.flush(); // required?
         ___JakartaValidationTestUtils.requireValid(entityInstance);
-        return entityInstance;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

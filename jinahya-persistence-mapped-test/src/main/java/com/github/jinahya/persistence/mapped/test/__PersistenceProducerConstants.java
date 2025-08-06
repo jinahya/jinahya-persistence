@@ -30,6 +30,8 @@ final class __PersistenceProducerConstants {
 
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA = "jinahya.persistence.default_schema";
 
+    static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES = "jinahya.persistence.default_types";
+
     // -----------------------------------------------------------------------------------------------------------------
     private __PersistenceProducerConstants() {
         throw new AssertionError("instantiation is not allowed");

@@ -65,12 +65,14 @@ class ___JavaSqlTestUtilsTest {
                         .thenAnswer((Answer<String>) i -> removableTableNames.removeFirst());
                 when(databaseMetaData.getTables(catalog, schema, null, null)).thenReturn(resultSet);
             }
+            @SuppressWarnings("unchecked")
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
             ___JavaSqlTestUtils.acceptEachTableName(
                     connection,
                     catalog,
                     schema,
+                    null,
                     consumer
             );
             // ---------------------------------------------------------------------------------------------------- then
@@ -106,6 +108,7 @@ class ___JavaSqlTestUtilsTest {
                     connection,
                     catalog,
                     schema,
+                    null,
                     new ArrayList<>()
             );
             // ---------------------------------------------------------------------------------------------------- then
@@ -135,6 +138,7 @@ class ___JavaSqlTestUtilsTest {
                         .thenAnswer((Answer<String>) i -> removableColumnNames.removeFirst());
                 when(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")).thenReturn(resultSet);
             }
+            @SuppressWarnings("unchecked")
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
             ___JavaSqlTestUtils.acceptEachColumnName(

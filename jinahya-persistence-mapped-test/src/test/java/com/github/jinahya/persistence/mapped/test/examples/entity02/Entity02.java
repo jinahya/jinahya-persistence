@@ -32,7 +32,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = Entity02.TABLE_NAME)
-public class Entity02 extends __MappedEntity<Entity02, Long> {
+public class Entity02 extends __MappedEntity<Long> {
 
     public static final String TABLE_NAME = "entity02";
 
@@ -62,12 +62,12 @@ public class Entity02 extends __MappedEntity<Entity02, Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    protected final Long getId__() {
+    protected Long getId__() {
         return getId();
     }
 
     @Override
-    protected final void setId__(final Long id__) {
+    protected void setId__(final Long id__) {
         setId(id__);
     }
 

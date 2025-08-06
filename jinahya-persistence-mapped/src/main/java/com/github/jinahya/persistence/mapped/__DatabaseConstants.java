@@ -208,64 +208,122 @@ public final class __DatabaseConstants {
      * @see <a href="https://www.postgresql.org/docs/current/datatype.html">Data Types</a> (PostgreSQL Reference
      *         Manual)
      * @see <a href="https://www.postgresql.org/docs/current/datatype-numeric.html">Numberic Types</a>
+     * @see <a href="https://stackoverflow.com/q/20810134/330457">Why unsigned integer is not available in
+     *         PostgreSQL?</a> (stackoverflow)
      */
     public static final class __PostgreSqlConstants {
 
         // ---------------------------------------------------------------------------------------------------- smallint
+
+        /**
+         * The storage size in bytes for {@code smallint} columns, which is {@value}.
+         */
+        public static final int BYTES_SMALLINT = Short.BYTES;
+
+        /**
+         * The minimum value of the {@code smallint} type, which is {@value}.
+         */
         public static final int MIN_SMALLINT = Short.MIN_VALUE;
 
+        /**
+         * The maximum value of the {@code smallint} type, which is {@value}.
+         */
         public static final int MAX_SMALLINT = Short.MAX_VALUE;
 
         // --------------------------------------------------------------------------------------------------------- int
+
+        /**
+         * The storage size in bytes for {@code int} columns, which is {@value}.
+         */
+        public static final int BYTES_INT = Integer.BYTES;
+
         public static final int MIN_INT = Integer.MIN_VALUE;
 
         public static final int MAX_INT = Integer.MAX_VALUE;
 
         // ------------------------------------------------------------------------------------------------------ bigint
+
+        /**
+         * The storage size in bytes for {@code bigint} columns, which is {@value}.
+         */
+        public static final int BYTES_BIGINT = Long.BYTES;
+
         public static final long MIN_BIGINT = Long.MIN_VALUE;
 
         public static final long MAX_BIGINT = Long.MAX_VALUE;
 
         // ----------------------------------------------------------------------------------------------------- decimal
-        public static final int MAX_SCALE_DECIMAL = 16383;
+        static final int MAX_SCALE_DECIMAL = 16383;
 
-        public static final int MAX_PRECISION_DECIMAL = MAX_SCALE_DECIMAL + 131072;
+        static final int MAX_PRECISION_DECIMAL = MAX_SCALE_DECIMAL + 131072;
 
         // ----------------------------------------------------------------------------------------------------- numeric
-        public static final int MAX_SCALE_NUMERIC = MAX_SCALE_DECIMAL;
+        static final int MAX_SCALE_NUMERIC = MAX_SCALE_DECIMAL;
 
-        public static final int MAX_PRECISION_NUMERIC = MAX_PRECISION_DECIMAL;
+        static final int MAX_PRECISION_NUMERIC = MAX_PRECISION_DECIMAL;
 
         // -------------------------------------------------------------------------------------------------------- real
+
+        /**
+         * The storage size of the {@code real} type, which is {@value}.
+         */
         public static final int BYTES_REAL = Float.BYTES;
 
         // -------------------------------------------------------------------------------------------- double precision
+
+        /**
+         * The storage size of the {@code double precision} type, which is {@value}.
+         */
         public static final int BYTES_DOUBLE_PRECISION = Double.BYTES;
 
         // ------------------------------------------------------------------------------------------------- smallserial
+
+        /**
+         * The storage size of the {@code smallserial} type, which is {@value}.
+         */
         public static final int BYTES_SMALLSERIAL = Short.BYTES;
 
+        /**
+         * The minimum value of the {@code smallserial} type, which is {@value}.
+         */
         public static final int MIN_SMALLSERIAL = 1;
 
+        /**
+         * The maximum value of the {@code smallserial} type, which is {@value}.
+         */
         public static final int MAX_SMALLSERIAL = Short.MAX_VALUE;
 
         // ------------------------------------------------------------------------------------------------------ serial
+
+        /**
+         * The storage size of the {@code serial} type, which is {@value}.
+         */
         public static final int BYTES_SERIAL = Integer.BYTES;
 
+        /**
+         * The minimum value of the {@code serial} type, which is {@value}.
+         */
         public static final int MIN_SERIAL = 1;
 
+        /**
+         * The maximum value of the {@code serial} type, which is {@value}.
+         */
         public static final int MAX_SERIAL = Integer.MAX_VALUE;
 
         // --------------------------------------------------------------------------------------------------- bigserial
+
+        /**
+         * The storage size of the {@code bigserial} type, which is {@value}.
+         */
         public static final int BYTES_BIGSERIAL = Long.BYTES;
 
         /**
-         * The minimum value for {@code bigserial} columns, which is {@value}.
+         * The minimum value of the {@code bigserial} type, which is {@value}.
          */
         public static final int MIN_BIGSERIAL = 1;
 
         /**
-         * The maximum value for {@code bigserial} columns, which is {@value}.
+         * The maximum value of the {@code bigserial} type, which is {@value}.
          */
         public static final long MAX_BIGSERIAL = Long.MAX_VALUE;
 

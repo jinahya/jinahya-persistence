@@ -27,7 +27,7 @@ import jakarta.persistence.Entity;
         "java:S116" // Field names should comply with a naming convention
 })
 class __ConcreteMappedEntityWithGeneratedUuid
-        extends __MappedEntityWithGeneratedUuid<__ConcreteMappedEntityWithGeneratedUuid> {
+        extends __MappedEntityWithGeneratedUuid {
 
     protected __ConcreteMappedEntityWithGeneratedUuid() {
         super();

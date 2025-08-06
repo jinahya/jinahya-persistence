@@ -21,7 +21,7 @@ package com.github.jinahya.persistence.more.test;
  */
 
 class _SampleStringAttributeEnumConverterTest
-        extends __AttributeEnumConverterTest.__OfString<
+        extends __AttributeEnumConverterTest.__OfStringTest<
         _SampleStringAttributeEnumConverter,
         _SampleStringAttributeEnum
         > {

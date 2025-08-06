@@ -41,18 +41,6 @@ class __ConcreteMappedEntityTest {
     @DisplayName("equals/hashCode")
     @Test
     void equals_verify_() {
-//        final var instance1 = new __ConcreteMappedEntity();
-//        {
-//            assertThat(instance1).isEqualTo(instance1);
-//            assertThat(instance1).isNotEqualTo(new Object());
-//        }
-//        final var instance2 = new __ConcreteMappedEntity();
-//        assertThat(instance1).isNotEqualTo(instance2);
-//        assertThat(instance2).isNotEqualTo(instance1);
-//        instance1.setId__(0L);
-//        instance2.setId__(0L);
-//        assertThat(instance1).isEqualTo(instance2);
-//        assertThat(instance2).isEqualTo(instance1);
         EqualsVerifier
                 .forClass(__ConcreteMappedEntity.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
@@ -65,12 +53,5 @@ class __ConcreteMappedEntityTest {
     void getId____() {
         final var instance = new __ConcreteMappedEntity();
         final var id__ = instance.getId__();
-    }
-
-    @Test
-    void id____() {
-        final var instance = new __ConcreteMappedEntity();
-        final var result = instance.id__(0L);
-        assertThat(result).isSameAs(instance);
     }
 }

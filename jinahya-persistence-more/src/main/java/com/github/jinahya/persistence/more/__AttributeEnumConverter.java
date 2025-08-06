@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * An abstract attribute converter for converting between {@link E} type and {@link ATTRIBUTE} type.
  *
- * @param <E>      enum type parameter
+ * @param <E>         enum type parameter
  * @param <ATTRIBUTE> attribute type parameter
  */
 @SuppressWarnings({
@@ -89,9 +89,9 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
     }
 
     /**
-     * Converts specified db data to an entity attribute.
+     * Converts the specified database column value to an entity attribute.
      *
-     * @param dbData the data from the database column to be converted.
+     * @param dbData the database column value to convert.
      * @return an entity attribute; {@code null} when {@code dbData} is {@code null}.
      */
     @Override

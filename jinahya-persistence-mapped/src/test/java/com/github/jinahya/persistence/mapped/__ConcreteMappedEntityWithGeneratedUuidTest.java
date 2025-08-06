@@ -25,10 +25,7 @@ import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class __ConcreteMappedEntityWithGeneratedUuidTest {
 
@@ -49,23 +46,10 @@ class __ConcreteMappedEntityWithGeneratedUuidTest {
     @DisplayName("equals/hashCode")
     @Test
     void equals_verify_() {
-//        final var instance1 = new __ConcreteMappedEntity();
-//        {
-//            assertThat(instance1).isEqualTo(instance1);
-//            assertThat(instance1).isNotEqualTo(new Object());
-//        }
-//        final var instance2 = new __ConcreteMappedEntity();
-//        assertThat(instance1).isNotEqualTo(instance2);
-//        assertThat(instance2).isNotEqualTo(instance1);
-//        instance1.setId__(0L);
-//        instance2.setId__(0L);
-//        assertThat(instance1).isEqualTo(instance2);
-//        assertThat(instance2).isEqualTo(instance1);
         EqualsVerifier
                 .forClass(__ConcreteMappedEntityWithGeneratedUuid.class)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
-//                .suppress(Warning.JPA_GETTER) // https://github.com/jqno/equalsverifier/issues/1102
                 .verify();
     }
 
@@ -74,13 +58,5 @@ class __ConcreteMappedEntityWithGeneratedUuidTest {
     void getId____() {
         final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
         final var id__ = instance.getId__();
-    }
-
-    @Test
-    void id____() {
-        final var instance = new __ConcreteMappedEntityWithGeneratedUuid();
-        assertThatThrownBy(() -> {
-            final var result = instance.id__(UUID.randomUUID());
-        }).isInstanceOf(UnsupportedOperationException.class);
     }
 }

@@ -24,11 +24,16 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.spi.PersistenceProviderResolverHolder;
 import jakarta.validation.constraints.PositiveOrZero;
 
+import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -42,12 +47,84 @@ import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 
+/**
+ * Utilities for the Jakarta Persistence API.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class ___JakartaPersistenceTestUtils {
+final class ___JakartaPersistenceTestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // ----------------------------------------------------------------------------------------------------------- types
+    static void acceptEachEntityType(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                     @Nonnull final Consumer<? super EntityType<?>> consumer) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        entityManagerFactory.getMetamodel().getEntities().forEach(consumer);
+    }
+
+    static <C extends Collection<? super EntityType<?>>>
+    C addAllEntityTypes(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachEntityType(
+                entityManagerFactory,
+                collection::add
+        );
+        return collection;
+    }
+
+    static void acceptEachEntityJavaType(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                         @Nonnull final Consumer<? super Class<?>> consumer) {
+        Objects.requireNonNull(consumer, "consumer is null");
+        acceptEachEntityType(
+                entityManagerFactory,
+                et -> consumer.accept(et.getJavaType())
+        );
+    }
+
+    static <C extends Collection<? super Class<?>>>
+    C addAllEntityJavaTypes(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachEntityJavaType(
+                entityManagerFactory,
+                collection::add
+        );
+        return collection;
+    }
+
+    static void acceptEachEntityTableName(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                          @Nonnull final Consumer<? super String> consumer) {
+        Objects.requireNonNull(consumer, "consumer is null");
+        acceptEachEntityJavaType(
+                entityManagerFactory,
+                jt -> {
+                    final var tableName = ___JavaLangReflectTestUtils.findAnnotation(jt, Table.class)
+                            .map(Table::name)
+                            .map(String::strip)
+                            .filter(v -> !v.isBlank())
+                            .orElse(null);
+                    if (tableName == null) {
+                        logger.log(Level.DEBUG, "no table name found for {0}", jt);
+                        return;
+                    }
+                    consumer.accept(tableName);
+                }
+        );
+    }
+
+    static <C extends Collection<? super String>>
+    C addAllEntityTableNames(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+        Objects.requireNonNull(collection, "collection is null");
+        acceptEachEntityTableName(
+                entityManagerFactory,
+                collection::add
+        );
+        return collection;
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -58,11 +135,14 @@ public final class ___JakartaPersistenceTestUtils {
      * @param consumer    the consumer.
      * @param <X>         managed type parameter.
      */
-    public static <X> void acceptEachAttributeName(@Nonnull final ManagedType<X> managedType,
-                                                   @Nonnull final Consumer<? super String> consumer) {
+    static <X> void acceptEachAttributeName(@Nonnull final ManagedType<X> managedType,
+                                            @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(managedType, "managedType is null");
         Objects.requireNonNull(consumer, "consumer is null");
+        final var attributes = managedType.getAttributes();
+        final var declaredAttributes = managedType.getDeclaredAttributes();
         managedType.getAttributes()
+//        managedType.getDeclaredAttributes()
                 .stream()
                 .map(Attribute::getName)
                 .forEach(consumer);
@@ -77,10 +157,13 @@ public final class ___JakartaPersistenceTestUtils {
      * @param <C>         collection type parameter
      * @return given {@code collection}.
      */
-    public static <X, C extends Collection<? super String>>
+    static <X, C extends Collection<? super String>>
     C addAllAttributeNames(@Nonnull final ManagedType<X> managedType, @Nonnull final C collection) {
         Objects.requireNonNull(collection, "collection is null");
-        acceptEachAttributeName(managedType, collection::add);
+        acceptEachAttributeName(
+                managedType,
+                collection::add
+        );
         return collection;
     }
 
@@ -132,9 +215,9 @@ public final class ___JakartaPersistenceTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
-                                                        final Function<? super EntityManager, ? extends R> function,
-                                                        final boolean rollback) {
+    static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
+                                                 final Function<? super EntityManager, ? extends R> function,
+                                                 final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         if (entityManager.isJoinedToTransaction()) {
             throw new IllegalArgumentException("entityManager is already joined to a transaction");
@@ -162,9 +245,9 @@ public final class ___JakartaPersistenceTestUtils {
         }
     }
 
-    public static void acceptEntityManagerInTransaction(final EntityManager entityManager,
-                                                        final Consumer<? super EntityManager> consumer,
-                                                        final boolean rollback) {
+    static void acceptEntityManagerInTransaction(final EntityManager entityManager,
+                                                 final Consumer<? super EntityManager> consumer,
+                                                 final boolean rollback) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerInTransaction(
                 entityManager,
@@ -177,15 +260,15 @@ public final class ___JakartaPersistenceTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <R> R applyUnwrappedConnection(final EntityManager entityManager,
-                                                 final Function<? super Connection, ? extends R> function) {
+    static <R> R applyUnwrappedConnection(final EntityManager entityManager,
+                                          final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         try {
             return function.apply(entityManager.unwrap(Connection.class));
         } catch (final Exception e1) {
             try {
-                return ___OrgHibernateOrmTestUtils.applyConnection(
+                return ___HibernateTestUtils.applyConnection(
                         entityManager,
                         function
                 );
@@ -195,15 +278,15 @@ public final class ___JakartaPersistenceTestUtils {
         }
     }
 
-    public static <R> R applyConnection(final EntityManager entityManager,
-                                        final Function<? super Connection, ? extends R> function) {
+    static <R> R applyConnection(final EntityManager entityManager,
+                                 final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         return applyUnwrappedConnection(entityManager, function);
     }
 
-    public static void acceptConnection(final EntityManager entityManager,
-                                        final Consumer<? super Connection> consumer) {
+    static void acceptConnection(final EntityManager entityManager,
+                                 final Consumer<? super Connection> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyConnection(
                 entityManager,
@@ -216,7 +299,7 @@ public final class ___JakartaPersistenceTestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     @PositiveOrZero
-    public static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
+    static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final var builder = entityManager.getCriteriaBuilder();
@@ -227,8 +310,8 @@ public final class ___JakartaPersistenceTestUtils {
         return typed.getSingleResult();
     }
 
-    public static <R> R applyCount(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
-                                   @Nonnull final LongFunction<? extends R> function) {
+    static <R> R applyCount(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
+                            @Nonnull final LongFunction<? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply(
                 count(entityManager, entityClass)
@@ -247,21 +330,23 @@ public final class ___JakartaPersistenceTestUtils {
      *         the entity class is {@code zero}.
      */
     @Nullable
-    public static <R> R applyCountAndRandomIndex(
+    static <R> R applyCountAndRandomIndex(
             @Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
+        logger.log(Level.DEBUG, "count of {0}: {1}", entityClass, count);
         if (count == 0L) {
             return null;
         }
         assert count > 0L;
         final var index = ThreadLocalRandom.current().nextLong(count);
+        logger.log(Level.DEBUG, "random index: {0}", index);
         return function.apply(count).apply(index);
     }
 
-    public static void acceptCountAndRandomIndex(@Nonnull final EntityManager entityManager,
-                                                 @Nonnull final Class<?> entityClass,
-                                                 @Nonnull final LongFunction<? extends LongConsumer> function) {
+    static void acceptCountAndRandomIndex(@Nonnull final EntityManager entityManager,
+                                          @Nonnull final Class<?> entityClass,
+                                          @Nonnull final LongFunction<? extends LongConsumer> function) {
         applyCountAndRandomIndex(entityManager, entityClass, c -> i -> {
             function.apply(c).accept(i);
             return null;
@@ -277,8 +362,8 @@ public final class ___JakartaPersistenceTestUtils {
      * @return an optional of the selected entity; {@link Optional#empty() empty} when no entity found.
      */
     @Nonnull
-    public static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
-                                               @Nonnull final Class<T> entityClass) {
+    static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
+                                        @Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         return Optional.ofNullable(
@@ -300,8 +385,25 @@ public final class ___JakartaPersistenceTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static String entityName(final EntityManager entityManager, final Class<?> entityClass) {
+    static String entityName(final EntityManager entityManager, final Class<?> entityClass) {
         return entityManager.getMetamodel().entity(entityClass).getName();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static boolean isEclipseLink() {
+        return PersistenceProviderResolverHolder
+                .getPersistenceProviderResolver()
+                .getPersistenceProviders()
+                .stream()
+                .anyMatch(pp -> pp.getClass().getName().startsWith("org.eclipse.persistence"));
+    }
+
+    static boolean isHibernate() {
+        return PersistenceProviderResolverHolder
+                .getPersistenceProviderResolver()
+                .getPersistenceProviders()
+                .stream()
+                .anyMatch(pp -> pp.getClass().getName().startsWith("org.hibernate"));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

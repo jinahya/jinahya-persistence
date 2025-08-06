@@ -34,7 +34,7 @@ import jakarta.annotation.Nonnull;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdentityInstantiator<
-        ENTITY extends __MappedEntityWithGeneratedIdentity<ENTITY>
+        ENTITY extends __MappedEntityWithGeneratedIdentity
         >
         extends __MappedEntityInstantiator<ENTITY, Long> {
 
@@ -47,7 +47,7 @@ public abstract class __MappedEntityWithGeneratedIdentityInstantiator<
      * @see #entityClass
      * @see #idClass
      */
-    protected __MappedEntityWithGeneratedIdentityInstantiator(final Class<ENTITY> entityClass) {
+    protected __MappedEntityWithGeneratedIdentityInstantiator(@Nonnull final Class<ENTITY> entityClass) {
         super(entityClass, Long.class);
     }
 

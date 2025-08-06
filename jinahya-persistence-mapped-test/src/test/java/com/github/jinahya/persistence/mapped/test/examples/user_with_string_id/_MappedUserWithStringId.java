@@ -22,14 +22,16 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 
 @MappedSuperclass
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
-abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF>>
-        extends __MappedEntity<SELF, String> {
+abstract class _MappedUserWithStringId extends __MappedEntity<String> {
 
     static final String TABLE_NAME = "user_with_string_id";
 
@@ -50,23 +52,26 @@ abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof _MappedUserWithStringId)) {
+            return false;
+        }
         return super.equals(obj);
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return super.hashCode();
     }
 
     // ------------------------------------------------------------------------------------------------------ super.id__
     @Override
-    protected final String getId__() {
+    protected String getId__() {
         return name;
     }
 
     @Override
-    protected final void setId__(final String id__) {
+    protected void setId__(final String id__) {
         this.name = id__;
     }
 
@@ -80,23 +85,10 @@ abstract class _MappedUserWithStringId<SELF extends _MappedUserWithStringId<SELF
         setId__(name);
     }
 
-    @SuppressWarnings({
-            "unchecked"
-    })
-    public SELF name(@Nonnull final String name) {
-        setName(name);
-        return (SELF) this;
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
-    @jakarta.annotation.Nonnull
-    @jakarta.validation.constraints.NotNull
-    @jakarta.persistence.Id
-    @jakarta.persistence.Column(
-            name = _MappedUserWithStringId.COLUMN_NAME_NAME,
-            nullable = false,
-            insertable = true,
-            updatable = false
-    )
+    @Nonnull
+    @NotNull
+    @Id
+    @Column(name = _MappedUserWithStringId.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
     private String name;
 }
