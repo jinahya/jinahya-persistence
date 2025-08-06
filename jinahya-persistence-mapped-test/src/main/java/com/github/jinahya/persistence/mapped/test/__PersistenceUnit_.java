@@ -61,6 +61,10 @@ abstract class __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
+        logger.log(Level.INFO, "entityManagerFactory: {0}", entityManagerFactory);
+        entityManagerFactory.getProperties().forEach((k, v) -> {
+            logger.log(Level.DEBUG, "{}: {}", k, v);
+        });
         catalog = __PersistenceUnitUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
         schema = __PersistenceUnitUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
         types = __PersistenceUnitUtils.getDefaultTypes(entityManagerFactory).orElse(null);
@@ -78,7 +82,7 @@ abstract class __PersistenceUnit_ {
     })
     protected void printDatabaseInfo__() {
         acceptEntityManager(em -> {
-            ___JakartaPersistenceTestUtils.acceptConnection(
+            ___JakartaPersistenceTestUtils.acceptConnectionInTransaction(
                     em,
                     c -> {
                         try {
@@ -90,7 +94,7 @@ abstract class __PersistenceUnit_ {
             );
         });
         acceptEntityManager(em -> {
-            ___JakartaPersistenceTestUtils.acceptConnection(
+            ___JakartaPersistenceTestUtils.acceptConnectionInTransaction(
                     em,
                     c -> {
                         try {

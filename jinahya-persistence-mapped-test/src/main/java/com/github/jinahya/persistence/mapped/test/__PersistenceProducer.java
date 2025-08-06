@@ -82,12 +82,12 @@ public class __PersistenceProducer {
     /**
      * The name of the persistence unit for unit tests.
      */
-    public static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "unitPU";
+    public static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "testPU";
 
     /**
      * The name of the persistence unit for integration tests.
      */
-    public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "integrationPU";
+    public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "itPU";
 
     // -----------------------------------------------------------------------------------------------------------------
 
