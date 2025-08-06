@@ -63,7 +63,7 @@ abstract class __PersistenceUnit_ {
     protected void doOnPostConstruct() {
         logger.log(Level.INFO, "entityManagerFactory: {0}", entityManagerFactory);
         entityManagerFactory.getProperties().forEach((k, v) -> {
-            logger.log(Level.DEBUG, "{}: {}", k, v);
+            logger.log(Level.DEBUG, "{0}: {1}", k, v);
         });
         catalog = __PersistenceUnitUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
         schema = __PersistenceUnitUtils.getDefaultSchema(entityManagerFactory).orElseThrow();

@@ -119,6 +119,7 @@ public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntit
     @Inject
     private EntityManagerFactory entityManagerFactory;
 
+    @Deprecated(forRemoval = true)
     @__PersistenceProducer.Unit__
     @Inject
     private EntityManager entityManager;
