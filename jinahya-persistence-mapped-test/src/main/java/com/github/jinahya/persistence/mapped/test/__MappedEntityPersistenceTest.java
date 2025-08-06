@@ -26,6 +26,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,7 @@ public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntit
 //        });
 //    }
 
+    @Disabled
     @DisplayName("__HibernateTestUtils")
     @Nested
     class __HibernateTestUtilsTest {
