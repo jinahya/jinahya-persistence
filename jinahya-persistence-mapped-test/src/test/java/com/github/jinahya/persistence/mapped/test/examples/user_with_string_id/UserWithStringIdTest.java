@@ -39,11 +39,9 @@ class UserWithStringIdTest extends __MappedEntityTest<UserWithStringId, String> 
         super.equals_verify();
     }
 
-    @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithStringId> getEqualsVerifier() {
-        return super.getEqualsVerifier()
-                .suppress(Warning.SURROGATE_KEY)
-                ;
+    protected void equals_verify_(@Nonnull final SingleTypeEqualsVerifierApi<UserWithStringId> equalsVerifier) {
+        super.equals_verify_(equalsVerifier);
+        equalsVerifier.suppress(Warning.SURROGATE_KEY);
     }
 }

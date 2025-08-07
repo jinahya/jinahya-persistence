@@ -50,10 +50,9 @@ public class Entity01Test extends _MappedEntityTest<Entity01, Long> {
         super.equals_verify();
     }
 
-    @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<Entity01> getEqualsVerifier() {
-        return super.getEqualsVerifier()
+    protected void equals_verify_(@Nonnull final SingleTypeEqualsVerifierApi<Entity01> equalsVerifier) {
+        equalsVerifier
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY);
     }
