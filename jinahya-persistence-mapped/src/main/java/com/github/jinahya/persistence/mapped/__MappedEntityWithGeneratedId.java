@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.mapped;
  */
 
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 
 /**
  * An abstract mapped superclass for entities with generated primary keys.
@@ -90,16 +89,4 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
     protected final void setId__(final ID id__) {
         throw new UnsupportedOperationException("setting id__ is not allowed");
     }
-
-//    // -----------------------------------------------------------------------------------------------------------------
-//
-//    /**
-//     * Returns the generated id.
-//     *
-//     * @return the generated id.
-//     */
-//    @Transient
-//    public final ID getGeneratedId__() {
-//        return getId__();
-//    }
 }

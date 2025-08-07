@@ -265,8 +265,13 @@ final class ___JakartaPersistenceTestUtils {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         try {
-            return function.apply(entityManager.unwrap(Connection.class));
+            final var connection = entityManager.unwrap(Connection.class);
+            if (connection == null) {
+                throw new RuntimeException("null unwrapped from " + entityManager);
+            }
+            return function.apply(connection);
         } catch (final Exception e1) {
+            logger.log(Level.DEBUG, "failed to unwrap connection from " + entityManager, e1);
             try {
                 return ___HibernateTestUtils.applyConnection(
                         entityManager,
@@ -282,13 +287,42 @@ final class ___JakartaPersistenceTestUtils {
                                  final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
-        return applyUnwrappedConnection(entityManager, function);
+        return applyUnwrappedConnection(
+                entityManager,
+                function
+        );
     }
 
     static void acceptConnection(final EntityManager entityManager,
                                  final Consumer<? super Connection> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyConnection(
+                entityManager,
+                c -> {
+                    consumer.accept(c);
+                    return null;
+                }
+        );
+    }
+
+    static <R> R applyConnectionInTransaction(final EntityManager entityManager,
+                                              final Function<? super Connection, ? extends R> function) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManagerInTransaction(
+                entityManager,
+                em -> applyUnwrappedConnection(
+                        em,
+                        function
+                ),
+                true
+        );
+    }
+
+    static void acceptConnectionInTransaction(final EntityManager entityManager,
+                                              final Consumer<? super Connection> consumer) {
+        Objects.requireNonNull(consumer, "consumer is null");
+        applyConnectionInTransaction(
                 entityManager,
                 c -> {
                     consumer.accept(c);

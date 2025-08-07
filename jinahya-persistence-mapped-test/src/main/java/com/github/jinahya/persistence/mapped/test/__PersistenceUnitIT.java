@@ -109,7 +109,7 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     protected void _Mapped_AllDatabaseTableNames() {
         final var databaseTableNames =
                 applyEntityManager(em -> {
-                    return ___JakartaPersistenceTestUtils.applyConnection(
+                    return ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
                             em,
                             c -> {
                                 try {
@@ -151,6 +151,7 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
         remainingDatabaseTableNames.removeIf(tn -> {
             return tn.startsWith("HTE_"); // H2 temporary tables
         });
+        remainingDatabaseTableNames.remove("SEQUENCE");
         remainingDatabaseTableNames.forEach(tn -> logger.log(Level.WARNING, "remaining database table name: {0}", tn));
         assertThat(remainingDatabaseTableNames)
                 .as("remaining database table names")
@@ -169,7 +170,7 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     protected void _Mapped_AllEntityTableNames() {
         final var databaseTableNames = Collections.unmodifiableList(
                 applyEntityManager(
-                        em -> ___JakartaPersistenceTestUtils.applyConnection(
+                        em -> ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
                                 em,
                                 c -> {
                                     try {

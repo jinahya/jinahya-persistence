@@ -31,7 +31,25 @@ import java.util.Optional;
 })
 final class __PersistenceUnitUtils {
 
+    private static Optional<String> getProperty(final EntityManagerFactory entityManagerFactory, final String name) {
+        return Optional
+                .ofNullable(
+                        (String) entityManagerFactory.getProperties().get(name)
+                )
+                .or(() -> {
+                    try (final var entityManager = entityManagerFactory.createEntityManager()) {
+                        return Optional.ofNullable((String) entityManager.getProperties().get(name));
+                    }
+                });
+    }
+
     static Optional<String> getDefaultCatalog(final EntityManagerFactory entityManagerFactory) {
+        if (true) {
+            return getProperty(
+                    entityManagerFactory,
+                    __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
+            );
+        }
         return Optional.ofNullable(
                 (String) entityManagerFactory.getProperties().get(
                         __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
@@ -40,6 +58,12 @@ final class __PersistenceUnitUtils {
     }
 
     static Optional<String> getDefaultSchema(final EntityManagerFactory entityManagerFactory) {
+        if (true) {
+            return getProperty(
+                    entityManagerFactory,
+                    __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
+            );
+        }
         return Optional.ofNullable(
                 (String) entityManagerFactory.getProperties().get(
                         __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
@@ -48,6 +72,13 @@ final class __PersistenceUnitUtils {
     }
 
     static Optional<String[]> getDefaultTypes(final EntityManagerFactory entityManagerFactory) {
+        if (true) {
+            return getProperty(
+                    entityManagerFactory,
+                    __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
+            )
+                    .map(v -> v.split(","));
+        }
         return Optional.ofNullable(
                         (String) entityManagerFactory.getProperties().get(
                                 __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
