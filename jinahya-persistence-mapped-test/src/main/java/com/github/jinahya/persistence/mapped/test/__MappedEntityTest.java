@@ -117,18 +117,21 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      */
     @DisplayName("equals/hashCode")
     @Test
-    protected void equals_verify() {
-        final var equalsVerifier = EqualsVerifier.forClass(entityClass);
-        equals_verify_(equalsVerifier);
-        equalsVerifier.verify();
+    protected void equals_verify_() {
+        equals_verify_(EqualsVerifier.forClass(entityClass)).verify();
     }
 
     /**
      * Configures specified equals verifier.
      *
-     * @see #equals_verify()
+     * @param equalsVerifier the equals verifier to configure.
+     * @return given {@code equalsVerifier}.
+     * @see #equals_verify_()
      */
-    protected void equals_verify_(@Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
+    @Nonnull
+    protected SingleTypeEqualsVerifierApi<ENTITY> equals_verify_(
+            @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
+        return equalsVerifier;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
