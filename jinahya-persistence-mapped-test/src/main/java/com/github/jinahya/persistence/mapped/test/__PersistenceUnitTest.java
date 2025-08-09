@@ -20,10 +20,6 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import org.jboss.weld.junit5.auto.AddBeanClasses;
-import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import java.lang.invoke.MethodHandles;
 
 /**
