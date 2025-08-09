@@ -31,6 +31,14 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * Utilities for the {@link java.sql} package.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 final class ___JavaSqlTestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());

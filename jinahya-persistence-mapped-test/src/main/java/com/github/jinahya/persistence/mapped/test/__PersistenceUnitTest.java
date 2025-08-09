@@ -20,74 +20,37 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.event.Startup;
-import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.invoke.MethodHandles;
-import java.sql.SQLException;
 
-@AddBeanClasses({
-        __PersistenceProducer.class
-})
-@ExtendWith(WeldJunit5AutoExtension.class)
+/**
+ * An abstract class for testing persistence unit of {@link __PersistenceConstants#PERSISTENCE_UNIT_NAME_TEST_PU}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __PersistenceUnitIT
+ */
+//@AddBeanClasses({
+//        __PersistenceProducer.class
+//})
+//@ExtendWith(WeldJunit5AutoExtension.class)
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-public abstract class __PersistenceUnitTest extends __PersistenceUnit_{
+public abstract class __PersistenceUnitTest extends __PersistenceUnit_ {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-//    // -----------------------------------------------------------------------------------------------------------------
-//    @PostConstruct
-//    protected void doOnPostConstruct() {
-//        logger.log(System.Logger.Level.DEBUG, "entityManagerFactory: {0}", entityManagerFactory);
-//        entityManagerFactory.getProperties().forEach((k, v) -> logger.log(System.Logger.Level.DEBUG, "\t{0}: {1}", k, v));
-//        catalog = __PersistenceUnitUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
-//        schema = __PersistenceUnitUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
-//        logger.log(System.Logger.Level.DEBUG, "catalog: {0}", catalog);
-//        logger.log(System.Logger.Level.DEBUG, "schema: {0}", schema);
-//    }
-//
-//    // https://stackoverflow.com/a/72628439/330457
-//    private void onStartup(@Observes final Startup startup) {
-//    }
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
-//    // -----------------------------------------------------------------------------------------------------------------
-//    @Test
-//    public void printDatabaseInfo__() {
-//        ___JakartaPersistenceTestUtils.acceptConnection(
-//                entityManager,
-//                c -> {
-//                    try {
-//                        ___JavaSqlTestUtils.printDatabaseInfo(c);
-//                    } catch (final SQLException sqle) {
-//                        throw new RuntimeException("failed to print database info", sqle);
-//                    }
-//                }
-//        );
-//    }
-//
-//    // -----------------------------------------------------------------------------------------------------------------
-//    @__PersistenceProducer.Unit__
-//    @Inject
-//    private EntityManagerFactory entityManagerFactory;
-//
-//    @Deprecated(forRemoval = true)
-//    @__PersistenceProducer.Unit__
-//    @Inject
-//    private EntityManager entityManager;
-//
-//    private String catalog;
-//
-//    private String schema;
+    /**
+     * Creates a new instance.
+     */
+    protected __PersistenceUnitTest() {
+        super();
+    }
 }

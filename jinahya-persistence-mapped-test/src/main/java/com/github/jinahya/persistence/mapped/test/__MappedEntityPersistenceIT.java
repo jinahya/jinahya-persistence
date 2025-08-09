@@ -244,11 +244,11 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__PersistenceProducer.Integration__
+    @__PersistenceProducer.__itPU
     @Inject
     private EntityManagerFactory entityManagerFactory;
 
-    @__PersistenceProducer.Integration__
+    @__PersistenceProducer.__itPU
     @Inject
     private EntityManager entityManager;
 }

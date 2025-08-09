@@ -169,7 +169,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
                         .doesNotThrowAnyException();
             }
         } catch (final Exception e) {
-            throw new RuntimeException("failed to test accessors for " + entityInstance, e);
+            throw new RuntimeException("failed to test accessors of " + entityInstance, e);
         }
     }
 
@@ -195,7 +195,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
         newRandomizedEntityInstance().ifPresent(this::accessors__);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------- entityClass
 
     /**
      * Returns a new instance of {@link #entityClass}.
@@ -228,7 +228,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
         return newRandomizedEntityInstance().map(Mockito::spy);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------- idClass
     @Nonnull
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)

@@ -40,6 +40,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Utilities for the {@link __MappedEntityPersistenceTest}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S125", // Sections of code should not be commented out
@@ -181,9 +186,9 @@ public class __MappedEntityPersistenceTestUtils {
 
         if (true) {
             if (___JakartaPersistenceTestUtils.isEclipseLink()) {
-                collection.addAll(___EclipseLinkTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
+                collection.addAll(____EclipseLinkTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
             } else if (___JakartaPersistenceTestUtils.isHibernate()) {
-                collection.addAll(___HibernateTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
+                collection.addAll(____HibernateTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
             }
             return collection;
         }

@@ -44,47 +44,24 @@ final class __PersistenceUnitUtils {
     }
 
     static Optional<String> getDefaultCatalog(final EntityManagerFactory entityManagerFactory) {
-        if (true) {
-            return getProperty(
-                    entityManagerFactory,
-                    __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
-            );
-        }
-        return Optional.ofNullable(
-                (String) entityManagerFactory.getProperties().get(
-                        __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
-                )
+        return getProperty(
+                entityManagerFactory,
+                __PersistenceConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
         );
     }
 
     static Optional<String> getDefaultSchema(final EntityManagerFactory entityManagerFactory) {
-        if (true) {
-            return getProperty(
-                    entityManagerFactory,
-                    __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
-            );
-        }
-        return Optional.ofNullable(
-                (String) entityManagerFactory.getProperties().get(
-                        __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
-                )
+        return getProperty(
+                entityManagerFactory,
+                __PersistenceConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
         );
     }
 
     static Optional<String[]> getDefaultTypes(final EntityManagerFactory entityManagerFactory) {
-        if (true) {
-            return getProperty(
-                    entityManagerFactory,
-                    __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
-            )
-                    .map(v -> v.split(","));
-        }
-        return Optional.ofNullable(
-                        (String) entityManagerFactory.getProperties().get(
-                                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
-                        )
-                )
-                .map(v -> v.split(","));
+        return getProperty(
+                entityManagerFactory,
+                __PersistenceConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
+        ).map(v -> v.split(","));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

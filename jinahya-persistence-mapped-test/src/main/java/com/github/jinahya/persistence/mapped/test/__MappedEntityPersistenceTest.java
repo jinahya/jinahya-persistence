@@ -89,7 +89,7 @@ public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntit
                 "java:S125"  // Sections of code should not be commented out
         })
         void getEntityColumnNames__() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-            final var m = ___HibernateTestUtils.class.getDeclaredMethod(
+            final var m = ____HibernateTestUtils.class.getDeclaredMethod(
                     "getEntityColumnNames",
                     EntityManagerFactory.class,
                     Class.class
@@ -115,12 +115,12 @@ public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntit
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__PersistenceProducer.Unit__
+    @__PersistenceProducer.__testPU
     @Inject
     private EntityManagerFactory entityManagerFactory;
 
     @Deprecated(forRemoval = true)
-    @__PersistenceProducer.Unit__
+    @__PersistenceProducer.__testPU
     @Inject
     private EntityManager entityManager;
 }

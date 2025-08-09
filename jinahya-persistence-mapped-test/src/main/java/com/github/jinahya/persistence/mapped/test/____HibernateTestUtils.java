@@ -36,15 +36,15 @@ import java.util.stream.Stream;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___HibernateTestUtils {
+final class ____HibernateTestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Return the result of the specified function applied to a connection unwrapped from the specified entity manager.
      *
-     * @param entityManager an entity manager.
-     * @param function      the function to be applied with a connection.
+     * @param entityManager the entity manager from which the connection is unwrapped.
+     * @param function      the function to be applied with the connection.
      * @param <R>           result type parameter
      * @return the result of the {@code function}.
      */
@@ -129,7 +129,7 @@ final class ___HibernateTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___HibernateTestUtils() {
+    private ____HibernateTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -20,10 +20,25 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+/**
+ * A class for providing persistence resources.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class __PersistenceProducerConstants {
+public final class __PersistenceConstants {
+
+    /**
+     * The name of the persistence unit for unit tests.
+     */
+    public static final String PERSISTENCE_UNIT_NAME_TEST_PU = "__testPU";
+
+    /**
+     * The name of the persistence unit for integration tests.
+     */
+    public static final String PERSISTENCE_UNIT_NAME_IT_PU = "__itPU";
 
     // -----------------------------------------------------------------------------------------------------------------
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG = "jinahya.persistence.default_catalog";
@@ -33,7 +48,11 @@ final class __PersistenceProducerConstants {
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES = "jinahya.persistence.default_types";
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __PersistenceProducerConstants() {
+
+    /**
+     * Creates a new instance.
+     */
+    private __PersistenceConstants() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
