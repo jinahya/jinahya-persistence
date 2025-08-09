@@ -28,7 +28,7 @@ package com.github.jinahya.persistence.mapped.test;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __PersistenceConstants {
+public final class __PersistenceProducerConstants {
 
     /**
      * The name of the persistence unit for unit tests.
@@ -52,7 +52,7 @@ public final class __PersistenceConstants {
     /**
      * Creates a new instance.
      */
-    private __PersistenceConstants() {
+    private __PersistenceProducerConstants() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

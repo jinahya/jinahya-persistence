@@ -56,7 +56,7 @@ public class __PersistenceProducer {
     }
 
     /**
-     * A qualifier for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
+     * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
      */
     @__PU
     @Qualifier
@@ -68,7 +68,7 @@ public class __PersistenceProducer {
     }
 
     /**
-     * A qualifier for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
+     * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
      */
     @__PU
     @Qualifier
@@ -91,10 +91,10 @@ public class __PersistenceProducer {
     // ---------------------------------------------------------------------------------------------------------- testPU
 
     /**
-     * Produces an entity manager factory for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
+     * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
      * persistence unit.
      *
-     * @return an entity manager factory for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
+     * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
      *         persistence unit
      * @see #disposeTestEntityManagerFactory(EntityManagerFactory)
      * @see #produceTestEntityManager(EntityManagerFactory)
@@ -102,7 +102,7 @@ public class __PersistenceProducer {
     @__testPU
     @Produces
     public EntityManagerFactory produceTestEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(__PersistenceConstants.PERSISTENCE_UNIT_NAME_TEST_PU);
+        return Persistence.createEntityManagerFactory(__PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_TEST_PU);
     }
 
     /**
@@ -116,9 +116,9 @@ public class __PersistenceProducer {
     }
 
     /**
-     * Produces an entity manager for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
+     * Produces an entity manager for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
      *
-     * @return an entity manager for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit
+     * @return an entity manager for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit
      * @see #disposeTestEntityManager(EntityManager)
      * @see #produceTestEntityManagerFactory()
      */
@@ -144,14 +144,14 @@ public class __PersistenceProducer {
     // ------------------------------------------------------------------------------------------------------------ itPU
 
     /**
-     * Produces an entity manager factory for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+     * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      *
-     * @return an entity manager factory for the {@value __PersistenceConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+     * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      */
     @__itPU
     @Produces
     public EntityManagerFactory produceItEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(__PersistenceConstants.PERSISTENCE_UNIT_NAME_IT_PU);
+        return Persistence.createEntityManagerFactory(__PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU);
     }
 
     /**

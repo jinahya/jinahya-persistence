@@ -23,7 +23,7 @@ package com.github.jinahya.persistence.mapped.test;
 import java.lang.invoke.MethodHandles;
 
 /**
- * An abstract class for testing persistence unit of {@link __PersistenceConstants#PERSISTENCE_UNIT_NAME_TEST_PU}.
+ * An abstract class for testing persistence unit of {@link __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __PersistenceUnitIT
