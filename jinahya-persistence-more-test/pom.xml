@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -10,10 +11,7 @@
 
   <artifactId>jinahya-persistence-more-test</artifactId>
 
-  <properties>
-    <jakarta.inject.version>2.0.1</jakarta.inject.version>
-    <jakarta.cdi.version>3.0.0</jakarta.cdi.version>
-  </properties>
+  <name>${project.artifactId}</name>
 
   <dependencies>
     <dependency>
@@ -28,14 +26,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>jakarta.interceptor</groupId>
-      <artifactId>jakarta.interceptor-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>jakarta.inject</groupId>
       <artifactId>jakarta.inject-api</artifactId>
-      <version>${jakarta.inject.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -43,11 +35,6 @@
       <artifactId>jakarta.persistence-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>net.jodah</groupId>-->
-    <!--      <artifactId>typetools</artifactId>-->
-    <!--      <scope>compile</scope>-->
-    <!--    </dependency>-->
     <dependency>
       <groupId>nl.jqno.equalsverifier</groupId>
       <artifactId>equalsverifier-nodep</artifactId>
