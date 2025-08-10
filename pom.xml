@@ -74,11 +74,17 @@
     <version.nl.jqno.equalsverifier>4.0.7</version.nl.jqno.equalsverifier>
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
     <version.org.eclipse.persistence>5.0.0-B09</version.org.eclipse.persistence>
+    <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
+    <!-- https://docs.jboss.org/hibernate/validator/8.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
+    <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
+    <!-- hibernate-validator: 6.3 /  org.glassfish:jakarta.el:3.0.3 -->
+    <!-- hibernate-validator: 8 / expressly: 5 -->
+    <!-- hibernate-validator: 9 / expressly: 6 -->
     <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly -->
     <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
     <!-- https://hibernate.org/orm/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-platform/versions -->
-<!--    <version.org.hibernate.orm>7.0.9.Final</version.org.hibernate.orm>-->
+    <!--    <version.org.hibernate.orm>7.0.9.Final</version.org.hibernate.orm>-->
     <version.org.hibernate.orm>7.1.0.Final</version.org.hibernate.orm>
     <!-- https://hibernate.org/validator/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
@@ -87,7 +93,8 @@
     <!-- https://central.sonatype.com/artifact/org.jboss.weld/weld-junit5/versions -->
     <version.org.jboss.weld>5.0.1.Final</version.org.jboss.weld>
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
-    <version.org.junit>5.13.3</version.org.junit>
+    <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/versions -->
+    <version.org.junit>5.13.4</version.org.junit>
     <version.org.junit.jupiter>${version.org.junit}</version.org.junit.jupiter>
     <version.org.junit.platform>1.9.1</version.org.junit.platform>
     <version.org.mockito>5.18.0</version.org.mockito>
@@ -115,11 +122,6 @@
         <version>${version.jakarta.jakartaee-bom}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.jodah</groupId>
-        <artifactId>typetools</artifactId>
-        <version>0.6.3</version>
       </dependency>
       <dependency>
         <groupId>nl.jqno.equalsverifier</groupId>
@@ -169,7 +171,7 @@
         <groupId>org.glassfish.expressly</groupId>
         <artifactId>expressly</artifactId>
         <!--        <version>5.0.0</version>-->
-        <version>6.0.0</version>
+        <version>${version.org.glassfish.expressly}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.weld</groupId>
@@ -567,6 +569,34 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>spring-boot-3.3</id>
+      <!-- https://docs.spring.io/spring-boot/3.3/appendix/dependency-versions/coordinates.html -->
+      <properties>
+        <version.org.hibenrate.orm>6.5.3.Final</version.org.hibenrate.orm>
+        <version.org.hibenrate.validator>8.0.2.Final</version.org.hibenrate.validator>
+        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
+      </properties>
+    </profile>
+    <profile>
+      <id>spring-boot-3.4</id>
+      <!-- https://docs.spring.io/spring-boot/3.4/appendix/dependency-versions/coordinates.html -->
+      <properties>
+        <version.org.hibenrate.orm>6.6.22.Final</version.org.hibenrate.orm>
+        <version.org.hibenrate.validator>8.0.2.Final</version.org.hibenrate.validator>
+        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
+      </properties>
+    </profile>
+    <profile>
+      <id>spring-boot-3.5</id>
+      <!-- https://docs.spring.io/spring-boot/3.5/appendix/dependency-versions/coordinates.html -->
+      <!-- https://docs.spring.io/spring-boot/appendix/dependency-versions/coordinates.html -->
+      <properties>
+        <version.org.hibenrate.orm>6.6.22.Final</version.org.hibenrate.orm>
+        <version.org.hibenrate.validator>8.0.2.Final</version.org.hibenrate.validator>
+        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
+      </properties>
     </profile>
   </profiles>
 </project>
