@@ -26,6 +26,11 @@ import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Utilities for {@link __AttributeEnum}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention

@@ -26,6 +26,11 @@ import jakarta.persistence.EntityManager;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Utilities for {@link ___Persister}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
@@ -52,12 +57,22 @@ public final class ___PersisterUtils {
                 .map(i -> (___Persister<T>) i);
     }
 
+    /**
+     * Returns a new persisted instance of the specified entity class.
+     *
+     * @param entityManager an entity manager.
+     * @param entityClass   entity entityClass parameter.
+     * @param <T>           entity entityClass parameter.
+     * @return a new persisted instance of the {@code entityClass}.
+     */
     @Nonnull
-    public static <T> T newPersistedInstanceOf(final EntityManager entityManager, final Class<T> type) {
-        Objects.requireNonNull(type, "type is null");
-        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(type).orElseThrow();
-        newPersisterInstanceOf(type)
-                .orElseThrow(() -> new RuntimeException("not persister instance for " + type))
+    public static <T> T newPersistedInstanceOf(@Nonnull final EntityManager entityManager,
+                                               @Nonnull final Class<T> entityClass) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
+        newPersisterInstanceOf(entityClass)
+                .orElseThrow(() -> new RuntimeException("not persister instance for " + entityClass))
                 .persist(entityManager, entityInstance);
         return entityInstance;
     }

@@ -29,7 +29,7 @@ import java.util.Objects;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___EclipseLinkTestUtils {
+final class ____EclipseLinkTestUtils {
 
     /**
      * Returns an unmodifiable list of the specified entity class's column names.
@@ -82,7 +82,7 @@ final class ___EclipseLinkTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___EclipseLinkTestUtils() {
+    private ____EclipseLinkTestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

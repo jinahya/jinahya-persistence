@@ -20,19 +20,48 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+/**
+ * Constants for the {@link __PersistenceProducer}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class __PersistenceProducerConstants {
+public final class __PersistenceProducerConstants {
+
+    /**
+     * The name of the persistence unit for unit tests.
+     */
+    public static final String PERSISTENCE_UNIT_NAME_TEST_PU = "__testPU";
+
+    /**
+     * The name of the persistence unit for integration tests.
+     */
+    public static final String PERSISTENCE_UNIT_NAME_IT_PU = "__itPU";
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The name of the persistence unit property for table catalog.
+     */
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG = "jinahya.persistence.default_catalog";
 
+    /**
+     * The name of the persistence unit property for table schema.
+     */
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA = "jinahya.persistence.default_schema";
 
+    /**
+     * The name of the persistence unit property for table types.
+     */
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES = "jinahya.persistence.default_types";
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new instance.
+     */
     private __PersistenceProducerConstants() {
         throw new AssertionError("instantiation is not allowed");
     }

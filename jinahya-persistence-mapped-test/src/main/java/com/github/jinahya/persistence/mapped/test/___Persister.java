@@ -25,12 +25,23 @@ import jakarta.persistence.EntityManager;
 
 import java.util.Objects;
 
+/**
+ * An abstract class for persisting a specific class.
+ *
+ * @param <ENTITY> entity type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class ___Persister<ENTITY> {
 
+    /**
+     * Creates a new instance for persisting specified class.
+     *
+     * @param entityClass the class to persist.
+     */
     protected ___Persister(@Nonnull final Class<ENTITY> entityClass) {
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");

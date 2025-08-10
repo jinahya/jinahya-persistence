@@ -33,10 +33,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@AddBeanClasses({
-//        __PersistenceProducer.class
-//})
-//@ExtendWith(WeldJunit5AutoExtension.class)
+/**
+ * An abstract class for testing persistence unit of
+ * {@link __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __PersistenceUnitTest
+ */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
@@ -47,56 +50,14 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new instance.
+     */
     protected __PersistenceUnitIT() {
         super();
     }
 
-//    // -----------------------------------------------------------------------------------------------------------------
-//    @PostConstruct
-//    protected void doOnPostConstruct() {
-//        catalog = __PersistenceUnitUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
-//        schema = __PersistenceUnitUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
-//        types = __PersistenceUnitUtils.getDefaultTypes(entityManagerFactory).orElse(null);
-//    }
-//
-//    // https://stackoverflow.com/a/72628439/330457
-//    private void onStartup(@Observes final Startup startup) {
-//    }
-
-//    // -----------------------------------------------------------------------------------------------------------------
-//    @DisplayName("print database info")
-//    @Test
-//    @SuppressWarnings({
-//            "java:S100" // Method names should comply with a naming convention
-//    })
-//    protected void printDatabaseInfo__() {
-//        ___JakartaPersistenceTestUtils.acceptConnection(
-//                entityManager,
-//                c -> {
-//                    try {
-//                        ___JavaSqlTestUtils.printDatabaseInfo(c);
-//                    } catch (final SQLException sqle) {
-//                        throw new RuntimeException("failed to print database info", sqle);
-//                    }
-//                }
-//        );
-//        ___JakartaPersistenceTestUtils.acceptConnection(
-//                entityManager,
-//                c -> {
-//                    try {
-//                        try (var tableTypes = c.getMetaData().getTableTypes()) {
-//                            while (tableTypes.next()) {
-//                                final var tableType = tableTypes.getString("TABLE_TYPE");
-//                                logger.log(Level.INFO, "TABLE_TYPE: {0}", tableType);
-//                            }
-//                        }
-//                    } catch (final SQLException sqle) {
-//                        throw new RuntimeException("failed to print table types", sqle);
-//                    }
-//                }
-//        );
-//    }
-//
     // -----------------------------------------------------------------------------------------------------------------
 
     /**

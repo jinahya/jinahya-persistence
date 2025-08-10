@@ -4,5 +4,3 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jinahya_jinahya-persistence&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jinahya_jinahya-persistence)
 
 Helper modules for the Jakarta Persistence API.
-
-This project MIGHT NOT be what you are looking for. This module is for creating mapped superclasses not entities.

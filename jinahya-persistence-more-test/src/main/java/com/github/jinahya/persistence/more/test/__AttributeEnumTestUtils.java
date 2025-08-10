@@ -32,6 +32,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Utilities for testing {@link __AttributeEnum}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
@@ -41,6 +46,7 @@ public final class __AttributeEnumTestUtils {
     static <E extends Enum<E> & __AttributeEnum<E, ?>, R>
     R applyEnumConstantStream(@Nonnull final Class<E> enumClass,
                               @Nonnull final Function<? super Stream<E>, ? extends R> function) {
+        Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(function, "function is null");
         final var builder = Stream.<E>builder();
         for (final E enumConstant : enumClass.getEnumConstants()) {
@@ -118,15 +124,18 @@ public final class __AttributeEnumTestUtils {
     R applyRandomEnumConstant(@Nonnull final Class<E> enumClass,
                               @Nonnull final Function<? super E, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return applyEnumConstantStream(enumClass, s -> {
-            final List<E> list = s.toList();
-            if (list.isEmpty()) {
-                return null;
-            }
-            final var index = ThreadLocalRandom.current().nextInt(list.size());
-            final var value = list.get(index);
-            return function.apply(value);
-        });
+        return applyEnumConstantStream(
+                enumClass,
+                s -> {
+                    final List<E> list = s.toList();
+                    if (list.isEmpty()) {
+                        return null;
+                    }
+                    final var index = ThreadLocalRandom.current().nextInt(list.size());
+                    final var value = list.get(index);
+                    return function.apply(value);
+                }
+        );
     }
 
     /**

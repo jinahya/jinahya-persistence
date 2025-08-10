@@ -30,6 +30,15 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * An abstract base class for testing {@link __AttributeEnumConverter} implementations.
+ *
+ * @param <CONVERTER> converter type parameter
+ * @param <E>         enums type parameter
+ * @param <ATTRIBUTE> attribute type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ *
+ */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
@@ -44,6 +53,7 @@ public abstract class __AttributeEnumConverterTest<
         >
         extends __AttributeEnumTest<E, ATTRIBUTE> {
 
+    // -----------------------------------------------------------------------------------------------------------------
     /**
      * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfString}.
      *

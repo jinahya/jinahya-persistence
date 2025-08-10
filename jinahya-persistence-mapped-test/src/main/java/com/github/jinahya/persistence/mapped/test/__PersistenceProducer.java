@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.mapped.test;
 import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Qualifier;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -43,7 +42,7 @@ import java.lang.annotation.Target;
 })
 public class __PersistenceProducer {
 
-    @Retention(RetentionPolicy.RUNTIME)
+    @Retention(RetentionPolicy.CLASS)
     @Target({
             ElementType.ANNOTATION_TYPE,
             ElementType.PARAMETER,
@@ -51,43 +50,31 @@ public class __PersistenceProducer {
             ElementType.METHOD,
             ElementType.TYPE
     })
-    @interface Persistence__ {
+    @interface __PU {
 
     }
 
     /**
-     * A qualifier for the {@value __PersistenceProducer#PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit.
+     * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
      */
-    @Persistence__
+    @Qualifier
+    @Documented
+    @__PU
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface __testPU {
+
+    }
+
+    /**
+     * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
+     */
+    @__PU
     @Qualifier
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
-//    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
-    public @interface Unit__ {
+    public @interface __itPU {
 
     }
-
-    /**
-     * A qualifier for the {@value __PersistenceProducer#PERSISTENCE_UNIT_NAME_INTEGRATION_PU} persistence unit.
-     */
-    @Persistence__
-    @Qualifier
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-//    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
-    public @interface Integration__ {
-
-    }
-
-    /**
-     * The name of the persistence unit for unit tests.
-     */
-    public static final String PERSISTENCE_UNIT_NAME_UNIT_PU = "testPU";
-
-    /**
-     * The name of the persistence unit for integration tests.
-     */
-    public static final String PERSISTENCE_UNIT_NAME_INTEGRATION_PU = "itPU";
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -98,75 +85,52 @@ public class __PersistenceProducer {
         super();
     }
 
-    // ------------------------------------------------------------------------------------------------------------ unit
+    // ---------------------------------------------------------------------------------------------------------- testPU
 
     /**
-     * Produces an entity manager factory for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit.
+     * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
+     * persistence unit.
      *
-     * @return an entity manager factory for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit
-     * @see #disposeUnitEntityManagerFactory(EntityManagerFactory)
-     * @see #produceUnitEntityManager(EntityManagerFactory)
+     * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
+     *         persistence unit
+     * @see #disposeTestEntityManagerFactory(EntityManagerFactory)
      */
-    @Unit__
+    @__testPU
     @Produces
-    public EntityManagerFactory produceUnitEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_UNIT_PU);
+    public EntityManagerFactory produceTestEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(__PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_TEST_PU);
     }
 
     /**
-     * Disposes the specified entity manager factory produced by {@link #produceUnitEntityManagerFactory()} method.
+     * Disposes the specified entity manager factory produced by {@link #produceTestEntityManagerFactory()} method.
      *
      * @param entityManagerFactory the entity manager factory to dispose.
-     * @see #produceUnitEntityManagerFactory()
+     * @see #produceTestEntityManagerFactory()
      */
-    public void disposeUnitEntityManagerFactory(@Unit__ @Disposes final EntityManagerFactory entityManagerFactory) {
+    public void disposeTestEntityManagerFactory(@__testPU @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
     }
 
-    /**
-     * Produces an entity manager for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit.
-     *
-     * @return an entity manager for the {@value #PERSISTENCE_UNIT_NAME_UNIT_PU} persistence unit
-     * @see #disposeUnitEntityManager(EntityManager)
-     * @see #produceUnitEntityManagerFactory()
-     */
-    @Unit__
-    @Produces
-    public EntityManager produceUnitEntityManager(@Unit__ final EntityManagerFactory entityManagerFactory) {
-        return entityManagerFactory.createEntityManager();
-    }
+    // ------------------------------------------------------------------------------------------------------------ itPU
 
     /**
-     * Disposes the specified entity manager produced by {@link #produceUnitEntityManager(EntityManagerFactory)}
-     * method.
+     * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      *
-     * @param entityManager the entity manager to dispose.
-     * @see #produceUnitEntityManager(EntityManagerFactory)
+     * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      */
-    public void disposeUnitEntityManager(@Unit__ @Disposes final EntityManager entityManager) {
-        entityManager.close();
-    }
-
-    // ----------------------------------------------------------------------------------------------------- integration
-    @Integration__
+    @__itPU
     @Produces
-    public EntityManagerFactory produceIntegrationEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME_INTEGRATION_PU);
+    public EntityManagerFactory produceItEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory(__PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU);
     }
 
-    public void disposeIntegrationEntityManagerFactory(
-            @Integration__ @Disposes final EntityManagerFactory entityManagerFactory) {
+    /**
+     * Disposes the specified entity manager factory produced by {@link #produceItEntityManagerFactory()} method.
+     *
+     * @param entityManagerFactory the entity manager factory to dispose.
+     */
+    public void disposeItEntityManagerFactory(
+            @__itPU @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
-    }
-
-    @Integration__
-    @Produces
-    public EntityManager produceIntegrationEntityManager(
-            @Integration__ final EntityManagerFactory entityManagerFactory) {
-        return entityManagerFactory.createEntityManager();
-    }
-
-    public void disposeIntegrationEntityManager(@Integration__ @Disposes final EntityManager entityManager) {
-        entityManager.close();
     }
 }

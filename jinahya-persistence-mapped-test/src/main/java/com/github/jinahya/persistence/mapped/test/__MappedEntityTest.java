@@ -89,7 +89,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @see #newEntityInstance()
      * @see #toString_NotBlank_(__MappedEntity)
      */
-    @DisplayName("toString()!blank <- newEntityInstance()")
+    @DisplayName("newEntityInstance().toString()!blank")
     @Test
     protected void toString_NotBlank_newEntityInstance() {
         toString_NotBlank_(newEntityInstance());
@@ -102,7 +102,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @see #newRandomizedEntityInstance()
      * @see #toString_NotBlank_(__MappedEntity)
      */
-    @DisplayName("toString()!blank <- newRandomizedEntityInstance()")
+    @DisplayName("newRandomizedEntityInstance().toString()!blank")
     @Test
     protected void toString_NotBlank_newRandomizedEntityInstance() {
         newRandomizedEntityInstance().ifPresent(this::toString_NotBlank_);
@@ -111,14 +111,15 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
 
     /**
-     * Verifies the {@link #entityClass} verifies with an equals verifier.
+     * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of {@link #entityClass} using an
+     * equals-verifier configured within {@link #equals_Verify_(SingleTypeEqualsVerifierApi)} method.
      *
-     * @see #equals_verify_(SingleTypeEqualsVerifierApi)
+     * @see #equals_Verify_(SingleTypeEqualsVerifierApi)
      */
     @DisplayName("equals/hashCode")
     @Test
-    protected void equals_verify_() {
-        equals_verify_(EqualsVerifier.forClass(entityClass)).verify();
+    protected void equals_Verify_() {
+        equals_Verify_(EqualsVerifier.forClass(entityClass)).verify();
     }
 
     /**
@@ -126,10 +127,10 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      *
      * @param equalsVerifier the equals verifier to configure.
      * @return given {@code equalsVerifier}.
-     * @see #equals_verify_()
+     * @see #equals_Verify_()
      */
     @Nonnull
-    protected SingleTypeEqualsVerifierApi<ENTITY> equals_verify_(
+    protected SingleTypeEqualsVerifierApi<ENTITY> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
         return equalsVerifier;
     }
@@ -141,35 +142,35 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      *
      * @param entityInstance the instance to test.
      */
-    protected void accessors__(@Nonnull final ENTITY entityInstance) {
+    @SuppressWarnings({
+            "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
+    })
+    protected void accessors_DoesNotThrow_(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         try {
             final var info = Introspector.getBeanInfo(entityClass);
             for (final var descriptor : info.getPropertyDescriptors()) {
                 final var reader = descriptor.getReadMethod();
-                if (reader == null) {
+                if (reader == null || reader.isAnnotationPresent(Transient.class)) {
                     continue;
                 }
                 if (!reader.canAccess(entityInstance)) {
                     reader.setAccessible(true);
                 }
-                if (reader.isAnnotationPresent(Transient.class)) {
-                    continue;
-                }
                 final var value = reader.invoke(entityInstance);
                 final var writer = descriptor.getWriteMethod();
-                if (writer == null) {
+                if (writer == null || writer.isAnnotationPresent(Transient.class)) {
                     continue;
                 }
                 if (!writer.canAccess(entityInstance)) {
                     writer.setAccessible(true);
                 }
                 assertThatCode(() -> writer.invoke(entityInstance, value))
-                        .as("%s(%s)", writer.getName(), value)
+                        .as("%s(%s())", writer.getName(), reader.getName())
                         .doesNotThrowAnyException();
             }
         } catch (final Exception e) {
-            throw new RuntimeException("failed to test accessors for " + entityInstance, e);
+            throw new RuntimeException("failed to test accessors of " + entityInstance, e);
         }
     }
 
@@ -177,25 +178,27 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * Tests standard accessors with a new instance of {@link #entityClass}.
      *
      * @see #newEntityInstance()
-     * @see #accessors__(__MappedEntity)
+     * @see #accessors_DoesNotThrow_(__MappedEntity)
      */
+    @DisplayName("newEntityInstance().accessors_DoesNotThrow_()")
     @Test
-    protected void accessors__newEntityInstance() {
-        accessors__(newEntityInstance());
+    protected void accessors_DoesNotThrow_newEntityInstance() {
+        accessors_DoesNotThrow_(newEntityInstance());
     }
 
     /**
      * Tests standard accessors with a new randomized instance of {@link #entityClass}.
      *
      * @see #newRandomizedEntityInstance()
-     * @see #accessors__(__MappedEntity)
+     * @see #accessors_DoesNotThrow_(__MappedEntity)
      */
+    @DisplayName("newRandomizedEntityInstance().accessors_DoesNotThrow_()")
     @Test
-    protected void accessors__newRandomizedEntityInstance() {
-        newRandomizedEntityInstance().ifPresent(this::accessors__);
+    protected void accessors_DoesNotThrow_newRandomizedEntityInstance() {
+        newRandomizedEntityInstance().ifPresent(this::accessors_DoesNotThrow_);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------- entityClass
 
     /**
      * Returns a new instance of {@link #entityClass}.
@@ -218,33 +221,66 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
         return Mockito.spy(newEntityInstance());
     }
 
+    /**
+     * Returns a new randomized instance of {@link #entityClass}.
+     *
+     * @return a new randomized instance of {@link #entityClass}.
+     */
     @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstance() {
         return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
+    /**
+     * Returns a new spy object of a new randomized instance of {@link #entityClass}.
+     *
+     * @return a new spy object of a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty}
+     *         when no randomizer found.
+     */
     @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
         return newRandomizedEntityInstance().map(Mockito::spy);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------- idClass
+
+    /**
+     * Returns a new instance of {@link #idClass}.
+     *
+     * @return a new instance of {@link #idClass}.
+     */
     @Nonnull
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
                 .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass));
     }
 
+    /**
+     * Returns a spy object of a new instance of {@link #newIdInstance()}.
+     *
+     * @return a spy object of a new instance of {@link #newIdInstance()}.
+     */
     @Nonnull
     protected ID newIdInstanceSpy() {
         return Mockito.spy(newIdInstance());
     }
 
+    /**
+     * Returns a new randomized instance of {@link #idClass}.
+     *
+     * @return a new randomized instance of {@link #idClass}; {@link Optional#empty() empty} when no randomizer found.
+     */
     @Nonnull
     protected Optional<ID> newRandomizedIdInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
     }
 
+    /**
+     * Returns a spy object of a new randomized instance of {@link #idClass}.
+     *
+     * @return a spy object of a new randomized instance of {@link #idClass}; {@link Optional#empty() empty} when no
+     *         randomizer found.
+     */
     @Nonnull
     protected Optional<ID> newRandomizedIdInstanceSpy() {
         return newRandomizedIdInstance().map(Mockito::spy);

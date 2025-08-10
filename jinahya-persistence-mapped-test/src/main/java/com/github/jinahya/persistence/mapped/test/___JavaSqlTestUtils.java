@@ -31,6 +31,14 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * Utilities for the {@link java.sql} package.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 final class ___JavaSqlTestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
@@ -122,8 +130,8 @@ final class ___JavaSqlTestUtils {
 
     static void printDatabaseInfo(final Connection connection) throws SQLException {
         final var databaseMetaData = connection.getMetaData();
-        final var databaseProductName = databaseMetaData.getDatabaseProductName();
-        final var databaseProductVersion = databaseMetaData.getDatabaseProductVersion();
+//        final var databaseProductName = databaseMetaData.getDatabaseProductName();
+//        final var databaseProductVersion = databaseMetaData.getDatabaseProductVersion();
         try (var catalogs = databaseMetaData.getCatalogs()) {
             while (catalogs.next()) {
                 final var tableCat = catalogs.getString("TABLE_CAT");
@@ -131,7 +139,7 @@ final class ___JavaSqlTestUtils {
                 try (var schemas = databaseMetaData.getSchemas(tableCat, null)) {
                     while (schemas.next()) {
                         final var schema = schemas.getString("TABLE_SCHEM");
-                        logger.log(Level.INFO, "\t{0}.TABLE_SCHEM: {1}", tableCat, schema);
+                        logger.log(Level.INFO, "\tTABLE_SCHEM: {0}", schema);
                     }
                 }
             }
@@ -139,7 +147,8 @@ final class ___JavaSqlTestUtils {
         try (var schemas = databaseMetaData.getSchemas()) {
             while (schemas.next()) {
                 final var tableSchem = schemas.getString("TABLE_SCHEM");
-                logger.log(Level.INFO, "TABLE_SCHEM: {0}", tableSchem);
+                final var tableCatalog = schemas.getString("TABLE_CATALOG");
+                logger.log(Level.INFO, "TABLE_SCHEM: {0}; TABLE_CATALOG: {1}", tableSchem, tableCatalog);
             }
         }
     }

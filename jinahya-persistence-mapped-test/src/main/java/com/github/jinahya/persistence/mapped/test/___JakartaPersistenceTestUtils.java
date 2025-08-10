@@ -273,7 +273,7 @@ final class ___JakartaPersistenceTestUtils {
         } catch (final Exception e1) {
             logger.log(Level.DEBUG, "failed to unwrap connection from " + entityManager, e1);
             try {
-                return ___HibernateTestUtils.applyConnection(
+                return ____HibernateTestUtils.applyConnection(
                         entityManager,
                         function
                 );

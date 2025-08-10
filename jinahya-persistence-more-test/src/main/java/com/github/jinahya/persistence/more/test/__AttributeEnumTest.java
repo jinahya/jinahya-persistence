@@ -21,6 +21,8 @@ package com.github.jinahya.persistence.more.test;
  */
 
 import com.github.jinahya.persistence.more.__AttributeEnum;
+import jakarta.annotation.Nonnull;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
@@ -77,8 +79,13 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Verifies that each enum constant has a non-null attribute value.
+     */
+    @DisplayName("no null attribute value")
     @Test
-    protected void _NoNullAttributeValue_() {
+    protected void _NoNull_AttributeValue() {
         __AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue(
                 enumClass,
                 (ec, av) -> {
@@ -89,8 +96,12 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
         );
     }
 
+    /**
+     * Verifies that each attribute value is unique among enum constants.
+     */
+    @DisplayName("no duplicates of attribute values")
     @Test
-    protected void _NoDuplicateAttributeValue_() {
+    protected void _NoDuplicates_AttributeValues() {
         __AttributeEnumTestUtils.acceptAttributeValueStream(
                 enumClass,
                 s -> {
@@ -108,7 +119,8 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
      *
      * @param consumer the consumer.
      */
-    protected void acceptEachEnumConstantAndAttributeValue(final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
+    protected void acceptEachEnumConstantAndAttributeValue(
+            @Nonnull final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
         __AttributeEnumTestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
     }
 
@@ -121,7 +133,7 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
      * @return the result of the {@code function}.
      * @see #acceptEnumConstantStream(Consumer)
      */
-    protected final <R> R applyEnumConstantStream(final Function<? super Stream<E>, ? extends R> function) {
+    protected final <R> R applyEnumConstantStream(@Nonnull final Function<? super Stream<E>, ? extends R> function) {
         return __AttributeEnumTestUtils.applyEnumConstantStream(enumClass, function);
     }
 
@@ -131,7 +143,7 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
      * @param consumer the consumer.
      * @see #applyEnumConstantStream(Function)
      */
-    protected final void acceptEnumConstantStream(final Consumer<? super Stream<E>> consumer) {
+    protected final void acceptEnumConstantStream(@Nonnull final Consumer<? super Stream<E>> consumer) {
         __AttributeEnumTestUtils.acceptEnumConstantStream(enumClass, consumer);
     }
 
@@ -142,7 +154,8 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
      * @param function the function.
      * @see #acceptAttributeValueStream(Consumer)
      */
-    protected final <R> R applyAttributeValueStream(final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
+    protected final <R> R applyAttributeValueStream(
+            @Nonnull final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
         return __AttributeEnumTestUtils.applyAttributeValueStream(enumClass, function);
     }
 
@@ -152,7 +165,7 @@ public abstract class __AttributeEnumTest<E extends Enum<E> & __AttributeEnum<E,
      * @param consumer the consumer.
      * @see #applyAttributeValueStream(Function)
      */
-    protected final void acceptAttributeValueStream(final Consumer<? super Stream<ATTRIBUTE>> consumer) {
+    protected final void acceptAttributeValueStream(@Nonnull final Consumer<? super Stream<ATTRIBUTE>> consumer) {
         __AttributeEnumTestUtils.acceptAttributeValueStream(enumClass, consumer);
     }
 

@@ -187,7 +187,7 @@ abstract class __PersistenceUnit_ {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__PersistenceProducer.Integration__
+    @__PersistenceProducer.__itPU
     @Inject
     private EntityManagerFactory entityManagerFactory;
 

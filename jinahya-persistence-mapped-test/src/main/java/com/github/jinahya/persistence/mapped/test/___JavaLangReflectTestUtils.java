@@ -29,6 +29,14 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Utilities for the {@link java.lang.reflect} package.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 final class ___JavaLangReflectTestUtils {
 
     private static final Method AUTO_CLOSEABLE_CLOSE_METHOD;

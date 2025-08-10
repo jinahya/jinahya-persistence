@@ -24,7 +24,7 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="3.2">
-  <persistence-unit name="testPU">
+  <persistence-unit name="__testPU">
     <description>Persistence Unit for an In-Memory DB</description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
@@ -47,7 +47,7 @@
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <!--      <property name="eclipselink.weaving" value="true"/>-->
+      <property name="eclipselink.weaving" value="static"/>
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
@@ -64,7 +64,7 @@
       <property name="jinahya.persistence.default_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
-  <persistence-unit name="itPU">
+  <persistence-unit name="__itPU">
     <description>Persistence Unit for a Physical Database</description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
@@ -87,13 +87,14 @@
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <!--      <property name="eclipselink.weaving" value="true"/>-->
+      <property name="eclipselink.weaving" value="static"/>
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <!-- https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation -->
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
-      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
       <property name="hibernate.format_sql" value="true"/>
+      <!-- https://docs.jboss.org/hibernate/orm/7.1/javadocs/constant-values.html#org.hibernate.tool.schema.Action.ACTION_NONE -->
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.highlight_sql" value="true"/>
       <property name="hibernate.show_sql" value="true"/>
