@@ -47,7 +47,7 @@
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <!--      <property name="eclipselink.weaving" value="true"/>-->
+      <property name="eclipselink.weaving" value="static"/>
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
@@ -87,13 +87,14 @@
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <!--      <property name="eclipselink.weaving" value="true"/>-->
+      <property name="eclipselink.weaving" value="static"/>
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <!-- https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation -->
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <!-- hibernate -->
-      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
       <property name="hibernate.format_sql" value="true"/>
+      <!-- https://docs.jboss.org/hibernate/orm/7.1/javadocs/constant-values.html#org.hibernate.tool.schema.Action.ACTION_NONE -->
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.highlight_sql" value="true"/>
       <property name="hibernate.show_sql" value="true"/>

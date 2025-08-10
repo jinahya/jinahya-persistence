@@ -69,17 +69,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Checks that all table column names are mapped, and reports to the
-     * {@link #_Empty_RemainingTableColumnNames(Collection)} method with remaining table column names.
-     *
-     * @see #_Empty_RemainingTableColumnNames(Collection)
-     * @see #_Mapped_AllEntityColumnColumnNames()
-     */
-    @DisplayName("check that all table columns are mapped")
-    @Test
-    protected void _Mapped_AllTableColumnNames() {
+    protected Collection<String> getTableColumnNames() {
         final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
         final var catalog = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultCatalog)
                 .orElseGet(table::catalog);
@@ -102,7 +92,11 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
                     "; table: " + table.name()
                 )
                 .isNotEmpty();
-        final var attributeColumnNames = Collections.unmodifiableList(
+        return tableColumnNames;
+    }
+
+    protected Collection<String> getEntityColumnNames() {
+        final var entityColumnNames = Collections.unmodifiableList(
                 applyEntityManagerFactory(
                         emf -> __MappedEntityPersistenceTestUtils.addAllEntityColumNames(
                                 emf,
@@ -111,11 +105,28 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
                         )
                 )
         );
-        logger.log(Level.DEBUG, "entity column names: {0}", attributeColumnNames);
-        assertThat(attributeColumnNames)
+        logger.log(Level.DEBUG, "entity column names: {0}", entityColumnNames);
+        assertThat(entityColumnNames)
                 .as("entity column names of " + entityClass)
                 .isNotEmpty();
+        return entityColumnNames;
+    }
+
+    /**
+     * Checks that all table column names are mapped, and reports to the
+     * {@link #_Empty_RemainingTableColumnNames(Collection)} method with remaining table column names.
+     *
+     * @see #_Empty_RemainingTableColumnNames(Collection)
+     */
+    @DisplayName("check that all table columns are mapped")
+    @Test
+    protected void _Mapped_AllTableColumnNames() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var tableColumnNames = getTableColumnNames();
+        final var attributeColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
+        // -------------------------------------------------------------------------------------------------------- when
         tableColumnNames.removeAll(attributeColumnNames);
+        // -------------------------------------------------------------------------------------------------------- then
         _Empty_RemainingTableColumnNames(tableColumnNames);
     }
 
@@ -123,6 +134,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
      * Asserts that specified remaining table column names, from which all entity column names are removed, is empty.
      *
      * @param remainingTableColumnNames the remaining table column names that all entity column names are removed.
+     * @see #_Mapped_AllTableColumnNames()
      */
     protected void _Empty_RemainingTableColumnNames(@Nonnull final Collection<String> remainingTableColumnNames) {
         Objects.requireNonNull(remainingTableColumnNames, "remainingTableColumnNames is null");
@@ -137,64 +149,33 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Checks that all entity column names are mapped, and reports to the
-     * {@link #_Empty_RemainingEntityColumnNames(Collection)} method with remaining table column names.
+     * Checks that all entity column names are known.
      *
-     * @see #_Empty_RemainingEntityColumnNames(Collection)
-     * @see #_Mapped_AllTableColumnNames()
+     * @see #_Empty_UnknownEntityColumnNames(Collection)
      */
-    @DisplayName("check that all entity columns are mapped")
+    @DisplayName("check that all entity columns are known")
     @Test
-    protected void _Mapped_AllEntityColumnColumnNames() {
-        final var table = __MappedEntityTestUtils.getTableAnnotation(entityClass);
-        final var catalog = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultCatalog)
-                .orElseGet(table::catalog);
-        final var schema = applyEntityManagerFactory(__PersistenceUnitUtils::getDefaultSchema)
-                .orElseGet(table::schema);
-        final var tableColumnNames = Collections.unmodifiableList(
-                applyConnectionInTransactionAndRollback(
-                        c -> ___JavaSqlTestUtils.addAllColumnNames(
-                                c,
-                                catalog,
-                                schema,
-                                table.name(),
-                                new ArrayList<>()
-                        )
-                )
-        );
-        assertThat(tableColumnNames)
-                .as("table column names for " + entityClass +
-                    "; catalog: " + catalog +
-                    "; schema: " + schema +
-                    "; table: " + table.name()
-                )
-                .isNotEmpty();
-        final var entityColumnNames = applyEntityManagerFactory(
-                emf -> __MappedEntityPersistenceTestUtils.addAllEntityColumNames(
-                        emf,
-                        entityClass,
-                        new ArrayList<>()
-                )
-        );
-        assertThat(entityColumnNames)
-                .as("entity column names of " + entityClass)
-                .isNotEmpty();
+    protected void _Known_AllEntityColumnColumnNames() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
+        final var entityColumnNames = getEntityColumnNames();
+        // -------------------------------------------------------------------------------------------------------- when
         entityColumnNames.removeAll(tableColumnNames);
-        _Empty_RemainingEntityColumnNames(entityColumnNames);
+        // -------------------------------------------------------------------------------------------------------- then
+        _Empty_UnknownEntityColumnNames(entityColumnNames);
     }
 
     /**
-     * Asserts that specified remaining entity column names, defined upward {@link #entityClass}, from which all table
-     * column names are removed, is empty.
+     * Asserts that specified remaining entity column names, from which all table column names are removed, is empty.
      *
-     * @param remainingEntityColumnNames the remaining entity column names that all table column names are removed.
+     * @param unknownEntityColumnNames the remaining entity column names that all table column names are removed.
      */
-    protected void _Empty_RemainingEntityColumnNames(@Nonnull final Collection<String> remainingEntityColumnNames) {
-        Objects.requireNonNull(remainingEntityColumnNames, "remainingEntityColumnNames is null");
-        remainingEntityColumnNames.forEach(cn -> {
+    protected void _Empty_UnknownEntityColumnNames(@Nonnull final Collection<String> unknownEntityColumnNames) {
+        Objects.requireNonNull(unknownEntityColumnNames, "unknownEntityColumnNames is null");
+        unknownEntityColumnNames.forEach(cn -> {
             logger.log(Level.WARNING, "remaining entity column name: " + cn);
         });
-        assertThat(remainingEntityColumnNames)
+        assertThat(unknownEntityColumnNames)
                 .as("remaining entity column names")
                 .isEmpty();
     }
@@ -202,31 +183,33 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     // ----------------------------------------------------------------------------------------------------- entityClass
 
     /**
-     * Tries to select a random entity instance, and reports to the {@link #__RandomEntityInstance(__MappedEntity)}
-     * method.
+     * Verifies that a randomly selected entity instance is valid.
      *
      * @see ___JakartaPersistenceTestUtils#selectRandom(EntityManager, Class)
      */
     @DisplayName("select an entity instance of a random index")
     @Test
-    protected void __RandomEntityInstance() {
+    protected void _Valid_RandomlySelectedEntityInstance() {
+        // -------------------------------------------------------------------------------------------------------- when
         final var entityInstance = applyEntityManager(
                 em -> ___JakartaPersistenceTestUtils.selectRandom(em, entityClass)
         );
         if (entityInstance.isEmpty()) {
-            logger.log(Level.INFO, "no random entity selected; maybe the table empty?");
+            logger.log(Level.INFO, "no random entity selected; maybe the table is empty?");
             return;
         }
-        __RandomEntityInstance(entityInstance.get());
+        // -------------------------------------------------------------------------------------------------------- then
+        _Valid_RandomlySelectedEntityInstance(entityInstance.get());
     }
 
     /**
-     * Notifies, by the {@link #__RandomEntityInstance()} method, that the specified entity instance has been selected.
+     * Notifies, by the {@link #_Valid_RandomlySelectedEntityInstance()} method, that the specified entity instance has
+     * been selected.
      *
      * @param entityInstance the entity instance.
-     * @see #__RandomEntityInstance()
+     * @see #_Valid_RandomlySelectedEntityInstance()
      */
-    protected void __RandomEntityInstance(@Nonnull final ENTITY entityInstance) {
+    protected void _Valid_RandomlySelectedEntityInstance(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(Level.DEBUG, "selected entity instance: {0}", entityInstance);
         ___JakartaValidationTestUtils.requireValid(entityInstance);

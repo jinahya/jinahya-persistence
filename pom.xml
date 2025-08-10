@@ -49,17 +49,17 @@
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
-    <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
+    <maven.compiler.release>${maven.compiler.source}</maven.compiler.release>
     <!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
     <maven.compiler.testSource>21</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
-    <maven.compiler.testRelease>${maven.compiler.testTarget}</maven.compiler.testRelease>
-    <sonar.organization>jinahya-github</sonar.organization>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <sonar.coverage.jacoco.xmlReportPaths>
       target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-mapped/target/site/jacoco/jacoco.xml,jinahya-persistence-mapped-test/target/site/jacoco/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml
     </sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.language>java</sonar.language>
+    <sonar.organization>jinahya-github</sonar.organization>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.3</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->

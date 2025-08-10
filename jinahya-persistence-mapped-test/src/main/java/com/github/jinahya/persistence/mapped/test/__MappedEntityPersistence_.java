@@ -46,32 +46,6 @@ abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
         super(entityClass, idClass);
     }
 
-//    // -----------------------------------------------------------------------------------------------------------------
-//    protected <T extends __MappedEntity<?>, R> R applyNewPersistEntityInstanceOf(
-//            @Nonnull final Class<T> entityClass,
-//            @Nonnull final Function<
-//                    ? super EntityManager,
-//                    ? extends Function<
-//                            ? super T,
-//                            ? extends R>> function) {
-//        Objects.requireNonNull(entityClass, "entityClass is null");
-//        Objects.requireNonNull(function, "function is null");
-//        return applyEntityManagerInTransactionAndRollback(em -> {
-//            final var entityInstance = __MappedEntityPersisterUtils.newPersistedInstanceOf(em, entityClass);
-//            return function.apply(em).apply(entityInstance);
-//        });
-//    }
-//
-//    protected <R> R applyNewPersistEntityInstance(
-//            @Nonnull final Function<
-//                    ? super EntityManager,
-//                    ? extends Function<
-//                            ? super ENTITY,
-//                            ? extends R>> function) {
-//        Objects.requireNonNull(function, "function is null");
-//        return applyNewPersistEntityInstanceOf(entityClass, function);
-//    }
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -105,6 +79,13 @@ abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
     // -------------------------------------------------------------------------------------------- entityManagerFactory
 
     /**
+     * Returns an instance of {@link EntityManagerFactory}.
+     *
+     * @return an instance of {@link EntityManagerFactory}.
+     */
+    abstract EntityManagerFactory getEntityManagerFactory();
+
+    /**
      * Applies an injected instance of {@link EntityManagerFactory} to the specified function, and returns the result.
      *
      * @param function the function.
@@ -112,7 +93,6 @@ abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
      * @return the result of the {@code function}.
      * @see #acceptEntityManagerFactory(Consumer)
      */
-    @Deprecated(forRemoval = true)
     protected final <R> R applyEntityManagerFactory(
             @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
@@ -125,7 +105,6 @@ abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
      * @param consumer the consumer.
      * @see #applyEntityManagerFactory(Function)
      */
-    @Deprecated(forRemoval = true)
     protected final void acceptEntityManagerFactory(@Nonnull final Consumer<? super EntityManagerFactory> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerFactory(emf -> {
@@ -179,7 +158,6 @@ abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
         });
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
     @Deprecated(forRemoval = true)
     protected final <R> R applyEntityManagerInTransaction(
             @Nonnull final Function<? super EntityManager, ? extends R> function,
@@ -309,10 +287,4 @@ abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
                 }
         );
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    abstract EntityManagerFactory getEntityManagerFactory();
-
-//    @Deprecated(forRemoval = true)
-//    abstract EntityManager getEntityManager();
 }

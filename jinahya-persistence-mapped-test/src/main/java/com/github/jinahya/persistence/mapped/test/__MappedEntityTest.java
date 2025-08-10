@@ -111,7 +111,8 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
 
     /**
-     * Verifies the {@link #entityClass} verifies with an equals verifier.
+     * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of {@link #entityClass} using an
+     * equals-verifier configured within {@link #equals_Verify_(SingleTypeEqualsVerifierApi)} method.
      *
      * @see #equals_Verify_(SingleTypeEqualsVerifierApi)
      */
