@@ -33,6 +33,8 @@
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUserWithEmbeddedId</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.UserWithEmbeddedId</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_generated_identity.UserWithGeneratedIdentity</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_generated_uuid.UserWithGeneratedUuid</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.UserWithStringId</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
@@ -47,7 +49,7 @@
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <property name="eclipselink.weaving" value="static"/>
+<!--      <property name="eclipselink.weaving" value="static"/>-->
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.ddl-generation" value="create-tables"/>
@@ -73,6 +75,8 @@
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUserWithEmbeddedId</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.UserWithEmbeddedId</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_generated_identity.UserWithGeneratedIdentity</class>
+    <class>com.github.jinahya.persistence.mapped.test.examples.user_with_generated_uuid.UserWithGeneratedUuid</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_string_id.UserWithStringId</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
@@ -87,7 +91,7 @@
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
-      <property name="eclipselink.weaving" value="static"/>
+<!--      <property name="eclipselink.weaving" value="static"/>-->
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <!-- https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation -->

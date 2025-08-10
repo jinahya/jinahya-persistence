@@ -65,9 +65,21 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
         return id__;
     }
 
+    @Override
+    protected void setId__(final Long id__) {
+        if (true) {
+            this.id__ = id__; // EclipseLink
+            return;
+        }
+        throw new UnsupportedOperationException("setting id__ is not allowed");
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = COLUMN_NAME_ID__, nullable = false, insertable = false, updatable = false)
+    @Column(name = COLUMN_NAME_ID__, nullable = false,
+            insertable = true, // EclipseLink
+            updatable = false
+    )
     private Long id__;
 }

@@ -20,30 +20,24 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import java.lang.invoke.MethodHandles;
+import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
+import jakarta.annotation.Nonnull;
 
 /**
- * An abstract class for testing the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence
- * unit.
+ * An abstract class for randomizing subclasses of {@link __MappedEntityWithGeneratedIdentity}.
  *
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __PersistenceUnitIT
+ * @param <ENTITY> entity type parameter
  */
 @SuppressWarnings({
-        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
-        "java:S6813" // Field dependency injection should be avoided
+        "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __PersistenceUnitTest extends __PersistenceUnit_ {
+public abstract class __MappedEntityWithGeneratedIdentityPersister<
+        ENTITY extends __MappedEntityWithGeneratedIdentity
+        >
+        extends __MappedEntityWithGeneratedIdPersister<ENTITY, Long> {
 
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
-    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-
-    /**
-     * Creates a new instance.
-     */
-    protected __PersistenceUnitTest() {
-        super();
+    protected __MappedEntityWithGeneratedIdentityPersister(@Nonnull final Class<ENTITY> entityClass) {
+        super(entityClass, Long.class);
     }
 }

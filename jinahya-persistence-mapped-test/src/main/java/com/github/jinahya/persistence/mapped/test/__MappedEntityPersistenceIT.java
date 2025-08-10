@@ -96,13 +96,11 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     }
 
     protected Collection<String> getEntityColumnNames() {
-        final var entityColumnNames = Collections.unmodifiableList(
-                applyEntityManagerFactory(
-                        emf -> __MappedEntityPersistenceTestUtils.addAllEntityColumNames(
-                                emf,
-                                entityClass,
-                                new ArrayList<>()
-                        )
+        final var entityColumnNames = applyEntityManagerFactory(
+                emf -> __MappedEntityPersistenceTestUtils.addAllEntityColumNames(
+                        emf,
+                        entityClass,
+                        new ArrayList<>()
                 )
         );
         logger.log(Level.DEBUG, "entity column names: {0}", entityColumnNames);

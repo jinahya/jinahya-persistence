@@ -54,7 +54,7 @@ public abstract class __MappedEntityWithGeneratedIdRandomizer<
     protected __MappedEntityWithGeneratedIdRandomizer(@Nonnull final Class<ENTITY> entityClass,
                                                       @Nonnull final Class<ID> idClass,
                                                       @Nonnull final String... excludedFields) {
-        super(entityClass, idClass, excludedFields);
+        super(entityClass, idClass, __MappedEntityWithGeneratedIdRandomizerUtils.prependId__(excludedFields));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

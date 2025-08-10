@@ -39,7 +39,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 public abstract class __MappedEntityWithGeneratedIdentityRandomizer<
         ENTITY extends __MappedEntityWithGeneratedIdentity
         >
-        extends __MappedEntityRandomizer<ENTITY, Long> {
+        extends __MappedEntityWithGeneratedIdRandomizer<ENTITY, Long> {
 
     /**
      * Creates a new instance for randomizing the specified entity class.
@@ -51,7 +51,7 @@ public abstract class __MappedEntityWithGeneratedIdentityRandomizer<
      */
     protected __MappedEntityWithGeneratedIdentityRandomizer(@Nonnull final Class<ENTITY> entityClass,
                                                             @Nonnull final String... excludedFields) {
-        super(entityClass, Long.class, __MappedEntityWithGeneratedIdRandomizerUtils.prependId__(excludedFields));
+        super(entityClass, Long.class, excludedFields);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

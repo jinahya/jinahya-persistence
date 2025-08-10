@@ -85,8 +85,8 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
     @Override
     protected abstract ID getId__();
 
-    @Override
-    protected final void setId__(final ID id__) {
-        throw new UnsupportedOperationException("setting id__ is not allowed");
-    }
+//    @Override
+//    protected final void setId__(final ID id__) {
+//        throw new UnsupportedOperationException("setting id__ is not allowed");
+//    }
 }

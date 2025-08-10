@@ -27,15 +27,15 @@ import org.junit.jupiter.api.Test;
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * An abstract class for testing persistence unit of
- * {@link __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+ * An abstract class for testing the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence
+ * unit.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __PersistenceUnitTest
@@ -61,43 +61,67 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Tests that all database tables are mapped to entities.
+     * Returns all database table names.
      *
-     * @see #_Empty_RemainingDatabaseTableNames(List)
+     * @return all database table names.
      */
-    @DisplayName("check all database tables are mapped")
-    @Test
-    protected void _Mapped_AllDatabaseTableNames() {
-        final var databaseTableNames =
-                applyEntityManager(em -> {
-                    return ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
-                            em,
-                            c -> {
-                                try {
-                                    return ___JavaSqlTestUtils.addAllTableNames(
-                                            c,
-                                            catalog(),
-                                            schema(),
-                                            types(),
-                                            new ArrayList<>()
-                                    );
-                                } catch (final SQLException sqle) {
-                                    throw new RuntimeException("failed to get database table names", sqle);
-                                }
-                            }
-                    );
-                });
-        final var entityTableNames = Collections.unmodifiableList(
+    protected Collection<String> getDatabaseTableNames() {
+        final var databaseTableNames = applyEntityManager(em -> {
+            return ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
+                    em,
+                    c -> {
+                        try {
+                            return ___JavaSqlTestUtils.addAllTableNames(
+                                    c,
+                                    catalog(),
+                                    schema(),
+                                    types(),
+                                    new TreeSet<>()
+                            );
+                        } catch (final SQLException sqle) {
+                            throw new RuntimeException("failed to get database table names", sqle);
+                        }
+                    }
+            );
+        });
+        logger.log(Level.DEBUG, "all database table names: {0}", databaseTableNames);
+        return databaseTableNames;
+    }
+
+    /**
+     * Returns all persistence table names.
+     *
+     * @return all persistence table names.
+     */
+    protected Collection<String> getPersistenceTableNames() {
+        final var persistenceTableNames =
                 applyEntityManagerFactory(
                         emf -> ___JakartaPersistenceTestUtils.addAllEntityTableNames(
                                 emf,
-                                new ArrayList<>()
+                                new TreeSet<>()
                         )
-                )
-        );
-        logger.log(Level.DEBUG, "all database table names: {0}", databaseTableNames);
-        logger.log(Level.DEBUG, "all entity table names: {0}", entityTableNames);
-        databaseTableNames.removeAll(entityTableNames);
+                );
+        logger.log(Level.DEBUG, "all persistence table names: {0}", persistenceTableNames);
+        return persistenceTableNames;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Tests that all database tables are mapped to entities.
+     *
+     * @see #_Empty_RemainingDatabaseTableNames(Collection)
+     */
+    @DisplayName("all database tables are mapped")
+    @Test
+    protected void _Mapped_AllTableFamilyTableNames() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var databaseTableNames = getDatabaseTableNames();
+        final var persistenceTableNames = Collections.unmodifiableCollection(getPersistenceTableNames());
+        // -------------------------------------------------------------------------------------------------------- when
+        databaseTableNames.removeAll(persistenceTableNames);
+        logger.log(Level.DEBUG, "remaining database table names: {0}", databaseTableNames);
+        // -------------------------------------------------------------------------------------------------------- then
         _Empty_RemainingDatabaseTableNames(databaseTableNames);
     }
 
@@ -106,9 +130,9 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
      * removed, is empty.
      *
      * @param remainingDatabaseTableNames the collection of remaining database table names which should be empty.
-     * @see #_Mapped_AllDatabaseTableNames()
+     * @see #_Mapped_AllTableFamilyTableNames()
      */
-    protected void _Empty_RemainingDatabaseTableNames(@Nonnull final List<String> remainingDatabaseTableNames) {
+    protected void _Empty_RemainingDatabaseTableNames(@Nonnull final Collection<String> remainingDatabaseTableNames) {
         remainingDatabaseTableNames.removeIf(tn -> {
             return tn.startsWith("HTE_"); // H2 temporary tables
         });
@@ -122,136 +146,36 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Tests that all database tables are mapped to entities.
+     * Tests that all entity table names are known.
      *
-     * @see #_Empty_RemainingEntityTableNames(List)
+     * @see #_Empty_UnknownPersistenceTableNames(Collection)
      */
     @DisplayName("check all entity tables are known")
     @Test
-    protected void _Mapped_AllEntityTableNames() {
-        final var databaseTableNames = Collections.unmodifiableList(
-                applyEntityManager(
-                        em -> ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
-                                em,
-                                c -> {
-                                    try {
-                                        return ___JavaSqlTestUtils.addAllTableNames(
-                                                c,
-                                                catalog(),
-                                                schema(),
-                                                types(),
-                                                new ArrayList<>()
-                                        );
-                                    } catch (final
-                                    SQLException sqle) {
-                                        throw new RuntimeException(
-                                                "failed to get database table names",
-                                                sqle);
-                                    }
-                                }
-                        )
-                )
-        );
-        final var entityTableNames = applyEntityManagerFactory(
-                emf -> ___JakartaPersistenceTestUtils.addAllEntityTableNames(
-                        emf,
-                        new ArrayList<>()
-                )
-        );
-        entityTableNames.removeAll(databaseTableNames);
-        _Empty_RemainingEntityTableNames(entityTableNames);
+    protected void _Known_AllPersistenceTableNames() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var databaseTableNames = Collections.unmodifiableCollection(getDatabaseTableNames());
+        final var persistenceTableNames = getPersistenceTableNames();
+        // -------------------------------------------------------------------------------------------------------- when
+        persistenceTableNames.removeAll(databaseTableNames);
+        logger.log(Level.DEBUG, "remaining persistence table names: {0}", persistenceTableNames);
+        // -------------------------------------------------------------------------------------------------------- then
+        _Empty_UnknownPersistenceTableNames(persistenceTableNames);
     }
 
     /**
-     * Verifies that the specified collection of remaining entity table names, from which all database table names are
-     * removed, is empty.
+     * Verifies that the specified collection of unknown persistence table names, from which all database table names
+     * are removed, is empty.
      *
-     * @param remainingEntityTableNames the entity table names from which all database table names are removed.
-     * @see #_Mapped_AllEntityTableNames()
+     * @param unknownPersistenceTableNames the unknown persistence table names from which all database table names are
+     *                                     removed.
+     * @see #_Known_AllPersistenceTableNames()
      */
-    protected void _Empty_RemainingEntityTableNames(@Nonnull final List<String> remainingEntityTableNames) {
-        remainingEntityTableNames.forEach(tn -> logger.log(Level.WARNING, "remaining entity table name: {0}", tn));
-        assertThat(remainingEntityTableNames)
-                .as("remaining entity table names")
+    protected void _Empty_UnknownPersistenceTableNames(@Nonnull final Collection<String> unknownPersistenceTableNames) {
+        unknownPersistenceTableNames.forEach(
+                tn -> logger.log(Level.WARNING, "remaining persistence table name: {0}", tn));
+        assertThat(unknownPersistenceTableNames)
+                .as("unknown persistence table names")
                 .isEmpty();
     }
-
-//    // -------------------------------------------------------------------------------------------- entityManagerFactory
-//
-//    /**
-//     * Applies an injected instance of {@link EntityManagerFactory} to the specified function, and returns the result.
-//     *
-//     * @param function the function.
-//     * @param <R>      result type parameter
-//     * @return the result of the {@code function}.
-//     * @see #acceptEntityManagerFactory(Consumer)
-//     */
-//    @Deprecated(forRemoval = true)
-//    protected final <R> R applyEntityManagerFactory(
-//            @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
-//        Objects.requireNonNull(function, "function is null");
-//        return function.apply(entityManagerFactory);
-//    }
-//
-//    /**
-//     * Accepts an injected instance of {@link EntityManagerFactory} to the specified consumer.
-//     *
-//     * @param consumer the consumer.
-//     * @see #applyEntityManagerFactory(Function)
-//     */
-//    @Deprecated(forRemoval = true)
-//    protected final void acceptEntityManagerFactory(@Nonnull final Consumer<? super EntityManagerFactory> consumer) {
-//        Objects.requireNonNull(consumer, "consumer is null");
-//        applyEntityManagerFactory(emf -> {
-//            consumer.accept(emf);
-//            return null;
-//        });
-//    }
-//
-//    /**
-//     * Applies an injected instance of {@link EntityManager} to the specified function, and returns the result.
-//     *
-//     * @param function the function.
-//     * @param <R>      result type parameter
-//     * @return the result of the {@code function}.
-//     * @see #acceptEntityManager(Consumer)
-//     */
-//    protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
-//        Objects.requireNonNull(function, "function is null");
-//        return applyEntityManagerFactory(emf -> {
-//            try (final var entityManager = emf.createEntityManager()) {
-//                return function.apply(entityManager);
-//            }
-//        });
-//    }
-//
-//    /**
-//     * Accepts an injected instance of {@link EntityManager} to the specified consumer.
-//     *
-//     * @param consumer the consumer.
-//     * @see #applyEntityManager(Function)
-//     */
-//    protected final void acceptEntityManager(@Nonnull final Consumer<? super EntityManager> consumer) {
-//        Objects.requireNonNull(consumer, "consumer is null");
-//        applyEntityManager(em -> {
-//            consumer.accept(em);
-//            return null;
-//        });
-//    }
-
-//    // -----------------------------------------------------------------------------------------------------------------
-//    @__PersistenceProducer.Integration__
-//    @Inject
-//    private EntityManagerFactory entityManagerFactory;
-//
-//    @Deprecated(forRemoval = true)
-//    @__PersistenceProducer.Integration__
-//    @Inject
-//    private EntityManager entityManager;
-//
-//    private String catalog;
-//
-//    private String schema;
-//
-//    private String[] types;
 }
