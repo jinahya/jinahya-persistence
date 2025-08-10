@@ -61,9 +61,7 @@ public final class ___RandomizerUtils {
     @Nonnull
     public static <T> Optional<T> newRandomizedInstanceOf(@Nonnull final Class<T> type) {
         Objects.requireNonNull(type, "type is null");
-        return
-                newRandomizerInstanceOf(type)
-                        .map(___Randomizer::get);
+        return newRandomizerInstanceOf(type).map(___Randomizer::get);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -38,11 +38,11 @@ import java.util.function.Function;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
+abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
         extends ___MappedEntityTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    ___MappedEntityPersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    __MappedEntityPersistence_(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 
@@ -313,6 +313,6 @@ abstract class ___MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>,
     // -----------------------------------------------------------------------------------------------------------------
     abstract EntityManagerFactory getEntityManagerFactory();
 
-    @Deprecated(forRemoval = true)
-    abstract EntityManager getEntityManager();
+//    @Deprecated(forRemoval = true)
+//    abstract EntityManager getEntityManager();
 }

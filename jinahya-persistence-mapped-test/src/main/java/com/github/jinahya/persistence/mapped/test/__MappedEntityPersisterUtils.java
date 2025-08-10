@@ -29,6 +29,15 @@ import jakarta.persistence.EntityManager;
 })
 public final class __MappedEntityPersisterUtils {
 
+    /**
+     * Returns a persisted instance of the specified entity class.
+     *
+     * @param entityManager an entity manager.
+     * @param entityClass   the entity class.
+     * @param <ENTITY>      entity type parameter
+     * @return a new persisted instance of the {@code entityClass}.
+     * @see ___PersisterUtils#newPersistedInstanceOf(EntityManager, Class)
+     */
     public static <ENTITY extends __MappedEntity<?>>
     ENTITY newPersistedInstanceOf(final EntityManager entityManager, final Class<ENTITY> entityClass) {
         return ___PersisterUtils.newPersistedInstanceOf(entityManager, entityClass);

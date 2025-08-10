@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.mapped.test;
 import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Qualifier;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -43,7 +42,7 @@ import java.lang.annotation.Target;
 })
 public class __PersistenceProducer {
 
-    @Retention(RetentionPolicy.RUNTIME)
+    @Retention(RetentionPolicy.CLASS)
     @Target({
             ElementType.ANNOTATION_TYPE,
             ElementType.PARAMETER,
@@ -58,11 +57,10 @@ public class __PersistenceProducer {
     /**
      * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
      */
-    @__PU
     @Qualifier
     @Documented
+    @__PU
     @Retention(RetentionPolicy.RUNTIME)
-//    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
     public @interface __testPU {
 
     }
@@ -74,7 +72,6 @@ public class __PersistenceProducer {
     @Qualifier
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
-//    @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
     public @interface __itPU {
 
     }
@@ -97,7 +94,6 @@ public class __PersistenceProducer {
      * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
      *         persistence unit
      * @see #disposeTestEntityManagerFactory(EntityManagerFactory)
-     * @see #produceTestEntityManager(EntityManagerFactory)
      */
     @__testPU
     @Produces
@@ -113,32 +109,6 @@ public class __PersistenceProducer {
      */
     public void disposeTestEntityManagerFactory(@__testPU @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
-    }
-
-    /**
-     * Produces an entity manager for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
-     *
-     * @return an entity manager for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit
-     * @see #disposeTestEntityManager(EntityManager)
-     * @see #produceTestEntityManagerFactory()
-     */
-    @Deprecated(forRemoval = true)
-    @__testPU
-    @Produces
-    public EntityManager produceTestEntityManager(@__testPU final EntityManagerFactory entityManagerFactory) {
-        return entityManagerFactory.createEntityManager();
-    }
-
-    /**
-     * Disposes the specified entity manager produced by {@link #produceTestEntityManager(EntityManagerFactory)}
-     * method.
-     *
-     * @param entityManager the entity manager to dispose.
-     * @see #produceTestEntityManager(EntityManagerFactory)
-     */
-    @Deprecated(forRemoval = true)
-    public void disposeTestEntityManager(@__testPU @Disposes final EntityManager entityManager) {
-        entityManager.close();
     }
 
     // ------------------------------------------------------------------------------------------------------------ itPU
@@ -162,17 +132,5 @@ public class __PersistenceProducer {
     public void disposeItEntityManagerFactory(
             @__itPU @Disposes final EntityManagerFactory entityManagerFactory) {
         entityManagerFactory.close();
-    }
-
-    @Deprecated(forRemoval = true)
-    @__itPU
-    @Produces
-    public EntityManager produceItEntityManager(@__itPU final EntityManagerFactory entityManagerFactory) {
-        return entityManagerFactory.createEntityManager();
-    }
-
-    @Deprecated(forRemoval = true)
-    public void disposeItEntityManager(@__itPU @Disposes final EntityManager entityManager) {
-        entityManager.close();
     }
 }

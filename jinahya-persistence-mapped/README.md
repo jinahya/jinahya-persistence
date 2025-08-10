@@ -1,6 +1,6 @@
 # jinahya-persistence-mapped
 
-A module for defining mapped superclasses (and may be entities).
+A module for defining mapped superclasses (and/or may be entities).
 
 ## Motivation
 

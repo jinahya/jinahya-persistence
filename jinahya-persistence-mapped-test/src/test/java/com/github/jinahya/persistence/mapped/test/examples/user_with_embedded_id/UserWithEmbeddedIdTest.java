@@ -35,15 +35,15 @@ class UserWithEmbeddedIdTest extends __MappedEntityTest<UserWithEmbeddedId, IdFo
     // -----------------------------------------------------------------------------------------------------------------
     @Test
     @Override
-    protected void equals_verify_() {
-        super.equals_verify_();
+    protected void equals_Verify_() {
+        super.equals_Verify_();
     }
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equals_verify_(
+    protected SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equalsVerifier) {
-        return super.equals_verify_(equalsVerifier)
+        return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.SURROGATE_KEY);
     }
 }

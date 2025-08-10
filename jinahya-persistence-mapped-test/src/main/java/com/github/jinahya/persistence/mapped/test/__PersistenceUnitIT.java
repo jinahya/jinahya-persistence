@@ -34,7 +34,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * An abstract class for testing persistence unit of {@link __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+ * An abstract class for testing persistence unit of
+ * {@link __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __PersistenceUnitTest
@@ -49,6 +50,10 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new instance.
+     */
     protected __PersistenceUnitIT() {
         super();
     }

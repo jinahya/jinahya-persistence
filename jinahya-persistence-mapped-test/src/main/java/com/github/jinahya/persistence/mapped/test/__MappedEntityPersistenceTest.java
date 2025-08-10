@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
@@ -46,37 +45,25 @@ import java.util.List;
         "java:S6813" // Field dependency injection should be avoided
 })
 public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
-        extends ___MappedEntityPersistenceTest<ENTITY, ID> {
+        extends __MappedEntityPersistence_<ENTITY, ID> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new instance for testing specified entity class with
+     * {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
+     *
+     * @param entityClass the entity class to test.
+     * @param idClass     an id class of the {@code entityClass}.
+     */
     protected __MappedEntityPersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-//    @Test
-//    void a() {
-//        final DatabaseSessionImpl databaseSession = ((EntityManagerFactoryImpl) entityManagerFactory).getDatabaseSession();
-
-    /// /        final org.eclipse.persistence.sessions.Session databaseSession = /
-    /// ((org.eclipse.persistence.internal.jpa.EntityManagerImpl) entityManager.getDelegate()).getSession();
-//        final var descriptor = databaseSession.getDescriptor(entityClass);
-//        final var mappings = descriptor.getMappings();
-//        mappings.forEach(mapping -> {
-//            logger.log(System.Logger.Level.DEBUG, "mapping: {0}", mapping);
-//            logger.log(System.Logger.Level.DEBUG, "\t attributeName: {0}", mapping.getAttributeName());
-//            logger.log(System.Logger.Level.DEBUG, "\t field.name: {0}",
-//                       Optional.ofNullable(mapping.getField()).map(DatabaseField::getName).orElse(null));
-//            mapping.getFields().forEach(f -> {
-//                logger.log(System.Logger.Level.DEBUG, "\t field: {0}", f);
-//                logger.log(System.Logger.Level.DEBUG, "\t\t name: {0}", f.getName());
-//                logger.log(System.Logger.Level.DEBUG, "\t\t type: {0}", f.getType());
-//            });
-//        });
-//    }
-
+    // TODO: remove or relocate
     @Disabled
     @DisplayName("__HibernateTestUtils")
     @Nested
@@ -102,25 +89,14 @@ public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntit
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
+    // -------------------------------------------------------------------------------------------- entityManagerFactory
     @Override
     final EntityManagerFactory getEntityManagerFactory() {
         return entityManagerFactory;
-    }
-
-    @Override
-    final EntityManager getEntityManager() {
-        return entityManager;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.__testPU
     @Inject
     private EntityManagerFactory entityManagerFactory;
-
-    @Deprecated(forRemoval = true)
-    @__PersistenceProducer.__testPU
-    @Inject
-    private EntityManager entityManager;
 }

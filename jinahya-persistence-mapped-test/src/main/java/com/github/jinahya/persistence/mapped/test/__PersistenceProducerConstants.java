@@ -21,7 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 /**
- * A class for providing persistence resources.
+ * Constants for the {@link __PersistenceProducer}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -41,10 +41,20 @@ public final class __PersistenceProducerConstants {
     public static final String PERSISTENCE_UNIT_NAME_IT_PU = "__itPU";
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The name of the persistence unit property for table catalog.
+     */
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG = "jinahya.persistence.default_catalog";
 
+    /**
+     * The name of the persistence unit property for table schema.
+     */
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA = "jinahya.persistence.default_schema";
 
+    /**
+     * The name of the persistence unit property for table types.
+     */
     static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES = "jinahya.persistence.default_types";
 
     // -----------------------------------------------------------------------------------------------------------------

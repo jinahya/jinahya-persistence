@@ -51,14 +51,15 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S6813" // Field dependency injection should be avoided
 })
 public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<ID>, ID>
-        extends ___MappedEntityPersistenceTest<ENTITY, ID> {
+        extends __MappedEntityPersistence_<ENTITY, ID> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Creates a new instance for testing specified entity class.
+     * Creates a new instance for testing specified entity class with
+     * {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
      *
      * @param entityClass the entity class to test.
      * @param idClass     an id class of the {@code entityClass}.
@@ -237,18 +238,8 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
         return entityManagerFactory;
     }
 
-    // --------------------------------------------------------------------------------------------- super.entityManager
-    @Override
-    final EntityManager getEntityManager() {
-        return entityManager;
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.__itPU
     @Inject
     private EntityManagerFactory entityManagerFactory;
-
-    @__PersistenceProducer.__itPU
-    @Inject
-    private EntityManager entityManager;
 }
