@@ -77,7 +77,7 @@ public abstract class __MappedEntity<ID> {
         }
         final var thisId__ = getId__();
         final var thatId__ = that.getId__();
-        if (thisId__ == null && thatId__ == null) {
+        if (false && thisId__ == null && thatId__ == null) {
             return false;
         }
         return Objects.equals(thisId__, thatId__);

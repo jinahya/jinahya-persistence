@@ -78,7 +78,8 @@
     <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
     <!-- https://hibernate.org/orm/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-platform/versions -->
-    <version.org.hibernate.orm>7.0.9.Final</version.org.hibernate.orm>
+<!--    <version.org.hibernate.orm>7.0.9.Final</version.org.hibernate.orm>-->
+    <version.org.hibernate.orm>7.1.0.Final</version.org.hibernate.orm>
     <!-- https://hibernate.org/validator/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
     <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>

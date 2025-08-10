@@ -98,7 +98,9 @@ public class __PersistenceProducer {
     @__testPU
     @Produces
     public EntityManagerFactory produceTestEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(__PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_TEST_PU);
+        return Persistence.createEntityManagerFactory(
+                __PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_TEST_PU
+        );
     }
 
     /**
@@ -121,7 +123,9 @@ public class __PersistenceProducer {
     @__itPU
     @Produces
     public EntityManagerFactory produceItEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(__PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU);
+        return Persistence.createEntityManagerFactory(
+                __PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU
+        );
     }
 
     /**

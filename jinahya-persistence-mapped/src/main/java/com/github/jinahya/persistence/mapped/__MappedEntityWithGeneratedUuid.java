@@ -68,9 +68,14 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
         return id__;
     }
 
+    @Override
+    protected void setId__(final UUID id__) {
+        this.id__ = id__;
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = COLUMN_NAME_ID__, nullable = false, insertable = false, updatable = false)
+    @Column(name = COLUMN_NAME_ID__, nullable = false, insertable = true, updatable = false)
     private UUID id__;
 }
