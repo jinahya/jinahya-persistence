@@ -11,6 +11,7 @@
   <artifactId>jinahya-persistence-more</artifactId>
 
   <name>${project.artifactId}</name>
+  <description>Extended interfaces/class for creating testing classes</description>
 
   <dependencies>
     <dependency>

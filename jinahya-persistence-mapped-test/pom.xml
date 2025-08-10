@@ -11,6 +11,7 @@
   <artifactId>jinahya-persistence-mapped-test</artifactId>
 
   <name>${project.artifactId}</name>
+  <description>Interfaces/Class for testing classes create with jinahya-persistence-mapped</description>
 
   <dependencies>
     <dependency>
@@ -34,11 +35,6 @@
       <artifactId>jakarta.annotation-api</artifactId>
       <scope>provided</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>jakarta.enterprise</groupId>-->
-<!--      <artifactId>jakarta.enterprise.cdi-api</artifactId>-->
-<!--      <scope>provided</scope>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>jakarta.inject</groupId>
       <artifactId>jakarta.inject-api</artifactId>

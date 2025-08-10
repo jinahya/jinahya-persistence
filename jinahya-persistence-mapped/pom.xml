@@ -11,6 +11,7 @@
   <artifactId>jinahya-persistence-mapped</artifactId>
 
   <name>${project.artifactId}</name>
+  <description>Interfaces/class for creating entity classes</description>
 
   <dependencies>
     <dependency>
