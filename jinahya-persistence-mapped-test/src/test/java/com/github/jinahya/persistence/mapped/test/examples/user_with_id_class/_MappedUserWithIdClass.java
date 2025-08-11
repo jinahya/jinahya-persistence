@@ -32,6 +32,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @MappedSuperclass
 @SuppressWarnings({
@@ -48,6 +49,16 @@ abstract class _MappedUserWithIdClass<ID extends _MappedIdForUserWithIdClass>
     static final String COLUMN_NAME_AGE = "age_check";
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+    protected static <T extends _MappedUserWithIdClass<ID>, ID extends _MappedIdForUserWithIdClass> T newInstance(
+            @Nonnull final Supplier<T> instantiator, final String name, final Integer age) {
+        final var instance = Objects.requireNonNull(
+                Objects.requireNonNull(instantiator, "instantiator is null").get(),
+                "null instantiated from " + instantiator
+        );
+        instance.setName(name);
+        instance.setAge(age);
+        return instance;
+    }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     _MappedUserWithIdClass() {

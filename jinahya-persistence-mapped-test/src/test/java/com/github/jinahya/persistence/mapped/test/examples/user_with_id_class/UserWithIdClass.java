@@ -6,14 +6,14 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-
 @IdClass(IdForUserWithIdClass.class)
 @Entity
 @Table(name = _MappedUserWithIdClass.TABLE_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 class UserWithIdClass extends _MappedUserWithIdClass<IdForUserWithIdClass> {
 
-    @Serial
-    private static final long serialVersionUID = -2013583858263692371L;
+    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+    public static UserWithIdClass newInstance(final String name, final Integer age) {
+        return newInstance(UserWithIdClass::new, name, age);
+    }
 }
