@@ -100,6 +100,7 @@
     <version.org.mockito>5.18.0</version.org.mockito>
     <version.org.projectlombok>1.18.38</version.org.projectlombok>
     <version.org.slf4j>2.0.17</version.org.slf4j>
+    <version.org.jetbrains.kotlin>2.2.0</version.org.jetbrains.kotlin>
   </properties>
 
   <dependencyManagement>
@@ -177,6 +178,11 @@
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-junit5</artifactId>
         <version>${version.org.jboss.weld}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib</artifactId>
+        <version>${version.org.jetbrains.kotlin}</version>
       </dependency>
       <dependency>
         <groupId>org.junit</groupId>
@@ -287,6 +293,11 @@
           <!-- https://central.sonatype.com/artifact/org.jacoco/jacoco-maven-plugin/versions -->
           <version>0.8.13</version>
         </plugin>
+        <plugin>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-maven-plugin</artifactId>
+          <version>${version.org.jetbrains.kotlin}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -297,7 +308,7 @@
         <configuration>
           <!--              <skip>true</skip>-->
           <rules>
-            <dependencyConvergence />
+            <dependencyConvergence/>
             <requireJavaVersion>
               <version>[21.0.0,)</version>
             </requireJavaVersion>
