@@ -20,14 +20,26 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
+import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.ToString;
 
+import java.util.Objects;
+
 @Entity
-@Table(name = _MappedUserWithStringId.TABLE_NAME)
+@Table(name = UserWithStringId.TABLE_NAME)
 @ToString(callSuper = true)
-class UserWithStringId extends _MappedUserWithStringId {
+class UserWithStringId extends __MappedEntity<String> {
+
+    static final String TABLE_NAME = "user_with_string_id";
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static final String COLUMN_NAME_NAME = "name";
 
     // -----------------------------------------------------------------------------------------------------------------
     protected UserWithStringId() {
@@ -37,15 +49,30 @@ class UserWithStringId extends _MappedUserWithStringId {
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
     @Override
-    public final boolean equals(final Object obj) {
-        if (false && !(obj instanceof UserWithStringId)) {
-            return false;
-        }
-        return super.equals(obj);
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof UserWithStringId that)) return false;
+        return name != null && Objects.equals(name, that.name);
     }
 
     @Override
-    public final int hashCode() {
-        return super.hashCode();
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
+
+    // -------------------------------------------------------------------------------------------------------------- id
+    @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@Nonnull final String name) {
+        this.name = name;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    @NotNull
+    @Id
+    @Column(name = COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
+    private String name;
 }

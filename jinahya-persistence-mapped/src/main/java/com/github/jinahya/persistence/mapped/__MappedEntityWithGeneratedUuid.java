@@ -49,28 +49,9 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
-    @Override
-    public final boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedEntityWithGeneratedUuid)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
-
-    // ------------------------------------------------------------------------------------------------------ super.id__
-    @Override
-    protected /* final */ UUID getId__() {
+    // ------------------------------------------------------------------------------------------------------------ id__
+    public UUID getId__() {
         return id__;
-    }
-
-    @Override
-    protected void setId__(final UUID id__) {
-        this.id__ = id__;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

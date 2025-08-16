@@ -2,13 +2,11 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_
 
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedUuid;
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
-import java.util.UUID;
+import java.util.Objects;
 
 @Entity
 @Table(name = UserWithGeneratedUuid.TABLE_NAME)
@@ -31,19 +29,18 @@ class UserWithGeneratedUuid extends __MappedEntityWithGeneratedUuid {
     // -----------------------------------------------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-
-    // -------------------------------------------------------------------------------------------------------------- id
-    @Transient
-    public UUID getId() {
-        return super.getId__();
+    @Override
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof __MappedEntityWithGeneratedUuid that)) {
+            return false;
+        }
+        final var thisId = this.getId__();
+        final var thatId = that.getId__();
+        return thisId != null && Objects.equals(thisId, thatId);
     }
 
-    protected void setId(final UUID id) {
-        super.setId__(id);
+    @Override
+    public final int hashCode() {
+        return Objects.hash(getId__());
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-//    @Basic(optional = false)
-//    @Column(name = "ignore", nullable = true)
-//    private String ignore; // EclipseLink
 }

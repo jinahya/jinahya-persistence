@@ -23,8 +23,6 @@ package com.github.jinahya.persistence.mapped;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
-import java.util.Objects;
-
 /**
  * An abstract mapped superclass for entities.
  *
@@ -52,69 +50,4 @@ public abstract class __MappedEntity<ID> {
     protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
         this();
     }
-
-    // ------------------------------------------------------------------------------------------------ java.lang.Object
-
-    /**
-     * Returns a string representation of this object.
-     *
-     * @return a string representation of this object.
-     */
-    @Override
-    public String toString() {
-        return super.toString() + '{' +
-               "id__=" + getId__() +
-               '}';
-    }
-
-    // https://jqno.nl/equalsverifier/manual/jpa-entities/
-    // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-    @Override
-    @SuppressWarnings({
-            "java:S117" // Local variable and method parameter names should comply with a naming convention
-    })
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof __MappedEntity<?> that)) {
-            return false;
-        }
-        final var thisId__ = getId__();
-        final var thatId__ = that.getId__();
-        if (false && thisId__ == null && thatId__ == null) {
-            return false;
-        }
-        return Objects.equals(thisId__, thatId__);
-    }
-
-    // https://jqno.nl/equalsverifier/manual/jpa-entities/
-    // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId__());
-    }
-
-    // ------------------------------------------------------------------------------------------------------------ id__
-
-    /**
-     * Returns the current value of {@link ID}.
-     *
-     * @return the current value of {@link ID}
-     */
-    @SuppressWarnings({
-            "java:S100" // Method names should comply with a naming convention
-    })
-    protected abstract ID getId__();
-
-    /**
-     * Replaces the current value of {@link ID} with the specified value.
-     *
-     * @param id__ new value for the {@link ID}.
-     */
-    @SuppressWarnings({
-            "java:S100", // Method names should comply with a naming convention
-            "java:S117" // Local variable and method parameter names should comply with a naming convention
-    })
-    protected abstract void setId__(ID id__);
 }

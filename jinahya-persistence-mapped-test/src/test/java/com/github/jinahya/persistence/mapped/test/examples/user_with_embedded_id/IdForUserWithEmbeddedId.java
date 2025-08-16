@@ -20,20 +20,20 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-@ToString(callSuper = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IdForUserWithEmbeddedId extends _MappedIdForUserWithEmbeddedId {
+public class IdForUserWithEmbeddedId implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 7137484531059857534L;
@@ -60,4 +60,67 @@ public class IdForUserWithEmbeddedId extends _MappedIdForUserWithEmbeddedId {
     public static IdForUserWithEmbeddedId of(@NotBlank final String name, @NotNull final Integer age) {
         return new IdForUserWithEmbeddedId(name, age);
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected IdForUserWithEmbeddedId() {
+        super();
+    }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "name=" + name +
+               ",age=" + age +
+               '}';
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof IdForUserWithEmbeddedId that)) {
+            return false;
+        }
+        return Objects.equals(name, that.name)
+               && Objects.equals(age, that.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@Nonnull final String name) {
+        this.name = name;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(@Nonnull final Integer age) {
+        this.age = age;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    @NotBlank
+    @Basic(optional = false)
+    @Column(name = UserWithEmbeddedId.COLUMN_NAME_NAME, nullable = false, insertable = true, updatable = false)
+    private String name;
+
+    @Nonnull
+    @PositiveOrZero
+    @NotNull
+    @Basic(optional = false)
+    @Column(name = UserWithEmbeddedId.COLUMN_NAME_AGE, nullable = false, insertable = true, updatable = false)
+    private Integer age;
 }

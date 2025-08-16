@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
 import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
 @SuppressWarnings({
@@ -43,7 +42,8 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<ENITTY extends __M
     protected SingleTypeEqualsVerifierApi<ENITTY> equals_Verify_(
             @Nonnull SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier)
-                .suppress(Warning.SURROGATE_KEY)
+//                .suppress(Warning.SURROGATE_KEY)
+//                .withRedefinedSuperclass()
                 ;
     }
 }

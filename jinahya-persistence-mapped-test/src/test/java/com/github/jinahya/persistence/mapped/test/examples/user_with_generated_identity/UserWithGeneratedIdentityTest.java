@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedIdentityTest;
 import jakarta.annotation.Nonnull;
+import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,8 @@ class UserWithGeneratedIdentityTest extends __MappedEntityWithGeneratedIdentityT
     protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier)
+                .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
+                .suppress(Warning.SURROGATE_KEY)
                 ;
     }
 }

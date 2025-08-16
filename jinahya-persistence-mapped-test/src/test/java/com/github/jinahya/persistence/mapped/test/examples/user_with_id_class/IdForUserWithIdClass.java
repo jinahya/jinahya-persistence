@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @MappedSuperclass
-abstract class _MappedIdForUserWithIdClass implements Serializable {
+class IdForUserWithIdClass implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -2192852258006202034L;
@@ -39,7 +39,7 @@ abstract class _MappedIdForUserWithIdClass implements Serializable {
     /**
      * Creates a new instance.
      */
-    _MappedIdForUserWithIdClass() {
+    IdForUserWithIdClass() {
         super();
     }
 
@@ -55,7 +55,7 @@ abstract class _MappedIdForUserWithIdClass implements Serializable {
 
     @Override
     public final boolean equals(final Object obj) {
-        if (!(obj instanceof _MappedIdForUserWithIdClass that)) {
+        if (!(obj instanceof IdForUserWithIdClass that)) {
             return false;
         }
         return Objects.equals(name, that.name) &&
