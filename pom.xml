@@ -188,7 +188,8 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-bom</artifactId>
-        <version>5.18.0</version>
+        <!-- https://central.sonatype.com/artifact/org.mockito/mockito-bom/versions -->
+        <version>5.19.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
