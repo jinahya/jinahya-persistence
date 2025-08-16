@@ -59,7 +59,7 @@ class UserWithStringId extends __MappedEntity<String> {
         return Objects.hashCode(name);
     }
 
-    // -------------------------------------------------------------------------------------------------------------- id
+    // ------------------------------------------------------------------------------------------------------------ name
     @Nonnull
     public String getName() {
         return name;

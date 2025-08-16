@@ -111,7 +111,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
     @Test
-    void _equals_() {
+    void _DoesNotEqualToEachOther_TwoNewInstances() {
         final var entityInstance1 = newEntityInstance();
         final var entityInstance2 = newEntityInstance();
         assertThat(entityInstance1).isNotEqualTo(entityInstance2);
