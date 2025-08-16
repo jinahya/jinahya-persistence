@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
 import java.util.Objects;
@@ -69,7 +70,8 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
      */
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass));
+//                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass));
+                .orElseGet(() -> ReflectionUtils.newInstance(entityClass));
     }
 
     /**
@@ -108,7 +110,9 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
     // -----------------------------------------------------------------------------------------------------------------
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
-                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass));
+//                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass))
+                .orElseGet(() -> ReflectionUtils.newInstance(idClass))
+                ;
     }
 
     protected ID newIdInstanceSpy() {

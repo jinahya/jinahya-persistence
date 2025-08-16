@@ -37,7 +37,7 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class ___JavaLangReflectTestUtils {
+final class ___JavaLangReflectTestUtils {
 
     private static final Method AUTO_CLOSEABLE_CLOSE_METHOD;
 

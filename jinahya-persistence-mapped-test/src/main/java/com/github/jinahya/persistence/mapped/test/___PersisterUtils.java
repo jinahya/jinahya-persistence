@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -53,7 +54,8 @@ public final class ___PersisterUtils {
     })
     static <T> Optional<___Persister<T>> newPersisterInstanceOf(final Class<T> type) {
         return getPersisterClassOf(type)
-                .map(___JavaLangReflectTestUtils::newInstanceOf)
+//                .map(___JavaLangReflectTestUtils::newInstanceOf)
+                .map(ReflectionUtils::newInstance)
                 .map(i -> (___Persister<T>) i);
     }
 

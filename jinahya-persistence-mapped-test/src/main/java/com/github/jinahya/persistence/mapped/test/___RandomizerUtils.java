@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -54,7 +55,8 @@ public final class ___RandomizerUtils {
     })
     private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(@Nonnull final Class<T> type) {
         return getRandomizerClassOf(type)
-                .map(___JavaLangReflectTestUtils::newInstanceOf)
+//                .map(___JavaLangReflectTestUtils::newInstanceOf)
+                .map(ReflectionUtils::newInstance)
                 .map(i -> (___Randomizer<T>) i);
     }
 

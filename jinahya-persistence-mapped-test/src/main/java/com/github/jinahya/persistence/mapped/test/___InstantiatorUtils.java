@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import org.junit.platform.commons.util.ReflectionUtils;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,7 +53,8 @@ public final class ___InstantiatorUtils {
     })
     private static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> type) {
         return getInstantiatorClassOf(type)
-                .map(___JavaLangReflectTestUtils::newInstanceOf)
+//                .map(___JavaLangReflectTestUtils::newInstanceOf)
+                .map(ReflectionUtils::newInstance)
                 .map(i -> (___Instantiator<T>) i);
     }
 

@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
 
@@ -63,7 +64,8 @@ public abstract class ___Instantiator<T> {
             "java:S112" // Generic exceptions should never be thrown
     })
     public T get() {
-        return ___JavaLangReflectTestUtils.newInstanceOf(type);
+//        return ___JavaLangReflectTestUtils.newInstanceOf(type);
+        return ReflectionUtils.newInstance(type);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
