@@ -51,6 +51,13 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
     @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "id__=" + id__ +
+               '}';
+    }
+
+    @Override
     public final boolean equals(final Object obj) {
         if (!(obj instanceof __MappedEntityWithGeneratedUuid that)) {
             return false;
