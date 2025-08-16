@@ -46,8 +46,8 @@ public class IdForUserWithEmbeddedId implements Serializable {
      */
     public IdForUserWithEmbeddedId(@NotBlank final String name, @NotNull final Integer age) {
         super();
-        setName(Objects.requireNonNull(name, "name is null"));
-        setAge(Objects.requireNonNull(age, "age is null"));
+        this.name = Objects.requireNonNull(name, "name is null");
+        this.age = Objects.requireNonNull(age, "age is null");
     }
 
     /**

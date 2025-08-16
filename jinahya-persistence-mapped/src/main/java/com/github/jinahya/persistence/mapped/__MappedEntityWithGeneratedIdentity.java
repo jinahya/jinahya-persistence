@@ -26,8 +26,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
+import java.util.Objects;
+
 @MappedSuperclass
 @SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
         "java:S116", // Field names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
@@ -46,6 +49,28 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
+
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "id__=" + id__ +
+               '}';
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof __MappedEntityWithGeneratedIdentity that)) {
+            return false;
+        }
+        final var thisId = this.getId__();
+        final var thatId = that.getId__();
+        return thisId != null && Objects.equals(thisId, thatId);
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(getId__());
+    }
 
     // ------------------------------------------------------------------------------------------------------------ id__
     public Long getId__() {
