@@ -119,14 +119,25 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
 
     /**
      * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of {@link #entityClass} using an
-     * equals-verifier configured within {@link #equals_Verify_(SingleTypeEqualsVerifierApi)} method.
+     * equals-verifier configured within {@link #equalsVerifier(SingleTypeEqualsVerifierApi)} method.
      *
-     * @see #equals_Verify_(SingleTypeEqualsVerifierApi)
+     * @see #equalsVerifier(SingleTypeEqualsVerifierApi)
      */
     @DisplayName("equals/hashCode")
     @Test
     protected void equals_Verify_() {
-        equals_Verify_(EqualsVerifier.forClass(entityClass)).verify();
+        final var equalsVerifier = equalsVerifier();
+        equalsVerifier(equalsVerifier);
+        equalsVerifier.verify();
+    }
+
+    /**
+     * Creates a new equals verifier for {@link #entityClass}.
+     *
+     * @return a new equals verifier for {@link #entityClass}.
+     */
+    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
+        return EqualsVerifier.forClass(entityClass);
     }
 
     /**
@@ -137,7 +148,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @see #equals_Verify_()
      */
     @Nonnull
-    protected SingleTypeEqualsVerifierApi<ENTITY> equals_Verify_(
+    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier(
             @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
         return equalsVerifier
                 ;

@@ -36,14 +36,16 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<ENITTY extends __M
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier() {
+        return super.equalsVerifier();
+    }
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENITTY> equals_Verify_(
+    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier(
             @Nonnull SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier) {
-        return super.equals_Verify_(equalsVerifier)
-//                .suppress(Warning.SURROGATE_KEY)
-//                .withRedefinedSuperclass()
+        return super.equalsVerifier(equalsVerifier)
                 ;
     }
 }
