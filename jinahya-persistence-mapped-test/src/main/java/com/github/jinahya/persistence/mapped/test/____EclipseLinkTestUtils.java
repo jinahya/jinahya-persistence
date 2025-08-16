@@ -38,6 +38,7 @@ final class ____EclipseLinkTestUtils {
      * @param entityClass          the entity class.
      * @return an unmodifiable list of {@code entityClass}'s column names.
      */
+    @SuppressWarnings("unchecked")
     static List<String> getEntityColumnNames(@Nonnull final EntityManagerFactory entityManagerFactory,
                                              @Nonnull final Class<?> entityClass) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");

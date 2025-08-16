@@ -55,38 +55,4 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
     protected __MappedEntityWithGeneratedId() {
         super();
     }
-
-    // ------------------------------------------------------------------------------------------------ java.lang.Object
-
-    /**
-     * Returns a string representation of this object.
-     *
-     * @return a string representation of this object.
-     */
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedEntityWithGeneratedId<?>)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    // ------------------------------------------------------------------------------------------------------ super.id__
-    @Override
-    protected abstract ID getId__();
-
-//    @Override
-//    protected final void setId__(final ID id__) {
-//        throw new UnsupportedOperationException("setting id__ is not allowed");
-//    }
 }

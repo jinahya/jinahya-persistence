@@ -18,7 +18,8 @@ import java.util.function.Function;
         "java:S101", // Class names should comply with a naming convention
         "java:S116", // Field names should comply with a naming convention
         "java:S117", // Local variable and method parameter names should comply with a naming convention
-        "java:S119"  // Type parameter names should comply with a naming convention
+        "java:S119", // Type parameter names should comply with a naming convention
+        "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class __MappedEntityBuilder<
         SELF extends __MappedEntityBuilder<SELF, ENTITY>,
@@ -28,10 +29,13 @@ public abstract class __MappedEntityBuilder<
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance.
+     * Creates a new instance with the specified entity class.
+     *
+     * @param entityClass the entity class.
      */
-    protected __MappedEntityBuilder() {
+    protected __MappedEntityBuilder(@Nonnull final Class<ENTITY> entityClass) {
         super();
+        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
@@ -39,19 +43,13 @@ public abstract class __MappedEntityBuilder<
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Builds this builder into an instance of {@link ENTITY}.
-     *
-     * @return an instance of {@link ENTITY}.
-     */
-    @Nonnull
-    public abstract ENTITY build();
-
-    /**
      * Builds this builder into an instance of {@link ENTITY} using specified function.
      *
      * @param function the function to build an instance of {@link ENTITY} applied to this builder.
      * @return an instance of {@link ENTITY} built by specified function applied to this builder.
+     * @deprecated Use {@link #build()} instead.
      */
+    @Deprecated(forRemoval = true)
     @Nonnull
     protected final ENTITY build(@Nonnull final Function<? super SELF, ? extends ENTITY> function) {
         Objects.requireNonNull(function, "function is null");
@@ -64,7 +62,9 @@ public abstract class __MappedEntityBuilder<
      * @param entityClass the entity class.
      * @return an instance of {@link ENTITY} built by specified entity class.
      * @implNote The entity class must have a constructor which takes this builder as a parameter.
+     * @deprecated Use {@link #build()} instead.
      */
+    @Deprecated(forRemoval = true)
     @Nonnull
     @SuppressWarnings({
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
@@ -86,4 +86,28 @@ public abstract class __MappedEntityBuilder<
             }
         });
     }
+
+    /**
+     * Builds this builder into an instance of {@link ENTITY}.
+     *
+     * @return an instance of {@link ENTITY}.
+     */
+    @Nonnull
+    public ENTITY build() {
+        try {
+            final var constructor = entityClass.getDeclaredConstructor(getClass());
+            if (!constructor.canAccess(null)) {
+                constructor.setAccessible(true);
+            }
+            return constructor.newInstance(this);
+        } catch (final ReflectiveOperationException roe) {
+            throw new RuntimeException(
+                    "failed to instantiate " + entityClass + " with " + this,
+                    roe
+            );
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected final Class<ENTITY> entityClass;
 }

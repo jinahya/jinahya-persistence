@@ -30,6 +30,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = Entity02.TABLE_NAME)
 public class Entity02 extends __MappedEntity<Long> {
@@ -41,34 +43,36 @@ public class Entity02 extends __MappedEntity<Long> {
         super();
     }
 
+    Entity02(final Entity02Builder builder) {
+        super(builder);
+        id = builder.id();
+        name = builder.name();
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
         return super.toString() + '{' +
                "id=" + id +
+               "name=" + name +
                '}';
     }
 
     @Override
-    public final boolean equals(final Object obj) {
-        return super.equals(obj);
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Entity02 that)) {
+            return false;
+        }
+        final var thisId = this.getId();
+        final var thatId = that.getId();
+        return thisId != null && Objects.equals(thisId, thatId);
     }
 
     @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Override
-    protected Long getId__() {
-        return getId();
-    }
-
-    @Override
-    protected void setId__(final Long id__) {
-        setId(id__);
+    public int hashCode() {
+//        return getClass().hashCode();
+        return Objects.hashCode(getId());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -76,7 +80,7 @@ public class Entity02 extends __MappedEntity<Long> {
         return id;
     }
 
-    protected void setId(final Long id) {
+    void setId(final Long id) {
         this.id = id;
     }
 

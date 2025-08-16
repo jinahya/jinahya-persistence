@@ -1,10 +1,10 @@
-package com.github.jinahya.persistence.mapped;
+package com.github.jinahya.persistence.mapped.test.examples.entity01;
 
 /*-
  * #%L
- * jinahya-persistence-mapped
+ * jinahya-persistence-mapped-test
  * %%
- * Copyright (C) 2025 Jinahya, Inc.
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,12 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import jakarta.persistence.Entity;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityBuilderTest;
 
-@Entity
-@SuppressWarnings({
-        "java:S116" // Field names should comply with a naming convention
-})
-class __ConcreteMappedEntityWithGeneratedUuid
-        extends __MappedEntityWithGeneratedUuid {
-
-    protected __ConcreteMappedEntityWithGeneratedUuid() {
-        super();
-    }
-
-    // ------------------------------------------------------------------------------------------------ java.lang.Object
-
-    // ------------------------------------------------------------------------------------------------------ super.id__
+class Entity01BuilderTest extends __MappedEntityBuilderTest<Entity01Builder, Entity01, Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
+    Entity01BuilderTest() {
+        super(Entity01Builder.class, Entity01.class, Long.class);
+    }
 }

@@ -6,7 +6,8 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = UserWithGeneratedIdentity.TABLE_NAME)
@@ -29,15 +30,19 @@ class UserWithGeneratedIdentity extends __MappedEntityWithGeneratedIdentity {
     // -----------------------------------------------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-
-    // -------------------------------------------------------------------------------------------------------------- id
-    @Transient
-    public Long getId() {
-        return super.getId__();
+    @Override
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof __MappedEntityWithGeneratedIdentity that)) {
+            return false;
+        }
+        final var thisId = this.getId__();
+        final var thatId = that.getId__();
+        return thisId != null && Objects.equals(thisId, thatId);
     }
 
-    protected void setId(final Long id) {
-        super.setId__(id);
+    @Override
+    public final int hashCode() {
+        return Objects.hash(getId__());
     }
 
     // -----------------------------------------------------------------------------------------------------------------

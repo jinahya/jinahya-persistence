@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
  * #L%
  */
 
+import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -34,9 +35,16 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Entity
-@Table(name = _MappedUserWithEmbeddedId.TABLE_NAME)
+@Table(name = UserWithEmbeddedId.TABLE_NAME)
 @ToString(callSuper = true)
-class UserWithEmbeddedId extends _MappedUserWithEmbeddedId<IdForUserWithEmbeddedId> {
+class UserWithEmbeddedId extends __MappedEntity<IdForUserWithEmbeddedId> {
+
+    public static final String TABLE_NAME = "user_with_embedded_id";
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static final String COLUMN_NAME_NAME = "name";
+
+    public static final String COLUMN_NAME_AGE = "age";
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected UserWithEmbeddedId() {
@@ -44,19 +52,24 @@ class UserWithEmbeddedId extends _MappedUserWithEmbeddedId<IdForUserWithEmbedded
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-//    @Override
-//    public final boolean equals(final Object obj) {
-//        if (false && !(obj instanceof User)) {
-//            return false;
-//        }
-//        return super.equals(obj);
-//    }
-//
-//    @Override
-//    public final int hashCode() {
-//        return super.hashCode();
-//    }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof UserWithEmbeddedId that)) {
+            return false;
+        }
+        final var thisId = this.getId();
+        final var thatId = that.getId();
+        return thisId != null && Objects.equals(thisId, thatId);
+    }
+
+    @Override
+    public int hashCode() {
+//        return getClass().hashCode();
+        return Objects.hashCode(getId());
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Transient
     protected IdForUserWithEmbeddedId getId__() {
         return getId();

@@ -82,6 +82,7 @@ public abstract class __MappedEntityPersistenceTest<ENTITY extends __MappedEntit
                     Class.class
             );
             m.setAccessible(true);
+            @SuppressWarnings("unchecked")
             final var columnNames = (List<String>) m.invoke(null, getEntityManagerFactory(), entityClass);
             for (final var columnName : columnNames) {
                 logger.log(System.Logger.Level.DEBUG, "column name: " + columnName);

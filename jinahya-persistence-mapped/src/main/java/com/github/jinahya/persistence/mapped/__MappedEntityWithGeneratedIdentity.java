@@ -28,6 +28,7 @@ import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 @SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
         "java:S116", // Field names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
@@ -46,32 +47,17 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-    @Override
-    public final boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedEntityWithGeneratedIdentity)) {
-            return false;
-        }
-        return super.equals(obj);
-    }
 
     @Override
-    public final int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return super.toString() + '{' +
+               "id__=" + id__ +
+               '}';
     }
 
-    // ------------------------------------------------------------------------------------------------------ super.id__
-    @Override
-    protected /* final */ Long getId__() {
+    // ------------------------------------------------------------------------------------------------------------ id__
+    public Long getId__() {
         return id__;
-    }
-
-    @Override
-    protected void setId__(final Long id__) {
-        if (true) {
-            this.id__ = id__; // EclipseLink
-            return;
-        }
-        throw new UnsupportedOperationException("setting id__ is not allowed");
     }
 
     // -----------------------------------------------------------------------------------------------------------------

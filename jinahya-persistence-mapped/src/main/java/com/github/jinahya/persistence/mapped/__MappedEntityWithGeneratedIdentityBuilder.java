@@ -20,34 +20,25 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
-import jakarta.persistence.MappedSuperclass;
-
-/**
- * An abstract mapped superclass for entities.
- *
- * @param <ID> id type parameter
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- */
-@MappedSuperclass
 @SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
+        "java:S115", // Constant names should comply with a naming convention
+        "java:s117", // Local variable and method parameter names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntity<ID> {
-
-    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+public abstract class __MappedEntityWithGeneratedIdentityBuilder<
+        SELF extends __MappedEntityWithGeneratedIdentityBuilder<SELF, ENTITY>,
+        ENTITY extends __MappedEntityWithGeneratedIdentity
+        >
+        extends __MappedEntityBuilder<SELF, ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      */
-    protected __MappedEntity() {
-        super();
-    }
-
-    protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
-        this();
+    protected __MappedEntityWithGeneratedIdentityBuilder(final Class<ENTITY> entityClass) {
+        super(entityClass);
     }
 }

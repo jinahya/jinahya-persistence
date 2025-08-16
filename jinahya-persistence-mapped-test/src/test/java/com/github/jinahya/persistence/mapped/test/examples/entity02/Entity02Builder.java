@@ -20,31 +20,36 @@ package com.github.jinahya.persistence.mapped.test.examples.entity02;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test._MappedEntityTest;
-import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
-import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.Test;
+import com.github.jinahya.persistence.mapped.__MappedEntityBuilder;
 
-public class Entity02Test extends _MappedEntityTest<Entity02, Long> {
+class Entity02Builder extends __MappedEntityBuilder<Entity02Builder, Entity02> {
 
-    protected Entity02Test() {
-        super(Entity02.class, Long.class);
+    Entity02Builder() {
+        super(Entity02.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void equals_Verify_() {
-        super.equals_Verify_();
+    Long id() {
+        return id;
     }
 
-    @Nonnull
-    @Override
-    protected SingleTypeEqualsVerifierApi<Entity02> equalsVerifier(
-            @Nonnull final SingleTypeEqualsVerifierApi<Entity02> equalsVerifier) {
-        return super.equalsVerifier(equalsVerifier)
-                .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
-                .suppress(Warning.SURROGATE_KEY);
+    public Entity02Builder id(final Long id) {
+        this.id = id;
+        return this;
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    String name() {
+        return name;
+    }
+
+    Entity02Builder name(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private Long id;
+
+    private String name;
 }

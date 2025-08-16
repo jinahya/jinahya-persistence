@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedUuid;
 import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
 import java.util.UUID;
@@ -39,12 +38,16 @@ public abstract class __MappedEntityWithGeneratedUuidTest<ENITTY extends __Mappe
     }
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
+    @Override
+    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier() {
+        return super.equalsVerifier();
+    }
+
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENITTY> equals_Verify_(
+    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier(
             @Nonnull SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier) {
-        return super.equals_Verify_(equalsVerifier)
-                .suppress(Warning.SURROGATE_KEY)
+        return super.equalsVerifier(equalsVerifier)
                 ;
     }
 }
