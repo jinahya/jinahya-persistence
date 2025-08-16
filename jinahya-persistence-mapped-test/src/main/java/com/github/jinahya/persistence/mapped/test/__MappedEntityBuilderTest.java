@@ -63,12 +63,13 @@ public abstract class __MappedEntityBuilderTest<
                         final var propertyDescriptors = beanInfo.getPropertyDescriptors();
                         for (var propertyDescriptor : propertyDescriptors) {
                             final var reader = propertyDescriptor.getReadMethod();
-                            if (reader == null) {
+                            if (reader == null || !__MappedEntity.class.isAssignableFrom(reader.getDeclaringClass())) {
                                 continue;
                             }
-                            if (!__MappedEntity.class.isAssignableFrom(reader.getDeclaringClass())) {
-                                continue;
+                            if (!reader.canAccess(entityInstance)) {
+                                reader.setAccessible(true);
                             }
+                            final var value = propertyDescriptor.getReadMethod().invoke(entityInstance);
                             final var name = propertyDescriptor.getName();
                             final var type = propertyDescriptor.getPropertyType();
                             final var writer = ReflectionUtils.findMethod(builderClass, name, type).orElse(null);
@@ -76,19 +77,12 @@ public abstract class __MappedEntityBuilderTest<
                                 logger.log(System.Logger.Level.DEBUG, "no writer method: {0}({1})", name, type);
                                 continue;
                             }
-                            if (!__MappedEntity.class.isAssignableFrom(writer.getDeclaringClass())) {
-                                continue;
-                            }
-                            if (__MappedEntityRandomizer.class.isAssignableFrom(writer.getDeclaringClass())) {
+                            if (!__MappedEntityBuilder.class.isAssignableFrom(writer.getDeclaringClass())) {
                                 continue;
                             }
                             if (!writer.canAccess(builderInstance)) {
                                 writer.setAccessible(false);
                             }
-                            if (!reader.canAccess(entityInstance)) {
-                                reader.setAccessible(true);
-                            }
-                            final var value = propertyDescriptor.getReadMethod().invoke(entityInstance);
                             writer.invoke(builderInstance, value);
                         }
                         return builderInstance;
