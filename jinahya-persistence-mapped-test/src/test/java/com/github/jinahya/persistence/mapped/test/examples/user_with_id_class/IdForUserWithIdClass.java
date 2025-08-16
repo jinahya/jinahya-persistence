@@ -20,28 +20,78 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_id_class;
  * #L%
  */
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
-import lombok.ToString;
 
 import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 
-@ToString(callSuper = true)
-class IdForUserWithIdClass extends _MappedIdForUserWithIdClass {
+@MappedSuperclass
+abstract class _MappedIdForUserWithIdClass implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -1152447558449093039L;
+    private static final long serialVersionUID = -2192852258006202034L;
 
-    // -----------------------------------------------------------------------------------------------------------------
-    static IdForUserWithIdClass of(@NotBlank final String name, @NotNull final Integer age) {
-        final var instance = new IdForUserWithIdClass();
-        instance.setName(name);
-        instance.setAge(age);
-        return instance;
-    }
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
-    // -----------------------------------------------------------------------------------------------------------------
-    protected IdForUserWithIdClass() {
+    /**
+     * Creates a new instance.
+     */
+    _MappedIdForUserWithIdClass() {
         super();
     }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "name=" + name +
+               ",age=" + age +
+               '}';
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (!(obj instanceof _MappedIdForUserWithIdClass that)) {
+            return false;
+        }
+        return Objects.equals(name, that.name) &&
+               Objects.equals(age, that.age);
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@Nonnull final String name) {
+        this.name = name;
+    }
+
+    @Nonnull
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(@Nonnull final Integer age) {
+        this.age = age;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    @NotNull
+    private String name;
+
+    @Nonnull
+    @NotNull
+    private Integer age;
 }
