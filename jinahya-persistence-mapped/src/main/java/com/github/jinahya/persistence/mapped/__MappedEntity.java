@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
 import java.util.Objects;
@@ -46,6 +47,10 @@ public abstract class __MappedEntity<ID> {
      */
     protected __MappedEntity() {
         super();
+    }
+
+    protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
+        this();
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object

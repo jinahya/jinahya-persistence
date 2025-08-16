@@ -23,16 +23,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 public abstract class __MappedEntityBuilderTest<
         BUILDER extends __MappedEntityBuilder<BUILDER, ENTITY>,
-        ENTITY extends __MappedEntity<?>
+        ENTITY extends __MappedEntity<ID>,
+        ID
         > {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __MappedEntityBuilderTest(final Class<BUILDER> builderSubclass, final Class<ENTITY> builderClass) {
+    protected __MappedEntityBuilderTest(final Class<BUILDER> builderClass, final Class<ENTITY> entityClass,
+                                        final Class<ID> idClass) {
         super();
-        this.builderClass = Objects.requireNonNull(builderSubclass, "builderSubclass is null");
-        this.entityClass = Objects.requireNonNull(builderClass, "builderClass is null");
+        this.builderClass = Objects.requireNonNull(builderClass, "builderClass is null");
+        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+        this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -81,7 +84,7 @@ public abstract class __MappedEntityBuilderTest<
                                 continue;
                             }
                             if (!writer.canAccess(builderInstance)) {
-                                writer.setAccessible(false);
+                                writer.setAccessible(true);
                             }
                             writer.invoke(builderInstance, value);
                         }
@@ -109,4 +112,6 @@ public abstract class __MappedEntityBuilderTest<
     protected final Class<BUILDER> builderClass;
 
     protected final Class<ENTITY> entityClass;
+
+    protected final Class<ID> idClass;
 }

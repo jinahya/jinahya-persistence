@@ -39,6 +39,11 @@ public class Entity01 extends __MappedEntity<Long> {
         super();
     }
 
+    Entity01(final Entity01Builder builder) {
+        super(builder);
+        id = builder.id();
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override

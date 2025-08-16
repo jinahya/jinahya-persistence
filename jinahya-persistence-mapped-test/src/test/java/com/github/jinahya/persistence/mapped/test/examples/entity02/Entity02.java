@@ -41,12 +41,19 @@ public class Entity02 extends __MappedEntity<Long> {
         super();
     }
 
+    Entity02(final Entity02Builder builder) {
+        super(builder);
+        id = builder.id();
+        name = builder.name();
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
         return super.toString() + '{' +
                "id=" + id +
+               "name=" + name +
                '}';
     }
 
