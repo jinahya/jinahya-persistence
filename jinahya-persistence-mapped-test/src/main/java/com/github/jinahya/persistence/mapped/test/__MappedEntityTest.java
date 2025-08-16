@@ -27,6 +27,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
 import java.beans.Introspector;
@@ -208,7 +209,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     @Nonnull
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass));
+//                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass))
+                .orElseGet(() -> ReflectionUtils.newInstance(entityClass))
+                ;
     }
 
     /**
@@ -252,7 +255,9 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     @Nonnull
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
-                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass));
+//                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass))
+                .orElseGet(() -> ReflectionUtils.newInstance(idClass))
+                ;
     }
 
     /**
