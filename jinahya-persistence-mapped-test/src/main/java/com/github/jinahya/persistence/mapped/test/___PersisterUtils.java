@@ -74,7 +74,7 @@ public final class ___PersisterUtils {
         Objects.requireNonNull(entityClass, "entityClass is null");
         final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
         newPersisterInstanceOf(entityClass)
-                .orElseThrow(() -> new RuntimeException("not persister instance for " + entityClass))
+                .orElseThrow(() -> new RuntimeException("no persister instance for " + entityClass))
                 .persist(entityManager, entityInstance);
         return entityInstance;
     }
