@@ -23,8 +23,11 @@ package com.github.jinahya.persistence.mapped.test;
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Table;
+import org.junit.platform.commons.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Utilities for {@link __MappedEntityTest}.
@@ -46,6 +49,46 @@ public class __MappedEntityTestUtils {
                 .orElseThrow(
                         () -> new IllegalArgumentException("unable to get @Table from " + entityClass)
                 );
+    }
+
+    public static <
+            ENTITY extends __MappedEntity<?>
+            >
+    ENTITY setFieldValue(@Nonnull final Class<ENTITY> entityClass,
+                         @Nonnull final ENTITY entityInstance,
+                         @Nonnull final Predicate<Field> fieldPredicate,
+                         final Object fieldValue) {
+        final var field = ReflectionUtils
+                .findFields(entityClass, fieldPredicate, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP).stream()
+                .findFirst()
+                .orElseThrow();
+        if (!field.canAccess(entityInstance)) {
+            field.setAccessible(true);
+        }
+        try {
+            field.set(entityInstance, fieldValue);
+        } catch (final IllegalAccessException iae) {
+            throw new RuntimeException("failed to set " + field + " on " + entityInstance + " with " + fieldValue, iae);
+        }
+        return entityInstance;
+    }
+
+    public static <
+            ENTITY extends __MappedEntity<?>
+            >
+    ENTITY setFieldValue(@Nonnull final Class<ENTITY> entityClass,
+                         @Nonnull final ENTITY entityInstance,
+                         @Nonnull final String fieldName,
+                         final Object fieldValue) {
+        Objects.requireNonNull(fieldName, "fieldName is null");
+        return setFieldValue(
+                entityClass,
+                entityInstance,
+                f -> {
+                    return fieldName.equals(f.getName());
+                },
+                fieldValue
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
