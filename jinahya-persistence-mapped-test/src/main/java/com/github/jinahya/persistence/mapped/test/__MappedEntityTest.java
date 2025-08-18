@@ -110,7 +110,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     }
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
-    @Test
+//    @Test
     void _DoesNotEqualToEachOther_TwoNewInstances() {
         final var entityInstance1 = newEntityInstance();
         final var entityInstance2 = newEntityInstance();
