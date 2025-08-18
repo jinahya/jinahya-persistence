@@ -14,10 +14,8 @@ import java.util.function.Function;
  */
 @SuppressWarnings({
         "unchecked",
-        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
-        "java:S116", // Field names should comply with a naming convention
-        "java:S117", // Local variable and method parameter names should comply with a naming convention
+        "java:S112", // Generic exceptions should never be thrown
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
@@ -29,13 +27,13 @@ public abstract class __MappedBuilder<
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance with the specified entity class.
+     * Creates a new instance for building an instance of {@link T}.
      *
-     * @param type the type.
+     * @param targetClass the class of {@link T} to build.
      */
-    protected __MappedBuilder(@Nonnull final Class<T> type) {
+    protected __MappedBuilder(@Nonnull final Class<T> targetClass) {
         super();
-        this.type = Objects.requireNonNull(type, "type is null");
+        this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
@@ -57,21 +55,21 @@ public abstract class __MappedBuilder<
     /**
      * Builds this builder into an instance of {@link T}.
      *
-     * @return an instance of {@link T}.
+     * @return an instance of {@link T} built from this builder.
      */
     @Nonnull
     public T build() {
         return build(
                 b -> {
                     try {
-                        final var constructor = type.getDeclaredConstructor(b.getClass());
+                        final var constructor = targetClass.getDeclaredConstructor(b.getClass());
                         if (!constructor.canAccess(null)) {
                             constructor.setAccessible(true);
                         }
                         return constructor.newInstance(b);
                     } catch (final ReflectiveOperationException roe) {
                         throw new RuntimeException(
-                                "failed to instantiate " + type + " with " + this,
+                                "failed to instantiate " + targetClass + " with " + this,
                                 roe
                         );
                     }
@@ -84,5 +82,5 @@ public abstract class __MappedBuilder<
     /**
      * The type to build.
      */
-    protected final Class<T> type;
+    protected final Class<T> targetClass;
 }
