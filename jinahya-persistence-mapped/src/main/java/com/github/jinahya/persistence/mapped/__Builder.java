@@ -19,8 +19,8 @@ import java.util.function.Function;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
-public abstract class __MappedBuilder<
-        SELF extends __MappedBuilder<SELF, T>,
+public abstract class __Builder<
+        SELF extends __Builder<SELF, T>,
         T
         > {
 
@@ -31,7 +31,7 @@ public abstract class __MappedBuilder<
      *
      * @param targetClass the class of {@link T} to build.
      */
-    protected __MappedBuilder(@Nonnull final Class<T> targetClass) {
+    protected __Builder(@Nonnull final Class<T> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }

@@ -17,7 +17,7 @@ public abstract class __MappedEntityBuilder<
         SELF extends __MappedEntityBuilder<SELF, ENTITY>,
         ENTITY extends __MappedEntity<?>
         >
-        extends __MappedBuilder<SELF, ENTITY> {
+        extends __Builder<SELF, ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
