@@ -19,6 +19,7 @@ class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuidTest<User
         super.equals_Verify_();
     }
 
+    @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equalsVerifier() {
         return super.equalsVerifier();

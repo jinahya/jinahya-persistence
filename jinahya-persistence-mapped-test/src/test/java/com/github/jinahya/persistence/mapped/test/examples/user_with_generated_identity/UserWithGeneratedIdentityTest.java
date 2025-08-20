@@ -19,6 +19,7 @@ class UserWithGeneratedIdentityTest extends __MappedEntityWithGeneratedIdentityT
         super.equals_Verify_();
     }
 
+    @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equalsVerifier() {
         return super.equalsVerifier();

@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.mapped.test;
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -35,7 +36,14 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<ENITTY extends __M
         super(entityClass, Long.class);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------- equals / hashCode
+    @Test
+    @Override
+    protected void equals_Verify_() {
+        super.equals_Verify_();
+    }
+
+    @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier() {
         return super.equalsVerifier();
