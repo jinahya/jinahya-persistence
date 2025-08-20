@@ -50,7 +50,7 @@ public abstract class __BuilderTest<
     }
 
     protected Optional<BUILDER> newRandomizedBuilderInstance() {
-        return __BuilderTestUtils.newRandomizedBuilderInstance(builderClass, targetClass);
+        return __BuilderTestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
     }
 
     // ----------------------------------------------------------------------------------------------------- targetClass

@@ -68,8 +68,8 @@ public final class __BuilderTestUtils {
     }
 
     public static <BUILDER extends __Builder<BUILDER, T>, T>
-    Optional<BUILDER> newRandomizedBuilderInstance(@Nonnull final Class<BUILDER> builderClass,
-                                                   @Nonnull final Class<T> targetClass) {
+    Optional<BUILDER> newBuilderInstanceFromRandomizedInstanceOf(@Nonnull final Class<BUILDER> builderClass,
+                                                                 @Nonnull final Class<T> targetClass) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetClass, "targetClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(targetClass)
