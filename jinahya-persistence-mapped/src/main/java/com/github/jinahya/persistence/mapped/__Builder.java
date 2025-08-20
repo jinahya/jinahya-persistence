@@ -6,10 +6,10 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * An abstract builder class for building a specific target type.
+ * An abstract class for building a specific target type.
  *
- * @param <SELF> self type parameter
- * @param <T>    target type parameter
+ * @param <SELF>   self type parameter
+ * @param <TARGET> target type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
@@ -20,18 +20,18 @@ import java.util.function.Function;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class __Builder<
-        SELF extends __Builder<SELF, T>,
-        T
+        SELF extends __Builder<SELF, TARGET>,
+        TARGET
         > {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance for building an instance of {@link T}.
+     * Creates a new instance for building instances of the specified target class.
      *
-     * @param targetClass the class of {@link T} to build.
+     * @param targetClass the class of {@link TARGET} to build.
      */
-    protected __Builder(@Nonnull final Class<T> targetClass) {
+    protected __Builder(@Nonnull final Class<TARGET> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
@@ -41,24 +41,24 @@ public abstract class __Builder<
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Builds this builder into an instance of {@link T} using specified function.
+     * Builds this builder into an instance of {@link #targetClass} using specified function.
      *
-     * @param function the function to build an instance of {@link T} applied to this builder.
-     * @return an instance of {@link T} built by specified function applied to this builder.
+     * @param function the function to be applied to this builder.
+     * @return an instance of {@link #targetClass} built by specified function applied to this builder.
      */
     @Nonnull
-    public T build(@Nonnull final Function<? super SELF, ? extends T> function) {
+    public TARGET build(@Nonnull final Function<? super SELF, ? extends TARGET> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply((SELF) this);
     }
 
     /**
-     * Builds this builder into an instance of {@link T}.
+     * Builds this builder into an instance of {@link #targetClass}.
      *
-     * @return an instance of {@link T} built from this builder.
+     * @return an instance of {@link #targetClass} built from this builder.
      */
     @Nonnull
-    public T build() {
+    public TARGET build() {
         return build(
                 b -> {
                     try {
@@ -69,7 +69,7 @@ public abstract class __Builder<
                         return constructor.newInstance(b);
                     } catch (final ReflectiveOperationException roe) {
                         throw new RuntimeException(
-                                "failed to instantiate " + targetClass + " with " + this,
+                                "failed to build a new instance of " + targetClass + " with " + this,
                                 roe
                         );
                     }
@@ -80,7 +80,7 @@ public abstract class __Builder<
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The type to build.
+     * The target type to build.
      */
-    protected final Class<T> targetClass;
+    protected final Class<TARGET> targetClass;
 }

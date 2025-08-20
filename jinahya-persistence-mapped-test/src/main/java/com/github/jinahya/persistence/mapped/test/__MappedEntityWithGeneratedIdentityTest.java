@@ -29,30 +29,51 @@ import org.junit.jupiter.api.Test;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedIdentityTest<ENITTY extends __MappedEntityWithGeneratedIdentity>
-        extends __MappedEntityWithGeneratedIdTest<ENITTY, Long> {
+public abstract class __MappedEntityWithGeneratedIdentityTest<ENTITY extends __MappedEntityWithGeneratedIdentity>
+        extends __MappedEntityWithGeneratedIdTest<ENTITY, Long> {
 
-    protected __MappedEntityWithGeneratedIdentityTest(final Class<ENITTY> entityClass) {
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    /**
+     * Creates a new instance for testing specified entity class.
+     *
+     * @param entityClass the entity class to test.
+     */
+    protected __MappedEntityWithGeneratedIdentityTest(final Class<ENTITY> entityClass) {
         super(entityClass, Long.class);
     }
 
     // ----------------------------------------------------------------------------------------------- equals / hashCode
+
+    /**
+     * {@inheritDoc}
+     */
     @Test
     @Override
     protected void equals_Verify_() {
         super.equals_Verify_();
     }
 
+    /**
+     * {@inheritDoc}}
+     *
+     * @return {@inheritDoc}
+     */
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier() {
+    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
         return super.equalsVerifier();
     }
 
+    /**
+     * {@inheritDoc}}}
+     *
+     * @param equalsVerifier {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier(
-            @Nonnull SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier) {
+    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier(
+            @Nonnull SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
         return super.equalsVerifier(equalsVerifier)
                 ;
     }
