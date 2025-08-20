@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.mapped.test;
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedUuid;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -38,6 +39,13 @@ public abstract class __MappedEntityWithGeneratedUuidTest<ENITTY extends __Mappe
     }
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
+    @Test
+    @Override
+    protected void equals_Verify_() {
+        super.equals_Verify_();
+    }
+
+    @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier() {
         return super.equalsVerifier();

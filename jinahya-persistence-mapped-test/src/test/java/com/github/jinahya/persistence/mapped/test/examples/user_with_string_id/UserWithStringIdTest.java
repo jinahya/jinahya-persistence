@@ -41,6 +41,12 @@ class UserWithStringIdTest extends __MappedEntityTest<UserWithStringId, String> 
 
     @Nonnull
     @Override
+    protected SingleTypeEqualsVerifierApi<UserWithStringId> equalsVerifier() {
+        return super.equalsVerifier();
+    }
+
+    @Nonnull
+    @Override
     protected SingleTypeEqualsVerifierApi<UserWithStringId> equalsVerifier(
             @Nonnull final SingleTypeEqualsVerifierApi<UserWithStringId> equalsVerifier) {
         return super.equalsVerifier(equalsVerifier)
