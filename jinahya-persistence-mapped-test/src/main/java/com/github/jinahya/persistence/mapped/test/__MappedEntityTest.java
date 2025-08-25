@@ -31,6 +31,9 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
 import java.beans.Introspector;
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InaccessibleObjectException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -50,6 +53,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         "java:S5960" // Assertions should not be used in production code
 })
 public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -110,12 +115,6 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     }
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
-//    @Test
-    void _DoesNotEqualToEachOther_TwoNewInstances() {
-        final var entityInstance1 = newEntityInstance();
-        final var entityInstance2 = newEntityInstance();
-        assertThat(entityInstance1).isNotEqualTo(entityInstance2);
-    }
 
     /**
      * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #entityClass} using an
@@ -129,7 +128,6 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @see #equalsVerifier(SingleTypeEqualsVerifierApi)
      */
     @DisplayName("equals/hashCode")
-//    @Test
     protected void equals_Verify_() {
         final var equalsVerifier = Objects.requireNonNull(equalsVerifier(), "equalsVerifier() returned null");
         equalsVerifier(equalsVerifier);
@@ -180,7 +178,11 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
                     continue;
                 }
                 if (!reader.canAccess(entityInstance)) {
-                    reader.setAccessible(true);
+                    try {
+                        reader.setAccessible(true);
+                    } catch (final InaccessibleObjectException ioe) {
+                        logger.log(Level.WARNING, "failed to set accessible for " + reader, ioe);
+                    }
                 }
                 final var value = reader.invoke(entityInstance);
                 final var writer = descriptor.getWriteMethod();
@@ -188,10 +190,14 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
                     continue;
                 }
                 if (!writer.canAccess(entityInstance)) {
-                    writer.setAccessible(true);
+                    try {
+                        writer.setAccessible(true);
+                    } catch (final InaccessibleObjectException ioe) {
+                        logger.log(Level.WARNING, "failed to set accessible for " + writer, ioe);
+                    }
                 }
                 assertThatCode(() -> writer.invoke(entityInstance, value))
-                        .as("%s(%s())", writer.getName(), reader.getName())
+                        .as("%s.%s(%s)", entityInstance, writer.getName(), value)
                         .doesNotThrowAnyException();
             }
         } catch (final Exception e) {
@@ -233,7 +239,6 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     @Nonnull
     protected ENTITY newEntityInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-//                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(entityClass))
                 .orElseGet(() -> ReflectionUtils.newInstance(entityClass))
                 ;
     }
@@ -279,7 +284,6 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
     @Nonnull
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
-//                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass))
                 .orElseGet(() -> ReflectionUtils.newInstance(idClass))
                 ;
     }
