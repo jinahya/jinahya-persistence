@@ -20,17 +20,23 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Slf4j
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
 class __DatabaseConstantsTest {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    private static final Logger log = LoggerFactory.getLogger(__DatabaseConstantsTest.class);
 
     @Test
     void constructors__() throws ReflectiveOperationException {
@@ -55,7 +61,8 @@ class __DatabaseConstantsTest {
         for (final var declaredClass : __DatabaseConstants.class.getDeclaredClasses()) {
             for (final var declaredField : declaredClass.getDeclaredFields()) {
                 final var value = declaredField.get(null);
-                log.debug("{}.{}: {}", declaredClass.getSimpleName(), declaredField.getName(), value);
+                logger.log(System.Logger.Level.DEBUG, "{0}.{1}: {2}", declaredClass.getSimpleName(),
+                           declaredField.getName(), value);
             }
         }
     }
@@ -70,12 +77,12 @@ class __DatabaseConstantsTest {
 
         @Test
         void __BIGINT() {
-            log.debug("MAX_BIGINT: {}", __DatabaseConstants.__MySqlConstants.MAX_BIGINT);
+//            log.debug("MAX_BIGINT: {}", __DatabaseConstants.__MySqlConstants.MAX_BIGINT);
         }
 
         @Test
         void __BIGINT_UNSIGNED() {
-            log.debug("MAX_BIGINT_UNSIGNED: {}", __DatabaseConstants.__MySqlConstants.MAX_BIGINT_UNSIGNED());
+//            log.debug("MAX_BIGINT_UNSIGNED: {}", __DatabaseConstants.__MySqlConstants.MAX_BIGINT_UNSIGNED());
         }
     }
 

@@ -21,10 +21,8 @@ package com.github.jinahya.persistence.mapped.test.examples.entity02;
  */
 
 import com.github.jinahya.persistence.mapped.test._MappedEntityPersistenceTest;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 class Entity02PersistenceTest extends _MappedEntityPersistenceTest<Entity02, Long> {
 
     Entity02PersistenceTest() {
@@ -40,7 +38,6 @@ class Entity02PersistenceTest extends _MappedEntityPersistenceTest<Entity02, Lon
 
     @Override
     protected void __persistEntityInstance(final Entity02 entityInstance) {
-        log.debug("persisted {}", entityInstance);
         super.__persistEntityInstance(entityInstance);
     }
 }

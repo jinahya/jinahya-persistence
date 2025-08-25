@@ -28,7 +28,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.ToString;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +35,6 @@ import java.util.function.Supplier;
 
 @Entity
 @Table(name = UserWithEmbeddedId.TABLE_NAME)
-@ToString(callSuper = true)
 class UserWithEmbeddedId extends __MappedEntity<IdForUserWithEmbeddedId> {
 
     public static final String TABLE_NAME = "user_with_embedded_id";

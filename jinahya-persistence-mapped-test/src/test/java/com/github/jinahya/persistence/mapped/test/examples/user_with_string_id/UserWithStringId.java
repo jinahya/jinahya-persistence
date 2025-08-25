@@ -27,13 +27,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.ToString;
 
 import java.util.Objects;
 
 @Entity
 @Table(name = UserWithStringId.TABLE_NAME)
-@ToString(callSuper = true)
 class UserWithStringId extends __MappedEntity<String> {
 
     static final String TABLE_NAME = "user_with_string_id";
