@@ -51,7 +51,7 @@ public class __DatabaseTestUtils {
          * @param connection the connection.
          * @param consumer   the consumer.
          * @see <a
-         *         href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/USER_SYS_PRIVS.html">USER_SYS_PRIVS</a>
+         *         href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/USER_TAB_PRIVS.html">USER_SYS_PRIVS</a>
          */
         public void USER_SYS_PRIVS(@Nonnull final Connection connection,
                                    @Nonnull final Consumer<? super ResultSet> consumer)
@@ -68,6 +68,43 @@ public class __DatabaseTestUtils {
         public List<String> USER_SYS_PRIVS__PRIVILEGES(@Nonnull final Connection connection) throws SQLException {
             final var privileges = new ArrayList<String>();
             USER_SYS_PRIVS(
+                    connection,
+                    r -> {
+                        try {
+                            while (r.next()) {
+                                privileges.add(r.getString("PRIVILEGE"));
+                            }
+                        } catch (final SQLException sqle) {
+                            throw new RuntimeException(sqle);
+                        }
+                    }
+            );
+            return privileges;
+        }
+
+        /**
+         * .
+         *
+         * @param connection the connection.
+         * @param consumer   the consumer.
+         * @see <a
+         *         href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/USER_TAB_PRIVS.html">USER_TAB_PRIVS</a>
+         */
+        public void USER_TAB_PRIVS(@Nonnull final Connection connection,
+                                   @Nonnull final Consumer<? super ResultSet> consumer)
+                throws SQLException {
+            Objects.requireNonNull(connection, "connection is null");
+            Objects.requireNonNull(consumer, "consumer is null");
+            try (var statement = connection.createStatement()) {
+                try (var resultSet = statement.executeQuery("SELECT * FROM USER_TAB_PRIVS")) {
+                    consumer.accept(resultSet);
+                }
+            }
+        }
+
+        public List<String> USER_TAB_PRIVS__PRIVILEGES(@Nonnull final Connection connection) throws SQLException {
+            final var privileges = new ArrayList<String>();
+            USER_TAB_PRIVS(
                     connection,
                     r -> {
                         try {

@@ -49,13 +49,15 @@ public final class __PersistenceProducerTestUtils {
      * Asserts that {@value PersistenceConfiguration#SCHEMAGEN_DATABASE_ACTION} property of the specified entity manager
      * factory is {@value #VALUE_SCHEMAGEN_DATABASE_ACTION_NONE)}.
      *
-     * @param bean the entity manager factory.
-     * @return given {@code bean}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
+     * @param entityManagerFactory the entity manager factory.
+     * @return given {@code entityManagerFactory}.
+     * @see <a
+     *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
      *         properties</a>
      */
-    public static EntityManagerFactory assertSchemagenDatabaseActionNone(final EntityManagerFactory bean) {
-        final var properties = bean.getProperties();
+    public static EntityManagerFactory assertSchemagenDatabaseActionNone(
+            final EntityManagerFactory entityManagerFactory) {
+        final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
                 PersistenceConfiguration.SCHEMAGEN_DATABASE_ACTION,
                 VALUE_SCHEMAGEN_DATABASE_ACTION_NONE
@@ -65,20 +67,21 @@ public final class __PersistenceProducerTestUtils {
                     "invalid value of '" + PersistenceConfiguration.SCHEMAGEN_DATABASE_ACTION + "': " + value
             );
         }
-        return bean;
+        return entityManagerFactory;
     }
 
     /**
      * Asserts that {@value #KEY_ECLIPSELINK_DDL_GENERATION} property of the specified entity manager factory is
      * {@value #VALUE_ECLIPSELINK_DDL_GENERATION_NONE)}.
      *
-     * @param bean the entity manager factory.
-     * @return given {@code bean}.
+     * @param entityManagerFactory the entity manager factory.
+     * @return given {@code entityManagerFactory}.
      * @see <a
      *         href="https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation">ddl-generation</a>
      */
-    public static EntityManagerFactory assertEclipselinkDdlGenerationNone(final EntityManagerFactory bean) {
-        final var properties = bean.getProperties();
+    public static EntityManagerFactory assertEclipselinkDdlGenerationNone(
+            final EntityManagerFactory entityManagerFactory) {
+        final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
                 KEY_ECLIPSELINK_DDL_GENERATION,
                 VALUE_ECLIPSELINK_DDL_GENERATION_NONE
@@ -86,21 +89,21 @@ public final class __PersistenceProducerTestUtils {
         if (!Objects.equals(value, VALUE_ECLIPSELINK_DDL_GENERATION_NONE)) {
             throw new RuntimeException("invalid value of '" + KEY_ECLIPSELINK_DDL_GENERATION + "': " + value);
         }
-        return bean;
+        return entityManagerFactory;
     }
 
     /**
      * Asserts that {@value #KEY_HIBERNATE_HBM2DDL_AUTO} property of the specified entity manager factory is
      * {@value #VALUE_HIBERNATE_HBM2DDL_AUTO_NONE)}.
      *
-     * @param bean the entity manager factory.
-     * @return given {@code bean}.
+     * @param entityManagerFactory the entity manager factory.
+     * @return given {@code entityManagerFactory}.
      * @see <a
      *         href="https://docs.jboss.org/hibernate/orm/7.1/userguide/html_single/Hibernate_User_Guide.html#settings-hibernate.hbm2ddl.auto">A.17.12.
      *         hibernate.hbm2ddl.auto</a>
      */
-    public static EntityManagerFactory assertHibernateHbm2ddlAutoNone(final EntityManagerFactory bean) {
-        final var properties = bean.getProperties();
+    public static EntityManagerFactory assertHibernateHbm2ddlAutoNone(final EntityManagerFactory entityManagerFactory) {
+        final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
                 KEY_HIBERNATE_HBM2DDL_AUTO,
                 VALUE_HIBERNATE_HBM2DDL_AUTO_NONE
@@ -108,7 +111,7 @@ public final class __PersistenceProducerTestUtils {
         if (!Objects.equals(value, VALUE_HIBERNATE_HBM2DDL_AUTO_NONE)) {
             throw new RuntimeException("invalid value of '" + KEY_HIBERNATE_HBM2DDL_AUTO + "': " + value);
         }
-        return bean;
+        return entityManagerFactory;
     }
 
     private __PersistenceProducerTestUtils() {

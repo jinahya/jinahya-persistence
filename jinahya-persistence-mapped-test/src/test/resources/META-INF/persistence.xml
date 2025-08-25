@@ -62,9 +62,9 @@
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
       <!-- jinahya.persistence -->
-      <property name="jinahya.persistence.default_catalog" value="UNNAMED"/>
-      <property name="jinahya.persistence.default_schema" value="PUBLIC"/>
-      <property name="jinahya.persistence.default_types" value="BASE TABLE"/>
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="__itPU">
@@ -106,9 +106,9 @@
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
       <!-- jinahya.persistence -->
-      <property name="jinahya.persistence.default_catalog" value="UNNAMED"/>
-      <property name="jinahya.persistence.default_schema" value="PUBLIC"/>
-      <property name="jinahya.persistence.default_types" value="BASE TABLE"/>
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
 </persistence>
