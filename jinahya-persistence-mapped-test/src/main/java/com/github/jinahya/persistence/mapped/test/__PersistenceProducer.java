@@ -119,13 +119,22 @@ public class __PersistenceProducer {
      * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      *
      * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+     * @see __PersistenceProducerTestUtils#assertSchemagenDatabaseActionNone(EntityManagerFactory)
+     * @see __PersistenceProducerTestUtils#assertEclipselinkDdlGenerationNone(EntityManagerFactory)
+     * @see __PersistenceProducerTestUtils#assertHibernateHbm2ddlAutoNone(EntityManagerFactory)
      */
     @__itPU
     @Produces
     public EntityManagerFactory produceItEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(
+        final var bean = Persistence.createEntityManagerFactory(
                 __PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU
         );
+        if (false) {
+            __PersistenceProducerTestUtils.assertSchemagenDatabaseActionNone(bean);
+            __PersistenceProducerTestUtils.assertEclipselinkDdlGenerationNone(bean);
+            __PersistenceProducerTestUtils.assertHibernateHbm2ddlAutoNone(bean);
+        }
+        return bean;
     }
 
     /**
