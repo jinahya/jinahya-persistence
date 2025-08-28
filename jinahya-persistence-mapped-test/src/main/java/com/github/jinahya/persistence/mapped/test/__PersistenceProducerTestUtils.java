@@ -47,12 +47,11 @@ public final class __PersistenceProducerTestUtils {
 
     /**
      * Asserts that {@value PersistenceConfiguration#SCHEMAGEN_DATABASE_ACTION} property of the specified entity manager
-     * factory is {@value #VALUE_SCHEMAGEN_DATABASE_ACTION_NONE)}.
+     * factory is {@value #VALUE_SCHEMAGEN_DATABASE_ACTION_NONE}.
      *
      * @param entityManagerFactory the entity manager factory.
      * @return given {@code entityManagerFactory}.
-     * @see <a
-     *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
      *         properties</a>
      */
     public static EntityManagerFactory assertSchemagenDatabaseActionNone(
@@ -72,7 +71,7 @@ public final class __PersistenceProducerTestUtils {
 
     /**
      * Asserts that {@value #KEY_ECLIPSELINK_DDL_GENERATION} property of the specified entity manager factory is
-     * {@value #VALUE_ECLIPSELINK_DDL_GENERATION_NONE)}.
+     * {@value #VALUE_ECLIPSELINK_DDL_GENERATION_NONE}.
      *
      * @param entityManagerFactory the entity manager factory.
      * @return given {@code entityManagerFactory}.
@@ -94,7 +93,7 @@ public final class __PersistenceProducerTestUtils {
 
     /**
      * Asserts that {@value #KEY_HIBERNATE_HBM2DDL_AUTO} property of the specified entity manager factory is
-     * {@value #VALUE_HIBERNATE_HBM2DDL_AUTO_NONE)}.
+     * {@value #VALUE_HIBERNATE_HBM2DDL_AUTO_NONE}.
      *
      * @param entityManagerFactory the entity manager factory.
      * @return given {@code entityManagerFactory}.
