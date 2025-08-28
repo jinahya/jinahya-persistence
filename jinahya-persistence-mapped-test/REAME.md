@@ -2,25 +2,36 @@
 
 A module for testing interfaces and classes extend what defined in the `jinahya-persistence-mapped` module.
 
+
+## Required dependencies
+
+
+
 ---
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
-**[WARNING] DO NOT USE THIS MODULE with a JDBC connection with DDL capabilities, PLEASE.**
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
+
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
+
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
+
+**[WARNING] DO NOT USE THIS MODULE with any DDL capabilities, PLEASE.**
 
 ---
 
@@ -180,4 +191,3 @@ class MyEntityPersistenceIT extends __MappedEntityPersistenceIT<MyEntity, Long> 
 ---
 
 [Jakarta Persistence]: https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2
-

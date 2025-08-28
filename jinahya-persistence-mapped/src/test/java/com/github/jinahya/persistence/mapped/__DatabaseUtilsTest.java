@@ -20,13 +20,11 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Slf4j
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })

@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.test.examples.entity02;
+package com.github.jinahya.persistence.mapped.test;
 
 /*-
  * #%L
@@ -20,24 +20,19 @@ package com.github.jinahya.persistence.mapped.test.examples.entity02;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test._MappedEntityPersistenceTest;
-import org.junit.jupiter.api.Test;
-
-class Entity02PersistenceTest extends _MappedEntityPersistenceTest<Entity02, Long> {
-
-    Entity02PersistenceTest() {
-        super(Entity02.class, Long.class);
-    }
+/**
+ * Utilities for the {@link __MappedEntityPersistenceTest}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
+@SuppressWarnings({
+        "java:S101", // Class names should comply with a naming convention
+        "java:S125", // Sections of code should not be commented out
+})
+public class __MappedEntityPersistenceITUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void __persistEntityInstance() {
-        super.__persistEntityInstance();
-    }
-
-    @Override
-    protected void __persistEntityInstance(final Entity02 entityInstance) {
-        super.__persistEntityInstance(entityInstance);
+    private __MappedEntityPersistenceITUtils() {
+        throw new AssertionError("instantiation is not allowed");
     }
 }

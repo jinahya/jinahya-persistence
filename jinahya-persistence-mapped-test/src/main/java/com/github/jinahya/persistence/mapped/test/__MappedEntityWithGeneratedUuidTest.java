@@ -47,15 +47,15 @@ public abstract class __MappedEntityWithGeneratedUuidTest<ENITTY extends __Mappe
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier() {
-        return super.equalsVerifier();
+    protected SingleTypeEqualsVerifierApi<ENITTY> createEqualsVerifier() {
+        return super.createEqualsVerifier();
     }
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier(
+    protected SingleTypeEqualsVerifierApi<ENITTY> configureEqualsVerifier(
             @Nonnull SingleTypeEqualsVerifierApi<ENITTY> equalsVerifier) {
-        return super.equalsVerifier(equalsVerifier)
+        return super.configureEqualsVerifier(equalsVerifier)
                 ;
     }
 }

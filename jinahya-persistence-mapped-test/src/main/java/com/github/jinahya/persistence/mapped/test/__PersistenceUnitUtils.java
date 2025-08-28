@@ -46,21 +46,21 @@ final class __PersistenceUnitUtils {
     static Optional<String> getDefaultCatalog(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
-                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG
+                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG
         );
     }
 
     static Optional<String> getDefaultSchema(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
-                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA
+                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_SCHEMA
         );
     }
 
     static Optional<String[]> getDefaultTypes(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
-                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES
+                __PersistenceProducerConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_TYPES
         ).map(v -> v.split(","));
     }
 

@@ -61,16 +61,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.eclipse.persistence</groupId>-->
-<!--      <artifactId>org.eclipse.persistence.jpa</artifactId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.hibernate.orm</groupId>-->
-<!--      <artifactId>hibernate-core</artifactId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
@@ -91,36 +81,21 @@
       <artifactId>weld-junit5</artifactId>
       <scope>compile</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.junit.jupiter</groupId>-->
-<!--      <artifactId>junit-jupiter-api</artifactId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
-<!--    <dependency>-->
-<!--      <groupId>org.junit.jupiter</groupId>-->
-<!--      <artifactId>junit-jupiter-params</artifactId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>compile</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.mockito</groupId>-->
-<!--      <artifactId>mockito-core</artifactId>-->
-<!--      <scope>compile</scope>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.projectlombok</groupId>-->
+<!--      <artifactId>lombok</artifactId>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk-platform-logging</artifactId>

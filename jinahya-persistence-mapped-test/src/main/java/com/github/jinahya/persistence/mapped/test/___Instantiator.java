@@ -64,7 +64,6 @@ public abstract class ___Instantiator<T> {
             "java:S112" // Generic exceptions should never be thrown
     })
     public T get() {
-//        return ___JavaLangReflectTestUtils.newInstanceOf(type);
         return ReflectionUtils.newInstance(type);
     }
 

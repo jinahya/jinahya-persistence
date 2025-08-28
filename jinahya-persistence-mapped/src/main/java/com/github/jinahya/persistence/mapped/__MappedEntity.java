@@ -47,6 +47,11 @@ public abstract class __MappedEntity<ID> {
         super();
     }
 
+    /**
+     * Creates a new instance built from the specified builder.
+     *
+     * @param builder the builder from which a new instance is built.
+     */
     protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
         this();
     }

@@ -46,6 +46,10 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
         super();
     }
 
+    protected __MappedEntityWithGeneratedIdentity(final __MappedEntityWithGeneratedIdentityBuilder<?, ?> builder) {
+        super(builder);
+    }
+
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
     @Override

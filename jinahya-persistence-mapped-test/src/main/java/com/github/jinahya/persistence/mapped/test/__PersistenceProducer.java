@@ -31,6 +31,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.invoke.MethodHandles;
 
 /**
  * A class for providing persistence resources.
@@ -77,6 +78,9 @@ public class __PersistenceProducer {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Creates a new instance.
@@ -119,13 +123,28 @@ public class __PersistenceProducer {
      * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      *
      * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+     * @see __PersistenceProducerTestUtils#assertSchemagenDatabaseActionNone(EntityManagerFactory)
+     * @see __PersistenceProducerTestUtils#assertEclipselinkDdlGenerationNone(EntityManagerFactory)
+     * @see __PersistenceProducerTestUtils#assertHibernateHbm2ddlAutoNone(EntityManagerFactory)
      */
     @__itPU
     @Produces
     public EntityManagerFactory produceItEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory(
+        final var entityManagerFactory = Persistence.createEntityManagerFactory(
                 __PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU
         );
+        if (false) {
+            __PersistenceProducerTestUtils.assertSchemagenDatabaseActionNone(entityManagerFactory);
+            __PersistenceProducerTestUtils.assertEclipselinkDdlGenerationNone(entityManagerFactory);
+            __PersistenceProducerTestUtils.assertHibernateHbm2ddlAutoNone(entityManagerFactory);
+        }
+        logger.log(
+                System.Logger.Level.DEBUG,
+                "producing entity manager factory: {0} for {1}",
+                entityManagerFactory,
+                __itPU.class
+        );
+        return entityManagerFactory;
     }
 
     /**
@@ -135,6 +154,12 @@ public class __PersistenceProducer {
      */
     public void disposeItEntityManagerFactory(
             @__itPU @Disposes final EntityManagerFactory entityManagerFactory) {
+        logger.log(
+                System.Logger.Level.DEBUG,
+                "disposing entity manager factory: {0}, produced for {1{",
+                entityManagerFactory,
+                __itPU.class
+        );
         entityManagerFactory.close();
     }
 }

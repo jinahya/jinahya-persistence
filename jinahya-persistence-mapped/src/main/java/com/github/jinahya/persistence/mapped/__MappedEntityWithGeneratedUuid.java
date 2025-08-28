@@ -48,6 +48,10 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
         super();
     }
 
+    protected __MappedEntityWithGeneratedUuid(final __MappedEntityWithGeneratedUuidBuilder<?, ?> builder) {
+        super(builder);
+    }
+
     // ------------------------------------------------------------------------------------------------ java.lang.Object
     @Override
     public String toString() {

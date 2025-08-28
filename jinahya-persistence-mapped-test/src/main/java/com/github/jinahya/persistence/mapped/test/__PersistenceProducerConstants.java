@@ -45,17 +45,17 @@ public final class __PersistenceProducerConstants {
     /**
      * The name of the persistence unit property for table catalog.
      */
-    static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_CATALOG = "jinahya.persistence.default_catalog";
+    static final String PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG = "jinahya.persistence.table_catalog";
 
     /**
      * The name of the persistence unit property for table schema.
      */
-    static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_SCHEMA = "jinahya.persistence.default_schema";
+    static final String PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_SCHEMA = "jinahya.persistence.table_schema";
 
     /**
      * The name of the persistence unit property for table types.
      */
-    static final String PERSISTENCE_UNIT_PROPERTY_DEFAULT_TYPES = "jinahya.persistence.default_types";
+    static final String PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_TYPES = "jinahya.persistence.table_types";
 
     // -----------------------------------------------------------------------------------------------------------------
 

@@ -31,7 +31,7 @@ public abstract class __MappedEntityWithGeneratedIdentityBuilder<
         SELF extends __MappedEntityWithGeneratedIdentityBuilder<SELF, ENTITY>,
         ENTITY extends __MappedEntityWithGeneratedIdentity
         >
-        extends __MappedEntityBuilder<SELF, ENTITY> {
+        extends __MappedEntityWithGeneratedIdBuilder<SELF, ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
