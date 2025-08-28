@@ -110,7 +110,7 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
     /**
      * Tests that all database tables are mapped to entities.
      *
-     * @see #_Empty_RemainingDatabaseTableNames(Collection)
+     * @see #__RemainingDatabaseTableNames(Collection)
      */
     @DisplayName("all database tables are mapped")
     @Test
@@ -122,33 +122,36 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
         databaseTableNames.removeAll(persistenceTableNames);
         logger.log(Level.DEBUG, "remaining database table names: {0}", databaseTableNames);
         // -------------------------------------------------------------------------------------------------------- then
-        _Empty_RemainingDatabaseTableNames(databaseTableNames);
+        __RemainingDatabaseTableNames(databaseTableNames);
+        assertThat(databaseTableNames)
+                .as("remaining database table names")
+                .isEmpty();
     }
 
     /**
-     * Verifies that the specified collection of remaining database table names, from which all entity table names are
-     * removed, is empty.
+     * Notifies that the specified collection of remaining database table names, from which all persistence table names
+     * are removed, is verified as empty.
      *
-     * @param remainingDatabaseTableNames the collection of remaining database table names which should be empty.
+     * @param remainingDatabaseTableNames the collection of remaining database table names from which all persistence
+     *                                    table names are removed.
      * @see #_Mapped_AllTableFamilyTableNames()
      */
-    protected void _Empty_RemainingDatabaseTableNames(@Nonnull final Collection<String> remainingDatabaseTableNames) {
+    protected void __RemainingDatabaseTableNames(@Nonnull final Collection<String> remainingDatabaseTableNames) {
         remainingDatabaseTableNames.removeIf(tn -> {
             return tn.startsWith("HTE_"); // H2 temporary tables
         });
         remainingDatabaseTableNames.remove("SEQUENCE");
-        remainingDatabaseTableNames.forEach(tn -> logger.log(Level.WARNING, "remaining database table name: {0}", tn));
-        assertThat(remainingDatabaseTableNames)
-                .as("remaining database table names")
-                .isEmpty();
+        remainingDatabaseTableNames.forEach(
+                tn -> logger.log(Level.WARNING, "remaining database table name: {0}", tn)
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Tests that all entity table names are known.
+     * Tests that all persistence table names are known.
      *
-     * @see #_Empty_UnknownPersistenceTableNames(Collection)
+     * @see #__RemainingPersistenceTableNames(Collection)
      */
     @DisplayName("check all entity tables are known")
     @Test
@@ -160,22 +163,23 @@ public abstract class __PersistenceUnitIT extends __PersistenceUnit_ {
         persistenceTableNames.removeAll(databaseTableNames);
         logger.log(Level.DEBUG, "remaining persistence table names: {0}", persistenceTableNames);
         // -------------------------------------------------------------------------------------------------------- then
-        _Empty_UnknownPersistenceTableNames(persistenceTableNames);
+        __RemainingPersistenceTableNames(persistenceTableNames);
+        assertThat(persistenceTableNames)
+                .as("unknown persistence table names")
+                .isEmpty();
     }
 
     /**
-     * Verifies that the specified collection of unknown persistence table names, from which all database table names
-     * are removed, is empty.
+     * Notifies the specified collection of remaining persistence table names, from which all database table names are
+     * removed.
      *
-     * @param unknownPersistenceTableNames the unknown persistence table names from which all database table names are
-     *                                     removed.
+     * @param remainingPersistenceTableNames the remaining persistence table names from which all database table names
+     *                                       are removed.
      * @see #_Known_AllPersistenceTableNames()
      */
-    protected void _Empty_UnknownPersistenceTableNames(@Nonnull final Collection<String> unknownPersistenceTableNames) {
-        unknownPersistenceTableNames.forEach(
-                tn -> logger.log(Level.WARNING, "remaining persistence table name: {0}", tn));
-        assertThat(unknownPersistenceTableNames)
-                .as("unknown persistence table names")
-                .isEmpty();
+    protected void __RemainingPersistenceTableNames(@Nonnull final Collection<String> remainingPersistenceTableNames) {
+        remainingPersistenceTableNames.forEach(
+                tn -> logger.log(Level.WARNING, "remaining persistence table name: {0}", tn)
+        );
     }
 }
