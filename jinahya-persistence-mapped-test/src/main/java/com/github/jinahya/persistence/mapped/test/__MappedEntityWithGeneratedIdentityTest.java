@@ -60,8 +60,8 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<ENTITY extends __M
      */
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
-        return super.equalsVerifier();
+    protected SingleTypeEqualsVerifierApi<ENTITY> createEqualsVerifier() {
+        return super.createEqualsVerifier();
     }
 
     /**
@@ -72,9 +72,9 @@ public abstract class __MappedEntityWithGeneratedIdentityTest<ENTITY extends __M
      */
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier(
+    protected SingleTypeEqualsVerifierApi<ENTITY> configureEqualsVerifier(
             @Nonnull SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
-        return super.equalsVerifier(equalsVerifier)
+        return super.configureEqualsVerifier(equalsVerifier)
                 ;
     }
 }

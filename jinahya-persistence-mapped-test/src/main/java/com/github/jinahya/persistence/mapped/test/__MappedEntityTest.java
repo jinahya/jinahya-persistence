@@ -118,19 +118,19 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
 
     /**
      * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #entityClass} using an
-     * equals-verifier created via {@link #equalsVerifier()}, and configured with
-     * {@link #equalsVerifier(SingleTypeEqualsVerifierApi)} method.
+     * equals-verifier created via {@link #createEqualsVerifier()}, and configured with
+     * {@link #configureEqualsVerifier(SingleTypeEqualsVerifierApi)} method.
      *
      * @implNote This method is not annotated with the {@link Test} annotation. Override this method, and put
      *         {@link Test} to verify the {@link #equals(Object)} method (and {@link #hashCode()} method) of the
      *         {@link #entityClass}
-     * @see #equalsVerifier()
-     * @see #equalsVerifier(SingleTypeEqualsVerifierApi)
+     * @see #createEqualsVerifier()
+     * @see #configureEqualsVerifier(SingleTypeEqualsVerifierApi)
      */
     @DisplayName("equals/hashCode")
     protected void equals_Verify_() {
-        final var equalsVerifier = Objects.requireNonNull(equalsVerifier(), "equalsVerifier() returned null");
-        equalsVerifier(equalsVerifier);
+        final var equalsVerifier = Objects.requireNonNull(createEqualsVerifier(), "null equalsVerifier created");
+        configureEqualsVerifier(equalsVerifier);
         equalsVerifier.verify();
     }
 
@@ -140,7 +140,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @return a new equals verifier for {@link #entityClass}.
      */
     @Nonnull
-    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier() {
+    protected SingleTypeEqualsVerifierApi<ENTITY> createEqualsVerifier() {
         return EqualsVerifier.forClass(entityClass);
     }
 
@@ -152,7 +152,7 @@ public abstract class __MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> 
      * @see #equals_Verify_()
      */
     @Nonnull
-    protected SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier(
+    protected SingleTypeEqualsVerifierApi<ENTITY> configureEqualsVerifier(
             @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
         return equalsVerifier
                 ;

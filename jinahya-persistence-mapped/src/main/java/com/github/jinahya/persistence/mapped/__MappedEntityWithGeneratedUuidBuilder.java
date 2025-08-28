@@ -31,7 +31,7 @@ public abstract class __MappedEntityWithGeneratedUuidBuilder<
         SELF extends __MappedEntityWithGeneratedUuidBuilder<SELF, ENTITY>,
         ENTITY extends __MappedEntityWithGeneratedUuid
         >
-        extends __MappedEntityBuilder<SELF, ENTITY> {
+        extends __MappedEntityWithGeneratedIdBuilder<SELF, ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
