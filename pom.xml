@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.0.9-SNAPSHOT</version>
+  <version>0.0.9</version>
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
@@ -39,7 +39,7 @@
     <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
     <url>https://github.com/jinahya/${project.artifactId}</url>
-    <tag>HEAD</tag>
+    <tag>0.0.9</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
@@ -298,7 +298,7 @@
         <configuration>
           <!--              <skip>true</skip>-->
           <rules>
-            <dependencyConvergence/>
+            <dependencyConvergence />
             <requireJavaVersion>
               <version>[21.0.0,)</version>
             </requireJavaVersion>
