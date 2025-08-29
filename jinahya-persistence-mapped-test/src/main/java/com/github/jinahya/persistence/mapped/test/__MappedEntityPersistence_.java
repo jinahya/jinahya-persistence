@@ -39,7 +39,7 @@ import java.util.function.Function;
         "java:S6813" // Field dependency injection should be avoided
 })
 abstract class __MappedEntityPersistence_<ENTITY extends __MappedEntity<ID>, ID>
-        extends ___MappedEntityTest<ENTITY, ID> {
+        extends ___MappedEntityTest_<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
     __MappedEntityPersistence_(final Class<ENTITY> entityClass, final Class<ID> idClass) {

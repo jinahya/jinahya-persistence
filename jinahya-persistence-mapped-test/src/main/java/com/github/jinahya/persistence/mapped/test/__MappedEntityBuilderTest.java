@@ -13,7 +13,7 @@ public abstract class __MappedEntityBuilderTest<
         BUILDER extends __MappedEntityBuilder<BUILDER, ENTITY>,
         ENTITY extends __MappedEntity<ID>,
         ID
-        > extends __BuilderTest<BUILDER, ENTITY> {
+        > extends __MappedBuilderTest<BUILDER, ENTITY> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected __MappedEntityBuilderTest(final Class<BUILDER> builderClass, final Class<ENTITY> entityClass,

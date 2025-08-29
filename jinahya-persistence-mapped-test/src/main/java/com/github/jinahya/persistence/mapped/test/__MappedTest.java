@@ -51,7 +51,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-public abstract class __Mapped_Test<MAPPED extends __Mapped> {
+public abstract class __MappedTest<MAPPED extends __Mapped> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -63,7 +63,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @param mappedClass the mapped class to test.
      * @see #mappedClass
      */
-    protected __Mapped_Test(@Nonnull final Class<MAPPED> mappedClass) {
+    protected __MappedTest(@Nonnull final Class<MAPPED> mappedClass) {
         super();
         this.mappedClass = Objects.requireNonNull(mappedClass, "mappedClass is null");
     }

@@ -7,14 +7,14 @@ import com.github.jinahya.persistence.mapped.__MappedBuilder;
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedBuilder_Test<
+public abstract class __MappedBuilderTest<
         BUILDER extends __MappedBuilder<BUILDER, MAPPED>,
         MAPPED extends __Mapped
         >
         extends __BuilderTest<BUILDER, MAPPED> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __MappedBuilder_Test(final Class<BUILDER> builderClass, final Class<MAPPED> mappedClass) {
+    protected __MappedBuilderTest(final Class<BUILDER> builderClass, final Class<MAPPED> mappedClass) {
         super(builderClass, mappedClass);
     }
 }
