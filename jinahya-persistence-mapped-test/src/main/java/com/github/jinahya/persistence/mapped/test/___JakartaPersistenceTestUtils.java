@@ -407,7 +407,8 @@ final class ___JakartaPersistenceTestUtils {
                         c -> i -> {
                             final var builder = entityManager.getCriteriaBuilder();
                             final var query = builder.createQuery(entityClass);
-                            query.from(entityClass);
+                            final var root = query.from(entityClass);
+                            query.select(root);
                             return entityManager
                                     .createQuery(query)
                                     .setFirstResult(Math.toIntExact(i))

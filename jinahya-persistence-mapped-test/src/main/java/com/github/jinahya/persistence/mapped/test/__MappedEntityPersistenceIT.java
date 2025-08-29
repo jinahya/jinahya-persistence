@@ -166,14 +166,14 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     /**
      * Asserts that specified remaining entity column names, from which all table column names are removed, is empty.
      *
-     * @param unknownEntityColumnNames the remaining entity column names that all table column names are removed.
+     * @param remainingEntityColumnNames the remaining entity column names that all table column names are removed.
      */
-    protected void _Empty_UnknownEntityColumnNames(@Nonnull final Collection<String> unknownEntityColumnNames) {
-        Objects.requireNonNull(unknownEntityColumnNames, "unknownEntityColumnNames is null");
-        unknownEntityColumnNames.forEach(cn -> {
+    protected void _Empty_UnknownEntityColumnNames(@Nonnull final Collection<String> remainingEntityColumnNames) {
+        Objects.requireNonNull(remainingEntityColumnNames, "remainingEntityColumnNames is null");
+        remainingEntityColumnNames.forEach(cn -> {
             logger.log(Level.WARNING, "remaining entity column name: " + cn);
         });
-        assertThat(unknownEntityColumnNames)
+        assertThat(remainingEntityColumnNames)
                 .as("remaining entity column names")
                 .isEmpty();
     }
@@ -188,16 +188,16 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
     @DisplayName("select an entity instance of a random index")
     @Test
     protected void _Valid_RandomlySelectedEntityInstance() {
-        // -------------------------------------------------------------------------------------------------------- when
-        final var entityInstance = applyEntityManager(
-                em -> ___JakartaPersistenceTestUtils.selectRandom(em, entityClass)
-        );
-        if (entityInstance.isEmpty()) {
-            logger.log(Level.INFO, "no random entity selected; maybe the table is empty?");
-            return;
-        }
-        // -------------------------------------------------------------------------------------------------------- then
-        _Valid_RandomlySelectedEntityInstance(entityInstance.get());
+        acceptEntityManager(em -> {
+            // ---------------------------------------------------------------------------------------------------- when
+            final var selected = ___JakartaPersistenceTestUtils.selectRandom(em, entityClass);
+            if (selected.isEmpty()) {
+                logger.log(Level.INFO, "no random entity selected; maybe the table is empty?");
+                return;
+            }
+            // ---------------------------------------------------------------------------------------------------- then
+            _Valid_RandomlySelectedEntityInstance(selected.get());
+        });
     }
 
     /**
@@ -209,7 +209,7 @@ public abstract class __MappedEntityPersistenceIT<ENTITY extends __MappedEntity<
      */
     protected void _Valid_RandomlySelectedEntityInstance(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        logger.log(Level.DEBUG, "selected entity instance: {0}", entityInstance);
+        logger.log(Level.DEBUG, "randomly selected entity instance: {0}", entityInstance);
         ___JakartaValidationTestUtils.requireValid(entityInstance);
     }
 
