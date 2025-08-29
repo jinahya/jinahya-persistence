@@ -20,21 +20,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 })
 public abstract class __BuilderTest<
-        BUILDER extends __Builder<BUILDER, T>,
-        T
+        BUILDER extends __Builder<BUILDER, TARGET>,
+        TARGET
         > {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __BuilderTest(final Class<BUILDER> builderClass, final Class<T> targetClass) {
+    protected __BuilderTest(final Class<BUILDER> builderClass, final Class<TARGET> targetClass) {
         super();
         this.builderClass = Objects.requireNonNull(builderClass, "builderClass is null");
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("build() should return non-null ENTITY")
+    @DisplayName("build() should return non-null TARGET")
     @Test
     protected void build_NotNull_() {
         newRandomizedBuilderInstance().ifPresent(b -> {
@@ -54,16 +54,16 @@ public abstract class __BuilderTest<
     }
 
     // ----------------------------------------------------------------------------------------------------- targetClass
-    protected T newTargetInstance() {
+    protected TARGET newTargetInstance() {
         return ReflectionUtils.newInstance(targetClass);
     }
 
-    protected Optional<T> newRandomizedTargetInstance() {
+    protected Optional<TARGET> newRandomizedTargetInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(targetClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     protected final Class<BUILDER> builderClass;
 
-    protected final Class<T> targetClass;
+    protected final Class<TARGET> targetClass;
 }

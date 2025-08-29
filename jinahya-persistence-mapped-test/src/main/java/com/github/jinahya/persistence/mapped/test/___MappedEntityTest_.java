@@ -40,7 +40,7 @@ import java.util.Optional;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
+abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -52,7 +52,7 @@ abstract class ___MappedEntityTest<ENTITY extends __MappedEntity<ID>, ID> {
      * @see #entityClass
      * @see #idClass
      */
-    ___MappedEntityTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
+    ___MappedEntityTest_(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");

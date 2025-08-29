@@ -18,14 +18,7 @@ public final class __BuilderTestUtils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <
-            BUILDER
-                    extends __Builder<
-                            BUILDER,
-                            T
-                            >,
-            T
-            >
+    public static <BUILDER extends __Builder<BUILDER, T>, T>
     BUILDER newBuilderInstanceFrom(final Class<BUILDER> builderClass, @Nonnull final T targetInstance) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetInstance, "targetInstance is null");
