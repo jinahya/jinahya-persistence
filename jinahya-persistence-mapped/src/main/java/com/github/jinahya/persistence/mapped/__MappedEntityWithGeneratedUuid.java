@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -48,7 +49,12 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
         super();
     }
 
-    protected __MappedEntityWithGeneratedUuid(final __MappedEntityWithGeneratedUuidBuilder<?, ?> builder) {
+    /**
+     * Creates a new instance built from the specified builder.
+     *
+     * @param builder the builder from which a new instance is built.
+     */
+    protected __MappedEntityWithGeneratedUuid(@Nonnull final __MappedEntityWithGeneratedUuidBuilder<?, ?> builder) {
         super(builder);
     }
 
@@ -61,6 +67,12 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
     }
 
     // ------------------------------------------------------------------------------------------------------------ id__
+
+    /**
+     * Returns curren value of the {@value __MappedEntityWithGeneratedId#ATTRIBUTE_NAME_ID__} attribute.
+     *
+     * @return current value of the {@value __MappedEntityWithGeneratedId#ATTRIBUTE_NAME_ID__} attribute.
+     */
     public UUID getId__() {
         return id__;
     }

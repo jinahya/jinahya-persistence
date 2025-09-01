@@ -353,7 +353,7 @@
             <!--            </path>-->
           </annotationProcessorPaths>
           <compilerArgs>
-            <arg>-Xlint</arg>
+<!--            <arg>-Xlint</arg>-->
           </compilerArgs>
         </configuration>
       </plugin>

@@ -37,6 +37,8 @@ public abstract class __MappedEntityWithGeneratedIdentityBuilder<
 
     /**
      * Creates a new instance.
+     *
+     * @param entityClass the entity class.
      */
     protected __MappedEntityWithGeneratedIdentityBuilder(final Class<ENTITY> entityClass) {
         super(entityClass);

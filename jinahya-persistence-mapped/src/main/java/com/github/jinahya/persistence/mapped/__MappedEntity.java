@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
 /**
@@ -51,8 +52,7 @@ public abstract class __MappedEntity<ID> extends __Mapped {
      *
      * @param builder the builder from which a new instance is built.
      */
-    protected __MappedEntity(
-            @org.jspecify.annotations.NonNull @jakarta.annotation.Nonnull final __MappedEntityBuilder<?, ?> builder) {
+    protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
         super(builder);
     }
 }

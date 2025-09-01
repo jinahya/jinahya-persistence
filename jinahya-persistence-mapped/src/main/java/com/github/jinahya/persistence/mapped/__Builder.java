@@ -1,5 +1,7 @@
 package com.github.jinahya.persistence.mapped;
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -29,7 +31,7 @@ public abstract class __Builder<
      *
      * @param targetClass the class of {@link TARGET} to build.
      */
-    protected __Builder(@org.jspecify.annotations.NonNull @jakarta.annotation.Nonnull final Class<TARGET> targetClass) {
+    protected __Builder(@Nonnull final Class<TARGET> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
@@ -44,11 +46,8 @@ public abstract class __Builder<
      * @param function the function to be applied to this builder.
      * @return an instance of {@link #targetClass} built by specified function applied to this builder.
      */
-    @org.jspecify.annotations.NonNull
-    @jakarta.annotation.Nonnull
-    public TARGET build(
-            @org.jspecify.annotations.NonNull @jakarta.annotation.Nonnull
-            final Function<? super SELF, ? extends TARGET> function) {
+    @Nonnull
+    public TARGET build(@Nonnull final Function<? super SELF, ? extends TARGET> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply((SELF) this);
     }
@@ -58,8 +57,7 @@ public abstract class __Builder<
      *
      * @return an instance of {@link #targetClass} built from this builder.
      */
-    @org.jspecify.annotations.NonNull
-    @jakarta.annotation.Nonnull
+    @Nonnull
     public TARGET build() {
         return build(
                 b -> {
@@ -82,9 +80,20 @@ public abstract class __Builder<
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Resets this builder.
+     *
+     * @return this builder.
+     */
+    public SELF reset() {
+        // TODO: implement
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * The target type to build.
      */
-    @org.jspecify.annotations.NonNull
-    @jakarta.annotation.Nonnull
+    @Nonnull
     protected final Class<TARGET> targetClass;
 }

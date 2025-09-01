@@ -20,6 +20,12 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+
+import java.util.Objects;
+import java.util.Optional;
+
 @SuppressWarnings({
         "java:S114", // Type parameter names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
@@ -27,4 +33,18 @@ package com.github.jinahya.persistence.mapped;
 public interface __MappedEntityWithGeneratedIdentityCriteria<ENTITY extends __MappedEntityWithGeneratedIdentity>
         extends __MappedEntityWithGeneratedIdCriteria<ENTITY, Long> {
 
+    static <ENTITY extends __MappedEntityWithGeneratedIdentity> Optional<ENTITY> findById(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Class<ENTITY> entityClass,
+            @Nonnull final Long idValue) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(idValue, "idValue is null");
+        return __MappedEntityWithGeneratedIdCriteria.findById(
+                entityManager,
+                entityClass,
+                __MappedEntityWithGeneratedIdentity_.id__,
+                idValue
+        );
+    }
 }

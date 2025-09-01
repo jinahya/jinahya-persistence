@@ -21,10 +21,9 @@ package com.github.jinahya.persistence.mapped;
  */
 
 @SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
         "java:S114",  // Interface names should comply with a naming convention
         "java:S119" // Type parameter names should comply with a naming convention
 })
-public interface __MappedEntityCriteria<ENTITY extends __MappedEntity<ID>, ID> {
+public interface __MappedCriteria<MAPPED extends __Mapped> {
 
 }

@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
 /**
@@ -56,7 +57,7 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
         super();
     }
 
-    protected __MappedEntityWithGeneratedId(final __MappedEntityWithGeneratedIdBuilder<?, ?> builder) {
+    protected __MappedEntityWithGeneratedId(@Nonnull final __MappedEntityWithGeneratedIdBuilder<?, ?> builder) {
         super(builder);
     }
 }
