@@ -22,23 +22,12 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
-import jakarta.persistence.Transient;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
-import java.beans.Introspector;
-import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InaccessibleObjectException;
 import java.util.Objects;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * A class for testing a specific subclass of {@link __MappedEntity}.
@@ -68,166 +57,166 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      */
     protected __MappedEntity_Test(@Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
         super(entityClass);
-        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+//        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
 
-    // -------------------------------------------------------------------------------------------------------- toString
-
-    /**
-     * Verifies that the result of {@link Object#toString() entityInstance.toString()} is not blank.
-     *
-     * @param entityInstance the instance to test.
-     * @see #toString_NotBlank_newEntityInstance()
-     * @see #toString_NotBlank_newRandomizedEntityInstance()
-     */
-    protected void toString_NotBlank_(@Nonnull final ENTITY entityInstance) {
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
-        final var string = entityInstance.toString();
-        assertThat(string)
-                .as("%s.toString()", entityInstance)
-                .isNotBlank();
-    }
-
-    /**
-     * Invokes {@link #toString_NotBlank_(__MappedEntity)} method with a new instance of {@link #entityClass}.
-     *
-     * @see #newEntityInstance()
-     * @see #toString_NotBlank_(__MappedEntity)
-     */
-    @DisplayName("newEntityInstance().toString()!blank")
-//    @Test
-    protected void toString_NotBlank_newEntityInstance() {
-        toString_NotBlank_(newEntityInstance());
-    }
-
-    /**
-     * Invokes {@link #toString_NotBlank_(__MappedEntity)} method with a new randomized instance of
-     * {@link #entityClass}.
-     *
-     * @see #newRandomizedEntityInstance()
-     * @see #toString_NotBlank_(__MappedEntity)
-     */
-    @DisplayName("newRandomizedEntityInstance().toString()!blank")
-//    @Test
-    protected void toString_NotBlank_newRandomizedEntityInstance() {
-        newRandomizedEntityInstance().ifPresent(this::toString_NotBlank_);
-    }
-
-    // ------------------------------------------------------------------------------------------------- equals/hashCode
-
-    /**
-     * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #entityClass} using an
-     * equals-verifier created via {@link #createEqualsVerifier()}, and configured with
-     * {@link #configureEqualsVerifier(SingleTypeEqualsVerifierApi)} method.
-     *
-     * @implNote This method is not annotated with the {@link Test} annotation. Override this method, and put
-     *         {@link Test} to verify the {@link #equals(Object)} method (and {@link #hashCode()} method) of the
-     *         {@link #entityClass}
-     * @see #createEqualsVerifier()
-     * @see #configureEqualsVerifier(SingleTypeEqualsVerifierApi)
-     */
-    @DisplayName("equals/hashCode")
-    protected void equals_Verify_() {
-        final var equalsVerifier = Objects.requireNonNull(createEqualsVerifier(), "null equalsVerifier created");
-        configureEqualsVerifier(equalsVerifier);
-        equalsVerifier.verify();
-    }
-
-    /**
-     * Creates a new equals verifier for {@link #entityClass}.
-     *
-     * @return a new equals verifier for {@link #entityClass}.
-     */
-    @Nonnull
-    protected SingleTypeEqualsVerifierApi<ENTITY> createEqualsVerifier() {
-        return EqualsVerifier.forClass(entityClass);
-    }
-
-    /**
-     * Configures specified equals verifier.
-     *
-     * @param equalsVerifier the equals verifier to configure.
-     * @return given {@code equalsVerifier}.
-     * @see #equals_Verify_()
-     */
-    @Nonnull
-    protected SingleTypeEqualsVerifierApi<ENTITY> configureEqualsVerifier(
-            @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
-        return equalsVerifier
-                ;
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Tests standard accessors with the specified instance.
-     *
-     * @param entityInstance the instance to test.
-     */
-    @SuppressWarnings({
-            "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
-    })
-    protected void accessors_DoesNotThrow_(@Nonnull final ENTITY entityInstance) {
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
-        try {
-            final var info = Introspector.getBeanInfo(entityClass);
-            for (final var descriptor : info.getPropertyDescriptors()) {
-                final var reader = descriptor.getReadMethod();
-                if (reader == null || reader.isAnnotationPresent(Transient.class)) {
-                    continue;
-                }
-                if (!reader.canAccess(entityInstance)) {
-                    try {
-                        reader.setAccessible(true);
-                    } catch (final InaccessibleObjectException ioe) {
-                        logger.log(Level.WARNING, "failed to set accessible for " + reader, ioe);
-                    }
-                }
-                final var value = reader.invoke(entityInstance);
-                final var writer = descriptor.getWriteMethod();
-                if (writer == null || writer.isAnnotationPresent(Transient.class)) {
-                    continue;
-                }
-                if (!writer.canAccess(entityInstance)) {
-                    try {
-                        writer.setAccessible(true);
-                    } catch (final InaccessibleObjectException ioe) {
-                        logger.log(Level.WARNING, "failed to set accessible for " + writer, ioe);
-                    }
-                }
-                assertThatCode(() -> writer.invoke(entityInstance, value))
-                        .as("%s.%s(%s)", entityInstance, writer.getName(), value)
-                        .doesNotThrowAnyException();
-            }
-        } catch (final Exception e) {
-            throw new RuntimeException("failed to test accessors of " + entityInstance, e);
-        }
-    }
-
-    /**
-     * Tests standard accessors with a new instance of {@link #entityClass}.
-     *
-     * @see #newEntityInstance()
-     * @see #accessors_DoesNotThrow_(__MappedEntity)
-     */
-    @DisplayName("newEntityInstance().accessors_DoesNotThrow_()")
-//    @Test
-    protected void accessors_DoesNotThrow_newEntityInstance() {
-        accessors_DoesNotThrow_(newEntityInstance());
-    }
-
-    /**
-     * Tests standard accessors with a new randomized instance of {@link #entityClass}.
-     *
-     * @see #newRandomizedEntityInstance()
-     * @see #accessors_DoesNotThrow_(__MappedEntity)
-     */
-    @DisplayName("newRandomizedEntityInstance().accessors_DoesNotThrow_()")
-//    @Test
-    protected void accessors_DoesNotThrow_newRandomizedEntityInstance() {
-        newRandomizedEntityInstance().ifPresent(this::accessors_DoesNotThrow_);
-    }
+//    // -------------------------------------------------------------------------------------------------------- toString
+//
+//    /**
+//     * Verifies that the result of {@link Object#toString() entityInstance.toString()} is not blank.
+//     *
+//     * @param entityInstance the instance to test.
+//     * @see #toString_NotBlank_newEntityInstance()
+//     * @see #toString_NotBlank_newRandomizedEntityInstance()
+//     */
+//    protected void toString_NotBlank_(@Nonnull final ENTITY entityInstance) {
+//        Objects.requireNonNull(entityInstance, "entityInstance is null");
+//        final var string = entityInstance.toString();
+//        assertThat(string)
+//                .as("%s.toString()", entityInstance)
+//                .isNotBlank();
+//    }
+//
+//    /**
+//     * Invokes {@link #toString_NotBlank_(__MappedEntity)} method with a new instance of {@link #entityClass}.
+//     *
+//     * @see #newEntityInstance()
+//     * @see #toString_NotBlank_(__MappedEntity)
+//     */
+//    @DisplayName("newEntityInstance().toString()!blank")
+////    @Test
+//    protected void toString_NotBlank_newEntityInstance() {
+//        toString_NotBlank_(newEntityInstance());
+//    }
+//
+//    /**
+//     * Invokes {@link #toString_NotBlank_(__MappedEntity)} method with a new randomized instance of
+//     * {@link #entityClass}.
+//     *
+//     * @see #newRandomizedEntityInstance()
+//     * @see #toString_NotBlank_(__MappedEntity)
+//     */
+//    @DisplayName("newRandomizedEntityInstance().toString()!blank")
+////    @Test
+//    protected void toString_NotBlank_newRandomizedEntityInstance() {
+//        newRandomizedEntityInstance().ifPresent(this::toString_NotBlank_);
+//    }
+//
+//    // ------------------------------------------------------------------------------------------------- equals/hashCode
+//
+//    /**
+//     * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #entityClass} using an
+//     * equals-verifier created via {@link #equals_Verify_Create()}, and configured with
+//     * {@link #equals_Verify_Configure(SingleTypeEqualsVerifierApi)} method.
+//     *
+//     * @implNote This method is not annotated with the {@link Test} annotation. Override this method, and put
+//     *         {@link Test} to verify the {@link #equals(Object)} method (and {@link #hashCode()} method) of the
+//     *         {@link #entityClass}
+//     * @see #equals_Verify_Create()
+//     * @see #equals_Verify_Configure(SingleTypeEqualsVerifierApi)
+//     */
+//    @DisplayName("equals/hashCode")
+//    protected void equals_Verify_() {
+//        final var equalsVerifier = Objects.requireNonNull(equals_Verify_Create(), "null equalsVerifier created");
+//        equals_Verify_Configure(equalsVerifier);
+//        equalsVerifier.verify();
+//    }
+//
+//    /**
+//     * Creates a new equals verifier for {@link #entityClass}.
+//     *
+//     * @return a new equals verifier for {@link #entityClass}.
+//     */
+//    @Nonnull
+//    protected SingleTypeEqualsVerifierApi<ENTITY> equals_Verify_Create() {
+//        return EqualsVerifier.forClass(entityClass);
+//    }
+//
+//    /**
+//     * Configures specified equals verifier.
+//     *
+//     * @param equalsVerifier the equals verifier to configure.
+//     * @return given {@code equalsVerifier}.
+//     * @see #equals_Verify_()
+//     */
+//    @Nonnull
+//    protected SingleTypeEqualsVerifierApi<ENTITY> equals_Verify_Configure(
+//            @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
+//        return equalsVerifier
+//                ;
+//    }
+//
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    /**
+//     * Tests standard accessors with the specified instance.
+//     *
+//     * @param entityInstance the instance to test.
+//     */
+//    @SuppressWarnings({
+//            "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
+//    })
+//    protected void accessors_DoesNotThrow_(@Nonnull final ENTITY entityInstance) {
+//        Objects.requireNonNull(entityInstance, "entityInstance is null");
+//        try {
+//            final var info = Introspector.getBeanInfo(entityClass);
+//            for (final var descriptor : info.getPropertyDescriptors()) {
+//                final var reader = descriptor.getReadMethod();
+//                if (reader == null || reader.isAnnotationPresent(Transient.class)) {
+//                    continue;
+//                }
+//                if (!reader.canAccess(entityInstance)) {
+//                    try {
+//                        reader.setAccessible(true);
+//                    } catch (final InaccessibleObjectException ioe) {
+//                        logger.log(Level.WARNING, "failed to set accessible for " + reader, ioe);
+//                    }
+//                }
+//                final var value = reader.invoke(entityInstance);
+//                final var writer = descriptor.getWriteMethod();
+//                if (writer == null || writer.isAnnotationPresent(Transient.class)) {
+//                    continue;
+//                }
+//                if (!writer.canAccess(entityInstance)) {
+//                    try {
+//                        writer.setAccessible(true);
+//                    } catch (final InaccessibleObjectException ioe) {
+//                        logger.log(Level.WARNING, "failed to set accessible for " + writer, ioe);
+//                    }
+//                }
+//                assertThatCode(() -> writer.invoke(entityInstance, value))
+//                        .as("%s.%s(%s)", entityInstance, writer.getName(), value)
+//                        .doesNotThrowAnyException();
+//            }
+//        } catch (final Exception e) {
+//            throw new RuntimeException("failed to test accessors of " + entityInstance, e);
+//        }
+//    }
+//
+//    /**
+//     * Tests standard accessors with a new instance of {@link #entityClass}.
+//     *
+//     * @see #newEntityInstance()
+//     * @see #accessors_DoesNotThrow_(__MappedEntity)
+//     */
+//    @DisplayName("newEntityInstance().accessors_DoesNotThrow_()")
+////    @Test
+//    protected void accessors_DoesNotThrow_newEntityInstance() {
+//        accessors_DoesNotThrow_(newEntityInstance());
+//    }
+//
+//    /**
+//     * Tests standard accessors with a new randomized instance of {@link #entityClass}.
+//     *
+//     * @see #newRandomizedEntityInstance()
+//     * @see #accessors_DoesNotThrow_(__MappedEntity)
+//     */
+//    @DisplayName("newRandomizedEntityInstance().accessors_DoesNotThrow_()")
+////    @Test
+//    protected void accessors_DoesNotThrow_newRandomizedEntityInstance() {
+//        newRandomizedEntityInstance().ifPresent(this::accessors_DoesNotThrow_);
+//    }
 
     // ----------------------------------------------------------------------------------------------------- entityClass
 
@@ -238,9 +227,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      */
     @Nonnull
     protected ENTITY newEntityInstance() {
-        return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-                .orElseGet(() -> ReflectionUtils.newInstance(entityClass))
-                ;
+        return newMappedInstance();
     }
 
     /**
@@ -250,7 +237,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      */
     @Nonnull
     protected ENTITY newEntityInstanceSpy() {
-        return Mockito.spy(newEntityInstance());
+        return newMappedInstanceSpy();
     }
 
     /**
@@ -260,7 +247,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      */
     @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstance() {
-        return __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass);
+        return newRandomizedMappedInstance();
     }
 
     /**
@@ -271,7 +258,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      */
     @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstanceSpy() {
-        return newRandomizedEntityInstance().map(Mockito::spy);
+        return newRandomizedMappedInstanceSpy();
     }
 
     // --------------------------------------------------------------------------------------------------------- idClass
@@ -320,11 +307,13 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * The class of {@link ENTITY}.
-     */
-    protected final Class<ENTITY> entityClass;
+//    /**
+//     * The class of {@link ENTITY}.
+//     *
+//     * @deprecated Use #mappedClass instead.
+//     */
+//    @Deprecated(forRemoval = true)
+//    protected final Class<ENTITY> entityClass;
 
     /**
      * The class of {@link ID}.

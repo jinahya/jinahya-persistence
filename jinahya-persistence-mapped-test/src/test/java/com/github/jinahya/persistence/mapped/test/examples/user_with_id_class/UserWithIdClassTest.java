@@ -14,9 +14,9 @@ class UserWithIdClassTest extends __MappedEntity_Test<UserWithIdClass, IdForUser
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithIdClass> configureEqualsVerifier(
+    protected SingleTypeEqualsVerifierApi<UserWithIdClass> equals_Verify_Configure(
             @Nonnull SingleTypeEqualsVerifierApi<UserWithIdClass> equalsVerifier) {
-        return super.configureEqualsVerifier(equalsVerifier)
+        return super.equals_Verify_Configure(equalsVerifier)
                 .suppress(Warning.SURROGATE_KEY)
                 ;
     }

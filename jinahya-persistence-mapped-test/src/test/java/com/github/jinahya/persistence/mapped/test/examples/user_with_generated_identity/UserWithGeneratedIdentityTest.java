@@ -21,15 +21,15 @@ class UserWithGeneratedIdentityTest extends __MappedEntityWithGeneratedIdentity_
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> createEqualsVerifier() {
-        return super.createEqualsVerifier();
+    protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equals_Verify_Create() {
+        return super.equals_Verify_Create();
     }
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> configureEqualsVerifier(
+    protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equals_Verify_Configure(
             @Nonnull final SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equalsVerifier) {
-        return super.configureEqualsVerifier(equalsVerifier)
+        return super.equals_Verify_Configure(equalsVerifier)
 //                .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY)
                 .suppress(Warning.INHERITED_DIRECTLY_FROM_OBJECT)
