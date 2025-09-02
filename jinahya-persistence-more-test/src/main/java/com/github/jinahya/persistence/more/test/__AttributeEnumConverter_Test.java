@@ -46,12 +46,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
-public abstract class __AttributeEnumConverterTest<
+public abstract class __AttributeEnumConverter_Test<
         CONVERTER extends __AttributeEnumConverter<E, ATTRIBUTE>,
         E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>,
         ATTRIBUTE
         >
-        extends __AttributeEnumTest<E, ATTRIBUTE> {
+        extends __AttributeEnum_Test<E, ATTRIBUTE> {
 
     // -----------------------------------------------------------------------------------------------------------------
     /**
@@ -66,7 +66,7 @@ public abstract class __AttributeEnumConverterTest<
             CONVERTER extends __AttributeEnumConverter.__OfString<E>,
             E extends Enum<E> & __AttributeEnum.__OfString<E>
             >
-            extends __AttributeEnumConverterTest<CONVERTER, E, String> {
+            extends __AttributeEnumConverter_Test<CONVERTER, E, String> {
 
         /**
          * {@inheritDoc}
@@ -89,8 +89,8 @@ public abstract class __AttributeEnumConverterTest<
      * @param converterClass the converter class to test.
      * @see #converterClass
      */
-    protected __AttributeEnumConverterTest(final Class<CONVERTER> converterClass, final Class<E> enumClass,
-                                           final Class<ATTRIBUTE> attributeClass) {
+    protected __AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<E> enumClass,
+                                            final Class<ATTRIBUTE> attributeClass) {
         super(enumClass, attributeClass);
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");
     }

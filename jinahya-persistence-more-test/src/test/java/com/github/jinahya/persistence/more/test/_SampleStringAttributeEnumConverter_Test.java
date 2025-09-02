@@ -20,14 +20,13 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-class _SampleIntegerAttributeEnumConverterTest
-        extends __AttributeEnumConverterTest<
-        _SampleIntegerAttributeEnumConverter,
-        _SampleIntegerAttributeEnum,
-        Integer
+class _SampleStringAttributeEnumConverter_Test
+        extends __AttributeEnumConverter_Test.__OfStringTest<
+        _SampleStringAttributeEnumConverter,
+        _SampleStringAttributeEnum
         > {
 
-    _SampleIntegerAttributeEnumConverterTest() {
-        super(_SampleIntegerAttributeEnumConverter.class, _SampleIntegerAttributeEnum.class, Integer.class);
+    _SampleStringAttributeEnumConverter_Test() {
+        super(_SampleStringAttributeEnumConverter.class, _SampleStringAttributeEnum.class);
     }
 }

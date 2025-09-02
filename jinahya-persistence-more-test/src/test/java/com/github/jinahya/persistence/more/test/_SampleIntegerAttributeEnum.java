@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+
 enum _SampleIntegerAttributeEnum implements __SampleIntegerAttributeEnum<_SampleIntegerAttributeEnum> {
 
     A(0),
@@ -32,6 +34,7 @@ enum _SampleIntegerAttributeEnum implements __SampleIntegerAttributeEnum<_Sample
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
     @Override
     public Integer attributeValue() {
         return attributeValue;

@@ -43,7 +43,7 @@ public final class __AttributeEnumUtils {
         if (!Objects.requireNonNull(enumClass, "enumClass is null").isEnum()) {
             throw new IllegalArgumentException("not an enum class: " + enumClass);
         }
-        assert attributeValue != null;
+        Objects.requireNonNull(attributeValue, "attributeValue is null");
         for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             if (Objects.equals(enumConstant.attributeValue(), attributeValue)) {
                 return enumConstant;
@@ -65,7 +65,6 @@ public final class __AttributeEnumUtils {
     @Nonnull
     public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
     E valueOfAttributeValue(@Nonnull final Class<E> enumClass, @Nonnull final ATTRIBUTE attributeValue) {
-        Objects.requireNonNull(attributeValue, "attributeValue is null");
         final var value = valueOfAttributeValue_(enumClass, attributeValue);
         if (value == null) {
             throw new IllegalArgumentException(

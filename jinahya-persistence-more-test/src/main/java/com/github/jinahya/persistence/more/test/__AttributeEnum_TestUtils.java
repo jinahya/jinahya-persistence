@@ -41,7 +41,7 @@ import java.util.stream.Stream;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public final class __AttributeEnumTestUtils {
+public final class __AttributeEnum_TestUtils {
 
     static <E extends Enum<E> & __AttributeEnum<E, ?>, R>
     R applyEnumConstantStream(@Nonnull final Class<E> enumClass,
@@ -188,7 +188,7 @@ public final class __AttributeEnumTestUtils {
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    private __AttributeEnumTestUtils() {
+    private __AttributeEnum_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
