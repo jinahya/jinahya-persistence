@@ -13,7 +13,7 @@ import java.util.Optional;
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
 })
-public final class __BuilderTestUtils {
+public final class __Builder_TestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -70,7 +70,7 @@ public final class __BuilderTestUtils {
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    private __BuilderTestUtils() {
+    private __Builder_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

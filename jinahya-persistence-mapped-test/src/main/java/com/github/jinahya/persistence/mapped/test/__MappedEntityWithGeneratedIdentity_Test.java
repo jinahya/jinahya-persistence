@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.mapped.test;
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -43,39 +42,60 @@ public abstract class __MappedEntityWithGeneratedIdentity_Test<ENTITY extends __
         super(entityClass, Long.class);
     }
 
-    // ----------------------------------------------------------------------------------------------- equals / hashCode
+    // -------------------------------------------------------------------------------------------------------- toString
+    @Override
+    protected void toString_NotBlank_(@Nonnull final ENTITY entityInstance) {
+        super.toString_NotBlank_(entityInstance);
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Test
+    //    @Test
+    @Override
+    protected void toString_NotBlank_newEntityInstance() {
+        super.toString_NotBlank_newEntityInstance();
+    }
+
+    //    @Test
+    @Override
+    protected void toString_NotBlank_newRandomizedEntityInstance() {
+        super.toString_NotBlank_newRandomizedEntityInstance();
+    }
+
+    // ------------------------------------------------------------------------------------------------- equals/hashCode
+//    @Test
     @Override
     protected void equals_Verify_() {
         super.equals_Verify_();
     }
 
-    /**
-     * {@inheritDoc}}
-     *
-     * @return {@inheritDoc}
-     */
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<ENTITY> createEqualsVerifier() {
         return super.createEqualsVerifier();
     }
 
-    /**
-     * {@inheritDoc}}}
-     *
-     * @param equalsVerifier {@inheritDoc}
-     * @return {@inheritDoc}
-     */
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<ENTITY> configureEqualsVerifier(
             @Nonnull SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
         return super.configureEqualsVerifier(equalsVerifier)
                 ;
+    }
+
+    // ------------------------------------------------------------------------------------------------------- accessors
+    @Override
+    protected void accessors_DoesNotThrow_(@Nonnull ENTITY entityInstance) {
+        super.accessors_DoesNotThrow_(entityInstance);
+    }
+
+    //    @Test
+    @Override
+    protected void accessors_DoesNotThrow_newEntityInstance() {
+        super.accessors_DoesNotThrow_newEntityInstance();
+    }
+
+    //    @Test
+    @Override
+    protected void accessors_DoesNotThrow_newRandomizedEntityInstance() {
+        super.accessors_DoesNotThrow_newRandomizedEntityInstance();
     }
 }

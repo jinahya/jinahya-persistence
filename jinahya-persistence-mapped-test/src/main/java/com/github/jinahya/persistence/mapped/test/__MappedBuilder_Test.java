@@ -11,7 +11,7 @@ public abstract class __MappedBuilder_Test<
         BUILDER extends __MappedBuilder<BUILDER, MAPPED>,
         MAPPED extends __Mapped
         >
-        extends __BuilderTest<BUILDER, MAPPED> {
+        extends __Builder_Test<BUILDER, MAPPED> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected __MappedBuilder_Test(final Class<BUILDER> builderClass, final Class<MAPPED> mappedClass) {

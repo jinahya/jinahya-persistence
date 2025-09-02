@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 
 })
-public abstract class __BuilderTest<
+public abstract class __Builder_Test<
         BUILDER extends __Builder<BUILDER, TARGET>,
         TARGET
         > {
@@ -27,7 +27,7 @@ public abstract class __BuilderTest<
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __BuilderTest(final Class<BUILDER> builderClass, final Class<TARGET> targetClass) {
+    protected __Builder_Test(final Class<BUILDER> builderClass, final Class<TARGET> targetClass) {
         super();
         this.builderClass = Objects.requireNonNull(builderClass, "builderClass is null");
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
@@ -50,7 +50,7 @@ public abstract class __BuilderTest<
     }
 
     protected Optional<BUILDER> newRandomizedBuilderInstance() {
-        return __BuilderTestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
+        return __Builder_TestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
     }
 
     // ----------------------------------------------------------------------------------------------------- targetClass
