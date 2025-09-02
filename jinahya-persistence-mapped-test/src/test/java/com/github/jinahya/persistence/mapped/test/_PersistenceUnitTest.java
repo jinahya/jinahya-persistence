@@ -25,7 +25,7 @@ package com.github.jinahya.persistence.mapped.test;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
 })
-class _PersistenceUnitTest extends __PersistenceUnitTest {
+class _PersistenceUnitTest extends __PersistenceUnit_Test {
 
     // -----------------------------------------------------------------------------------------------------------------
     _PersistenceUnitTest() {

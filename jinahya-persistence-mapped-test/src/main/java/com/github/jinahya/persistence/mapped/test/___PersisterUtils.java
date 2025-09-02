@@ -42,7 +42,7 @@ public final class ___PersisterUtils {
         return Optional.ofNullable(
                 ___JavaLangTestUtils.siblingClassForPostfix(
                         type,
-                        __MappedEntityPersister.class,
+                        __MappedEntity_Persister.class,
                         "Persister",
                         "_Persister"
                 )

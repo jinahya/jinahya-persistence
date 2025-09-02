@@ -20,10 +20,24 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.metamodel.SingularAttribute;
+
+import java.util.Optional;
+
 @SuppressWarnings({
         "java:S114", // Interface names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public interface __MappedEntityWithGeneratedIdCriteria<ENTITY extends __MappedEntityWithGeneratedId<ID>, ID> {
+public interface __MappedEntityWithGeneratedIdCriteria<ENTITY extends __MappedEntityWithGeneratedId<ID>, ID>
+        extends __MappedEntityCriteria<ENTITY, ID> {
 
+    static <T extends __MappedEntityWithGeneratedId<U>, U> Optional<T> findById(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Class<T> entityClass,
+            @Nonnull final SingularAttribute<? super T, U> idAttribute,
+            @Nonnull final U idValue) {
+        return __MappedEntityCriteria.findById(entityManager, entityClass, idAttribute, idValue);
+    }
 }

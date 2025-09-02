@@ -20,6 +20,11 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+import jakarta.persistence.EntityManager;
+
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @SuppressWarnings({
@@ -29,4 +34,18 @@ import java.util.UUID;
 public interface __MappedEntityWithGeneratedUuidCriteria<ENTITY extends __MappedEntityWithGeneratedUuid>
         extends __MappedEntityWithGeneratedIdCriteria<ENTITY, UUID> {
 
+    static <T extends __MappedEntityWithGeneratedUuid> Optional<T> findById(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Class<T> entityClass,
+            @Nonnull final UUID idValue) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(idValue, "idValue is null");
+        return __MappedEntityWithGeneratedIdCriteria.findById(
+                entityManager,
+                entityClass,
+                __MappedEntityWithGeneratedUuid_.id__,
+                idValue
+        );
+    }
 }

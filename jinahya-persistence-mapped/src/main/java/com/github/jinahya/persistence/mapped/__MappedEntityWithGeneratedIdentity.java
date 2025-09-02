@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -46,12 +47,17 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
         super();
     }
 
-    protected __MappedEntityWithGeneratedIdentity(final __MappedEntityWithGeneratedIdentityBuilder<?, ?> builder) {
+    /**
+     * Creates a new instance built from the specified builder.
+     *
+     * @param builder the builder from which a new instance is built.
+     */
+    protected __MappedEntityWithGeneratedIdentity(
+            @Nonnull final __MappedEntityWithGeneratedIdentityBuilder<?, ?> builder) {
         super(builder);
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -60,6 +66,12 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
     }
 
     // ------------------------------------------------------------------------------------------------------------ id__
+
+    /**
+     * Returns curren value of the {@value __MappedEntityWithGeneratedId#ATTRIBUTE_NAME_ID__} attribute.
+     *
+     * @return current value of the {@value __MappedEntityWithGeneratedId#ATTRIBUTE_NAME_ID__} attribute.
+     */
     public Long getId__() {
         return id__;
     }
@@ -67,7 +79,8 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
     // -----------------------------------------------------------------------------------------------------------------
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = COLUMN_NAME_ID__, nullable = false,
+    @Column(name = COLUMN_NAME_ID__,
+            nullable = false,
             insertable = true, // EclipseLink
             updatable = false
     )

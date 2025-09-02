@@ -1,12 +1,12 @@
 package com.github.jinahya.persistence.mapped.test.examples.user_with_id_class;
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityRandomizer;
+import com.github.jinahya.persistence.mapped.test.__MappedEntity_Randomizer;
 import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class UserWithIdClassRandomizer extends __MappedEntityRandomizer<UserWithIdClass, IdForUserWithIdClass> {
+class UserWithIdClassRandomizer extends __MappedEntity_Randomizer<UserWithIdClass, IdForUserWithIdClass> {
 
     UserWithIdClassRandomizer() {
         super(UserWithIdClass.class, IdForUserWithIdClass.class);

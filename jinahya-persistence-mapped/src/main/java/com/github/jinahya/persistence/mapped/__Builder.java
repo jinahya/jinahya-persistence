@@ -80,7 +80,20 @@ public abstract class __Builder<
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Resets this builder.
+     *
+     * @return this builder.
+     */
+    @Nonnull
+    public SELF reset() {
+        return __BuilderUtils.reset((SELF) this);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * The target type to build.
      */
+    @Nonnull
     protected final Class<TARGET> targetClass;
 }

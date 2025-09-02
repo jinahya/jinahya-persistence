@@ -36,7 +36,9 @@ public abstract class __MappedEntityWithGeneratedIdBuilder<
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance.
+     * Creates a new instance for building instances of the specified entity class.
+     *
+     * @param entityClass tne entity class.
      */
     protected __MappedEntityWithGeneratedIdBuilder(final Class<ENTITY> entityClass) {
         super(entityClass);

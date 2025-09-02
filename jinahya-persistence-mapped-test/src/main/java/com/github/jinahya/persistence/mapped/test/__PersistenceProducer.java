@@ -56,7 +56,7 @@ public class __PersistenceProducer {
     }
 
     /**
-     * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
+     * A qualifier for the {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
      */
     @Qualifier
     @Documented
@@ -67,7 +67,7 @@ public class __PersistenceProducer {
     }
 
     /**
-     * A qualifier for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
+     * A qualifier for the {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_IT_PU} persistence unit.
      */
     @__PU
     @Qualifier
@@ -92,18 +92,18 @@ public class __PersistenceProducer {
     // ---------------------------------------------------------------------------------------------------------- testPU
 
     /**
-     * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
-     * persistence unit.
+     * Produces an entity manager factory for the
+     * {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit.
      *
-     * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
-     *         persistence unit
+     * @return an entity manager factory for the
+     *         {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_TEST_PU} persistence unit
      * @see #disposeTestEntityManagerFactory(EntityManagerFactory)
      */
     @__testPU
     @Produces
     public EntityManagerFactory produceTestEntityManagerFactory() {
         return Persistence.createEntityManagerFactory(
-                __PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_TEST_PU
+                __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_NAME_TEST_PU
         );
     }
 
@@ -120,23 +120,25 @@ public class __PersistenceProducer {
     // ------------------------------------------------------------------------------------------------------------ itPU
 
     /**
-     * Produces an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+     * Produces an entity manager factory for the
+     * {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
      *
-     * @return an entity manager factory for the {@value __PersistenceProducerConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
-     * @see __PersistenceProducerTestUtils#assertSchemagenDatabaseActionNone(EntityManagerFactory)
-     * @see __PersistenceProducerTestUtils#assertEclipselinkDdlGenerationNone(EntityManagerFactory)
-     * @see __PersistenceProducerTestUtils#assertHibernateHbm2ddlAutoNone(EntityManagerFactory)
+     * @return an entity manager factory for the
+     *         {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_IT_PU}.
+     * @see __PersistenceProducer_TestUtils#assertSchemagenDatabaseActionNone(EntityManagerFactory)
+     * @see __PersistenceProducer_TestUtils#assertEclipselinkDdlGenerationNone(EntityManagerFactory)
+     * @see __PersistenceProducer_TestUtils#assertHibernateHbm2ddlAutoNone(EntityManagerFactory)
      */
     @__itPU
     @Produces
     public EntityManagerFactory produceItEntityManagerFactory() {
         final var entityManagerFactory = Persistence.createEntityManagerFactory(
-                __PersistenceProducerConstants.PERSISTENCE_UNIT_NAME_IT_PU
+                __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_NAME_IT_PU
         );
         if (false) {
-            __PersistenceProducerTestUtils.assertSchemagenDatabaseActionNone(entityManagerFactory);
-            __PersistenceProducerTestUtils.assertEclipselinkDdlGenerationNone(entityManagerFactory);
-            __PersistenceProducerTestUtils.assertHibernateHbm2ddlAutoNone(entityManagerFactory);
+            __PersistenceProducer_TestUtils.assertSchemagenDatabaseActionNone(entityManagerFactory);
+            __PersistenceProducer_TestUtils.assertEclipselinkDdlGenerationNone(entityManagerFactory);
+            __PersistenceProducer_TestUtils.assertHibernateHbm2ddlAutoNone(entityManagerFactory);
         }
         logger.log(
                 System.Logger.Level.DEBUG,

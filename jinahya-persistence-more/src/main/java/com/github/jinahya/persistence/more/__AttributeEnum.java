@@ -20,10 +20,10 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.annotation.Nonnull;
 
 /**
- * An interface for defining enum constants with a specific type of attribute values.
+ * An interface for defining enum constants with a specific type of attribute values.a
  *
  * @param <SELF>      self type parameter
  * @param <ATTRIBUTE> attribute type parameter
@@ -53,6 +53,7 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
          *         {@link Enum#name() this.name()}.
          */
         @Override
+        @Nonnull
         @SuppressWarnings({"unchecked"})
         default String attributeValue() {
             return ((SELF) this).name();
@@ -66,6 +67,6 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      *
      * @return the attribute value of this enum constant.
      */
-    @NotNull
+    @Nonnull
     ATTRIBUTE attributeValue();
 }

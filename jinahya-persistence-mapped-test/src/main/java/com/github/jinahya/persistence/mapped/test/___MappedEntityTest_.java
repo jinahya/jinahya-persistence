@@ -88,12 +88,12 @@ abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
      * Returns a new randomized instance of {@link #entityClass}.
      *
      * @return a new randomized instance of {@link #entityClass}.
-     * @see __MappedEntityRandomizerUtils#newRandomizedInstanceOf(Class)
+     * @see __MappedEntity_RandomizerUtils#newRandomizedInstanceOf(Class)
      * @see #newRandomizedEntityInstanceSpy()
      */
     @Nonnull
     protected Optional<ENTITY> newRandomizedEntityInstance() {
-        return __MappedEntityRandomizerUtils.newRandomizedInstanceOf(entityClass);
+        return __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 
     /**

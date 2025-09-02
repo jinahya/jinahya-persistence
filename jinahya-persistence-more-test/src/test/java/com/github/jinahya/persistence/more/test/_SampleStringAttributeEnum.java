@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Optional;
 
 enum _SampleStringAttributeEnum implements __SampleStringAttributeEnum<_SampleStringAttributeEnum> {
@@ -38,6 +40,7 @@ enum _SampleStringAttributeEnum implements __SampleStringAttributeEnum<_SampleSt
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
     @Override
     public String attributeValue() {
         return Optional.ofNullable(attributeValue)
