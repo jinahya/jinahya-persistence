@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * An abstract base class for testing {@link __AttributeEnum} implementations.
  *
- * @param <E>         entity type parameter
+ * @param <ENUM>      entity type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @see __AttributeEnum_TestUtils
  */
@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeEnum_Test<E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE> {
+public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE> {
 
     /**
      * An abstract base class for testing {@link __AttributeEnum.__OfString} implementations.
@@ -72,7 +72,7 @@ public abstract class __AttributeEnum_Test<E extends Enum<E> & __AttributeEnum<E
      * @param enumClass      the enum class to test.
      * @param attributeClass the type of entity attribute.
      */
-    protected __AttributeEnum_Test(final Class<E> enumClass, final Class<ATTRIBUTE> attributeClass) {
+    protected __AttributeEnum_Test(final Class<ENUM> enumClass, final Class<ATTRIBUTE> attributeClass) {
         super();
         this.enumClass = Objects.requireNonNull(enumClass, "enumClass is null");
         this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
@@ -120,7 +120,7 @@ public abstract class __AttributeEnum_Test<E extends Enum<E> & __AttributeEnum<E
      * @param consumer the consumer.
      */
     protected void acceptEachEnumConstantAndAttributeValue(
-            @Nonnull final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
+            @Nonnull final BiConsumer<? super ENUM, ? super ATTRIBUTE> consumer) {
         __AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
     }
 
@@ -133,7 +133,7 @@ public abstract class __AttributeEnum_Test<E extends Enum<E> & __AttributeEnum<E
      * @return the result of the {@code function}.
      * @see #acceptEnumConstantStream(Consumer)
      */
-    protected final <R> R applyEnumConstantStream(@Nonnull final Function<? super Stream<E>, ? extends R> function) {
+    protected final <R> R applyEnumConstantStream(@Nonnull final Function<? super Stream<ENUM>, ? extends R> function) {
         return __AttributeEnum_TestUtils.applyEnumConstantStream(enumClass, function);
     }
 
@@ -143,7 +143,7 @@ public abstract class __AttributeEnum_Test<E extends Enum<E> & __AttributeEnum<E
      * @param consumer the consumer.
      * @see #applyEnumConstantStream(Function)
      */
-    protected final void acceptEnumConstantStream(@Nonnull final Consumer<? super Stream<E>> consumer) {
+    protected final void acceptEnumConstantStream(@Nonnull final Consumer<? super Stream<ENUM>> consumer) {
         __AttributeEnum_TestUtils.acceptEnumConstantStream(enumClass, consumer);
     }
 
@@ -176,9 +176,9 @@ public abstract class __AttributeEnum_Test<E extends Enum<E> & __AttributeEnum<E
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class of {@link E} type.
+     * The class of {@link ENUM} type.
      */
-    protected final Class<E> enumClass;
+    protected final Class<ENUM> enumClass;
 
     /**
      * The class of {@link ATTRIBUTE} type.

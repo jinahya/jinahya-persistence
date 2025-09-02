@@ -43,13 +43,13 @@ import java.util.stream.Stream;
 })
 public final class __AttributeEnum_TestUtils {
 
-    static <E extends Enum<E> & __AttributeEnum<E, ?>, R>
-    R applyEnumConstantStream(@Nonnull final Class<E> enumClass,
-                              @Nonnull final Function<? super Stream<E>, ? extends R> function) {
+    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R>
+    R applyEnumConstantStream(@Nonnull final Class<ENUM> enumClass,
+                              @Nonnull final Function<? super Stream<ENUM>, ? extends R> function) {
         Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(function, "function is null");
-        final var builder = Stream.<E>builder();
-        for (final E enumConstant : enumClass.getEnumConstants()) {
+        final var builder = Stream.<ENUM>builder();
+        for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             builder.add(enumConstant);
         }
         return function.apply(builder.build());
@@ -69,20 +69,20 @@ public final class __AttributeEnum_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE, R>
-    R applyAttributeValueStream(@Nonnull final Class<E> enumClass,
+    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R>
+    R applyAttributeValueStream(@Nonnull final Class<ENUM> enumClass,
                                 @Nonnull final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
         Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(function, "function is null");
         final var builder = Stream.<ATTRIBUTE>builder();
-        for (final E enumConstant : enumClass.getEnumConstants()) {
+        for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             builder.add(enumConstant.attributeValue());
         }
         return function.apply(builder.build());
     }
 
-    static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE, R>
-    void acceptAttributeValueStream(@Nonnull final Class<E> enumClass,
+    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R>
+    void acceptAttributeValueStream(@Nonnull final Class<ENUM> enumClass,
                                     @Nonnull final Consumer<? super Stream<ATTRIBUTE>> consumer) {
         Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(consumer, "consumer is null");
@@ -96,12 +96,12 @@ public final class __AttributeEnum_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
-    void acceptEachEnumConstantAndAttributeValue(@Nonnull final Class<E> enumClass,
-                                                 @Nonnull final BiConsumer<? super E, ? super ATTRIBUTE> consumer) {
+    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
+    void acceptEachEnumConstantAndAttributeValue(@Nonnull final Class<ENUM> enumClass,
+                                                 @Nonnull final BiConsumer<? super ENUM, ? super ATTRIBUTE> consumer) {
         Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        for (final E enumConstant : enumClass.getEnumConstants()) {
+        for (final ENUM enumConstant : enumClass.getEnumConstants()) {
             final var attributeValue = enumConstant.attributeValue();
             consumer.accept(enumConstant, attributeValue);
         }
@@ -114,20 +114,20 @@ public final class __AttributeEnum_TestUtils {
      *
      * @param enumClass the enum class.
      * @param function  the function.
-     * @param <E>       enum type parameter
+     * @param <ENUM>    enum type parameter
      * @param <R>       result type parameter
      * @return the result of the {@code function}; {@code null} if the {@code enumClass} doesn't have any constant.
      * @see #getRandomEnumConstant(Class)
      */
     @Nullable
-    public static <E extends Enum<E> & __AttributeEnum<E, ?>, R>
-    R applyRandomEnumConstant(@Nonnull final Class<E> enumClass,
-                              @Nonnull final Function<? super E, ? extends R> function) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R>
+    R applyRandomEnumConstant(@Nonnull final Class<ENUM> enumClass,
+                              @Nonnull final Function<? super ENUM, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyEnumConstantStream(
                 enumClass,
                 s -> {
-                    final List<E> list = s.toList();
+                    final List<ENUM> list = s.toList();
                     if (list.isEmpty()) {
                         return null;
                     }
@@ -142,14 +142,14 @@ public final class __AttributeEnum_TestUtils {
      * Returns a random enum constant of the specified enum class.
      *
      * @param enumClass the enum class.
-     * @param <E>       enum type parameter
+     * @param <ENUM>    enum type parameter
      * @return a random enum constant of the {@code enumClass}; {@code null} if the {@code enumClass} doesn't have any
      *         constant.
      * @see #applyRandomEnumConstant(Class, Function)
      */
     @Nullable
-    public static <E extends Enum<E> & __AttributeEnum<E, ?>>
-    E getRandomEnumConstant(@Nonnull final Class<E> enumClass) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>>
+    ENUM getRandomEnumConstant(@Nonnull final Class<ENUM> enumClass) {
         return applyRandomEnumConstant(enumClass, Function.identity());
     }
 
@@ -159,14 +159,14 @@ public final class __AttributeEnum_TestUtils {
      *
      * @param enumClass the enum class.
      * @param function  the function.
-     * @param <E>       enum type parameter
+     * @param <ENUM>    enum type parameter
      * @param <R>       result type parameter
      * @return the result of the {@code function}; {@code null} if the {@code enumClass} doesn't have any constant.
      * @see #getRandomAttributeValue(Class)
      */
     @Nullable
-    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE, R>
-    R applyRandomAttributeValue(@Nonnull final Class<E> enumClass,
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R>
+    R applyRandomAttributeValue(@Nonnull final Class<ENUM> enumClass,
                                 @Nonnull final Function<? super ATTRIBUTE, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyRandomEnumConstant(enumClass, e -> function.apply(e.attributeValue()));
@@ -176,14 +176,14 @@ public final class __AttributeEnum_TestUtils {
      * Returns a random attribute value of the specified enum class.
      *
      * @param enumClass the enum class.
-     * @param <E>       enum type parameter
+     * @param <ENUM>    enum type parameter
      * @return a random attribute value of the {@code enumClass}; {@code null} if the {@code enumClass} doesn't have any
      *         constant.
      * @see #applyRandomAttributeValue(Class, Function)
      */
     @Nullable
-    public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
-    ATTRIBUTE getRandomAttributeValue(@Nonnull final Class<E> enumClass) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
+    ATTRIBUTE getRandomAttributeValue(@Nonnull final Class<ENUM> enumClass) {
         return applyRandomAttributeValue(enumClass, Function.identity());
     }
 
