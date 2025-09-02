@@ -36,6 +36,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -53,7 +54,7 @@ abstract class __PersistenceUnit_ {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     __PersistenceUnit_() {
         super();
     }
@@ -65,9 +66,9 @@ abstract class __PersistenceUnit_ {
         entityManagerFactory.getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "{0}: {1}", k, v);
         });
-        catalog = __PersistenceUnit_TestUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
-        schema = __PersistenceUnit_TestUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
-        types = __PersistenceUnit_TestUtils.getDefaultTypes(entityManagerFactory).orElse(null);
+        tableCatalog = __PersistenceUnit_TestUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
+        tableSchema = __PersistenceUnit_TestUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
+        tableTypes = __PersistenceUnit_TestUtils.getDefaultTypes(entityManagerFactory).orElse(null);
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -98,10 +99,10 @@ abstract class __PersistenceUnit_ {
                     em,
                     c -> {
                         try {
-                            try (var tableTypes = c.getMetaData().getTableTypes()) {
-                                while (tableTypes.next()) {
-                                    final var tableType = tableTypes.getString("TABLE_TYPE");
-                                    logger.log(Level.INFO, "TABLE_TYPE: {0}", tableType);
+                            try (var databaseTableTypes = c.getMetaData().getTableTypes()) {
+                                while (databaseTableTypes.next()) {
+                                    final var databaseTableType = databaseTableTypes.getString("TABLE_TYPE");
+                                    logger.log(Level.INFO, "TABLE_TYPE: {0}", databaseTableType);
                                 }
                             }
                         } catch (final SQLException sqle) {
@@ -174,16 +175,24 @@ abstract class __PersistenceUnit_ {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected String catalog() {
-        return catalog;
+
+    /**
+     * Returns the value of {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG}
+     * property of the injected instance of an {@link EntityManagerFactory}.
+     *
+     * @return the value of
+     *         {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG}.
+     */
+    protected String tableCatalog() {
+        return tableCatalog;
     }
 
-    protected String schema() {
-        return schema;
+    protected String tableSchema() {
+        return tableSchema;
     }
 
-    protected String[] types() {
-        return types;
+    protected String[] tableTypes() {
+        return Arrays.copyOf(tableTypes, tableTypes.length);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -191,14 +200,10 @@ abstract class __PersistenceUnit_ {
     @Inject
     private EntityManagerFactory entityManagerFactory;
 
-//    @Deprecated(forRemoval = true)
-//    @__PersistenceProducer.Integration__
-//    @Inject
-//    private EntityManager entityManager;
+    // -----------------------------------------------------------------------------------------------------------------q
+    private String tableCatalog;
 
-    private String catalog;
+    private String tableSchema;
 
-    private String schema;
-
-    private String[] types;
+    private String[] tableTypes;
 }

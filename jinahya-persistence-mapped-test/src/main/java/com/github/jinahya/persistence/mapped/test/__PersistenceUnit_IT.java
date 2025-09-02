@@ -73,9 +73,9 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
                         try {
                             return ___JavaSqlTestUtils.addAllTableNames(
                                     c,
-                                    catalog(),
-                                    schema(),
-                                    types(),
+                                    tableCatalog(),
+                                    tableSchema(),
+                                    tableTypes(),
                                     new TreeSet<>()
                             );
                         } catch (final SQLException sqle) {

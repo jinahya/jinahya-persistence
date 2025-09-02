@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceConfiguration;
 
@@ -51,12 +52,13 @@ public final class __PersistenceProducer_TestUtils {
      *
      * @param entityManagerFactory the entity manager factory.
      * @return given {@code entityManagerFactory}.
-     * @see <a
-     *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
      *         properties</a>
      */
+    @Nonnull
     public static EntityManagerFactory assertSchemagenDatabaseActionNone(
-            final EntityManagerFactory entityManagerFactory) {
+            @Nonnull final EntityManagerFactory entityManagerFactory) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
                 PersistenceConfiguration.SCHEMAGEN_DATABASE_ACTION,
@@ -79,8 +81,10 @@ public final class __PersistenceProducer_TestUtils {
      * @see <a
      *         href="https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation">ddl-generation</a>
      */
+    @Nonnull
     public static EntityManagerFactory assertEclipselinkDdlGenerationNone(
-            final EntityManagerFactory entityManagerFactory) {
+            @Nonnull final EntityManagerFactory entityManagerFactory) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
                 KEY_ECLIPSELINK_DDL_GENERATION,
@@ -102,7 +106,10 @@ public final class __PersistenceProducer_TestUtils {
      *         href="https://docs.jboss.org/hibernate/orm/7.1/userguide/html_single/Hibernate_User_Guide.html#settings-hibernate.hbm2ddl.auto">A.17.12.
      *         hibernate.hbm2ddl.auto</a>
      */
-    public static EntityManagerFactory assertHibernateHbm2ddlAutoNone(final EntityManagerFactory entityManagerFactory) {
+    @Nonnull
+    public static EntityManagerFactory assertHibernateHbm2ddlAutoNone(
+            @Nonnull final EntityManagerFactory entityManagerFactory) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
                 KEY_HIBERNATE_HBM2DDL_AUTO,
@@ -114,6 +121,7 @@ public final class __PersistenceProducer_TestUtils {
         return entityManagerFactory;
     }
 
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     private __PersistenceProducer_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
