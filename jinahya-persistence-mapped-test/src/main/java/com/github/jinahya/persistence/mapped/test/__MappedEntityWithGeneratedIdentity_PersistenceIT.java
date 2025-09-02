@@ -27,11 +27,11 @@ import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedIdentity
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdentity_PersistenceIT<
-        ENITTY extends __MappedEntityWithGeneratedIdentity
+        ENTITY extends __MappedEntityWithGeneratedIdentity
         >
-        extends __MappedEntityWithGeneratedId_PersistenceIT<ENITTY, Long> {
+        extends __MappedEntityWithGeneratedId_PersistenceIT<ENTITY, Long> {
 
-    protected __MappedEntityWithGeneratedIdentity_PersistenceIT(final Class<ENITTY> entityClass) {
+    protected __MappedEntityWithGeneratedIdentity_PersistenceIT(final Class<ENTITY> entityClass) {
         super(entityClass, Long.class);
     }
 }

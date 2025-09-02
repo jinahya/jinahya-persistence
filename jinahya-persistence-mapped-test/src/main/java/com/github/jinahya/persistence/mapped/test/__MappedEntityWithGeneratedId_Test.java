@@ -22,10 +22,14 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntityWithGeneratedId;
 
-public abstract class __MappedEntityWithGeneratedId_Test<ENITTY extends __MappedEntityWithGeneratedId<ID>, ID>
-        extends __MappedEntity_Test<ENITTY, ID> {
+@SuppressWarnings({
+        "java:S101", // Class names should comply with a naming convention
+        "java:S119"  // Type parameter names should comply with a naming convention
+})
+public abstract class __MappedEntityWithGeneratedId_Test<ENTITY extends __MappedEntityWithGeneratedId<ID>, ID>
+        extends __MappedEntity_Test<ENTITY, ID> {
 
-    protected __MappedEntityWithGeneratedId_Test(final Class<ENITTY> entityClass, final Class<ID> idClass) {
+    protected __MappedEntityWithGeneratedId_Test(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
     }
 }

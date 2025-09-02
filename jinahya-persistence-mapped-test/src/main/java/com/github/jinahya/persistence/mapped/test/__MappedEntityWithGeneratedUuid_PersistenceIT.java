@@ -28,10 +28,10 @@ import java.util.UUID;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedUuid_PersistenceIT<ENITTY extends __MappedEntityWithGeneratedUuid>
-        extends __MappedEntityWithGeneratedId_PersistenceIT<ENITTY, UUID> {
+public abstract class __MappedEntityWithGeneratedUuid_PersistenceIT<ENTITY extends __MappedEntityWithGeneratedUuid>
+        extends __MappedEntityWithGeneratedId_PersistenceIT<ENTITY, UUID> {
 
-    protected __MappedEntityWithGeneratedUuid_PersistenceIT(final Class<ENITTY> entityClass) {
+    protected __MappedEntityWithGeneratedUuid_PersistenceIT(final Class<ENTITY> entityClass) {
         super(entityClass, UUID.class);
     }
 }
