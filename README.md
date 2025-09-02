@@ -7,18 +7,10 @@
 
 ## Modules
 
-### jinahya-persistence-mapped
+### [jinahya-persistence-mapped](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-mapped)
 
-[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-mapped/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-mapped)
+### [jinahya-persistence-mapped-test](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-mapped-test)
 
-### jinahya-persistence-mapped-test
+### [jinahya-persistence-more](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more)
 
-[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-mapped-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-mapped-test)
-
-### jinahya-persistence-more
-
-[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more)
-
-### jinahya-persistence-more-test
-
-[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test)
+### [jinahya-persistence-more-test](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more-test)
