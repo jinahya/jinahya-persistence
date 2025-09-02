@@ -25,6 +25,7 @@ import com.github.jinahya.persistence.more.__AttributeEnumConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
 
@@ -34,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * An abstract base class for testing {@link __AttributeEnumConverter} implementations.
  *
  * @param <CONVERTER> converter type parameter
- * @param <E>         enums type parameter
+ * @param <ENUM>      enums type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  *
@@ -47,26 +48,27 @@ import static org.assertj.core.api.Assertions.assertThat;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class __AttributeEnumConverter_Test<
-        CONVERTER extends __AttributeEnumConverter<E, ATTRIBUTE>,
-        E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>,
+        CONVERTER extends __AttributeEnumConverter<ENUM, ATTRIBUTE>,
+        ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>,
         ATTRIBUTE
         >
-        extends __AttributeEnum_Test<E, ATTRIBUTE> {
+        extends __AttributeEnum_Test<ENUM, ATTRIBUTE> {
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfString}.
      *
      * @param <CONVERTER> converter type parameter
-     * @param <E>         entity type parameter
+     * @param <ENUM>      entity type parameter
      * @see #converterClass
      * @see #enumClass
      */
     public abstract static class __OfStringTest<
-            CONVERTER extends __AttributeEnumConverter.__OfString<E>,
-            E extends Enum<E> & __AttributeEnum.__OfString<E>
+            CONVERTER extends __AttributeEnumConverter.__OfString<ENUM>,
+            ENUM extends Enum<ENUM> & __AttributeEnum.__OfString<ENUM>
             >
-            extends __AttributeEnumConverter_Test<CONVERTER, E, String> {
+            extends __AttributeEnumConverter_Test<CONVERTER, ENUM, String> {
 
         /**
          * {@inheritDoc}
@@ -76,7 +78,7 @@ public abstract class __AttributeEnumConverter_Test<
          * @see #converterClass
          * @see #enumClass
          */
-        protected __OfStringTest(final Class<CONVERTER> converterClass, final Class<E> enumClass) {
+        protected __OfStringTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
             super(converterClass, enumClass, String.class);
         }
     }
@@ -89,7 +91,7 @@ public abstract class __AttributeEnumConverter_Test<
      * @param converterClass the converter class to test.
      * @see #converterClass
      */
-    protected __AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<E> enumClass,
+    protected __AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass,
                                             final Class<ATTRIBUTE> attributeClass) {
         super(enumClass, attributeClass);
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");
@@ -152,9 +154,14 @@ public abstract class __AttributeEnumConverter_Test<
      * @return a new instance of {@link #converterClass}.
      */
     protected CONVERTER newConverterInstance() {
+        if (true) {
+            return ReflectionUtils.newInstance(converterClass);
+        }
         try {
             final var constructor = converterClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
+            if (!constructor.canAccess(null)) {
+                constructor.setAccessible(true);
+            }
             return constructor.newInstance();
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException("failed to initialize a new instance of " + converterClass, roe);
