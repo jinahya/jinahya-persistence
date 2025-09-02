@@ -65,9 +65,9 @@ abstract class __PersistenceUnit_ {
         entityManagerFactory.getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "{0}: {1}", k, v);
         });
-        catalog = __PersistenceUnitUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
-        schema = __PersistenceUnitUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
-        types = __PersistenceUnitUtils.getDefaultTypes(entityManagerFactory).orElse(null);
+        catalog = __PersistenceUnit_TestUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
+        schema = __PersistenceUnit_TestUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
+        types = __PersistenceUnit_TestUtils.getDefaultTypes(entityManagerFactory).orElse(null);
     }
 
     // https://stackoverflow.com/a/72628439/330457

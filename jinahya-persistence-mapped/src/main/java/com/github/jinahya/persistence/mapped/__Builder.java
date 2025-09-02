@@ -84,9 +84,9 @@ public abstract class __Builder<
      *
      * @return this builder.
      */
+    @Nonnull
     public SELF reset() {
-        // TODO: implement
-        throw new UnsupportedOperationException("not yet implemented");
+        return __BuilderUtils.reset((SELF) this);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

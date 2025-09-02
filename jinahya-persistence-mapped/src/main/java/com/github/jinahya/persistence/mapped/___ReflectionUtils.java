@@ -23,6 +23,7 @@ final class ___ReflectionUtils {
         }
     }
 
+    @Nonnull
     static <T> T reset(@Nonnull final T instance) {
         Objects.requireNonNull(instance, "instance is null");
         acceptFields(

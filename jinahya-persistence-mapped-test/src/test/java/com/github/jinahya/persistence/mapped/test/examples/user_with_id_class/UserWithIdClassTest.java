@@ -1,11 +1,11 @@
 package com.github.jinahya.persistence.mapped.test.examples.user_with_id_class;
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityTest;
+import com.github.jinahya.persistence.mapped.test.__MappedEntity_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class UserWithIdClassTest extends __MappedEntityTest<UserWithIdClass, IdForUserWithIdClass> {
+class UserWithIdClassTest extends __MappedEntity_Test<UserWithIdClass, IdForUserWithIdClass> {
 
     UserWithIdClassTest() {
         super(UserWithIdClass.class, IdForUserWithIdClass.class);

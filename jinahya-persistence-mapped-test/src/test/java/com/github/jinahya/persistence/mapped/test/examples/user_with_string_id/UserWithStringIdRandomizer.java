@@ -20,12 +20,12 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityRandomizer;
+import com.github.jinahya.persistence.mapped.test.__MappedEntity_Randomizer;
 import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class UserWithStringIdRandomizer extends __MappedEntityRandomizer<UserWithStringId, String> {
+class UserWithStringIdRandomizer extends __MappedEntity_Randomizer<UserWithStringId, String> {
 
     UserWithStringIdRandomizer() {
         super(UserWithStringId.class, String.class);

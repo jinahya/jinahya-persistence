@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Utilities for the {@link __MappedEntityPersistenceTest}.
+ * Utilities for the {@link __MappedEntity_PersistenceTest}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

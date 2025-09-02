@@ -34,9 +34,9 @@ import java.util.UUID;
 public interface __MappedEntityWithGeneratedUuidCriteria<ENTITY extends __MappedEntityWithGeneratedUuid>
         extends __MappedEntityWithGeneratedIdCriteria<ENTITY, UUID> {
 
-    static <ENTITY extends __MappedEntityWithGeneratedUuid> Optional<ENTITY> findById(
+    static <T extends __MappedEntityWithGeneratedUuid> Optional<T> findById(
             @Nonnull final EntityManager entityManager,
-            @Nonnull final Class<ENTITY> entityClass,
+            @Nonnull final Class<T> entityClass,
             @Nonnull final UUID idValue) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");

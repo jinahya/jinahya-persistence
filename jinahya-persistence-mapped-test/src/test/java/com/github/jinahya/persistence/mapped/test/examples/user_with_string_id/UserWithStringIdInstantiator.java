@@ -20,10 +20,10 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityInstantiator;
+import com.github.jinahya.persistence.mapped.test.__MappedEntity_Instantiator;
 import jakarta.annotation.Nonnull;
 
-class UserWithStringIdInstantiator extends __MappedEntityInstantiator<UserWithStringId, String> {
+class UserWithStringIdInstantiator extends __MappedEntity_Instantiator<UserWithStringId, String> {
 
     UserWithStringIdInstantiator() {
         super(UserWithStringId.class, String.class);

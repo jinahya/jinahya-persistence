@@ -1,0 +1,185 @@
+package com.github.jinahya.persistence.mapped.test;
+
+/*-
+ * #%L
+ * jinahya-persistence-mapped-test
+ * %%
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import jakarta.annotation.Nonnull;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.TreeSet;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * An abstract class for testing the {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_IT_PU}
+ * persistence unit.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __PersistenceUnit_Test
+ */
+@SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
+        "java:S101", // Class names should comply with a naming convention
+        "java:S6813" // Field dependency injection should be avoided
+})
+public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new instance.
+     */
+    protected __PersistenceUnit_IT() {
+        super();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns all database table names.
+     *
+     * @return all database table names.
+     */
+    protected Collection<String> getDatabaseTableNames() {
+        final var databaseTableNames = applyEntityManager(em -> {
+            return ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
+                    em,
+                    c -> {
+                        try {
+                            return ___JavaSqlTestUtils.addAllTableNames(
+                                    c,
+                                    catalog(),
+                                    schema(),
+                                    types(),
+                                    new TreeSet<>()
+                            );
+                        } catch (final SQLException sqle) {
+                            throw new RuntimeException("failed to get database table names", sqle);
+                        }
+                    }
+            );
+        });
+        logger.log(Level.DEBUG, "all database table names: {0}", databaseTableNames);
+        return databaseTableNames;
+    }
+
+    /**
+     * Returns all persistence table names.
+     *
+     * @return all persistence table names.
+     */
+    protected Collection<String> getPersistenceTableNames() {
+        final var persistenceTableNames =
+                applyEntityManagerFactory(
+                        emf -> ___JakartaPersistenceTestUtils.addAllEntityTableNames(
+                                emf,
+                                new TreeSet<>()
+                        )
+                );
+        logger.log(Level.DEBUG, "all persistence table names: {0}", persistenceTableNames);
+        return persistenceTableNames;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Tests that all database tables are mapped to entities.
+     *
+     * @see #__RemainingDatabaseTableNames(Collection)
+     */
+    @DisplayName("all database tables are mapped")
+    @Test
+    protected void _Mapped_AllTableFamilyTableNames() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var databaseTableNames = getDatabaseTableNames();
+        final var persistenceTableNames = Collections.unmodifiableCollection(getPersistenceTableNames());
+        // -------------------------------------------------------------------------------------------------------- when
+        databaseTableNames.removeAll(persistenceTableNames);
+        logger.log(Level.DEBUG, "remaining database table names: {0}", databaseTableNames);
+        // -------------------------------------------------------------------------------------------------------- then
+        __RemainingDatabaseTableNames(databaseTableNames);
+        assertThat(databaseTableNames)
+                .as("remaining database table names")
+                .isEmpty();
+    }
+
+    /**
+     * Notifies that the specified collection of remaining database table names, from which all persistence table names
+     * are removed, is verified as empty.
+     *
+     * @param remainingDatabaseTableNames the collection of remaining database table names from which all persistence
+     *                                    table names are removed.
+     * @see #_Mapped_AllTableFamilyTableNames()
+     */
+    protected void __RemainingDatabaseTableNames(@Nonnull final Collection<String> remainingDatabaseTableNames) {
+        remainingDatabaseTableNames.removeIf(tn -> {
+            return tn.startsWith("HTE_"); // H2 temporary tables
+        });
+        remainingDatabaseTableNames.remove("SEQUENCE");
+        remainingDatabaseTableNames.forEach(
+                tn -> logger.log(Level.WARNING, "remaining database table name: {0}", tn)
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Tests that all persistence table names are known.
+     *
+     * @see #__RemainingPersistenceTableNames(Collection)
+     */
+    @DisplayName("check all entity tables are known")
+    @Test
+    protected void _Known_AllPersistenceTableNames() {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var databaseTableNames = Collections.unmodifiableCollection(getDatabaseTableNames());
+        final var persistenceTableNames = getPersistenceTableNames();
+        // -------------------------------------------------------------------------------------------------------- when
+        persistenceTableNames.removeAll(databaseTableNames);
+        logger.log(Level.DEBUG, "remaining persistence table names: {0}", persistenceTableNames);
+        // -------------------------------------------------------------------------------------------------------- then
+        __RemainingPersistenceTableNames(persistenceTableNames);
+        assertThat(persistenceTableNames)
+                .as("unknown persistence table names")
+                .isEmpty();
+    }
+
+    /**
+     * Notifies the specified collection of remaining persistence table names, from which all database table names are
+     * removed.
+     *
+     * @param remainingPersistenceTableNames the remaining persistence table names from which all database table names
+     *                                       are removed.
+     * @see #_Known_AllPersistenceTableNames()
+     */
+    protected void __RemainingPersistenceTableNames(@Nonnull final Collection<String> remainingPersistenceTableNames) {
+        remainingPersistenceTableNames.forEach(
+                tn -> logger.log(Level.WARNING, "remaining persistence table name: {0}", tn)
+        );
+    }
+}

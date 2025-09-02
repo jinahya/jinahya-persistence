@@ -20,13 +20,13 @@ package com.github.jinahya.persistence.mapped.test.examples.entity02;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test._MappedEntityTest;
+import com.github.jinahya.persistence.mapped.test._MappedEntity_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.Test;
 
-public class Entity02Test extends _MappedEntityTest<Entity02, Long> {
+public class Entity02Test extends _MappedEntity_Test<Entity02, Long> {
 
     protected Entity02Test() {
         super(Entity02.class, Long.class);

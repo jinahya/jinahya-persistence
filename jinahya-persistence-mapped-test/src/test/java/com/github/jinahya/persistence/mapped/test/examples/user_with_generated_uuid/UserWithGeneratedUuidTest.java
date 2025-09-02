@@ -1,12 +1,12 @@
 package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_uuid;
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedUuidTest;
+import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedUuid_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.jupiter.api.Test;
 
-class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuidTest<UserWithGeneratedUuid> {
+class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuid_Test<UserWithGeneratedUuid> {
 
     UserWithGeneratedUuidTest() {
         super(UserWithGeneratedUuid.class);
