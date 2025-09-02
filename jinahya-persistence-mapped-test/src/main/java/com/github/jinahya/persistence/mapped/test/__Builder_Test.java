@@ -37,11 +37,12 @@ public abstract class __Builder_Test<
     @DisplayName("build() should return non-null TARGET")
     @Test
     protected void build_NotNull_() {
-        newRandomizedBuilderInstance().ifPresent(b -> {
-            final var built = b.build();
-            logger.log(System.Logger.Level.DEBUG, "built: {0}", built);
-            assertThat(built).isNotNull();
-        });
+        newRandomizedBuilderInstance()
+                .map(__Builder::build)
+                .ifPresent(b -> {
+                    logger.log(System.Logger.Level.DEBUG, "built: {0}", b);
+                    assertThat(b).isNotNull();
+                });
     }
 
     // ---------------------------------------------------------------------------------------------------- builderClass
