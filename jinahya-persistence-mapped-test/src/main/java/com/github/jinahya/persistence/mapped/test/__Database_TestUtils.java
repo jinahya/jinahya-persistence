@@ -41,7 +41,7 @@ import java.util.function.Consumer;
         "java:S125", // Sections of code should not be commented out
         "java:S6905" // SQL queries should retrieve only necessary fields
 })
-public class __DatabaseTestUtils {
+public class __Database_TestUtils {
 
     public static class Oracle {
 
@@ -120,8 +120,40 @@ public class __DatabaseTestUtils {
         }
     }
 
+    public static final class MySQL {
+
+        public void SHOW_PRIVILEGES(@Nonnull final Connection connection,
+                                    @Nonnull final Consumer<? super ResultSet> consumer)
+                throws SQLException {
+            Objects.requireNonNull(connection, "connection is null");
+            Objects.requireNonNull(consumer, "consumer is null");
+            try (var statement = connection.createStatement()) {
+                try (var resultSet = statement.executeQuery("SHOW PRIVILEGS")) {
+                    consumer.accept(resultSet);
+                }
+            }
+        }
+
+        public List<String> SHOW_PRIVILEGES(@Nonnull final Connection connection) throws SQLException {
+            final var privileges = new ArrayList<String>();
+            SHOW_PRIVILEGES(
+                    connection,
+                    r -> {
+                        try {
+                            while (r.next()) {
+                                privileges.add(r.getString("PRIVILEGE"));
+                            }
+                        } catch (final SQLException sqle) {
+                            throw new RuntimeException(sqle);
+                        }
+                    }
+            );
+            return privileges;
+        }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
-    private __DatabaseTestUtils() {
+    private __Database_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

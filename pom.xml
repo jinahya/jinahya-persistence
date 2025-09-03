@@ -331,25 +331,21 @@
         <version>3.14.0</version>
         <configuration>
           <annotationProcessorPaths>
-            <!--            <path>-->
-            <!--              <groupId>org.eclipse.persistence</groupId>-->
-            <!--              <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>-->
-            <!--              <version>${version.org.eclipse.persistence}</version>-->
-            <!--            </path>-->
             <path>
               <groupId>org.hibernate.orm</groupId>
               <artifactId>hibernate-jpamodelgen</artifactId>
               <version>${version.org.hibernate.orm}</version>
             </path>
             <!--            <path>-->
-            <!--              <groupId>org.projectlombok</groupId>-->
-            <!--              <artifactId>lombok</artifactId>-->
-            <!--              <version>${version.org.projectlombok}</version>-->
+            <!--              <groupId>${metamodel.generator.groupId}</groupId>-->
+            <!--              <artifactId>${metamodel.generator.artifactId}</artifactId>-->
+            <!--              <version>${metamodel.generator.version}</version>-->
             <!--            </path>-->
           </annotationProcessorPaths>
-          <compilerArgs>
-            <!--            <arg>-Xlint</arg>-->
-          </compilerArgs>
+          <!--          <compilerArgs>-->
+          <!--            &lt;!&ndash;            <arg>-Xlint</arg>&ndash;&gt;-->
+          <!--            <arg>-Aeclipselink.persistencexml=${basedir}/src/test/resource/META-INF/persistence.xml</arg>-->
+          <!--          </compilerArgs>-->
         </configuration>
       </plugin>
       <plugin>
@@ -385,12 +381,20 @@
         <version>1.4.0</version>
         <executions>
           <execution>
-            <id>validate</id>
-            <phase>validate</phase>
+            <id>pom</id>
+<!--            <phase>validate</phase>-->
+<!--            <phase>initialize</phase>-->
             <goals>
-              <!--              <goal>check</goal>-->
+              <goal>pom</goal>
             </goals>
           </execution>
+<!--          <execution>-->
+<!--            <id>validate</id>-->
+<!--            <phase>validate</phase>-->
+<!--            <goals>-->
+<!--              &lt;!&ndash;              <goal>check</goal>&ndash;&gt;-->
+<!--            </goals>-->
+<!--          </execution>-->
         </executions>
       </plugin>
       <plugin><!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage/ -->
@@ -548,11 +552,19 @@
       <id>eclipselink</id>
       <properties>
         <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
+        <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
+        <metamodel.generator.artifactId>org.eclipse.persistence.jpa.modelgen.processor</metamodel.generator.artifactId>
+        <metamodel.generator.version>${version.org.eclipse.persistence}</metamodel.generator.version>
       </properties>
       <dependencies>
+        <!--        <dependency>-->
+        <!--          <groupId>org.eclipse.persistence</groupId>-->
+        <!--          <artifactId>eclipselink</artifactId>-->
+        <!--          <scope>test</scope>-->
+        <!--        </dependency>-->
         <dependency>
           <groupId>org.eclipse.persistence</groupId>
-          <artifactId>eclipselink</artifactId>
+          <artifactId>org.eclipse.persistence.jpa</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -564,6 +576,9 @@
       </activation>
       <properties>
         <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
+        <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
+        <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
+        <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
       </properties>
       <dependencies>
         <dependency>
