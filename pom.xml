@@ -72,9 +72,9 @@
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
     <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
-    <version.nl.jqno.equalsverifier>4.0.9</version.nl.jqno.equalsverifier>
+    <version.nl.jqno.equalsverifier>4.1</version.nl.jqno.equalsverifier>
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
-    <version.org.eclipse.persistence>5.0.0-B09</version.org.eclipse.persistence>
+    <version.org.eclipse.persistence>5.0.0-B10</version.org.eclipse.persistence>
     <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
     <!-- https://docs.jboss.org/hibernate/validator/8.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
     <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
@@ -553,7 +553,6 @@
         <dependency>
           <groupId>org.eclipse.persistence</groupId>
           <artifactId>eclipselink</artifactId>
-          <version>${version.org.eclipse.persistence}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -573,34 +572,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>
-    <profile>
-      <id>spring-boot-3.3</id>
-      <!-- https://docs.spring.io/spring-boot/3.3/appendix/dependency-versions/coordinates.html -->
-      <properties>
-        <version.org.hibenrate.orm>6.5.3.Final</version.org.hibenrate.orm>
-        <version.org.hibenrate.validator>8.0.2.Final</version.org.hibenrate.validator>
-        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
-      </properties>
-    </profile>
-    <profile>
-      <id>spring-boot-3.4</id>
-      <!-- https://docs.spring.io/spring-boot/3.4/appendix/dependency-versions/coordinates.html -->
-      <properties>
-        <version.org.hibenrate.orm>6.6.22.Final</version.org.hibenrate.orm>
-        <version.org.hibenrate.validator>8.0.2.Final</version.org.hibenrate.validator>
-        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
-      </properties>
-    </profile>
-    <profile>
-      <id>spring-boot-3.5</id>
-      <!-- https://docs.spring.io/spring-boot/3.5/appendix/dependency-versions/coordinates.html -->
-      <!-- https://docs.spring.io/spring-boot/appendix/dependency-versions/coordinates.html -->
-      <properties>
-        <version.org.hibenrate.orm>6.6.22.Final</version.org.hibenrate.orm>
-        <version.org.hibenrate.validator>8.0.2.Final</version.org.hibenrate.validator>
-        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
-      </properties>
     </profile>
   </profiles>
 </project>
