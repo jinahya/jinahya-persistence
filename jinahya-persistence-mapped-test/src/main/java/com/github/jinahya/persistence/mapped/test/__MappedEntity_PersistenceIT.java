@@ -27,6 +27,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,6 +67,19 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected __MappedEntity_PersistenceIT(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Asserts no modification to the schema.
+     */
+    @DisplayName("no modification to the schema")
+    @BeforeEach
+    protected final void assertNoSchemaModification() {
+        acceptEntityManagerFactory(__PersistenceProducer_TestUtils::assertSchemagenDatabaseActionNone);
+        acceptEntityManagerFactory(__PersistenceProducer_TestUtils::assertEclipselinkDdlGenerationNone);
+        acceptEntityManagerFactory(__PersistenceProducer_TestUtils::assertHibernateHbm2ddlAutoNone);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

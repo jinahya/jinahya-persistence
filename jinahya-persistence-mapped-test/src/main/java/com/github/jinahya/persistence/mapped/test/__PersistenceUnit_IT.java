@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +57,19 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      */
     protected __PersistenceUnit_IT() {
         super();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Asserts no modification to the schema.
+     */
+    @DisplayName("no modification to the schema")
+    @BeforeEach
+    protected final void assertNoSchemaModification() {
+        acceptEntityManagerFactory(__PersistenceProducer_TestUtils::assertSchemagenDatabaseActionNone);
+        acceptEntityManagerFactory(__PersistenceProducer_TestUtils::assertEclipselinkDdlGenerationNone);
+        acceptEntityManagerFactory(__PersistenceProducer_TestUtils::assertHibernateHbm2ddlAutoNone);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
