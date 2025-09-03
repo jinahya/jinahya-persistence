@@ -24,7 +24,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Startup;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
@@ -60,15 +59,18 @@ abstract class __PersistenceUnit_ {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    abstract EntityManagerFactory getEntityManagerFactory();
+
+    // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
-        logger.log(Level.INFO, "entityManagerFactory: {0}", entityManagerFactory);
-        entityManagerFactory.getProperties().forEach((k, v) -> {
+        logger.log(Level.INFO, "getEntityManagerFactory(): {0}", getEntityManagerFactory());
+        getEntityManagerFactory().getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "{0}: {1}", k, v);
         });
-        tableCatalog = __PersistenceUnit_TestUtils.getDefaultCatalog(entityManagerFactory).orElseThrow();
-        tableSchema = __PersistenceUnit_TestUtils.getDefaultSchema(entityManagerFactory).orElseThrow();
-        tableTypes = __PersistenceUnit_TestUtils.getDefaultTypes(entityManagerFactory).orElse(null);
+        tableCatalog = __PersistenceUnit_TestUtils.getDefaultCatalog(getEntityManagerFactory()).orElseThrow();
+        tableSchema = __PersistenceUnit_TestUtils.getDefaultSchema(getEntityManagerFactory()).orElseThrow();
+        tableTypes = __PersistenceUnit_TestUtils.getDefaultTypes(getEntityManagerFactory()).orElse(null);
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -126,7 +128,7 @@ abstract class __PersistenceUnit_ {
     protected final <R> R applyEntityManagerFactory(
             @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return function.apply(entityManagerFactory);
+        return function.apply(getEntityManagerFactory());
     }
 
     /**
@@ -194,11 +196,6 @@ abstract class __PersistenceUnit_ {
     protected String[] tableTypes() {
         return Arrays.copyOf(tableTypes, tableTypes.length);
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @__PersistenceProducer.__itPU
-    @Inject
-    private EntityManagerFactory entityManagerFactory;
 
     // -----------------------------------------------------------------------------------------------------------------q
     private String tableCatalog;

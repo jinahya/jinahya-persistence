@@ -21,6 +21,8 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,6 +59,12 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      */
     protected __PersistenceUnit_IT() {
         super();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    final EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -196,4 +204,9 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
                 tn -> logger.log(Level.WARNING, "remaining persistence table name: {0}", tn)
         );
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @__PersistenceProducer.__itPU
+    @Inject
+    private EntityManagerFactory entityManagerFactory;
 }
