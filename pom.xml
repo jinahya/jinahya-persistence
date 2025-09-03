@@ -201,11 +201,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!--      <dependency>-->
-      <!--        <groupId>org.projectlombok</groupId>-->
-      <!--        <artifactId>lombok</artifactId>-->
-      <!--        <version>${version.org.projectlombok}</version>-->
-      <!--      </dependency>-->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-bom</artifactId>
