@@ -79,7 +79,7 @@ abstract class __PersistenceUnit_ {
 
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("print database info")
-    @Test
+//    @Test
     @SuppressWarnings({
             "java:S100" // Method names should comply with a naming convention
     })

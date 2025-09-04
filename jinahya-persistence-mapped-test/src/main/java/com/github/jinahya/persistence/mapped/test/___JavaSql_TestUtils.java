@@ -200,6 +200,9 @@ final class ___JavaSql_TestUtils {
                         final var schema = schemas.getString("TABLE_SCHEM");
                         logger.log(Level.INFO, "\tTABLE_SCHEM: {0}", schema);
                     }
+                } catch (final SQLException sqle) {
+                    // https://bugs.mysql.com/bug.php?id=118938
+                    sqle.printStackTrace(System.err);
                 }
             }
         }

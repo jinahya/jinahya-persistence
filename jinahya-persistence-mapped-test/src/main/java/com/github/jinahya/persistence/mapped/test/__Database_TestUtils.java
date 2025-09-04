@@ -42,9 +42,9 @@ import java.util.function.Consumer;
         "java:S125", // Sections of code should not be commented out
         "java:S6905" // SQL queries should retrieve only necessary fields
 })
-public class __Database_TestUtils {
+public final class __Database_TestUtils {
 
-    public static class Oracle {
+    public static final class Oracle {
 
         /**
          * .
@@ -123,8 +123,8 @@ public class __Database_TestUtils {
 
     public static final class MySQL {
 
-        public void SHOW_GRANTS(@Nonnull final Connection connection,
-                                @Nonnull final Consumer<? super ResultSet> consumer)
+        public static void SHOW_GRANTS(@Nonnull final Connection connection,
+                                       @Nonnull final Consumer<? super ResultSet> consumer)
                 throws SQLException {
             Objects.requireNonNull(connection, "connection is null");
             Objects.requireNonNull(consumer, "consumer is null");
@@ -135,8 +135,8 @@ public class __Database_TestUtils {
             }
         }
 
-        public <C extends Collection<String>> C SHOW_GRANTS(@Nonnull final Connection connection,
-                                                            @Nonnull final C collection
+        public static <C extends Collection<String>> C SHOW_GRANTS(@Nonnull final Connection connection,
+                                                                   @Nonnull final C collection
         ) throws SQLException {
             Objects.requireNonNull(collection, "collection is null");
             SHOW_GRANTS(
@@ -154,7 +154,7 @@ public class __Database_TestUtils {
             return collection;
         }
 
-        public List<String> SHOW_GRANTS(@Nonnull final Connection connection) throws SQLException {
+        public static List<String> SHOW_GRANTS(@Nonnull final Connection connection) throws SQLException {
             return SHOW_GRANTS(
                     connection,
                     new ArrayList<>()

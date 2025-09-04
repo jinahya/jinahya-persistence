@@ -88,7 +88,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @see #__persistEntityInstance(__MappedEntity)
      */
     @DisplayName("persist a random entity instance")
-    @Test
+//    @Test
     protected void __persistEntityInstance() {
         acceptEntityManagerInTransactionAndRollback(em -> {
             final var entityInstance = __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);

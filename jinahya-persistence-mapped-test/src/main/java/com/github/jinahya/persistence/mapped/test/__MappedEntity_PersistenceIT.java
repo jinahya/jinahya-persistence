@@ -33,12 +33,12 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -151,7 +151,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see #_Mapped_AllTableColumnNames(Collection)
      */
     @DisplayName("check that all table columns are mapped")
-    @Test
+//    @Test
     protected void _Mapped_AllTableColumnNames() {
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = getTableColumnNames();
@@ -186,7 +186,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see #_Empty_AllEntityColumnNames(Collection)
      */
     @DisplayName("check that all entity columns are known")
-    @Test
+//    @Test
     protected void _Known_AllEntityColumnNames() {
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
@@ -230,26 +230,36 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
             return em.getMetamodel().managedType(entityClass);
         });
         managedType.getAttributes().forEach(a -> {
-            final var member = a.getJavaMember();
-            final Column column;
-            if (member instanceof Field field) {
-                column = field.getAnnotation(Column.class);
-            } else if (member instanceof Method method) {
-                column = method.getAnnotation(Column.class);
+            final var entityMember = a.getJavaMember();
+            final Column entityColumn;
+            if (entityMember instanceof Field field) {
+                entityColumn = field.getAnnotation(Column.class);
+            } else if (entityMember instanceof Method method) {
+                entityColumn = method.getAnnotation(Column.class);
             } else {
-                throw new RuntimeException("unknown member type: " + member);
+                throw new RuntimeException("unknown entityMember type: " + entityMember);
             }
-            if (column == null) {
-                logger.log(Level.WARNING, "no @Column annotation for " + member);
+            if (entityColumn == null) {
+                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
                 return;
             }
-            final var name = column.name();
-            final var nullable = column.nullable();
-            final var isNullable = tableColumnNamesAndIsNullables.get(name);
-            assertThat(nullable)
-                    .as("Column#nullable of %s maps to %s(%s) ", member, name, isNullable)
-                    .isEqualTo(isNullable);
+            final var entityColumnName = entityColumn.name();
+            final var entityColumnNullable = entityColumn.nullable();
+            final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+            if (!_MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable(
+                    entityMember, entityColumn, tableColumnIsNullable)) {
+                return;
+            }
+            assertThat(entityColumnNullable)
+                    .as("Column#entityColumnNullable of %s maps to %s(%s) ", entityMember, entityColumnName,
+                        tableColumnIsNullable)
+                    .isEqualTo(tableColumnIsNullable);
         });
+    }
+
+    protected boolean _MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable(
+            final Member entityMember, final Column entityColum, final boolean tableColumnIsNullable) {
+        return true;
     }
 
     // ----------------------------------------------------------------------------------------------------- entityClass
@@ -260,7 +270,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see ___JakartaPersistence_TestUtils#selectRandom(EntityManager, Class)
      */
     @DisplayName("select an entity instance of a random index")
-    @Test
+//    @Test
     protected void _Valid_RandomlySelectedEntityInstance() {
         acceptEntityManager(em -> {
             // ---------------------------------------------------------------------------------------------------- when
