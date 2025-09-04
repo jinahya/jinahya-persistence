@@ -38,6 +38,7 @@ import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
@@ -405,10 +406,19 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         managedType.getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;
+            final java.lang.annotation.Annotation[] annotations;
             if (entityMember instanceof Field field) {
+                final var actualField =
+                        ReflectionUtils.findFields(entityClass, f -> f.getName().equals(field.getName()),
+                                                   ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP).get(0);
                 entityColumn = field.getAnnotation(Column.class);
+//                annotations = field.getDeclaredAnnotations();
+                annotations = actualField.getDeclaredAnnotations();
             } else if (entityMember instanceof Method method) {
+                final var actualMethod = ReflectionUtils.findMethod(entityClass, method.getName()).orElseThrow();
                 entityColumn = method.getAnnotation(Column.class);
+//                annotations = method.getDeclaredAnnotations();
+                annotations = actualMethod.getDeclaredAnnotations();
             } else {
                 throw new RuntimeException("unknown entity member type: " + entityMember);
             }
@@ -419,10 +429,12 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
             if (!entityColumn.nullable()) {
                 return;
             }
-            final var annotations = ((AccessibleObject) entityMember).getAnnotations();
             final var nonnull = Arrays.stream(annotations)
                     .filter(nn -> {
-                        return nn.getClass().getSimpleName().equalsIgnoreCase("nonnull");
+                        final var c = nn.getClass();
+                        final var name = c.getName();
+                        final var simpleName = c.getSimpleName();
+                        return nn.annotationType().getSimpleName().equalsIgnoreCase("nonnull");
                     })
                     .findAny()
                     .orElse(null);
