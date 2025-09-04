@@ -26,9 +26,12 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Startup;
 import jakarta.inject.Inject;
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -46,6 +50,7 @@ import java.util.Collections;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.extractProperty;
 
 @AddBeanClasses({
         __PersistenceProducer.class
@@ -237,7 +242,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
             } else if (entityMember instanceof Method method) {
                 entityColumn = method.getAnnotation(Column.class);
             } else {
-                throw new RuntimeException("unknown entityMember type: " + entityMember);
+                throw new RuntimeException("unknown entity member type: " + entityMember);
             }
             if (entityColumn == null) {
                 logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
@@ -258,7 +263,85 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     protected boolean _MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable(
-            final Member entityMember, final Column entityColum, final boolean tableColumnIsNullable) {
+            final Member entityMember, final Column entityColumn, final boolean tableColumnIsNullable) {
+        return true;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * All values of {@code @Column(nullable)} should match table column's nullability.
+     */
+    protected void _MatchToColumnNullable_AllEntityMappingOptional() {
+        final var managedType = applyEntityManagerFactory(em -> {
+            return em.getMetamodel().managedType(entityClass);
+        });
+        managedType.getAttributes().forEach(a -> {
+            final var entityMember = a.getJavaMember();
+            final Column entityColumn;
+            if (entityMember instanceof Field field) {
+                entityColumn = field.getAnnotation(Column.class);
+            } else if (entityMember instanceof Method method) {
+                entityColumn = method.getAnnotation(Column.class);
+            } else {
+                throw new RuntimeException("unknown entity member type: " + entityMember);
+            }
+            if (entityColumn == null) {
+                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
+                return;
+            }
+            final var entityColumnNullable = entityColumn.nullable();
+            {
+                final var entityMapping = ((AccessibleObject) entityMember).getAnnotation(Basic.class);
+                if (entityMapping == null) {
+                    return;
+                }
+                if (!_MatchToColumnNullable_AllEntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                    return;
+                }
+                assertThat(entityMapping.optional())
+                        .as("@Basic#optional of %s against %s", entityMember, entityColumn)
+                        .isEqualTo(entityColumnNullable);
+            }
+            {
+                final var entityMapping = ((AccessibleObject) entityMember).getAnnotation(OneToOne.class);
+                if (entityMapping == null) {
+                    return;
+                }
+                if (!_MatchToColumnNullable_AllEntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                    return;
+                }
+                assertThat(entityMapping.optional())
+                        .as("@OneToOne#optional of %s against %s", entityMember, entityColumn)
+                        .isEqualTo(entityColumnNullable);
+            }
+            {
+                final var entityMapping = ((AccessibleObject) entityMember).getAnnotation(ManyToOne.class);
+                if (entityMapping == null) {
+                    return;
+                }
+                if (!_MatchToColumnNullable_AllEntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                    return;
+                }
+                assertThat(entityMapping.optional())
+                        .as("@ManyToOne#optional of %s against %s", entityMember, entityColumn)
+                        .isEqualTo(entityColumnNullable);
+            }
+        });
+    }
+
+    protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
+            final Member entityMember, final Column entityColum, final Basic entityMapping) {
+        return true;
+    }
+
+    protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
+            final Member entityMember, final Column entityColum, final OneToOne entityMapping) {
+        return true;
+    }
+
+    protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
+            final Member entityMember, final Column entityColum, final ManyToOne entityMapping) {
         return true;
     }
 
