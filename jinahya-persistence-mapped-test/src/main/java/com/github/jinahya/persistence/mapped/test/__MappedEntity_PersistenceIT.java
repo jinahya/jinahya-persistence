@@ -32,6 +32,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,12 +46,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.extractProperty;
 
 @AddBeanClasses({
         __PersistenceProducer.class
@@ -270,8 +271,10 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * All values of {@code @Column(nullable)} should match table column's nullability.
+     * All values of either {@code @Basic(optional)}, {@code @OneToOne(optional)}, or {@code @ManyToOne(optional)}
+     * should match {@code @Column(nullabl)}.
      */
+    @DisplayName("@Basic, @OneToOne, and @ManyToOne's optional should match @Column(nullable)")
     protected void _MatchToColumnNullable_AllEntityMappingOptional() {
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
@@ -342,6 +345,102 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
 
     protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
             final Member entityMember, final Column entityColum, final ManyToOne entityMapping) {
+        return true;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * All attributes of {@code @Column(nullable)} should not be annotated with {@link NotNull}.
+     */
+    @DisplayName("@Column(nullable = true) should not have @NotNull")
+    protected void _ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable() {
+        final var managedType = applyEntityManagerFactory(em -> {
+            return em.getMetamodel().managedType(entityClass);
+        });
+        managedType.getAttributes().forEach(a -> {
+            final var entityMember = a.getJavaMember();
+            final Column entityColumn;
+            if (entityMember instanceof Field field) {
+                entityColumn = field.getAnnotation(Column.class);
+            } else if (entityMember instanceof Method method) {
+                entityColumn = method.getAnnotation(Column.class);
+            } else {
+                throw new RuntimeException("unknown entity member type: " + entityMember);
+            }
+            if (entityColumn == null) {
+                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
+                return;
+            }
+            if (!entityColumn.nullable()) {
+                return;
+            }
+            final var notNull = ((AccessibleObject) entityMember).getAnnotation(NotNull.class);
+            if (notNull == null) {
+                return;
+            }
+            if (!_ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable(entityMember, entityColumn,
+                                                                                  notNull)) {
+                return;
+            }
+            throw new AssertionError(
+                    "entity member " + entityMember + " with + " + entityColumn + " is annotated with @NotNull"
+            );
+        });
+    }
+
+    protected boolean _ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable(
+            final Member entityMember, final Column entityColum, final NotNull notNull) {
+        return true;
+    }
+
+    /**
+     * All attributes of {@code @Column(nullable)} should not be annotated with any {@code NonNull} annotation.
+     */
+    @DisplayName("@Column(nullable = true) should not have @NonNull")
+    protected void _ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable() {
+        final var managedType = applyEntityManagerFactory(em -> {
+            return em.getMetamodel().managedType(entityClass);
+        });
+        managedType.getAttributes().forEach(a -> {
+            final var entityMember = a.getJavaMember();
+            final Column entityColumn;
+            if (entityMember instanceof Field field) {
+                entityColumn = field.getAnnotation(Column.class);
+            } else if (entityMember instanceof Method method) {
+                entityColumn = method.getAnnotation(Column.class);
+            } else {
+                throw new RuntimeException("unknown entity member type: " + entityMember);
+            }
+            if (entityColumn == null) {
+                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
+                return;
+            }
+            if (!entityColumn.nullable()) {
+                return;
+            }
+            final var annotations = ((AccessibleObject) entityMember).getAnnotations();
+            final var nonnull = Arrays.stream(annotations)
+                    .filter(nn -> {
+                        return nn.getClass().getSimpleName().equalsIgnoreCase("nonnull");
+                    })
+                    .findAny()
+                    .orElse(null);
+            if (nonnull == null) {
+                return;
+            }
+            if (!_ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable(entityMember, entityColumn,
+                                                                                     nonnull)) {
+                return;
+            }
+            throw new AssertionError(
+                    "entity member " + entityMember + " with + " + entityColumn + " is annotated with " + nonnull
+            );
+        });
+    }
+
+    protected boolean _ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable(
+            final Member entityMember, final Column entityColum, final Object nonNull) {
         return true;
     }
 
