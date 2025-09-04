@@ -89,11 +89,11 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      */
     protected Collection<String> getDatabaseTableNames() {
         final var databaseTableNames = applyEntityManager(em -> {
-            return ___JakartaPersistenceTestUtils.applyConnectionInTransaction(
+            return ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
                     em,
                     c -> {
                         try {
-                            return ___JavaSqlTestUtils.addAllTableNames(
+                            return ___JavaSql_TestUtils.addAllTableNames(
                                     c,
                                     tableCatalog(),
                                     tableSchema(),
@@ -118,7 +118,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
     protected Collection<String> getPersistenceTableNames() {
         final var persistenceTableNames =
                 applyEntityManagerFactory(
-                        emf -> ___JakartaPersistenceTestUtils.addAllEntityTableNames(
+                        emf -> ___JakartaPersistence_TestUtils.addAllEntityTableNames(
                                 emf,
                                 new TreeSet<>()
                         )

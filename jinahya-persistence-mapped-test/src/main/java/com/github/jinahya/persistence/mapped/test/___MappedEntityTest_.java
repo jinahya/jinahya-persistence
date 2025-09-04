@@ -65,7 +65,7 @@ abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
      *
      * @return a new instance of {@link #entityClass}.
      * @see ___InstantiatorUtils#newInstantiatedInstanceOf(Class)
-     * @see ___JavaLangReflectTestUtils#newInstanceOf(Class)
+     * @see ___JavaLangReflect_TestUtils#newInstanceOf(Class)
      * @see #newEntityInstanceSpy()
      */
     protected ENTITY newEntityInstance() {

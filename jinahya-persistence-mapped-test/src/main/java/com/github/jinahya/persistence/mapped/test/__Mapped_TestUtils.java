@@ -44,7 +44,7 @@ public class __Mapped_TestUtils {
 
     static <MAPPED extends __Mapped> Table getTableAnnotation(@Nonnull final Class<MAPPED> mappedClass) {
         Objects.requireNonNull(mappedClass, "mappedClass is null");
-        return ___JavaLangReflectTestUtils.findAnnotation(mappedClass, Table.class)
+        return ___JavaLangReflect_TestUtils.findAnnotation(mappedClass, Table.class)
                 .orElseThrow(
                         () -> new IllegalArgumentException("unable to get @Table from " + mappedClass)
                 );

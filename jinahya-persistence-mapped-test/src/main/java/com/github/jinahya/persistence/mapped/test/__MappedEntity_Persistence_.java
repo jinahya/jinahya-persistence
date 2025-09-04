@@ -22,12 +22,20 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Startup;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Table;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.AnnotationUtils;
 
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -41,9 +49,34 @@ import java.util.function.Function;
 abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID>
         extends ___MappedEntityTest_<ENTITY, ID> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // -----------------------------------------------------------------------------------------------------------------
     __MappedEntity_Persistence_(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
+        tableName = AnnotationUtils.findAnnotation(entityClass, jakarta.persistence.Table.class, false)
+                .map(Table::name)
+                .filter(v -> !v.isBlank())
+                .orElseThrow();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @PostConstruct
+    protected void doOnPostConstruct() {
+        logger.log(Level.INFO, "getEntityManagerFactory(): {0}", getEntityManagerFactory());
+        getEntityManagerFactory().getProperties().forEach((k, v) -> {
+            logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
+        });
+        tableCatalog = __PersistenceUnit_TestUtils.getDefaultCatalog(getEntityManagerFactory()).orElseThrow();
+        tableSchema = __PersistenceUnit_TestUtils.getDefaultSchema(getEntityManagerFactory()).orElseThrow();
+        tableTypes = __PersistenceUnit_TestUtils
+                .getDefaultTypes(getEntityManagerFactory())
+                .map(List::of)
+                .orElseGet(List::of);
+    }
+
+    // https://stackoverflow.com/a/72628439/330457
+    protected void onStartup(@Observes final Startup startup) {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -73,7 +106,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      */
     protected void __persistEntityInstance(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        ___JakartaValidationTestUtils.requireValid(entityInstance);
+        ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
@@ -164,7 +197,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManager(em -> {
-            return ___JakartaPersistenceTestUtils.applyEntityManagerInTransaction(em, function, rollback);
+            return ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(em, function, rollback);
         });
     }
 
@@ -227,7 +260,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerInTransaction(
-                em -> ___JakartaPersistenceTestUtils.applyConnection(em, function),
+                em -> ___JakartaPersistence_TestUtils.applyConnection(em, function),
                 rollback
         );
     }
@@ -287,4 +320,38 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                 }
         );
     }
+
+    // ------------------------------------------------------------------------------------------------------- tableName
+    protected String getTableName() {
+        return tableName;
+    }
+
+    // ---------------------------------------------------------------------------------------------------- tableCatalog
+    protected String getTableCatalog() {
+        return tableCatalog;
+    }
+
+    // ----------------------------------------------------------------------------------------------------- tableSchema
+    protected String getTableSchema() {
+        return tableSchema;
+    }
+
+    // ------------------------------------------------------------------------------------------------------ tableTypes
+    protected List<String> getTableTypes() {
+        return tableTypes;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The value of {@code @Table(name =)} of the {@link #entityClass}.
+     */
+    private final String tableName;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private String tableCatalog;
+
+    private String tableSchema;
+
+    private List<String> tableTypes;
 }

@@ -85,11 +85,11 @@ abstract class __PersistenceUnit_ {
     })
     protected void printDatabaseInfo__() {
         acceptEntityManager(em -> {
-            ___JakartaPersistenceTestUtils.acceptConnectionInTransaction(
+            ___JakartaPersistence_TestUtils.acceptConnectionInTransaction(
                     em,
                     c -> {
                         try {
-                            ___JavaSqlTestUtils.printDatabaseInfo(c);
+                            ___JavaSql_TestUtils.printDatabaseInfo(c);
                         } catch (final SQLException sqle) {
                             throw new RuntimeException("failed to print database info", sqle);
                         }
@@ -97,7 +97,7 @@ abstract class __PersistenceUnit_ {
             );
         });
         acceptEntityManager(em -> {
-            ___JakartaPersistenceTestUtils.acceptConnectionInTransaction(
+            ___JakartaPersistence_TestUtils.acceptConnectionInTransaction(
                     em,
                     c -> {
                         try {

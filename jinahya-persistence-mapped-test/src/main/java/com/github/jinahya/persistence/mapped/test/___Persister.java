@@ -59,10 +59,10 @@ public abstract class ___Persister<ENTITY> {
     public void persist(@Nonnull final EntityManager entityManager, @Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        ___JakartaValidationTestUtils.requireValid(entityInstance);
+        ___JakartaValidation_TestUtils.requireValid(entityInstance);
         entityManager.persist(entityInstance);
         entityManager.flush(); // required?
-        ___JakartaValidationTestUtils.requireValid(entityInstance);
+        ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

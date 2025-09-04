@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -122,33 +123,42 @@ public class __Database_TestUtils {
 
     public static final class MySQL {
 
-        public void SHOW_PRIVILEGES(@Nonnull final Connection connection,
-                                    @Nonnull final Consumer<? super ResultSet> consumer)
+        public void SHOW_GRANTS(@Nonnull final Connection connection,
+                                @Nonnull final Consumer<? super ResultSet> consumer)
                 throws SQLException {
             Objects.requireNonNull(connection, "connection is null");
             Objects.requireNonNull(consumer, "consumer is null");
             try (var statement = connection.createStatement()) {
-                try (var resultSet = statement.executeQuery("SHOW PRIVILEGS")) {
+                try (var resultSet = statement.executeQuery("SHOW GRANTS")) {
                     consumer.accept(resultSet);
                 }
             }
         }
 
-        public List<String> SHOW_PRIVILEGES(@Nonnull final Connection connection) throws SQLException {
-            final var privileges = new ArrayList<String>();
-            SHOW_PRIVILEGES(
+        public <C extends Collection<String>> C SHOW_GRANTS(@Nonnull final Connection connection,
+                                                            @Nonnull final C collection
+        ) throws SQLException {
+            Objects.requireNonNull(collection, "collection is null");
+            SHOW_GRANTS(
                     connection,
-                    r -> {
+                    (Consumer<? super ResultSet>) r -> {
                         try {
                             while (r.next()) {
-                                privileges.add(r.getString("PRIVILEGE"));
+                                collection.add(r.getString(1));
                             }
                         } catch (final SQLException sqle) {
                             throw new RuntimeException(sqle);
                         }
                     }
             );
-            return privileges;
+            return collection;
+        }
+
+        public List<String> SHOW_GRANTS(@Nonnull final Connection connection) throws SQLException {
+            return SHOW_GRANTS(
+                    connection,
+                    new ArrayList<>()
+            );
         }
     }
 

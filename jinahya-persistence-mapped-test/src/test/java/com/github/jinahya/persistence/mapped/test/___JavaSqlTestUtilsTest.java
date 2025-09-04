@@ -61,14 +61,14 @@ class ___JavaSqlTestUtilsTest {
                 final var resultSet = mock(ResultSet.class);
                 final var removableTableNames = new ArrayList<>(tableNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableTableNames.isEmpty());
-                when(resultSet.getString(___JavaSqlTestUtils.COLUMN_LABEL_TABLE_NAME))
+                when(resultSet.getString(___JavaSql_TestUtils.COLUMN_LABEL_TABLE_NAME))
                         .thenAnswer((Answer<String>) i -> removableTableNames.removeFirst());
                 when(databaseMetaData.getTables(catalog, schema, null, null)).thenReturn(resultSet);
             }
             @SuppressWarnings("unchecked")
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
-            ___JavaSqlTestUtils.acceptEachTableName(
+            ___JavaSql_TestUtils.acceptEachTableName(
                     connection,
                     catalog,
                     schema,
@@ -99,12 +99,12 @@ class ___JavaSqlTestUtilsTest {
                 final var resultSet = mock(ResultSet.class);
                 final var removableTableNames = new ArrayList<>(tableNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableTableNames.isEmpty());
-                when(resultSet.getString(___JavaSqlTestUtils.COLUMN_LABEL_TABLE_NAME))
+                when(resultSet.getString(___JavaSql_TestUtils.COLUMN_LABEL_TABLE_NAME))
                         .thenAnswer((Answer<String>) i -> removableTableNames.removeFirst());
                 when(databaseMetaData.getTables(catalog, schema, null, null)).thenReturn(resultSet);
             }
             // ---------------------------------------------------------------------------------------------------- when
-            final var collection = ___JavaSqlTestUtils.addAllTableNames(
+            final var collection = ___JavaSql_TestUtils.addAllTableNames(
                     connection,
                     catalog,
                     schema,
@@ -134,14 +134,14 @@ class ___JavaSqlTestUtilsTest {
                 final var resultSet = mock(ResultSet.class);
                 final var removableColumnNames = new ArrayList<>(columnNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableColumnNames.isEmpty());
-                when(resultSet.getString(___JavaSqlTestUtils.COLUMN_LABEL_COLUMN_NAME))
+                when(resultSet.getString(___JavaSql_TestUtils.COLUMN_LABEL_COLUMN_NAME))
                         .thenAnswer((Answer<String>) i -> removableColumnNames.removeFirst());
                 when(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")).thenReturn(resultSet);
             }
             @SuppressWarnings("unchecked")
             final var consumer = (Consumer<? super String>) mock(Consumer.class);
             // ---------------------------------------------------------------------------------------------------- when
-            ___JavaSqlTestUtils.acceptEachColumnName(
+            ___JavaSql_TestUtils.acceptEachColumnName(
                     connection,
                     catalog,
                     schemaPattern,
@@ -175,12 +175,12 @@ class ___JavaSqlTestUtilsTest {
                 final var removableColumnNames = new ArrayList<>(columnNames);
                 when(resultSet.next()).thenAnswer((Answer<Boolean>) i -> !removableColumnNames.isEmpty());
                 when(resultSet.getString(
-                        ___JavaSqlTestUtils.COLUMN_LABEL_COLUMN_NAME))
+                        ___JavaSql_TestUtils.COLUMN_LABEL_COLUMN_NAME))
                         .thenAnswer((Answer<String>) i -> removableColumnNames.removeFirst());
                 when(databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")).thenReturn(resultSet);
             }
             // ---------------------------------------------------------------------------------------------------- when
-            final var collection = ___JavaSqlTestUtils.addAllColumnNames(
+            final var collection = ___JavaSql_TestUtils.addAllColumnNames(
                     connection,
                     catalog,
                     schemaPattern,
