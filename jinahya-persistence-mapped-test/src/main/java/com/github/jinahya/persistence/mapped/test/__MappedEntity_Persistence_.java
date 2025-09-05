@@ -23,13 +23,14 @@ package com.github.jinahya.persistence.mapped.test;
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Table;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.AnnotationUtils;
 
 import java.lang.System.Logger.Level;
@@ -63,7 +64,6 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
-        logger.log(Level.INFO, "getEntityManagerFactory(): {0}", getEntityManagerFactory());
         getEntityManagerFactory().getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
         });
@@ -73,10 +73,22 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                 .getDefaultTypes(getEntityManagerFactory())
                 .map(List::of)
                 .orElseGet(List::of);
+        entityManager = getEntityManagerFactory().createEntityManager();
+        logger.log(Level.DEBUG, "created: {0}", entityManager);
     }
 
     // https://stackoverflow.com/a/72628439/330457
     protected void onStartup(@Observes final Startup startup) {
+    }
+
+    @PreDestroy
+    protected void onPreDestroy() {
+        logger.log(Level.DEBUG, "closing {0}", entityManager);
+        entityManager.close();
+    }
+
+    // https://stackoverflow.com/a/72628439/330457
+    protected void onShutdown(@Observes final Shutdown shutdown) {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -170,6 +182,9 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      */
     protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
+        if (true) {
+            return function.apply(entityManager);
+        }
         return applyEntityManagerFactory(emf -> {
             try (final var entityManager = emf.createEntityManager()) {
                 return function.apply(entityManager);
@@ -354,4 +369,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     private String tableSchema;
 
     private List<String> tableTypes;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private EntityManager entityManager;
 }
