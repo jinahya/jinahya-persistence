@@ -39,7 +39,7 @@ public final class ___InstantiatorUtils {
     // -----------------------------------------------------------------------------------------------------------------
     private static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                ___JavaLangTestUtils.siblingClassForPostfix(
+                ___JavaLang_TestUtils.siblingClassForPostfix(
                         type,
                         ___Instantiator.class,
                         "Instantiator",

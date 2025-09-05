@@ -40,7 +40,7 @@ public final class ___PersisterUtils {
 
     static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> type) {
         return Optional.ofNullable(
-                ___JavaLangTestUtils.siblingClassForPostfix(
+                ___JavaLang_TestUtils.siblingClassForPostfix(
                         type,
                         __MappedEntity_Persister.class,
                         "Persister",

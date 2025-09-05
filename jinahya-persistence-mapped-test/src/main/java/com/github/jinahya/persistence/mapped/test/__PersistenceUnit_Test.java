@@ -20,6 +20,9 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManagerFactory;
+
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -46,4 +49,16 @@ public abstract class __PersistenceUnit_Test extends __PersistenceUnit_ {
     protected __PersistenceUnit_Test() {
         super();
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    final EntityManagerFactory getEntityManagerFactory() {
+
+        return entityManagerFactory;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @__PersistenceProducer.__testPU
+    @Inject
+    private EntityManagerFactory entityManagerFactory;
 }

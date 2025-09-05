@@ -28,7 +28,10 @@ import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -39,7 +42,7 @@ import java.util.function.Consumer;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JavaSqlTestUtils {
+final class ___JavaSql_TestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -47,6 +50,10 @@ final class ___JavaSqlTestUtils {
     static final String COLUMN_LABEL_TABLE_NAME = "TABLE_NAME";
 
     static final String COLUMN_LABEL_COLUMN_NAME = "COLUMN_NAME";
+
+    static final String COLUMN_LABEL_IS_NULLABLE = "IS_NULLABLE";
+
+    static final String COLUMN_VALUE_IS_NULLABLE_YES = "YES";
 
     static void acceptEachTableName(@Nonnull final Connection connection,
                                     @Nonnull final String catalog, @Nonnull final String schema,
@@ -111,6 +118,58 @@ final class ___JavaSqlTestUtils {
         }
     }
 
+    static void acceptEachColumnNameAndIsNullable(
+            @Nonnull final Connection connection,
+            @Nullable final String catalog, @Nullable final String schemaPattern,
+            @Nonnull final String tableNamePattern,
+            @Nonnull final BiConsumer<? super String, ? super Boolean> consumer) {
+        Objects.requireNonNull(connection, "connection is null");
+        Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        final var columnNamePattern = "%";
+        try (var resultSet = connection.getMetaData().getColumns(
+                catalog,
+                schemaPattern,
+                tableNamePattern,
+                columnNamePattern
+        )) {
+            while (resultSet.next()) {
+                final var columnName = resultSet.getString(COLUMN_LABEL_COLUMN_NAME);
+                final var isNullable = resultSet.getString(COLUMN_LABEL_IS_NULLABLE);
+                consumer.accept(
+                        columnName,
+                        Objects.equals(isNullable, COLUMN_VALUE_IS_NULLABLE_YES)
+                );
+            }
+        } catch (final SQLException sqle) {
+            throw new RuntimeException(
+                    "failed to get columns" +
+                    "; catalog: " + catalog +
+                    "; schemaPattern: " + schemaPattern +
+                    "; tableNamePattern: " + tableNamePattern,
+                    sqle
+            );
+        }
+    }
+
+    static Map<String, Boolean> getColumnNameAndIsNullable(
+            @Nonnull final Connection connection,
+            @Nullable final String catalog, @Nullable final String schemaPattern,
+            @Nonnull final String tableNamePattern) {
+        Objects.requireNonNull(connection, "connection is null");
+        Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
+        final var map = new HashMap<String, Boolean>();
+        acceptEachColumnNameAndIsNullable(
+                connection,
+                catalog,
+                schemaPattern,
+                tableNamePattern,
+                map::put
+        );
+        return map;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     static <C extends Collection<? super String>>
     C addAllColumnNames(@Nonnull final Connection connection, @Nullable final String catalog,
                         @Nullable final String schemaPattern, @Nonnull final String tableNamePattern,
@@ -141,6 +200,9 @@ final class ___JavaSqlTestUtils {
                         final var schema = schemas.getString("TABLE_SCHEM");
                         logger.log(Level.INFO, "\tTABLE_SCHEM: {0}", schema);
                     }
+                } catch (final SQLException sqle) {
+                    // https://bugs.mysql.com/bug.php?id=118938
+                    sqle.printStackTrace(System.err);
                 }
             }
         }
@@ -154,7 +216,7 @@ final class ___JavaSqlTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JavaSqlTestUtils() {
+    private ___JavaSql_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

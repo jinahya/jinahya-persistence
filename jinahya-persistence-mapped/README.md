@@ -1,27 +1,7 @@
 # jinahya-persistence-mapped
 
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-mapped)
+[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-mapped/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-mapped)
+
+
 A module for defining mapped superclasses (and/or may be entities).
-
-## Motivation
-
-## Defining mapped superclasses for extension
-
-```java
-
-@jakarta.persistence.MappedSuperclass
-abstract class _MappedEntityWithIdentity<SELF extends _MappedEntity<SELF>>
-        extends com.github.jinahya.persistence.mapped.__MappedEntity<SELF, Long> {
-
-    @jakarta.persistence.Id
-    @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
-}
-```
-
-```java
-@jakarta.persistence.Entity
-@jakarta.persistence.Table(name = "MY_ENTITY")
-class MyEntity extends _MappedEntity<MyEntity> {
-
-}
-```

@@ -50,7 +50,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * A class for testing {@link ___JakartaPersistenceTestUtils}.
+ * A class for testing {@link ___JakartaPersistence_TestUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -82,7 +82,7 @@ class ___JakartaPersistenceTestUtilsTest {
                     }
             );
             // ---------------------------------------------------------------------------------------------------- when
-            ___JakartaPersistenceTestUtils.acceptEachAttributeName(managedType, consumer);
+            ___JakartaPersistence_TestUtils.acceptEachAttributeName(managedType, consumer);
             // ---------------------------------------------------------------------------------------------------- then
             final var captor = ArgumentCaptor.forClass(String.class);
             verify(consumer, times(attributes.size())).accept(captor.capture());
@@ -110,7 +110,7 @@ class ___JakartaPersistenceTestUtilsTest {
             when(managedType.getAttributes()).thenReturn(attributes);
             final var collection = mock(Collection.class);
             // ---------------------------------------------------------------------------------------------------- when
-            final var result = ___JakartaPersistenceTestUtils.addAllAttributeNames(managedType, collection);
+            final var result = ___JakartaPersistence_TestUtils.addAllAttributeNames(managedType, collection);
             // ---------------------------------------------------------------------------------------------------- then
             final var captor = ArgumentCaptor.forClass(String.class);
             verify(collection, times(attributes.size())).add(captor.capture());
@@ -131,7 +131,7 @@ class ___JakartaPersistenceTestUtilsTest {
             when(entityManager.isJoinedToTransaction()).thenReturn(true);
             // ----------------------------------------------------------------------------------------------- when/then
             assertThatThrownBy(() -> {
-                ___JakartaPersistenceTestUtils.applyEntityManagerInTransaction(
+                ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                         entityManager,
                         e -> {
                             return null;
@@ -159,7 +159,7 @@ class ___JakartaPersistenceTestUtilsTest {
             );
             final var rollback = ThreadLocalRandom.current().nextBoolean();
             // ---------------------------------------------------------------------------------------------------- when
-            final var actual = ___JakartaPersistenceTestUtils.applyEntityManagerInTransaction(
+            final var actual = ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                     entityManager,
                     function,
                     rollback
@@ -193,7 +193,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var rollback = ThreadLocalRandom.current().nextBoolean();
             // ---------------------------------------------------------------------------------------------------- when
             assertThatThrownBy(() -> {
-                ___JakartaPersistenceTestUtils.applyEntityManagerInTransaction(
+                ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                         entityManager,
                         function,
                         rollback
@@ -226,14 +226,14 @@ class ___JakartaPersistenceTestUtilsTest {
             );
             final var rollback = ThreadLocalRandom.current().nextBoolean();
             // ---------------------------------------------------------------------------------------------------- when
-            try (var mocked = mockStatic(___JakartaPersistenceTestUtils.class, Mockito.CALLS_REAL_METHODS)) {
-                ___JakartaPersistenceTestUtils.acceptEntityManagerInTransaction(
+            try (var mocked = mockStatic(___JakartaPersistence_TestUtils.class, Mockito.CALLS_REAL_METHODS)) {
+                ___JakartaPersistence_TestUtils.acceptEntityManagerInTransaction(
                         entityManager,
                         consumer,
                         rollback
                 );
                 // ---------------------------------------------------------------------------------------------------- then
-                mocked.verify(() -> ___JakartaPersistenceTestUtils.applyEntityManagerInTransaction(
+                mocked.verify(() -> ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                         same(entityManager),
                         ArgumentMatchers.<Function<EntityManager, Object>>notNull(),
                         same(rollback)

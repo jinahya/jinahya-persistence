@@ -34,7 +34,7 @@ import java.util.Objects;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JavaLangTestUtils {
+final class ___JavaLang_TestUtils {
 
     /**
      * Finds a sibling class of the specified type, which (optionally) extends the specified supertype and has any of
@@ -73,7 +73,7 @@ final class ___JavaLangTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JavaLangTestUtils() {
+    private ___JavaLang_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

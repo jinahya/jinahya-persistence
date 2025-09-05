@@ -40,7 +40,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JakartaValidationTestUtils {
+final class ___JakartaValidation_TestUtils {
 
     private static <T> T requireNonNullObject(final T object) {
         return Objects.requireNonNull(object, "object is null");
@@ -152,7 +152,7 @@ final class ___JakartaValidationTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JakartaValidationTestUtils() {
+    private ___JakartaValidation_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

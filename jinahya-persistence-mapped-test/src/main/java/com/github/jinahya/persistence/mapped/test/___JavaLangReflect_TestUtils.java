@@ -37,7 +37,7 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JavaLangReflectTestUtils {
+final class ___JavaLangReflect_TestUtils {
 
     private static final Method AUTO_CLOSEABLE_CLOSE_METHOD;
 
@@ -149,7 +149,7 @@ final class ___JavaLangReflectTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JavaLangReflectTestUtils() {
+    private ___JavaLangReflect_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

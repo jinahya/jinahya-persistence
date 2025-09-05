@@ -39,7 +39,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class ___JavaBeansTestUtils {
+public final class ___JavaBeans_TestUtils {
 
     public static <R> R applyPropertyDescriptors(@Nonnull final Class<?> clazz,
                                                  final Function<? super PropertyDescriptor[], ? extends R> function) {
@@ -72,7 +72,7 @@ public final class ___JavaBeansTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private ___JavaBeansTestUtils() {
+    private ___JavaBeans_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -24,7 +24,6 @@ import com.github.jinahya.persistence.mapped.test.__MappedEntity_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.Test;
 
 class UserWithEmbeddedId_Test extends __MappedEntity_Test<UserWithEmbeddedId, IdForUserWithEmbeddedId> {
 
@@ -33,12 +32,6 @@ class UserWithEmbeddedId_Test extends __MappedEntity_Test<UserWithEmbeddedId, Id
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void equals_Verify_() {
-        super.equals_Verify_();
-    }
-
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equals_Verify_Create() {

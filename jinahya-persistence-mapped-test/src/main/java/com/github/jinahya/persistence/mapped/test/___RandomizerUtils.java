@@ -40,7 +40,7 @@ public final class ___RandomizerUtils {
     @Nonnull
     private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> type) {
         return Optional.ofNullable(
-                ___JavaLangTestUtils.siblingClassForPostfix(
+                ___JavaLang_TestUtils.siblingClassForPostfix(
                         type,
                         ___Randomizer.class,
                         "Randomizer",

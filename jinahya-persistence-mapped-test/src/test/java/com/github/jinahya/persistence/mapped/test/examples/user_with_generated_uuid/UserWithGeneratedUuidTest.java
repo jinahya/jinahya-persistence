@@ -13,12 +13,6 @@ class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuid_Test<Use
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void equals_Verify_() {
-        super.equals_Verify_();
-    }
-
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equals_Verify_Create() {

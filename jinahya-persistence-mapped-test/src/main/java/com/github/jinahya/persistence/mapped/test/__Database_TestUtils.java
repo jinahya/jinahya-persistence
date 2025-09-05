@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -41,9 +42,9 @@ import java.util.function.Consumer;
         "java:S125", // Sections of code should not be commented out
         "java:S6905" // SQL queries should retrieve only necessary fields
 })
-public class __DatabaseTestUtils {
+public final class __Database_TestUtils {
 
-    public static class Oracle {
+    public static final class Oracle {
 
         /**
          * .
@@ -120,8 +121,49 @@ public class __DatabaseTestUtils {
         }
     }
 
+    public static final class MySQL {
+
+        public static void SHOW_GRANTS(@Nonnull final Connection connection,
+                                       @Nonnull final Consumer<? super ResultSet> consumer)
+                throws SQLException {
+            Objects.requireNonNull(connection, "connection is null");
+            Objects.requireNonNull(consumer, "consumer is null");
+            try (var statement = connection.createStatement()) {
+                try (var resultSet = statement.executeQuery("SHOW GRANTS")) {
+                    consumer.accept(resultSet);
+                }
+            }
+        }
+
+        public static <C extends Collection<String>> C SHOW_GRANTS(@Nonnull final Connection connection,
+                                                                   @Nonnull final C collection
+        ) throws SQLException {
+            Objects.requireNonNull(collection, "collection is null");
+            SHOW_GRANTS(
+                    connection,
+                    (Consumer<? super ResultSet>) r -> {
+                        try {
+                            while (r.next()) {
+                                collection.add(r.getString(1));
+                            }
+                        } catch (final SQLException sqle) {
+                            throw new RuntimeException(sqle);
+                        }
+                    }
+            );
+            return collection;
+        }
+
+        public static List<String> SHOW_GRANTS(@Nonnull final Connection connection) throws SQLException {
+            return SHOW_GRANTS(
+                    connection,
+                    new ArrayList<>()
+            );
+        }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
-    private __DatabaseTestUtils() {
+    private __Database_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

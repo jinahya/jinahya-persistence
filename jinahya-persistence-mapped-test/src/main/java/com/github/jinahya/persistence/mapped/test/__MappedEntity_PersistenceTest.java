@@ -25,15 +25,9 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 @AddBeanClasses({
         __PersistenceProducer.class
@@ -60,34 +54,6 @@ public abstract class __MappedEntity_PersistenceTest<ENTITY extends __MappedEnti
      */
     protected __MappedEntity_PersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // TODO: remove or relocate
-    @Disabled
-    @DisplayName("__HibernateTestUtils")
-    @Nested
-    class __HibernateTestUtilsTest {
-
-        @DisplayName("getEntityColumnNames(entityManagerFactory, entityClass)")
-        @Test
-        @SuppressWarnings({
-                "java:S100", // Method names should comply with a naming convention
-                "java:S125"  // Sections of code should not be commented out
-        })
-        void getEntityColumnNames__() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-            final var m = ____HibernateTestUtils.class.getDeclaredMethod(
-                    "getEntityColumnNames",
-                    EntityManagerFactory.class,
-                    Class.class
-            );
-            m.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            final var columnNames = (List<String>) m.invoke(null, getEntityManagerFactory(), entityClass);
-            for (final var columnName : columnNames) {
-                logger.log(System.Logger.Level.DEBUG, "column name: " + columnName);
-            }
-        }
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
