@@ -19,4 +19,5 @@ https://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
 
 ### bugs.mysql.com
 
-* [DatabaseMetaDataInformationSchema#getSchemas has a bug](https://bugs.mysql.com/bug.php?id=118938)
+* [Bug #118938 / DatabaseMetaDataInformationSchema#getSchemas has a bug](https://bugs.mysql.com/bug.php?id=118938)
+* [Bug #117620 / NumberFormatException in JDBC](https://bugs.mysql.com/bug.php?id=117620)
