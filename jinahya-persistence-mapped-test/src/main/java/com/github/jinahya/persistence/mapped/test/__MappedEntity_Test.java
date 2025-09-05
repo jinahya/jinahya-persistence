@@ -25,7 +25,6 @@ import jakarta.annotation.Nonnull;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -42,8 +41,6 @@ import java.util.Optional;
         "java:S5960" // Assertions should not be used in production code
 })
 public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID> extends __Mapped_Test<ENTITY> {
-
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -68,7 +65,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      * @return a new instance of {@link #idClass}.
      */
     @Nonnull
-    protected ID newIdInstance() {
+    protected final ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
                 .orElseGet(() -> ReflectionUtils.newInstance(idClass))
                 ;
@@ -80,7 +77,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      * @return a spy object of a new instance of {@link #newIdInstance()}.
      */
     @Nonnull
-    protected ID newIdInstanceSpy() {
+    protected final ID newIdInstanceSpy() {
         return Mockito.spy(newIdInstance());
     }
 
@@ -90,7 +87,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      * @return a new randomized instance of {@link #idClass}; {@link Optional#empty() empty} when no randomizer found.
      */
     @Nonnull
-    protected Optional<ID> newRandomizedIdInstance() {
+    protected final Optional<ID> newRandomizedIdInstance() {
         return ___RandomizerUtils.newRandomizedInstanceOf(idClass);
     }
 
@@ -101,7 +98,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      *         randomizer found.
      */
     @Nonnull
-    protected Optional<ID> newRandomizedIdInstanceSpy() {
+    protected final Optional<ID> newRandomizedIdInstanceSpy() {
         return newRandomizedIdInstance().map(Mockito::spy);
     }
 
