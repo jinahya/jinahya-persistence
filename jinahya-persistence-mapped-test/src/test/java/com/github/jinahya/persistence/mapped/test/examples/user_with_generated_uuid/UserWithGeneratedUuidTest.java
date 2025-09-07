@@ -4,7 +4,6 @@ import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedUui
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
-import org.junit.jupiter.api.Test;
 
 class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuid_Test<UserWithGeneratedUuid> {
 
@@ -15,15 +14,9 @@ class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuid_Test<Use
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equals_Verify_Create() {
-        return super.equals_Verify_Create();
-    }
-
-    @Nonnull
-    @Override
-    protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equals_Verify_Configure(
+    protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equalsVerifier) {
-        return super.equals_Verify_Configure(equalsVerifier)
+        return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.SURROGATE_KEY)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 ;

@@ -34,9 +34,9 @@ public class Entity02Test extends _MappedEntity_Test<Entity02, Long> {
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<Entity02> equals_Verify_Configure(
+    protected SingleTypeEqualsVerifierApi<Entity02> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<Entity02> equalsVerifier) {
-        return super.equals_Verify_Configure(equalsVerifier)
+        return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.IDENTICAL_COPY_FOR_VERSIONED_ENTITY)
                 .suppress(Warning.SURROGATE_KEY);
     }
