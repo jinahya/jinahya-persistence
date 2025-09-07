@@ -129,8 +129,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
 
     /**
      * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #mappedClass} using an
-     * equals-verifier created via {@link #equals_Verify_Create()}, and configured with
-     * {@link #equals_Verify_(SingleTypeEqualsVerifierApi)} method.
+     * equals-verifier configured with {@link #equals_Verify_(SingleTypeEqualsVerifierApi)} method.
      *
      * @implNote This method is not annotated with the {@link Test} annotation. Override this method, and put
      *         {@link Test} to verify the {@link #equals(Object)} method (and {@link #hashCode()} method) of the
