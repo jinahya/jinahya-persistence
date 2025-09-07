@@ -88,7 +88,7 @@
       <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
-<!--      <property name="jakarta.persistence.schema-generation.database.action" value="none"/>-->
+      <!--      <property name="jakarta.persistence.schema-generation.database.action" value="none"/>-->
       <!-- eclipselink -->
       <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
       <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
