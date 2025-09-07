@@ -130,13 +130,12 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     /**
      * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #mappedClass} using an
      * equals-verifier created via {@link #equals_Verify_Create()}, and configured with
-     * {@link #equals_Verify_Configure(SingleTypeEqualsVerifierApi)} method.
+     * {@link #equals_Verify_(SingleTypeEqualsVerifierApi)} method.
      *
      * @implNote This method is not annotated with the {@link Test} annotation. Override this method, and put
      *         {@link Test} to verify the {@link #equals(Object)} method (and {@link #hashCode()} method) of the
      *         {@link #mappedClass}
-     * @see #equals_Verify_Create()
-     * @see #equals_Verify_Configure(SingleTypeEqualsVerifierApi)
+     * @see #equals_Verify_(SingleTypeEqualsVerifierApi)
      */
     @DisplayName("equals/hashCode")
     protected final void equals_Verify_() {
@@ -147,19 +146,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
                     .as("%s on %s", __Disable_Equals_Test.class, clazz)
                     .isEmpty();
         }
-        final var equalsVerifier = Objects.requireNonNull(equals_Verify_Create(), "null equalsVerifier created");
-        equals_Verify_Configure(equalsVerifier);
-        equalsVerifier.verify();
-    }
-
-    /**
-     * Creates a new equals verifier for {@link #mappedClass}.
-     *
-     * @return a new equals verifier for {@link #mappedClass}.
-     */
-    @Nonnull
-    protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_Create() {
-        return EqualsVerifier.forClass(mappedClass);
+        equals_Verify_(EqualsVerifier.forClass(mappedClass)).verify();
     }
 
     /**
@@ -170,7 +157,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see #equals_Verify_()
      */
     @Nonnull
-    protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_Configure(
+    protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<MAPPED> equalsVerifier) {
         return equalsVerifier
                 ;
