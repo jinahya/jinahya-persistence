@@ -44,9 +44,10 @@ import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.mockito.Mockito.spy;
 
 /**
- * A class for testing a specific subclass of {@link __Mapped} class.
+ * An abstract class for testing a specific subclass of {@link __Mapped} class.
  *
  * @param <MAPPED> target type parameter
+ * @see __Mapped_Randomizer
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
@@ -74,7 +75,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     // -------------------------------------------------------------------------------------------------------- toString
 
     /**
-     * Verifies that the result of {@link Object#toString() mappedInstance.toString()} is not blank.
+     * Verifies that the result of {@link Object#toString() toString()} is not blank.
      *
      * @param mappedInstance the instance to test.
      * @see #toString_NotBlank_newMappedInstance()
@@ -97,7 +98,8 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     }
 
     /**
-     * Invokes {@link #toString_NotBlank_(__Mapped)} method with a new instance of {@link #mappedClass}.
+     * Verifies that the result of {@link Object#toString() toString()} of an instance from the
+     * {@link #newMappedInstance()} is not blank.
      *
      * @see #newMappedInstance()
      * @see #toString_NotBlank_(__Mapped)
@@ -110,7 +112,8 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     }
 
     /**
-     * Invokes {@link #toString_NotBlank_(__Mapped)} method with a new randomized instance of {@link #mappedClass}.
+     * Verifies that the result of {@link Object#toString() toString()} of an instance from the
+     * {@link #newRandomizedMappedInstance()} is not blank.
      *
      * @see #newRandomizedMappedInstance()
      * @see #toString_NotBlank_(__Mapped)
