@@ -67,10 +67,10 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
         getEntityManagerFactory().getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
         });
-        tableCatalog = __PersistenceUnit_TestUtils.getDefaultCatalog(getEntityManagerFactory()).orElseThrow();
-        tableSchema = __PersistenceUnit_TestUtils.getDefaultSchema(getEntityManagerFactory()).orElseThrow();
+        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElseThrow();
+        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElseThrow();
         tableTypes = __PersistenceUnit_TestUtils
-                .getDefaultTypes(getEntityManagerFactory())
+                .getJinahyaTableTypes(getEntityManagerFactory())
                 .map(List::of)
                 .orElseGet(List::of);
         entityManager = getEntityManagerFactory().createEntityManager();

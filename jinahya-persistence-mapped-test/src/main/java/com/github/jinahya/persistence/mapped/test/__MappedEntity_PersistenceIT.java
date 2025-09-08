@@ -110,9 +110,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     // -----------------------------------------------------------------------------------------------------------------
     protected Collection<String> getTableColumnNames() {
         final var table = __MappedEntity_TestUtils.getTableAnnotation(entityClass);
-        final var catalog = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getDefaultCatalog)
+        final var catalog = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableCatalog)
                 .orElseGet(table::catalog);
-        final var schema = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getDefaultSchema)
+        final var schema = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = applyConnectionInTransactionAndRollback(
                 c -> ___JavaSql_TestUtils.addAllColumnNames(
