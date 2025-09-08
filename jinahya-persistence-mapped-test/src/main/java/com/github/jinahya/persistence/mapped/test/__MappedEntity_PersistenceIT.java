@@ -37,7 +37,9 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.System.Logger.Level;
@@ -53,6 +55,7 @@ import java.util.Collections;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 @AddBeanClasses({
         __PersistenceProducer.class
@@ -158,8 +161,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see #_Mapped_AllTableColumnNames(Collection)
      */
     @DisplayName("check that all table columns are mapped")
-//    @Test
-    protected void _Mapped_AllTableColumnNames() {
+    @Test
+    final void _Mapped_AllTableColumnNames() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_TableColumnNames_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_TableColumnNames_Test.class, clazz)
+                    .isEmpty();
+        }
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = getTableColumnNames();
         final var attributeColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
@@ -193,8 +205,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see #_Empty_AllEntityColumnNames(Collection)
      */
     @DisplayName("check that all entity columns are known")
-//    @Test
-    protected void _Known_AllEntityColumnNames() {
+    @Test
+    void _Known_AllEntityColumnNames() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_EnittyColumnNames_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_EnittyColumnNames_Test.class, clazz)
+                    .isEmpty();
+        }
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
         final var entityColumnNames = getEntityColumnNames();
@@ -224,7 +245,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     /**
      * All values of {@code @Column(nullable)} should match table column's nullability.
      */
-    protected void _MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable() {
+    @Test
+    void _MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_NullabilityCheck_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_NullabilityCheck_Test.class, clazz)
+                    .isEmpty();
+        }
         final var tableColumnNamesAndIsNullables = applyConnectionInTransactionAndRollback(
                 c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
                         c,
@@ -276,7 +307,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * should match {@code @Column(nullabl)}.
      */
     @DisplayName("@Basic, @OneToOne, and @ManyToOne's optional should match @Column(nullable)")
-    protected void _MatchToColumnNullable_AllEntityMappingOptional() {
+    @Test
+    void _MatchToColumnNullable_AllEntityMappingOptional() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_EntityMappingOptional_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_EntityMappingOptional_Test.class, clazz)
+                    .isEmpty();
+        }
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
         });
@@ -355,7 +396,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * All attributes of {@code @Column(nullable)} should not be annotated with {@link NotNull}.
      */
     @DisplayName("@Column(nullable = true) should not have @NotNull")
-    protected void _ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable() {
+    @Test
+    void _ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_NotNull_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_NotNull_Test.class, clazz)
+                    .isEmpty();
+        }
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
         });
@@ -399,7 +450,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * All attributes of {@code @Column(nullable)} should not be annotated with any {@code NonNull} annotation.
      */
     @DisplayName("@Column(nullable = true) should not have @NonNull")
-    protected void _ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable() {
+    @Test
+    void _ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_NonNull_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_NonNull_Test.class, clazz)
+                    .isEmpty();
+        }
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
         });
@@ -464,8 +525,15 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see ___JakartaPersistence_TestUtils#selectRandom(EntityManager, Class)
      */
     @DisplayName("select an entity instance of a random index")
-//    @Test
-    protected void _Valid_RandomlySelectedEntityInstance() {
+    @Test
+    void _Valid_RandomlySelectedEntityInstance() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_RandomSelection_Test.class);
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_RandomSelection_Test.class, clazz)
+                    .isEmpty();
+        }
         acceptEntityManager(em -> {
             // ---------------------------------------------------------------------------------------------------- when
             final var selected = ___JakartaPersistence_TestUtils.selectRandom(em, entityClass);
@@ -473,8 +541,10 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 logger.log(Level.INFO, "no random entity selected; maybe the table is empty?");
                 return;
             }
+            final var value = selected.get();
+            _Valid_RandomlySelectedEntityInstance(value);
             // ---------------------------------------------------------------------------------------------------- then
-            _Valid_RandomlySelectedEntityInstance(selected.get());
+            ___JakartaValidation_TestUtils.requireValid(value);
         });
     }
 
@@ -488,7 +558,6 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     protected void _Valid_RandomlySelectedEntityInstance(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(Level.DEBUG, "randomly selected entity instance: {0}", entityInstance);
-        ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
     // -------------------------------------------------------------------------------------- super.entityManagerFactory
