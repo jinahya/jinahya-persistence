@@ -243,25 +243,26 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * All values of {@code @Column(nullable)} should match table column's nullability.
+     * All values of {@code @Column(nullable)} should match corresponding table column's nullability.
      */
     @Test
-    void _MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable() {
+    void _MatchTableColumnNullable_EntityColumnNullable() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_NullabilityCheck_Test.class
+                    clazz, __Disable_ColumnNullable_Test.class
             );
             assumeThat(disabled)
-                    .as("%s on %s", __Disable_NullabilityCheck_Test.class, clazz)
+                    .as("%s on %s", __Disable_ColumnNullable_Test.class, clazz)
                     .isEmpty();
         }
+        final var tableName = getTableName();
         final var tableColumnNamesAndIsNullables = applyConnectionInTransactionAndRollback(
                 c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
                         c,
                         getTableCatalog(),
                         getTableSchema(),
-                        getTableName()
+                        tableName
                 )
         );
         final var managedType = applyEntityManagerFactory(em -> {
@@ -278,25 +279,41 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 throw new RuntimeException("unknown entity member type: " + entityMember);
             }
             if (entityColumn == null) {
-                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
+                logger.log(Level.WARNING, "no @Column annotation on {0}", entityMember);
                 return;
             }
             final var entityColumnName = entityColumn.name();
             final var entityColumnNullable = entityColumn.nullable();
             final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
-            if (!_MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable(
+            if (!_MatchTableColumnNullable_EntityColumnNullable(
                     entityMember, entityColumn, tableColumnIsNullable)) {
+                logger.log(
+                        Level.INFO,
+                        "skipping nullability check; member {0}, column: {1}",
+                        entityMember,
+                        entityColumn
+                );
                 return;
             }
             assertThat(entityColumnNullable)
-                    .as("Column#entityColumnNullable of %s maps to %s(%s) ", entityMember, entityColumnName,
-                        tableColumnIsNullable)
+                    .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
+                        entityColumnName, tableColumnIsNullable)
                     .isEqualTo(tableColumnIsNullable);
         });
     }
 
-    protected boolean _MatchToCorrespondingTableColumnNullable_AllEntityColumnNullable(
-            final Member entityMember, final Column entityColumn, final boolean tableColumnIsNullable) {
+    /**
+     * Notifies that an attribute's {@link Column#nullable() @Column#nullable} element is going to be verified to match
+     * the table column's nullability.
+     *
+     * @param member   a java member of the attribute.
+     * @param column   a {@link Column @Column} annotation of the attribute.
+     * @param nullable the nullability of the table column.
+     * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
+     */
+    protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
+                                                                     @Nonnull final Column column,
+                                                                     @Nonnull final boolean nullable) {
         return true;
     }
 
@@ -304,18 +321,18 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
 
     /**
      * All values of either {@code @Basic(optional)}, {@code @OneToOne(optional)}, or {@code @ManyToOne(optional)}
-     * should match {@code @Column(nullabl)}.
+     * should match {@code @Column(nullable)}.
      */
     @DisplayName("@Basic, @OneToOne, and @ManyToOne's optional should match @Column(nullable)")
     @Test
-    void _MatchToColumnNullable_AllEntityMappingOptional() {
+    void _MatchColumnNullable_EntityMappingOptional() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_EntityMappingOptional_Test.class
+                    clazz, __Disable_MappingOptional_Test.class
             );
             assumeThat(disabled)
-                    .as("%s on %s", __Disable_EntityMappingOptional_Test.class, clazz)
+                    .as("%s on %s", __Disable_MappingOptional_Test.class, clazz)
                     .isEmpty();
         }
         final var managedType = applyEntityManagerFactory(em -> {
@@ -332,7 +349,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 throw new RuntimeException("unknown entity member type: " + entityMember);
             }
             if (entityColumn == null) {
-                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
+                logger.log(Level.WARNING, "no @Column annotation on {0}", entityMember);
                 return;
             }
             final var entityColumnNullable = entityColumn.nullable();
@@ -341,7 +358,14 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 if (entityMapping == null) {
                     return;
                 }
-                if (!_MatchToColumnNullable_AllEntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                if (!_MatchColumnNullable_EntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                    logger.log(
+                            Level.INFO,
+                            "skipping mapping#optional check; member {0}, column: {1}, mapping: {2}",
+                            entityMember,
+                            entityColumn,
+                            entityMapping
+                    );
                     return;
                 }
                 assertThat(entityMapping.optional())
@@ -353,7 +377,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 if (entityMapping == null) {
                     return;
                 }
-                if (!_MatchToColumnNullable_AllEntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                if (!_MatchColumnNullable_EntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                    // TODO: log
                     return;
                 }
                 assertThat(entityMapping.optional())
@@ -365,7 +390,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 if (entityMapping == null) {
                     return;
                 }
-                if (!_MatchToColumnNullable_AllEntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                if (!_MatchColumnNullable_EntityMappingOptional(entityMember, entityColumn, entityMapping)) {
+                    // TODO: log
                     return;
                 }
                 assertThat(entityMapping.optional())
@@ -375,18 +401,30 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         });
     }
 
-    protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
-            final Member entityMember, final Column entityColum, final Basic entityMapping) {
+    /**
+     * Notifies that an attribute's {@link Basic#optional() @Basic#optional} element is going to be verified to match
+     * the attribute's {@link Column#nullable() @Column#nullable}.
+     *
+     * @param member  a java member of the attribute.
+     * @param column  a {@link Column @Column} annotation of the attribute.
+     * @param mapping the mapping.
+     * @return {@code true} if the mapping should be verified; {@code false} for skipping the mapping.
+     */
+    protected boolean _MatchColumnNullable_EntityMappingOptional(@Nonnull final Member member,
+                                                                 @Nonnull final Column column,
+                                                                 @Nonnull final Basic mapping) {
         return true;
     }
 
-    protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
-            final Member entityMember, final Column entityColum, final OneToOne entityMapping) {
+    protected boolean _MatchColumnNullable_EntityMappingOptional(@Nonnull final Member member,
+                                                                 @Nonnull final Column column,
+                                                                 @Nonnull final OneToOne mapping) {
         return true;
     }
 
-    protected boolean _MatchToColumnNullable_AllEntityMappingOptional(
-            final Member entityMember, final Column entityColum, final ManyToOne entityMapping) {
+    protected boolean _MatchColumnNullable_EntityMappingOptional(@Nonnull final Member member,
+                                                                 @Nonnull final Column column,
+                                                                 @Nonnull final ManyToOne mapping) {
         return true;
     }
 
@@ -397,7 +435,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     @DisplayName("@Column(nullable = true) should not have @NotNull")
     @Test
-    void _ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable() {
+    void _ShouldNotBeAnnotatedWithNotNull_AttributeWithColumnNullable() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(
@@ -421,7 +459,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 throw new RuntimeException("unknown entity member type: " + entityMember);
             }
             if (entityColumn == null) {
-                logger.log(Level.WARNING, "no @Column annotation for " + entityMember);
+                logger.log(Level.WARNING, "no @Column annotation on {0}", entityMember);
                 return;
             }
             if (!entityColumn.nullable()) {
@@ -431,8 +469,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
             if (notNull == null) {
                 return;
             }
-            if (!_ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable(entityMember, entityColumn,
-                                                                                  notNull)) {
+            if (!_ShouldNotBeAnnotatedWithNotNull_AttributeWithColumnNullable(entityMember, entityColumn,
+                                                                              notNull)) {
                 return;
             }
             throw new AssertionError(
@@ -441,7 +479,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         });
     }
 
-    protected boolean _ShouldNotBeAnnotatedWithNotNull_AllAttributesWithColumnNullable(
+    protected boolean _ShouldNotBeAnnotatedWithNotNull_AttributeWithColumnNullable(
             final Member entityMember, final Column entityColum, final NotNull notNull) {
         return true;
     }
@@ -449,9 +487,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     /**
      * All attributes of {@code @Column(nullable)} should not be annotated with any {@code NonNull} annotation.
      */
-    @DisplayName("@Column(nullable = true) should not have @NonNull")
+    @DisplayName("@Column(nullable = true) should not have any @NonNull")
     @Test
-    void _ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable() {
+    void _ShouldNotBeAnnotatedWithAnyNonNull_AttributeWithColumnNullable() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(
@@ -502,8 +540,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
             if (nonnull == null) {
                 return;
             }
-            if (!_ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable(entityMember, entityColumn,
-                                                                                     nonnull)) {
+            if (!_ShouldNotBeAnnotatedWithAnyNonNull_AttributeWithColumnNullable(entityMember, entityColumn, nonnull)) {
+                // TODO: log
                 return;
             }
             throw new AssertionError(
@@ -512,8 +550,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         });
     }
 
-    protected boolean _ShouldNotBeAnnotatedWithAnyNonNull_AllAttributesWithColumnNullable(
-            final Member entityMember, final Column entityColum, final Object nonNull) {
+    protected boolean _ShouldNotBeAnnotatedWithAnyNonNull_AttributeWithColumnNullable(
+            @Nonnull final Member entityMember, @Nonnull final Column entityColum, @Nonnull final Object nonNull) {
         return true;
     }
 

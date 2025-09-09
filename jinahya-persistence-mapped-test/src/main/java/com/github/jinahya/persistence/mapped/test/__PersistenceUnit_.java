@@ -22,7 +22,9 @@ package com.github.jinahya.persistence.mapped.test;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -63,9 +65,9 @@ abstract class __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
-        logger.log(Level.INFO, "getEntityManagerFactory(): {0}", getEntityManagerFactory());
+        logger.log(Level.DEBUG, "getEntityManagerFactory(): {0}", getEntityManagerFactory());
         getEntityManagerFactory().getProperties().forEach((k, v) -> {
-            logger.log(Level.DEBUG, "{0}: {1}", k, v);
+            logger.log(Level.DEBUG, "entityManagerFactory property: key: {0}, value: {1}", k, v);
         });
         tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElseThrow();
         tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElseThrow();
@@ -73,7 +75,18 @@ abstract class __PersistenceUnit_ {
     }
 
     // https://stackoverflow.com/a/72628439/330457
-    private void onStartup(@Observes final Startup startup) {
+    // https://stackoverflow.com/a/72628439/330457
+    protected void onStartup(@Observes final Startup startup) {
+        logger.log(Level.DEBUG, "onStartup{0})", startup);
+    }
+
+    @PreDestroy
+    protected void onPreDestroy() {
+    }
+
+    // https://stackoverflow.com/a/72628439/330457
+    protected void onShutdown(@Observes final Shutdown shutdown) {
+        logger.log(Level.DEBUG, "onShutdown({0})", shutdown);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

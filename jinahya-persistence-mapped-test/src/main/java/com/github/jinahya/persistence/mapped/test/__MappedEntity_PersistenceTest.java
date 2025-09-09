@@ -27,8 +27,6 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.lang.invoke.MethodHandles;
-
 @AddBeanClasses({
         __PersistenceProducer.class
 })
@@ -40,8 +38,6 @@ import java.lang.invoke.MethodHandles;
 })
 public abstract class __MappedEntity_PersistenceTest<ENTITY extends __MappedEntity<ID>, ID>
         extends __MappedEntity_Persistence_<ENTITY, ID> {
-
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface __Disable_EntityMappingOptional_Test {
+public @interface __Disable_ColumnNullable_Test {
 
     String message() default "";
 }
