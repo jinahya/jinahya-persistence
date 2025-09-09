@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface __Disable_Equals_Test {
+public @interface __Disable_RandomSelection_Test {
 
     String message() default "";
 }

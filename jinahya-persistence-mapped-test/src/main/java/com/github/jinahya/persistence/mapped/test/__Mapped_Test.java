@@ -41,11 +41,13 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assumptions.assumeThat;
+import static org.mockito.Mockito.spy;
 
 /**
- * A class for testing a specific subclass of {@link __Mapped} class.
+ * An abstract class for testing a specific subclass of {@link __Mapped} class.
  *
  * @param <MAPPED> target type parameter
+ * @see __Mapped_Randomizer
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
@@ -73,13 +75,13 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     // -------------------------------------------------------------------------------------------------------- toString
 
     /**
-     * Verifies that the result of {@link Object#toString() mappedInstance.toString()} is not blank.
+     * Verifies that the result of {@link Object#toString() toString()} is not blank.
      *
      * @param mappedInstance the instance to test.
      * @see #toString_NotBlank_newMappedInstance()
      * @see #toString_NotBlank_newRandomizedMappedInstance()
      */
-    protected final void toString_NotBlank_(@Nonnull final MAPPED mappedInstance) {
+    private void toString_NotBlank_(@Nonnull final MAPPED mappedInstance) {
         Objects.requireNonNull(mappedInstance, "mappedInstance is null");
         final var string = mappedInstance.toString();
         assertThat(string)
@@ -87,41 +89,39 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
                 .isNotBlank();
     }
 
+    private void assumeToStringTestNotDisabled() {
+        final var clazz = getClass();
+        final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_ToString_Test.class);
+        assumeThat(disabled)
+                .as("%s on %s", __Disable_ToString_Test.class, clazz)
+                .isEmpty();
+    }
+
     /**
-     * Invokes {@link #toString_NotBlank_(__Mapped)} method with a new instance of {@link #mappedClass}.
+     * Verifies that the result of {@link Object#toString() toString()} of an instance from the
+     * {@link #newMappedInstance()} is not blank.
      *
      * @see #newMappedInstance()
      * @see #toString_NotBlank_(__Mapped)
      */
     @DisplayName("newMappedInstance().toString()!blank")
     @Test
-    protected final void toString_NotBlank_newMappedInstance() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_ToString_Test.class);
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_ToString_Test.class, clazz)
-                    .isEmpty();
-        }
+    void toString_NotBlank_newMappedInstance() {
+        assumeToStringTestNotDisabled();
         toString_NotBlank_(newMappedInstance());
     }
 
     /**
-     * Invokes {@link #toString_NotBlank_(__Mapped)} method with a new randomized instance of {@link #mappedClass}.
+     * Verifies that the result of {@link Object#toString() toString()} of an instance from the
+     * {@link #newRandomizedMappedInstance()} is not blank.
      *
      * @see #newRandomizedMappedInstance()
      * @see #toString_NotBlank_(__Mapped)
      */
     @DisplayName("newRandomizedMappedInstance().toString()!blank")
     @Test
-    protected final void toString_NotBlank_newRandomizedMappedInstance() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_ToString_Test.class);
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_ToString_Test.class, clazz)
-                    .isEmpty();
-        }
+    void toString_NotBlank_newRandomizedMappedInstance() {
+        assumeToStringTestNotDisabled();
         newRandomizedMappedInstance().ifPresent(this::toString_NotBlank_);
     }
 
@@ -137,7 +137,8 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see #equals_Verify_(SingleTypeEqualsVerifierApi)
      */
     @DisplayName("equals/hashCode")
-    protected final void equals_Verify_() {
+    @Test
+    final void equals_Verify_() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_Equals_Test.class);
@@ -153,7 +154,6 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      *
      * @param equalsVerifier the equals verifier to configure.
      * @return given {@code equalsVerifier}.
-     * @see #equals_Verify_()
      */
     @Nonnull
     protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_(
@@ -172,7 +172,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     @SuppressWarnings({
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
-    protected final void propertyAccessors_DoesNotThrow_(@Nonnull final MAPPED mappedInstance) {
+    private void propertyAccessors_DoesNotThrow_(@Nonnull final MAPPED mappedInstance) {
         Objects.requireNonNull(mappedInstance, "mappedInstance is null");
         try {
             final var info = Introspector.getBeanInfo(mappedClass);
@@ -209,6 +209,14 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
         }
     }
 
+    private void assumePropertyAccessorsTestNotDisabled() {
+        final var clazz = getClass();
+        final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_PropertyAccessors_Test.class);
+        assumeThat(disabled)
+                .as("%s on %s", __Disable_PropertyAccessors_Test.class, clazz)
+                .isEmpty();
+    }
+
     /**
      * Tests standard accessors with a new instance of {@link #mappedClass}.
      *
@@ -217,12 +225,8 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      */
     @DisplayName("newMappedInstance().accessors_DoesNotThrow_()")
     @Test
-    protected final void propertyAccessors_DoesNotThrow_newMappedInstance() {
-        final var clazz = getClass();
-        final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_PropertyAccessors_Test.class);
-        assumeThat(disabled)
-                .as("%s on %s", __Disable_PropertyAccessors_Test.class, clazz)
-                .isEmpty();
+    final void propertyAccessors_DoesNotThrow_newMappedInstance() {
+        assumePropertyAccessorsTestNotDisabled();
         propertyAccessors_DoesNotThrow_(newMappedInstance());
     }
 
@@ -234,12 +238,8 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      */
     @DisplayName("newRandomizedMappedInstance().accessors_DoesNotThrow_()")
     @Test
-    protected final void propertyAccessors_DoesNotThrow_newRandomizedMappedInstance() {
-        final var clazz = getClass();
-        final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_PropertyAccessors_Test.class);
-        assumeThat(disabled)
-                .as("%s on %s", __Disable_PropertyAccessors_Test.class, clazz)
-                .isEmpty();
+    final void propertyAccessors_DoesNotThrow_newRandomizedMappedInstance() {
+        assumePropertyAccessorsTestNotDisabled();
         newRandomizedMappedInstance().ifPresent(this::propertyAccessors_DoesNotThrow_);
     }
 
@@ -264,7 +264,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      */
     @Nonnull
     protected final MAPPED newMappedInstanceSpy() {
-        return Mockito.spy(newMappedInstance());
+        return spy(newMappedInstance());
     }
 
     /**
@@ -291,7 +291,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class of {@link MAPPED}.
+     * The class of {@link MAPPED} to test.
      */
     protected final Class<MAPPED> mappedClass;
 }

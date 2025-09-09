@@ -31,4 +31,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 public @interface __Disable_PropertyAccessors_Test {
 
+    String message() default "";
 }

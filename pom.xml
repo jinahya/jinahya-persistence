@@ -306,7 +306,7 @@
         <configuration>
           <!--              <skip>true</skip>-->
           <rules>
-            <dependencyConvergence />
+            <dependencyConvergence/>
             <requireJavaVersion>
               <version>[21.0.0,)</version>
             </requireJavaVersion>

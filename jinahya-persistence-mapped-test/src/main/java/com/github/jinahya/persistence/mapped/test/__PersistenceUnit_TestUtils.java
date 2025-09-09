@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 
 import java.util.Optional;
@@ -31,33 +32,34 @@ import java.util.Optional;
 })
 final class __PersistenceUnit_TestUtils {
 
-    private static Optional<String> getProperty(final EntityManagerFactory entityManagerFactory, final String name) {
+    private static Optional<String> getProperty(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                                @Nonnull final String propertyName) {
         return Optional
                 .ofNullable(
-                        (String) entityManagerFactory.getProperties().get(name)
+                        (String) entityManagerFactory.getProperties().get(propertyName)
                 )
                 .or(() -> {
                     try (final var entityManager = entityManagerFactory.createEntityManager()) {
-                        return Optional.ofNullable((String) entityManager.getProperties().get(name));
+                        return Optional.ofNullable((String) entityManager.getProperties().get(propertyName));
                     }
                 });
     }
 
-    static Optional<String> getDefaultCatalog(final EntityManagerFactory entityManagerFactory) {
+    static Optional<String> getJinahyaTableCatalog(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
                 __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG
         );
     }
 
-    static Optional<String> getDefaultSchema(final EntityManagerFactory entityManagerFactory) {
+    static Optional<String> getJinahyaTableSchema(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
                 __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_SCHEMA
         );
     }
 
-    static Optional<String[]> getDefaultTypes(final EntityManagerFactory entityManagerFactory) {
+    static Optional<String[]> getJinahyaTableTypes(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
                 __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_TYPES

@@ -511,6 +511,7 @@ final class ___JakartaPersistence_TestUtils {
         return function.apply(count).apply(index);
     }
 
+    @Deprecated(forRemoval = true)
     static void acceptCountAndRandomIndex(@Nonnull final EntityManager entityManager,
                                           @Nonnull final Class<?> entityClass,
                                           @Nonnull final LongFunction<? extends LongConsumer> function) {

@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
@@ -30,6 +31,9 @@ import jakarta.enterprise.event.Startup;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Table;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.platform.commons.util.AnnotationUtils;
 
@@ -41,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.function.LongFunction;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -67,10 +73,10 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
         getEntityManagerFactory().getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
         });
-        tableCatalog = __PersistenceUnit_TestUtils.getDefaultCatalog(getEntityManagerFactory()).orElseThrow();
-        tableSchema = __PersistenceUnit_TestUtils.getDefaultSchema(getEntityManagerFactory()).orElseThrow();
+        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElseThrow();
+        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElseThrow();
         tableTypes = __PersistenceUnit_TestUtils
-                .getDefaultTypes(getEntityManagerFactory())
+                .getJinahyaTableTypes(getEntityManagerFactory())
                 .map(List::of)
                 .orElseGet(List::of);
         entityManager = getEntityManagerFactory().createEntityManager();
@@ -79,6 +85,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
 
     // https://stackoverflow.com/a/72628439/330457
     protected void onStartup(@Observes final Startup startup) {
+        logger.log(Level.DEBUG, "onStartup{0})", startup);
     }
 
     @PreDestroy
@@ -89,6 +96,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
 
     // https://stackoverflow.com/a/72628439/330457
     protected void onShutdown(@Observes final Shutdown shutdown) {
+        logger.log(Level.DEBUG, "onShutdown({0})", shutdown);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -354,6 +362,38 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // ------------------------------------------------------------------------------------------------------ tableTypes
     protected List<String> getTableTypes() {
         return tableTypes;
+    }
+
+    // --------------------------------------------------------------------------------------------------- entityManager
+    @Nullable
+    protected <R> R applyCountAndRandomIndex(
+            @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
+        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyCountAndRandomIndex(
+                em,
+                entityClass,
+                function
+        ));
+    }
+
+    @Deprecated(forRemoval = true)
+    protected void acceptCountAndRandomIndex(@Nonnull final LongFunction<? extends LongConsumer> function) {
+        applyCountAndRandomIndex(c -> i -> {
+            function.apply(c).accept(i);
+            return null;
+        });
+    }
+
+    protected <R> R applyCriteria(
+            final Function<
+                    ? super CriteriaBuilder, ? extends Function<
+                    ? super CriteriaQuery<ENTITY>, ? extends Function<
+                    ? super Root<ENTITY>, ? extends R>>> function) {
+        return applyEntityManager(em -> {
+            final var builder = em.getCriteriaBuilder();
+            final var query = builder.createQuery(entityClass);
+            final var root = query.from(entityClass);
+            return function.apply(builder).apply(query).apply(root);
+        });
     }
 
     // -----------------------------------------------------------------------------------------------------------------

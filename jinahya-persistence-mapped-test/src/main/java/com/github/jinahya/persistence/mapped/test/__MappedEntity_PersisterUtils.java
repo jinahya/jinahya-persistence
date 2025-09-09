@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 @SuppressWarnings({
@@ -38,8 +39,10 @@ public final class __MappedEntity_PersisterUtils {
      * @return a new persisted instance of the {@code entityClass}.
      * @see ___PersisterUtils#newPersistedInstanceOf(EntityManager, Class)
      */
+    @Nonnull
     public static <ENTITY extends __MappedEntity<?>>
-    ENTITY newPersistedInstanceOf(final EntityManager entityManager, final Class<ENTITY> entityClass) {
+    ENTITY newPersistedInstanceOf(@Nonnull final EntityManager entityManager,
+                                  @Nonnull final Class<ENTITY> entityClass) {
         return ___PersisterUtils.newPersistedInstanceOf(entityManager, entityClass);
     }
 

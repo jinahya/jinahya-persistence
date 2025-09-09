@@ -20,26 +20,6 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.__MappedEntity;
-import jakarta.annotation.Nonnull;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.metamodel.Attribute;
-import jakarta.persistence.metamodel.ManagedType;
-import jakarta.persistence.metamodel.Metamodel;
-
-import java.beans.BeanInfo;
-import java.beans.FeatureDescriptor;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 /**
  * Utilities for the {@link __MappedEntity_PersistenceTest}.
  *
@@ -50,8 +30,6 @@ import java.util.stream.Collectors;
         "java:S125", // Sections of code should not be commented out
 })
 public class __MappedEntity_PersistenceTestUtils {
-
-
 
     // -----------------------------------------------------------------------------------------------------------------
     private __MappedEntity_PersistenceTestUtils() {

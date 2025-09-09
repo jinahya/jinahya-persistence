@@ -23,8 +23,6 @@ package com.github.jinahya.persistence.mapped.test;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 
-import java.lang.invoke.MethodHandles;
-
 /**
  * An abstract class for testing the {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_NAME_TEST_PU}
  * persistence unit.
@@ -39,8 +37,6 @@ import java.lang.invoke.MethodHandles;
 })
 public abstract class __PersistenceUnit_Test extends __PersistenceUnit_ {
 
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
@@ -53,7 +49,6 @@ public abstract class __PersistenceUnit_Test extends __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     final EntityManagerFactory getEntityManagerFactory() {
-
         return entityManagerFactory;
     }
 

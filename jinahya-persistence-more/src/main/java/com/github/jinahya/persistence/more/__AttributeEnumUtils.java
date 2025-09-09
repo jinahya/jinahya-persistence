@@ -91,11 +91,10 @@ public final class __AttributeEnumUtils {
     ENUM valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
                                @Nonnull final List<Class<? extends ENUM>> enumClasses) {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
-        Objects.requireNonNull(enumClasses, "enumClasses is null");
+        if (Objects.requireNonNull(enumClasses, "enumClasses is null").isEmpty()) {
+            throw new IllegalArgumentException("empty enumClasses:");
+        }
         for (final var enumClass : enumClasses) {
-            if (enumClass == null) {
-                throw new IllegalArgumentException("null in enum classes: " + enumClasses);
-            }
             final var value = valueOfAttributeValue_(enumClass, attributeValue);
             if (value != null) {
                 return value;
