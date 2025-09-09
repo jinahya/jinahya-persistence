@@ -48,7 +48,6 @@ public abstract class __MappedEntityWithGeneratedId_Randomizer<
      * @param entityClass    the entity class to be randomized.
      * @param idClass        the type of {@link ID} of the {@code entityClass}.
      * @param excludedFields the names of the fields to be excluded from randomization.
-     * @see #entityClass
      * @see #idClass
      */
     protected __MappedEntityWithGeneratedId_Randomizer(@Nonnull final Class<ENTITY> entityClass,
