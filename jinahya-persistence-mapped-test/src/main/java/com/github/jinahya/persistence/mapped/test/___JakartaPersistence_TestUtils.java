@@ -361,8 +361,10 @@ final class ___JakartaPersistence_TestUtils {
         try {
             final R result = function.apply(entityManager);
             if (rollback) {
+                logger.log(Level.DEBUG, "rolling back...");
                 transaction.rollback();
             } else {
+                logger.log(Level.WARNING, "committing...");
                 transaction.commit();
             }
             return result;
