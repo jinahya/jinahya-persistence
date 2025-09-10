@@ -313,7 +313,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
                                                                      @Nonnull final Column column,
-                                                                     @Nonnull final boolean nullable) {
+                                                                     final boolean nullable) {
         return true;
     }
 
