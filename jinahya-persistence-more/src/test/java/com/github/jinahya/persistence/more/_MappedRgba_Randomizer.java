@@ -6,10 +6,10 @@ import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class Rgba_Randomizer extends __Mapped_Randomizer<Rgba> {
+class _MappedRgba_Randomizer extends __Mapped_Randomizer<_MappedRgba> {
 
-    Rgba_Randomizer() {
-        super(Rgba.class);
+    _MappedRgba_Randomizer() {
+        super(_MappedRgba.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ class Rgba_Randomizer extends __Mapped_Randomizer<Rgba> {
 
     @Nonnull
     @Override
-    public Rgba get() {
+    public _MappedRgba get() {
         return super.get();
     }
 }

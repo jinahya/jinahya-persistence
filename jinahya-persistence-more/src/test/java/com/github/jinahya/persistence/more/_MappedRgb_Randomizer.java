@@ -2,16 +2,14 @@ package com.github.jinahya.persistence.more;
 
 import com.github.jinahya.persistence.mapped.test.__Mapped_Randomizer;
 import jakarta.annotation.Nonnull;
-import nl.jqno.equalsverifier.Warning;
-import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class Rgb_Randomizer extends __Mapped_Randomizer<Rgb> {
+class _MappedRgb_Randomizer extends __Mapped_Randomizer<_MappedRgb> {
 
-    Rgb_Randomizer() {
-        super(Rgb.class);
+    _MappedRgb_Randomizer() {
+        super(_MappedRgb.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -35,7 +33,7 @@ class Rgb_Randomizer extends __Mapped_Randomizer<Rgb> {
 
     @Nonnull
     @Override
-    public Rgb get() {
+    public _MappedRgb get() {
         return super.get();
     }
 }

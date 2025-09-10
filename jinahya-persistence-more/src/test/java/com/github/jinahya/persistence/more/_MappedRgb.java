@@ -2,13 +2,13 @@ package com.github.jinahya.persistence.more;
 
 import java.util.Objects;
 
-class Rgb extends __MappedRgb {
+class _MappedRgb extends __MappedRgb {
 
-    protected Rgb() {
+    protected _MappedRgb() {
         super();
     }
 
-    protected Rgb(final RgbBuilder builder) {
+    _MappedRgb(final _MappedRgbBuilder builder) {
         super(builder);
     }
 
@@ -17,7 +17,7 @@ class Rgb extends __MappedRgb {
         if (true) {
             return super.equals(obj);
         }
-        if (!(obj instanceof Rgb that)) {
+        if (!(obj instanceof _MappedRgb that)) {
             return false;
         }
         return Objects.equals(getRed(), that.getRed())

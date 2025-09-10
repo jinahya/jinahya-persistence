@@ -2,13 +2,13 @@ package com.github.jinahya.persistence.more;
 
 import java.util.Objects;
 
-class Rgba extends __MappedRgba {
+class _MappedRgba extends __MappedRgba {
 
-    protected Rgba() {
+    protected _MappedRgba() {
         super();
     }
 
-    protected Rgba(final RgbaBuilder builder) {
+    _MappedRgba(final _MappedRgbaBuilder builder) {
         super(builder);
     }
 
@@ -19,7 +19,7 @@ class Rgba extends __MappedRgba {
         if (true) {
             return super.equals(obj);
         }
-        if (!(obj instanceof Rgba that)) {
+        if (!(obj instanceof _MappedRgba that)) {
             return false;
         }
         return Objects.equals(getRed(), that.getRed())

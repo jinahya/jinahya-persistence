@@ -5,18 +5,18 @@ import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class Rgb_Test extends __Mapped_Test<Rgb> {
+class _MappedRgb_Test extends __Mapped_Test<_MappedRgb> {
 
-    Rgb_Test() {
-        super(Rgb.class);
+    _MappedRgb_Test() {
+        super(_MappedRgb.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<Rgb> equals_Verify_(
-            @Nonnull SingleTypeEqualsVerifierApi<Rgb> equalsVerifier) {
+    protected SingleTypeEqualsVerifierApi<_MappedRgb> equals_Verify_(
+            @Nonnull SingleTypeEqualsVerifierApi<_MappedRgb> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.NONFINAL_FIELDS)
                 ;

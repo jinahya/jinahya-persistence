@@ -3,11 +3,13 @@ package com.github.jinahya.persistence.more;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -56,6 +58,21 @@ public abstract class __MappedRgba extends __MappedRgb {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns a string representation of the object in hexadecimal notation as {@code rrggbbaa}.
+     *
+     * @return a string representation of the object in hexadecimal notation as {@code rrggbbaa}.
+     */
+    @Override
+    public String toHexNotation() {
+        return super.toHexNotation() +
+               Optional.ofNullable(getAlphaAsInteger())
+                       .map(a -> String.format(HEX_FORMAT, a))
+                       .orElseThrow();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
     public Double getAlpha() {
         return alpha;
@@ -65,10 +82,26 @@ public abstract class __MappedRgba extends __MappedRgb {
         this.alpha = alpha;
     }
 
+    public Integer getAlphaAsInteger() {
+        return Optional.ofNullable(getAlpha())
+                .map(v -> v * MAX_COMPONENT)
+                .map(Double::intValue)
+                .orElse(null);
+    }
+
+    @Transient
+    public void setAlphaFromInteger(final Integer alpha) {
+        setAlpha(
+                Optional.ofNullable(alpha)
+                        .map(v -> (double) v * MAX_COMPONENT)
+                        .orElse(null)
+        );
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
-    @DecimalMax(DECIMAL_MAX_COMPONENT)
-    @DecimalMin(DECIMAL_MIN_COMPONENT)
+    @DecimalMax(DECIMAL_MAX_COMPONENT_NORMALIZED)
+    @DecimalMin(DECIMAL_MIN_COMPONENT_NORMALIZED)
     @NotNull
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_ALPHA, nullable = false, insertable = true, updatable = true)
