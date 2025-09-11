@@ -22,13 +22,12 @@ package com.github.jinahya.persistence.more.entity_relationships;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
-        "java:S114", // Interface names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public interface _BidirectionalOneToOne<
-        OWNING_SIDE extends _BidirectionalOneToOne<OWNING_SIDE, INVERSE_SIDE>,
-        INVERSE_SIDE extends ___ToOne<? extends OWNING_SIDE>
+public interface __BidirectionalOneToMany<
+        ONE extends __UnidirectionalOneToMany<OWNER>,
+        OWNER extends __BidirectionalManyToOne<OWNER, ONE>
         >
-        extends __UnidirectionalOneToOne<INVERSE_SIDE> {
+        extends __UnidirectionalOneToMany<OWNER> {
 
 }

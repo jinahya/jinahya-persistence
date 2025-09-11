@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_uuid;
 
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
 import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedUuid_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
@@ -12,6 +13,7 @@ class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuid_Test<Use
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithGeneratedUuid> equals_Verify_(

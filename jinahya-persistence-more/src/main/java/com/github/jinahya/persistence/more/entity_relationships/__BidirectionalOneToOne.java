@@ -25,10 +25,10 @@ package com.github.jinahya.persistence.more.entity_relationships;
         "java:S114", // Interface names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public interface _BidirectionalManyToOne<
-        OWNER extends _BidirectionalManyToOne<OWNER, ONE>,
-        ONE extends ___ToMany<OWNER>
+public interface __BidirectionalOneToOne<
+        OWNING_SIDE extends __BidirectionalOneToOne<OWNING_SIDE, INVERSE_SIDE>,
+        INVERSE_SIDE extends __UnidirectionalOneToOne<? extends OWNING_SIDE>
         >
-        extends __UnidirectionalManyToOne<ONE> {
+        extends __UnidirectionalOneToOne<INVERSE_SIDE> {
 
 }

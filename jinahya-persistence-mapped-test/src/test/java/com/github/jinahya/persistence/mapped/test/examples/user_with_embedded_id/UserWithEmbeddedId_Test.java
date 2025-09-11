@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
  * #L%
  */
 
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
 import com.github.jinahya.persistence.mapped.test.__MappedEntity_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
@@ -32,6 +33,7 @@ class UserWithEmbeddedId_Test extends __MappedEntity_Test<UserWithEmbeddedId, Id
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equals_Verify_(

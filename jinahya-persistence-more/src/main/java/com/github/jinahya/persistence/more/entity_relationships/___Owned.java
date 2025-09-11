@@ -36,9 +36,9 @@ import java.lang.annotation.Target;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public @interface ___InverseSide {
+public @interface ___Owned {
 
     Class<?> value() default void.class;
 
-    Class<?> owningSide();
+    Class<?> owner();
 }

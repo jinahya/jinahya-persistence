@@ -20,10 +20,25 @@ package com.github.jinahya.persistence.more.entity_relationships;
  * #L%
  */
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({
+        ElementType.FIELD,
+        ElementType.METHOD
+})
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public @interface ___OwningSide {
 
+    Class<?> value() default void.class;
+
+    Class<?> inverseSide() default void.class;
 }

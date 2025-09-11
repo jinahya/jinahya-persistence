@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.more;
 
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
 import com.github.jinahya.persistence.mapped.test.__Mapped_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -18,13 +19,12 @@ class _MappedRgba_Test extends __Mapped_Test<_MappedRgba> {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<_MappedRgba> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<_MappedRgba> equalsVerifier) {
         return EqualsVerifier.simple().forClass(mappedClass)
-//        return super.equals_Verify_(equalsVerifier)
                 ;
     }
 

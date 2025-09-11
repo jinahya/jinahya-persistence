@@ -1,8 +1,8 @@
-package com.github.jinahya.persistence.more.entity_relationships;
+package com.github.jinahya.persistence.mapped.test;
 
 /*-
  * #%L
- * jinahya-persistence-mapped
+ * jinahya-persistence-mapped-test
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -20,14 +20,20 @@ package com.github.jinahya.persistence.more.entity_relationships;
  * #L%
  */
 
-@SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
-        "java:S119"  // Type parameter names should comply with a naming convention
-})
-public interface _BidirectionalManyToMany<
-        OWNING extends _BidirectionalManyToMany<OWNING, MANY>,
-        MANY extends __UnidirectionalManyToMany<OWNING>
-        >
-        extends __UnidirectionalManyToMany<MANY> {
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * A marker interface for methods configures an equals-verifier.
+ *
+ * @see __Configure_EqualsVerifier
+ */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
+public @interface __Configure_EqualsVerifier {
 
 }

@@ -1,8 +1,8 @@
-package com.github.jinahya.persistence.more.entity_relationships;
+package com.github.jinahya.persistence.mapped.test;
 
 /*-
  * #%L
- * jinahya-persistence-mapped
+ * jinahya-persistence-mapped-test
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -22,23 +22,21 @@ package com.github.jinahya.persistence.more.entity_relationships;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * .
+ *
+ * @see __Configure_EqualsVerifier
+ */
 @Documented
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({
-        ElementType.FIELD,
-        ElementType.METHOD
-})
-@SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
-        "java:S119"  // Type parameter names should comply with a naming convention
-})
-public @interface ___InverseSide {
+@Target({ElementType.TYPE})
+public @interface __Disable_EqualsVerifier_Test {
 
-    Class<?> value() default void.class;
-
-    Class<?> owningSide();
+    String message() default "";
 }

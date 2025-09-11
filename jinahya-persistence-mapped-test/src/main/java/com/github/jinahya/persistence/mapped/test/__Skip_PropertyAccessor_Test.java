@@ -20,16 +20,16 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Inherited
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface __Disable_Equals_Test {
+@Target({ElementType.METHOD})
+public @interface __Skip_PropertyAccessor_Test {
 
     String message() default "";
 }

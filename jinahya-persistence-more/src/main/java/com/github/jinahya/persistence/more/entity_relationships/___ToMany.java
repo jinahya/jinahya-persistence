@@ -24,6 +24,6 @@ package com.github.jinahya.persistence.more.entity_relationships;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public interface ___ToMany<MANY> {
+interface ___ToMany<MANY> {
 
 }

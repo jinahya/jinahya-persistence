@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test.examples.entity01;
  */
 
 import com.github.jinahya.persistence.mapped.test._MappedEntity_Test;
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
@@ -43,6 +44,7 @@ public class Entity01_Test extends _MappedEntity_Test<Entity01, Long> {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<Entity01> equals_Verify_(
