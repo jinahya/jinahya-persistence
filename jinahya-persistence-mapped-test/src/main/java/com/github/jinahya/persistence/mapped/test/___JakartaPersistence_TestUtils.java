@@ -54,6 +54,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -348,6 +349,56 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    public static <R> R applyEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
+                                                        @Nonnull final Supplier<? extends R> supplier,
+                                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        if (entityManager.isJoinedToTransaction()) {
+            throw new IllegalArgumentException("entityManager is already joined to a transaction");
+        }
+        Objects.requireNonNull(supplier, "supplier is null");
+        final var transaction = entityManager.getTransaction();
+        transaction.begin();
+        try {
+            final R result = supplier.get();
+            if (rollback) {
+                logger.log(Level.DEBUG, "rolling back...");
+                transaction.rollback();
+            } else {
+                logger.log(Level.WARNING, "committing...");
+                transaction.commit();
+            }
+            return result;
+        } catch (final Exception e) {
+            transaction.rollback();
+            throw new RuntimeException(
+                    "failed to apply, in transaction" +
+                    "; entityManager: " + entityManager +
+                    "; supplier: " + supplier +
+                    "; rollback: " + rollback,
+                    e
+            );
+        }
+    }
+
+    public static void acceptEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
+                                                        final boolean rollback) {
+        applyEntityManagerInTransaction(
+                entityManager,
+                em -> null,
+                rollback
+        );
+    }
+
+    public static <R> R applyEntityManagerInTransactionAndRollBack(@Nonnull final EntityManager entityManager,
+                                                                   @Nonnull final Supplier<? extends R> supplier) {
+        return applyEntityManagerInTransaction(entityManager, supplier, true);
+    }
+
+    public static void acceptEntityManagerInTransactionAndRollback(@Nonnull final EntityManager entityManager) {
+        acceptEntityManagerInTransaction(entityManager, true);
+    }
+
     public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
                                                         final Function<? super EntityManager, ? extends R> function,
                                                         final boolean rollback) {
