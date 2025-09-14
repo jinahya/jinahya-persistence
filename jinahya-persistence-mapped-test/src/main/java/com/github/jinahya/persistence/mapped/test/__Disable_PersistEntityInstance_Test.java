@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.mapped.test.examples.entity01;
+package com.github.jinahya.persistence.mapped.test;
 
 /*-
  * #%L
@@ -20,11 +20,16 @@ package com.github.jinahya.persistence.mapped.test.examples.entity01;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test._MappedEntity_PersistenceIT;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-class Entity01_PersistenceIT extends _MappedEntity_PersistenceIT<Entity01, Long> {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface __Disable_PersistEntityInstance_Test {
 
-    Entity01_PersistenceIT() {
-        super(Entity01.class, Long.class);
-    }
+    String message() default "";
 }

@@ -55,7 +55,4 @@ public interface __MappedEntityCriteria<ENTITY extends __MappedEntity<ID>, ID> e
             return Optional.empty();
         }
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    ENTITY findById(ID id);
 }

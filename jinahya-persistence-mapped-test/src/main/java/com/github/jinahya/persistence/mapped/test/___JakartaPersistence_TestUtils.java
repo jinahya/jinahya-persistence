@@ -64,7 +64,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JakartaPersistence_TestUtils {
+public final class ___JakartaPersistence_TestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -348,9 +348,9 @@ final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
-                                                 final Function<? super EntityManager, ? extends R> function,
-                                                 final boolean rollback) {
+    public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
+                                                        final Function<? super EntityManager, ? extends R> function,
+                                                        final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         if (entityManager.isJoinedToTransaction()) {
             throw new IllegalArgumentException("entityManager is already joined to a transaction");
@@ -380,9 +380,9 @@ final class ___JakartaPersistence_TestUtils {
         }
     }
 
-    static void acceptEntityManagerInTransaction(final EntityManager entityManager,
-                                                 final Consumer<? super EntityManager> consumer,
-                                                 final boolean rollback) {
+    public static void acceptEntityManagerInTransaction(final EntityManager entityManager,
+                                                        final Consumer<? super EntityManager> consumer,
+                                                        final boolean rollback) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerInTransaction(
                 entityManager,
