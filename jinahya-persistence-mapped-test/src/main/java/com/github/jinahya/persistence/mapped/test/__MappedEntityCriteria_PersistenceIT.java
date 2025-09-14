@@ -24,7 +24,14 @@ import com.github.jinahya.persistence.mapped.__MappedEntity;
 import com.github.jinahya.persistence.mapped.__MappedEntityCriteria;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@AddBeanClasses({
+        __PersistenceProducer.class
+})
+@ExtendWith(WeldJunit5AutoExtension.class)
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
