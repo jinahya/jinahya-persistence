@@ -518,7 +518,7 @@ public final class ___JakartaPersistence_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     @PositiveOrZero
-    static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
+    public static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final var builder = entityManager.getCriteriaBuilder();
@@ -529,13 +529,14 @@ public final class ___JakartaPersistence_TestUtils {
         return typed.getSingleResult();
     }
 
-    static <R> R applyCount(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
-                            @Nonnull final LongFunction<? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return function.apply(
-                count(entityManager, entityClass)
-        );
-    }
+//    public static <R> R applyCount(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
+//                                   @Nonnull final LongFunction<? extends R> function) {
+//        Objects.requireNonNull(function, "function is null");
+//        final var count = count(entityManager, entityClass);
+//        return function.apply(
+//                count(entityManager, entityClass)
+//        );
+//    }
 
     /**
      * Applies {@link #count(EntityManager, Class) count} of the specified entity class and a random index([0, count -
@@ -549,7 +550,7 @@ public final class ___JakartaPersistence_TestUtils {
      *         the entity class is {@code zero}.
      */
     @Nullable
-    static <R> R applyCountAndRandomIndex(
+    public static <R> R applyCountAndRandomIndex(
             @Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
@@ -557,7 +558,6 @@ public final class ___JakartaPersistence_TestUtils {
         if (count == 0L) {
             return null;
         }
-        assert count > 0L;
         final var index = ThreadLocalRandom.current().nextLong(count);
         logger.log(Level.DEBUG, "random index: {0}", index);
         return function.apply(count).apply(index);
@@ -573,6 +573,36 @@ public final class ___JakartaPersistence_TestUtils {
         });
     }
 
+    @Nonnull
+    public static <T, R> Optional<R> applyCountRandomIndexAndSelected(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Class<T> entityClass,
+            @Nonnull final LongFunction<? extends LongFunction<? extends Function<? super T, ? extends R>>> function) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(function, "function is null");
+        return Optional.ofNullable(
+                applyCountAndRandomIndex(
+                        entityManager,
+                        entityClass,
+                        c -> i -> {
+                            assert c > 0L;
+                            assert i < c;
+                            final var builder = entityManager.getCriteriaBuilder();
+                            final var query = builder.createQuery(entityClass);
+                            final var root = query.from(entityClass);
+                            query.select(root);
+                            final var selected = entityManager
+                                    .createQuery(query)
+                                    .setFirstResult(Math.toIntExact(i))
+                                    .setMaxResults(1)
+                                    .getSingleResult();
+                            return function.apply(c).apply(i).apply(selected);
+                        }
+                )
+        );
+    }
+
     /**
      * Selects an entity of the specified type at a random index.
      *
@@ -582,8 +612,8 @@ public final class ___JakartaPersistence_TestUtils {
      * @return an optional of the selected entity; {@link Optional#empty() empty} when no entity found.
      */
     @Nonnull
-    static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
-                                        @Nonnull final Class<T> entityClass) {
+    public static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
+                                               @Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         return Optional.ofNullable(
