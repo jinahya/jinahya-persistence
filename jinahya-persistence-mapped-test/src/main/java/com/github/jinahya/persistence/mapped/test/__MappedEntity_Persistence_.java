@@ -113,15 +113,10 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                     .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
                     .isEmpty();
         }
-        __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass)
-                .ifPresent(v -> applyEntityManagerInTransactionAndRollback(
-                        em -> {
-                            em.persist(v);
-                            em.flush();
-                            logger.log(Level.DEBUG, "persisted: {0}", v);
-                            return null;
-                        })
-                );
+        final var persisted = applyEntityManagerInTransactionAndRollback(em -> {
+            return __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
+        });
+        logger.log(Level.DEBUG, "persisted: {0}", persisted);
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
