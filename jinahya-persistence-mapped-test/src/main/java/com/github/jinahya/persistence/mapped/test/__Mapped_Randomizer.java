@@ -29,9 +29,10 @@ import uk.co.jemos.podam.api.PodamFactory;
 import java.util.Objects;
 
 /**
- * An abstract class for randomizing subclasses of {@link __Mapped}.
+ * An abstract class for creating randomized instances of a subclasses of {@link __Mapped}.
  *
  * @param <MAPPED> mapped type parameter
+ * @see __Mapped_RandomizerUtils
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention

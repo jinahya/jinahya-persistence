@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.mapped.test.examples.user_with_id_class;
 
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
 import com.github.jinahya.persistence.mapped.test.__MappedEntity_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
@@ -12,6 +13,7 @@ class UserWithIdClassTest extends __MappedEntity_Test<UserWithIdClass, IdForUser
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithIdClass> equals_Verify_(

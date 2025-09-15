@@ -54,6 +54,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -64,7 +65,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JakartaPersistence_TestUtils {
+public final class ___JakartaPersistence_TestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -348,21 +349,23 @@ final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
-                                                 final Function<? super EntityManager, ? extends R> function,
+    static <R> R applyEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
+                                                 @Nonnull final Supplier<? extends R> supplier,
                                                  final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         if (entityManager.isJoinedToTransaction()) {
             throw new IllegalArgumentException("entityManager is already joined to a transaction");
         }
-        Objects.requireNonNull(function, "function is null");
+        Objects.requireNonNull(supplier, "supplier is null");
         final var transaction = entityManager.getTransaction();
         transaction.begin();
         try {
-            final R result = function.apply(entityManager);
+            final R result = supplier.get();
             if (rollback) {
+                logger.log(Level.DEBUG, "rolling back...");
                 transaction.rollback();
             } else {
+                logger.log(Level.WARNING, "committing...");
                 transaction.commit();
             }
             return result;
@@ -371,26 +374,76 @@ final class ___JakartaPersistence_TestUtils {
             throw new RuntimeException(
                     "failed to apply, in transaction" +
                     "; entityManager: " + entityManager +
-                    "; function: " + function +
+                    "; supplier: " + supplier +
                     "; rollback: " + rollback,
                     e
             );
         }
     }
 
-    static void acceptEntityManagerInTransaction(final EntityManager entityManager,
-                                                 final Consumer<? super EntityManager> consumer,
+    static void acceptEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
                                                  final boolean rollback) {
-        Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerInTransaction(
                 entityManager,
-                em -> {
-                    consumer.accept(em);
-                    return null;
-                },
+                () -> null,
                 rollback
         );
     }
+
+    public static <R> R applyEntityManagerInTransactionAndRollBack(@Nonnull final EntityManager entityManager,
+                                                                   @Nonnull final Supplier<? extends R> supplier) {
+        return applyEntityManagerInTransaction(entityManager, supplier, true);
+    }
+
+    public static void acceptEntityManagerInTransactionAndRollback(@Nonnull final EntityManager entityManager) {
+        acceptEntityManagerInTransaction(entityManager, true);
+    }
+
+//    public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
+//                                                        final Function<? super EntityManager, ? extends R> function,
+//                                                        final boolean rollback) {
+//        Objects.requireNonNull(entityManager, "entityManager is null");
+//        if (entityManager.isJoinedToTransaction()) {
+//            throw new IllegalArgumentException("entityManager is already joined to a transaction");
+//        }
+//        Objects.requireNonNull(function, "function is null");
+//        final var transaction = entityManager.getTransaction();
+//        transaction.begin();
+//        try {
+//            final R result = function.apply(entityManager);
+//            if (rollback) {
+//                logger.log(Level.DEBUG, "rolling back...");
+//                transaction.rollback();
+//            } else {
+//                logger.log(Level.WARNING, "committing...");
+//                transaction.commit();
+//            }
+//            return result;
+//        } catch (final Exception e) {
+//            transaction.rollback();
+//            throw new RuntimeException(
+//                    "failed to apply, in transaction" +
+//                    "; entityManager: " + entityManager +
+//                    "; function: " + function +
+//                    "; rollback: " + rollback,
+//                    e
+//            );
+//        }
+//    }
+//
+//    public static void acceptEntityManagerInTransaction(final EntityManager entityManager,
+//                                                        final Consumer<? super EntityManager> consumer,
+//                                                        final boolean rollback) {
+//        Objects.requireNonNull(consumer, "consumer is null");
+//        applyEntityManagerInTransaction(
+//                entityManager,
+//                em -> {
+//                    consumer.accept(em);
+//                    return null;
+//                },
+//                rollback
+//        );
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
     static <R> R applyUnwrappedConnection(final EntityManager entityManager,
@@ -438,17 +491,16 @@ final class ___JakartaPersistence_TestUtils {
         );
     }
 
-    static <R> R applyConnectionInTransaction(final EntityManager entityManager,
-                                              final Function<? super Connection, ? extends R> function) {
+    public static <R> R applyConnectionInTransaction(final EntityManager entityManager,
+                                                     final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManagerInTransaction(
+        return applyEntityManagerInTransactionAndRollBack(
                 entityManager,
-                em -> applyUnwrappedConnection(
-                        em,
+                () -> applyUnwrappedConnection(
+                        entityManager,
                         function
-                ),
-                true
+                )
         );
     }
 

@@ -34,7 +34,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.AnnotationUtils;
 
 import java.lang.System.Logger.Level;
@@ -47,6 +47,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
+
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -100,33 +102,26 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Persists {@link #newRandomizedEntityInstance() a new randomized instance} of {@link #entityClass}.
-     *
-     * @see #newRandomizedEntityInstance()
-     * @see #__persistEntityInstance(__MappedEntity)
-     */
-    @DisplayName("persist a random entity instance")
-//    @Test
-    protected void __persistEntityInstance() {
-        acceptEntityManagerInTransactionAndRollback(em -> {
-            final var entityInstance = __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
-            em.persist(entityInstance);
-            em.flush();
-            __persistEntityInstance(entityInstance);
-        });
-    }
-
-    /**
-     * Notifies, by the {@link #__persistEntityInstance()} method, that the specified entity instance has been
-     * persisted.
-     *
-     * @param entityInstance the entity instance.
-     */
-    protected void __persistEntityInstance(@Nonnull final ENTITY entityInstance) {
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
-        ___JakartaValidation_TestUtils.requireValid(entityInstance);
+    @Test
+    final void __persistRandomInstance() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_PersistEntityInstance_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
+                    .isEmpty();
+        }
+        __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass)
+                .ifPresent(v -> applyEntityManagerInTransactionAndRollback(
+                        em -> {
+                            em.persist(v);
+                            em.flush();
+                            logger.log(Level.DEBUG, "persisted: {0}", v);
+                            return null;
+                        })
+                );
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
@@ -167,9 +162,9 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     /**
-     * Applies an unmodified map of properties of the injected instance of {@link EntityManagerFactory}.
+     * Applies an unmodified map of the injected instance of {@link EntityManagerFactory}'s properties.
      *
-     * @return an unmodified map of properties of the injected instance of {@link EntityManagerFactory}.
+     * @return an unmodified map of the injected instance of {@link EntityManagerFactory}'s properties.
      * @see EntityManagerFactory#getProperties()
      */
     protected final Map<String, Object> getEntityManagerFactoryProperties() {
@@ -181,36 +176,22 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // --------------------------------------------------------------------------------------------------- entityManager
 
     /**
-     * Applies an injected instance of {@link EntityManager} to the specified function, and returns the result.
+     * Applies an instance of {@link EntityManager} to the specified function, and returns the result.
      *
      * @param function the function.
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
-     * @see #acceptEntityManager(Consumer)
      */
     protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         if (true) {
             return function.apply(entityManager);
         }
+        // too slow!
         return applyEntityManagerFactory(emf -> {
             try (final var entityManager = emf.createEntityManager()) {
                 return function.apply(entityManager);
             }
-        });
-    }
-
-    /**
-     * Accepts an injected instance of {@link EntityManager} to the specified consumer.
-     *
-     * @param consumer the consumer.
-     * @see #applyEntityManager(Function)
-     */
-    protected final void acceptEntityManager(@Nonnull final Consumer<? super EntityManager> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyEntityManager(em -> {
-            consumer.accept(em);
-            return null;
         });
     }
 
@@ -219,22 +200,11 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             @Nonnull final Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(em -> {
-            return ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(em, function, rollback);
-        });
-    }
-
-    @Deprecated(forRemoval = true)
-    protected final void acceptEntityManagerInTransaction(@Nonnull final Consumer<? super EntityManager> consumer,
-                                                          final boolean rollback) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyEntityManagerInTransaction(
-                em -> {
-                    consumer.accept(em);
-                    return null;
-                },
+        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+                em,
+                () -> function.apply(em),
                 rollback
-        );
+        ));
     }
 
     /**
@@ -243,27 +213,13 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @param function the function.
      * @param <R>      result type parameter.
      * @return the result of the {@code function}.
-     * @see #acceptEntityManagerInTransactionAndRollback(Consumer)
      */
     protected final <R> R applyEntityManagerInTransactionAndRollback(
             @Nonnull final Function<? super EntityManager, ? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return applyEntityManagerInTransaction(function, true);
-    }
-
-    /**
-     * Accepts an entity manager to the specified consumer.
-     *
-     * @param consumer the consumer.
-     * @see #applyEntityManagerInTransactionAndRollback(Function)
-     */
-    protected final void acceptEntityManagerInTransactionAndRollback(
-            @Nonnull final Consumer<? super EntityManager> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyEntityManagerInTransactionAndRollback(rm -> {
-            consumer.accept(rm);
-            return null;
-        });
+        return applyEntityManagerInTransaction(
+                function,
+                true
+        );
     }
 
     // ------------------------------------------------------------------------------------------------------ connection
@@ -289,58 +245,19 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     /**
-     * Accepts a connection, unwrapped from an entity manager, to the specified consumer.
-     *
-     * @param consumer the consumer.
-     * @param rollback a flag for rolling-back; {@code true} for rollback; {@code false} otherwise.
-     * @deprecated Use {@link #acceptConnectionInTransactionAndRollback(Consumer)} method.
-     */
-    @Deprecated(forRemoval = true)
-    protected final void acceptConnectionInTransaction(@Nonnull final Consumer<? super Connection> consumer,
-                                                       final boolean rollback) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyConnectionInTransaction(
-                c -> {
-                    consumer.accept(c);
-                    return null;
-                },
-                rollback
-        );
-    }
-
-    /**
      * Returns the result of the specified function applied, in transaction, to a connection unwrapped from an entity
      * manager, and rolls back.
      *
      * @param function the function.
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
-     * @see #acceptConnectionInTransactionAndRollback(Consumer)
      */
     protected final <R> R applyConnectionInTransactionAndRollback(
             @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return applyConnectionInTransaction(
-                function,
-                true
-        );
-    }
-
-    /**
-     * Accepts a connection, unwrapped from an entity manager, in transaction, to the specified consumer, and rolls
-     * back.
-     *
-     * @param consumer the consumer.
-     * @see #applyConnectionInTransactionAndRollback(Function)
-     */
-    protected final void acceptConnectionInTransactionAndRollback(
-            @Nonnull final Consumer<? super Connection> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyConnectionInTransactionAndRollback(
-                c -> {
-                    consumer.accept(c);
-                    return null;
-                }
+        return ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+                entityManager,
+                function
         );
     }
 

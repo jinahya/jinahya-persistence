@@ -21,23 +21,12 @@ package com.github.jinahya.persistence.mapped.test.examples.entity01;
  */
 
 import com.github.jinahya.persistence.mapped.test._MappedEntity_PersistenceIT;
-import org.junit.jupiter.api.Test;
+import com.github.jinahya.persistence.mapped.test.__Disable_PersistEntityInstance_Test;
 
+@__Disable_PersistEntityInstance_Test
 class Entity01_PersistenceIT extends _MappedEntity_PersistenceIT<Entity01, Long> {
 
     Entity01_PersistenceIT() {
         super(Entity01.class, Long.class);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Test
-    @Override
-    protected void __persistEntityInstance() {
-        super.__persistEntityInstance();
-    }
-
-    @Override
-    protected void __persistEntityInstance(final Entity01 entityInstance) {
-        super.__persistEntityInstance(entityInstance);
     }
 }

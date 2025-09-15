@@ -22,9 +22,6 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.event.Startup;
 import jakarta.inject.Inject;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -85,17 +82,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         super(entityClass, idClass);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    @Override
-    @PostConstruct
-    protected void doOnPostConstruct() {
-        super.doOnPostConstruct();
-    }
-
-    // https://stackoverflow.com/a/72628439/330457
-    protected void onStartup(@Observes final Startup startup) {
-        super.onStartup(startup);
-    }
+//    // -----------------------------------------------------------------------------------------------------------------
+//    @Override
+//    @PostConstruct
+//    protected void doOnPostConstruct() {
+//        super.doOnPostConstruct();
+//    }
+//
+//    // https://stackoverflow.com/a/72628439/330457
+//    protected void onStartup(@Observes final Startup startup) {
+//        super.onStartup(startup);
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -117,15 +114,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 .orElseGet(table::catalog);
         final var schema = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableSchema)
                 .orElseGet(table::schema);
-        final var tableColumnNames = applyConnectionInTransactionAndRollback(
-                c -> ___JavaSql_TestUtils.addAllColumnNames(
-                        c,
-                        catalog,
-                        schema,
-                        table.name(),
-                        new ArrayList<>()
-                )
-        );
+        final var tableColumnNames = applyEntityManager(
+                em -> ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+                        em,
+                        c -> ___JavaSql_TestUtils.addAllColumnNames(
+                                c,
+                                catalog,
+                                schema,
+                                table.name(),
+                                new ArrayList<>()
+                        )
+                ));
         logger.log(Level.DEBUG, "tableColumnNames: {0}", tableColumnNames);
         assertThat(tableColumnNames)
                 .as("table column names for " + entityClass +
@@ -257,14 +256,16 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                     .isEmpty();
         }
         final var tableName = getTableName();
-        final var tableColumnNamesAndIsNullables = applyConnectionInTransactionAndRollback(
-                c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
-                        c,
-                        getTableCatalog(),
-                        getTableSchema(),
-                        tableName
-                )
-        );
+        final var tableColumnNamesAndIsNullables =
+                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+                        em,
+                        c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
+                                c,
+                                getTableCatalog(),
+                                getTableSchema(),
+                                tableName
+                        )
+                ));
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
         });
@@ -313,7 +314,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
                                                                      @Nonnull final Column column,
-                                                                     @Nonnull final boolean nullable) {
+                                                                     final boolean nullable) {
         return true;
     }
 
@@ -572,17 +573,18 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                     .as("%s on %s", __Disable_RandomSelection_Test.class, clazz)
                     .isEmpty();
         }
-        acceptEntityManager(em -> {
+        applyEntityManager(em -> {
             // ---------------------------------------------------------------------------------------------------- when
             final var selected = ___JakartaPersistence_TestUtils.selectRandom(em, entityClass);
             if (selected.isEmpty()) {
                 logger.log(Level.INFO, "no random entity selected; maybe the table is empty?");
-                return;
+                return null;
             }
             final var value = selected.get();
             _Valid_RandomlySelectedEntityInstance(value);
             // ---------------------------------------------------------------------------------------------------- then
             ___JakartaValidation_TestUtils.requireValid(value);
+            return null;
         });
     }
 

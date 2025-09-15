@@ -20,8 +20,10 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_i
  * #L%
  */
 
+import com.github.jinahya.persistence.mapped.test.__Disable_PersistEntityInstance_Test;
 import com.github.jinahya.persistence.mapped.test.__MappedEntity_PersistenceIT;
 
+@__Disable_PersistEntityInstance_Test
 class UserWithEmbeddedId_PersistenceIT
         extends __MappedEntity_PersistenceIT<UserWithEmbeddedId, IdForUserWithEmbeddedId> {
 

@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_identity;
 
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
 import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedIdentity_Test;
 import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
@@ -12,6 +13,7 @@ class UserWithGeneratedIdentityTest extends __MappedEntityWithGeneratedIdentity_
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithGeneratedIdentity> equals_Verify_(

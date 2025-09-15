@@ -20,13 +20,19 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Inherited
+/**
+ * An annotation for disabling property accessors test.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __Disable_PropertyAccessor_Test
+ */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface __Disable_PropertyAccessors_Test {
