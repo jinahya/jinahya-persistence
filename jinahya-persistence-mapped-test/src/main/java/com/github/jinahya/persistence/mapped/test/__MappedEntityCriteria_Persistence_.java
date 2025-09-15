@@ -33,6 +33,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
+import java.sql.Connection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -123,9 +124,9 @@ abstract class __MappedEntityCriteria_Persistence_<
     }
 
     /**
-     * Applies an unmodified map of properties of the injected instance of {@link EntityManagerFactory}.
+     * Applies an unmodified map of the injected instance of {@link EntityManagerFactory}'s properties.
      *
-     * @return an unmodified map of properties of the injected instance of {@link EntityManagerFactory}.
+     * @return an unmodified map of the injected instance of {@link EntityManagerFactory}'s properties.
      * @see EntityManagerFactory#getProperties()
      */
     protected final Map<String, Object> getEntityManagerFactoryProperties() {
@@ -137,36 +138,22 @@ abstract class __MappedEntityCriteria_Persistence_<
     // --------------------------------------------------------------------------------------------------- entityManager
 
     /**
-     * Applies an injected instance of {@link EntityManager} to the specified function, and returns the result.
+     * Applies an instance of {@link EntityManager} to the specified function, and returns the result.
      *
      * @param function the function.
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
-     * @see #acceptEntityManager(Consumer)
      */
     protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         if (true) {
             return function.apply(entityManager);
         }
+        // too slow!
         return applyEntityManagerFactory(emf -> {
             try (final var entityManager = emf.createEntityManager()) {
                 return function.apply(entityManager);
             }
-        });
-    }
-
-    /**
-     * Accepts an injected instance of {@link EntityManager} to the specified consumer.
-     *
-     * @param consumer the consumer.
-     * @see #applyEntityManager(Function)
-     */
-    protected final void acceptEntityManager(@Nonnull final Consumer<? super EntityManager> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyEntityManager(em -> {
-            consumer.accept(em);
-            return null;
         });
     }
 
@@ -175,22 +162,11 @@ abstract class __MappedEntityCriteria_Persistence_<
             @Nonnull final Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(em -> {
-            return ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(em, function, rollback);
-        });
-    }
-
-    @Deprecated(forRemoval = true)
-    protected final void acceptEntityManagerInTransaction(@Nonnull final Consumer<? super EntityManager> consumer,
-                                                          final boolean rollback) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyEntityManagerInTransaction(
-                em -> {
-                    consumer.accept(em);
-                    return null;
-                },
+        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+                em,
+                () -> function.apply(em),
                 rollback
-        );
+        ));
     }
 
     /**
@@ -199,27 +175,52 @@ abstract class __MappedEntityCriteria_Persistence_<
      * @param function the function.
      * @param <R>      result type parameter.
      * @return the result of the {@code function}.
-     * @see #acceptEntityManagerInTransactionAndRollback(Consumer)
      */
     protected final <R> R applyEntityManagerInTransactionAndRollback(
             @Nonnull final Function<? super EntityManager, ? extends R> function) {
+        return applyEntityManagerInTransaction(
+                function,
+                true
+        );
+    }
+
+    // ------------------------------------------------------------------------------------------------------ connection
+
+    /**
+     * Returns the result of the specified function applied to a connection unwrapped from an entity manager.
+     *
+     * @param function the function.
+     * @param rollback a flag for rolling-back; {@code true} for rollback; {@code false} otherwise.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @deprecated Use {@link #applyConnectionInTransactionAndRollback(Function)} method.
+     */
+    @Deprecated(forRemoval = true)
+    protected final <R> R applyConnectionInTransaction(
+            @Nonnull final Function<? super Connection, ? extends R> function,
+            final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManagerInTransaction(function, true);
+        return applyEntityManagerInTransaction(
+                em -> ___JakartaPersistence_TestUtils.applyConnection(em, function),
+                rollback
+        );
     }
 
     /**
-     * Accepts an entity manager to the specified consumer.
+     * Returns the result of the specified function applied, in transaction, to a connection unwrapped from an entity
+     * manager, and rolls back.
      *
-     * @param consumer the consumer.
-     * @see #applyEntityManagerInTransactionAndRollback(Function)
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
      */
-    protected final void acceptEntityManagerInTransactionAndRollback(
-            @Nonnull final Consumer<? super EntityManager> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyEntityManagerInTransactionAndRollback(rm -> {
-            consumer.accept(rm);
-            return null;
-        });
+    protected final <R> R applyConnectionInTransactionAndRollback(
+            @Nonnull final Function<? super Connection, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+                entityManager,
+                function
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

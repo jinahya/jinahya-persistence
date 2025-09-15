@@ -26,6 +26,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation for disabling property accessors test.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __Disable_PropertyAccessor_Test
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})

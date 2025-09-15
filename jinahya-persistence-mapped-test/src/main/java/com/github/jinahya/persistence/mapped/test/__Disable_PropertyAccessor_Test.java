@@ -26,10 +26,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation for excluding a specific property from being tested.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __Disable_PropertyAccessors_Test
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface __Skip_PropertyAccessor_Test {
+public @interface __Disable_PropertyAccessor_Test {
 
     String message() default "";
 }

@@ -28,8 +28,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -41,9 +39,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -133,9 +129,7 @@ class ___JakartaPersistenceTestUtilsTest {
             assertThatThrownBy(() -> {
                 ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                         entityManager,
-                        e -> {
-                            return null;
-                        },
+                        () -> null,
                         false
                 );
             }).isInstanceOf(IllegalArgumentException.class);
@@ -161,7 +155,7 @@ class ___JakartaPersistenceTestUtilsTest {
             // ---------------------------------------------------------------------------------------------------- when
             final var actual = ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                     entityManager,
-                    function,
+                    () -> function.apply(entityManager),
                     rollback
             );
             // ---------------------------------------------------------------------------------------------------- then
@@ -195,7 +189,7 @@ class ___JakartaPersistenceTestUtilsTest {
             assertThatThrownBy(() -> {
                 ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
                         entityManager,
-                        function,
+                        () -> function.apply(entityManager),
                         rollback
                 );
             }).isInstanceOf(RuntimeException.class);
@@ -203,43 +197,6 @@ class ___JakartaPersistenceTestUtilsTest {
             verify(entityManager, times(1)).getTransaction();
             verify(transaction, times(1)).begin();
             verify(transaction, times(1)).rollback(); // regardless of the rollback parameter
-        }
-    }
-
-    @DisplayName("acceptEntityManagerInTransaction(entityManager, consumer, rollback)")
-    @Nested
-    class AcceptEntityManagerInTransactionTest {
-
-        @Test
-        void __() {
-            // --------------------------------------------------------------------------------------------------- given
-            final var entityManager = mock(EntityManager.class);
-            final var transaction = mock(EntityTransaction.class);
-            when(entityManager.getTransaction()).thenReturn(transaction);
-            //noinspection Convert2Lambda
-            final var consumer = (Consumer<EntityManager>) spy(
-                    new Consumer<EntityManager>() { // DO NOT CONVERT INTO A LAMBDA EXPRESSION
-                        @Override
-                        public void accept(final EntityManager entityManager) {
-                        }
-                    }
-            );
-            final var rollback = ThreadLocalRandom.current().nextBoolean();
-            // ---------------------------------------------------------------------------------------------------- when
-            try (var mocked = mockStatic(___JakartaPersistence_TestUtils.class, Mockito.CALLS_REAL_METHODS)) {
-                ___JakartaPersistence_TestUtils.acceptEntityManagerInTransaction(
-                        entityManager,
-                        consumer,
-                        rollback
-                );
-                // ---------------------------------------------------------------------------------------------------- then
-                mocked.verify(() -> ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
-                        same(entityManager),
-                        ArgumentMatchers.<Function<EntityManager, Object>>notNull(),
-                        same(rollback)
-                ));
-                verify(consumer, times(1)).accept(entityManager);
-            }
         }
     }
 }

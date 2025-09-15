@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -27,9 +29,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A marker interface for methods configures an equals-verifier.
+ * An annotation for configuring an equals-verifier.
  *
- * @see __Configure_EqualsVerifier
+ * @see __Mapped_Test#equals_Verify_()
+ * @see __Mapped_Test#equals_Verify_(SingleTypeEqualsVerifierApi)
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
