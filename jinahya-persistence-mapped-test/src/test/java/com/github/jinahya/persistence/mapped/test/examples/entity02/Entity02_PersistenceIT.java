@@ -21,7 +21,9 @@ package com.github.jinahya.persistence.mapped.test.examples.entity02;
  */
 
 import com.github.jinahya.persistence.mapped.test._MappedEntity_PersistenceIT;
+import com.github.jinahya.persistence.mapped.test.__Disable_PersistEntityInstance_Test;
 
+@__Disable_PersistEntityInstance_Test
 class Entity02_PersistenceIT extends _MappedEntity_PersistenceIT<Entity02, Long> {
 
     Entity02_PersistenceIT() {

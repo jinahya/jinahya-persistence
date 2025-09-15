@@ -34,6 +34,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.AnnotationUtils;
 
 import java.lang.System.Logger.Level;
@@ -46,6 +47,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
+
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -96,6 +99,29 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // https://stackoverflow.com/a/72628439/330457
     protected void onShutdown(@Observes final Shutdown shutdown) {
         logger.log(Level.DEBUG, "onShutdown({0})", shutdown);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Test
+    final void __persistRandomInstance() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_PersistEntityInstance_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
+                    .isEmpty();
+        }
+        __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass)
+                .ifPresent(v -> applyEntityManagerInTransactionAndRollback(
+                        em -> {
+                            em.persist(v);
+                            em.flush();
+                            logger.log(Level.DEBUG, "persisted: {0}", v);
+                            return null;
+                        })
+                );
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
