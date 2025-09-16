@@ -195,7 +195,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             @Nonnull final Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.getInTransaction(
                 em,
                 () -> function.apply(em),
                 rollback
@@ -250,7 +250,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     protected final <R> R applyConnectionInTransactionAndRollback(
             @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+        return ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
                 entityManager,
                 function
         );
@@ -280,7 +280,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     @Nullable
     protected <R> R applyCountAndRandomIndex(
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
-        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyCountAndRandomIndex(
+        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyCountAndIndex(
                 em,
                 entityClass,
                 function

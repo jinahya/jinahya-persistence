@@ -97,11 +97,12 @@ abstract class __PersistenceUnit_ {
     })
     protected void printDatabaseInfo__() {
         acceptEntityManager(em -> {
-            ___JakartaPersistence_TestUtils.acceptConnectionInTransaction(
+            ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
                     em,
                     c -> {
                         try {
                             ___JavaSql_TestUtils.printDatabaseInfo(c);
+                            return null;
                         } catch (final SQLException sqle) {
                             throw new RuntimeException("failed to print database info", sqle);
                         }
@@ -109,7 +110,7 @@ abstract class __PersistenceUnit_ {
             );
         });
         acceptEntityManager(em -> {
-            ___JakartaPersistence_TestUtils.acceptConnectionInTransaction(
+            ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
                     em,
                     c -> {
                         try {
@@ -119,6 +120,7 @@ abstract class __PersistenceUnit_ {
                                     logger.log(Level.INFO, "TABLE_TYPE: {0}", databaseTableType);
                                 }
                             }
+                            return null;
                         } catch (final SQLException sqle) {
                             throw new RuntimeException("failed to print table types", sqle);
                         }

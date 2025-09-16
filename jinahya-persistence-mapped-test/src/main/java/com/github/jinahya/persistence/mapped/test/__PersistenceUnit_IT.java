@@ -89,7 +89,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      */
     protected Collection<String> getDatabaseTableNames() {
         final var databaseTableNames = applyEntityManager(em -> {
-            return ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+            return ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
                     em,
                     c -> {
                         try {

@@ -115,7 +115,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         final var schema = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = applyEntityManager(
-                em -> ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+                em -> ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
                         em,
                         c -> ___JavaSql_TestUtils.addAllColumnNames(
                                 c,
@@ -257,7 +257,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         }
         final var tableName = getTableName();
         final var tableColumnNamesAndIsNullables =
-                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
                         em,
                         c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
                                 c,

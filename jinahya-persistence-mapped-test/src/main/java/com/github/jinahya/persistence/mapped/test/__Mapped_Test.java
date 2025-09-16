@@ -148,6 +148,11 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
                     .as("%s on %s", __Disable_EqualsVerifier_Test.class, clazz)
                     .isEmpty();
         }
+        if (true) {
+            final var verifier = equals_Verify_(EqualsVerifier.forClass(mappedClass));
+            verifier.verify();
+            return;
+        }
         final var equalsVerifierReference = new AtomicReference<>(EqualsVerifier.forClass(mappedClass));
         ReflectionUtils.findMethods(
                 getClass(),
