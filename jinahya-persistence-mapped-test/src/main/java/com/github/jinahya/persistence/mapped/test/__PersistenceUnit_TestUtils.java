@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.mapped.test;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @SuppressWarnings({
@@ -49,21 +50,25 @@ final class __PersistenceUnit_TestUtils {
         return getProperty(
                 entityManagerFactory,
                 __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG
-        );
+        ).map(String::strip).filter(c -> !c.isBlank());
     }
 
     static Optional<String> getJinahyaTableSchema(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
                 __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_SCHEMA
-        );
+        ).map(String::strip).filter(s -> !s.isBlank());
     }
 
     static Optional<String[]> getJinahyaTableTypes(final EntityManagerFactory entityManagerFactory) {
         return getProperty(
                 entityManagerFactory,
                 __PersistenceProducer_TestConstants.PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_TYPES
-        ).map(v -> v.split(","));
+        ).map(v -> Arrays.stream(v.split(","))
+                        .map(String::strip)
+                        .filter(t -> !t.isBlank())
+                        .toArray(String[]::new))
+                .filter(v -> v.length > 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

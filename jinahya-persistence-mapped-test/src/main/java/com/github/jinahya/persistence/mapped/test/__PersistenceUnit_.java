@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
@@ -38,6 +39,7 @@ import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -69,8 +71,8 @@ abstract class __PersistenceUnit_ {
         getEntityManagerFactory().getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "entityManagerFactory property: key: {0}, value: {1}", k, v);
         });
-        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElseThrow();
-        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElseThrow();
+        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
+        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
         tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
     }
 
@@ -199,22 +201,31 @@ abstract class __PersistenceUnit_ {
      * @return the value of
      *         {@value __PersistenceProducer_TestConstants#PERSISTENCE_UNIT_PROPERTY_JINAHYA_TABLE_CATALOG}.
      */
+    @Nullable
     protected String tableCatalog() {
         return tableCatalog;
     }
 
+    @Nullable
     protected String tableSchema() {
         return tableSchema;
     }
 
+    @Nullable
     protected String[] tableTypes() {
-        return Arrays.copyOf(tableTypes, tableTypes.length);
+        return Optional.ofNullable(tableTypes)
+                .map(v -> Arrays.copyOf(v, v.length))
+                .orElse(null)
+                ;
     }
 
     // -----------------------------------------------------------------------------------------------------------------q
+    @Nullable
     private String tableCatalog;
 
+    @Nullable
     private String tableSchema;
 
+    @Nullable
     private String[] tableTypes;
 }

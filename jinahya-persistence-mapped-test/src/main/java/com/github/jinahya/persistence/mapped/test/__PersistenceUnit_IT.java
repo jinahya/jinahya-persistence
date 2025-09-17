@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -107,6 +108,9 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
             );
         });
         logger.log(Level.DEBUG, "all database table names: {0}", databaseTableNames);
+        assertThat(databaseTableNames)
+                .as("all database table names")
+                .isNotEmpty();
         return databaseTableNames;
     }
 

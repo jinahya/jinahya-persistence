@@ -45,7 +45,7 @@ public final class __DatabaseConstants {
      * @see <a href="https://dev.mysql.com/doc/refman/8.4/en/integer-types.html">Integer Types (Exact Value) -
      *         INTEGER, INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT</a>
      */
-    public static final class __MySqlConstants {
+    public static final class MySql {
 
         // ----------------------------------------------------------------------------------------------------- TINYINT
 
@@ -183,7 +183,7 @@ public final class __DatabaseConstants {
         /**
          * Creates a new instance.
          */
-        private __MySqlConstants() {
+        private MySql() {
             throw new AssertionError("instantiation is not allowed");
         }
     }
@@ -197,7 +197,7 @@ public final class __DatabaseConstants {
      * @see <a href="https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Data-Types.html">Data
      *         Types</a> (Oracle Database / SQL Language Reference)
      */
-    public static final class __OracleConstants {
+    public static final class Oracle {
 
         public static final int MIN_NUMBER_PRECISION = 1;
 
@@ -207,7 +207,7 @@ public final class __DatabaseConstants {
 
         public static final int MAX_NUMBER_SCALE = 128;
 
-        private __OracleConstants() {
+        private Oracle() {
             throw new AssertionError("instantiation is not allowed");
         }
     }
@@ -223,7 +223,7 @@ public final class __DatabaseConstants {
      * @see <a href="https://stackoverflow.com/q/20810134/330457">Why unsigned integer is not available in
      *         PostgreSQL?</a> (stackoverflow)
      */
-    public static final class __PostgreSqlConstants {
+    public static final class PostgreSql {
 
         // ---------------------------------------------------------------------------------------------------- smallint
 
@@ -344,7 +344,7 @@ public final class __DatabaseConstants {
         /**
          * Creates a new instance.
          */
-        private __PostgreSqlConstants() {
+        private PostgreSql() {
             throw new AssertionError("instantiation is not allowed");
         }
     }
