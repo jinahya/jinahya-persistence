@@ -217,7 +217,7 @@ abstract class __MappedEntityCriteria_Persistence_<
     protected final <R> R applyConnectionInTransactionAndRollback(
             @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+        return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                 entityManager,
                 function
         );

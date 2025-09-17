@@ -348,9 +348,10 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R applyEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
-                                                 @Nonnull final Function<? super EntityManager, ? extends R> function,
-                                                 final boolean rollback) {
+    public static <R> R applyEntityManagerInTransaction(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Function<? super EntityManager, ? extends R> function,
+            final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         if (entityManager.isJoinedToTransaction()) {
             throw new IllegalArgumentException("entityManager is already joined to a transaction");
@@ -440,9 +441,23 @@ public final class ___JakartaPersistence_TestUtils {
         );
     }
 
-    public static <R> R applyConnectionInTransactionAndRollback(
-            final EntityManager entityManager,
-            final Function<? super Connection, ? extends R> function) {
+    public static <R> R applyConnection(final EntityManager entityManager,
+                                        final Function<? super Connection, ? extends R> function,
+                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(function, "function is null");
+        return getInTransaction(
+                entityManager,
+                () -> applyUnwrappedConnection(
+                        entityManager,
+                        function
+                ),
+                rollback
+        );
+    }
+
+    public static <R> R applyConnectionAndRollback(final EntityManager entityManager,
+                                                   final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         return getInTransactionAndRollback(

@@ -99,7 +99,7 @@ abstract class __PersistenceUnit_ {
     })
     protected void printDatabaseInfo__() {
         acceptEntityManager(em -> {
-            ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+            ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                     em,
                     c -> {
                         try {
@@ -112,7 +112,7 @@ abstract class __PersistenceUnit_ {
             );
         });
         acceptEntityManager(em -> {
-            ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+            ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                     em,
                     c -> {
                         try {

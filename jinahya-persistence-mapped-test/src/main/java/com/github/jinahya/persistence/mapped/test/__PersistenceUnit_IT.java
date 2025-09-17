@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -90,7 +89,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      */
     protected Collection<String> getDatabaseTableNames() {
         final var databaseTableNames = applyEntityManager(em -> {
-            return ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+            return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                     em,
                     c -> {
                         try {

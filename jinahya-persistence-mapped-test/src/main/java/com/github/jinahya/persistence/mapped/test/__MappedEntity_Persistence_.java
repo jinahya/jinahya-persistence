@@ -40,9 +40,10 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.LongConsumer;
@@ -75,12 +76,9 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
         getEntityManagerFactory().getProperties().forEach((k, v) -> {
             logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
         });
-        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElseThrow();
-        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElseThrow();
-        tableTypes = __PersistenceUnit_TestUtils
-                .getJinahyaTableTypes(getEntityManagerFactory())
-                .map(List::of)
-                .orElseGet(List::of);
+        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
+        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
+        tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
         entityManager = getEntityManagerFactory().createEntityManager();
         logger.log(Level.DEBUG, "created: {0}", entityManager);
     }
@@ -250,30 +248,34 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     protected final <R> R applyConnectionInTransactionAndRollback(
             @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+        return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                 entityManager,
                 function
         );
     }
 
     // ------------------------------------------------------------------------------------------------------- tableName
-    protected String getTableName() {
+    protected String tableName() {
         return tableName;
     }
 
-    // ---------------------------------------------------------------------------------------------------- tableCatalog
-    protected String getTableCatalog() {
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nullable
+    protected String tableCatalog() {
         return tableCatalog;
     }
 
-    // ----------------------------------------------------------------------------------------------------- tableSchema
-    protected String getTableSchema() {
+    @Nullable
+    protected String tableSchema() {
         return tableSchema;
     }
 
-    // ------------------------------------------------------------------------------------------------------ tableTypes
-    protected List<String> getTableTypes() {
-        return tableTypes;
+    @Nullable
+    protected String[] tableTypes() {
+        return Optional.ofNullable(tableTypes)
+                .map(v -> Arrays.copyOf(v, v.length))
+                .orElse(null)
+                ;
     }
 
     // --------------------------------------------------------------------------------------------------- entityManager
@@ -316,11 +318,14 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     private final String tableName;
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Nullable
     private String tableCatalog;
 
+    @Nullable
     private String tableSchema;
 
-    private List<String> tableTypes;
+    @Nullable
+    private String[] tableTypes;
 
     // -----------------------------------------------------------------------------------------------------------------
     private EntityManager entityManager;

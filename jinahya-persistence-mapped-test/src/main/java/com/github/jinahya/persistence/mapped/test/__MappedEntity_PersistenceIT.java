@@ -115,7 +115,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         final var schema = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableSchema)
                 .orElseGet(table::schema);
         final var tableColumnNames = applyEntityManager(
-                em -> ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+                em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                         em,
                         c -> ___JavaSql_TestUtils.addAllColumnNames(
                                 c,
@@ -255,14 +255,14 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                     .as("%s on %s", __Disable_ColumnNullable_Test.class, clazz)
                     .isEmpty();
         }
-        final var tableName = getTableName();
+        final var tableName = tableName();
         final var tableColumnNamesAndIsNullables =
-                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionInTransactionAndRollback(
+                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                         em,
                         c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
                                 c,
-                                getTableCatalog(),
-                                getTableSchema(),
+                                tableCatalog(),
+                                tableSchema(),
                                 tableName
                         )
                 ));
