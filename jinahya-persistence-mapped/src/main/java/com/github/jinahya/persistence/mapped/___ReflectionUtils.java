@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.mapped;
 import jakarta.annotation.Nonnull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -12,8 +13,7 @@ import java.util.function.Consumer;
 })
 final class ___ReflectionUtils {
 
-    static <T> void acceptFields(@Nonnull final Class<T> clazz,
-                                 @Nonnull final Consumer<? super Field> consumer) {
+    static <T> void acceptEachField(@Nonnull final Class<T> clazz, @Nonnull final Consumer<? super Field> consumer) {
         Objects.requireNonNull(clazz, "clazz is null");
         Objects.requireNonNull(consumer, "consumer is null");
         for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
@@ -26,9 +26,13 @@ final class ___ReflectionUtils {
     @Nonnull
     static <T> T reset(@Nonnull final T instance) {
         Objects.requireNonNull(instance, "instance is null");
-        acceptFields(
+        acceptEachField(
                 instance.getClass(),
                 f -> {
+                    final var modifiers = f.getModifiers();
+                    if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) {
+                        return;
+                    }
                     if (!f.canAccess(instance)) {
                         f.setAccessible(true);
                     }

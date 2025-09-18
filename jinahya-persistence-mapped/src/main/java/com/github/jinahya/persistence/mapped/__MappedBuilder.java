@@ -29,4 +29,6 @@ public abstract class __MappedBuilder<
     protected __MappedBuilder(@Nonnull final Class<MAPPED> mappedClass) {
         super(mappedClass);
     }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
 }

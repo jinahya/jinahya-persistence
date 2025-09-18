@@ -29,4 +29,6 @@ public abstract class __MappedEntityBuilder<
     protected __MappedEntityBuilder(@Nonnull final Class<ENTITY> entityClass) {
         super(entityClass);
     }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
 }
