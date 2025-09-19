@@ -37,6 +37,12 @@ public abstract class __Builder<
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "targetClass=" + targetClass +
+               '}';
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -61,16 +67,21 @@ public abstract class __Builder<
     public TARGET build() {
         return build(
                 b -> {
+                    final var clazz = b.getClass();
                     try {
-                        final var constructor = targetClass.getDeclaredConstructor(b.getClass());
+                        final var constructor = targetClass.getDeclaredConstructor(clazz);
                         if (!constructor.canAccess(null)) {
                             constructor.setAccessible(true);
                         }
-                        return constructor.newInstance(b);
-                    } catch (final ReflectiveOperationException roe) {
+                        try {
+                            return constructor.newInstance(b);
+                        } catch (final ReflectiveOperationException roe) {
+                            throw new RuntimeException("failed to invoke " + constructor + " with " + b, roe);
+                        }
+                    } catch (final NoSuchMethodException nsme) {
                         throw new RuntimeException(
-                                "failed to build a new instance of " + targetClass + " with " + this,
-                                roe
+                                "failed to find a constructor from " + targetClass + " accepting " + clazz,
+                                nsme
                         );
                     }
                 }

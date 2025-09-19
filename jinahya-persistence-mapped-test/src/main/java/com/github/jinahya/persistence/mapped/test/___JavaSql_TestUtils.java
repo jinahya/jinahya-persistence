@@ -55,14 +55,11 @@ final class ___JavaSql_TestUtils {
 
     static final String COLUMN_VALUE_IS_NULLABLE_YES = "YES";
 
-    static void acceptEachTableName(@Nonnull final Connection connection,
-                                    @Nonnull final String catalog, @Nonnull final String schema,
-                                    @Nullable final String[] types,
+    static void acceptEachTableName(@Nonnull final Connection connection, @Nullable final String catalog,
+                                    @Nullable final String schema, @Nullable final String[] types,
                                     @Nonnull final Consumer<? super String> consumer)
             throws SQLException {
         Objects.requireNonNull(connection, "connection is null");
-        Objects.requireNonNull(catalog, "catalog is null");
-        Objects.requireNonNull(schema, "schema is null");
         Objects.requireNonNull(consumer, "consumer is null");
         final String tableNamePattern = null;
         try (var resultSet = connection.getMetaData().getTables(
@@ -79,8 +76,8 @@ final class ___JavaSql_TestUtils {
     }
 
     static <C extends Collection<? super String>> C addAllTableNames(@Nonnull final Connection connection,
-                                                                     @Nonnull final String catalog,
-                                                                     @Nonnull final String schema,
+                                                                     @Nullable final String catalog,
+                                                                     @Nullable final String schema,
                                                                      @Nullable final String[] types,
                                                                      @Nonnull final C collection)
             throws SQLException {
@@ -89,9 +86,8 @@ final class ___JavaSql_TestUtils {
         return collection;
     }
 
-    static void acceptEachColumnName(@Nonnull final Connection connection,
-                                     @Nullable final String catalog, @Nullable final String schemaPattern,
-                                     @Nonnull final String tableNamePattern,
+    static void acceptEachColumnName(@Nonnull final Connection connection, @Nullable final String catalog,
+                                     @Nullable final String schemaPattern, @Nonnull final String tableNamePattern,
                                      @Nonnull final Consumer<? super String> consumer) {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
@@ -118,11 +114,10 @@ final class ___JavaSql_TestUtils {
         }
     }
 
-    static void acceptEachColumnNameAndIsNullable(
-            @Nonnull final Connection connection,
-            @Nullable final String catalog, @Nullable final String schemaPattern,
-            @Nonnull final String tableNamePattern,
-            @Nonnull final BiConsumer<? super String, ? super Boolean> consumer) {
+    static void acceptEachColumnNameAndIsNullable(@Nonnull final Connection connection, @Nullable final String catalog,
+                                                  @Nullable final String schemaPattern,
+                                                  @Nonnull final String tableNamePattern,
+                                                  @Nonnull final BiConsumer<? super String, ? super Boolean> consumer) {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
         Objects.requireNonNull(consumer, "consumer is null");
@@ -152,10 +147,10 @@ final class ___JavaSql_TestUtils {
         }
     }
 
-    static Map<String, Boolean> getColumnNameAndIsNullable(
-            @Nonnull final Connection connection,
-            @Nullable final String catalog, @Nullable final String schemaPattern,
-            @Nonnull final String tableNamePattern) {
+    static Map<String, Boolean> getColumnNameAndIsNullable(@Nonnull final Connection connection,
+                                                           @Nullable final String catalog,
+                                                           @Nullable final String schemaPattern,
+                                                           @Nonnull final String tableNamePattern) {
         Objects.requireNonNull(connection, "connection is null");
         Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
         final var map = new HashMap<String, Boolean>();

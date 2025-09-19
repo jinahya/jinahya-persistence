@@ -70,10 +70,10 @@ class __DatabaseConstantsTest {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * A class for testing {@link __DatabaseConstants.__MySqlConstants}.
+     * A class for testing {@link __DatabaseConstants.MySql}.
      */
     @Nested
-    class __MySqlConstantsTest {
+    class __MySqlTest {
 
         @Test
         void __BIGINT() {
@@ -89,10 +89,10 @@ class __DatabaseConstantsTest {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * A class for testing {@link __DatabaseConstants.__PostgreSqlConstants}.
+     * A class for testing {@link __DatabaseConstants.PostgreSql}.
      */
     @Nested
-    class __PostgreSqlConstantsTest {
+    class __PostgreSqlTest {
 
     }
 }

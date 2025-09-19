@@ -33,7 +33,9 @@ import java.lang.annotation.Target;
  *
  * @see __Mapped_Test#equals_Verify_()
  * @see __Mapped_Test#equals_Verify_(SingleTypeEqualsVerifierApi)
+ * @deprecated not going to be used anymore
  */
+@Deprecated(forRemoval = true)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

@@ -52,7 +52,6 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -349,18 +348,19 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R applyEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
-                                                 @Nonnull final Supplier<? extends R> supplier,
-                                                 final boolean rollback) {
+    public static <R> R applyEntityManagerInTransaction(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Function<? super EntityManager, ? extends R> function,
+            final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         if (entityManager.isJoinedToTransaction()) {
             throw new IllegalArgumentException("entityManager is already joined to a transaction");
         }
-        Objects.requireNonNull(supplier, "supplier is null");
+        Objects.requireNonNull(function, "function is null");
         final var transaction = entityManager.getTransaction();
         transaction.begin();
         try {
-            final R result = supplier.get();
+            final R result = function.apply(entityManager);
             if (rollback) {
                 logger.log(Level.DEBUG, "rolling back...");
                 transaction.rollback();
@@ -374,76 +374,38 @@ public final class ___JakartaPersistence_TestUtils {
             throw new RuntimeException(
                     "failed to apply, in transaction" +
                     "; entityManager: " + entityManager +
-                    "; supplier: " + supplier +
+                    "; function: " + function +
                     "; rollback: " + rollback,
                     e
             );
         }
     }
 
-    static void acceptEntityManagerInTransaction(@Nonnull final EntityManager entityManager,
-                                                 final boolean rollback) {
-        applyEntityManagerInTransaction(
+    public static <R> R applyEntityManagerInTransactionAndRollback(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Function<? super EntityManager, ? extends R> function) {
+        return applyEntityManagerInTransaction(
                 entityManager,
-                () -> null,
-                rollback
+                function,
+                true
         );
     }
 
-    public static <R> R applyEntityManagerInTransactionAndRollBack(@Nonnull final EntityManager entityManager,
-                                                                   @Nonnull final Supplier<? extends R> supplier) {
-        return applyEntityManagerInTransaction(entityManager, supplier, true);
+    static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
+                                  @Nonnull final Supplier<? extends R> supplier,
+                                  final boolean rollback) {
+        Objects.requireNonNull(supplier, "supplier is null");
+        return applyEntityManagerInTransaction(entityManager, em -> supplier.get(), rollback);
     }
 
-    public static void acceptEntityManagerInTransactionAndRollback(@Nonnull final EntityManager entityManager) {
-        acceptEntityManagerInTransaction(entityManager, true);
+    public static <R> R getInTransactionAndRollback(@Nonnull final EntityManager entityManager,
+                                                    @Nonnull final Supplier<? extends R> supplier) {
+        return getInTransaction(
+                entityManager,
+                supplier,
+                true
+        );
     }
-
-//    public static <R> R applyEntityManagerInTransaction(final EntityManager entityManager,
-//                                                        final Function<? super EntityManager, ? extends R> function,
-//                                                        final boolean rollback) {
-//        Objects.requireNonNull(entityManager, "entityManager is null");
-//        if (entityManager.isJoinedToTransaction()) {
-//            throw new IllegalArgumentException("entityManager is already joined to a transaction");
-//        }
-//        Objects.requireNonNull(function, "function is null");
-//        final var transaction = entityManager.getTransaction();
-//        transaction.begin();
-//        try {
-//            final R result = function.apply(entityManager);
-//            if (rollback) {
-//                logger.log(Level.DEBUG, "rolling back...");
-//                transaction.rollback();
-//            } else {
-//                logger.log(Level.WARNING, "committing...");
-//                transaction.commit();
-//            }
-//            return result;
-//        } catch (final Exception e) {
-//            transaction.rollback();
-//            throw new RuntimeException(
-//                    "failed to apply, in transaction" +
-//                    "; entityManager: " + entityManager +
-//                    "; function: " + function +
-//                    "; rollback: " + rollback,
-//                    e
-//            );
-//        }
-//    }
-//
-//    public static void acceptEntityManagerInTransaction(final EntityManager entityManager,
-//                                                        final Consumer<? super EntityManager> consumer,
-//                                                        final boolean rollback) {
-//        Objects.requireNonNull(consumer, "consumer is null");
-//        applyEntityManagerInTransaction(
-//                entityManager,
-//                em -> {
-//                    consumer.accept(em);
-//                    return null;
-//                },
-//                rollback
-//        );
-//    }
 
     // -----------------------------------------------------------------------------------------------------------------
     static <R> R applyUnwrappedConnection(final EntityManager entityManager,
@@ -479,23 +441,26 @@ public final class ___JakartaPersistence_TestUtils {
         );
     }
 
-    static void acceptConnection(final EntityManager entityManager,
-                                 final Consumer<? super Connection> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyConnection(
+    public static <R> R applyConnection(final EntityManager entityManager,
+                                        final Function<? super Connection, ? extends R> function,
+                                        final boolean rollback) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(function, "function is null");
+        return getInTransaction(
                 entityManager,
-                c -> {
-                    consumer.accept(c);
-                    return null;
-                }
+                () -> applyUnwrappedConnection(
+                        entityManager,
+                        function
+                ),
+                rollback
         );
     }
 
-    public static <R> R applyConnectionInTransaction(final EntityManager entityManager,
-                                                     final Function<? super Connection, ? extends R> function) {
+    public static <R> R applyConnectionAndRollback(final EntityManager entityManager,
+                                                   final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManagerInTransactionAndRollBack(
+        return getInTransactionAndRollback(
                 entityManager,
                 () -> applyUnwrappedConnection(
                         entityManager,
@@ -504,42 +469,29 @@ public final class ___JakartaPersistence_TestUtils {
         );
     }
 
-    static void acceptConnectionInTransaction(final EntityManager entityManager,
-                                              final Consumer<? super Connection> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyConnectionInTransaction(
-                entityManager,
-                c -> {
-                    consumer.accept(c);
-                    return null;
-                }
-        );
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Counts the number of entities in the table from which the specified entity maps.
+     *
+     * @param entityManager an entity manager
+     * @param entityClass   the entity class
+     * @return the number of entities of {@code entityClass}.
+     */
     @PositiveOrZero
-    static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
+    public static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final var builder = entityManager.getCriteriaBuilder();
-        final var criteria = builder.createQuery(Long.class);
-        final var root = criteria.from(entityClass);
-        criteria.select(builder.count(root));
-        final var typed = entityManager.createQuery(criteria);
-        return typed.getSingleResult();
-    }
-
-    static <R> R applyCount(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
-                            @Nonnull final LongFunction<? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return function.apply(
-                count(entityManager, entityClass)
-        );
+        final var query = builder.createQuery(Long.class);
+        final var root = query.from(entityClass);
+        query.select(builder.count(root));
+        return entityManager.createQuery(query).getSingleResult();
     }
 
     /**
-     * Applies {@link #count(EntityManager, Class) count} of the specified entity class and a random index([0, count -
-     * 1]) to the specified function, and returns the result.
+     * Applies {@link #count(EntityManager, Class) count} of the specified entity class and a random index([0, count))
+     * to the specified function, and returns the result.
      *
      * @param entityManager an entity manager
      * @param entityClass   the entity class
@@ -549,7 +501,7 @@ public final class ___JakartaPersistence_TestUtils {
      *         the entity class is {@code zero}.
      */
     @Nullable
-    static <R> R applyCountAndRandomIndex(
+    public static <R> R applyCountAndIndex(
             @Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
@@ -560,17 +512,40 @@ public final class ___JakartaPersistence_TestUtils {
         assert count > 0L;
         final var index = ThreadLocalRandom.current().nextLong(count);
         logger.log(Level.DEBUG, "random index: {0}", index);
+        assert index >= 0L;
+        assert index < count;
         return function.apply(count).apply(index);
     }
 
-    @Deprecated(forRemoval = true)
-    static void acceptCountAndRandomIndex(@Nonnull final EntityManager entityManager,
-                                          @Nonnull final Class<?> entityClass,
-                                          @Nonnull final LongFunction<? extends LongConsumer> function) {
-        applyCountAndRandomIndex(entityManager, entityClass, c -> i -> {
-            function.apply(c).accept(i);
-            return null;
-        });
+    @Nonnull
+    public static <T, R> Optional<R> applyCountIndexAndEntity(
+            @Nonnull final EntityManager entityManager,
+            @Nonnull final Class<T> entityClass,
+            @Nonnull final LongFunction<? extends LongFunction<? extends Function<? super T, ? extends R>>> function) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(function, "function is null");
+        return Optional.ofNullable(
+                applyCountAndIndex(
+                        entityManager,
+                        entityClass,
+                        c -> i -> {
+                            assert c > 0L;
+                            assert i >= 0L;
+                            assert i < c;
+                            final var builder = entityManager.getCriteriaBuilder();
+                            final var query = builder.createQuery(entityClass);
+                            final var root = query.from(entityClass);
+                            query.select(root);
+                            final var entity = entityManager
+                                    .createQuery(query)
+                                    .setFirstResult(Math.toIntExact(i))
+                                    .setMaxResults(1)
+                                    .getSingleResult();
+                            return function.apply(c).apply(i).apply(entity);
+                        }
+                )
+        );
     }
 
     /**
@@ -579,29 +554,17 @@ public final class ___JakartaPersistence_TestUtils {
      * @param entityManager an entity manager
      * @param entityClass   the entity type
      * @param <T>           entity type parameter
-     * @return an optional of the selected entity; {@link Optional#empty() empty} when no entity found.
+     * @return an optional of the selected entity; {@link Optional#empty() empty} when the table is empty.
      */
     @Nonnull
-    static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
-                                        @Nonnull final Class<T> entityClass) {
+    public static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
+                                               @Nonnull final Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return Optional.ofNullable(
-                applyCountAndRandomIndex(
-                        entityManager,
-                        entityClass,
-                        c -> i -> {
-                            final var builder = entityManager.getCriteriaBuilder();
-                            final var query = builder.createQuery(entityClass);
-                            final var root = query.from(entityClass);
-                            query.select(root);
-                            return entityManager
-                                    .createQuery(query)
-                                    .setFirstResult(Math.toIntExact(i))
-                                    .setMaxResults(1)
-                                    .getSingleResult();
-                        }
-                )
+        return applyCountIndexAndEntity(
+                entityManager,
+                entityClass,
+                c -> i -> e -> e
         );
     }
 

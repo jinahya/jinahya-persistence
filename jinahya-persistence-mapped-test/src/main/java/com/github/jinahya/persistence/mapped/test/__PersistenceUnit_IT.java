@@ -89,7 +89,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      */
     protected Collection<String> getDatabaseTableNames() {
         final var databaseTableNames = applyEntityManager(em -> {
-            return ___JakartaPersistence_TestUtils.applyConnectionInTransaction(
+            return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                     em,
                     c -> {
                         try {
@@ -107,6 +107,9 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
             );
         });
         logger.log(Level.DEBUG, "all database table names: {0}", databaseTableNames);
+        assertThat(databaseTableNames)
+                .as("all database table names")
+                .isNotEmpty();
         return databaseTableNames;
     }
 

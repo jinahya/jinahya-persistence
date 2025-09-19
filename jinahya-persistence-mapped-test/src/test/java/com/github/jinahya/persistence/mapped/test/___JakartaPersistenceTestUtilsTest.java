@@ -127,7 +127,7 @@ class ___JakartaPersistenceTestUtilsTest {
             when(entityManager.isJoinedToTransaction()).thenReturn(true);
             // ----------------------------------------------------------------------------------------------- when/then
             assertThatThrownBy(() -> {
-                ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+                ___JakartaPersistence_TestUtils.getInTransaction(
                         entityManager,
                         () -> null,
                         false
@@ -153,7 +153,7 @@ class ___JakartaPersistenceTestUtilsTest {
             );
             final var rollback = ThreadLocalRandom.current().nextBoolean();
             // ---------------------------------------------------------------------------------------------------- when
-            final var actual = ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+            final var actual = ___JakartaPersistence_TestUtils.getInTransaction(
                     entityManager,
                     () -> function.apply(entityManager),
                     rollback
@@ -187,7 +187,7 @@ class ___JakartaPersistenceTestUtilsTest {
             final var rollback = ThreadLocalRandom.current().nextBoolean();
             // ---------------------------------------------------------------------------------------------------- when
             assertThatThrownBy(() -> {
-                ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+                ___JakartaPersistence_TestUtils.getInTransaction(
                         entityManager,
                         () -> function.apply(entityManager),
                         rollback

@@ -28,6 +28,7 @@ class _MappedRgba_Test extends __Mapped_Test<_MappedRgba> {
                 ;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Nested
     class ToHexNotationTest {
 
