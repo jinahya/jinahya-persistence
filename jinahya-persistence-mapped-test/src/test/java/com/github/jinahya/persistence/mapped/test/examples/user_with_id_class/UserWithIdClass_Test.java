@@ -6,9 +6,9 @@ import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class UserWithIdClassTest extends __MappedEntity_Test<UserWithIdClass, IdForUserWithIdClass> {
+class UserWithIdClass_Test extends __MappedEntity_Test<UserWithIdClass, IdForUserWithIdClass> {
 
-    UserWithIdClassTest() {
+    UserWithIdClass_Test() {
         super(UserWithIdClass.class, IdForUserWithIdClass.class);
     }
 

@@ -40,7 +40,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-final class ___JakartaValidation_TestUtils {
+public final class ___JakartaValidation_TestUtils {
 
     private static <T> T requireNonNullObject(final T object) {
         return Objects.requireNonNull(object, "object is null");
@@ -62,8 +62,8 @@ final class ___JakartaValidation_TestUtils {
      * @return a set of constraint violations of the {@code object}; {@code empty} if the {@code object} is valid.
      */
     @Nonnull
-    static <T> Set<ConstraintViolation<T>> validate(@Nonnull final Validator validator, @Nonnull final T object,
-                                                    @Nonnull final Class<?>... groups) {
+    public static <T> Set<ConstraintViolation<T>> validate(@Nonnull final Validator validator, @Nonnull final T object,
+                                                           @Nonnull final Class<?>... groups) {
         Objects.requireNonNull(validator, "validator is null");
         return validator.validate(
                 requireNonNullObject(object),
@@ -81,13 +81,47 @@ final class ___JakartaValidation_TestUtils {
      * @return given {@code object}.
      * @throws ConstraintViolationException if the {@code object} is invalid.
      */
-    static <T> T requireValid(@Nonnull final Validator validator, @Nonnull final T object,
-                              @Nonnull final Class<?>... groups) {
+    public static <T> T requireValid(@Nonnull final Validator validator, @Nonnull final T object,
+                                     @Nonnull final Class<?>... groups) {
         final var violations = validate(validator, object, groups);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
         return object;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Validates the specified object using the default validator and specified groups.
+     *
+     * @param object the object to validate.
+     * @param groups the validation groups.
+     * @param <T>    object type parameter
+     * @return a set of constraint violations of the {@code object}; {@code empty} if the {@code object} is valid.
+     * @see #validate(Validator, Object, Class...)
+     */
+    public static <T> Set<ConstraintViolation<T>> validate(final T object, final Class<?>... groups) {
+        requireNonNullObject(object);
+        requireNonNullGroups(groups);
+        return applyValidator(v -> validate(v, object, groups));
+    }
+
+    /**
+     * Verifies that the specified object is valid using the default validator and specified validation groups.
+     *
+     * @param object the object to validate.
+     * @param groups the validation groups.
+     * @param <T>    object type parameter
+     * @return given {@code object}.
+     * @throws ConstraintViolationException if the {@code object} is invalid.
+     * @see #requireValid(Validator, Object, Class...)
+     */
+    @Nonnull
+    public static <T> T requireValid(@Nonnull final T object, @Nonnull final Class<?>... groups) {
+        requireNonNullObject(object);
+        requireNonNullGroups(groups);
+        return applyValidator(v -> requireValid(v, object, groups));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -117,38 +151,6 @@ final class ___JakartaValidation_TestUtils {
     static <R> R applyValidator(@Nonnull final Function<? super Validator, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyValidationFactory(f -> function.apply(f.getValidator()));
-    }
-
-    /**
-     * Validates the specified object using the default validator and specified groups.
-     *
-     * @param object the object to validate.
-     * @param groups the validation groups.
-     * @param <T>    object type parameter
-     * @return a set of constraint violations of the {@code object}; {@code empty} if the {@code object} is valid.
-     * @see #validate(Validator, Object, Class...)
-     */
-    static <T> Set<ConstraintViolation<T>> validate(final T object, final Class<?>... groups) {
-        requireNonNullObject(object);
-        requireNonNullGroups(groups);
-        return applyValidator(v -> validate(v, object, groups));
-    }
-
-    /**
-     * Verifies that the specified object is valid using the default validator and specified validation groups.
-     *
-     * @param object the object to validate.
-     * @param groups the validation groups.
-     * @param <T>    object type parameter
-     * @return given {@code object}.
-     * @throws ConstraintViolationException if the {@code object} is invalid.
-     * @see #requireValid(Validator, Object, Class...)
-     */
-    @Nonnull
-    static <T> T requireValid(@Nonnull final T object, @Nonnull final Class<?>... groups) {
-        requireNonNullObject(object);
-        requireNonNullGroups(groups);
-        return applyValidator(v -> requireValid(v, object, groups));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -4,10 +4,10 @@ import com.github.jinahya.persistence.mapped.test.__Disable_PersistEntityInstanc
 import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedUuid_PersistenceIT;
 
 @__Disable_PersistEntityInstance_Test
-class UserWithGeneratedUuidPersistenceIT
+class UserWithGeneratedUuid_PersistenceIT
         extends __MappedEntityWithGeneratedUuid_PersistenceIT<UserWithGeneratedUuid> {
 
-    UserWithGeneratedUuidPersistenceIT() {
+    UserWithGeneratedUuid_PersistenceIT() {
         super(UserWithGeneratedUuid.class);
     }
 }
