@@ -2,10 +2,10 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedIdentity_Persister;
 
-class UserWithGeneratedIdentityPersister
+class UserWithGeneratedIdentity_Persister
         extends __MappedEntityWithGeneratedIdentity_Persister<UserWithGeneratedIdentity> {
 
-    UserWithGeneratedIdentityPersister() {
+    UserWithGeneratedIdentity_Persister() {
         super(UserWithGeneratedIdentity.class);
     }
 }

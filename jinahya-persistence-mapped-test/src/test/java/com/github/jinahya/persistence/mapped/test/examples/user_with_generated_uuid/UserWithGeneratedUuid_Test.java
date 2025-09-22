@@ -6,9 +6,9 @@ import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class UserWithGeneratedUuidTest extends __MappedEntityWithGeneratedUuid_Test<UserWithGeneratedUuid> {
+class UserWithGeneratedUuid_Test extends __MappedEntityWithGeneratedUuid_Test<UserWithGeneratedUuid> {
 
-    UserWithGeneratedUuidTest() {
+    UserWithGeneratedUuid_Test() {
         super(UserWithGeneratedUuid.class);
     }
 

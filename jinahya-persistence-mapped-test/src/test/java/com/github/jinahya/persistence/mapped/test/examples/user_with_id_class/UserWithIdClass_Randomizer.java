@@ -6,9 +6,9 @@ import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class UserWithIdClassRandomizer extends __MappedEntity_Randomizer<UserWithIdClass, IdForUserWithIdClass> {
+class UserWithIdClass_Randomizer extends __MappedEntity_Randomizer<UserWithIdClass, IdForUserWithIdClass> {
 
-    UserWithIdClassRandomizer() {
+    UserWithIdClass_Randomizer() {
         super(UserWithIdClass.class, IdForUserWithIdClass.class);
     }
 

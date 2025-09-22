@@ -20,11 +20,19 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntity_PersistenceTest;
+import com.github.jinahya.persistence.mapped.test.__MappedEntity_Instantiator;
+import jakarta.annotation.Nonnull;
 
-class UserWithStringIdPersistenceTest extends __MappedEntity_PersistenceTest<UserWithStringId, String> {
+class UserWithStringId_Instantiator extends __MappedEntity_Instantiator<UserWithStringId, String> {
 
-    UserWithStringIdPersistenceTest() {
+    UserWithStringId_Instantiator() {
         super(UserWithStringId.class, String.class);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    @Override
+    public UserWithStringId get() {
+        return super.get();
     }
 }

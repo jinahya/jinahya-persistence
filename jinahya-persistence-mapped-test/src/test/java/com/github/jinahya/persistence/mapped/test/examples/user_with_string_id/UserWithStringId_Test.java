@@ -20,19 +20,25 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_string_id;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__MappedEntity_Instantiator;
+import com.github.jinahya.persistence.mapped.test.__Configure_EqualsVerifier;
+import com.github.jinahya.persistence.mapped.test.__MappedEntity_Test;
 import jakarta.annotation.Nonnull;
+import nl.jqno.equalsverifier.Warning;
+import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class UserWithStringIdInstantiator extends __MappedEntity_Instantiator<UserWithStringId, String> {
+class UserWithStringId_Test extends __MappedEntity_Test<UserWithStringId, String> {
 
-    UserWithStringIdInstantiator() {
+    UserWithStringId_Test() {
         super(UserWithStringId.class, String.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @__Configure_EqualsVerifier
     @Nonnull
     @Override
-    public UserWithStringId get() {
-        return super.get();
+    protected SingleTypeEqualsVerifierApi<UserWithStringId> equals_Verify_(
+            @Nonnull final SingleTypeEqualsVerifierApi<UserWithStringId> equalsVerifier) {
+        return super.equals_Verify_(equalsVerifier)
+                .suppress(Warning.SURROGATE_KEY);
     }
 }

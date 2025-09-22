@@ -4,9 +4,9 @@ import com.github.jinahya.persistence.mapped.test.__MappedEntity_Persister;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
-class UserWithIdClassPersister extends __MappedEntity_Persister<UserWithIdClass, IdForUserWithIdClass> {
+class UserWithIdClass_Persister extends __MappedEntity_Persister<UserWithIdClass, IdForUserWithIdClass> {
 
-    UserWithIdClassPersister() {
+    UserWithIdClass_Persister() {
         super(UserWithIdClass.class, IdForUserWithIdClass.class);
     }
 

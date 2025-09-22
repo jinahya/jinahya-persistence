@@ -2,10 +2,10 @@ package com.github.jinahya.persistence.mapped.test.examples.user_with_generated_
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntityWithGeneratedIdentity_Randomizer;
 
-class UserWithGeneratedIdentityRandomizer
+class UserWithGeneratedIdentity_Randomizer
         extends __MappedEntityWithGeneratedIdentity_Randomizer<UserWithGeneratedIdentity> {
 
-    UserWithGeneratedIdentityRandomizer() {
+    UserWithGeneratedIdentity_Randomizer() {
         super(UserWithGeneratedIdentity.class, "id");
     }
 }

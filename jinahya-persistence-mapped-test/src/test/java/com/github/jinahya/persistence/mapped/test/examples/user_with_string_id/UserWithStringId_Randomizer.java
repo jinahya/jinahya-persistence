@@ -25,9 +25,9 @@ import jakarta.annotation.Nonnull;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-class UserWithStringIdRandomizer extends __MappedEntity_Randomizer<UserWithStringId, String> {
+class UserWithStringId_Randomizer extends __MappedEntity_Randomizer<UserWithStringId, String> {
 
-    UserWithStringIdRandomizer() {
+    UserWithStringId_Randomizer() {
         super(UserWithStringId.class, String.class);
     }
 
