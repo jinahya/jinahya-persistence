@@ -55,6 +55,7 @@
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <doclint>none</doclint>
+    <persistence.version>3.2</persistence.version>
     <sonar.coverage.jacoco.xmlReportPaths>
       target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-mapped/target/site/jacoco/jacoco.xml,jinahya-persistence-mapped-test/target/site/jacoco/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml
     </sonar.coverage.jacoco.xmlReportPaths>
@@ -382,19 +383,19 @@
         <executions>
           <execution>
             <id>pom</id>
-<!--            <phase>validate</phase>-->
-<!--            <phase>initialize</phase>-->
+            <!--            <phase>validate</phase>-->
+            <!--            <phase>initialize</phase>-->
             <goals>
               <goal>pom</goal>
             </goals>
           </execution>
-<!--          <execution>-->
-<!--            <id>validate</id>-->
-<!--            <phase>validate</phase>-->
-<!--            <goals>-->
-<!--              &lt;!&ndash;              <goal>check</goal>&ndash;&gt;-->
-<!--            </goals>-->
-<!--          </execution>-->
+          <!--          <execution>-->
+          <!--            <id>validate</id>-->
+          <!--            <phase>validate</phase>-->
+          <!--            <goals>-->
+          <!--              &lt;!&ndash;              <goal>check</goal>&ndash;&gt;-->
+          <!--            </goals>-->
+          <!--          </execution>-->
         </executions>
       </plugin>
       <plugin><!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage/ -->
@@ -547,6 +548,23 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>jakarta-ee-10</id>
+      <properties>
+        <!-- https://central.sonatype.com/artifact/jakarta.platform/jakartaee-api-parent/10.0.0 -->
+        <!-- jakarta.enterprise.cdi-api.version: 4.0.1 -->
+        <!-- jakarta.persistence-api.version: 3.1.0 -->
+        <!-- jakarta.validation-api.version: 3.0.2 -->
+        <persistence.version>3.1</persistence.version>
+        <version.jakarta.platform>10.0.0</version.jakarta.platform>
+        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
+        <version.org.hibernate.orm>6.6.29.Final</version.org.hibernate.orm>
+        <version.org.hibernate.validator>8.0.3.Final</version.org.hibernate.validator>
+        <!-- https://weld.cdi-spec.org/download/ -->
+<!--        <version.org.jboss.weld>5.1.6.Final</version.org.jboss.weld>-->
+        <version.org.jboss.weld>5.0.2.Final</version.org.jboss.weld>
+      </properties>
     </profile>
     <profile>
       <id>eclipselink</id>
