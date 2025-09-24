@@ -3,21 +3,20 @@ package com.github.jinahya.persistence.more;
 import jakarta.persistence.AttributeConverter;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 public abstract class __StringAttributeConverter<X> implements AttributeConverter<X, String> {
 
     public abstract static class NumberConverter<N extends Number> extends __StringAttributeConverter<N> {
 
-        protected NumberConverter(final Class<N> attributeClass) {
-            super(attributeClass);
+        protected NumberConverter() {
+            super();
         }
     }
 
     public static class BigDecimalConverter extends NumberConverter<BigDecimal> {
 
         protected BigDecimalConverter() {
-            super(BigDecimal.class);
+            super();
         }
 
         @Override
@@ -40,7 +39,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
     public static class DoubleConverter extends NumberConverter<Double> {
 
         protected DoubleConverter() {
-            super(Double.class);
+            super();
             delegate = new BigDecimalConverter();
         }
 
@@ -66,7 +65,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
     public static class FloatConverter extends NumberConverter<Float> {
 
         protected FloatConverter() {
-            super(Float.class);
+            super();
             delegate = new BigDecimalConverter();
         }
 
@@ -90,15 +89,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __StringAttributeConverter(final Class<X> attributeClass) {
+    protected __StringAttributeConverter() {
         super();
-        this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * The type of the entity attribute.
-     */
-    protected final Class<X> attributeClass;
 }
