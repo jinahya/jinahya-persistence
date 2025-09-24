@@ -2,7 +2,7 @@ package com.github.jinahya.persistence.more.test;
 
 import com.github.jinahya.persistence.more.__StringAttributeConverter;
 
-class SampleStringAttributeConverter
+class _SampleStringAttributeConverter
         extends __StringAttributeConverter<String> {
 
     @Override

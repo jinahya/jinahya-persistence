@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Slf4j
-class SampleStringAttributeConverter_Test
-        extends __StringAttributeConverter_Test<SampleStringAttributeConverter, String> {
+class _SampleStringAttributeConverter_Test
+        extends __StringAttributeConverter_Test<_SampleStringAttributeConverter, String> {
 
-    SampleStringAttributeConverter_Test() {
-        super(SampleStringAttributeConverter.class, String.class);
+    _SampleStringAttributeConverter_Test() {
+        super(_SampleStringAttributeConverter.class, String.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -41,56 +41,36 @@ class SampleStringAttributeConverter_Test
                 final ExtensionContext context) {
             return Stream.of(
                     new TestTemplateInvocationContext() {
-//                        @Override
-//                        public String getDisplayName(final int invocationIndex) {
-//                            return TestTemplateInvocationContext.super.getDisplayName(invocationIndex);
-//                        }
-
                         @Override
                         public List<Extension> getAdditionalExtensions() {
                             return List.of(
-                                    new TypeBasedParameterResolver<TestCase<String, String>>() {
+                                    new TypeBasedParameterResolver<__AttributeConverterTestCase<String, String>>() {
                                         @Override
-                                        public TestCase<String, String> resolveParameter(
+                                        public __AttributeConverterTestCase<String, String> resolveParameter(
                                                 final ParameterContext parameterContext,
                                                 final ExtensionContext extensionContext)
                                                 throws ParameterResolutionException {
-                                            return TestCase.of("a", "a");
+                                            return __AttributeConverterTestCase.of("a", "a");
                                         }
                                     }
                             );
                         }
-
-//                        @Override
-//                        public void prepareInvocation(final ExtensionContext context) {
-//                            TestTemplateInvocationContext.super.prepareInvocation(context);
-//                        }
                     },
                     new TestTemplateInvocationContext() {
-//                        @Override
-//                        public String getDisplayName(final int invocationIndex) {
-//                            return TestTemplateInvocationContext.super.getDisplayName(invocationIndex);
-//                        }
-
                         @Override
                         public List<Extension> getAdditionalExtensions() {
                             return List.of(
-                                    new TypeBasedParameterResolver<TestCase<String, String>>() {
+                                    new TypeBasedParameterResolver<__AttributeConverterTestCase<String, String>>() {
                                         @Override
-                                        public TestCase<String, String> resolveParameter(
+                                        public __AttributeConverterTestCase<String, String> resolveParameter(
                                                 final ParameterContext parameterContext,
                                                 final ExtensionContext extensionContext)
                                                 throws ParameterResolutionException {
-                                            return TestCase.of("b", "b");
+                                            return __AttributeConverterTestCase.of("b", "b");
                                         }
                                     }
                             );
                         }
-
-//                        @Override
-//                        public void prepareInvocation(final ExtensionContext context) {
-//                            TestTemplateInvocationContext.super.prepareInvocation(context);
-//                        }
                     }
             );
         }
@@ -99,7 +79,7 @@ class SampleStringAttributeConverter_Test
     @ExtendWith(ConvertToDatabaseColumnTestInvocationContextProvider.class)
     @TestTemplate
     @Override
-    protected void convertToDatabaseColumn__(@Nonnull final TestCase<String, String> testCase) {
+    protected void convertToDatabaseColumn__(@Nonnull final __AttributeConverterTestCase<String, String> testCase) {
         super.convertToDatabaseColumn__(testCase);
     }
 }
