@@ -52,12 +52,40 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
         final var actualDbData = instance.convertToDatabaseColumn(attribute);
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(actualDbData)
-                .as("actual dbData converted from %1$s", attribute, expectedDbData)
+                .as("actual dbData converted from %1$s", attribute)
                 .isNotNull()
                 .isEqualTo(expectedDbData);
     }
 
     // ---------------------------------------------------------------------------------------- convertToEntityAttribute
+    protected abstract static class __ConvertToEntityAttributeTestInvocationContextProvider
+            implements TestTemplateInvocationContextProvider {
+
+        @Override
+        public boolean supportsTestTemplate(final ExtensionContext context) {
+            return true;
+        }
+
+        @Override
+        public boolean mayReturnZeroTestTemplateInvocationContexts(final ExtensionContext context) {
+            return TestTemplateInvocationContextProvider.super.mayReturnZeroTestTemplateInvocationContexts(context);
+        }
+    }
+
+//    @TestTemplate
+    protected void convertToEntityAttribute__(@Nonnull final __AttributeConverterTestCase<X, Y> testCase) {
+        // ------------------------------------------------------------------------------------------------------- given
+        final var instance = newConverterInstance();
+        final var dbData = testCase.getDbData();
+        final var expectedAttribute = testCase.getAttribute();
+        // -------------------------------------------------------------------------------------------------------- when
+        final var actualAttribute = instance.convertToEntityAttribute(dbData);
+        // -------------------------------------------------------------------------------------------------------- then
+        assertThat(actualAttribute)
+                .as("actual attribute converted from %1$s", dbData)
+                .isNotNull()
+                .isEqualTo(expectedAttribute);
+    }
 
     // -------------------------------------------------------------------------------------------------- converterClass
     protected C newConverterInstance() {

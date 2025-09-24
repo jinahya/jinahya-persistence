@@ -24,12 +24,11 @@ class _SampleStringAttributeConverter_Test
 
     // -----------------------------------------------------------------------------------------------------------------
     private static class ConvertToDatabaseColumnTestInvocationContextProvider
-            extends __ConvertToDatabaseColumnTestInvocationContextProvider {
+            extends __ConvertToEntityAttributeTestInvocationContextProvider {
 
-//        @Override
-//        public boolean supportsTestTemplate(final ExtensionContext context) {
-//            return true;
-//        }
+        public boolean supportsTestTemplate(final ExtensionContext context) {
+            return true;
+        }
 //
 //        @Override
 //        public boolean mayReturnZeroTestTemplateInvocationContexts(ExtensionContext context) {
