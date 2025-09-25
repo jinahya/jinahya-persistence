@@ -4,18 +4,36 @@ import jakarta.persistence.AttributeConverter;
 
 import java.math.BigDecimal;
 
+/**
+ * An abstract class for converting {@code String} db data to a specific type of entity attribute, and vice versa.
+ *
+ * @param <X> entity attribute type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
 public abstract class __StringAttributeConverter<X> implements AttributeConverter<X, String> {
 
-    public abstract static class NumberConverter<N extends Number> extends __StringAttributeConverter<N> {
+    // -----------------------------------------------------------------------------------------------------------------
 
-        protected NumberConverter() {
+    /**
+     * An abstract class for converting {@code String} db data to an entity attribute of aspecific subtype of
+     * {@link Number}, and vice versa.
+     *
+     * @param <N> number type parameter
+     * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+     */
+    public abstract static class OfNumber<N extends Number> extends __StringAttributeConverter<N> {
+
+        protected OfNumber() {
             super();
         }
     }
 
-    public static class BigDecimalConverter extends NumberConverter<BigDecimal> {
+    public static class OfBigDecimal extends OfNumber<BigDecimal> {
 
-        protected BigDecimalConverter() {
+        protected OfBigDecimal() {
             super();
         }
 
@@ -36,37 +54,57 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
-    public static class DoubleConverter extends NumberConverter<Double> {
+    public static class OfInteger extends OfNumber<Integer> {
 
-        protected DoubleConverter() {
+        protected OfInteger() {
             super();
-            delegate = new BigDecimalConverter();
         }
 
         @Override
-        public String convertToDatabaseColumn(final Double attribute) {
+        public String convertToDatabaseColumn(final Integer attribute) {
             if (attribute == null) {
                 return null;
             }
-            return delegate.convertToDatabaseColumn(BigDecimal.valueOf(attribute));
+            return attribute.toString();
         }
 
         @Override
-        public Double convertToEntityAttribute(final String dbData) {
+        public Integer convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
-            return delegate.convertToEntityAttribute(dbData).doubleValue();
+            return Integer.valueOf(dbData);
         }
-
-        private final BigDecimalConverter delegate;
     }
 
-    public static class FloatConverter extends NumberConverter<Float> {
+    public static class OfLong extends OfNumber<Long> {
 
-        protected FloatConverter() {
+        protected OfLong() {
             super();
-            delegate = new BigDecimalConverter();
+        }
+
+        @Override
+        public String convertToDatabaseColumn(final Long attribute) {
+            if (attribute == null) {
+                return null;
+            }
+            return attribute.toString();
+        }
+
+        @Override
+        public Long convertToEntityAttribute(final String dbData) {
+            if (dbData == null) {
+                return null;
+            }
+            return Long.valueOf(dbData);
+        }
+    }
+
+    public static class OfFloat extends OfNumber<Float> {
+
+        protected OfFloat() {
+            super();
+            delegate = new OfBigDecimal();
         }
 
         @Override
@@ -85,8 +123,36 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
             return delegate.convertToEntityAttribute(dbData).floatValue();
         }
 
-        private final BigDecimalConverter delegate;
+        private final OfBigDecimal delegate;
     }
+
+    public static class OfDouble extends OfNumber<Double> {
+
+        protected OfDouble() {
+            super();
+            delegate = new OfBigDecimal();
+        }
+
+        @Override
+        public String convertToDatabaseColumn(final Double attribute) {
+            if (attribute == null) {
+                return null;
+            }
+            return delegate.convertToDatabaseColumn(BigDecimal.valueOf(attribute));
+        }
+
+        @Override
+        public Double convertToEntityAttribute(final String dbData) {
+            if (dbData == null) {
+                return null;
+            }
+            return delegate.convertToEntityAttribute(dbData).doubleValue();
+        }
+
+        private final OfBigDecimal delegate;
+    }
+
+    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected __StringAttributeConverter() {

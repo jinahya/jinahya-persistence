@@ -3,20 +3,18 @@ package com.github.jinahya.persistence.more.test;
 import com.github.jinahya.persistence.mapped.__Builder;
 
 @SuppressWarnings({
+        "unchecked",
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeConverterTestCaseBuilder<
-        SELF extends __AttributeConverterTestCaseBuilder<SELF, TARGET, X, Y>,
-        TARGET extends __AttributeConverterTestCase<X, Y>,
-        X,
-        Y
-        >
-        extends __Builder<SELF, TARGET> {
+// TODO: make final?
+public class __AttributeConverterTestCaseBuilder<X, Y>
+        extends __Builder<__AttributeConverterTestCaseBuilder<X, Y>, __AttributeConverterTestCase<X, Y>> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __AttributeConverterTestCaseBuilder(final Class<TARGET> targetClass) {
-        super(targetClass);
+    protected __AttributeConverterTestCaseBuilder() {
+        // https://stackoverflow.com/a/30754982/330457
+        super((Class<__AttributeConverterTestCase<X, Y>>) (Object) __AttributeConverterTestCase.class);
     }
 
     // ------------------------------------------------------------------------------------------------------- attribute
@@ -24,9 +22,17 @@ public abstract class __AttributeConverterTestCaseBuilder<
         return attribute;
     }
 
-    public SELF attribute(final X attribute) {
+    public __AttributeConverterTestCaseBuilder<X, Y> attribute(final X attribute) {
         this.attribute = attribute;
-        return (SELF) this;
+        return this;
+    }
+
+    public __AttributeConverterTestCaseBuilder<X, Y> givenAttribute(final X attribute) {
+        return attribute(attribute);
+    }
+
+    public __AttributeConverterTestCaseBuilder<X, Y> expectAttribute(final X attribute) {
+        return attribute(attribute);
     }
 
     // ---------------------------------------------------------------------------------------------------------- dbData
@@ -34,9 +40,17 @@ public abstract class __AttributeConverterTestCaseBuilder<
         return dbData;
     }
 
-    public SELF dbData(final Y dbData) {
+    public __AttributeConverterTestCaseBuilder<X, Y> dbData(final Y dbData) {
         this.dbData = dbData;
-        return (SELF) this;
+        return this;
+    }
+
+    public __AttributeConverterTestCaseBuilder<X, Y> givenDbData(final Y dbData) {
+        return dbData(dbData);
+    }
+
+    public __AttributeConverterTestCaseBuilder<X, Y> expectDbData(final Y dbData) {
+        return dbData(dbData);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -26,15 +26,6 @@ class _SampleStringAttributeConverter_Test
     private static class ConvertToDatabaseColumnTestInvocationContextProvider
             extends __ConvertToEntityAttributeTestInvocationContextProvider {
 
-        public boolean supportsTestTemplate(final ExtensionContext context) {
-            return true;
-        }
-//
-//        @Override
-//        public boolean mayReturnZeroTestTemplateInvocationContexts(ExtensionContext context) {
-//            return super.mayReturnZeroTestTemplateInvocationContexts(context);
-//        }
-
         @Override
         public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
                 final ExtensionContext context) {
@@ -65,7 +56,10 @@ class _SampleStringAttributeConverter_Test
                                                 final ParameterContext parameterContext,
                                                 final ExtensionContext extensionContext)
                                                 throws ParameterResolutionException {
-                                            return __AttributeConverterTestCase.of("b", "b");
+                                            return __AttributeConverterTestCase.<String, String>builder()
+                                                    .givenAttribute("a")
+                                                    .expectDbData("a")
+                                                    .build();
                                         }
                                     }
                             );
@@ -78,7 +72,8 @@ class _SampleStringAttributeConverter_Test
     @ExtendWith(ConvertToDatabaseColumnTestInvocationContextProvider.class)
     @TestTemplate
     @Override
-    protected void convertToDatabaseColumn__(@Nonnull final __AttributeConverterTestCase<String, String> testCase) {
-        super.convertToDatabaseColumn__(testCase);
+    protected void convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(
+            @Nonnull final __AttributeConverterTestCase<String, String> testCase) {
+        super.convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(testCase);
     }
 }
