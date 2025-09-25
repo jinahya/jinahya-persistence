@@ -28,35 +28,35 @@ import java.util.Objects;
 /**
  * An abstract class for persisting a specific class.
  *
- * @param <ENTITY> entity type parameter
+ * @param <T> entity type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
-public abstract class ___Persister<ENTITY> {
+public abstract class ___Persister<T> {
 
     /**
      * Creates a new instance for persisting specified class.
      *
-     * @param entityClass the class to persist.
+     * @param type the class to persist.
      */
-    protected ___Persister(@Nonnull final Class<ENTITY> entityClass) {
+    protected ___Persister(@Nonnull final Class<T> type) {
         super();
-        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+        this.type = Objects.requireNonNull(type, "type is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Persists specified instance of {@link ENTITY} using specified entity manager.
+     * Persists specified instance of {@link T} using specified entity manager.
      *
      * @param entityManager  the entity manager to use.
-     * @param entityInstance the instance of {@link ENTITY} to persist.
+     * @param entityInstance the instance of {@link T} to persist.
      * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
      */
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final ENTITY entityInstance) {
+    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final T entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         ___JakartaValidation_TestUtils.requireValid(entityInstance);
@@ -68,7 +68,7 @@ public abstract class ___Persister<ENTITY> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class of {@link ENTITY}.
+     * The entity class to persist.
      */
-    protected final Class<ENTITY> entityClass;
+    protected final Class<T> type;
 }

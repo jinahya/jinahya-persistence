@@ -47,6 +47,8 @@
   </issueManagement>
 
   <properties>
+    <!-- https://endoflife.date/eclipse-temurin -->
+    <!-- https://endoflife.date/amazon-corretto -->
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.source}</maven.compiler.release>
@@ -111,6 +113,13 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>1.5.18</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>2.20.0</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>

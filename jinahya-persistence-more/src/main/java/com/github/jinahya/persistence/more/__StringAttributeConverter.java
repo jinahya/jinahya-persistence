@@ -1,6 +1,7 @@
 package com.github.jinahya.persistence.more;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 import java.math.BigDecimal;
 
@@ -31,6 +32,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    @Converter(autoApply = false)
     public static class OfBigDecimal extends OfNumber<BigDecimal> {
 
         protected OfBigDecimal() {
@@ -54,6 +56,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    @Converter(autoApply = false)
     public static class OfInteger extends OfNumber<Integer> {
 
         protected OfInteger() {
@@ -77,6 +80,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    @Converter(autoApply = false)
     public static class OfLong extends OfNumber<Long> {
 
         protected OfLong() {
@@ -100,6 +104,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    @Converter(autoApply = false)
     public static class OfFloat extends OfNumber<Float> {
 
         protected OfFloat() {
@@ -126,6 +131,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         private final OfBigDecimal delegate;
     }
 
+    @Converter(autoApply = false)
     public static class OfDouble extends OfNumber<Double> {
 
         protected OfDouble() {

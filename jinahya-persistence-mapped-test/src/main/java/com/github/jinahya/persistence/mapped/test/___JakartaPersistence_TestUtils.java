@@ -391,11 +391,19 @@ public final class ___JakartaPersistence_TestUtils {
         );
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
                                   @Nonnull final Supplier<? extends R> supplier,
                                   final boolean rollback) {
         Objects.requireNonNull(supplier, "supplier is null");
-        return applyEntityManagerInTransaction(entityManager, em -> supplier.get(), rollback);
+        return applyEntityManagerInTransaction(
+                entityManager,
+                em -> {
+                    assert em == entityManager;
+                    return supplier.get();
+                },
+                rollback
+        );
     }
 
     public static <R> R getInTransactionAndRollback(@Nonnull final EntityManager entityManager,
@@ -408,8 +416,8 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R applyUnwrappedConnection(final EntityManager entityManager,
-                                          final Function<? super Connection, ? extends R> function) {
+    static <R> R applyUnwrappedConnection(@Nonnull final EntityManager entityManager,
+                                          @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         try {
@@ -446,27 +454,16 @@ public final class ___JakartaPersistence_TestUtils {
                                         final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
-        return getInTransaction(
+        return applyEntityManagerInTransaction(
                 entityManager,
-                () -> applyUnwrappedConnection(
-                        entityManager,
-                        function
-                ),
+                em -> applyUnwrappedConnection(em, function),
                 rollback
         );
     }
 
     public static <R> R applyConnectionAndRollback(final EntityManager entityManager,
                                                    final Function<? super Connection, ? extends R> function) {
-        Objects.requireNonNull(entityManager, "entityManager is null");
-        Objects.requireNonNull(function, "function is null");
-        return getInTransactionAndRollback(
-                entityManager,
-                () -> applyUnwrappedConnection(
-                        entityManager,
-                        function
-                )
-        );
+        return applyConnection(entityManager, function, true);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
