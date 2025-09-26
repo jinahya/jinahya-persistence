@@ -1,5 +1,7 @@
 package com.github.jinahya.persistence.more;
 
+import com.github.jinahya.persistence.more.color.__MappedRgb;
+
 import java.util.Objects;
 
 class _MappedRgb extends __MappedRgb {

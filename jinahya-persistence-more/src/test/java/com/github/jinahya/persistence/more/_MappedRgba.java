@@ -1,5 +1,7 @@
 package com.github.jinahya.persistence.more;
 
+import com.github.jinahya.persistence.more.color.__MappedRgba;
+
 import java.util.Objects;
 
 class _MappedRgba extends __MappedRgba {

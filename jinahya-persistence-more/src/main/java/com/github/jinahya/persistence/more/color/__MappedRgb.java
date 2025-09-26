@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.color;
 
 import com.github.jinahya.persistence.mapped.__Mapped;
 import jakarta.annotation.Nonnull;
