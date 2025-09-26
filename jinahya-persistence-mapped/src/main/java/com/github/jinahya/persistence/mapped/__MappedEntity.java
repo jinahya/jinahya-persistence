@@ -20,7 +20,6 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
 /**
@@ -31,28 +30,29 @@ import jakarta.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 @SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
+        "java:S114", // Interface names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntity<ID> extends __Mapped {
+public interface __MappedEntity<ID> extends __Mapped {
 
-    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
-
-    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-
-    /**
-     * Creates a new instance.
-     */
-    protected __MappedEntity() {
-        super();
-    }
-
-    /**
-     * Creates a new instance built from the specified builder.
-     *
-     * @param builder the builder from which a new instance is built.
-     */
-    protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
-        super(builder);
-    }
+//    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+//
+//    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+//
+//    /**
+//     * Creates a new instance.
+//     */
+//    protected __MappedEntity() {
+//        super();
+//    }
+//
+//    /**
+//     * Creates a new instance built from the specified builder.
+//     *
+//     * @param builder the builder from which a new instance is built.
+//     */
+//    protected __MappedEntity(@Nonnull final __MappedEntityBuilder<?, ?> builder) {
+////        super(builder);
+//        super();
+//    }
 }

@@ -20,33 +20,30 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
-
-import java.util.Objects;
-
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "java:S114" // Interface names should comply with a naming convention
+//        "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __Mapped {
-
-    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
-
-    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-
-    /**
-     * Creates a new instance.
-     */
-    protected __Mapped() {
-        super();
-    }
-
-    /**
-     * Creates a new instance built from the specified builder.
-     *
-     * @param builder the builder from which a new instance is built.
-     */
-    protected __Mapped(@Nonnull final __MappedBuilder<?, ?> builder) {
-        this();
-        Objects.requireNonNull(builder, "builder is null");
-    }
+public interface __Mapped {
+//
+//    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+//
+//    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+//
+//    /**
+//     * Creates a new instance.
+//     */
+//    protected __Mapped() {
+//        super();
+//    }
+//
+//    /**
+//     * Creates a new instance built from the specified builder.
+//     *
+//     * @param builder the builder from which a new instance is built.
+//     */
+//    protected __Mapped(@Nonnull final __MappedBuilder<?, ?> builder) {
+//        this();
+//        Objects.requireNonNull(builder, "builder is null");
+//    }
 }

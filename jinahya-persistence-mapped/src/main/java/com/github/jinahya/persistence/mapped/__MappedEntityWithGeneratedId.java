@@ -39,7 +39,7 @@ import jakarta.persistence.MappedSuperclass;
         "java:s117", // Local variable and method parameter names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<ID> {
+public abstract class __MappedEntityWithGeneratedId<ID> implements  __MappedEntity<ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_ID__ = "id__";
@@ -58,6 +58,7 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
     }
 
     protected __MappedEntityWithGeneratedId(@Nonnull final __MappedEntityWithGeneratedIdBuilder<?, ?> builder) {
-        super(builder);
+//        super(builder);
+        super();
     }
 }
