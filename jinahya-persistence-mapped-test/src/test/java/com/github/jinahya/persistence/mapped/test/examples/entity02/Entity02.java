@@ -34,7 +34,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = Entity02.TABLE_NAME)
-public class Entity02 extends __MappedEntity<Long> {
+public class Entity02 implements  __MappedEntity<Long> {
 
     public static final String TABLE_NAME = "entity02";
 
@@ -44,7 +44,8 @@ public class Entity02 extends __MappedEntity<Long> {
     }
 
     Entity02(final Entity02Builder builder) {
-        super(builder);
+//        super(builder);
+        super();
         id = builder.id();
         name = builder.name();
     }

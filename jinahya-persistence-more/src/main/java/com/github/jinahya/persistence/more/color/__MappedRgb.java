@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.color;
 
 import com.github.jinahya.persistence.mapped.__Mapped;
 import jakarta.annotation.Nonnull;
@@ -15,7 +15,7 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedRgb extends __Mapped {
+public abstract class __MappedRgb implements __Mapped {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_RED = "red";
@@ -52,7 +52,8 @@ public abstract class __MappedRgb extends __Mapped {
     }
 
     protected __MappedRgb(final __MappedRgbBuilder<?, ?> builder) {
-        super(builder);
+        super();
+//        super(builder);
         red = builder.red();
         green = builder.green();
         blue = builder.blue();

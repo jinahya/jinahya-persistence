@@ -164,9 +164,6 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
                     if (parameterTypes[0] != SingleTypeEqualsVerifierApi.class) {
                         return false;
                     }
-                    if (!m.isAnnotationPresent(__Configure_EqualsVerifier.class)) {
-                        return false;
-                    }
                     return true;
                 },
                 ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP
@@ -203,7 +200,6 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @apiNote the {@code equals_Verify_(SingleTypeEqualsVerifierApi)} method of {@code __Mapped_Test} class
      *         simply returns the {@code equalsVerifier}.
      */
-    @__Configure_EqualsVerifier
     @Nonnull
     protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_(
             @Nonnull final SingleTypeEqualsVerifierApi<MAPPED> equalsVerifier) {

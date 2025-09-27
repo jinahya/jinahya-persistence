@@ -11,9 +11,26 @@
   <artifactId>jinahya-persistence-more-test</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Interfaces/classes for testing created with jinahya-persistence-more</description>
+  <description>Interfaces/classes for testing classes/interfaces created with jinahya-persistence-more</description>
 
   <dependencies>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.github.jinahya</groupId>
+      <artifactId>jinahya-persistence-mapped</artifactId>
+      <version>0.2.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.github.jinahya</groupId>
+      <artifactId>jinahya-persistence-mapped-test</artifactId>
+      <version>0.2.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>io.github.jinahya</groupId>
       <artifactId>jinahya-persistence-more</artifactId>
@@ -76,11 +93,16 @@
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.projectlombok</groupId>-->
-<!--      <artifactId>lombok</artifactId>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk-platform-logging</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>uk.co.jemos.podam</groupId>
       <artifactId>podam</artifactId>

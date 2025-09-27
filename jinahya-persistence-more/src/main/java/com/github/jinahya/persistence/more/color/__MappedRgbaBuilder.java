@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.color;
 
 @SuppressWarnings({
         "unchecked",
