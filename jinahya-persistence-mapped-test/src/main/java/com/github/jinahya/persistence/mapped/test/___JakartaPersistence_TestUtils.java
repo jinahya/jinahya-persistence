@@ -392,9 +392,9 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
-                                  @Nonnull final Supplier<? extends R> supplier,
-                                  final boolean rollback) {
+    public static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
+                                         @Nonnull final Supplier<? extends R> supplier,
+                                         final boolean rollback) {
         Objects.requireNonNull(supplier, "supplier is null");
         return applyEntityManagerInTransaction(
                 entityManager,
