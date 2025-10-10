@@ -75,7 +75,8 @@
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
     <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
-    <version.nl.jqno.equalsverifier>4.1.1</version.nl.jqno.equalsverifier>
+<!--    <version.nl.jqno.equalsverifier>4.1.1</version.nl.jqno.equalsverifier>-->
+    <version.nl.jqno.equalsverifier>4.2</version.nl.jqno.equalsverifier>
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
     <version.org.eclipse.persistence>5.0.0-B10</version.org.eclipse.persistence>
     <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
@@ -100,6 +101,8 @@
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
     <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/versions -->
     <version.org.junit>5.13.4</version.org.junit>
+    <!-- https://github.com/weld/weld-testing/issues/293 -->
+<!--    <version.org.junit>6.0.0</version.org.junit>-->
     <version.org.junit.jupiter>${version.org.junit}</version.org.junit.jupiter>
     <version.org.junit.platform>1.9.1</version.org.junit.platform>
     <version.org.mockito>5.18.0</version.org.mockito>
@@ -112,7 +115,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.5.18</version>
+        <version>1.5.19</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
