@@ -88,6 +88,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
         assertThat(string)
                 .as("%s.toString()", mappedInstance)
                 .isNotBlank();
+        logger.log(Level.DEBUG, "instance: {0}", mappedInstance);
     }
 
     private void assumeToStringTestNotDisabled() {

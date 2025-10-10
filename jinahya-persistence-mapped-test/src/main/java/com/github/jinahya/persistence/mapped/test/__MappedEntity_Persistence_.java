@@ -111,9 +111,12 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                     .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
                     .isEmpty();
         }
-        final var persisted = applyEntityManagerInTransactionAndRollback(em -> {
-            return __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
-        });
+        final var persisted = applyEntityManagerInTransaction(
+                em -> {
+                    return __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
+                },
+                true
+        );
         logger.log(Level.DEBUG, "persisted: {0}", persisted);
     }
 
@@ -173,7 +176,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      *
      * @param function the function.
      * @param <R>      result type parameter
-     * @return the result of the {@code function}.
+     * @return the result of the {@code function} applied to an entity manager.
      */
     protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
@@ -188,31 +191,25 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
         });
     }
 
-    @Deprecated(forRemoval = true)
+    /**
+     * Applies an instance of {@link EntityManager}, as joined to a transaction, to the specified function, and returns
+     * the result.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function} applied to an entity manager.
+     */
     protected final <R> R applyEntityManagerInTransaction(
             @Nonnull final Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.getInTransaction(
-                em,
-                () -> function.apply(em),
-                rollback
-        ));
-    }
-
-    /**
-     * Returns the result of the specified function applied to an entity manager.
-     *
-     * @param function the function.
-     * @param <R>      result type parameter.
-     * @return the result of the {@code function}.
-     */
-    protected final <R> R applyEntityManagerInTransactionAndRollback(
-            @Nonnull final Function<? super EntityManager, ? extends R> function) {
-        return applyEntityManagerInTransaction(
-                function,
-                true
-        );
+        return applyEntityManager(em -> {
+            return ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+                    em,
+                    function,
+                    rollback
+            );
+        });
     }
 
     // ------------------------------------------------------------------------------------------------------ connection
@@ -224,33 +221,14 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @param rollback a flag for rolling-back; {@code true} for rollback; {@code false} otherwise.
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
-     * @deprecated Use {@link #applyConnectionInTransactionAndRollback(Function)} method.
+     * @see #applyEntityManagerInTransaction(Function, boolean)
      */
-    @Deprecated(forRemoval = true)
-    protected final <R> R applyConnectionInTransaction(
-            @Nonnull final Function<? super Connection, ? extends R> function,
-            final boolean rollback) {
+    protected final <R> R applyConnection(@Nonnull final Function<? super Connection, ? extends R> function,
+                                          final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerInTransaction(
-                em -> ___JakartaPersistence_TestUtils.applyConnection(em, function),
+                em -> ___JakartaPersistence_TestUtils.applyUnwrappedConnection(em, function),
                 rollback
-        );
-    }
-
-    /**
-     * Returns the result of the specified function applied, in transaction, to a connection unwrapped from an entity
-     * manager, and rolls back.
-     *
-     * @param function the function.
-     * @param <R>      result type parameter
-     * @return the result of the {@code function}.
-     */
-    protected final <R> R applyConnectionInTransactionAndRollback(
-            @Nonnull final Function<? super Connection, ? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
-                entityManager,
-                function
         );
     }
 
