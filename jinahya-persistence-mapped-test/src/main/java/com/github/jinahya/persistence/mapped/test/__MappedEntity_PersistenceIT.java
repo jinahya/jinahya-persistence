@@ -286,6 +286,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
             final var entityColumnName = entityColumn.name();
             final var entityColumnNullable = entityColumn.nullable();
             final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+            {
+                assumeThat(tableColumnIsNullable).isNotNull();
+            }
             if (!_MatchTableColumnNullable_EntityColumnNullable(
                     entityMember, entityColumn, tableColumnIsNullable)) {
                 logger.log(

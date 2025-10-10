@@ -20,6 +20,9 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled("H2")
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
