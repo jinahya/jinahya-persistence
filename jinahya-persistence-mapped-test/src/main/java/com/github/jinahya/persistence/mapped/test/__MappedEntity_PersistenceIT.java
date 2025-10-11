@@ -125,7 +125,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                                 new ArrayList<>()
                         )
                 ));
-        logger.log(Level.DEBUG, "tableColumnNames: {0}", tableColumnNames);
+        logger.log(Level.DEBUG, "table column names: {0}", tableColumnNames);
         assertThat(tableColumnNames)
                 .as("table column names for " + entityClass +
                     "; catalog: " + catalog +

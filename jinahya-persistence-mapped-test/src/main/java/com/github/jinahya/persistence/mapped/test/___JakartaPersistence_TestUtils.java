@@ -381,20 +381,22 @@ public final class ___JakartaPersistence_TestUtils {
         }
     }
 
-    public static <R> R applyEntityManagerInTransactionAndRollback(
-            @Nonnull final EntityManager entityManager,
-            @Nonnull final Function<? super EntityManager, ? extends R> function) {
-        return applyEntityManagerInTransaction(
-                entityManager,
-                function,
-                true
-        );
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
-                                  @Nonnull final Supplier<? extends R> supplier,
-                                  final boolean rollback) {
+
+    /**
+     * Starts a resource-level transaction on the specified entity manager, and returns what supplied from the specified
+     * supplier.
+     *
+     * @param entityManager the entity manager.
+     * @param supplier      the supplier.
+     * @param rollback      a flag for rolling-back; {@code true} for rolling-back, {@code false} for committing.
+     * @param <R>           result type parameter.
+     * @return the result of the specified supplier.
+     * @see #applyEntityManagerInTransaction(EntityManager, Function, boolean)
+     */
+    public static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
+                                         @Nonnull final Supplier<? extends R> supplier,
+                                         final boolean rollback) {
         Objects.requireNonNull(supplier, "supplier is null");
         return applyEntityManagerInTransaction(
                 entityManager,
@@ -406,6 +408,17 @@ public final class ___JakartaPersistence_TestUtils {
         );
     }
 
+    /**
+     * Starts a resource-level transaction on the specified entity manager, returns what supplied from the specified
+     * supplier, and rolls back the transaction.
+     *
+     * @param entityManager the entity manager.
+     * @param supplier      the supplier.
+     * @param <R>           result type parameter.
+     * @return the result of the specified supplier.
+     * @apiNote This method invokes the {@link #getInTransaction(EntityManager, Supplier, boolean)} method with
+     *         {@code entityManager}, {@code supplier}, and {@code true}.
+     */
     public static <R> R getInTransactionAndRollback(@Nonnull final EntityManager entityManager,
                                                     @Nonnull final Supplier<? extends R> supplier) {
         return getInTransaction(
@@ -416,8 +429,8 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static <R> R applyUnwrappedConnection(@Nonnull final EntityManager entityManager,
-                                          @Nonnull final Function<? super Connection, ? extends R> function) {
+    public static <R> R applyUnwrappedConnection(@Nonnull final EntityManager entityManager,
+                                                 @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         try {

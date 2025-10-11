@@ -73,14 +73,20 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
-        getEntityManagerFactory().getProperties().forEach((k, v) -> {
-            logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
-        });
-        tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
-        tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
-        tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
-        entityManager = getEntityManagerFactory().createEntityManager();
-        logger.log(Level.DEBUG, "created: {0}", entityManager);
+        {
+            getEntityManagerFactory().getProperties().forEach((k, v) -> {
+                logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
+            });
+        }
+        {
+            tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
+            tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
+            tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
+        }
+        {
+//            entityManager = getEntityManagerFactory().createEntityManager();
+//            logger.log(Level.DEBUG, "created: {0}", entityManager);
+        }
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -111,9 +117,12 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                     .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
                     .isEmpty();
         }
-        final var persisted = applyEntityManagerInTransactionAndRollback(em -> {
-            return __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
-        });
+        final var persisted = applyEntityManagerInTransaction(
+                em -> {
+                    return __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
+                },
+                true
+        );
         logger.log(Level.DEBUG, "persisted: {0}", persisted);
     }
 
@@ -167,118 +176,74 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     // --------------------------------------------------------------------------------------------------- entityManager
+    private EntityManager entityManager() {
+        var em = entityManager;
+        if (em == null || !em.isOpen()) {
+            em = entityManager = getEntityManagerFactory().createEntityManager();
+        }
+        return em;
+    }
 
     /**
      * Applies an instance of {@link EntityManager} to the specified function, and returns the result.
      *
      * @param function the function.
      * @param <R>      result type parameter
-     * @return the result of the {@code function}.
+     * @return the result of the {@code function} applied to an entity manager.
      */
     protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        if (true) {
-            return function.apply(entityManager);
+        {
+            final var clazz = getClass();
+            final var flag = AnnotationUtils.findAnnotation(clazz, __Use_Cached_EntityManager.class);
+            if (flag.isPresent()) {
+                return function.apply(entityManager());
+            }
         }
         // too slow!
         return applyEntityManagerFactory(emf -> {
-            try (final var entityManager = emf.createEntityManager()) {
-                return function.apply(entityManager);
+            try (final var em = emf.createEntityManager()) {
+                return function.apply(em);
             }
         });
     }
 
-    @Deprecated(forRemoval = true)
+    /**
+     * Applies an instance of {@link EntityManager}, as joined to a transaction, to the specified function, and returns
+     * the result.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function} applied to an entity manager.
+     */
     protected final <R> R applyEntityManagerInTransaction(
             @Nonnull final Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.getInTransaction(
-                em,
-                () -> function.apply(em),
-                rollback
-        ));
+        return applyEntityManager(em -> {
+            return ___JakartaPersistence_TestUtils.applyEntityManagerInTransaction(
+                    em,
+                    function,
+                    rollback
+            );
+        });
     }
 
     /**
-     * Returns the result of the specified function applied to an entity manager.
+     * Applies an instance of {@link EntityManager}, as joined to a transaction, to the specified function, and returns
+     * the result.
      *
      * @param function the function.
-     * @param <R>      result type parameter.
-     * @return the result of the {@code function}.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function} applied to an entity manager.
+     * @apiNote This method invokes the {@link #applyEntityManagerInTransaction(Function, boolean)} method with
+     *         {@code function} and {@code true}.
      */
     protected final <R> R applyEntityManagerInTransactionAndRollback(
             @Nonnull final Function<? super EntityManager, ? extends R> function) {
-        return applyEntityManagerInTransaction(
-                function,
-                true
-        );
+        return applyEntityManagerInTransaction(function, true);
     }
 
-    // ------------------------------------------------------------------------------------------------------ connection
-
-    /**
-     * Returns the result of the specified function applied to a connection unwrapped from an entity manager.
-     *
-     * @param function the function.
-     * @param rollback a flag for rolling-back; {@code true} for rollback; {@code false} otherwise.
-     * @param <R>      result type parameter
-     * @return the result of the {@code function}.
-     * @deprecated Use {@link #applyConnectionInTransactionAndRollback(Function)} method.
-     */
-    @Deprecated(forRemoval = true)
-    protected final <R> R applyConnectionInTransaction(
-            @Nonnull final Function<? super Connection, ? extends R> function,
-            final boolean rollback) {
-        Objects.requireNonNull(function, "function is null");
-        return applyEntityManagerInTransaction(
-                em -> ___JakartaPersistence_TestUtils.applyConnection(em, function),
-                rollback
-        );
-    }
-
-    /**
-     * Returns the result of the specified function applied, in transaction, to a connection unwrapped from an entity
-     * manager, and rolls back.
-     *
-     * @param function the function.
-     * @param <R>      result type parameter
-     * @return the result of the {@code function}.
-     */
-    protected final <R> R applyConnectionInTransactionAndRollback(
-            @Nonnull final Function<? super Connection, ? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
-                entityManager,
-                function
-        );
-    }
-
-    // ------------------------------------------------------------------------------------------------------- tableName
-    protected String tableName() {
-        return tableName;
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Nullable
-    protected String tableCatalog() {
-        return tableCatalog;
-    }
-
-    @Nullable
-    protected String tableSchema() {
-        return tableSchema;
-    }
-
-    @Nullable
-    protected String[] tableTypes() {
-        return Optional.ofNullable(tableTypes)
-                .map(v -> Arrays.copyOf(v, v.length))
-                .orElse(null)
-                ;
-    }
-
-    // --------------------------------------------------------------------------------------------------- entityManager
     @Nullable
     protected <R> R applyCountAndRandomIndex(
             @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
@@ -308,6 +273,66 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             final var root = query.from(entityClass);
             return function.apply(builder).apply(query).apply(root);
         });
+    }
+
+    // ------------------------------------------------------------------------------------------------------ connection
+
+    /**
+     * Returns the result of the specified function applied to a connection unwrapped from an entity manager.
+     *
+     * @param function the function.
+     * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @see #applyEntityManagerInTransaction(Function, boolean)
+     */
+    protected final <R> R applyConnection(@Nonnull final Function<? super Connection, ? extends R> function,
+                                          final boolean rollback) {
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManagerInTransaction(
+                em -> ___JakartaPersistence_TestUtils.applyUnwrappedConnection(em, function),
+                rollback
+        );
+    }
+
+    /**
+     * Returns the result of the specified function applied to a connection unwrapped from an entity manager.
+     *
+     * @param function the function.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @apiNote This method invokes the {@link #applyConnection(Function, boolean)} method with {@code function}
+     *         and {@code true}.
+     */
+    protected final <R> R applyConnectionAndRollback(
+            @Nonnull final Function<? super Connection, ? extends R> function) {
+        return applyConnection(function, true);
+    }
+
+    // ------------------------------------------------------------------------------------------------------- tableName
+    protected String tableName() {
+        return tableName;
+    }
+
+    // ---------------------------------------------------------------------------------------------------- tableCatalog
+    @Nullable
+    protected String tableCatalog() {
+        return tableCatalog;
+    }
+
+    // ----------------------------------------------------------------------------------------------------- tableSchema
+    @Nullable
+    protected String tableSchema() {
+        return tableSchema;
+    }
+
+    // ------------------------------------------------------------------------------------------------------ tableTypes
+    @Nullable
+    protected String[] tableTypes() {
+        return Optional.ofNullable(tableTypes)
+                .map(v -> Arrays.copyOf(v, v.length))
+                .orElse(null)
+                ;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
