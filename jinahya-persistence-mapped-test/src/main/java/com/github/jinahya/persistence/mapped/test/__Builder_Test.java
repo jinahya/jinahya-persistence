@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThatCode;
 
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
@@ -34,14 +35,24 @@ public abstract class __Builder_Test<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("build() should return non-null TARGET")
+    @DisplayName("build() should return non-null <TARGET>")
     @Test
-    protected void build_NotNull_() {
+    protected void build_NotNull_newBuilderInstance() {
+        assumeThatCode(() -> { // some builder constructors may throw
+            final var built = newBuilderInstance().build();
+            logger.log(System.Logger.Level.DEBUG, "built: {0}", built);
+            assertThat(built).isNotNull();
+        }).doesNotThrowAnyException();
+    }
+
+    @DisplayName("build() should return non-null <TARGET>")
+    @Test
+    protected void build_NotNull_newRandomizedBuilderInstance() {
         newRandomizedBuilderInstance()
                 .map(__Builder::build)
-                .ifPresent(b -> {
-                    logger.log(System.Logger.Level.DEBUG, "built: {0}", b);
-                    assertThat(b).isNotNull();
+                .ifPresent(v -> {
+                    logger.log(System.Logger.Level.DEBUG, "built: {0}", v);
+                    assertThat(v).isNotNull();
                 });
     }
 
