@@ -137,7 +137,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      *
      * @see #_Mapped_AllDatabaseTableNames(Collection)
      */
-    @DisplayName("all database tables are mapped")
+    @DisplayName("all database table names are mapped")
     @Test
     void _Mapped_AllDatabaseTableNames() {
         // ------------------------------------------------------------------------------------------------------- given
@@ -145,11 +145,15 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
         final var persistenceTableNames = Collections.unmodifiableCollection(getPersistenceTableNames());
         // -------------------------------------------------------------------------------------------------------- when
         databaseTableNames.removeAll(persistenceTableNames);
-        logger.log(Level.DEBUG, "remaining database table names: {0}", databaseTableNames);
+        if (false) {
+            persistenceTableNames.forEach(dtn -> {
+                logger.log(Level.DEBUG, "remaining database table name: {0}", dtn);
+            });
+        }
         // -------------------------------------------------------------------------------------------------------- then
         _Mapped_AllDatabaseTableNames(databaseTableNames);
         assertThat(databaseTableNames)
-                .as("remaining database table names")
+                .as("unmapped database table names")
                 .isEmpty();
     }
 
@@ -178,7 +182,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      *
      * @see #_Known_AllPersistenceTableNames(Collection)
      */
-    @DisplayName("check all entity tables are known")
+    @DisplayName("all persistence table names are known")
     @Test
     void _Known_AllPersistenceTableNames() {
         // ------------------------------------------------------------------------------------------------------- given
@@ -186,7 +190,11 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
         final var persistenceTableNames = getPersistenceTableNames();
         // -------------------------------------------------------------------------------------------------------- when
         persistenceTableNames.removeAll(databaseTableNames);
-        logger.log(Level.DEBUG, "unknown persistence table names: {0}", persistenceTableNames);
+        if (false) {
+            persistenceTableNames.forEach(ptn -> {
+                logger.log(Level.DEBUG, "remaining persistence table name: {0}", ptn);
+            });
+        }
         // -------------------------------------------------------------------------------------------------------- then
         _Known_AllPersistenceTableNames(persistenceTableNames);
         assertThat(persistenceTableNames)
