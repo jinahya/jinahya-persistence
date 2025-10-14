@@ -6,7 +6,7 @@ import jakarta.annotation.Nonnull;
  * An abstract builder class for building a specific subclass of {@link __MappedEntity} class.
  *
  * @param <SELF>   self type parameter
- * @param <ENTITY> entity type parameter
+ * @param <TARGET> entity type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
@@ -14,20 +14,20 @@ import jakarta.annotation.Nonnull;
         "java:S119", // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityBuilder<
-        SELF extends __MappedEntityBuilder<SELF, ENTITY>,
-        ENTITY extends __MappedEntity<?>
+        SELF extends __MappedEntityBuilder<SELF, TARGET>,
+        TARGET extends __MappedEntity<?>
         >
-        extends __MappedBuilder<SELF, ENTITY> {
+        extends __MappedBuilder<SELF, TARGET> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance with the specified entity class.
      *
-     * @param entityClass the entity class.
+     * @param targetClass the entity class.
      */
-    protected __MappedEntityBuilder(@Nonnull final Class<ENTITY> entityClass) {
-        super(entityClass);
+    protected __MappedEntityBuilder(@Nonnull final Class<TARGET> targetClass) {
+        super(targetClass);
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object

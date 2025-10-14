@@ -28,19 +28,19 @@ package com.github.jinahya.persistence.mapped;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedIdBuilder<
-        SELF extends __MappedEntityWithGeneratedIdBuilder<SELF, ENTITY>,
-        ENTITY extends __MappedEntityWithGeneratedId<?>
+        SELF extends __MappedEntityWithGeneratedIdBuilder<SELF, TARGET>,
+        TARGET extends __MappedEntityWithGeneratedId<?>
         >
-        extends __MappedEntityBuilder<SELF, ENTITY> {
+        extends __MappedEntityBuilder<SELF, TARGET> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance for building instances of the specified entity class.
      *
-     * @param entityClass tne entity class.
+     * @param targetClass tne entity class.
      */
-    protected __MappedEntityWithGeneratedIdBuilder(final Class<ENTITY> entityClass) {
-        super(entityClass);
+    protected __MappedEntityWithGeneratedIdBuilder(final Class<TARGET> targetClass) {
+        super(targetClass);
     }
 }

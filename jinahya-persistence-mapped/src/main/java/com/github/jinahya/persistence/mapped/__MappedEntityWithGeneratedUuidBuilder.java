@@ -24,7 +24,7 @@ package com.github.jinahya.persistence.mapped;
  * An abstract builder class for a specific subclass of {@link __MappedEntityWithGeneratedUuid} class.
  *
  * @param <SELF>   self type parameter
- * @param <ENTITY> entity type parameter
+ * @param <TARGET> entity type parameter
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
@@ -34,19 +34,19 @@ package com.github.jinahya.persistence.mapped;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __MappedEntityWithGeneratedUuidBuilder<
-        SELF extends __MappedEntityWithGeneratedUuidBuilder<SELF, ENTITY>,
-        ENTITY extends __MappedEntityWithGeneratedUuid
+        SELF extends __MappedEntityWithGeneratedUuidBuilder<SELF, TARGET>,
+        TARGET extends __MappedEntityWithGeneratedUuid
         >
-        extends __MappedEntityWithGeneratedIdBuilder<SELF, ENTITY> {
+        extends __MappedEntityWithGeneratedIdBuilder<SELF, TARGET> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @param entityClass the entity class.
+     * @param targetClass the entity class.
      */
-    protected __MappedEntityWithGeneratedUuidBuilder(final Class<ENTITY> entityClass) {
-        super(entityClass);
+    protected __MappedEntityWithGeneratedUuidBuilder(final Class<TARGET> targetClass) {
+        super(targetClass);
     }
 }

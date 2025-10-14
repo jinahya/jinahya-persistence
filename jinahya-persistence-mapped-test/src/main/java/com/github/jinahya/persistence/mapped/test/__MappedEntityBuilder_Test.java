@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import com.github.jinahya.persistence.mapped.__MappedEntityBuilder;
+import jakarta.annotation.Nonnull;
 
 import java.util.Objects;
 
@@ -31,8 +32,8 @@ public abstract class __MappedEntityBuilder_Test<
      * @param entityClass  a target entity class of the {@code builderClass}.
      * @param idClass      an id class of the {@code entityClass}.
      */
-    protected __MappedEntityBuilder_Test(final Class<BUILDER> builderClass, final Class<ENTITY> entityClass,
-                                         final Class<ID> idClass) {
+    protected __MappedEntityBuilder_Test(@Nonnull final Class<BUILDER> builderClass,
+                                         @Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
         super(builderClass, entityClass);
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
