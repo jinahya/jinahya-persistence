@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.2.6-SNAPSHOT</version>
+  <version>0.2.7-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
