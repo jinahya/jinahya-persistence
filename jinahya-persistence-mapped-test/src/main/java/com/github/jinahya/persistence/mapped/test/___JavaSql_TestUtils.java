@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
+import com.github.jinahya.database.metadata.bind.Column;
+import com.github.jinahya.database.metadata.bind.Context;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -33,6 +35,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for the {@link java.sql} package.
@@ -162,6 +166,29 @@ final class ___JavaSql_TestUtils {
                 map::put
         );
         return map;
+    }
+
+    /**
+     * .
+     *
+     * @param connection       .
+     * @param catalog          .
+     * @param schemaPattern    .
+     * @param tableNamePattern .
+     * @return .
+     * @throws SQLException .
+     * @see Context#getColumns(String, String, String, String)
+     */
+    static Map<String, Column> getBoundColumns(@Nonnull final Connection connection, @Nullable final String catalog,
+                                               @Nullable final String schemaPattern,
+                                               @Nonnull final String tableNamePattern)
+            throws SQLException {
+        Objects.requireNonNull(connection, "connection is null");
+        Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
+        return Context.newInstance(connection)
+                .getColumns(catalog, schemaPattern, tableNamePattern, "%")
+                .stream()
+                .collect(Collectors.toMap(Column::getColumnName, Function.identity()));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -128,6 +128,12 @@
         <version>${version.com.h2database}</version>
       </dependency>
       <dependency>
+        <groupId>io.github.jinahya</groupId>
+        <artifactId>database-metadata-bind</artifactId>
+        <!-- https://central.sonatype.com/artifact/io.github.jinahya/database-metadata-bind/versions -->
+        <version>4.2.10</version>
+      </dependency>
+      <dependency>
         <groupId>jakarta.platform</groupId>
         <artifactId>jakarta.jakartaee-bom</artifactId>
         <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->

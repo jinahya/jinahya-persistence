@@ -45,10 +45,13 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -307,8 +310,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     /**
-     * Notifies that an attribute's {@link Column#nullable() @Column#nullable} element is going to be verified to match
-     * the table column's nullability.
+     * Notifies that an attribute's {@link Column#nullable()} @Column#nullable} element is going to be verified to match
+     * the table column's precision.
      *
      * @param member   a java member of the attribute.
      * @param column   a {@link Column @Column} annotation of the attribute.
@@ -320,6 +323,85 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                                                                      final boolean nullable) {
         return true;
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * All values of {@link Column#precision() @Column(precision)} should match corresponding table column's precision.
+     */
+    @Test
+    void _MatchTableColumnPrecision_EntityColumnPrecision() {
+        {
+            final var clazz = getClass();
+            final var disabled = AnnotationUtils.findAnnotation(
+                    clazz, __Disable_ColumnPrecision_Test.class
+            );
+            assumeThat(disabled)
+                    .as("%s on %s", __Disable_ColumnPrecision_Test.class, clazz)
+                    .isEmpty();
+        }
+        final var tableName = tableName();
+        final var boundColumns = applyEntityManager(
+                em -> ___JakartaPersistence_TestUtils.applyConnection(em, this::boundColumns_)
+        );
+        final var managedType = applyEntityManagerFactory(em -> em.getMetamodel().managedType(entityClass));
+        managedType.getAttributes().forEach(a -> {
+            final var entityMember = a.getJavaMember();
+            final Column entityColumn;
+            if (entityMember instanceof Field field) {
+                entityColumn = field.getAnnotation(Column.class);
+            } else if (entityMember instanceof Method method) {
+                entityColumn = method.getAnnotation(Column.class);
+            } else {
+                throw new RuntimeException("unknown entity member type: " + entityMember);
+            }
+            if (entityColumn == null) {
+                logger.log(Level.WARNING, "no @Column annotation on {0}", entityMember);
+                return;
+            }
+            final var entityColumnName = entityColumn.name();
+            final var entityColumnPrecision = entityColumn.precision();
+            if (entityColumnPrecision == 0) { // default value
+                return;
+            }
+            final var boundColumn = boundColumns.get(entityColumnName);
+            {
+                assumeThat(boundColumn).isNotNull();
+            }
+            logger.log(Level.DEBUG, "entity column: {0}, database column: {1}", entityColumn, boundColumn);
+            final var databaseColumnSize = boundColumn.getColumnSize();
+            final var databaseColumnDecimalDigits = boundColumn.getDecimalDigits();
+//            if (!_MatchTableColumnPrecision_EntityColumnPrecision(
+//                    entityMember, entityColumn, boundColumn.)) {
+//                logger.log(
+//                        Level.INFO,
+//                        "skipping nullability check; member {0}, column: {1}",
+//                        entityMember,
+//                        entityColumn
+//                );
+//                return;
+//            }
+//            assertThat(entityColumnPrecision)
+//                    .as("@Column#precision of %s supposed to match %s.%s(%s) ", entityMember, tableName,
+//                        entityColumnName, boundColumn)
+//                    .isEqualTo(boundColumn);
+        });
+    }
+
+//    /**
+//     * Notifies that an attribute's {@link Column#precision() @Column#precision} element is going to be verified to
+//     * match the table column's nullability.
+//     *
+//     * @param member    a java member of the attribute.
+//     * @param column    a {@link Column @Column} annotation of the attribute.
+//     * @param precision the nullability of the table column.
+//     * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
+//     */
+//    protected boolean _MatchTableColumnPrecision_EntityColumnPrecision(@Nonnull final Member member,
+//                                                                       @Nonnull final Column column,
+//                                                                       final boolean precision) {
+//        return true;
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -609,8 +691,28 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         return entityManagerFactory;
     }
 
+    // ---------------------------------------------------------------------------------------------------- boundColumns
+    private Map<String, com.github.jinahya.database.metadata.bind.Column> boundColumns_(final Connection connection) {
+        if (boundColumns_ == null) {
+            try {
+                boundColumns_ = ___JavaSql_TestUtils.getBoundColumns(
+                        connection,
+                        tableCatalog(),
+                        tableSchema(),
+                        tableName()
+                );
+            } catch (final SQLException sqle) {
+                throw new RuntimeException("failed to get bound columns", sqle);
+            }
+        }
+        return boundColumns_;
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.__itPU
     @Inject
     private EntityManagerFactory entityManagerFactory;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private transient Map<String, com.github.jinahya.database.metadata.bind.Column> boundColumns_;
 }
