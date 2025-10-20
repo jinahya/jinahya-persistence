@@ -4,7 +4,7 @@ package com.github.jinahya.persistence.mapped;
  * #%L
  * jinahya-persistence-mapped
  * %%
- * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * Copyright (C) 2025 Jinahya, Inc.
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,25 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-@SuppressWarnings({
-        "java:S114" // Interface names should comply with a naming convention
-//        "java:S101" // Class names should comply with a naming convention
-})
-public interface __Mapped {
+import lombok.Getter;
+import lombok.Setter;
 
+import java.beans.IntrospectionException;
+
+@Setter
+@Getter
+class SampleMapped extends _Mapped {
+
+    private SampleMapped(final SampleMappedBuilder builder) {
+        super();
+        try {
+            __MappedUtils.setPropertiesFrom(this, builder);
+        } catch (final IntrospectionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Integer age;
+
+    private String name;
 }
