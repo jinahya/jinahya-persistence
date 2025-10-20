@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.metamodel.EntityType;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
@@ -58,7 +59,7 @@ abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------- entityClass
 
     /**
      * Returns a new instance of {@link #entityClass}.
@@ -107,7 +108,7 @@ abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
         return newRandomizedEntityInstance().map(Mockito::spy);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------- idClass
     protected ID newIdInstance() {
         return ___InstantiatorUtils.newInstantiatedInstanceOf(idClass)
 //                .orElseGet(() -> ___JavaLangReflectTestUtils.newInstanceOf(idClass))
@@ -129,6 +130,8 @@ abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
 
+    // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * The entity class to test.
      */
@@ -138,4 +141,7 @@ abstract class ___MappedEntityTest_<ENTITY extends __MappedEntity<ID>, ID> {
      * The id class of the {@link #entityClass}.
      */
     protected final Class<ID> idClass;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private EntityType<ENTITY> entityType;
 }

@@ -210,6 +210,36 @@ final class ___JavaSql_TestUtils {
         }
     }
 
+    private static final Map<String, Map<String, Map<String, Object>>> META_DATA_COLUMNS = new HashMap<>();
+
+    static Map<String, Map<String, Object>> getMetaDataColumns(final Connection connection, final String catalog,
+                                                               final String schemaPattern,
+                                                               final String tableNamePattern,
+                                                               final String columnNamePattern)
+            throws SQLException {
+        final var key = catalog + ":" + schemaPattern + ":" + tableNamePattern + ":" + columnNamePattern;
+        final var result = META_DATA_COLUMNS.computeIfAbsent(key, k -> new HashMap<>());
+        final var databaseMetaData = connection.getMetaData();
+        try (var resultSet = databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern)) {
+            final var resultSetMetaData = resultSet.getMetaData();
+            final var columnCount = resultSetMetaData.getColumnCount();
+            while (resultSet.next()) {
+                final var columnName = resultSet.getString(COLUMN_LABEL_COLUMN_NAME);
+                final var map = result.compute(columnName, (k, v) -> {
+                    assert v == null : "column value already exists; columnName: " + columnName;
+                    return new HashMap<>();
+                });
+                for (int i = 1; i <= columnCount; i++) {
+                    final var columnLabel = resultSetMetaData.getColumnLabel(i);
+                    final var columnValue = resultSet.getObject(columnLabel);
+                    final var previousValue = map.put(columnLabel, columnValue);
+                    assert previousValue == null : "column value already exists; columnLabel: " + columnLabel;
+                }
+            }
+        }
+        return result;
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     private ___JavaSql_TestUtils() {
         throw new AssertionError("instantiation is not allowed");

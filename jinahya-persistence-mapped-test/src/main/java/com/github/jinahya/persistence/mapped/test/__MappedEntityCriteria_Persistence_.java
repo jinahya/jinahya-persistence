@@ -63,9 +63,9 @@ abstract class __MappedEntityCriteria_Persistence_<
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
-        getEntityManagerFactory().getProperties().forEach((k, v) -> {
-            logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
-        });
+//        getEntityManagerFactory().getProperties().forEach((k, v) -> {
+//            logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
+//        });
         entityManager = getEntityManagerFactory().createEntityManager();
         logger.log(Level.DEBUG, "created: {0}", entityManager);
     }

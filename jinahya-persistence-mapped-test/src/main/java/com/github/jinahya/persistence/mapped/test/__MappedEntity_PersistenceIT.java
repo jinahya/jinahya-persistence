@@ -29,6 +29,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.metamodel.Attribute;
 import jakarta.validation.constraints.NotNull;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
@@ -40,16 +41,22 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.System.Logger.Level;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assumptions.assumeThat;
@@ -307,8 +314,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     /**
-     * Notifies that an attribute's {@link Column#nullable() @Column#nullable} element is going to be verified to match
-     * the table column's nullability.
+     * Notifies that an attribute's {@link Column#nullable()} @Column#nullable} element is going to be verified to match
+     * the table column's precision.
      *
      * @param member   a java member of the attribute.
      * @param column   a {@link Column @Column} annotation of the attribute.
@@ -488,6 +495,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         return true;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * All attributes of {@code @Column(nullable)} should not be annotated with any {@code NonNull} annotation.
      */
@@ -557,6 +566,89 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     protected boolean _ShouldNotBeAnnotatedWithAnyNonNull_AttributeWithColumnNullable(
             @Nonnull final Member entityMember, @Nonnull final Column entityColum, @Nonnull final Object nonNull) {
         return true;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected final <R> R applyTableColumnsAndEntityAttributes(
+            @Nonnull final Function<
+                    ? super Map<String, Map<String, Object>>,
+                    ? extends Function<
+                            ? super Map<Attribute<? super ENTITY, ?>, List<Annotation>>,
+                            ? extends R
+                            >
+                    > function) {
+        Objects.requireNonNull(function, "function is null");
+        final var metadataColumns = applyConnectionAndRollback(c -> {
+            try {
+                return ___JavaSql_TestUtils.getMetaDataColumns(c, tableCatalog(), tableSchema(), tableName(), "%");
+            } catch (final SQLException sqle) {
+                throw new RuntimeException("failed to get column info", sqle);
+            }
+        });
+        final var attributesAndAnnotationLists = applyEntityManagerFactory(emf -> {
+            return ___JakartaPersistence_TestUtils.getAttributesAndAnnotationLists(emf, entityClass);
+        });
+        return function.apply(metadataColumns).apply(attributesAndAnnotationLists);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Test
+    protected void _MatchTableColumnNullable_AttributeColumnNullable() {
+        applyTableColumnsAndEntityAttributes(tableColumns -> entityAttributes -> {
+            entityAttributes.forEach((a, annotations) -> {
+                final Column attributeColumn = annotations.stream()
+                        .filter(Column.class::isInstance)
+                        .findAny()
+                        .map(Column.class::cast)
+                        .orElse(null);
+                if (attributeColumn == null) {
+                    logger.log(Level.WARNING, "no @Column annotation for %s", a);
+                    return;
+                }
+                final boolean attributeColumnNullable;
+                {
+                    if (attributeColumn.name().isBlank()) {
+                        return;
+                    }
+                    attributeColumnNullable = attributeColumn.nullable();
+                }
+                final Boolean tableColumnNullable;
+                {
+                    final var tableColumn = tableColumns.get(attributeColumn.name());
+                    assertThat(tableColumn)
+                            .as("table column metadata for %s", a)
+                            .isNotNull();
+                    {
+                        Boolean tableColumnNullable_ = null;
+                        if (tableColumnNullable_ == null) {
+                            final var nullable = tableColumn.get("NULLABLE");
+                            if (nullable == null) {
+                                return;
+                            }
+                            tableColumnNullable_ = Objects.equals(
+                                    ((Number) nullable).intValue(),
+                                    DatabaseMetaData.columnNullable
+                            );
+                        }
+                        if (tableColumnNullable_ == null) {
+                            final var isNullable = tableColumn.get("IS_NULLABLE");
+                            if (isNullable != null) {
+                                tableColumnNullable_ = "yes".equalsIgnoreCase((String) isNullable);
+                            }
+                        }
+                        tableColumnNullable = tableColumnNullable_;
+                    }
+                    if (tableColumnNullable == null) {
+                        logger.log(Level.WARNING, "unable to detect table column nullable for %s", tableColumn);
+                        return;
+                    }
+                }
+                assertThat(attributeColumnNullable)
+                        .as("@Column#nullable of %s", a)
+                        .isEqualTo(tableColumnNullable);
+            });
+            return null;
+        });
     }
 
     // ----------------------------------------------------------------------------------------------------- entityClass

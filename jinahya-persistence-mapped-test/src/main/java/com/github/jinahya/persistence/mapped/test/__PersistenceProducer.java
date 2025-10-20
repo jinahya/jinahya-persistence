@@ -43,6 +43,9 @@ import java.lang.invoke.MethodHandles;
 })
 public class __PersistenceProducer {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Retention(RetentionPolicy.CLASS)
     @Target({
             ElementType.ANNOTATION_TYPE,
@@ -76,9 +79,6 @@ public class __PersistenceProducer {
     public @interface __itPU {
 
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -146,6 +146,9 @@ public class __PersistenceProducer {
                 entityManagerFactory,
                 __itPU.class
         );
+        entityManagerFactory.getProperties().forEach((k, v) -> {
+            logger.log(System.Logger.Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
+        });
         return entityManagerFactory;
     }
 
