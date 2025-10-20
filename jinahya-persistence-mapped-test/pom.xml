@@ -21,11 +21,6 @@
     </dependency>
     <dependency>
       <groupId>io.github.jinahya</groupId>
-      <artifactId>database-metadata-bind</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.github.jinahya</groupId>
       <artifactId>jinahya-persistence-mapped</artifactId>
       <version>0.2.7-SNAPSHOT</version>
       <scope>provided</scope>

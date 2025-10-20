@@ -34,6 +34,7 @@ import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.Metamodel;
 import jakarta.persistence.spi.PersistenceProviderResolverHolder;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.beans.BeanInfo;
 import java.beans.FeatureDescriptor;
@@ -41,12 +42,17 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.System.Logger.Level;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -62,11 +68,72 @@ import java.util.stream.Collectors;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "unchecked",
+        "java:S101", // Class names should comply with a naming convention
+        "java:S119"  // Type parameter names should comply with a naming convention
 })
 public final class ___JakartaPersistence_TestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private static final Map<Class<? extends __MappedEntity<?>>, ManagedType<?>> MANAGED_TYPES = new HashMap<>();
+
+    @Nonnull
+    static <ENTITY extends __MappedEntity<?>>
+    ManagedType<ENTITY> getManagedType(@Nonnull final EntityManagerFactory entityManagerFactory,
+                                       @Nonnull final Class<ENTITY> entityClass) {
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        return (ManagedType<ENTITY>) MANAGED_TYPES.computeIfAbsent(
+                entityClass,
+                k -> entityManagerFactory.getMetamodel().managedType(k)
+        );
+    }
+
+    @Nonnull
+    static <ENTITY extends __MappedEntity<?>>
+    Annotation[] getAnnotations(@Nonnull final Class<ENTITY> entityClass,
+                                @Nonnull final Attribute<? super ENTITY, ?> attribute) {
+        final var entityMember = attribute.getJavaMember();
+        if (entityMember instanceof Field field) {
+            final var actualField = ReflectionUtils.findFields(
+                    entityClass,
+                    f -> f.getName().equals(field.getName()),
+                    ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP
+            ).get(0);
+            return actualField.getDeclaredAnnotations();
+        } else if (entityMember instanceof Method method) {
+            final var actualMethod = ReflectionUtils.findMethod(
+                    entityClass,
+                    method.getName()
+            ).orElseThrow();
+            return actualMethod.getDeclaredAnnotations();
+        }
+        throw new RuntimeException("unknown entity member type: " + entityMember);
+    }
+
+    /**
+     * Returns an <em>unmodifiable</em> map of attributes and their annotations defined in the specified entity class.
+     *
+     * @param entityManagerFactory an entity manager factory.
+     * @param entityClass          the entity class.
+     * @param <ENTITY>             entity type parameter.
+     * @return an <em>unmodifiable</em> map of attributes and their annotations defined in the specified entity class.
+     */
+    static <ENTITY extends __MappedEntity<?>>
+    Map<Attribute<? super ENTITY, ?>, List<Annotation>> getAttributesAndAnnotationLists(
+            @Nonnull final EntityManagerFactory entityManagerFactory,
+            @Nonnull final Class<ENTITY> entityClass) {
+        final var managedType = getManagedType(entityManagerFactory, entityClass);
+        final var attributes = managedType.getAttributes();
+        return attributes.stream()
+                .map(a -> {
+                    final var annotations = Arrays.asList(getAnnotations(entityClass, a));
+                    return new AbstractMap.SimpleEntry<>(a, annotations);
+                })
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 
     // ----------------------------------------------------------------------------------------------------------- types
     static void acceptEachEntityType(@Nonnull final EntityManagerFactory entityManagerFactory,
@@ -136,7 +203,7 @@ public final class ___JakartaPersistence_TestUtils {
         return collection;
     }
 
-    // ------------------------------------------------------------------------------------------------------ attributes
+// ------------------------------------------------------------------------------------------------------ attributes
 
     /**
      * Accepts each attribute name of the specified managed type to the specified consumer.
@@ -381,7 +448,7 @@ public final class ___JakartaPersistence_TestUtils {
         }
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Starts a resource-level transaction on the specified entity manager, and returns what supplied from the specified
@@ -479,7 +546,7 @@ public final class ___JakartaPersistence_TestUtils {
         return applyConnection(entityManager, function, true);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Counts the number of entities in the table from which the specified entity maps.

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -105,6 +106,7 @@
     <!-- https://central.sonatype.com/artifact/org.mockito/mockito-junit-jupiter/versions -->
     <version.org.mockito>5.28.0</version.org.mockito>
     <version.org.projectlombok>1.18.42</version.org.projectlombok>
+    <!-- https://central.sonatype.com/artifact/org.slf4j/slf4j-bom/versions -->
     <version.org.slf4j>2.0.17</version.org.slf4j>
   </properties>
 
@@ -113,7 +115,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.5.19</version>
+        <version>1.5.20</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
@@ -126,12 +128,6 @@
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>${version.com.h2database}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.github.jinahya</groupId>
-        <artifactId>database-metadata-bind</artifactId>
-        <!-- https://central.sonatype.com/artifact/io.github.jinahya/database-metadata-bind/versions -->
-        <version>4.2.10</version>
       </dependency>
       <dependency>
         <groupId>jakarta.platform</groupId>
@@ -324,25 +320,33 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.6.1</version>
-        <configuration>
-          <!--              <skip>true</skip>-->
-          <rules>
-            <dependencyConvergence/>
-            <requireJavaVersion>
-              <version>[21.0.0,)</version>
-            </requireJavaVersion>
-            <requireMavenVersion>
-              <version>[3.6.3,)</version>
-            </requireMavenVersion>
-          </rules>
-        </configuration>
+        <version>3.6.2</version>
         <executions>
           <execution>
-            <id>enforce</id>
+            <id>enforce-java</id>
             <goals>
               <goal>enforce</goal>
             </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[21,)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.6.3,)</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
           </execution>
         </executions>
       </plugin>

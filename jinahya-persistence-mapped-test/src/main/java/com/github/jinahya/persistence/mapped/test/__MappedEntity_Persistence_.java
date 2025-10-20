@@ -34,6 +34,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.ManagedType;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.AnnotationUtils;
 
@@ -124,6 +126,25 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                 true
         );
         logger.log(Level.DEBUG, "persisted: {0}", persisted);
+    }
+
+    // ----------------------------------------------------------------------------------------------- super.entityClass
+    protected final EntityType<ENTITY> entityType() {
+        if (entityType == null) {
+            entityType = getEntityManagerFactory().getMetamodel().entity(entityClass);
+        }
+        return entityType;
+    }
+
+    protected final String entityName() {
+        return entityType().getName();
+    }
+
+    protected final ManagedType<ENTITY> managedType() {
+        if (managedType == null) {
+            managedType = getEntityManagerFactory().getMetamodel().managedType(entityClass);
+        }
+        return managedType;
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
@@ -334,6 +355,11 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                 .orElse(null)
                 ;
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private EntityType<ENTITY> entityType;
+
+    private ManagedType<ENTITY> managedType;
 
     // -----------------------------------------------------------------------------------------------------------------
 

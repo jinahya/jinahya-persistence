@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.mapped.test;
  * #L%
  */
 
-import com.github.jinahya.database.metadata.bind.Column;
-import com.github.jinahya.database.metadata.bind.Context;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -35,8 +33,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Utilities for the {@link java.sql} package.
@@ -168,29 +164,6 @@ final class ___JavaSql_TestUtils {
         return map;
     }
 
-    /**
-     * .
-     *
-     * @param connection       .
-     * @param catalog          .
-     * @param schemaPattern    .
-     * @param tableNamePattern .
-     * @return .
-     * @throws SQLException .
-     * @see Context#getColumns(String, String, String, String)
-     */
-    static Map<String, Column> getBoundColumns(@Nonnull final Connection connection, @Nullable final String catalog,
-                                               @Nullable final String schemaPattern,
-                                               @Nonnull final String tableNamePattern)
-            throws SQLException {
-        Objects.requireNonNull(connection, "connection is null");
-        Objects.requireNonNull(tableNamePattern, "tableNamePattern is null");
-        return Context.newInstance(connection)
-                .getColumns(catalog, schemaPattern, tableNamePattern, "%")
-                .stream()
-                .collect(Collectors.toMap(Column::getColumnName, Function.identity()));
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     static <C extends Collection<? super String>>
     C addAllColumnNames(@Nonnull final Connection connection, @Nullable final String catalog,
@@ -235,6 +208,36 @@ final class ___JavaSql_TestUtils {
                 logger.log(Level.INFO, "TABLE_SCHEM: {0}; TABLE_CATALOG: {1}", tableSchem, tableCatalog);
             }
         }
+    }
+
+    private static final Map<String, Map<String, Map<String, Object>>> META_DATA_COLUMNS = new HashMap<>();
+
+    static Map<String, Map<String, Object>> getMetaDataColumns(final Connection connection, final String catalog,
+                                                               final String schemaPattern,
+                                                               final String tableNamePattern,
+                                                               final String columnNamePattern)
+            throws SQLException {
+        final var key = catalog + ":" + schemaPattern + ":" + tableNamePattern + ":" + columnNamePattern;
+        final var result = META_DATA_COLUMNS.computeIfAbsent(key, k -> new HashMap<>());
+        final var databaseMetaData = connection.getMetaData();
+        try (var resultSet = databaseMetaData.getColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern)) {
+            final var resultSetMetaData = resultSet.getMetaData();
+            final var columnCount = resultSetMetaData.getColumnCount();
+            while (resultSet.next()) {
+                final var columnName = resultSet.getString(COLUMN_LABEL_COLUMN_NAME);
+                final var map = result.compute(columnName, (k, v) -> {
+                    assert v == null : "column value already exists; columnName: " + columnName;
+                    return new HashMap<>();
+                });
+                for (int i = 1; i <= columnCount; i++) {
+                    final var columnLabel = resultSetMetaData.getColumnLabel(i);
+                    final var columnValue = resultSet.getObject(columnLabel);
+                    final var previousValue = map.put(columnLabel, columnValue);
+                    assert previousValue == null : "column value already exists; columnLabel: " + columnLabel;
+                }
+            }
+        }
+        return result;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
