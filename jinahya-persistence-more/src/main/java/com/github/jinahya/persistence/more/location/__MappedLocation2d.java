@@ -21,7 +21,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedLocation2d extends  __Mapped {
+public abstract class __MappedLocation2d extends __Mapped {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_LATITUDE = "latitude";

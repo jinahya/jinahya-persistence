@@ -17,7 +17,7 @@ import java.util.Objects;
 @IdClass(IdForUserWithIdClass.class)
 @Entity
 @Table(name = UserWithIdClass.TABLE_NAME)
-class UserWithIdClass extends   __MappedEntity<IdForUserWithIdClass> {
+class UserWithIdClass extends __MappedEntity<IdForUserWithIdClass> {
 
     public static final String TABLE_NAME = "user_with_id_class";
 

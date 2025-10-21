@@ -32,7 +32,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = UserWithStringId.TABLE_NAME)
-class UserWithStringId extends   __MappedEntity<String> {
+class UserWithStringId extends __MappedEntity<String> {
 
     static final String TABLE_NAME = "user_with_string_id";
 
