@@ -78,6 +78,9 @@ final class ___ReflectionUtils {
                 if (getter == null) {
                     continue;
                 }
+                if (!getter.canAccess(object)) {
+                    getter.setAccessible(true);
+                }
                 final var value = getter.invoke(object);
                 values.putIfAbsent(name, value);
             }
@@ -93,7 +96,7 @@ final class ___ReflectionUtils {
                 if (!field.canAccess(object)) {
                     field.setAccessible(true);
                 }
-                final Object value = field.get(object);
+                final var value = field.get(object);
                 values.putIfAbsent(name, value);
             }
         }
@@ -116,7 +119,6 @@ final class ___ReflectionUtils {
         Objects.requireNonNull(type, "type is null");
         Objects.requireNonNull(object, "object is null");
         values = new HashMap<>(Objects.requireNonNull(values, "values is null"));
-
         for (Class<?> c = type; c != null && type.isAssignableFrom(c); c = c.getSuperclass()) {
             final var beanInfo = Introspector.getBeanInfo(c, Introspector.USE_ALL_BEANINFO);
             final var descriptors = beanInfo.getPropertyDescriptors();
@@ -128,6 +130,9 @@ final class ___ReflectionUtils {
                 }
                 if (values.containsKey(name)) {
                     continue;
+                }
+                if (!setter.canAccess(object)) {
+                    setter.setAccessible(true);
                 }
                 setter.invoke(object, values.remove(name));
             }
