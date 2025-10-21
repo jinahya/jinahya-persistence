@@ -20,6 +20,15 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-abstract class _Mapped implements __Mapped {
+import jakarta.annotation.Nonnull;
 
+abstract class _Mapped extends __Mapped {
+
+    protected _Mapped() {
+        super();
+    }
+
+    protected _Mapped(@Nonnull final _MappedBuilder<?, ?> builder) {
+        super(builder);
+    }
 }

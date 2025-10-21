@@ -24,6 +24,19 @@ package com.github.jinahya.persistence.mapped;
         "java:S114" // Interface names should comply with a naming convention
 //        "java:S101" // Class names should comply with a naming convention
 })
-public interface __Mapped {
+public abstract class __Mapped {
 
+    protected __Mapped() {
+        super();
+    }
+
+    protected __Mapped(final __MappedBuilder<?, ?> builder) {
+        this();
+        try {
+            final var values = ___ReflectionUtils.getValues(builder);
+            ___ReflectionUtils.setValues(this, values);
+        } catch (final Exception ie) {
+            throw new RuntimeException("failed to get values from " + builder, ie);
+        }
+    }
 }

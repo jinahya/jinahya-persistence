@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 @Entity
 @Table(name = UserWithEmbeddedId.TABLE_NAME)
-class UserWithEmbeddedId implements __MappedEntity<IdForUserWithEmbeddedId> {
+class UserWithEmbeddedId extends  __MappedEntity<IdForUserWithEmbeddedId> {
 
     public static final String TABLE_NAME = "user_with_embedded_id";
 

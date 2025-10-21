@@ -14,11 +14,18 @@ class SampleMappedBuilder_Test {
     void __() {
         final var builder = new SampleMappedBuilder()
                 .age(ThreadLocalRandom.current().nextBoolean() ? null : ThreadLocalRandom.current().nextInt())
-                .name(ThreadLocalRandom.current().nextBoolean() ? null : Long.toString(System.nanoTime()));
+                .name(ThreadLocalRandom.current().nextBoolean() ? null : Long.toString(System.nanoTime()))
+//                .age(ThreadLocalRandom.current().nextInt())
+//                .name(Long.toString(System.nanoTime()))
+                ;
         log.debug("builder: {}", builder);
-        final var built = new SampleMappedBuilder().build();
+        final var built = builder.build();
         log.debug("built: {}", built);
-        assertThat(built.getAge()).isEqualTo(builder.age());
-        assertThat(built.getName()).isEqualTo(builder.name());
+        assertThat(built.getAge())
+                .as("age")
+                .isEqualTo(builder.age());
+        assertThat(built.getName())
+                .as("name")
+                .isEqualTo(builder.name());
     }
 }

@@ -24,24 +24,51 @@ import jakarta.annotation.Nonnull;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Objects;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __MappedUtils {
+final class __MappedUtils {
 
-    public static <TARGET extends __Mapped>
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    static <TARGET extends __Mapped>
     void setPropertiesFrom(@Nonnull final TARGET target,
                            @Nonnull final __MappedBuilder<?, ? extends TARGET> builder)
             throws IntrospectionException {
         Objects.requireNonNull(builder, "builder is null");
         Objects.requireNonNull(target, "target is null");
-        for (Class<?> c = target.getClass(); c != null; c = c.getSuperclass()) {
-            final var beanInfo = Introspector.getBeanInfo(c);
-            for (final var descriptor : beanInfo.getPropertyDescriptors()) {
+        final var builderValues = new HashMap<String, Object>();
+        for (Class<?> c = builder.getClass();
+             c != null && __MappedBuilder.class.isAssignableFrom(c);
+             c = c.getSuperclass()) {
+            for (final var field : c.getDeclaredFields()) {
+                if (!field.isSynthetic()) {
+                    continue;
+                }
+                final var name = field.getName();
+                if (!field.canAccess(builder)) {
+                    field.setAccessible(true);
+                }
+                final Object value;
+                try {
+                    value = field.get(builder);
+                } catch (final IllegalAccessException iae) {
+                    logger.log(System.Logger.Level.WARNING, "failed to get " + field + " from " + builder, iae);
+                    continue;
+                }
+                builderValues.put(name, value);
+            }
+        }
+        for (Class<?> c = target.getClass(); c != null && __Mapped.class.isAssignableFrom(c); c = c.getSuperclass()) {
+            final var beanInfo = Introspector.getBeanInfo(c, Introspector.USE_ALL_BEANINFO);
+            final var descriptors = beanInfo.getPropertyDescriptors();
+            for (final var descriptor : descriptors) {
                 final var name = descriptor.getName();
                 final Method getter;
                 try {
@@ -69,6 +96,7 @@ public final class __MappedUtils {
                     }
                     try {
                         setter.invoke(target, value);
+                        continue;
                     } catch (final ReflectiveOperationException roe) {
                         continue;
                     }

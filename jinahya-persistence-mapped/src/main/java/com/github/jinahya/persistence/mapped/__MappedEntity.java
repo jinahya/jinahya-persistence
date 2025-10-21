@@ -33,7 +33,7 @@ import jakarta.persistence.MappedSuperclass;
         "java:S114", // Interface names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public interface __MappedEntity<ID> extends __Mapped {
+public abstract class __MappedEntity<ID> extends __Mapped {
 
 //    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 //

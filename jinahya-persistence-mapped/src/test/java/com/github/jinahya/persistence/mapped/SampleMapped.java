@@ -20,22 +20,34 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.beans.IntrospectionException;
-
-@Setter
-@Getter
 class SampleMapped extends _Mapped {
 
     private SampleMapped(final SampleMappedBuilder builder) {
-        super();
-        try {
-            __MappedUtils.setPropertiesFrom(this, builder);
-        } catch (final IntrospectionException e) {
-            throw new RuntimeException(e);
-        }
+        super(builder);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "age=" + age +
+               ",name=" + name +
+               '}';
+    }
+
+    Integer getAge() {
+        return age;
+    }
+
+    void setAge(final Integer age) {
+        this.age = age;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    void setName(final String name) {
+        this.name = name;
     }
 
     private Integer age;
