@@ -19,7 +19,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedLocation3d implements __Mapped {
+public abstract class __MappedLocation3d extends __Mapped {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_LATITUDE = __MappedLocation2d.COLUMN_NAME_LATITUDE;

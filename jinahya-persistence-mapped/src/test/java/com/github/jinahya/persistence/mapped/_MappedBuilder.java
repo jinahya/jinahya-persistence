@@ -1,10 +1,10 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.mapped;
 
 /*-
  * #%L
- * jinahya-persistence-more-test
+ * jinahya-persistence-mapped
  * %%
- * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * Copyright (C) 2025 Jinahya, Inc.
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,10 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-class _SampleIntegerAttributeEnumConverter_Test
-        extends __AttributeEnumConverter_Test<
-        _SampleIntegerAttributeEnumConverter,
-        _SampleIntegerAttributeEnum,
-        Integer
-        > {
+abstract class _MappedBuilder<SELF extends _MappedBuilder<SELF, TARGET>, TARGET extends _Mapped>
+        extends __MappedBuilder<SELF, TARGET> {
 
-    _SampleIntegerAttributeEnumConverter_Test() {
-        super(_SampleIntegerAttributeEnumConverter.class, _SampleIntegerAttributeEnum.class, Integer.class);
+    _MappedBuilder(final Class<TARGET> targetClass) {
+        super(targetClass);
     }
 }

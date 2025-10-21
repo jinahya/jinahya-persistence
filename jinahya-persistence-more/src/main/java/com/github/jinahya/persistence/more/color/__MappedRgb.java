@@ -15,7 +15,7 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedRgb implements __Mapped {
+public abstract class __MappedRgb extends __Mapped {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_RED = "red";

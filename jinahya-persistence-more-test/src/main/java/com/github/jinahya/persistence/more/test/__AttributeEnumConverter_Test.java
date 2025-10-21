@@ -60,7 +60,7 @@ public abstract class __AttributeEnumConverter_Test<
      * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfString}.
      *
      * @param <CONVERTER> converter type parameter
-     * @param <ENUM> entity type parameter
+     * @param <ENUM>      entity type parameter
      * @see #converterClass
      * @see #enumClass
      */

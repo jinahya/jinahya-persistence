@@ -4,7 +4,7 @@ package com.github.jinahya.persistence.mapped;
  * #%L
  * jinahya-persistence-mapped
  * %%
- * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * Copyright (C) 2025 Jinahya, Inc.
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,23 +20,28 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
-@SuppressWarnings({
-        "java:S114" // Interface names should comply with a naming convention
-//        "java:S101" // Class names should comply with a naming convention
-})
-public abstract class __Mapped {
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-    protected __Mapped() {
-        super();
+@Accessors(fluent = true, chain = true)
+@Setter
+@Getter
+class SampleMappedBuilder extends _MappedBuilder<SampleMappedBuilder, SampleMapped> {
+
+    SampleMappedBuilder() {
+        super(SampleMapped.class);
     }
 
-    protected __Mapped(final __MappedBuilder<?, ?> builder) {
-        this();
-        try {
-            final var values = ___ReflectionUtils.getValues(builder);
-            ___ReflectionUtils.setValues(this, values);
-        } catch (final Exception ie) {
-            throw new RuntimeException("failed to get values from " + builder, ie);
-        }
+    @Override
+    public String toString() {
+        return super.toString() + '{' +
+               "age=" + age +
+               ",name=" + name +
+               '}';
     }
+
+    private Integer age;
+
+    private String name;
 }
