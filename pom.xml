@@ -28,6 +28,23 @@
     </license>
   </licenses>
 
+  <developers>
+    <developer>
+      <id>onacit</id>
+      <name>Jin Kwon</name>
+      <email>onacit@gmail.com</email>
+      <url>https://github.com/onacit</url>
+      <organization>Jinahya, Inc.</organization>
+      <organizationUrl>https://github.com/jinahya</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Asia/Seoul</timezone>
+      <properties/>
+    </developer>
+  </developers>
+
   <modules>
     <module>jinahya-persistence-mapped</module>
     <module>jinahya-persistence-mapped-test</module>
