@@ -76,11 +76,6 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     @PostConstruct
     protected void doOnPostConstruct() {
         {
-            getEntityManagerFactory().getProperties().forEach((k, v) -> {
-                logger.log(Level.DEBUG, "entityManagerFactory.property; {0}: {1}", k, v);
-            });
-        }
-        {
             tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
             tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
             tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
