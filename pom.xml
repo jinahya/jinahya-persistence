@@ -41,7 +41,7 @@
         <role>developer</role>
       </roles>
       <timezone>Asia/Seoul</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
 
@@ -85,6 +85,8 @@
     <version.maven-surefire>3.5.4</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
     <version.com.h2database>2.4.240</version.com.h2database>
+    <!-- https://central.sonatype.com/artifact/com.querydsl/querydsl-jpa/versions -->
+    <version.com.querydsl>5.1.0</version.com.querydsl>
     <!-- https://central.sonatype.com/namespace/jakarta.platform -->
     <version.jakarta.platform>11.0.0</version.jakarta.platform>
     <!-- https://jakarta.ee/specifications/platform/10/ -->
@@ -144,6 +146,12 @@
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>${version.com.h2database}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.querydsl</groupId>
+        <artifactId>querydsl-jpa</artifactId>
+        <version>${version.com.querydsl}</version>
+        <classifier>jakarta</classifier>
       </dependency>
       <dependency>
         <groupId>jakarta.platform</groupId>
@@ -254,6 +262,12 @@
     <!--      <groupId>org.jspecify</groupId>-->
     <!--      <artifactId>jspecify</artifactId>-->
     <!--    </dependency>-->
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+      <classifier>jakarta</classifier>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -388,6 +402,18 @@
             <!--              <artifactId>${metamodel.generator.artifactId}</artifactId>-->
             <!--              <version>${metamodel.generator.version}</version>-->
             <!--            </path>-->
+            <!-- =================================================================================================== -->
+            <path>
+              <groupId>com.querydsl</groupId>
+              <artifactId>querydsl-apt</artifactId>
+              <version>${version.com.querydsl}</version>
+              <classifier>jakarta</classifier>
+            </path>
+            <path>
+              <groupId>jakarta.persistence</groupId>
+              <artifactId>jakarta.persistence-api</artifactId>
+            </path>
+            <!-- =================================================================================================== -->
           </annotationProcessorPaths>
           <!--          <compilerArgs>-->
           <!--            &lt;!&ndash;            <arg>-Xlint</arg>&ndash;&gt;-->

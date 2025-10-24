@@ -35,7 +35,7 @@ public abstract class __Builder_Test<
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("build() should return non-null <TARGET>")
+    @DisplayName("<constructed> -> build() should return non-null <TARGET>")
     @Test
     protected void build_NotNull_newBuilderInstance() {
         assumeThatCode(() -> { // some builder constructors may throw
@@ -45,7 +45,7 @@ public abstract class __Builder_Test<
         }).doesNotThrowAnyException();
     }
 
-    @DisplayName("build() should return non-null <TARGET>")
+    @DisplayName("<randomized> -> build() should return non-null <TARGET>")
     @Test
     protected void build_NotNull_newRandomizedBuilderInstance() {
         newRandomizedBuilderInstance()

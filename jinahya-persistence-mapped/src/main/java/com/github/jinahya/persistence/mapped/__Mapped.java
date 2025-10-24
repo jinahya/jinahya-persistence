@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+//@jakarta.persistence.MappedSuperclass // https://stackoverflow.com/a/52151579/330457
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 //        "java:S101" // Class names should comply with a naming convention

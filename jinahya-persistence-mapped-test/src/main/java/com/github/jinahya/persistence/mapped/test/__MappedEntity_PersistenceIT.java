@@ -660,7 +660,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     @DisplayName("select an entity instance of a random index")
     @Test
-    void _Valid_RandomlySelectedEntityInstance() {
+    void selectRandomEntityInstance() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_RandomSelection_Test.class);
@@ -676,7 +676,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 return null;
             }
             final var value = selected.get();
-            _Valid_RandomlySelectedEntityInstance(value);
+            selectRandomEntityInstance(value);
             // ---------------------------------------------------------------------------------------------------- then
             ___JakartaValidation_TestUtils.requireValid(value);
             return null;
@@ -684,13 +684,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     /**
-     * Notifies, by the {@link #_Valid_RandomlySelectedEntityInstance()} method, that the specified entity instance has
-     * been selected.
+     * Notifies, by the {@link #selectRandomEntityInstance()} method, that the specified entity instance has been
+     * selected.
      *
      * @param entityInstance the entity instance.
-     * @see #_Valid_RandomlySelectedEntityInstance()
+     * @see #selectRandomEntityInstance()
      */
-    protected void _Valid_RandomlySelectedEntityInstance(@Nonnull final ENTITY entityInstance) {
+    protected void selectRandomEntityInstance(@Nonnull final ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(Level.DEBUG, "randomly selected entity instance: {0}", entityInstance);
     }
