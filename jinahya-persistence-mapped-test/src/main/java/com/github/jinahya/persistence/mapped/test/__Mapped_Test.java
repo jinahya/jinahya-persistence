@@ -107,7 +107,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see #newMappedInstance()
      * @see #toString_NotBlank_(__Mapped)
      */
-    @DisplayName("newMappedInstance().toString()!blank")
+    @DisplayName("<instantiated>.toString()!blank")
     @Test
     final void toString_NotBlank_newMappedInstance() {
         assumeToStringTestNotDisabled();
@@ -122,11 +122,15 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see #newRandomizedMappedInstance()
      * @see #toString_NotBlank_(__Mapped)
      */
-    @DisplayName("newRandomizedMappedInstance().toString()!blank")
+    @DisplayName("<randomized>.toString()!blank")
     @Test
     final void toString_NotBlank_newRandomizedMappedInstance() {
         assumeToStringTestNotDisabled();
-        newRandomizedMappedInstance().ifPresent(this::toString_NotBlank_);
+        final var randomized = newRandomizedMappedInstance().orElse(null);
+        assumeThat(randomized)
+                .as("new randomized mapped instance")
+                .isNotNull();
+        toString_NotBlank_(randomized);
     }
 
     // ------------------------------------------------------------------------------------------------- equals/hashCode
