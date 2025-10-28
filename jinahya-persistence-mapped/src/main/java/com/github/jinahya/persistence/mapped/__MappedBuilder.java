@@ -17,7 +17,7 @@ public abstract class __MappedBuilder<
         SELF extends __MappedBuilder<SELF, TARGET>,
         TARGET extends __Mapped
         >
-        extends __Builder<SELF, TARGET> {
+        extends ___Builder<SELF, TARGET> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

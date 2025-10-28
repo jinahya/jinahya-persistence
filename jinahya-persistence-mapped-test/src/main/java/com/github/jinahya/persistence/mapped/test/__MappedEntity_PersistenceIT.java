@@ -27,6 +27,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.metamodel.Attribute;
@@ -278,38 +279,74 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         });
         managedType.getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
-            final Column entityColumn;
-            if (entityMember instanceof Field field) {
-                entityColumn = field.getAnnotation(Column.class);
-            } else if (entityMember instanceof Method method) {
-                entityColumn = method.getAnnotation(Column.class);
-            } else {
-                throw new RuntimeException("unknown entity member type: " + entityMember);
-            }
-            if (entityColumn == null) {
-                logger.log(Level.WARNING, "no @Column annotation on {0}", entityMember);
-                return;
-            }
-            final var entityColumnName = entityColumn.name();
-            final var entityColumnNullable = entityColumn.nullable();
-            final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
             {
-                assumeThat(tableColumnIsNullable).isNotNull();
+                final Column entityColumn;
+                if (entityMember instanceof Field field) {
+                    entityColumn = field.getAnnotation(Column.class);
+                } else if (entityMember instanceof Method method) {
+                    entityColumn = method.getAnnotation(Column.class);
+                } else {
+                    throw new RuntimeException("unknown entity member type: " + entityMember);
+                }
+                if (entityColumn == null) {
+                    logger.log(Level.DEBUG, "no @Column annotation on {0}", entityMember);
+                    return;
+                }
+                final var entityColumnName = entityColumn.name();
+                final var entityColumnNullable = entityColumn.nullable();
+                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+                {
+                    assumeThat(tableColumnIsNullable).isNotNull();
+                }
+                if (!_MatchTableColumnNullable_EntityColumnNullable(
+                        entityMember, entityColumn, tableColumnIsNullable)) {
+                    logger.log(
+                            Level.INFO,
+                            "skipping nullability check; member {0}, column: {1}",
+                            entityMember,
+                            entityColumn
+                    );
+                    return;
+                }
+                assertThat(entityColumnNullable)
+                        .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
+                            entityColumnName, tableColumnIsNullable)
+                        .isEqualTo(tableColumnIsNullable);
             }
-            if (!_MatchTableColumnNullable_EntityColumnNullable(
-                    entityMember, entityColumn, tableColumnIsNullable)) {
-                logger.log(
-                        Level.INFO,
-                        "skipping nullability check; member {0}, column: {1}",
-                        entityMember,
-                        entityColumn
-                );
-                return;
+            {
+                final JoinColumn entityColumn;
+                if (entityMember instanceof Field field) {
+                    entityColumn = field.getAnnotation(JoinColumn.class);
+                } else if (entityMember instanceof Method method) {
+                    entityColumn = method.getAnnotation(JoinColumn.class);
+                } else {
+                    throw new RuntimeException("unknown entity member type: " + entityMember);
+                }
+                if (entityColumn == null) {
+                    logger.log(Level.DEBUG, "no @JoinColumn annotation on {0}", entityMember);
+                    return;
+                }
+                final var entityColumnName = entityColumn.name();
+                final var entityColumnNullable = entityColumn.nullable();
+                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+                {
+                    assumeThat(tableColumnIsNullable).isNotNull();
+                }
+                if (!_MatchTableColumnNullable_EntityColumnNullable(
+                        entityMember, entityColumn, tableColumnIsNullable)) {
+                    logger.log(
+                            Level.INFO,
+                            "skipping nullability check; member {0}, column: {1}",
+                            entityMember,
+                            entityColumn
+                    );
+                    return;
+                }
+                assertThat(entityColumnNullable)
+                        .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
+                            entityColumnName, tableColumnIsNullable)
+                        .isEqualTo(tableColumnIsNullable);
             }
-            assertThat(entityColumnNullable)
-                    .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
-                        entityColumnName, tableColumnIsNullable)
-                    .isEqualTo(tableColumnIsNullable);
         });
     }
 
@@ -324,6 +361,21 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
                                                                      @Nonnull final Column column,
+                                                                     final boolean nullable) {
+        return true;
+    }
+
+    /**
+     * Notifies that an attribute's {@link JoinColumn#nullable()} @Column#nullable} element is going to be verified to
+     * match the table column's precision.
+     *
+     * @param member   a java member of the attribute.
+     * @param column   a {@link JoinColumn @Column} annotation of the attribute.
+     * @param nullable the nullability of the table column.
+     * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
+     */
+    protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
+                                                                     @Nonnull final JoinColumn column,
                                                                      final boolean nullable) {
         return true;
     }

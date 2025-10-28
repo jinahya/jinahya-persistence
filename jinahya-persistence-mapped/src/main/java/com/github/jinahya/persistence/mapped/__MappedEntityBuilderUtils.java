@@ -12,7 +12,7 @@ public final class __MappedEntityBuilderUtils {
 
     public static <BUILDER extends __MappedEntityBuilder<BUILDER, ?>> BUILDER reset(@Nonnull final BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
-        return __BuilderUtils.reset(instance);
+        return ___BuilderUtils.reset(instance);
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS

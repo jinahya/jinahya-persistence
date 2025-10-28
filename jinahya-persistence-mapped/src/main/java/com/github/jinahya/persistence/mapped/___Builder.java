@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.mapped;
 
 import jakarta.annotation.Nonnull;
 
+import java.lang.reflect.Constructor;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -19,8 +20,8 @@ import java.util.function.Function;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
-public abstract class __Builder<
-        SELF extends __Builder<SELF, TARGET>,
+public abstract class ___Builder<
+        SELF extends ___Builder<SELF, TARGET>,
         TARGET
         > {
 
@@ -31,7 +32,7 @@ public abstract class __Builder<
      *
      * @param targetClass the class of {@link TARGET} to build.
      */
-    protected __Builder(@Nonnull final Class<TARGET> targetClass) {
+    protected ___Builder(@Nonnull final Class<TARGET> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
@@ -67,22 +68,23 @@ public abstract class __Builder<
     public TARGET build() {
         return build(
                 b -> {
-                    final var clazz = b.getClass();
+                    final var builderClass = b.getClass();
+                    final Constructor<TARGET> constructor;
                     try {
-                        final var constructor = targetClass.getDeclaredConstructor(clazz);
-                        if (!constructor.canAccess(null)) {
-                            constructor.setAccessible(true);
-                        }
-                        try {
-                            return constructor.newInstance(b);
-                        } catch (final ReflectiveOperationException roe) {
-                            throw new RuntimeException("failed to invoke " + constructor + " with " + b, roe);
-                        }
+                        constructor = targetClass.getDeclaredConstructor(builderClass);
                     } catch (final NoSuchMethodException nsme) {
                         throw new RuntimeException(
-                                "failed to find a constructor from " + targetClass + " accepting " + clazz,
+                                "no constructor found from " + targetClass + " accepting " + builderClass,
                                 nsme
                         );
+                    }
+                    if (!constructor.canAccess(null)) {
+                        constructor.setAccessible(true);
+                    }
+                    try {
+                        return constructor.newInstance(b);
+                    } catch (final ReflectiveOperationException roe) {
+                        throw new RuntimeException("failed to invoke " + constructor + " with " + b, roe);
                     }
                 }
         );
@@ -97,7 +99,7 @@ public abstract class __Builder<
      */
     @Nonnull
     public SELF reset() {
-        return __BuilderUtils.reset((SELF) this);
+        return ___BuilderUtils.reset((SELF) this);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

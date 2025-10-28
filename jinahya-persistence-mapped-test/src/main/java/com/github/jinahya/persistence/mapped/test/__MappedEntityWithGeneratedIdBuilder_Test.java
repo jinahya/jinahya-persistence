@@ -19,9 +19,14 @@ public abstract class __MappedEntityWithGeneratedIdBuilder_Test<
         extends __MappedEntityBuilder_Test<BUILDER, ENTITY, ID> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    @Deprecated(forRemoval = true)
     protected __MappedEntityWithGeneratedIdBuilder_Test(final Class<BUILDER> builderClass,
-                                                        final Class<ENTITY> entityClass,
-                                                        final Class<ID> idClass) {
+                                                        final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(builderClass, entityClass, idClass);
+    }
+
+    protected __MappedEntityWithGeneratedIdBuilder_Test(final Class<BUILDER> builderClass,
+                                                        final Class<ENTITY> entityClass) {
+        super(builderClass, entityClass);
     }
 }

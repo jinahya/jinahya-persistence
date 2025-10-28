@@ -50,12 +50,12 @@ public abstract class ___Randomizer<T> {
     /**
      * Creates a new instance for initializing a randomized instance of the specified class.
      *
-     * @param type           the class to be randomized.
+     * @param target         the class to be randomized.
      * @param excludedFields fields to be excluded from randomization.
      */
-    protected ___Randomizer(@Nonnull final Class<T> type, @Nonnull final String... excludedFields) {
+    protected ___Randomizer(@Nonnull final Class<T> target, @Nonnull final String... excludedFields) {
         super();
-        this.type = Objects.requireNonNull(type, "type is null");
+        this.target = Objects.requireNonNull(target, "target is null");
         this.excludedFields = Arrays
                 .stream(Objects.requireNonNull(excludedFields, "excludedFields is null"))
                 .filter(Objects::nonNull)
@@ -102,20 +102,20 @@ public abstract class ___Randomizer<T> {
     @Nonnull
     protected ClassInfoStrategy getClassInfoStrategy() {
         final var classInfoStrategy = DefaultClassInfoStrategy.getInstance();
-        excludedFields.forEach(v -> classInfoStrategy.addExcludedField(type, v));
+        excludedFields.forEach(v -> classInfoStrategy.addExcludedField(target, v));
         return classInfoStrategy;
     }
 
     /**
-     * Returns a randomized instance of the {@link #type}.
+     * Returns a randomized instance of the {@link #target}.
      *
-     * @return a randomized instance of the {@link #type}.
+     * @return a randomized instance of the {@link #target}.
      */
     @Nonnull
     public T get() {
-        return ___InstantiatorUtils.newInstantiatedInstanceOf(type)
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(target)
                 .map(o -> getPodamFactory().populatePojo(o))
-                .orElseGet(() -> getPodamFactory().manufacturePojo(type));
+                .orElseGet(() -> getPodamFactory().manufacturePojo(target));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ public abstract class ___Randomizer<T> {
     /**
      * The type to be randomized.
      */
-    protected final Class<T> type;
+    protected final Class<T> target;
 
     /**
      * The fields to be excluded from randomization.

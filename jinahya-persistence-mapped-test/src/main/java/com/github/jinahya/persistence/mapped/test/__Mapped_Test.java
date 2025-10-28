@@ -276,7 +276,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see __Disable_PropertyAccessor_Test
      * @see #newMappedInstance()
      */
-    @DisplayName("newMappedInstance().accessors_DoesNotThrow_()")
+    @DisplayName("<instantiated>.accessors_DoesNotThrow_()")
     @Test
     final void propertyAccessors_DoesNotThrow_newMappedInstance() {
         assumePropertyAccessorsTestNotDisabled();
@@ -290,11 +290,13 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see __Disable_PropertyAccessor_Test
      * @see #newRandomizedMappedInstance()
      */
-    @DisplayName("newRandomizedMappedInstance().accessors_DoesNotThrow_()")
+    @DisplayName("<randomized>.accessors_DoesNotThrow_()")
     @Test
     final void propertyAccessors_DoesNotThrow_newRandomizedMappedInstance() {
         assumePropertyAccessorsTestNotDisabled();
-        newRandomizedMappedInstance().ifPresent(this::propertyAccessors_DoesNotThrow_);
+        final var randomized = newRandomizedMappedInstance();
+        assumeThat(randomized).isNotEmpty();
+        propertyAccessors_DoesNotThrow_(randomized.get());
     }
 
     // ----------------------------------------------------------------------------------------------------- mappedClass

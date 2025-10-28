@@ -20,6 +20,7 @@ final class ___ReflectionUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
+    // -----------------------------------------------------------------------------------------------------------------
     static <T> void acceptEachField(@Nonnull final Class<T> clazz, @Nonnull final Consumer<? super Field> consumer) {
         Objects.requireNonNull(clazz, "clazz is null");
         Objects.requireNonNull(consumer, "consumer is null");
