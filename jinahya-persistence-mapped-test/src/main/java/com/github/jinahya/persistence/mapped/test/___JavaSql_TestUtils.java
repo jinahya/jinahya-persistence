@@ -26,13 +26,18 @@ import jakarta.annotation.Nullable;
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for the {@link java.sql} package.
@@ -210,8 +215,27 @@ final class ___JavaSql_TestUtils {
         }
     }
 
+    // <key, <column-name, <column-meta-label, column-meta-value>>>
     private static final Map<String, Map<String, Map<String, Object>>> META_DATA_COLUMNS = new HashMap<>();
 
+    // <column-meta-label, column-meta-value>
+    private static Map<String, Object> getResultSetMetaData(final ResultSet resultSet) throws SQLException {
+        Objects.requireNonNull(resultSet, "resultSet is null");
+        final var resultSetMetaData = resultSet.getMetaData();
+        final var result = new HashMap<String, Object>();
+        final var columnCount = resultSetMetaData.getColumnCount();
+        while (resultSet.next()) {
+            for (int i = 1; i <= columnCount; i++) {
+                final var columnLabel = resultSetMetaData.getColumnLabel(i);
+                final var columnValue = resultSet.getObject(columnLabel);
+                final var previousValue = result.put(columnLabel, columnValue);
+                assert previousValue == null : "column value already exists; columnLabel: " + columnLabel;
+            }
+        }
+        return result;
+    }
+
+    // <column-name, <column-meta-label, column-meta-value>>
     static Map<String, Map<String, Object>> getMetaDataColumns(final Connection connection, final String catalog,
                                                                final String schemaPattern,
                                                                final String tableNamePattern,
@@ -238,6 +262,42 @@ final class ___JavaSql_TestUtils {
             }
         }
         return result;
+    }
+
+    // <<column-meta-label, column-meta-value>>
+    private static List<Map<String, Object>> getResultSetList(final ResultSet resultSet) throws SQLException {
+        Objects.requireNonNull(resultSet, "resultSet is null");
+        final var resultSetMetaData = resultSet.getMetaData();
+        final var result = new ArrayList<Map<String, Object>>();
+        final var columnCount = resultSetMetaData.getColumnCount();
+        while (resultSet.next()) {
+            final var map = new HashMap<String, Object>();
+            result.add(map);
+            for (int i = 1; i <= columnCount; i++) {
+                final var columnLabel = resultSetMetaData.getColumnLabel(i);
+                final var columnValue = resultSet.getObject(columnLabel);
+                final var previousValue = map.put(columnLabel, columnValue);
+                assert previousValue == null : "column value already exists; columnLabel: " + columnLabel;
+            }
+        }
+        return result;
+    }
+
+    // <column-label, <column-meta-label, column-meta-value>>
+    private static Map<String, Map<String, Object>> getResultSetMap(final ResultSet resultSet) throws SQLException {
+        return getResultSetList(resultSet).stream().collect(
+                Collectors.toMap(
+                        m -> (String) m.get(COLUMN_LABEL_COLUMN_NAME), Function.identity()
+                ));
+    }
+
+    // <column-label, <column-meta-label, column-meta-value>>
+    static Map<String, Map<String, Object>> getMetaDataColumns(final Connection connection, final String tableName)
+            throws SQLException {
+        final var metaData = connection.getMetaData();
+        try (var resultSet = metaData.getColumns(null, null, tableName, "%")) {
+            return getResultSetMap(resultSet);
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
