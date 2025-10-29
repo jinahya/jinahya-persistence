@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.entity.test;
+package com.github.jinahya.persistence.mapped.test;
 
 /*-
  * #%L
@@ -20,12 +20,6 @@ package com.github.jinahya.persistence.entity.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.mapped.test.__Disable_EqualsVerifier_Test;
-import com.github.jinahya.persistence.mapped.test.__Disable_PropertyAccessor_Test;
-import com.github.jinahya.persistence.mapped.test.__Disable_PropertyAccessors_Test;
-import com.github.jinahya.persistence.mapped.test.__Disable_ToString_Test;
-import com.github.jinahya.persistence.mapped.test.___InstantiatorUtils;
-import com.github.jinahya.persistence.mapped.test.___RandomizerUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Transient;
 import nl.jqno.equalsverifier.EqualsVerifier;
