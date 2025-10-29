@@ -265,38 +265,36 @@ final class ___JavaSql_TestUtils {
     }
 
     // <<column-meta-label, column-meta-value>>
-    private static List<Map<String, Object>> getResultSetList(final ResultSet resultSet) throws SQLException {
+    public static List<Map<String, Object>> getResultSetValueMapList(final ResultSet resultSet) throws SQLException {
         Objects.requireNonNull(resultSet, "resultSet is null");
-        final var resultSetMetaData = resultSet.getMetaData();
-        final var result = new ArrayList<Map<String, Object>>();
-        final var columnCount = resultSetMetaData.getColumnCount();
-        while (resultSet.next()) {
-            final var map = new HashMap<String, Object>();
-            result.add(map);
-            for (int i = 1; i <= columnCount; i++) {
-                final var columnLabel = resultSetMetaData.getColumnLabel(i);
-                final var columnValue = resultSet.getObject(columnLabel);
-                final var previousValue = map.put(columnLabel, columnValue);
-                assert previousValue == null : "column value already exists; columnLabel: " + columnLabel;
+        final var list = new ArrayList<Map<String, Object>>();
+        {
+            final var metaData = resultSet.getMetaData();
+            final var columnCount = metaData.getColumnCount();
+            while (resultSet.next()) {
+                final var map = new HashMap<String, Object>();
+                list.add(map);
+                for (int i = 1; i <= columnCount; i++) {
+                    final var label = metaData.getColumnLabel(i);
+                    final var value = resultSet.getObject(label);
+                    final var previous = map.put(label, value);
+                    assert previous == null : "entry already exists; label: " + label;
+                }
             }
         }
-        return result;
+        return list;
     }
 
     // <column-label, <column-meta-label, column-meta-value>>
-    private static Map<String, Map<String, Object>> getResultSetMap(final ResultSet resultSet) throws SQLException {
-        return getResultSetList(resultSet).stream().collect(
-                Collectors.toMap(
-                        m -> (String) m.get(COLUMN_LABEL_COLUMN_NAME), Function.identity()
-                ));
-    }
-
-    // <column-label, <column-meta-label, column-meta-value>>
-    static Map<String, Map<String, Object>> getMetaDataColumns(final Connection connection, final String tableName)
+    public static Map<String, Map<String, Object>> getColumnMetaData(final Connection connection,
+                                                                     final String tableName)
             throws SQLException {
         final var metaData = connection.getMetaData();
         try (var resultSet = metaData.getColumns(null, null, tableName, "%")) {
-            return getResultSetMap(resultSet);
+            return getResultSetValueMapList(resultSet).stream().collect(
+                    Collectors.toMap(
+                            m -> (String) m.get(COLUMN_LABEL_COLUMN_NAME), Function.identity()
+                    ));
         }
     }
 

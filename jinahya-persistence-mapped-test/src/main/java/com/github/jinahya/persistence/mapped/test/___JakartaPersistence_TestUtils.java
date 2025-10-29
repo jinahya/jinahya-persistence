@@ -500,11 +500,13 @@ public final class ___JakartaPersistence_TestUtils {
                                                  @Nonnull final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
+
         try {
             final var connection = entityManager.unwrap(Connection.class);
             if (connection == null) {
                 throw new RuntimeException("null unwrapped from " + entityManager);
             }
+            logger.log(Level.DEBUG, "unwrapped connection: {0}", connection);
             return function.apply(connection);
         } catch (final Exception e1) {
             logger.log(Level.DEBUG, "failed to unwrap connection from " + entityManager, e1);

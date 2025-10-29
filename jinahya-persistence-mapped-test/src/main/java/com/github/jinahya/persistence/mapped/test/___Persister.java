@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.mapped.test;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -36,6 +37,8 @@ import java.util.Objects;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class ___Persister<T> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance for persisting specified class.
@@ -59,7 +62,7 @@ public abstract class ___Persister<T> {
     public void persist(@Nonnull final EntityManager entityManager, @Nonnull final T entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-//        ___JakartaValidation_TestUtils.requireValid(entityInstance);
+        logger.log(System.Logger.Level.DEBUG, "persisting {0}", entityInstance);
         entityManager.persist(entityInstance);
         entityManager.flush(); // required?
         ___JakartaValidation_TestUtils.requireValid(entityInstance);

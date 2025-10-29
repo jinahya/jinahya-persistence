@@ -117,6 +117,16 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
 
     // -----------------------------------------------------------------------------------------------------------------
     protected Collection<String> getTableColumnNames() {
+        if (true) {
+            final var columnMetaData = applyConnection(c -> {
+                try {
+                    return ___JavaSql_TestUtils.getColumnMetaData(c, tableName());
+                } catch (final SQLException sqle) {
+                    throw new RuntimeException("failed to get column metadata of " + tableName(), sqle);
+                }
+            }, true);
+            return columnMetaData.keySet();
+        }
         final var table = __MappedEntity_TestUtils.getTableAnnotation(entityClass);
         final var catalog = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableCatalog)
                 .orElseGet(table::catalog);
@@ -133,7 +143,6 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                                 new ArrayList<>()
                         )
                 ));
-        logger.log(Level.DEBUG, "table column names: {0}", tableColumnNames);
         assertThat(tableColumnNames)
                 .as("table column names for " + entityClass +
                     "; catalog: " + catalog +
@@ -152,7 +161,6 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                         new ArrayList<>()
                 )
         );
-        logger.log(Level.DEBUG, "entity column names: {0}", entityColumnNames);
         assertThat(entityColumnNames)
                 .as("entity column names of " + entityClass)
                 .isNotEmpty();
@@ -181,9 +189,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         }
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = getTableColumnNames();
-        final var attributeColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
+        logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
+        tableColumnNames.forEach(tcn -> {
+            logger.log(Level.DEBUG, "\ttable column name: {0}", tcn);
+        });
+        final var entityColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
+        logger.log(Level.DEBUG, "number of entity columns: {0}", entityColumnNames.size());
+        entityColumnNames.forEach(acn -> {
+            logger.log(Level.DEBUG, "\tentity column name: {0}", acn);
+        });
         // -------------------------------------------------------------------------------------------------------- when
-        tableColumnNames.removeAll(attributeColumnNames);
+        tableColumnNames.removeAll(entityColumnNames);
         _Mapped_AllTableColumnNames(tableColumnNames);
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(tableColumnNames)
@@ -196,11 +212,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      *
      * @param tableColumnNames the remaining table column names that all entity column names are removed.
      * @see #_Mapped_AllTableColumnNames()
+     * @see __Disable_TableColumnNames_Test
      */
     protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> tableColumnNames) {
         Objects.requireNonNull(tableColumnNames, "tableColumnNames is null");
-        tableColumnNames.forEach(cn -> {
-            logger.log(Level.WARNING, "remaining table column name: " + cn);
+        logger.log(Level.DEBUG, "number of remaining table columns: {0}", tableColumnNames.size());
+        tableColumnNames.forEach(tcn -> {
+            logger.log(Level.WARNING, "\tremaining table column name: {0}", tcn);
         });
     }
 
@@ -225,7 +243,15 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         }
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
+        logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
+        tableColumnNames.forEach(tcn -> {
+            logger.log(Level.DEBUG, "\ttable column name: {0}", tcn);
+        });
         final var entityColumnNames = getEntityColumnNames();
+        logger.log(Level.DEBUG, "number of entity columns: {0}", entityColumnNames.size());
+        entityColumnNames.forEach(acn -> {
+            logger.log(Level.DEBUG, "\tentity column name: {0}", acn);
+        });
         // -------------------------------------------------------------------------------------------------------- when
         entityColumnNames.removeAll(tableColumnNames);
         _Empty_AllEntityColumnNames(entityColumnNames);
@@ -242,8 +268,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected void _Empty_AllEntityColumnNames(@Nonnull final Collection<String> remainingEntityColumnNames) {
         Objects.requireNonNull(remainingEntityColumnNames, "remainingEntityColumnNames is null");
-        remainingEntityColumnNames.forEach(cn -> {
-            logger.log(Level.WARNING, "remaining entity column name: " + cn);
+        logger.log(Level.DEBUG, "number of remaining entity columns: {0}", remainingEntityColumnNames.size());
+        remainingEntityColumnNames.forEach(ecn -> {
+            logger.log(Level.WARNING, "\tremaining entity column name: {0}", ecn);
         });
     }
 
@@ -398,9 +425,11 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                     .as("%s on %s", __Disable_MappingOptional_Test.class, clazz)
                     .isEmpty();
         }
+
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
         });
+
         managedType.getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;
