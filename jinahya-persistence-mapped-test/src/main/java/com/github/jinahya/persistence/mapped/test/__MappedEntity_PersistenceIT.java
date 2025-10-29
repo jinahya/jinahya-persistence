@@ -120,7 +120,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         if (true) {
             final var columnMetaData = applyConnection(c -> {
                 try {
-                    return ___JavaSql_TestUtils.getColumnMetaData(c, tableName());
+                    return ___JavaSql_TestUtils.getColumnMetaData(c, tableCatalog(), tableSchema(), tableName());
                 } catch (final SQLException sqle) {
                     throw new RuntimeException("failed to get column metadata of " + tableName(), sqle);
                 }
