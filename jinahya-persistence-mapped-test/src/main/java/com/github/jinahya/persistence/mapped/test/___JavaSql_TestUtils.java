@@ -287,10 +287,12 @@ final class ___JavaSql_TestUtils {
 
     // <column-label, <column-meta-label, column-meta-value>>
     public static Map<String, Map<String, Object>> getColumnMetaData(final Connection connection,
-                                                                     final String tableName)
+                                                                     final String catalog,
+                                                                     final String schemaPattern,
+                                                                     final String tableNamePattern)
             throws SQLException {
         final var metaData = connection.getMetaData();
-        try (var resultSet = metaData.getColumns(null, null, tableName, "%")) {
+        try (var resultSet = metaData.getColumns(catalog, schemaPattern, tableNamePattern, "%")) {
             return getResultSetValueMapList(resultSet).stream().collect(
                     Collectors.toMap(
                             m -> (String) m.get(COLUMN_LABEL_COLUMN_NAME), Function.identity()
