@@ -24,8 +24,12 @@ import jakarta.annotation.Nonnull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.TypeVariable;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -146,6 +150,52 @@ final class ___JavaLangReflect_TestUtils {
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException("failed to initialize a new instance of " + type, roe);
         }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    // TODO: cache!
+    // https://stackoverflow.com/a/25974010/330457
+    public static <T> Class<T> getActualTypeClass(@Nonnull final Class<?> forClass, final Class<?> asClass,
+                                                  final int typeIndex) {
+        Objects.requireNonNull(forClass, "forClass is null");
+        Objects.requireNonNull(asClass, "asClass is null");
+        if (typeIndex < 0) {
+            throw new IllegalArgumentException("negative typeIndex: " + typeIndex);
+        }
+        final var mapping = new HashMap<TypeVariable<?>, Class<?>>();
+        for (Class<?> c = forClass; c != null; c = c.getSuperclass()) {
+            final var genericSuperclass = c.getGenericSuperclass();
+            if (!(genericSuperclass instanceof ParameterizedType parameterizedType)) {
+                continue;
+            }
+            final var rawType = parameterizedType.getRawType();
+            if (parameterizedType.getRawType() != asClass) {
+                // resolve
+                final var parameters = ((GenericDeclaration) (rawType)).getTypeParameters();
+                final var actualTypeArguments = parameterizedType.getActualTypeArguments();
+                for (int i = 0; i < parameters.length; i++) {
+                    if (actualTypeArguments[i] instanceof Class<?> actualTypeArgumentClass) {
+//                        mapping.put(parameters[i], (Class<?>) actualTypeArguments[i]);
+                        mapping.put(parameters[i], actualTypeArgumentClass);
+                    } else {
+//                        mapping.put(parameters[i], mapping.get((TypeVariable<?>) (actualTypeArguments[i])));
+                        mapping.put(parameters[i], mapping.get(actualTypeArguments[i]));
+                    }
+                }
+                continue;
+            }
+            // found
+            final var actualTypeArguments = parameterizedType.getActualTypeArguments();
+            assert actualTypeArguments.length >= typeIndex;
+            final var actualTypeArgument = actualTypeArguments[typeIndex];
+            if (actualTypeArgument instanceof Class<?> actualTypeArgumentClass) {
+                return (Class<T>) actualTypeArgumentClass;
+            } else {
+                return (Class<T>) mapping.get((TypeVariable<?>) actualTypeArgument);
+            }
+        }
+        throw new IllegalArgumentException("unable to get id class from " + forClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
