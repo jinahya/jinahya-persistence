@@ -6,7 +6,6 @@ import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.beans.Introspector;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.ParameterizedType;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,23 +18,10 @@ public final class ___Builder_TestUtils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
+    // https://stackoverflow.com/a/25974010/330457
     public static <BUILDER extends ___Builder<BUILDER, TARGET>, TARGET> Class<TARGET> getTargetClass(
             @Nonnull final Class<BUILDER> builderClass) {
-        Objects.requireNonNull(builderClass, "builderClass is null");
-        for (Class<?> c = builderClass; c != null; c = c.getSuperclass()) {
-            final var genericSuperclass = builderClass.getGenericSuperclass();
-            if (!(genericSuperclass instanceof ParameterizedType parameterizedType)) {
-                continue;
-            }
-            if (parameterizedType.getRawType() != ___Builder.class) {
-                continue;
-            }
-            final var actualTypeArguments = parameterizedType.getActualTypeArguments();
-            assert actualTypeArguments.length == 2;
-            assert actualTypeArguments[0] == builderClass;
-            return (Class<TARGET>) actualTypeArguments[1];
-        }
-        throw new IllegalArgumentException("unable to get id class from " + builderClass);
+        return ___JavaLangReflect_TestUtils.getActualTypeClass(builderClass, ___Builder.class, 1);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -26,7 +26,6 @@ import jakarta.persistence.Table;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -46,20 +45,7 @@ public class __MappedEntity_TestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     public static <ENTITY extends __MappedEntity<ID>, ID> Class<ID> getIdClass(
             @Nonnull final Class<ENTITY> entityClass) {
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        for (Class<?> c = entityClass; c != null; c = c.getSuperclass()) {
-            final var genericSuperclass = entityClass.getGenericSuperclass();
-            if (!(genericSuperclass instanceof ParameterizedType parameterizedType)) {
-                continue;
-            }
-            if (parameterizedType.getRawType() != __MappedEntity.class) {
-                continue;
-            }
-            final var actualTypeArguments = parameterizedType.getActualTypeArguments();
-            assert actualTypeArguments.length == 1;
-            return (Class<ID>) actualTypeArguments[0];
-        }
-        throw new IllegalArgumentException("unable to get id class from " + entityClass);
+        return ___JavaLangReflect_TestUtils.getActualTypeClass(entityClass, __MappedEntity.class, 0);
     }
 
     static <ENTITY extends __MappedEntity<?>>
