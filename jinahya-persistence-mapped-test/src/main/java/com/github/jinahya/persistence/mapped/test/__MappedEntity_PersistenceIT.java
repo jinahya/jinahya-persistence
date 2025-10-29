@@ -27,6 +27,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.metamodel.Attribute;
@@ -116,6 +117,16 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
 
     // -----------------------------------------------------------------------------------------------------------------
     protected Collection<String> getTableColumnNames() {
+        if (true) {
+            final var columnMetaData = applyConnection(c -> {
+                try {
+                    return ___JavaSql_TestUtils.getColumnMetaData(c, tableName());
+                } catch (final SQLException sqle) {
+                    throw new RuntimeException("failed to get column metadata of " + tableName(), sqle);
+                }
+            }, true);
+            return columnMetaData.keySet();
+        }
         final var table = __MappedEntity_TestUtils.getTableAnnotation(entityClass);
         final var catalog = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableCatalog)
                 .orElseGet(table::catalog);
@@ -132,7 +143,6 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                                 new ArrayList<>()
                         )
                 ));
-        logger.log(Level.DEBUG, "table column names: {0}", tableColumnNames);
         assertThat(tableColumnNames)
                 .as("table column names for " + entityClass +
                     "; catalog: " + catalog +
@@ -151,7 +161,6 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                         new ArrayList<>()
                 )
         );
-        logger.log(Level.DEBUG, "entity column names: {0}", entityColumnNames);
         assertThat(entityColumnNames)
                 .as("entity column names of " + entityClass)
                 .isNotEmpty();
@@ -180,9 +189,17 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         }
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = getTableColumnNames();
-        final var attributeColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
+        logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
+        tableColumnNames.forEach(tcn -> {
+            logger.log(Level.DEBUG, "\ttable column name: {0}", tcn);
+        });
+        final var entityColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
+        logger.log(Level.DEBUG, "number of entity columns: {0}", entityColumnNames.size());
+        entityColumnNames.forEach(acn -> {
+            logger.log(Level.DEBUG, "\tentity column name: {0}", acn);
+        });
         // -------------------------------------------------------------------------------------------------------- when
-        tableColumnNames.removeAll(attributeColumnNames);
+        tableColumnNames.removeAll(entityColumnNames);
         _Mapped_AllTableColumnNames(tableColumnNames);
         // -------------------------------------------------------------------------------------------------------- then
         assertThat(tableColumnNames)
@@ -195,11 +212,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      *
      * @param tableColumnNames the remaining table column names that all entity column names are removed.
      * @see #_Mapped_AllTableColumnNames()
+     * @see __Disable_TableColumnNames_Test
      */
     protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> tableColumnNames) {
         Objects.requireNonNull(tableColumnNames, "tableColumnNames is null");
-        tableColumnNames.forEach(cn -> {
-            logger.log(Level.WARNING, "remaining table column name: " + cn);
+        logger.log(Level.DEBUG, "number of remaining table columns: {0}", tableColumnNames.size());
+        tableColumnNames.forEach(tcn -> {
+            logger.log(Level.WARNING, "\tremaining table column name: {0}", tcn);
         });
     }
 
@@ -224,7 +243,15 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         }
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
+        logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
+        tableColumnNames.forEach(tcn -> {
+            logger.log(Level.DEBUG, "\ttable column name: {0}", tcn);
+        });
         final var entityColumnNames = getEntityColumnNames();
+        logger.log(Level.DEBUG, "number of entity columns: {0}", entityColumnNames.size());
+        entityColumnNames.forEach(acn -> {
+            logger.log(Level.DEBUG, "\tentity column name: {0}", acn);
+        });
         // -------------------------------------------------------------------------------------------------------- when
         entityColumnNames.removeAll(tableColumnNames);
         _Empty_AllEntityColumnNames(entityColumnNames);
@@ -241,8 +268,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected void _Empty_AllEntityColumnNames(@Nonnull final Collection<String> remainingEntityColumnNames) {
         Objects.requireNonNull(remainingEntityColumnNames, "remainingEntityColumnNames is null");
-        remainingEntityColumnNames.forEach(cn -> {
-            logger.log(Level.WARNING, "remaining entity column name: " + cn);
+        logger.log(Level.DEBUG, "number of remaining entity columns: {0}", remainingEntityColumnNames.size());
+        remainingEntityColumnNames.forEach(ecn -> {
+            logger.log(Level.WARNING, "\tremaining entity column name: {0}", ecn);
         });
     }
 
@@ -278,38 +306,74 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         });
         managedType.getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
-            final Column entityColumn;
-            if (entityMember instanceof Field field) {
-                entityColumn = field.getAnnotation(Column.class);
-            } else if (entityMember instanceof Method method) {
-                entityColumn = method.getAnnotation(Column.class);
-            } else {
-                throw new RuntimeException("unknown entity member type: " + entityMember);
-            }
-            if (entityColumn == null) {
-                logger.log(Level.WARNING, "no @Column annotation on {0}", entityMember);
-                return;
-            }
-            final var entityColumnName = entityColumn.name();
-            final var entityColumnNullable = entityColumn.nullable();
-            final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
             {
-                assumeThat(tableColumnIsNullable).isNotNull();
+                final Column entityColumn;
+                if (entityMember instanceof Field field) {
+                    entityColumn = field.getAnnotation(Column.class);
+                } else if (entityMember instanceof Method method) {
+                    entityColumn = method.getAnnotation(Column.class);
+                } else {
+                    throw new RuntimeException("unknown entity member type: " + entityMember);
+                }
+                if (entityColumn == null) {
+                    logger.log(Level.DEBUG, "no @Column annotation on {0}", entityMember);
+                    return;
+                }
+                final var entityColumnName = entityColumn.name();
+                final var entityColumnNullable = entityColumn.nullable();
+                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+                {
+                    assumeThat(tableColumnIsNullable).isNotNull();
+                }
+                if (!_MatchTableColumnNullable_EntityColumnNullable(
+                        entityMember, entityColumn, tableColumnIsNullable)) {
+                    logger.log(
+                            Level.INFO,
+                            "skipping nullability check; member {0}, column: {1}",
+                            entityMember,
+                            entityColumn
+                    );
+                    return;
+                }
+                assertThat(entityColumnNullable)
+                        .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
+                            entityColumnName, tableColumnIsNullable)
+                        .isEqualTo(tableColumnIsNullable);
             }
-            if (!_MatchTableColumnNullable_EntityColumnNullable(
-                    entityMember, entityColumn, tableColumnIsNullable)) {
-                logger.log(
-                        Level.INFO,
-                        "skipping nullability check; member {0}, column: {1}",
-                        entityMember,
-                        entityColumn
-                );
-                return;
+            {
+                final JoinColumn entityColumn;
+                if (entityMember instanceof Field field) {
+                    entityColumn = field.getAnnotation(JoinColumn.class);
+                } else if (entityMember instanceof Method method) {
+                    entityColumn = method.getAnnotation(JoinColumn.class);
+                } else {
+                    throw new RuntimeException("unknown entity member type: " + entityMember);
+                }
+                if (entityColumn == null) {
+                    logger.log(Level.DEBUG, "no @JoinColumn annotation on {0}", entityMember);
+                    return;
+                }
+                final var entityColumnName = entityColumn.name();
+                final var entityColumnNullable = entityColumn.nullable();
+                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+                {
+                    assumeThat(tableColumnIsNullable).isNotNull();
+                }
+                if (!_MatchTableColumnNullable_EntityColumnNullable(
+                        entityMember, entityColumn, tableColumnIsNullable)) {
+                    logger.log(
+                            Level.INFO,
+                            "skipping nullability check; member {0}, column: {1}",
+                            entityMember,
+                            entityColumn
+                    );
+                    return;
+                }
+                assertThat(entityColumnNullable)
+                        .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
+                            entityColumnName, tableColumnIsNullable)
+                        .isEqualTo(tableColumnIsNullable);
             }
-            assertThat(entityColumnNullable)
-                    .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
-                        entityColumnName, tableColumnIsNullable)
-                    .isEqualTo(tableColumnIsNullable);
         });
     }
 
@@ -324,6 +388,21 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
                                                                      @Nonnull final Column column,
+                                                                     final boolean nullable) {
+        return true;
+    }
+
+    /**
+     * Notifies that an attribute's {@link JoinColumn#nullable()} @Column#nullable} element is going to be verified to
+     * match the table column's precision.
+     *
+     * @param member   a java member of the attribute.
+     * @param column   a {@link JoinColumn @Column} annotation of the attribute.
+     * @param nullable the nullability of the table column.
+     * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
+     */
+    protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
+                                                                     @Nonnull final JoinColumn column,
                                                                      final boolean nullable) {
         return true;
     }
@@ -346,9 +425,11 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                     .as("%s on %s", __Disable_MappingOptional_Test.class, clazz)
                     .isEmpty();
         }
+
         final var managedType = applyEntityManagerFactory(em -> {
             return em.getMetamodel().managedType(entityClass);
         });
+
         managedType.getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;

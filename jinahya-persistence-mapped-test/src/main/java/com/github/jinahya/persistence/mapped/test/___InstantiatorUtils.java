@@ -37,10 +37,11 @@ import java.util.Optional;
 public final class ___InstantiatorUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> type) {
+    private static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> target) {
+        assert target != null;
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
-                        type,
+                        target,
                         ___Instantiator.class,
                         "Instantiator",
                         "_Instantiator"
@@ -51,10 +52,11 @@ public final class ___InstantiatorUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    private static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> type) {
-        return getInstantiatorClassOf(type)
-//                .map(___JavaLangReflectTestUtils::newInstanceOf)
+    private static <T> Optional<___Instantiator<T>> newInstantiatorInstanceOf(final Class<T> target) {
+        assert target != null;
+        return getInstantiatorClassOf(target)
                 .map(ReflectionUtils::newInstance)
+                .filter(i -> target.isAssignableFrom(((___Instantiator<?>) i).target))
                 .map(i -> (___Instantiator<T>) i);
     }
 
@@ -62,13 +64,13 @@ public final class ___InstantiatorUtils {
      * Instantiates a new instance of the specified class, who has a sibling instantiator class which implements
      * {@link ___Instantiator}, and has a postfix of either {@code "Instantiator"} or {@code "_Instantiator"}.
      *
-     * @param type the class to be instantiated.
-     * @param <T>  class type parameter
+     * @param target the class to be instantiated.
+     * @param <T>    class target parameter
      * @return an optional of the instantiated instance; {@link Optional#empty() empty} when no instantiator found.
      */
-    public static <T> Optional<T> newInstantiatedInstanceOf(final Class<T> type) {
-        Objects.requireNonNull(type, "type is null");
-        return newInstantiatorInstanceOf(type)
+    public static <T> Optional<T> newInstantiatedInstanceOf(final Class<T> target) {
+        Objects.requireNonNull(target, "target is null");
+        return newInstantiatorInstanceOf(target)
                 .map(___Instantiator::get);
     }
 

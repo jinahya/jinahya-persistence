@@ -13,7 +13,7 @@ public final class __MappedEntityWithGeneratedUuidBuilderUtils {
     public static <BUILDER extends __MappedEntityWithGeneratedUuidBuilder<BUILDER, ?>> BUILDER reset(
             @Nonnull final BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
-        return __BuilderUtils.reset(instance);
+        return ___BuilderUtils.reset(instance);
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS

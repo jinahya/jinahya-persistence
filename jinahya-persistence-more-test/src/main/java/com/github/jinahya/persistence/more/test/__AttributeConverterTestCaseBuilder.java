@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.test;
 
-import com.github.jinahya.persistence.mapped.__Builder;
+import com.github.jinahya.persistence.mapped.___Builder;
 
 @SuppressWarnings({
         "unchecked",
@@ -9,7 +9,7 @@ import com.github.jinahya.persistence.mapped.__Builder;
 })
 // TODO: make final?
 public class __AttributeConverterTestCaseBuilder<X, Y>
-        extends __Builder<__AttributeConverterTestCaseBuilder<X, Y>, __AttributeConverterTestCase<X, Y>> {
+        extends ___Builder<__AttributeConverterTestCaseBuilder<X, Y>, __AttributeConverterTestCase<X, Y>> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     protected __AttributeConverterTestCaseBuilder() {

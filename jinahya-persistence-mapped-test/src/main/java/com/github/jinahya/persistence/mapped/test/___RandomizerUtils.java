@@ -38,10 +38,11 @@ import java.util.Optional;
 public final class ___RandomizerUtils {
 
     @Nonnull
-    private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> type) {
+    private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> target) {
+        assert target != null;
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
-                        type,
+                        target,
                         ___Randomizer.class,
                         "Randomizer",
                         "_Randomizer"
@@ -53,17 +54,18 @@ public final class ___RandomizerUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(@Nonnull final Class<T> type) {
-        return getRandomizerClassOf(type)
-//                .map(___JavaLangReflectTestUtils::newInstanceOf)
+    private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(@Nonnull final Class<T> target) {
+        assert target != null;
+        return getRandomizerClassOf(target)
                 .map(ReflectionUtils::newInstance)
+                .filter(i -> target.isAssignableFrom(((___Randomizer<?>) i).target))
                 .map(i -> (___Randomizer<T>) i);
     }
 
     @Nonnull
-    public static <T> Optional<T> newRandomizedInstanceOf(@Nonnull final Class<T> type) {
-        Objects.requireNonNull(type, "type is null");
-        return newRandomizerInstanceOf(type).map(___Randomizer::get);
+    public static <T> Optional<T> newRandomizedInstanceOf(@Nonnull final Class<T> target) {
+        Objects.requireNonNull(target, "target is null");
+        return newRandomizerInstanceOf(target).map(___Randomizer::get);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

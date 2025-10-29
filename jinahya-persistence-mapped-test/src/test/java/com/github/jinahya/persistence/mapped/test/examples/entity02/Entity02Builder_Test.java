@@ -25,6 +25,7 @@ import com.github.jinahya.persistence.mapped.test.__MappedEntityBuilder_Test;
 class Entity02Builder_Test extends __MappedEntityBuilder_Test<Entity02Builder, Entity02, Long> {
 
     Entity02Builder_Test() {
-        super(Entity02Builder.class, Entity02.class, Long.class);
+//        super(Entity02Builder.class, Entity02.class, Long.class);
+        super(Entity02Builder.class, Entity02.class);
     }
 }

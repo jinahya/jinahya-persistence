@@ -36,6 +36,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.AnnotationUtils;
 
@@ -54,6 +55,7 @@ import java.util.function.LongFunction;
 import static org.assertj.core.api.Assumptions.assumeThat;
 
 @SuppressWarnings({
+        "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S6813" // Field dependency injection should be avoided
@@ -79,6 +81,9 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
             tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
             tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
+            logger.log(Level.DEBUG, "tableCatalog: {0}", tableCatalog);
+            logger.log(Level.DEBUG, "tableSchema: {0}", tableSchema);
+            logger.log(Level.DEBUG, "tableTypes: {0}", Arrays.toString(tableTypes));
         }
         {
 //            entityManager = getEntityManagerFactory().createEntityManager();
@@ -93,8 +98,11 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
 
     @PreDestroy
     protected void onPreDestroy() {
-        logger.log(Level.DEBUG, "closing {0}", entityManager);
-        entityManager.close();
+        if (cachedEntityManager != null) {
+            logger.log(Level.DEBUG, "closing cached entity manager: {0}", cachedEntityManager);
+            cachedEntityManager.close();
+            cachedEntityManager = null;
+        }
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -103,12 +111,20 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Persists a new (randomized) instance.
+     *
+     * @see __Disable_PersistEntityInstance_Test
+     */
+    @DisplayName("persist a new (randomized) entity instance")
     @Test
-    final void __persistRandomInstance() {
+    final void __persistEntityInstance() {
         {
             final var clazz = getClass();
             final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_PersistEntityInstance_Test.class
+                    clazz,
+                    __Disable_PersistEntityInstance_Test.class
             );
             assumeThat(disabled)
                     .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
@@ -120,6 +136,15 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                 },
                 true
         );
+        __persistEntityInstance(persisted);
+    }
+
+    /**
+     * Notifies that the specified entity instance has been persisted.
+     *
+     * @param persisted the entity instance persisted.
+     */
+    protected void __persistEntityInstance(final ENTITY persisted) {
         logger.log(Level.DEBUG, "persisted: {0}", persisted);
     }
 
@@ -192,10 +217,10 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     // --------------------------------------------------------------------------------------------------- entityManager
-    private EntityManager entityManager() {
-        var em = entityManager;
+    private EntityManager cachedEntityManager() {
+        var em = cachedEntityManager;
         if (em == null || !em.isOpen()) {
-            em = entityManager = getEntityManagerFactory().createEntityManager();
+            em = cachedEntityManager = getEntityManagerFactory().createEntityManager();
         }
         return em;
     }
@@ -213,7 +238,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
             final var clazz = getClass();
             final var flag = AnnotationUtils.findAnnotation(clazz, __Use_Cached_EntityManager.class);
             if (flag.isPresent()) {
-                return function.apply(entityManager());
+                return function.apply(cachedEntityManager());
             }
         }
         // too slow!
@@ -374,5 +399,5 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     private String[] tableTypes;
 
     // -----------------------------------------------------------------------------------------------------------------
-    private EntityManager entityManager;
+    private EntityManager cachedEntityManager;
 }

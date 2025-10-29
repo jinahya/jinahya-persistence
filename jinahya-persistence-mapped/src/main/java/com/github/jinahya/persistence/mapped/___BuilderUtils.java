@@ -8,15 +8,15 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public final class __BuilderUtils {
+public final class ___BuilderUtils {
 
-    public static <BUILDER extends __Builder<BUILDER, ?>> BUILDER reset(@Nonnull final BUILDER instance) {
+    public static <BUILDER extends ___Builder<BUILDER, ?>> BUILDER reset(@Nonnull final BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
         return ___ReflectionUtils.reset(instance);
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    private __BuilderUtils() {
+    private ___BuilderUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

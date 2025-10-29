@@ -26,6 +26,7 @@ class Entity01Builder_Test extends __MappedEntityBuilder_Test<Entity01Builder, E
 
     // -----------------------------------------------------------------------------------------------------------------
     Entity01Builder_Test() {
-        super(Entity01Builder.class, Entity01.class, Long.class);
+//        super(Entity01Builder.class, Entity01.class, Long.class);
+        super(Entity01Builder.class, Entity01.class);
     }
 }

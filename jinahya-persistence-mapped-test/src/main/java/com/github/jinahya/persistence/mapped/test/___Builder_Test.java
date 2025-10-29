@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.mapped.test;
 
-import com.github.jinahya.persistence.mapped.__Builder;
+import com.github.jinahya.persistence.mapped.___Builder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.ReflectionUtils;
@@ -20,15 +20,15 @@ import static org.assertj.core.api.Assumptions.assumeThatCode;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 
 })
-public abstract class __Builder_Test<
-        BUILDER extends __Builder<BUILDER, TARGET>,
+public abstract class ___Builder_Test<
+        BUILDER extends ___Builder<BUILDER, TARGET>,
         TARGET
         > {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __Builder_Test(final Class<BUILDER> builderClass, final Class<TARGET> targetClass) {
+    protected ___Builder_Test(final Class<BUILDER> builderClass, final Class<TARGET> targetClass) {
         super();
         this.builderClass = Objects.requireNonNull(builderClass, "builderClass is null");
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
@@ -49,7 +49,7 @@ public abstract class __Builder_Test<
     @Test
     protected void build_NotNull_newRandomizedBuilderInstance() {
         newRandomizedBuilderInstance()
-                .map(__Builder::build)
+                .map(___Builder::build)
                 .ifPresent(v -> {
                     logger.log(System.Logger.Level.DEBUG, "built: {0}", v);
                     assertThat(v).isNotNull();
@@ -62,7 +62,7 @@ public abstract class __Builder_Test<
     }
 
     protected Optional<BUILDER> newRandomizedBuilderInstance() {
-        return __Builder_TestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
+        return ___Builder_TestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
     }
 
     // ----------------------------------------------------------------------------------------------------- targetClass

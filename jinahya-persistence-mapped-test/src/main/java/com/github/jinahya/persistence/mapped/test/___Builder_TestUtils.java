@@ -1,11 +1,12 @@
 package com.github.jinahya.persistence.mapped.test;
 
-import com.github.jinahya.persistence.mapped.__Builder;
+import com.github.jinahya.persistence.mapped.___Builder;
 import jakarta.annotation.Nonnull;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.beans.Introspector;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.ParameterizedType;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -13,13 +14,33 @@ import java.util.Optional;
         "java:S101", // Class names should comply with a naming convention
         "java:S119", // Type parameter names should comply with a naming convention
 })
-public final class __Builder_TestUtils {
+public final class ___Builder_TestUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <BUILDER extends __Builder<BUILDER, T>, T>
-    BUILDER newBuilderInstanceFrom(final Class<BUILDER> builderClass, @Nonnull final T targetInstance) {
+    public static <BUILDER extends ___Builder<BUILDER, TARGET>, TARGET> Class<TARGET> getTargetClass(
+            @Nonnull final Class<BUILDER> builderClass) {
+        Objects.requireNonNull(builderClass, "builderClass is null");
+        for (Class<?> c = builderClass; c != null; c = c.getSuperclass()) {
+            final var genericSuperclass = builderClass.getGenericSuperclass();
+            if (!(genericSuperclass instanceof ParameterizedType parameterizedType)) {
+                continue;
+            }
+            if (parameterizedType.getRawType() != ___Builder.class) {
+                continue;
+            }
+            final var actualTypeArguments = parameterizedType.getActualTypeArguments();
+            assert actualTypeArguments.length == 2;
+            assert actualTypeArguments[0] == builderClass;
+            return (Class<TARGET>) actualTypeArguments[1];
+        }
+        throw new IllegalArgumentException("unable to get id class from " + builderClass);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    public static <BUILDER extends ___Builder<BUILDER, T>, T>
+    BUILDER newBuilderInstanceFrom(@Nonnull final Class<BUILDER> builderClass, @Nonnull final T targetInstance) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetInstance, "targetInstance is null");
         final var builderInstance = ReflectionUtils.newInstance(builderClass);
@@ -60,7 +81,7 @@ public final class __Builder_TestUtils {
         }
     }
 
-    public static <BUILDER extends __Builder<BUILDER, T>, T>
+    public static <BUILDER extends ___Builder<BUILDER, T>, T>
     Optional<BUILDER> newBuilderInstanceFromRandomizedInstanceOf(@Nonnull final Class<BUILDER> builderClass,
                                                                  @Nonnull final Class<T> targetClass) {
         Objects.requireNonNull(builderClass, "builderClass is null");
@@ -70,7 +91,7 @@ public final class __Builder_TestUtils {
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    private __Builder_TestUtils() {
+    private ___Builder_TestUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -1,9 +1,9 @@
 package com.github.jinahya.persistence.more.test;
 
-import com.github.jinahya.persistence.mapped.test.__Builder_Test;
+import com.github.jinahya.persistence.mapped.test.___Builder_Test;
 
 class __AttributeConverterTestCaseBuilder_Test<X, Y>
-        extends __Builder_Test<__AttributeConverterTestCaseBuilder<X, Y>, __AttributeConverterTestCase<X, Y>> {
+        extends ___Builder_Test<__AttributeConverterTestCaseBuilder<X, Y>, __AttributeConverterTestCase<X, Y>> {
 
     @SuppressWarnings({
             "unchecked"

@@ -24,6 +24,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -37,6 +38,8 @@ import java.util.stream.Stream;
         "java:S101" // Class names should comply with a naming convention
 })
 final class ____HibernateTestUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -65,12 +68,13 @@ final class ____HibernateTestUtils {
                     (p, m, a) -> {
                         if (m.equals(executeMethod)) {
                             final var connection = (Connection) a[0];
+                            logger.log(System.Logger.Level.DEBUG, "connection: {0}", connection);
                             return function.apply(connection);
                         }
                         return null;
                     }
             );
-            final Method doReturningWorkMethod = sessionClass.getMethod("doReturningWork", returningWorkClass);
+            final var doReturningWorkMethod = sessionClass.getMethod("doReturningWork", returningWorkClass);
             return (R) doReturningWorkMethod.invoke(sessionInstance, returningWorkProxy);
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException("failed to work with hibernate", roe);

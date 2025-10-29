@@ -24,6 +24,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import org.junit.platform.commons.util.ReflectionUtils;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -37,6 +38,8 @@ import java.util.Optional;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public final class ___PersisterUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> type) {
         return Optional.ofNullable(
@@ -73,9 +76,11 @@ public final class ___PersisterUtils {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
-        newPersisterInstanceOf(entityClass)
-                .orElseThrow(() -> new RuntimeException("no persister instance for " + entityClass))
-                .persist(entityManager, entityInstance);
+        logger.log(System.Logger.Level.DEBUG, "entityInstance: {0}", entityInstance);
+        final var persisterInstance = newPersisterInstanceOf(entityClass)
+                .orElseThrow(() -> new RuntimeException("no persisterInstance instance for " + entityClass));
+        logger.log(System.Logger.Level.DEBUG, "persisterInstance: {0}", persisterInstance);
+        persisterInstance.persist(entityManager, entityInstance);
         return entityInstance;
     }
 
