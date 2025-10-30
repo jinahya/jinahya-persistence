@@ -46,7 +46,7 @@
   </developers>
 
   <modules>
-    <module>_coverage-report-aggregated</module>
+    <module>coverage-report-aggregated</module>
     <module>jinahya-persistence-mapped</module>
     <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
@@ -83,7 +83,7 @@
     <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-mapped/target/site/jacoco/jacoco.xml,jinahya-persistence-mapped-test/target/site/jacoco/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
 <!--    <sonar.coverage.jacoco.xmlReportPaths>_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
-    <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.4</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
