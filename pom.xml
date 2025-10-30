@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -41,11 +42,12 @@
         <role>developer</role>
       </roles>
       <timezone>Asia/Seoul</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
 
   <modules>
+    <module>coverage-report-aggregated</module>
     <module>jinahya-persistence-mapped</module>
     <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
@@ -81,6 +83,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.language>java</sonar.language>
     <sonar.organization>jinahya-github</sonar.organization>
+    <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.4</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
