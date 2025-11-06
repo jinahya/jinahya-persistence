@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
@@ -40,6 +41,12 @@ public final class ___RandomizerUtils {
     @Nonnull
     private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> target) {
         assert target != null;
+        {
+            final var annotation = AnnotationUtils.findAnnotation(target, ___RandomizerClass.class, false);
+            if (annotation.isPresent()) {
+                return Optional.of(annotation.get().value());
+            }
+        }
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
                         target,

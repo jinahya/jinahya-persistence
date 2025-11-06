@@ -57,6 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -210,14 +211,14 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     /**
      * Notifies specified remaining table column names, from which all entity column names are removed.
      *
-     * @param tableColumnNames the remaining table column names that all entity column names are removed.
+     * @param remainingTableColumnNames the remaining table column names that all entity column names are removed.
      * @see #_Mapped_AllTableColumnNames()
      * @see __Disable_TableColumnNames_Test
      */
-    protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> tableColumnNames) {
-        Objects.requireNonNull(tableColumnNames, "tableColumnNames is null");
-        logger.log(Level.DEBUG, "number of remaining table columns: {0}", tableColumnNames.size());
-        tableColumnNames.forEach(tcn -> {
+    protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> remainingTableColumnNames) {
+        Objects.requireNonNull(remainingTableColumnNames, "remainingTableColumnNames is null");
+        logger.log(Level.DEBUG, "number of remaining table columns: {0}", remainingTableColumnNames.size());
+        remainingTableColumnNames.forEach(tcn -> {
             logger.log(Level.WARNING, "\tremaining table column name: {0}", tcn);
         });
     }
@@ -321,7 +322,11 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 }
                 final var entityColumnName = entityColumn.name();
                 final var entityColumnNullable = entityColumn.nullable();
-                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+                final var tableColumnIsNullable =
+                        Optional.ofNullable(tableColumnNamesAndIsNullables.get(entityColumnName)).orElseGet(
+                                () -> tableColumnNamesAndIsNullables.get(
+                                        entityColumnName.substring(1, entityColumnName.length() - 1))
+                        );
                 {
                     assumeThat(tableColumnIsNullable).isNotNull();
                 }
@@ -695,7 +700,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 }
                 final Boolean tableColumnNullable;
                 {
-                    final var tableColumn = tableColumns.get(attributeColumn.name());
+                    final var tableColumn =
+                            Optional.ofNullable(tableColumns.get(attributeColumn.name())).orElseGet(() -> {
+                                // `***`
+                                return tableColumns.get(
+                                        attributeColumn.name().substring(1, attributeColumn.name().length() - 1)
+                                );
+                            });
                     assertThat(tableColumn)
                             .as("table column metadata for %s", a)
                             .isNotNull();
