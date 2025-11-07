@@ -51,7 +51,7 @@ public abstract class ___Builder_Test<
     protected void build_NotNull_newRandomizedBuilderInstance() {
         final var instance = newRandomizedBuilderInstance();
         assumeThat(instance)
-                .as("optional of new randomized builder instance")
+                .as("optional of new randomized builder instance of %1$s", targetClass)
                 .isNotEmpty();
         final var built = instance.get().build();
         logger.log(System.Logger.Level.DEBUG, "built: {0}", built);

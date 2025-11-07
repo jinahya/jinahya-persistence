@@ -47,6 +47,22 @@ public final class ___RandomizerUtils {
                 return Optional.of(annotation.get().value());
             }
         }
+        {
+            final var optionalEnclosedRandomizerClass =
+                    Optional.ofNullable(target.getEnclosingClass()).flatMap(
+                            ___RandomizerUtils::getRandomizerClassOf).map(
+                            enclosingRandomizerClass -> {
+                                return ___JavaLang_TestUtils.siblingClassForPostfix(
+                                        enclosingRandomizerClass,
+                                        ___Randomizer.class,
+                                        "$" + target.getSimpleName() + "Randomizer",
+                                        "$" + target.getSimpleName() + "_Randomizer"
+                                );
+                            });
+            if (optionalEnclosedRandomizerClass.isPresent()) {
+                return Optional.of(optionalEnclosedRandomizerClass.get());
+            }
+        }
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
                         target,
