@@ -38,6 +38,16 @@ import java.util.Optional;
 })
 public final class ___RandomizerUtils {
 
+    public static String[] mergeExcludedFields(final String[] excludedFields, final String... moreExcludedFields) {
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
+        final var result = new String[excludedFields.length + moreExcludedFields.length];
+        System.arraycopy(excludedFields, 0, result, 0, excludedFields.length);
+        System.arraycopy(moreExcludedFields, 0, result, excludedFields.length, moreExcludedFields.length);
+        return result;
+
+    }
+
     @Nonnull
     private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> target) {
         assert target != null;
