@@ -47,11 +47,13 @@ public final class ___RandomizerUtils {
                 return Optional.of(annotation.get().value());
             }
         }
+        // if enclosed,
+        // try to find [enclosingClass_Randomizer$targetClass_Randomizer]
         {
-            final var optionalEnclosedRandomizerClass =
-                    Optional.ofNullable(target.getEnclosingClass()).flatMap(
-                            ___RandomizerUtils::getRandomizerClassOf).map(
-                            enclosingRandomizerClass -> {
+            final Optional<Class<?>> optionalEnclosedRandomizerClass =
+                    Optional.ofNullable(target.getEnclosingClass())
+                            .flatMap(___RandomizerUtils::getRandomizerClassOf)
+                            .map(enclosingRandomizerClass -> {
                                 return ___JavaLang_TestUtils.siblingClassForPostfix(
                                         enclosingRandomizerClass,
                                         ___Randomizer.class,
@@ -60,7 +62,7 @@ public final class ___RandomizerUtils {
                                 );
                             });
             if (optionalEnclosedRandomizerClass.isPresent()) {
-                return Optional.of(optionalEnclosedRandomizerClass.get());
+                return optionalEnclosedRandomizerClass;
             }
         }
         return Optional.ofNullable(
