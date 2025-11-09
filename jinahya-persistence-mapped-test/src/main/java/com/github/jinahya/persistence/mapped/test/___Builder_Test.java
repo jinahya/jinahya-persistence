@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.assertj.core.api.Assumptions.assumeThatCode;
 
 @SuppressWarnings({
@@ -48,12 +49,13 @@ public abstract class ___Builder_Test<
     @DisplayName("<randomized> -> build() should return non-null <TARGET>")
     @Test
     protected void build_NotNull_newRandomizedBuilderInstance() {
-        newRandomizedBuilderInstance()
-                .map(___Builder::build)
-                .ifPresent(v -> {
-                    logger.log(System.Logger.Level.DEBUG, "built: {0}", v);
-                    assertThat(v).isNotNull();
-                });
+        final var instance = newRandomizedBuilderInstance();
+        assumeThat(instance)
+                .as("optional of new randomized builder instance of %1$s", targetClass)
+                .isNotEmpty();
+        final var built = instance.get().build();
+        logger.log(System.Logger.Level.DEBUG, "built: {0}", built);
+        assertThat(built).isNotNull();
     }
 
     // ---------------------------------------------------------------------------------------------------- builderClass

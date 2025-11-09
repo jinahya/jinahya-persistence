@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.mapped.test;
  */
 
 import jakarta.annotation.Nonnull;
+import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
@@ -37,9 +38,43 @@ import java.util.Optional;
 })
 public final class ___RandomizerUtils {
 
+    public static String[] mergeExcludedFields(final String[] excludedFields, final String... moreExcludedFields) {
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
+        final var result = new String[excludedFields.length + moreExcludedFields.length];
+        System.arraycopy(excludedFields, 0, result, 0, excludedFields.length);
+        System.arraycopy(moreExcludedFields, 0, result, excludedFields.length, moreExcludedFields.length);
+        return result;
+
+    }
+
     @Nonnull
     private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> target) {
         assert target != null;
+        {
+            final var annotation = AnnotationUtils.findAnnotation(target, ___RandomizerClass.class, false);
+            if (annotation.isPresent()) {
+                return Optional.of(annotation.get().value());
+            }
+        }
+        // if enclosed,
+        // try to find [enclosingClass_Randomizer$targetClass_Randomizer]
+        {
+            final Optional<Class<?>> optionalEnclosedRandomizerClass =
+                    Optional.ofNullable(target.getEnclosingClass())
+                            .flatMap(___RandomizerUtils::getRandomizerClassOf)
+                            .map(enclosingRandomizerClass -> {
+                                return ___JavaLang_TestUtils.siblingClassForPostfix(
+                                        enclosingRandomizerClass,
+                                        ___Randomizer.class,
+                                        "$" + target.getSimpleName() + "Randomizer",
+                                        "$" + target.getSimpleName() + "_Randomizer"
+                                );
+                            });
+            if (optionalEnclosedRandomizerClass.isPresent()) {
+                return optionalEnclosedRandomizerClass;
+            }
+        }
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
                         target,

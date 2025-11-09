@@ -57,6 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,9 +121,10 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         if (true) {
             final var columnMetaData = applyConnection(c -> {
                 try {
-                    return ___JavaSql_TestUtils.getColumnMetaData(c, tableCatalog(), tableSchema(), tableName());
+                    return ___JavaSql_TestUtils.getColumnMetaData(c, getJinahyaTableCatalog(), getJinahyaTableSchema(),
+                                                                  getEntityTableName());
                 } catch (final SQLException sqle) {
-                    throw new RuntimeException("failed to get column metadata of " + tableName(), sqle);
+                    throw new RuntimeException("failed to get column metadata of " + getEntityTableName(), sqle);
                 }
             }, true);
             return columnMetaData.keySet();
@@ -168,6 +170,15 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    private void assumeNotAnnotatedWith(final Class<? extends Annotation> annotationClass) {
+        final var clazz = getClass();
+        final var disabled = AnnotationUtils.findAnnotation(clazz, annotationClass);
+        assumeThat(disabled)
+                .as("%s on %s", annotationClass, clazz)
+                .isEmpty();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Checks that all table column names are mapped, and reports to the
@@ -178,15 +189,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     @DisplayName("check that all table columns are mapped")
     @Test
     final void _Mapped_AllTableColumnNames() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_TableColumnNames_Test.class
-            );
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_TableColumnNames_Test.class, clazz)
-                    .isEmpty();
-        }
+        assumeNotAnnotatedWith(__Disable_TableColumnNames_Test.class);
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = getTableColumnNames();
         logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
@@ -210,14 +213,14 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     /**
      * Notifies specified remaining table column names, from which all entity column names are removed.
      *
-     * @param tableColumnNames the remaining table column names that all entity column names are removed.
+     * @param remainingTableColumnNames the remaining table column names that all entity column names are removed.
      * @see #_Mapped_AllTableColumnNames()
      * @see __Disable_TableColumnNames_Test
      */
-    protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> tableColumnNames) {
-        Objects.requireNonNull(tableColumnNames, "tableColumnNames is null");
-        logger.log(Level.DEBUG, "number of remaining table columns: {0}", tableColumnNames.size());
-        tableColumnNames.forEach(tcn -> {
+    protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> remainingTableColumnNames) {
+        Objects.requireNonNull(remainingTableColumnNames, "remainingTableColumnNames is null");
+        logger.log(Level.DEBUG, "number of remaining table columns: {0}", remainingTableColumnNames.size());
+        remainingTableColumnNames.forEach(tcn -> {
             logger.log(Level.WARNING, "\tremaining table column name: {0}", tcn);
         });
     }
@@ -232,15 +235,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     @DisplayName("check that all entity columns are known")
     @Test
     void _Known_AllEntityColumnNames() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_EnittyColumnNames_Test.class
-            );
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_EnittyColumnNames_Test.class, clazz)
-                    .isEmpty();
-        }
+        assumeNotAnnotatedWith(__Disable_EnittyColumnNames_Test.class);
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
         logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
@@ -277,103 +272,62 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * All values of {@code @Column(nullable)} should match corresponding table column's nullability.
+     * All values of {@link Column#nullable()} should match corresponding table column's nullability.
      */
+    @DisplayName("@Column#nullable should match corresponding table column's nullability")
     @Test
     void _MatchTableColumnNullable_EntityColumnNullable() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_ColumnNullable_Test.class
-            );
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_ColumnNullable_Test.class, clazz)
-                    .isEmpty();
-        }
-        final var tableName = tableName();
+        assumeNotAnnotatedWith(__Disable_ColumnNullable_Test.class);
+        // -------------------------------------------------------------------------------------------------------------
+        final var entityTableName = getEntityTableName();
         final var tableColumnNamesAndIsNullables =
                 applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                         em,
                         c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
                                 c,
-                                tableCatalog(),
-                                tableSchema(),
-                                tableName
+                                getJinahyaTableCatalog(),
+                                getJinahyaTableSchema(),
+                                entityTableName
                         )
                 ));
-        final var managedType = applyEntityManagerFactory(em -> {
-            return em.getMetamodel().managedType(entityClass);
-        });
-        managedType.getAttributes().forEach(a -> {
+        managedType().getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
-            {
-                final Column entityColumn;
-                if (entityMember instanceof Field field) {
-                    entityColumn = field.getAnnotation(Column.class);
-                } else if (entityMember instanceof Method method) {
-                    entityColumn = method.getAnnotation(Column.class);
-                } else {
-                    throw new RuntimeException("unknown entity member type: " + entityMember);
-                }
-                if (entityColumn == null) {
-                    logger.log(Level.DEBUG, "no @Column annotation on {0}", entityMember);
-                    return;
-                }
-                final var entityColumnName = entityColumn.name();
-                final var entityColumnNullable = entityColumn.nullable();
-                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
-                {
-                    assumeThat(tableColumnIsNullable).isNotNull();
-                }
-                if (!_MatchTableColumnNullable_EntityColumnNullable(
-                        entityMember, entityColumn, tableColumnIsNullable)) {
-                    logger.log(
-                            Level.INFO,
-                            "skipping nullability check; member {0}, column: {1}",
-                            entityMember,
-                            entityColumn
-                    );
-                    return;
-                }
-                assertThat(entityColumnNullable)
-                        .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
-                            entityColumnName, tableColumnIsNullable)
-                        .isEqualTo(tableColumnIsNullable);
+            final Column entityColumn;
+            if (entityMember instanceof Field field) {
+                entityColumn = field.getAnnotation(Column.class);
+            } else if (entityMember instanceof Method method) {
+                entityColumn = method.getAnnotation(Column.class);
+            } else {
+                throw new RuntimeException("unknown entity member type: " + entityMember);
             }
-            {
-                final JoinColumn entityColumn;
-                if (entityMember instanceof Field field) {
-                    entityColumn = field.getAnnotation(JoinColumn.class);
-                } else if (entityMember instanceof Method method) {
-                    entityColumn = method.getAnnotation(JoinColumn.class);
-                } else {
-                    throw new RuntimeException("unknown entity member type: " + entityMember);
-                }
-                if (entityColumn == null) {
-                    logger.log(Level.DEBUG, "no @JoinColumn annotation on {0}", entityMember);
-                    return;
-                }
-                final var entityColumnName = entityColumn.name();
-                final var entityColumnNullable = entityColumn.nullable();
-                final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
-                {
-                    assumeThat(tableColumnIsNullable).isNotNull();
-                }
-                if (!_MatchTableColumnNullable_EntityColumnNullable(
-                        entityMember, entityColumn, tableColumnIsNullable)) {
-                    logger.log(
-                            Level.INFO,
-                            "skipping nullability check; member {0}, column: {1}",
-                            entityMember,
-                            entityColumn
-                    );
-                    return;
-                }
-                assertThat(entityColumnNullable)
-                        .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, tableName,
-                            entityColumnName, tableColumnIsNullable)
-                        .isEqualTo(tableColumnIsNullable);
+            if (entityColumn == null) {
+                logger.log(Level.DEBUG, "no @Column annotation on {0}", entityMember);
+                return;
             }
+            final var entityColumnName = entityColumn.name();
+            final var entityColumnNullable = entityColumn.nullable();
+            final var tableColumnIsNullable =
+                    Optional.ofNullable(tableColumnNamesAndIsNullables.get(entityColumnName)).orElseGet(
+                            () -> tableColumnNamesAndIsNullables.get(
+                                    entityColumnName.substring(1, entityColumnName.length() - 1))
+                    );
+            {
+                assumeThat(tableColumnIsNullable).isNotNull();
+            }
+            if (!_MatchTableColumnNullable_EntityColumnNullable(
+                    entityMember, entityColumn, tableColumnIsNullable)) {
+                logger.log(
+                        Level.INFO,
+                        "skipping nullability check; member {0}, column: {1}",
+                        entityMember,
+                        entityColumn
+                );
+                return;
+            }
+            assertThat(entityColumnNullable)
+                    .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, entityTableName,
+                        entityColumnName, tableColumnIsNullable)
+                    .isEqualTo(tableColumnIsNullable);
         });
     }
 
@@ -393,17 +347,73 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     /**
+     * All values of {@link JoinColumn#nullable()} should match corresponding table column's nullability.
+     */
+    @DisplayName("@JoinColumn#nullable should match corresponding table column's nullability")
+    @Test
+    void _MatchTableColumnNullable_EntityJoinColumnNullable() {
+        assumeNotAnnotatedWith(__Disable_JoinColumnNullable_Test.class);
+        // -------------------------------------------------------------------------------------------------------------
+        final var entityTableName = getEntityTableName();
+        final var tableColumnNamesAndIsNullables =
+                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
+                        em,
+                        c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
+                                c,
+                                getJinahyaTableCatalog(),
+                                getJinahyaTableSchema(),
+                                entityTableName
+                        )
+                ));
+        managedType().getAttributes().forEach(a -> {
+            final var entityMember = a.getJavaMember();
+            final JoinColumn entityJoinColumn;
+            if (entityMember instanceof Field field) {
+                entityJoinColumn = field.getAnnotation(JoinColumn.class);
+            } else if (entityMember instanceof Method method) {
+                entityJoinColumn = method.getAnnotation(JoinColumn.class);
+            } else {
+                throw new RuntimeException("unknown entity member type: " + entityMember);
+            }
+            if (entityJoinColumn == null) {
+                logger.log(Level.DEBUG, "no @JoinColumn annotation on {0}", entityMember);
+                return;
+            }
+            final var entityColumnName = entityJoinColumn.name();
+            final var entityColumnNullable = entityJoinColumn.nullable();
+            final var tableColumnIsNullable = tableColumnNamesAndIsNullables.get(entityColumnName);
+            {
+                assumeThat(tableColumnIsNullable).isNotNull();
+            }
+            if (!_MatchTableColumnNullable_EntityJoinColumnNullable(
+                    entityMember, entityJoinColumn, tableColumnIsNullable)) {
+                logger.log(
+                        Level.INFO,
+                        "skipping nullability check; member {0}, column: {1}",
+                        entityMember,
+                        entityJoinColumn
+                );
+                return;
+            }
+            assertThat(entityColumnNullable)
+                    .as("@Column#nullable of %s supposed to match %s.%s(%s) ", entityMember, entityTableName,
+                        entityColumnName, tableColumnIsNullable)
+                    .isEqualTo(tableColumnIsNullable);
+        });
+    }
+
+    /**
      * Notifies that an attribute's {@link JoinColumn#nullable()} @Column#nullable} element is going to be verified to
      * match the table column's precision.
      *
      * @param member   a java member of the attribute.
-     * @param column   a {@link JoinColumn @Column} annotation of the attribute.
+     * @param column   a {@link JoinColumn @JoinColumn} annotation of the attribute.
      * @param nullable the nullability of the table column.
      * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
      */
-    protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
-                                                                     @Nonnull final JoinColumn column,
-                                                                     final boolean nullable) {
+    protected boolean _MatchTableColumnNullable_EntityJoinColumnNullable(@Nonnull final Member member,
+                                                                         @Nonnull final JoinColumn column,
+                                                                         final boolean nullable) {
         return true;
     }
 
@@ -416,21 +426,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     @DisplayName("@Basic, @OneToOne, and @ManyToOne's optional should match @Column(nullable)")
     @Test
     void _MatchColumnNullable_EntityMappingOptional() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_MappingOptional_Test.class
-            );
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_MappingOptional_Test.class, clazz)
-                    .isEmpty();
-        }
-
-        final var managedType = applyEntityManagerFactory(em -> {
-            return em.getMetamodel().managedType(entityClass);
-        });
-
-        managedType.getAttributes().forEach(a -> {
+        assumeNotAnnotatedWith(__Disable_MappingOptional_Test.class);
+        // -------------------------------------------------------------------------------------------------------------
+        managedType().getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;
             if (entityMember instanceof Field field) {
@@ -528,19 +526,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     @DisplayName("@Column(nullable = true) should not have @NotNull")
     @Test
     void _ShouldNotBeAnnotatedWithNotNull_AttributeWithColumnNullable() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_NotNull_Test.class
-            );
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_NotNull_Test.class, clazz)
-                    .isEmpty();
-        }
-        final var managedType = applyEntityManagerFactory(em -> {
-            return em.getMetamodel().managedType(entityClass);
-        });
-        managedType.getAttributes().forEach(a -> {
+        assumeNotAnnotatedWith(__Disable_NotNull_Test.class);
+        // -------------------------------------------------------------------------------------------------------------
+        managedType().getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;
             if (entityMember instanceof Field field) {
@@ -584,19 +572,9 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     @DisplayName("@Column(nullable = true) should not have any @NonNull")
     @Test
     void _ShouldNotBeAnnotatedWithAnyNonNull_AttributeWithColumnNullable() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(
-                    clazz, __Disable_NonNull_Test.class
-            );
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_NonNull_Test.class, clazz)
-                    .isEmpty();
-        }
-        final var managedType = applyEntityManagerFactory(em -> {
-            return em.getMetamodel().managedType(entityClass);
-        });
-        managedType.getAttributes().forEach(a -> {
+        assumeNotAnnotatedWith(__Disable_NonNull_Test.class);
+        // -------------------------------------------------------------------------------------------------------------
+        managedType().getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;
             final java.lang.annotation.Annotation[] annotations;
@@ -661,7 +639,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         Objects.requireNonNull(function, "function is null");
         final var metadataColumns = applyConnectionAndRollback(c -> {
             try {
-                return ___JavaSql_TestUtils.getMetaDataColumns(c, tableCatalog(), tableSchema(), tableName(), "%");
+                return ___JavaSql_TestUtils.getMetaDataColumns(c, getJinahyaTableCatalog(), getJinahyaTableSchema(),
+                                                               getEntityTableName(), "%");
             } catch (final SQLException sqle) {
                 throw new RuntimeException("failed to get column info", sqle);
             }
@@ -695,7 +674,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 }
                 final Boolean tableColumnNullable;
                 {
-                    final var tableColumn = tableColumns.get(attributeColumn.name());
+                    final var tableColumn =
+                            Optional.ofNullable(tableColumns.get(attributeColumn.name())).orElseGet(() -> {
+                                // `***`
+                                return tableColumns.get(
+                                        attributeColumn.name().substring(1, attributeColumn.name().length() - 1)
+                                );
+                            });
                     assertThat(tableColumn)
                             .as("table column metadata for %s", a)
                             .isNotNull();
@@ -742,13 +727,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     @DisplayName("select an entity instance of a random index")
     @Test
     void selectRandomEntityInstance() {
-        {
-            final var clazz = getClass();
-            final var disabled = AnnotationUtils.findAnnotation(clazz, __Disable_RandomSelection_Test.class);
-            assumeThat(disabled)
-                    .as("%s on %s", __Disable_RandomSelection_Test.class, clazz)
-                    .isEmpty();
-        }
+        assumeNotAnnotatedWith(__Disable_RandomSelection_Test.class);
+        // -------------------------------------------------------------------------------------------------------------
         applyEntityManager(em -> {
             // ---------------------------------------------------------------------------------------------------- when
             final var selected = ___JakartaPersistence_TestUtils.selectRandom(em, entityClass);

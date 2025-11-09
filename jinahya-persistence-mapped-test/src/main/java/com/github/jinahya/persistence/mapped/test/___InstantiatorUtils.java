@@ -39,6 +39,24 @@ public final class ___InstantiatorUtils {
     // -----------------------------------------------------------------------------------------------------------------
     private static <T> Optional<Class<?>> getInstantiatorClassOf(final Class<T> target) {
         assert target != null;
+        // if enclosed,
+        // try to find [enclosingClass_Instantiator$targetClass_Instantiator]
+        {
+            final Optional<Class<?>> optionalEnclosingInstantiatorClass =
+                    Optional.ofNullable(target.getEnclosingClass())
+                            .flatMap(___InstantiatorUtils::getInstantiatorClassOf)
+                            .map(enclosingInstantiatorClass -> {
+                                return ___JavaLang_TestUtils.siblingClassForPostfix(
+                                        enclosingInstantiatorClass,
+                                        ___Randomizer.class,
+                                        "$" + target.getSimpleName() + "Randomizer",
+                                        "$" + target.getSimpleName() + "_Randomizer"
+                                );
+                            });
+            if (optionalEnclosingInstantiatorClass.isPresent()) {
+                return optionalEnclosingInstantiatorClass;
+            }
+        }
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
                         target,
