@@ -68,7 +68,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // -----------------------------------------------------------------------------------------------------------------
     __MappedEntity_Persistence_(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
-        tableName = AnnotationUtils.findAnnotation(entityClass, jakarta.persistence.Table.class, false)
+        entityTableName = AnnotationUtils.findAnnotation(entityClass, Table.class, false)
                 .map(Table::name)
                 .filter(v -> !v.isBlank())
                 .orElseThrow();
@@ -77,18 +77,15 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     // -----------------------------------------------------------------------------------------------------------------
     @PostConstruct
     protected void doOnPostConstruct() {
-        {
-            tableCatalog = __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
-            tableSchema = __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
-            tableTypes = __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
-            logger.log(Level.DEBUG, "tableCatalog: {0}", tableCatalog);
-            logger.log(Level.DEBUG, "tableSchema: {0}", tableSchema);
-            logger.log(Level.DEBUG, "tableTypes: {0}", Arrays.toString(tableTypes));
-        }
-        {
-//            entityManager = getEntityManagerFactory().createEntityManager();
-//            logger.log(Level.DEBUG, "created: {0}", entityManager);
-        }
+        jinahyaTableCatalog =
+                __PersistenceUnit_TestUtils.getJinahyaTableCatalog(getEntityManagerFactory()).orElse(null);
+        jinahyaTableSchema =
+                __PersistenceUnit_TestUtils.getJinahyaTableSchema(getEntityManagerFactory()).orElse(null);
+        jinahyaTableTypes =
+                __PersistenceUnit_TestUtils.getJinahyaTableTypes(getEntityManagerFactory()).orElse(null);
+        logger.log(Level.DEBUG, "jinahyaTableCatalog: {0}", jinahyaTableCatalog);
+        logger.log(Level.DEBUG, "jinahyaTableSchema: {0}", jinahyaTableSchema);
+        logger.log(Level.DEBUG, "jinahyaTableTypes: {0}", Arrays.toString(jinahyaTableTypes));
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -116,6 +113,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * Persists a new (randomized) instance.
      *
      * @see __Disable_PersistEntityInstance_Test
+     * @see __MappedEntity_PersisterUtils#newPersistedInstanceOf(EntityManager, Class)
      */
     @DisplayName("persist a new (randomized) entity instance")
     @Test
@@ -351,26 +349,32 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     // ------------------------------------------------------------------------------------------------------- tableName
-    protected String tableName() {
-        return tableName;
+
+    /**
+     * Returns the value of {@link Table#name()} of the {@link #entityClass}.
+     *
+     * @return the value of {@link Table#name()} of the {@link #entityClass}.
+     */
+    protected String getEntityTableName() {
+        return entityTableName;
     }
 
     // ---------------------------------------------------------------------------------------------------- tableCatalog
     @Nullable
-    protected String tableCatalog() {
-        return tableCatalog;
+    protected String getJinahyaTableCatalog() {
+        return jinahyaTableCatalog;
     }
 
     // ----------------------------------------------------------------------------------------------------- tableSchema
     @Nullable
-    protected String tableSchema() {
-        return tableSchema;
+    protected String getJinahyaTableSchema() {
+        return jinahyaTableSchema;
     }
 
     // ------------------------------------------------------------------------------------------------------ tableTypes
     @Nullable
     protected String[] tableTypes() {
-        return Optional.ofNullable(tableTypes)
+        return Optional.ofNullable(jinahyaTableTypes)
                 .map(v -> Arrays.copyOf(v, v.length))
                 .orElse(null)
                 ;
@@ -386,17 +390,17 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     /**
      * The value of {@code @Table(name =)} of the {@link #entityClass}.
      */
-    private final String tableName;
+    private final String entityTableName;
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nullable
-    private String tableCatalog;
+    private String jinahyaTableCatalog;
 
     @Nullable
-    private String tableSchema;
+    private String jinahyaTableSchema;
 
     @Nullable
-    private String[] tableTypes;
+    private String[] jinahyaTableTypes;
 
     // -----------------------------------------------------------------------------------------------------------------
     private EntityManager cachedEntityManager;
