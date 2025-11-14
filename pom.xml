@@ -9,7 +9,8 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.3.10-SNAPSHOT</version>
+  <!--  <version>0.3.10-SNAPSHOT</version>-->
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
@@ -47,6 +48,7 @@
 
   <modules>
     <module>coverage-report-aggregated</module>
+    <module>jinahya-persistence-crypto</module>
     <module>jinahya-persistence-mapped</module>
     <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
@@ -66,6 +68,7 @@
   </issueManagement>
 
   <properties>
+    <revision>0.3.10-SNAPSHOT</revision>
     <!-- https://endoflife.date/eclipse-temurin -->
     <!-- https://endoflife.date/amazon-corretto -->
     <maven.compiler.source>17</maven.compiler.source>
