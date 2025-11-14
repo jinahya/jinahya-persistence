@@ -52,8 +52,7 @@ public final class __PersistenceProducer_TestUtils {
      *
      * @param entityManagerFactory the entity manager factory.
      * @return given {@code entityManagerFactory}.
-     * @see <a
-     *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
      *         properties</a>
      */
     @Nonnull

@@ -45,7 +45,6 @@ public final class ___RandomizerUtils {
         System.arraycopy(excludedFields, 0, result, 0, excludedFields.length);
         System.arraycopy(moreExcludedFields, 0, result, excludedFields.length, moreExcludedFields.length);
         return result;
-
     }
 
     @Nonnull
