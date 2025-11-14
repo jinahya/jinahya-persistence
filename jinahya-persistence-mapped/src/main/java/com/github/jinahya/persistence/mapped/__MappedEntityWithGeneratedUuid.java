@@ -54,7 +54,7 @@ public abstract class __MappedEntityWithGeneratedUuid extends __MappedEntityWith
      *
      * @param builder the builder from which a new instance is built.
      */
-    protected __MappedEntityWithGeneratedUuid(@Nonnull final __MappedEntityWithGeneratedUuidBuilder<?, ?> builder) {
+    protected __MappedEntityWithGeneratedUuid(final @Nonnull __MappedEntityWithGeneratedUuidBuilder<?, ?> builder) {
         super(builder);
     }
 

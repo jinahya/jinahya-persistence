@@ -57,7 +57,7 @@ public abstract class __MappedEntityWithGeneratedId<ID> extends __MappedEntity<I
         super();
     }
 
-    protected __MappedEntityWithGeneratedId(@Nonnull final __MappedEntityWithGeneratedIdBuilder<?, ?> builder) {
+    protected __MappedEntityWithGeneratedId(final @Nonnull __MappedEntityWithGeneratedIdBuilder<?, ?> builder) {
         super(builder);
     }
 }

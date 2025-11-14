@@ -57,7 +57,7 @@ public abstract class ___Entity_Test<T> {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected ___Entity_Test(@Nonnull final Class<T> entityClass) {
+    protected ___Entity_Test(final @Nonnull Class<T> entityClass) {
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
     }
@@ -71,7 +71,7 @@ public abstract class ___Entity_Test<T> {
      * @see #toString_NotBlank_newEntityInstance()
      * @see #toString_NotBlank_newRandomizedEntityInstance()
      */
-    private void toString_NotBlank_(@Nonnull final T entityInstance) {
+    private void toString_NotBlank_(final @Nonnull T entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         final var string = entityInstance.toString();
         assertThat(string)
@@ -196,7 +196,7 @@ public abstract class ___Entity_Test<T> {
      */
     @Nonnull
     protected SingleTypeEqualsVerifierApi<T> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<T> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<T> equalsVerifier) {
         return equalsVerifier
                 ;
     }
@@ -211,7 +211,7 @@ public abstract class ___Entity_Test<T> {
     @SuppressWarnings({
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
-    private void propertyAccessors_DoesNotThrow_(@Nonnull final T entityInstance) {
+    private void propertyAccessors_DoesNotThrow_(final @Nonnull T entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         try {
             final var info = Introspector.getBeanInfo(entityClass);

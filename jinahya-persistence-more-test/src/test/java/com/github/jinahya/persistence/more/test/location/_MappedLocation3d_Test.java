@@ -13,7 +13,7 @@ class _MappedLocation3d_Test extends __MappedLocation3d_Test<_MappedLocation3d> 
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<_MappedLocation3d> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<_MappedLocation3d> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<_MappedLocation3d> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier);
     }
 }

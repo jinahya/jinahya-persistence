@@ -73,7 +73,7 @@ class _SampleStringAttributeConverter_Test
     @TestTemplate
     @Override
     protected void convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(
-            @Nonnull final __AttributeConverterTestCase<String, String> testCase) {
+            final @Nonnull __AttributeConverterTestCase<String, String> testCase) {
         super.convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(testCase);
     }
 }

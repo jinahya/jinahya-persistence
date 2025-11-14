@@ -40,7 +40,7 @@ public abstract class __MappedEntityWithGeneratedUuid_Persister<
         >
         extends __MappedEntityWithGeneratedId_Persister<ENTITY, UUID> {
 
-    protected __MappedEntityWithGeneratedUuid_Persister(@Nonnull final Class<ENTITY> entityClass) {
+    protected __MappedEntityWithGeneratedUuid_Persister(final @Nonnull Class<ENTITY> entityClass) {
         super(entityClass, UUID.class);
     }
 }

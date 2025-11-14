@@ -32,7 +32,7 @@ public abstract class _MappedEntity_PersistenceIT<ENTITY extends __MappedEntity<
         extends __MappedEntity_PersistenceIT<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected _MappedEntity_PersistenceIT(@Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
+    protected _MappedEntity_PersistenceIT(final @Nonnull Class<ENTITY> entityClass, final @Nonnull Class<ID> idClass) {
         super(entityClass, idClass);
     }
 }

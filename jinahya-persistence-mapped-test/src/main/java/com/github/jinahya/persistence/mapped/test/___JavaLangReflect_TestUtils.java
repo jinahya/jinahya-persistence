@@ -59,7 +59,7 @@ final class ___JavaLangReflect_TestUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    static <T extends AutoCloseable> T uncloseable(@Nonnull final T closeable) {
+    static <T extends AutoCloseable> T uncloseable(final @Nonnull T closeable) {
         Objects.requireNonNull(closeable, "closeable is null");
         return (T) Proxy.newProxyInstance(
                 closeable.getClass().getClassLoader(),
@@ -76,7 +76,7 @@ final class ___JavaLangReflect_TestUtils {
 
     @Deprecated(forRemoval = true)
     static <T extends AutoCloseable, U extends T>
-    U uncloseable(@Nonnull final T closeable, final Class<U> type) {
+    U uncloseable(final @Nonnull T closeable, final Class<U> type) {
         Objects.requireNonNull(closeable, "closeable is null");
         final var proxy = Proxy.newProxyInstance(
                 closeable.getClass().getClassLoader(),
@@ -139,7 +139,7 @@ final class ___JavaLangReflect_TestUtils {
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
     @Nonnull
-    static <T> T newInstanceOf(@Nonnull final Class<T> type) {
+    static <T> T newInstanceOf(final @Nonnull Class<T> type) {
         Objects.requireNonNull(type, "type is null");
         try {
             final var constructor = type.getDeclaredConstructor();
@@ -156,7 +156,7 @@ final class ___JavaLangReflect_TestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     // TODO: cache!
     // https://stackoverflow.com/a/25974010/330457
-    public static <T> Class<T> getActualTypeClass(@Nonnull final Class<?> forClass, final Class<?> asClass,
+    public static <T> Class<T> getActualTypeClass(final @Nonnull Class<?> forClass, final Class<?> asClass,
                                                   final int typeIndex) {
         Objects.requireNonNull(forClass, "forClass is null");
         Objects.requireNonNull(asClass, "asClass is null");

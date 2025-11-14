@@ -45,7 +45,7 @@ public abstract class ___Persister<T> {
      *
      * @param type the class to persist.
      */
-    protected ___Persister(@Nonnull final Class<T> type) {
+    protected ___Persister(final @Nonnull Class<T> type) {
         super();
         this.type = Objects.requireNonNull(type, "type is null");
     }
@@ -59,7 +59,7 @@ public abstract class ___Persister<T> {
      * @param entityInstance the instance of {@link T} to persist.
      * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
      */
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final T entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull T entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(System.Logger.Level.DEBUG, "persisting {0}", entityInstance);

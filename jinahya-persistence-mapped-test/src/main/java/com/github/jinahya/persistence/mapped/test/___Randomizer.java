@@ -53,7 +53,7 @@ public abstract class ___Randomizer<T> {
      * @param target         the class to be randomized.
      * @param excludedFields fields to be excluded from randomization.
      */
-    protected ___Randomizer(@Nonnull final Class<T> target, @Nonnull final String... excludedFields) {
+    protected ___Randomizer(final @Nonnull Class<T> target, final @Nonnull String... excludedFields) {
         super();
         this.target = Objects.requireNonNull(target, "target is null");
         this.excludedFields = Arrays

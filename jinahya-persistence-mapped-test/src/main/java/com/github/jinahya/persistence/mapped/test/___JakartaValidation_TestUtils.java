@@ -62,8 +62,8 @@ public final class ___JakartaValidation_TestUtils {
      * @return a set of constraint violations of the {@code object}; {@code empty} if the {@code object} is valid.
      */
     @Nonnull
-    public static <T> Set<ConstraintViolation<T>> validate(@Nonnull final Validator validator, @Nonnull final T object,
-                                                           @Nonnull final Class<?>... groups) {
+    public static <T> Set<ConstraintViolation<T>> validate(final @Nonnull Validator validator, final @Nonnull T object,
+                                                           final @Nonnull Class<?>... groups) {
         Objects.requireNonNull(validator, "validator is null");
         return validator.validate(
                 requireNonNullObject(object),
@@ -81,8 +81,8 @@ public final class ___JakartaValidation_TestUtils {
      * @return given {@code object}.
      * @throws ConstraintViolationException if the {@code object} is invalid.
      */
-    public static <T> T requireValid(@Nonnull final Validator validator, @Nonnull final T object,
-                                     @Nonnull final Class<?>... groups) {
+    public static <T> T requireValid(final @Nonnull Validator validator, final @Nonnull T object,
+                                     final @Nonnull Class<?>... groups) {
         final var violations = validate(validator, object, groups);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -118,7 +118,7 @@ public final class ___JakartaValidation_TestUtils {
      * @see #requireValid(Validator, Object, Class...)
      */
     @Nonnull
-    public static <T> T requireValid(@Nonnull final T object, @Nonnull final Class<?>... groups) {
+    public static <T> T requireValid(final @Nonnull T object, final @Nonnull Class<?>... groups) {
         requireNonNullObject(object);
         requireNonNullGroups(groups);
         return applyValidator(v -> requireValid(v, object, groups));
@@ -134,7 +134,7 @@ public final class ___JakartaValidation_TestUtils {
      * @return the result of the {@code function}.
      */
     static <R> R applyValidationFactory(
-            @Nonnull final Function<? super ValidatorFactory, ? extends R> function) {
+            final @Nonnull Function<? super ValidatorFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         try (var factory = Validation.buildDefaultValidatorFactory()) {
             return function.apply(factory);
@@ -148,7 +148,7 @@ public final class ___JakartaValidation_TestUtils {
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
      */
-    static <R> R applyValidator(@Nonnull final Function<? super Validator, ? extends R> function) {
+    static <R> R applyValidator(final @Nonnull Function<? super Validator, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyValidationFactory(f -> function.apply(f.getValidator()));
     }

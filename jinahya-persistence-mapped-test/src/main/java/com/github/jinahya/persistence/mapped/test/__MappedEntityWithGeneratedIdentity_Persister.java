@@ -37,7 +37,7 @@ public abstract class __MappedEntityWithGeneratedIdentity_Persister<
         >
         extends __MappedEntityWithGeneratedId_Persister<ENTITY, Long> {
 
-    protected __MappedEntityWithGeneratedIdentity_Persister(@Nonnull final Class<ENTITY> entityClass) {
+    protected __MappedEntityWithGeneratedIdentity_Persister(final @Nonnull Class<ENTITY> entityClass) {
         super(entityClass, Long.class);
     }
 }

@@ -53,7 +53,7 @@ public abstract class __MappedEntityWithGeneratedIdentity extends __MappedEntity
      * @param builder the builder from which a new instance is built.
      */
     protected __MappedEntityWithGeneratedIdentity(
-            @Nonnull final __MappedEntityWithGeneratedIdentityBuilder<?, ?> builder) {
+            final @Nonnull __MappedEntityWithGeneratedIdentityBuilder<?, ?> builder) {
         super(builder);
     }
 

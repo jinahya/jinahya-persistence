@@ -33,7 +33,7 @@ class UserWithStringId_Persister extends __MappedEntity_Persister<UserWithString
     // -----------------------------------------------------------------------------------------------------------------
 
     @Override
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final UserWithStringId entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull UserWithStringId entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }

@@ -50,7 +50,7 @@ public final class __Mapped_RandomizerUtils {
             "java:S119" // Type parameter names should comply with a naming convention
     })
     public static <MAPPED extends __Mapped>
-    Optional<MAPPED> newRandomizedInstanceOf(@Nonnull final Class<MAPPED> mappedClass) {
+    Optional<MAPPED> newRandomizedInstanceOf(final @Nonnull Class<MAPPED> mappedClass) {
         Objects.requireNonNull(mappedClass, "mappedClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(mappedClass);
     }

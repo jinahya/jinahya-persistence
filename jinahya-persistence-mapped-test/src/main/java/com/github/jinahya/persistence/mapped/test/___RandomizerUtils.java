@@ -49,7 +49,7 @@ public final class ___RandomizerUtils {
     }
 
     @Nonnull
-    private static Optional<Class<?>> getRandomizerClassOf(@Nonnull final Class<?> target) {
+    private static Optional<Class<?>> getRandomizerClassOf(final @Nonnull Class<?> target) {
         assert target != null;
         {
             final var annotation = AnnotationUtils.findAnnotation(target, ___RandomizerClass.class, false);
@@ -89,7 +89,7 @@ public final class ___RandomizerUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(@Nonnull final Class<T> target) {
+    private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final @Nonnull Class<T> target) {
         assert target != null;
         return getRandomizerClassOf(target)
                 .map(ReflectionUtils::newInstance)
@@ -98,7 +98,7 @@ public final class ___RandomizerUtils {
     }
 
     @Nonnull
-    public static <T> Optional<T> newRandomizedInstanceOf(@Nonnull final Class<T> target) {
+    public static <T> Optional<T> newRandomizedInstanceOf(final @Nonnull Class<T> target) {
         Objects.requireNonNull(target, "target is null");
         return newRandomizerInstanceOf(target).map(___Randomizer::get);
     }

@@ -68,7 +68,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @param mappedClass the mapped class to test.
      * @see #mappedClass
      */
-    protected __Mapped_Test(@Nonnull final Class<MAPPED> mappedClass) {
+    protected __Mapped_Test(final @Nonnull Class<MAPPED> mappedClass) {
         super();
         this.mappedClass = Objects.requireNonNull(mappedClass, "mappedClass is null");
     }
@@ -82,7 +82,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      * @see #toString_NotBlank_newMappedInstance()
      * @see #toString_NotBlank_newRandomizedMappedInstance()
      */
-    private void toString_NotBlank_(@Nonnull final MAPPED mappedInstance) {
+    private void toString_NotBlank_(final @Nonnull MAPPED mappedInstance) {
         Objects.requireNonNull(mappedInstance, "mappedInstance is null");
         final var string = mappedInstance.toString();
         assertThat(string)
@@ -207,7 +207,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
      */
     @Nonnull
     protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<MAPPED> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<MAPPED> equalsVerifier) {
         return equalsVerifier
                 ;
     }
@@ -222,7 +222,7 @@ public abstract class __Mapped_Test<MAPPED extends __Mapped> {
     @SuppressWarnings({
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
-    private void propertyAccessors_DoesNotThrow_(@Nonnull final MAPPED mappedInstance) {
+    private void propertyAccessors_DoesNotThrow_(final @Nonnull MAPPED mappedInstance) {
         Objects.requireNonNull(mappedInstance, "mappedInstance is null");
         try {
             final var info = Introspector.getBeanInfo(mappedClass);

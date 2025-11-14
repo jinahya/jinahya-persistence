@@ -20,13 +20,13 @@ public final class ___Builder_TestUtils {
     // -----------------------------------------------------------------------------------------------------------------
     // https://stackoverflow.com/a/25974010/330457
     public static <BUILDER extends ___Builder<BUILDER, TARGET>, TARGET> Class<TARGET> getTargetClass(
-            @Nonnull final Class<BUILDER> builderClass) {
+            final @Nonnull Class<BUILDER> builderClass) {
         return ___JavaLangReflect_TestUtils.getActualTypeClass(builderClass, ___Builder.class, 1);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     public static <BUILDER extends ___Builder<BUILDER, T>, T>
-    BUILDER newBuilderInstanceFrom(@Nonnull final Class<BUILDER> builderClass, @Nonnull final T targetInstance) {
+    BUILDER newBuilderInstanceFrom(final @Nonnull Class<BUILDER> builderClass, final @Nonnull T targetInstance) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetInstance, "targetInstance is null");
         final var builderInstance = ReflectionUtils.newInstance(builderClass);
@@ -68,8 +68,8 @@ public final class ___Builder_TestUtils {
     }
 
     public static <BUILDER extends ___Builder<BUILDER, T>, T>
-    Optional<BUILDER> newBuilderInstanceFromRandomizedInstanceOf(@Nonnull final Class<BUILDER> builderClass,
-                                                                 @Nonnull final Class<T> targetClass) {
+    Optional<BUILDER> newBuilderInstanceFromRandomizedInstanceOf(final @Nonnull Class<BUILDER> builderClass,
+                                                                 final @Nonnull Class<T> targetClass) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetClass, "targetClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(targetClass)

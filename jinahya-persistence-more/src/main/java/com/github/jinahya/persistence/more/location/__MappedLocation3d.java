@@ -100,7 +100,7 @@ public abstract class __MappedLocation3d extends __Mapped {
         return latitude;
     }
 
-    public void setLatitude(@Nonnull final BigDecimal latitude) {
+    public void setLatitude(final @Nonnull BigDecimal latitude) {
         this.latitude = latitude;
     }
 
@@ -145,7 +145,7 @@ public abstract class __MappedLocation3d extends __Mapped {
         return longitude;
     }
 
-    public void setLongitude(@Nonnull final BigDecimal longitude) {
+    public void setLongitude(final @Nonnull BigDecimal longitude) {
         this.longitude = longitude;
     }
 
@@ -190,7 +190,7 @@ public abstract class __MappedLocation3d extends __Mapped {
         return altitude;
     }
 
-    public void setAltitude(@Nonnull final BigDecimal altitude) {
+    public void setAltitude(final @Nonnull BigDecimal altitude) {
         this.altitude = altitude;
     }
 

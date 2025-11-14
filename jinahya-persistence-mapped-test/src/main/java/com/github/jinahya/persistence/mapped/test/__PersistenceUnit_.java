@@ -142,7 +142,7 @@ abstract class __PersistenceUnit_ {
      * @see #acceptEntityManagerFactory(Consumer)
      */
     protected final <R> R applyEntityManagerFactory(
-            @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
+            final @Nonnull Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply(getEntityManagerFactory());
     }
@@ -153,7 +153,7 @@ abstract class __PersistenceUnit_ {
      * @param consumer the consumer.
      * @see #applyEntityManagerFactory(Function)
      */
-    protected final void acceptEntityManagerFactory(@Nonnull final Consumer<? super EntityManagerFactory> consumer) {
+    protected final void acceptEntityManagerFactory(final @Nonnull Consumer<? super EntityManagerFactory> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerFactory(emf -> {
             consumer.accept(emf);
@@ -169,7 +169,7 @@ abstract class __PersistenceUnit_ {
      * @return the result of the {@code function}.
      * @see #acceptEntityManager(Consumer)
      */
-    protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
+    protected final <R> R applyEntityManager(final @Nonnull Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerFactory(emf -> {
             try (final var entityManager = emf.createEntityManager()) {
@@ -184,7 +184,7 @@ abstract class __PersistenceUnit_ {
      * @param consumer the consumer.
      * @see #applyEntityManager(Function)
      */
-    protected final void acceptEntityManager(@Nonnull final Consumer<? super EntityManager> consumer) {
+    protected final void acceptEntityManager(final @Nonnull Consumer<? super EntityManager> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManager(em -> {
             consumer.accept(em);

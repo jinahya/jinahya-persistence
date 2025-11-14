@@ -39,7 +39,7 @@ public final class __MappedEntityWithGeneratedId_InstantiatorUtils {
      */
     @Nonnull
     public static <ENTITY extends __MappedEntityWithGeneratedId<?>>
-    Optional<ENTITY> newInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
+    Optional<ENTITY> newInstanceOf(final @Nonnull Class<ENTITY> entityClass) {
         return __MappedEntity_InstantiatorUtils.newInstanceOf(entityClass);
     }
 

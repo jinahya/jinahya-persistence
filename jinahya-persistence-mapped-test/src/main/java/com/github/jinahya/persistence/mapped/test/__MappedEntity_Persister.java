@@ -57,7 +57,7 @@ public abstract class __MappedEntity_Persister<ENTITY extends __MappedEntity<ID>
     @SuppressWarnings({
             "java:S1185" // Overriding methods should do more than simply call the same method in the super class
     })
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final ENTITY entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull ENTITY entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 

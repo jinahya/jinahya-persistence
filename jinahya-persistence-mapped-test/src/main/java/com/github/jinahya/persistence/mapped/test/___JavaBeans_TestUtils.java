@@ -41,7 +41,7 @@ import java.util.function.Function;
 })
 public final class ___JavaBeans_TestUtils {
 
-    public static <R> R applyPropertyDescriptors(@Nonnull final Class<?> clazz,
+    public static <R> R applyPropertyDescriptors(final @Nonnull Class<?> clazz,
                                                  final Function<? super PropertyDescriptor[], ? extends R> function) {
         Objects.requireNonNull(clazz, "clazz is null");
         Objects.requireNonNull(function, "function is null");
@@ -54,8 +54,8 @@ public final class ___JavaBeans_TestUtils {
         return function.apply(beanInfo.getPropertyDescriptors());
     }
 
-    public static void acceptPropertyDescriptors(@Nonnull final Class<?> clazz,
-                                                 @Nonnull final Consumer<? super PropertyDescriptor[]> consumer) {
+    public static void acceptPropertyDescriptors(final @Nonnull Class<?> clazz,
+                                                 final @Nonnull Consumer<? super PropertyDescriptor[]> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyPropertyDescriptors(clazz, v -> {
             consumer.accept(v);
@@ -63,8 +63,8 @@ public final class ___JavaBeans_TestUtils {
         });
     }
 
-    public static void acceptEachPropertyDescriptor(@Nonnull final Class<?> clazz,
-                                                    @Nonnull final Consumer<? super PropertyDescriptor> consumer) {
+    public static void acceptEachPropertyDescriptor(final @Nonnull Class<?> clazz,
+                                                    final @Nonnull Consumer<? super PropertyDescriptor> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         acceptPropertyDescriptors(clazz, v -> {
             Arrays.stream(v).forEach(consumer);

@@ -39,7 +39,7 @@ public final class __AttributeEnumUtils {
 
     @Nullable
     private static <ENUM extends __AttributeEnum<?, ?>>
-    ENUM valueOfAttributeValue_(@Nonnull final Class<? extends ENUM> enumClass, @Nonnull final Object attributeValue) {
+    ENUM valueOfAttributeValue_(final @Nonnull Class<? extends ENUM> enumClass, final @Nonnull Object attributeValue) {
         if (!Objects.requireNonNull(enumClass, "enumClass is null").isEnum()) {
             throw new IllegalArgumentException("not an enum class: " + enumClass);
         }
@@ -64,7 +64,7 @@ public final class __AttributeEnumUtils {
      */
     @Nonnull
     public static <E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
-    E valueOfAttributeValue(@Nonnull final Class<E> enumClass, @Nonnull final ATTRIBUTE attributeValue) {
+    E valueOfAttributeValue(final @Nonnull Class<E> enumClass, final @Nonnull ATTRIBUTE attributeValue) {
         final var value = valueOfAttributeValue_(enumClass, attributeValue);
         if (value == null) {
             throw new IllegalArgumentException(
@@ -88,8 +88,8 @@ public final class __AttributeEnumUtils {
     // https://stackoverflow.com/q/79701562/330457
     @Nonnull
     public static <ENUM extends __AttributeEnum<? extends Enum<?>, ATTRIBUTE>, ATTRIBUTE>
-    ENUM valueOfAttributeValue(@Nonnull final ATTRIBUTE attributeValue,
-                               @Nonnull final List<Class<? extends ENUM>> enumClasses) {
+    ENUM valueOfAttributeValue(final @Nonnull ATTRIBUTE attributeValue,
+                               final @Nonnull List<Class<? extends ENUM>> enumClasses) {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         if (Objects.requireNonNull(enumClasses, "enumClasses is null").isEmpty()) {
             throw new IllegalArgumentException("empty enumClasses:");

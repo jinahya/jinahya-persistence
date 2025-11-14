@@ -15,7 +15,7 @@ final class __TestTemplateInvocationContext_Utils {
 
     static TestTemplateInvocationContext of(
             @Nullable final IntFunction<String> getDisplayNameFunction,
-            @Nonnull final Supplier<? extends List<Extension>> getAdditionalExtensionsSupplier,
+            final @Nonnull Supplier<? extends List<Extension>> getAdditionalExtensionsSupplier,
             @Nullable final Consumer<? super ExtensionContext> prepareInvocationConsumer) {
         return new TestTemplateInvocationContext() {
             @Override

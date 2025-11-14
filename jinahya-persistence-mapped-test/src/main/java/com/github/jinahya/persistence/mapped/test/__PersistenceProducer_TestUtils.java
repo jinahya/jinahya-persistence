@@ -58,7 +58,7 @@ public final class __PersistenceProducer_TestUtils {
      */
     @Nonnull
     public static EntityManagerFactory assertSchemagenDatabaseActionNone(
-            @Nonnull final EntityManagerFactory entityManagerFactory) {
+            final @Nonnull EntityManagerFactory entityManagerFactory) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
@@ -84,7 +84,7 @@ public final class __PersistenceProducer_TestUtils {
      */
     @Nonnull
     public static EntityManagerFactory assertEclipselinkDdlGenerationNone(
-            @Nonnull final EntityManagerFactory entityManagerFactory) {
+            final @Nonnull EntityManagerFactory entityManagerFactory) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
@@ -109,7 +109,7 @@ public final class __PersistenceProducer_TestUtils {
      */
     @Nonnull
     public static EntityManagerFactory assertHibernateHbm2ddlAutoNone(
-            @Nonnull final EntityManagerFactory entityManagerFactory) {
+            final @Nonnull EntityManagerFactory entityManagerFactory) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(

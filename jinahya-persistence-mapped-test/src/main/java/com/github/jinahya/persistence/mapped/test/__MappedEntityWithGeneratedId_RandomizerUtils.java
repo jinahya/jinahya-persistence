@@ -57,7 +57,7 @@ public final class __MappedEntityWithGeneratedId_RandomizerUtils {
             "java:S119" // Type parameter names should comply with a naming convention
     })
     public static <ENTITY extends __MappedEntityWithGeneratedId<?>>
-    Optional<ENTITY> newRandomizedInstanceOf(@Nonnull final Class<ENTITY> entityClass) {
+    Optional<ENTITY> newRandomizedInstanceOf(final @Nonnull Class<ENTITY> entityClass) {
         return __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass);
     }
 

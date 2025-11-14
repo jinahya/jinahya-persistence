@@ -165,7 +165,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      *                                    table names are removed.
      * @see #_Mapped_AllDatabaseTableNames()
      */
-    protected void _Mapped_AllDatabaseTableNames(@Nonnull final Collection<String> remainingDatabaseTableNames) {
+    protected void _Mapped_AllDatabaseTableNames(final @Nonnull Collection<String> remainingDatabaseTableNames) {
         remainingDatabaseTableNames.removeIf(tn -> {
             return tn.startsWith("HTE_"); // H2 temporary tables
         });
@@ -210,7 +210,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      *                                       are removed.
      * @see #_Known_AllPersistenceTableNames()
      */
-    protected void _Known_AllPersistenceTableNames(@Nonnull final Collection<String> remainingPersistenceTableNames) {
+    protected void _Known_AllPersistenceTableNames(final @Nonnull Collection<String> remainingPersistenceTableNames) {
         remainingPersistenceTableNames.forEach(
                 tn -> logger.log(Level.WARNING, "unknown persistence table name: {0}", tn)
         );

@@ -16,7 +16,7 @@ public abstract class __MappedLocation2d_Test<MAPPED extends __MappedLocation2d>
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<MAPPED> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<MAPPED> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<MAPPED> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.STRICT_INHERITANCE)
                 .suppress(Warning.NONFINAL_FIELDS)

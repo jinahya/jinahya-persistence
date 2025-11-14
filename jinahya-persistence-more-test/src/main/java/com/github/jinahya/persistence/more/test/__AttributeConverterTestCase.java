@@ -21,19 +21,19 @@ public class __AttributeConverterTestCase<X, Y> {
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
     @Nonnull
-    public static <X, Y> __AttributeConverterTestCase<X, Y> of(@Nonnull final X attribute, @Nonnull final Y dbData) {
+    public static <X, Y> __AttributeConverterTestCase<X, Y> of(final @Nonnull X attribute, final @Nonnull Y dbData) {
         return new __AttributeConverterTestCase<>(attribute, dbData) {
         };
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __AttributeConverterTestCase(@Nonnull final X attribute, @Nonnull final Y dbData) {
+    protected __AttributeConverterTestCase(final @Nonnull X attribute, final @Nonnull Y dbData) {
         super();
         this.attribute = Objects.requireNonNull(attribute, "attribute is null");
         this.dbData = Objects.requireNonNull(dbData, "dbData is null");
     }
 
-    __AttributeConverterTestCase(@Nonnull final __AttributeConverterTestCaseBuilder<X, Y> builder) {
+    __AttributeConverterTestCase(final @Nonnull __AttributeConverterTestCaseBuilder<X, Y> builder) {
         this(Objects.requireNonNull(builder, "builder is null").attribute(), builder.dbData());
     }
 

@@ -44,12 +44,12 @@ public class __MappedEntity_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static <ENTITY extends __MappedEntity<ID>, ID> Class<ID> getIdClass(
-            @Nonnull final Class<ENTITY> entityClass) {
+            final @Nonnull Class<ENTITY> entityClass) {
         return ___JavaLangReflect_TestUtils.getActualTypeClass(entityClass, __MappedEntity.class, 0);
     }
 
     static <ENTITY extends __MappedEntity<?>>
-    Table getTableAnnotation(@Nonnull final Class<ENTITY> entityClass) {
+    Table getTableAnnotation(final @Nonnull Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         return ___JavaLangReflect_TestUtils.findAnnotation(entityClass, Table.class)
                 .orElseThrow(
@@ -60,9 +60,9 @@ public class __MappedEntity_TestUtils {
     public static <
             ENTITY extends __MappedEntity<?>
             >
-    ENTITY setFieldValue(@Nonnull final Class<ENTITY> entityClass,
-                         @Nonnull final ENTITY entityInstance,
-                         @Nonnull final Predicate<Field> fieldPredicate,
+    ENTITY setFieldValue(final @Nonnull Class<ENTITY> entityClass,
+                         final @Nonnull ENTITY entityInstance,
+                         final @Nonnull Predicate<Field> fieldPredicate,
                          final Object fieldValue) {
         final var field = ReflectionUtils
                 .findFields(entityClass, fieldPredicate, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP).stream()
@@ -82,9 +82,9 @@ public class __MappedEntity_TestUtils {
     public static <
             ENTITY extends __MappedEntity<?>
             >
-    ENTITY setFieldValue(@Nonnull final Class<ENTITY> entityClass,
-                         @Nonnull final ENTITY entityInstance,
-                         @Nonnull final String fieldName,
+    ENTITY setFieldValue(final @Nonnull Class<ENTITY> entityClass,
+                         final @Nonnull ENTITY entityInstance,
+                         final @Nonnull String fieldName,
                          final Object fieldValue) {
         Objects.requireNonNull(fieldName, "fieldName is null");
         return setFieldValue(

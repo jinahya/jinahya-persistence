@@ -15,7 +15,7 @@ class _MappedRgb_Test extends __Mapped_Test<_MappedRgb> {
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<_MappedRgb> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<_MappedRgb> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<_MappedRgb> equalsVerifier) {
         return EqualsVerifier.simple().forClass(mappedClass)
                 ;
     }

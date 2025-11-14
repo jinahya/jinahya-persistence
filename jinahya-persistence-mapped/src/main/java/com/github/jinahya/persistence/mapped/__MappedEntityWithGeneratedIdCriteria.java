@@ -34,10 +34,10 @@ public interface __MappedEntityWithGeneratedIdCriteria<ENTITY extends __MappedEn
         extends __MappedEntityCriteria<ENTITY, ID> {
 
     static <T extends __MappedEntityWithGeneratedId<U>, U> Optional<T> findById(
-            @Nonnull final EntityManager entityManager,
-            @Nonnull final Class<T> entityClass,
-            @Nonnull final SingularAttribute<? super T, U> idAttribute,
-            @Nonnull final U idValue) {
+            final @Nonnull EntityManager entityManager,
+            final @Nonnull Class<T> entityClass,
+            final @Nonnull SingularAttribute<? super T, U> idAttribute,
+            final @Nonnull U idValue) {
         return __MappedEntityCriteria.findById(entityManager, entityClass, idAttribute, idValue);
     }
 }

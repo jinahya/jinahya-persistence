@@ -32,8 +32,8 @@ public abstract class _MappedEntity_PersistenceTest<ENTITY extends __MappedEntit
         extends __MappedEntity_PersistenceTest<ENTITY, ID> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected _MappedEntity_PersistenceTest(@Nonnull final Class<ENTITY> entityClass,
-                                            @Nonnull final Class<ID> idClass) {
+    protected _MappedEntity_PersistenceTest(final @Nonnull Class<ENTITY> entityClass,
+                                            final @Nonnull Class<ID> idClass) {
         super(entityClass, idClass);
     }
 }

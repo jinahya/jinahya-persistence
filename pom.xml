@@ -41,7 +41,7 @@
         <role>developer</role>
       </roles>
       <timezone>Asia/Seoul</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
 
@@ -51,6 +51,7 @@
     <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
+    <module>jinahya-persistence-utils</module>
   </modules>
 
   <scm>
@@ -82,7 +83,7 @@
     <!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage -->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-mapped/target/site/jacoco/jacoco.xml,jinahya-persistence-mapped-test/target/site/jacoco/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
-<!--    <sonar.coverage.jacoco.xmlReportPaths>_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
+    <!--    <sonar.coverage.jacoco.xmlReportPaths>_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.5.4</version.maven-surefire>
@@ -99,8 +100,10 @@
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
     <!--    <version.nl.jqno.equalsverifier>4.1.1</version.nl.jqno.equalsverifier>-->
     <version.nl.jqno.equalsverifier>4.2.2</version.nl.jqno.equalsverifier>
+    <!-- https://github.com/eclipse-ee4j/eclipselink/releases -->
+    <!-- https://eclipse.dev/eclipselink/releases/index.html -->
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
-    <version.org.eclipse.persistence>5.0.0-B10</version.org.eclipse.persistence>
+    <version.org.eclipse.persistence>5.0.0-B11</version.org.eclipse.persistence>
     <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
     <!-- https://docs.jboss.org/hibernate/validator/8.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
     <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
@@ -115,7 +118,7 @@
     <version.org.hibernate.orm>7.1.4.Final</version.org.hibernate.orm>
     <!-- https://hibernate.org/validator/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
-<!--    <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>-->
+    <!--    <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>-->
     <version.org.hibernate.validator>9.1.0.Final</version.org.hibernate.validator>
     <!-- https://weld.cdi-spec.org/download/ -->
     <!-- https://central.sonatype.com/artifact/org.jboss.weld/weld-junit5/versions -->

@@ -71,8 +71,8 @@ public final class ___PersisterUtils {
      * @return a new persisted instance of the {@code entityClass}.
      */
     @Nonnull
-    public static <T> T newPersistedInstanceOf(@Nonnull final EntityManager entityManager,
-                                               @Nonnull final Class<T> entityClass) {
+    public static <T> T newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
+                                               final @Nonnull Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();

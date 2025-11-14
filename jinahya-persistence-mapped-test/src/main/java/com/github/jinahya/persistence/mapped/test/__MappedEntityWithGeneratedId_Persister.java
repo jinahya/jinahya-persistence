@@ -47,8 +47,8 @@ public abstract class __MappedEntityWithGeneratedId_Persister<
      * @see #type
      * @see #idClass
      */
-    protected __MappedEntityWithGeneratedId_Persister(@Nonnull final Class<ENTITY> entityClass,
-                                                      @Nonnull final Class<ID> idClass) {
+    protected __MappedEntityWithGeneratedId_Persister(final @Nonnull Class<ENTITY> entityClass,
+                                                      final @Nonnull Class<ID> idClass) {
         super(entityClass, idClass);
     }
 }

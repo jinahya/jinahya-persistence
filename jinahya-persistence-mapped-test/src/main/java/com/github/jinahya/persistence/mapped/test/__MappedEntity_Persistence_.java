@@ -183,7 +183,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @see #acceptEntityManagerFactory(Consumer)
      */
     protected final <R> R applyEntityManagerFactory(
-            @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
+            final @Nonnull Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply(getEntityManagerFactory());
     }
@@ -194,7 +194,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @param consumer the consumer.
      * @see #applyEntityManagerFactory(Function)
      */
-    protected final void acceptEntityManagerFactory(@Nonnull final Consumer<? super EntityManagerFactory> consumer) {
+    protected final void acceptEntityManagerFactory(final @Nonnull Consumer<? super EntityManagerFactory> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerFactory(emf -> {
             consumer.accept(emf);
@@ -230,7 +230,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @param <R>      result type parameter
      * @return the result of the {@code function} applied to an entity manager.
      */
-    protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
+    protected final <R> R applyEntityManager(final @Nonnull Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         {
             final var clazz = getClass();
@@ -256,7 +256,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @return the result of the {@code function} applied to an entity manager.
      */
     protected final <R> R applyEntityManagerInTransaction(
-            @Nonnull final Function<? super EntityManager, ? extends R> function,
+            final @Nonnull Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManager(em -> {
@@ -279,13 +279,13 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      *         {@code function} and {@code true}.
      */
     protected final <R> R applyEntityManagerInTransactionAndRollback(
-            @Nonnull final Function<? super EntityManager, ? extends R> function) {
+            final @Nonnull Function<? super EntityManager, ? extends R> function) {
         return applyEntityManagerInTransaction(function, true);
     }
 
     @Nullable
     protected <R> R applyCountAndRandomIndex(
-            @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
+            final @Nonnull LongFunction<? extends LongFunction<? extends R>> function) {
         return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyCountAndIndex(
                 em,
                 entityClass,
@@ -294,7 +294,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     @Deprecated(forRemoval = true)
-    protected void acceptCountAndRandomIndex(@Nonnull final LongFunction<? extends LongConsumer> function) {
+    protected void acceptCountAndRandomIndex(final @Nonnull LongFunction<? extends LongConsumer> function) {
         applyCountAndRandomIndex(c -> i -> {
             function.apply(c).accept(i);
             return null;
@@ -325,7 +325,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * @return the result of the {@code function}.
      * @see #applyEntityManagerInTransaction(Function, boolean)
      */
-    protected final <R> R applyConnection(@Nonnull final Function<? super Connection, ? extends R> function,
+    protected final <R> R applyConnection(final @Nonnull Function<? super Connection, ? extends R> function,
                                           final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerInTransaction(
@@ -344,7 +344,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      *         and {@code true}.
      */
     protected final <R> R applyConnectionAndRollback(
-            @Nonnull final Function<? super Connection, ? extends R> function) {
+            final @Nonnull Function<? super Connection, ? extends R> function) {
         return applyConnection(function, true);
     }
 

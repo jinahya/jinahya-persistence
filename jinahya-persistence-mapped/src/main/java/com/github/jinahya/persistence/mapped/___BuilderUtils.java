@@ -10,7 +10,7 @@ import java.util.Objects;
 })
 public final class ___BuilderUtils {
 
-    public static <BUILDER extends ___Builder<BUILDER, ?>> BUILDER reset(@Nonnull final BUILDER instance) {
+    public static <BUILDER extends ___Builder<BUILDER, ?>> BUILDER reset(final @Nonnull BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
         return ___ReflectionUtils.reset(instance);
     }

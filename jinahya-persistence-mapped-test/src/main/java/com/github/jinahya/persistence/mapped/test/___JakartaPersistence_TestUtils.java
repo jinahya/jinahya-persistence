@@ -81,8 +81,8 @@ public final class ___JakartaPersistence_TestUtils {
 
     @Nonnull
     static <ENTITY extends __MappedEntity<?>>
-    ManagedType<ENTITY> getManagedType(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                       @Nonnull final Class<ENTITY> entityClass) {
+    ManagedType<ENTITY> getManagedType(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                       final @Nonnull Class<ENTITY> entityClass) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         return (ManagedType<ENTITY>) MANAGED_TYPES.computeIfAbsent(
@@ -93,8 +93,8 @@ public final class ___JakartaPersistence_TestUtils {
 
     @Nonnull
     static <ENTITY extends __MappedEntity<?>>
-    Annotation[] getAnnotations(@Nonnull final Class<ENTITY> entityClass,
-                                @Nonnull final Attribute<? super ENTITY, ?> attribute) {
+    Annotation[] getAnnotations(final @Nonnull Class<ENTITY> entityClass,
+                                final @Nonnull Attribute<? super ENTITY, ?> attribute) {
         final var entityMember = attribute.getJavaMember();
         if (entityMember instanceof Field field) {
             final var actualField = ReflectionUtils.findFields(
@@ -123,8 +123,8 @@ public final class ___JakartaPersistence_TestUtils {
      */
     static <ENTITY extends __MappedEntity<?>>
     Map<Attribute<? super ENTITY, ?>, List<Annotation>> getAttributesAndAnnotationLists(
-            @Nonnull final EntityManagerFactory entityManagerFactory,
-            @Nonnull final Class<ENTITY> entityClass) {
+            final @Nonnull EntityManagerFactory entityManagerFactory,
+            final @Nonnull Class<ENTITY> entityClass) {
         final var managedType = getManagedType(entityManagerFactory, entityClass);
         final var attributes = managedType.getAttributes();
         return attributes.stream()
@@ -136,15 +136,15 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // ----------------------------------------------------------------------------------------------------------- types
-    static void acceptEachEntityType(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                     @Nonnull final Consumer<? super EntityType<?>> consumer) {
+    static void acceptEachEntityType(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                     final @Nonnull Consumer<? super EntityType<?>> consumer) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(consumer, "consumer is null");
         entityManagerFactory.getMetamodel().getEntities().forEach(consumer);
     }
 
     static <C extends Collection<? super EntityType<?>>>
-    C addAllEntityTypes(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+    C addAllEntityTypes(final @Nonnull EntityManagerFactory entityManagerFactory, final @Nonnull C collection) {
         Objects.requireNonNull(collection, "collection is null");
         acceptEachEntityType(
                 entityManagerFactory,
@@ -153,8 +153,8 @@ public final class ___JakartaPersistence_TestUtils {
         return collection;
     }
 
-    static void acceptEachEntityJavaType(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                         @Nonnull final Consumer<? super Class<?>> consumer) {
+    static void acceptEachEntityJavaType(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                         final @Nonnull Consumer<? super Class<?>> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         acceptEachEntityType(
                 entityManagerFactory,
@@ -163,7 +163,7 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     static <C extends Collection<? super Class<?>>>
-    C addAllEntityJavaTypes(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+    C addAllEntityJavaTypes(final @Nonnull EntityManagerFactory entityManagerFactory, final @Nonnull C collection) {
         Objects.requireNonNull(collection, "collection is null");
         acceptEachEntityJavaType(
                 entityManagerFactory,
@@ -173,8 +173,8 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------ tableNames
-    static void acceptEachEntityTableName(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                          @Nonnull final Consumer<? super String> consumer) {
+    static void acceptEachEntityTableName(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                          final @Nonnull Consumer<? super String> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         acceptEachEntityJavaType(
                 entityManagerFactory,
@@ -194,7 +194,7 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     static <C extends Collection<? super String>>
-    C addAllEntityTableNames(@Nonnull final EntityManagerFactory entityManagerFactory, @Nonnull final C collection) {
+    C addAllEntityTableNames(final @Nonnull EntityManagerFactory entityManagerFactory, final @Nonnull C collection) {
         Objects.requireNonNull(collection, "collection is null");
         acceptEachEntityTableName(
                 entityManagerFactory,
@@ -212,8 +212,8 @@ public final class ___JakartaPersistence_TestUtils {
      * @param consumer    the consumer.
      * @param <X>         managed type parameter.
      */
-    static <X> void acceptEachAttributeName(@Nonnull final ManagedType<X> managedType,
-                                            @Nonnull final Consumer<? super String> consumer) {
+    static <X> void acceptEachAttributeName(final @Nonnull ManagedType<X> managedType,
+                                            final @Nonnull Consumer<? super String> consumer) {
         Objects.requireNonNull(managedType, "managedType is null");
         Objects.requireNonNull(consumer, "consumer is null");
         final var attributes = managedType.getAttributes();
@@ -235,7 +235,7 @@ public final class ___JakartaPersistence_TestUtils {
      * @return given {@code collection}.
      */
     static <X, C extends Collection<? super String>>
-    C addAllAttributeNames(@Nonnull final ManagedType<X> managedType, @Nonnull final C collection) {
+    C addAllAttributeNames(final @Nonnull ManagedType<X> managedType, final @Nonnull C collection) {
         Objects.requireNonNull(collection, "collection is null");
         acceptEachAttributeName(
                 managedType,
@@ -246,7 +246,7 @@ public final class ___JakartaPersistence_TestUtils {
 
     // ----------------------------------------------------------------------------------------------------- columnNames
     static Optional<String> getAttributeColumnName(@Nonnull Class<?> beanClass,
-                                                   @Nonnull final PropertyDescriptor propertyDescriptor) {
+                                                   final @Nonnull PropertyDescriptor propertyDescriptor) {
         Objects.requireNonNull(beanClass, "beanClass is null");
         Objects.requireNonNull(propertyDescriptor, "propertyDescriptor is null");
         {
@@ -277,10 +277,10 @@ public final class ___JakartaPersistence_TestUtils {
         return Optional.empty();
     }
 
-    private static void acceptEachAttributeColumName(@Nonnull final Metamodel metamodel,
-                                                     @Nonnull final Class<?> entityClass,
-                                                     @Nonnull final ManagedType<?> managedType,
-                                                     @Nonnull final Consumer<? super String> consumer) {
+    private static void acceptEachAttributeColumName(final @Nonnull Metamodel metamodel,
+                                                     final @Nonnull Class<?> entityClass,
+                                                     final @Nonnull ManagedType<?> managedType,
+                                                     final @Nonnull Consumer<? super String> consumer) {
         Objects.requireNonNull(metamodel, "metamodel is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(managedType, "managedType is null");
@@ -313,9 +313,9 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     public static <ENTITY extends __MappedEntity<?>>
-    void acceptEntityColumName(@Nonnull final EntityManagerFactory entityManagerFactory,
-                               @Nonnull final Class<ENTITY> entityClass,
-                               @Nonnull final Consumer<? super String> consumer) {
+    void acceptEntityColumName(final @Nonnull EntityManagerFactory entityManagerFactory,
+                               final @Nonnull Class<ENTITY> entityClass,
+                               final @Nonnull Consumer<? super String> consumer) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(consumer, "consumer is null");
@@ -344,9 +344,9 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     public static <ENTITY extends __MappedEntity<?>, C extends Collection<? super String>>
-    C addAllEntityColumNames(@Nonnull final EntityManagerFactory entityManagerFactory,
-                             @Nonnull final Class<ENTITY> entityClass,
-                             @Nonnull final C collection) {
+    C addAllEntityColumNames(final @Nonnull EntityManagerFactory entityManagerFactory,
+                             final @Nonnull Class<ENTITY> entityClass,
+                             final @Nonnull C collection) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(collection, "collection is null");
@@ -368,7 +368,7 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static Optional<String> getColumnName(@Nonnull final Method method) {
+    static Optional<String> getColumnName(final @Nonnull Method method) {
         Objects.requireNonNull(method, "method is null");
         {
             final var column = method.getAnnotation(Column.class);
@@ -391,7 +391,7 @@ public final class ___JakartaPersistence_TestUtils {
         return Optional.empty();
     }
 
-    static Optional<String> getColumnName(@Nonnull final Field field) {
+    static Optional<String> getColumnName(final @Nonnull Field field) {
         Objects.requireNonNull(field, "field is null");
         {
             final var column = field.getAnnotation(Column.class);
@@ -416,8 +416,8 @@ public final class ___JakartaPersistence_TestUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     public static <R> R applyEntityManagerInTransaction(
-            @Nonnull final EntityManager entityManager,
-            @Nonnull final Function<? super EntityManager, ? extends R> function,
+            final @Nonnull EntityManager entityManager,
+            final @Nonnull Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         if (entityManager.isJoinedToTransaction()) {
@@ -461,8 +461,8 @@ public final class ___JakartaPersistence_TestUtils {
      * @return the result of the specified supplier.
      * @see #applyEntityManagerInTransaction(EntityManager, Function, boolean)
      */
-    public static <R> R getInTransaction(@Nonnull final EntityManager entityManager,
-                                         @Nonnull final Supplier<? extends R> supplier,
+    public static <R> R getInTransaction(final @Nonnull EntityManager entityManager,
+                                         final @Nonnull Supplier<? extends R> supplier,
                                          final boolean rollback) {
         Objects.requireNonNull(supplier, "supplier is null");
         return applyEntityManagerInTransaction(
@@ -486,8 +486,8 @@ public final class ___JakartaPersistence_TestUtils {
      * @apiNote This method invokes the {@link #getInTransaction(EntityManager, Supplier, boolean)} method with
      *         {@code entityManager}, {@code supplier}, and {@code true}.
      */
-    public static <R> R getInTransactionAndRollback(@Nonnull final EntityManager entityManager,
-                                                    @Nonnull final Supplier<? extends R> supplier) {
+    public static <R> R getInTransactionAndRollback(final @Nonnull EntityManager entityManager,
+                                                    final @Nonnull Supplier<? extends R> supplier) {
         return getInTransaction(
                 entityManager,
                 supplier,
@@ -496,11 +496,10 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static <R> R applyUnwrappedConnection(@Nonnull final EntityManager entityManager,
-                                                 @Nonnull final Function<? super Connection, ? extends R> function) {
+    public static <R> R applyUnwrappedConnection(final @Nonnull EntityManager entityManager,
+                                                 final @Nonnull Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
-
         try {
             final var connection = entityManager.unwrap(Connection.class);
             if (connection == null) {
@@ -558,7 +557,7 @@ public final class ___JakartaPersistence_TestUtils {
      * @return the number of entities of {@code entityClass}.
      */
     @PositiveOrZero
-    public static long count(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
+    public static long count(final @Nonnull EntityManager entityManager, final @Nonnull Class<?> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final var builder = entityManager.getCriteriaBuilder();
@@ -581,8 +580,8 @@ public final class ___JakartaPersistence_TestUtils {
      */
     @Nullable
     public static <R> R applyCountAndIndex(
-            @Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass,
-            @Nonnull final LongFunction<? extends LongFunction<? extends R>> function) {
+            final @Nonnull EntityManager entityManager, final @Nonnull Class<?> entityClass,
+            final @Nonnull LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
         logger.log(Level.DEBUG, "count of {0}: {1}", entityClass, count);
         if (count == 0L) {
@@ -598,9 +597,9 @@ public final class ___JakartaPersistence_TestUtils {
 
     @Nonnull
     public static <T, R> Optional<R> applyCountIndexAndEntity(
-            @Nonnull final EntityManager entityManager,
-            @Nonnull final Class<T> entityClass,
-            @Nonnull final LongFunction<? extends LongFunction<? extends Function<? super T, ? extends R>>> function) {
+            final @Nonnull EntityManager entityManager,
+            final @Nonnull Class<T> entityClass,
+            final @Nonnull LongFunction<? extends LongFunction<? extends Function<? super T, ? extends R>>> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(function, "function is null");
@@ -636,8 +635,8 @@ public final class ___JakartaPersistence_TestUtils {
      * @return an optional of the selected entity; {@link Optional#empty() empty} when the table is empty.
      */
     @Nonnull
-    public static <T> Optional<T> selectRandom(@Nonnull final EntityManager entityManager,
-                                               @Nonnull final Class<T> entityClass) {
+    public static <T> Optional<T> selectRandom(final @Nonnull EntityManager entityManager,
+                                               final @Nonnull Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         return applyCountIndexAndEntity(
@@ -648,7 +647,7 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static String entityName(@Nonnull final EntityManager entityManager, @Nonnull final Class<?> entityClass) {
+    static String entityName(final @Nonnull EntityManager entityManager, final @Nonnull Class<?> entityClass) {
         return entityManager.getMetamodel().entity(entityClass).getName();
     }
 

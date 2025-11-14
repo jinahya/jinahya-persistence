@@ -10,7 +10,7 @@ import java.util.Objects;
 })
 public final class __MappedBuilderUtils {
 
-    public static <BUILDER extends __MappedBuilder<BUILDER, ?>> BUILDER reset(@Nonnull final BUILDER instance) {
+    public static <BUILDER extends __MappedBuilder<BUILDER, ?>> BUILDER reset(final @Nonnull BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
         return ___BuilderUtils.reset(instance);
     }

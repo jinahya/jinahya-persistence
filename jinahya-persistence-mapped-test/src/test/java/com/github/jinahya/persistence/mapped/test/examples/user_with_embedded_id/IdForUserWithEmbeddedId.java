@@ -96,7 +96,7 @@ public class IdForUserWithEmbeddedId implements Serializable {
         return name;
     }
 
-    public void setName(@Nonnull final String name) {
+    public void setName(final @Nonnull String name) {
         this.name = name;
     }
 
@@ -106,7 +106,7 @@ public class IdForUserWithEmbeddedId implements Serializable {
         return age;
     }
 
-    public void setAge(@Nonnull final Integer age) {
+    public void setAge(final @Nonnull Integer age) {
         this.age = age;
     }
 

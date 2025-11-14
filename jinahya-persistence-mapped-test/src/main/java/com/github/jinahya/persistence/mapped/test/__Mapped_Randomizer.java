@@ -48,7 +48,7 @@ public abstract class __Mapped_Randomizer<MAPPED extends __Mapped>
      * @param excludedFields the names of the fields to be excluded from randomization.
      * @see #mappedClass
      */
-    protected __Mapped_Randomizer(@Nonnull final Class<MAPPED> mappedClass, @Nonnull final String... excludedFields) {
+    protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> mappedClass, final @Nonnull String... excludedFields) {
         super(mappedClass, excludedFields);
         this.mappedClass = Objects.requireNonNull(mappedClass, "mappedClass is null");
     }

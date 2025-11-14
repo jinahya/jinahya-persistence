@@ -32,7 +32,7 @@ class UserWithEmbeddedId_Persister extends __MappedEntity_Persister<UserWithEmbe
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final UserWithEmbeddedId entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull UserWithEmbeddedId entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }
