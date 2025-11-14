@@ -98,7 +98,7 @@
     <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
     <!--    <version.nl.jqno.equalsverifier>4.1.1</version.nl.jqno.equalsverifier>-->
-    <version.nl.jqno.equalsverifier>4.2.1</version.nl.jqno.equalsverifier>
+    <version.nl.jqno.equalsverifier>4.2.2</version.nl.jqno.equalsverifier>
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
     <version.org.eclipse.persistence>5.0.0-B10</version.org.eclipse.persistence>
     <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
@@ -137,7 +137,8 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.5.20</version>
+        <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-parent -->
+        <version>1.5.21</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
