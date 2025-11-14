@@ -1,9 +1,7 @@
 package com.github.jinahya.persistence.crypto;
 
 import jakarta.annotation.Nonnull;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceContext;
+import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
@@ -12,15 +10,12 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
 
-import java.util.Objects;
-import java.util.function.Function;
-
 public abstract class __PersistenceCryptoListener {
 
     // -----------------------------------------------------------------------------------------------------------------
     @PrePersist
     protected void onPrePersist(final @Nonnull Object entityInstance) {
-        // encrypt
+        service.encrypt(entityInstance);
     }
 
     @PostPersist
@@ -42,7 +37,7 @@ public abstract class __PersistenceCryptoListener {
     // -----------------------------------------------------------------------------------------------------------------
     @PreUpdate
     protected void onPreUpdate(final @Nonnull Object entityInstance) {
-        // encrypt
+        service.encrypt(entityInstance);
     }
 
     @PostUpdate
@@ -53,23 +48,10 @@ public abstract class __PersistenceCryptoListener {
     // -----------------------------------------------------------------------------------------------------------------
     @PostLoad
     protected void onPostLoad(final @Nonnull Object entityInstance) {
-        // decrypt
-    }
-
-    // --------------------------------------------------------------------------------------------------- entityManager
-    protected <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return function.apply(entityManager);
-    }
-
-    protected <R> R applyEntityManagerFactory(
-            @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
-        Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(em -> function.apply(em.getEntityManagerFactory()));
+        service.decrypt(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-//    @jakarta.inject.Inject
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Inject
+    private __PersistenceCryptoService service;
 }
