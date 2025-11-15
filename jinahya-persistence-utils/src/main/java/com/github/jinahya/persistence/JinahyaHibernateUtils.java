@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.util;
+package com.github.jinahya.persistence;
 
 /*-
  * #%L

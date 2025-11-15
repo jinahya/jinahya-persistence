@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.util;
+package com.github.jinahya.persistence.metamodel;
 
 /*-
  * #%L
@@ -25,7 +25,6 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.ManagedType;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -40,63 +39,37 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class JinahyaMetamodelUtils {
+public final class JinahyaEntityTypeUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final Map<Class<?>, ManagedType<?>> MANAGED_TYPES = new ConcurrentHashMap<>();
-
-    public static <X> ManagedType<X> getManagedType(
-            final @Nonnull Class<X> typeClass,
-            final @Nonnull Stream<? extends EntityManagerFactory> entityManagerFactoryStream) {
-        Objects.requireNonNull(typeClass, "typeClass is null");
-        Objects.requireNonNull(entityManagerFactoryStream, "entityManagerFactoryStream is null");
-        @SuppressWarnings({"unchecked"})
-        final var managedType = (ManagedType<X>) MANAGED_TYPES.computeIfAbsent(
-                typeClass,
-                k -> entityManagerFactoryStream
-                        .map(EntityManagerFactory::getMetamodel)
-                        .map(m -> {
-                            try {
-                                return m.entity(typeClass);
-                            } catch (final IllegalArgumentException iae) {
-                                return null;
-                            }
-                        })
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .orElseThrow(
-                                () -> new IllegalArgumentException(
-                                        "no entity type found for entity class: " + typeClass)
-                        ));
-        return managedType;
-    }
 
     // -----------------------------------------------------------------------------------------------------------------
     private static final Map<Class<?>, EntityType<?>> ENTITY_TYPES = new ConcurrentHashMap<>();
 
     public static <X> EntityType<X> getEntityType(
             final @Nonnull Class<X> entityClass,
-            final @Nonnull Stream<? extends EntityManagerFactory> entityManagerFactoryStream) {
+            final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
         Objects.requireNonNull(entityClass, "entityClass is null");
-        Objects.requireNonNull(entityManagerFactoryStream, "entityManagerFactoryStream is null");
+        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
         @SuppressWarnings({"unchecked"})
         final var entityType = (EntityType<X>) ENTITY_TYPES.computeIfAbsent(
                 entityClass,
                 k -> {
-                    {
-                        final var managedType = MANAGED_TYPES.get(entityClass);
+                    try {
+                        final var managedType =
+                                JinahyaManagedTypeUtils.getManagedType(entityClass, entityManagerFactories);
                         if (managedType instanceof EntityType<?> et && et.getJavaType() == entityClass) {
                             return et;
                         }
+                    } catch (final IllegalArgumentException iae) {
+                        // empty
                     }
-                    return entityManagerFactoryStream
+                    return StreamSupport.stream(entityManagerFactories.spliterator(), false)
                             .map(EntityManagerFactory::getMetamodel)
                             .map(m -> {
                                 try {
@@ -267,7 +240,7 @@ public final class JinahyaMetamodelUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private JinahyaMetamodelUtils() {
+    private JinahyaEntityTypeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

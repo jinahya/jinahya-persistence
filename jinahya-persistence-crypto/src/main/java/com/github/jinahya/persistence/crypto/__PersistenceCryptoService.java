@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.crypto;
 
+import com.github.jinahya.persistence.metamodel.JinahyaAttributeUtils;
 import com.github.jinahya.persistence.util.JinahyaMetamodelUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.enterprise.inject.Instance;
@@ -7,17 +8,25 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.SingularAttribute;
 import jakarta.validation.constraints.NotNull;
 
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * .
+ *
+ * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486">2.6. Basic
+ *         Types</a> (Jakarta Persistence 3.2 Specification Document)
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -44,10 +53,31 @@ public abstract class __PersistenceCryptoService {
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected void encrypt(final @Nonnull Object entity, final @Nonnull SingularAttribute<?, ?> attribute) {
+    protected void encrypt(final @Nonnull Object entity,
+                           final @Nonnull Attribute<?, ?> attribute,
+                           final @Nonnull String cryptoIdentifier) {
         Objects.requireNonNull(entity, "entity is null");
         Objects.requireNonNull(attribute, "attribute is null");
-        final var value = JinahyaMetamodelUtils.<Object, Object>getAttributeValue(entity, attribute);
+        final var value = JinahyaAttributeUtils.getAttributeValue(entity, attribute);
+        final var type = attribute.getJavaType();
+        {
+            final var annotation =
+                    JinahyaMetamodelUtils.getJavaMemberAnnotation(attribute, __EncryptedAttributeOfSelf.class);
+            if (annotation != null) {
+                if (type == String.class) {
+                    if (value == null) {
+                        return;
+                    }
+                    final var decrypted = ((String) value).getBytes(StandardCharsets.UTF_8);
+                    final var encrypted = manager.encrypt(cryptoIdentifier, decrypted);
+                    JinahyaAttributeUtils.setAttributeValue(
+                            entity,
+                            attribute,
+                            Base64.getEncoder().encodeToString(encrypted)
+                    );
+                }
+            }
+        }
     }
 
     protected void encrypt(@Nonnull @NotNull Object entity) {
@@ -55,7 +85,7 @@ public abstract class __PersistenceCryptoService {
         final var cryptoIdentifier = manager.getCryptoIdentifier(entity);
         final var entityClass = entity.getClass();
         final var entityType = getEntityType(entityClass);
-        final var attributes = getAttributes(entityType);
+        final var attributes = new HashMap<>(getAttributes(entityType));
         final var byteBuffer = ByteBuffer.allocate(Long.BYTES);
         for (final var entry : attributes.entrySet()) {
             final var name = entry.getKey();
@@ -66,7 +96,35 @@ public abstract class __PersistenceCryptoService {
             }
             final var javaType = attribute.getJavaType();
             final var value = JinahyaMetamodelUtils.getAttributeValue(entity, attribute);
-            final var singularAttribute = (SingularAttribute<?, ?>) attribute;
+            {
+                final var annotation =
+                        JinahyaMetamodelUtils.getJavaMemberAnnotation(attribute, __EncryptedAttributeOfSelf.class);
+                if (annotation != null) {
+                    if (value == null) {
+                        continue;
+                    }
+                    if (javaType == String.class) {
+                        final var decrypted = ((String) value).getBytes(StandardCharsets.UTF_8);
+                        final var encrypted = manager.encrypt(cryptoIdentifier, decrypted);
+                        JinahyaAttributeUtils.setAttributeValue(
+                                entity,
+                                attribute,
+                                Base64.getEncoder().encodeToString(encrypted)
+                        );
+                        continue;
+                    }
+                    if (javaType == byte[].class) {
+                        final var encrypted = manager.encrypt(cryptoIdentifier, (byte[]) value);
+                        JinahyaAttributeUtils.setAttributeValue(
+                                entity,
+                                attribute,
+                                encrypted
+                        );
+                        continue;
+                    }
+                    throw new RuntimeException("unsupported type: " + javaType);
+                }
+            }
             {
                 final var annotation =
                         JinahyaMetamodelUtils.getJavaMemberAnnotation(attribute, __EncryptedAttributeOfSelf.class);
