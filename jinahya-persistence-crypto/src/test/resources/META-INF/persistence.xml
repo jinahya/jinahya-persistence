@@ -29,6 +29,7 @@
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
+    <!--    <class>com.github.jinahya.persistence.crypto.__PersistenceCryptoListener</class>-->
     <class>com.github.jinahya.persistence.crypto.Entity01</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
@@ -54,6 +55,7 @@
       <property name="hibernate.highlight_sql" value="true"/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.use_sql_comment" value="true"/>
+<!--      <property name="hibernate.cache.use_second_level_cache" value="false"/>-->
       <!-- jinahya.persistence -->
       <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
       <property name="jinahya.persistence.table_schema" value="PUBLIC"/>

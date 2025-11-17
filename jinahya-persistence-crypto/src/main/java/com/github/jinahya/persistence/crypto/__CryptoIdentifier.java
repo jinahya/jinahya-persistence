@@ -10,9 +10,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(value = RUNTIME)
 @Target({
-        ElementType.FIELD,
-        ElementType.METHOD
+        ElementType.METHOD,
+        ElementType.TYPE
 })
-public @interface __EncryptedAttributeOfSelf {
+public @interface __CryptoIdentifier {
 
 }
