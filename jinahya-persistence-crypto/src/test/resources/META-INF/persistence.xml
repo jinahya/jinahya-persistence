@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  jinahya-persistence-mapped-test
+  %%
+  Copyright (C) 2024 - 2025 Jinahya, Inc.
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<!-- https://jakarta.ee/xml/ns/persistence/ -->
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="${persistence.version}">
+  <persistence-unit name="__testPU">
+    <description>Persistence Unit for an In-Memory DB</description>
+    <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+    <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+    <provider>${persistence-unit.provider}</provider>
+    <class>com.github.jinahya.persistence.crypto.Entity01</class>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>CALLBACK</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!-- eclipselink -->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+      <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <!--      <property name="eclipselink.weaving" value="static"/>-->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <!-- hibernate -->
+      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+      <property name="hibernate.format_sql" value="true"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.highlight_sql" value="true"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.use_sql_comment" value="true"/>
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__itPU">
+    <description>Persistence Unit for a Physical Database</description>
+    <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+    <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+    <provider>${persistence-unit.provider}</provider>
+    <class>com.github.jinahya.persistence.crypto.Entity01</class>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>CALLBACK</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!--      <property name="jakarta.persistence.schema-generation.database.action" value="none"/>-->
+      <!-- eclipselink -->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+      <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <!--      <property name="eclipselink.weaving" value="static"/>-->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <!-- https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation -->
+      <property name="eclipselink.ddl-generation" value="none"/>
+      <!-- hibernate -->
+      <property name="hibernate.format_sql" value="true"/>
+      <!-- https://docs.jboss.org/hibernate/orm/7.1/javadocs/constant-values.html#org.hibernate.tool.schema.Action.ACTION_NONE -->
+      <property name="hibernate.hbm2ddl.auto" value="none"/>
+      <property name="hibernate.highlight_sql" value="true"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.use_sql_comment" value="true"/>
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
+    </properties>
+  </persistence-unit>
+</persistence>

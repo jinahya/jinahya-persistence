@@ -15,5 +15,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 })
 public @interface __EncryptedAttribute {
 
-    String value() default "";
+    String value();
 }

@@ -162,9 +162,31 @@ public abstract class __PersistenceCryptoService {
         );
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-//    private volatile Map<Class<?>, Metamodel> metamodels;
+    // ----------------------------------------------------------------------------------------------------- entityTypes
 
+    // ------------------------------------------------------------------------------------ entityManagerFactoryInstance
+
+    // --------------------------------------------------------------------------------------------------------- manager
+
+    // ------------------------------------------------------------------------------------------------------ encryptors
+    private __PersistenceCryptoProcessor<?> encryptor(@Nonnull final EntityType<?> entityType) {
+        Objects.requireNonNull(entityType, "entityType is null");
+        return encryptionProcessors.computeIfAbsent(
+                entityType,
+                k -> new __PersistenceCryptoEncryptor<>(k, manager)
+        );
+    }
+
+    // ------------------------------------------------------------------------------------------------------ decryptors
+    private __PersistenceCryptoProcessor<?> decryptor(@Nonnull final EntityType<?> entityType) {
+        Objects.requireNonNull(entityType, "entityType is null");
+        return decryptionProcessors.computeIfAbsent(
+                entityType,
+                k -> new __PersistenceCryptoDecryptor<>(k, manager)
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     private volatile Map<Class<?>, EntityType<?>> entityTypes;
 
     @Inject
@@ -173,4 +195,9 @@ public abstract class __PersistenceCryptoService {
     // -----------------------------------------------------------------------------------------------------------------
     @Inject
     private __PersistenceCryptoManager manager;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private final Map<Class<?>, __PersistenceCryptoProcessor<?>> encryptionProcessors = new ConcurrentHashMap<>();
+
+    private final Map<Class<?>, __PersistenceCryptoProcessor<?>> decryptionProcessors = new ConcurrentHashMap<>();
 }
