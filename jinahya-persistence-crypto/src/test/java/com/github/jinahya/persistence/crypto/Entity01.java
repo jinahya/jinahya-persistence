@@ -64,52 +64,52 @@ class Entity01 extends __MappedEntity<Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Basic(optional = true)
-    @Column(name = "__encryption_identifier", nullable = true, insertable = true, updatable = true)
+    @Column(name = "encryption_identifie__r", nullable = true, insertable = true, updatable = true)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    String __encryptionIdentifier;
+    String encryptionIdentifier__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "byte1Enc")
+    @__EncryptedAttribute(encryptedAttribute = "byte1Enc__")
     @Basic(optional = true)
     @Column(name = "b1", nullable = true, insertable = true, updatable = true)
     Byte byte1;
 
     @Basic(optional = true)
-    @Column(name = "byte1_enc", nullable = true, insertable = true, updatable = true)
+    @Column(name = "byte1_enc__", nullable = true, insertable = true, updatable = true)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    byte[] byte1Enc;
+    byte[] byte1Enc__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "short1Enc")
+    @__EncryptedAttribute(encryptedAttribute = "")
     @Basic(optional = true)
     @Column(name = "s1", nullable = true, insertable = true, updatable = true)
     Short short1;
 
     @Basic(optional = true)
-    @Column(name = "short1_enc", nullable = true, insertable = true, updatable = true)
+    @Column(name = "short1_enc__", nullable = true, insertable = true, updatable = true)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    byte[] short1Enc;
+    byte[] short1Enc__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "int1Enc")
+    @__EncryptedAttribute(encryptedAttribute = "")
     @Basic(optional = true)
     @Column(name = "i2", nullable = true, insertable = true, updatable = true)
     Integer int1;
 
     @Basic(optional = true)
-    @Column(name = "int1_enc", nullable = true, insertable = true, updatable = true)
+    @Column(name = "int1_enc__", nullable = true, insertable = true, updatable = true)
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    byte[] int1Enc;
+    byte[] int1Enc__;
 }

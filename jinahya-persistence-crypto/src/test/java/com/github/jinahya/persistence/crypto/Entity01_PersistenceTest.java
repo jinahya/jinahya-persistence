@@ -74,9 +74,9 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
             }
             em.detach(randomized);
             em.clear();
-            log.debug("persisted: {}", randomized);
+            // ---------------------------------------------------------------------------------------------------------
+            log.debug("----------------------------------------------------------------------------------------------");
             final var found = em.find(entityClass, randomized.getId());
-            log.debug("found: {}", found);
             {
                 assertThat(found.byte1).isEqualTo(byte1);
                 assertThat(found.short1).isEqualTo(short1);
