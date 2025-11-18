@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         ElementType.FIELD,
         ElementType.METHOD
 })
-public @interface __Encrypted {
+public @interface __EncryptedAttribute {
 
-    String value();
+    String encryptedAttribute() default "";
 }

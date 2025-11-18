@@ -15,6 +15,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
@@ -103,7 +104,7 @@ public abstract class __EncryptionService {
     protected void onPostConstruct() {
         logger.log(System.Logger.Level.DEBUG, "onPostConstruct()");
         logger.log(System.Logger.Level.DEBUG, "factoryInstance: {0}", factoryInstance);
-        logger.log(System.Logger.Level.DEBUG, "cryptoManager: {0}", encryptionManager);
+        logger.log(System.Logger.Level.DEBUG, "encryptionManager: {0}", encryptionManager);
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -123,7 +124,7 @@ public abstract class __EncryptionService {
 
     // -----------------------------------------------------------------------------------------------------------------
     private void check(final Attribute<?, ?> decryptedAttribute,
-                       final __Encrypted encryptionAnnotation, final Attribute<?, ?> encryptedAttribute) {
+                       final __EncryptedAttribute encryptionAnnotation, final Attribute<?, ?> encryptedAttribute) {
         // decrypted attribute should be optional
         {
             final var basic = JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, Basic.class);
@@ -147,11 +148,11 @@ public abstract class __EncryptionService {
         }
         // encrypted attribute should be optional
         {
-            final var basic = JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, Basic.class);
-            final var optional = Optional.ofNullable(basic).map(Basic::optional).orElse(true);
+            final var mapping = JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, Basic.class);
+            final var optional = Optional.ofNullable(mapping).map(Basic::optional).orElse(true);
             if (!optional) {
                 throw new RuntimeException(
-                        "decrypted attribute should be optional" +
+                        "encrypted attribute should be optional" +
                         "; decrypted attribute: " + decryptedAttribute +
                         "; encryption annotation: " + encryptionAnnotation +
                         "; encrypted attribute: " + encryptedAttribute
@@ -161,9 +162,9 @@ public abstract class __EncryptionService {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected void encrypt(final @Nonnull @NotNull Object entity) {
+    public void encrypt(final @Valid @NotNull Object entity) {
         Objects.requireNonNull(entity, "entity is null");
-        final var cryptoIdentifier = encryptionManager.getCryptoIdentifier(entity);
+        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(entity);
         final var entityClass = entity.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
@@ -174,29 +175,30 @@ public abstract class __EncryptionService {
             if (persistenceAttributeType != Attribute.PersistentAttributeType.BASIC) {
                 continue;
             }
-            final var javaType = decryptedAttribute.getJavaType();
-            final var encryptionAnnotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __Encrypted.class);
-            if (encryptionAnnotation == null) {
+            final var attributeAnnotation =
+                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
+            if (attributeAnnotation == null) {
                 continue;
             }
-            final var encryptedAttribute = Optional.of(encryptionAnnotation.value())
+            final var encryptedAttribute = Optional.of(attributeAnnotation.encryptedAttribute())
+                    .map(v -> v.isBlank() ? decryptedAttribute.getName() + "Enc__" : v)
                     .map(attributes::get)
                     .orElseThrow(() -> new RuntimeException(
                             "no encrypted attribute found" +
-                            "; attribute: " + attributes +
-                            "; encryption annotation: " + encryptionAnnotation
+                            "; decrypted attribute: " + decryptedAttribute +
+                            "; encryption annotation: " + attributeAnnotation
                     ));
-            check(decryptedAttribute, encryptionAnnotation, encryptedAttribute);
-            // encrypted attribute's value should be null; which means not yet encrypted
+            check(decryptedAttribute, attributeAnnotation, encryptedAttribute);
             {
-                final var value = JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
-                if (value != null) {
+                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
+                if (encryptedValue != null) {
                     logger.log(System.Logger.Level.DEBUG,
                                "seems already encrypted" +
                                "; decrypted attribute: " + decryptedAttribute +
-                               "; encryption annotation: " + encryptionAnnotation +
-                               "; decrypted attribute: " + decryptedAttribute);
+                               "; encryption annotation: " + attributeAnnotation +
+                               "; encrypted attribute: " + decryptedAttribute +
+                               "; encrypted value: " + encryptedValue
+                    );
                     continue;
                 }
             }
@@ -206,6 +208,7 @@ public abstract class __EncryptionService {
                 continue;
             }
             final byte[] decryptedBytes;
+            final var javaType = decryptedAttribute.getJavaType();
             if (javaType == byte.class || javaType == Byte.class) {
                 decryptedBytes = new byte[]{(byte) decryptedValue};
             } else if (javaType == short.class || javaType == Short.class) {
@@ -272,15 +275,15 @@ public abstract class __EncryptionService {
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-            final var encrypted = encryptionManager.encrypt(cryptoIdentifier, decryptedBytes);
+            final var encrypted = encryptionManager.encrypt(encryptionIdentifier, decryptedBytes);
             JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, encrypted);
             JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
         }
     }
 
-    protected void decrypt(final @Nonnull @NotNull Object entity) {
+    public void decrypt(final @Valid @NotNull Object entity) {
         Objects.requireNonNull(entity, "entity is null");
-        final var cryptoIdentifier = encryptionManager.getCryptoIdentifier(entity);
+        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(entity);
         final var entityClass = entity.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
@@ -291,20 +294,20 @@ public abstract class __EncryptionService {
             if (persistenceAttributeType != Attribute.PersistentAttributeType.BASIC) {
                 continue;
             }
-            final var javaType = decryptedAttribute.getJavaType();
-            final var annotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __Encrypted.class);
-            if (annotation == null) {
+            final var attributeAnnotation =
+                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
+            if (attributeAnnotation == null) {
                 continue;
             }
-            final var encryptedAttribute = Optional.of(annotation.value())
+            final var encryptedAttribute = Optional.of(attributeAnnotation.encryptedAttribute())
+                    .map(v -> v.isBlank() ? decryptedAttribute.getName() + "Enc__" : v)
                     .map(attributes::get)
                     .orElseThrow(() -> new RuntimeException(
                             "no encrypted attribute found" +
-                            "; attribute: " + attributes +
-                            "; annotation: " + annotation
+                            "; decrypted attribute: " + decryptedAttribute +
+                            "; attribute annotation: " + attributeAnnotation
                     ));
-            check(decryptedAttribute, annotation, encryptedAttribute);
+            check(decryptedAttribute, attributeAnnotation, encryptedAttribute);
             final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
             if (encryptedBytes == null) {
                 final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
@@ -314,8 +317,9 @@ public abstract class __EncryptionService {
                 JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
                 continue;
             }
-            final var decryptedBytes = encryptionManager.decrypt(cryptoIdentifier, encryptedBytes);
+            final var decryptedBytes = encryptionManager.decrypt(encryptionIdentifier, encryptedBytes);
             final Object decryptedValue;
+            final var javaType = decryptedAttribute.getJavaType();
             if (javaType == byte.class || javaType == Byte.class) {
                 decryptedValue = decryptedBytes[0];
             } else if (javaType == short.class || javaType == Short.class) {

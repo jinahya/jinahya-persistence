@@ -10,7 +10,8 @@ class Entity01_Randomizer extends __MappedEntity_Randomizer<Entity01, Long> {
 
     Entity01_Randomizer() {
         super(Entity01.class, Long.class,
-              "id"
+              "id",
+              "encryptionIdentifier"
         );
     }
 

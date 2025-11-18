@@ -64,15 +64,24 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
                     __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
             final var byte1 = randomized.byte1;
             final var short1 = randomized.short1;
+            final var int1 = randomized.int1;
             em.persist(randomized);
             em.flush();
+            {
+                assertThat(randomized.byte1).isNull();
+                assertThat(randomized.short1).isNull();
+                assertThat(randomized.int1).isNull();
+            }
             em.detach(randomized);
             em.clear();
             log.debug("persisted: {}", randomized);
             final var found = em.find(entityClass, randomized.getId());
             log.debug("found: {}", found);
-            assertThat(found.byte1).isEqualTo(byte1);
-            assertThat(found.short1).isEqualTo(short1);
+            {
+                assertThat(found.byte1).isEqualTo(byte1);
+                assertThat(found.short1).isEqualTo(short1);
+                assertThat(found.int1).isEqualTo(int1);
+            }
             return null;
         });
     }

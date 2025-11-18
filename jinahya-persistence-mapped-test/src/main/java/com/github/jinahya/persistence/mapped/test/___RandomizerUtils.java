@@ -96,6 +96,13 @@ public final class ___RandomizerUtils {
                 .map(i -> (___Randomizer<T>) i);
     }
 
+    /**
+     * Returns, an optional of, a randomized instance of the specified target class.
+     *
+     * @param target the target class.
+     * @param <T>    target type parameter
+     * @return an optional of randomized instance of the {@code target}; {@code empty} when no randomizer found.
+     */
     @Nonnull
     public static <T> Optional<T> newRandomizedInstanceOf(final @Nonnull Class<T> target) {
         Objects.requireNonNull(target, "target is null");

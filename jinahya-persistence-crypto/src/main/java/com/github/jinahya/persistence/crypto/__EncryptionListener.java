@@ -56,11 +56,7 @@ public abstract class __EncryptionListener {
     @PrePersist
     protected void onPrePersist(final @Nonnull Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "onPrePersist({0})", entityInstance);
-        final var cryptoService = getEncryptionService();
-        logger.log(System.Logger.Level.DEBUG, "cryptoService: {0}", cryptoService);
-        assert cryptoService != null;
-        cryptoService.encrypt(entityInstance);
-        logger.log(System.Logger.Level.DEBUG, "encrypted entity instance: {0}", entityInstance);
+        encrypt(entityInstance);
     }
 
     @PostPersist
@@ -83,11 +79,7 @@ public abstract class __EncryptionListener {
     @PreUpdate
     protected void onPreUpdate(final @Nonnull Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "onPreUpdate({0})", entityInstance);
-        final var cryptoService = getEncryptionService();
-        logger.log(System.Logger.Level.DEBUG, "cryptoService: {0}", cryptoService);
-        assert cryptoService != null;
-        cryptoService.encrypt(entityInstance);
-        logger.log(System.Logger.Level.DEBUG, "encrypted entity instance: {0}", entityInstance);
+        encrypt(entityInstance);
     }
 
     @PostUpdate
@@ -99,11 +91,7 @@ public abstract class __EncryptionListener {
     @PostLoad
     protected void onPostLoad(final @Nonnull Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "onPostLoad({0})", entityInstance);
-        final var cryptoService = getEncryptionService();
-        logger.log(System.Logger.Level.DEBUG, "cryptoService: {0}", cryptoService);
-        assert cryptoService != null;
-        cryptoService.decrypt(entityInstance);
-        logger.log(System.Logger.Level.DEBUG, "decrypted entity instance: {0}", entityInstance);
+        decrypt(entityInstance);
     }
 
     // ----------------------------------------------------------------------------------------------- encryptionService
@@ -111,6 +99,32 @@ public abstract class __EncryptionListener {
         return Optional.ofNullable(encryptionService)
                 .orElseGet(() -> CDI.current().select(__EncryptionService.class).get())
                 ;
+    }
+
+    protected void encrypt(final Object entityInstance) {
+        logger.log(System.Logger.Level.DEBUG, "encrypt({0})", entityInstance);
+        final var annotation = entityInstance.getClass().getAnnotation(__EncryptedEntity.class);
+        if (annotation == null) {
+            return;
+        }
+        final var encryptionService = getEncryptionService();
+        logger.log(System.Logger.Level.DEBUG, "encryptionService: {0}", encryptionService);
+        assert encryptionService != null;
+        encryptionService.encrypt(entityInstance);
+        logger.log(System.Logger.Level.DEBUG, "encrypted: {0}", entityInstance);
+    }
+
+    protected void decrypt(final Object entityInstance) {
+        logger.log(System.Logger.Level.DEBUG, "decrypt({0})", entityInstance);
+        final var annotation = entityInstance.getClass().getAnnotation(__EncryptedEntity.class);
+        if (annotation == null) {
+            return;
+        }
+        final var encryptionService = getEncryptionService();
+        logger.log(System.Logger.Level.DEBUG, "encryptionService: {0}", encryptionService);
+        assert encryptionService != null;
+        encryptionService.decrypt(entityInstance);
+        logger.log(System.Logger.Level.DEBUG, "decrypted: {0}", entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

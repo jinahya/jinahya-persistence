@@ -1,15 +1,26 @@
 package com.github.jinahya.persistence.crypto;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.Shutdown;
+import jakarta.enterprise.event.Startup;
 import jakarta.validation.constraints.NotNull;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 
+@ApplicationScoped
 public class _EncryptionManager implements __EncryptionManager {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
     private static final String ALGORITHM = "AES";
 
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -21,8 +32,30 @@ public class _EncryptionManager implements __EncryptionManager {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    @PostConstruct
+    protected void onPostConstruct() {
+        logger.log(System.Logger.Level.DEBUG, "onPostConstruct()");
+    }
+
+    // https://stackoverflow.com/a/72628439/330457
+    protected void onStartup(@Observes final Startup startup) {
+        logger.log(System.Logger.Level.DEBUG, "onStartup({0})", startup);
+    }
+
+    @PreDestroy
+    protected void onPreDestroy() {
+        logger.log(System.Logger.Level.DEBUG, "onPreDestroy()");
+    }
+
+    // https://stackoverflow.com/a/72628439/330457
+    protected void onShutdown(@Observes final Shutdown shutdown) {
+        logger.log(System.Logger.Level.DEBUG, "onShutdown({0})", shutdown);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public String getCryptoIdentifier(final @Nonnull Object entityInstance) {
+    public String getEncryptionIdentifier(final @Nonnull Object entityInstance) {
         return "irrelevant";
     }
 

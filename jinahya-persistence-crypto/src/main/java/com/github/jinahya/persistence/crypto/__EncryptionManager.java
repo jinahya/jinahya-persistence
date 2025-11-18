@@ -13,27 +13,27 @@ public interface __EncryptionManager {
      * @return an identifier for the {@code entityInstance}.
      */
     @NotBlank
-    String getCryptoIdentifier(@Valid @NotNull Object entityInstance);
+    String getEncryptionIdentifier(@Valid @NotNull Object entityInstance);
 
     /**
      * Encrypts the specified decrypted bytes with the specified identifier provided via
-     * {@link #getCryptoIdentifier(Object)}.
+     * {@link #getEncryptionIdentifier(Object)}.
      *
-     * @param cryptoIdentifier an identifier for the entity instance.
-     * @param decryptedBytes   the decrypted bytes to encrypt.
+     * @param encryptionIdentifier an identifier for the entity instance.
+     * @param decryptedBytes       the decrypted bytes to encrypt.
      * @return an array of encrypted bytes of the {@code decryptedBytes}.
      */
     @NotNull
-    byte[] encrypt(@NotBlank String cryptoIdentifier, @NotNull byte[] decryptedBytes);
+    byte[] encrypt(@NotBlank String encryptionIdentifier, @NotNull byte[] decryptedBytes);
 
     /**
      * Decrypts the specified encrypted bytes with the specified identifier provided via
-     * {@link #getCryptoIdentifier(Object)}.
+     * {@link #getEncryptionIdentifier(Object)}.
      *
-     * @param cryptoIdentifier an identifier for the entity instance.
-     * @param encryptedBytes   the encrypted bytes to decrypt.
+     * @param encryptionIdentifier an identifier for the entity instance.
+     * @param encryptedBytes       the encrypted bytes to decrypt.
      * @return an array of decrypted bytes of the {@code encryptedBytes}.
      */
     @NotNull
-    byte[] decrypt(@NotBlank String cryptoIdentifier, @NotNull byte[] encryptedBytes);
+    byte[] decrypt(@NotBlank String encryptionIdentifier, @NotNull byte[] encryptedBytes);
 }
