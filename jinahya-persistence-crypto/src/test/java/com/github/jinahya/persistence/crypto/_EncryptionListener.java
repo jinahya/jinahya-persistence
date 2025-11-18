@@ -13,9 +13,9 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
 
-public class _PersistenceCryptoListener extends __PersistenceCryptoListener {
+public class _EncryptionListener extends __EncryptionListener {
 
-    protected _PersistenceCryptoListener() {
+    protected _EncryptionListener() {
         super();
     }
 

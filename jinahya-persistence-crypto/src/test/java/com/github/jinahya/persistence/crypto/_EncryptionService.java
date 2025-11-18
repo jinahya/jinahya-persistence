@@ -6,9 +6,9 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
 
-public class _PersistenceCryptoService extends __PersistenceCryptoService {
+public class _EncryptionService extends __EncryptionService {
 
-    protected _PersistenceCryptoService() {
+    protected _EncryptionService() {
         super();
     }
 

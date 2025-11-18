@@ -13,6 +13,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         ElementType.METHOD,
         ElementType.TYPE
 })
-public @interface __CryptoIdentifier {
+public @interface __EncryptionIdentifier {
 
 }

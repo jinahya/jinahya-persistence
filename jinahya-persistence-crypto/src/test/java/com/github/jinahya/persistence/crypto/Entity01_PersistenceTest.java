@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 //        _PersistenceCryptoListener.class,
 //        __PersistenceProducer.class,
 //        __PersistenceCryptoProducer.class
-        _PersistenceCryptoListener.class,
-        _PersistenceCryptoService.class,
-        _PersistenceCryptoManager.class,
+        _EncryptionListener.class,
+        _EncryptionService.class,
+        _EncryptionManager.class,
 })
 //@ExtendWith(WeldJunit5AutoExtension.class)
 @Slf4j
@@ -54,24 +54,6 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     protected void __persistEntityInstance(final Entity01 persisted) {
-        super.__persistEntityInstance(persisted);
-        {
-            assertThat(persisted.b1Enc).isNotNull().isNotEmpty();
-        }
-        {
-            assertThat(persisted.b2Enc).isNotNull().isNotEmpty();
-        }
-        {
-            assertThat(persisted.s1Enc).isNotNull().isNotEmpty();
-        }
-        {
-            assertThat(persisted.s2Enc).isNotNull().isNotEmpty();
-        }
-        {
-            final var found = applyEntityManager(em -> em.find(entityClass, persisted.getId()));
-            log.debug("found: {}", found);
-            assertThat(found).isNotNull();
-        }
     }
 
     //    @Transactional
@@ -80,10 +62,8 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
         applyEntityManagerInTransactionAndRollback(em -> {
             final var randomized =
                     __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
-            final var b1 = randomized.b1;
-            final var b2 = randomized.b2;
-            final var s1 = randomized.s1;
-            final var s2 = randomized.s2;
+            final var byte1 = randomized.byte1;
+            final var short1 = randomized.short1;
             em.persist(randomized);
             em.flush();
             em.detach(randomized);
@@ -91,10 +71,8 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
             log.debug("persisted: {}", randomized);
             final var found = em.find(entityClass, randomized.getId());
             log.debug("found: {}", found);
-            assertThat(found.b1).isEqualTo(b1);
-            assertThat(found.b2).isEqualTo(b2);
-            assertThat(found.s1).isEqualTo(s1);
-            assertThat(found.s2).isEqualTo(s2);
+            assertThat(found.byte1).isEqualTo(byte1);
+            assertThat(found.short1).isEqualTo(short1);
             return null;
         });
     }

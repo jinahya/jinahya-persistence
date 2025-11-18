@@ -8,7 +8,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 
-public class _PersistenceCryptoManager implements __PersistenceCryptoManager {
+public class _EncryptionManager implements __EncryptionManager {
 
     private static final String ALGORITHM = "AES";
 
@@ -16,7 +16,7 @@ public class _PersistenceCryptoManager implements __PersistenceCryptoManager {
 
     private static final String IV_STRING = "0123456789abcdef";
 
-    protected _PersistenceCryptoManager() {
+    protected _EncryptionManager() {
         super();
     }
 

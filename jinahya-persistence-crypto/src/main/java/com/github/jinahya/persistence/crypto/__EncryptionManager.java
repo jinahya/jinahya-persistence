@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public interface __PersistenceCryptoManager {
+public interface __EncryptionManager {
 
     /**
      * Returns an identifier for the specified entity instance.

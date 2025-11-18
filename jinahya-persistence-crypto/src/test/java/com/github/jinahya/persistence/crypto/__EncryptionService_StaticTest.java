@@ -21,6 +21,34 @@ import java.time.OffsetTime;
 import java.time.Year;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Bytes_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Characters_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_decimal_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_integer_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.boolean_1;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.bytes_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.char_2;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.chars_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.double_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.enum_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.float_4;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.instant_16;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.int_4;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.local_date_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.local_date_time_16;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.local_time_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.long_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_date_time_20;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.serializable_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.short_2;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_date_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_time_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_calendar_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.year_4;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -29,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486>2.6. Basic
  *         Types</a> (Jakarta Persistence 3.2 Specification Document
  */
-class __PersistenceCryptoService_StaticTest {
+class __EncryptionService_StaticTest {
 
     private static byte[] randomBytes(final int minLength, final int maxLength) {
         final var v = new byte[ThreadLocalRandom.current().nextInt(minLength, maxLength + 1)];
@@ -56,80 +84,80 @@ class __PersistenceCryptoService_StaticTest {
     @ParameterizedTest
     void boolean__(final boolean v) {
         final var b = ByteBuffer.allocate(1);
-        __PersistenceCryptoService.boolean_1(b, v);
-        assertThat(__PersistenceCryptoService.boolean_1(b.flip())).isEqualTo(v);
+        boolean_1(b, v);
+        assertThat(boolean_1(b.flip())).isEqualTo(v);
     }
 
     @Test
     void short__() {
         final var b = ByteBuffer.allocate(Short.BYTES);
         final var v = (short) ThreadLocalRandom.current().nextInt();
-        __PersistenceCryptoService.short_2(b, v);
-        assertThat(__PersistenceCryptoService.short_2(b.flip())).isEqualTo(v);
+        short_2(b, v);
+        assertThat(short_2(b.flip())).isEqualTo(v);
     }
 
     @Test
     void int__() {
         final var b = ByteBuffer.allocate(Integer.BYTES);
         final var v = ThreadLocalRandom.current().nextInt();
-        __PersistenceCryptoService.int_4(b, v);
-        assertThat(__PersistenceCryptoService.int_4(b.flip())).isEqualTo(v);
+        int_4(b, v);
+        assertThat(int_4(b.flip())).isEqualTo(v);
     }
 
     @Test
     void long__() {
         final var b = ByteBuffer.allocate(Long.BYTES);
         final var v = ThreadLocalRandom.current().nextLong();
-        __PersistenceCryptoService.long_8(b, v);
-        assertThat(__PersistenceCryptoService.long_8(b.flip())).isEqualTo(v);
+        long_8(b, v);
+        assertThat(long_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void float__() {
         final var b = ByteBuffer.allocate(Float.BYTES);
         final var v = Float.intBitsToFloat(ThreadLocalRandom.current().nextInt());
-        __PersistenceCryptoService.float_4(b, v);
-        assertThat(__PersistenceCryptoService.float_4(b.flip())).isEqualTo(v);
+        float_4(b, v);
+        assertThat(float_4(b.flip())).isEqualTo(v);
     }
 
     @Test
     void double__() {
         final var b = ByteBuffer.allocate(Double.BYTES);
         final var v = Double.longBitsToDouble(ThreadLocalRandom.current().nextLong());
-        __PersistenceCryptoService.double_8(b, v);
-        assertThat(__PersistenceCryptoService.double_8(b.flip())).isEqualTo(v);
+        double_8(b, v);
+        assertThat(double_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void char__() {
         final var b = ByteBuffer.allocate(Character.BYTES);
         final var v = (char) Double.longBitsToDouble(ThreadLocalRandom.current().nextInt());
-        __PersistenceCryptoService.char_2(b, v);
-        assertThat(__PersistenceCryptoService.char_2(b.flip())).isEqualTo(v);
+        char_2(b, v);
+        assertThat(char_2(b.flip())).isEqualTo(v);
     }
 
     @Test
     void string__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new RandomStringGenerator.Builder().build().generate(ThreadLocalRandom.current().nextInt(128));
-        __PersistenceCryptoService.string_4_(b, v);
-        assertThat(__PersistenceCryptoService.string_4_(b.flip())).isEqualTo(v);
+        string_4_(b, v);
+        assertThat(string_4_(b.flip())).isEqualTo(v);
     }
 
     @Test
     void big_integer__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new BigInteger(randomBytes(1, 128));
-        __PersistenceCryptoService.big_integer_(b, v);
-        assertThat(__PersistenceCryptoService.big_integer_(b.flip())).isEqualTo(v);
+        big_integer_(b, v);
+        assertThat(big_integer_(b.flip())).isEqualTo(v);
     }
 
     @Test
     void big_decimal__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new BigDecimal(randomDigitString(0, 128) + '.' + randomDigitString(0, 128));
-        __PersistenceCryptoService.big_decimal_(b, v);
-        assertThat(__PersistenceCryptoService.big_decimal_(b.flip())).isEqualTo(v);
+        big_decimal_(b, v);
+        assertThat(big_decimal_(b.flip())).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -137,56 +165,56 @@ class __PersistenceCryptoService_StaticTest {
     void local_date__() {
         final var b = ByteBuffer.allocate(Long.BYTES);
         final var v = LocalDate.now();
-        __PersistenceCryptoService.local_date_8(b, v);
-        assertThat(__PersistenceCryptoService.local_date_8(b.flip())).isEqualTo(v);
+        local_date_8(b, v);
+        assertThat(local_date_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void local_time__() {
         final var b = ByteBuffer.allocate(Long.BYTES);
         final var v = LocalTime.now();
-        __PersistenceCryptoService.local_time_8(b, v);
-        assertThat(__PersistenceCryptoService.local_time_8(b.flip())).isEqualTo(v);
+        local_time_8(b, v);
+        assertThat(local_time_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void local_date_time__() {
         final var b = ByteBuffer.allocate(Long.BYTES << 1);
         final var v = LocalDateTime.now();
-        __PersistenceCryptoService.local_date_time_16(b, v);
-        assertThat(__PersistenceCryptoService.local_date_time_16(b.flip())).isEqualTo(v);
+        local_date_time_16(b, v);
+        assertThat(local_date_time_16(b.flip())).isEqualTo(v);
     }
 
     @Test
     void offset_time__() {
         final var b = ByteBuffer.allocate(12);
         final var v = OffsetTime.now();
-        __PersistenceCryptoService.offset_time_12(b, v);
-        assertThat(__PersistenceCryptoService.offset_time_12(b.flip())).isEqualTo(v);
+        offset_time_12(b, v);
+        assertThat(offset_time_12(b.flip())).isEqualTo(v);
     }
 
     @Test
     void offset_date_time__() {
         final var b = ByteBuffer.allocate(20);
         final var v = OffsetDateTime.now();
-        __PersistenceCryptoService.offset_date_time_20(b, v);
-        assertThat(__PersistenceCryptoService.offset_date_time_20(b.flip())).isEqualTo(v);
+        offset_date_time_20(b, v);
+        assertThat(offset_date_time_20(b.flip())).isEqualTo(v);
     }
 
     @Test
     void instant__() {
         final var b = ByteBuffer.allocate(16);
         final var v = Instant.now();
-        __PersistenceCryptoService.instant_16(b, v);
-        assertThat(__PersistenceCryptoService.instant_16(b.flip())).isEqualTo(v);
+        instant_16(b, v);
+        assertThat(instant_16(b.flip())).isEqualTo(v);
     }
 
     @Test
     void year__() {
         final var b = ByteBuffer.allocate(4);
         final var v = Year.now();
-        __PersistenceCryptoService.year_4(b, v);
-        assertThat(__PersistenceCryptoService.year_4(b.flip())).isEqualTo(v);
+        year_4(b, v);
+        assertThat(year_4(b.flip())).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -194,16 +222,16 @@ class __PersistenceCryptoService_StaticTest {
     void util_date__() {
         final var b = ByteBuffer.allocate(8);
         final var v = new java.util.Date();
-        __PersistenceCryptoService.util_date_8(b, v);
-        assertThat(__PersistenceCryptoService.util_date_8(b.flip())).isEqualTo(v);
+        util_date_8(b, v);
+        assertThat(util_date_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void util_calendar__() {
         final var b = ByteBuffer.allocate(8);
         final var v = java.util.Calendar.getInstance();
-        __PersistenceCryptoService.util_calendar_8(b, v);
-        assertThat(__PersistenceCryptoService.util_calendar_8(b.flip())).isEqualTo(v);
+        util_calendar_8(b, v);
+        assertThat(util_calendar_8(b.flip())).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -211,24 +239,24 @@ class __PersistenceCryptoService_StaticTest {
     void sql_date__() {
         final var b = ByteBuffer.allocate(8);
         final var v = new java.sql.Date(new java.util.Date().getTime());
-        __PersistenceCryptoService.sql_date_8(b, v);
-        assertThat(__PersistenceCryptoService.sql_date_8(b.flip())).isEqualTo(v);
+        sql_date_8(b, v);
+        assertThat(sql_date_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void sql_time__() {
         final var b = ByteBuffer.allocate(8);
         final var v = new java.sql.Time(new java.util.Date().getTime());
-        __PersistenceCryptoService.sql_time_8(b, v);
-        assertThat(__PersistenceCryptoService.sql_time_8(b.flip())).isEqualTo(v);
+        sql_time_8(b, v);
+        assertThat(sql_time_8(b.flip())).isEqualTo(v);
     }
 
     @Test
     void sql_timestamp__() {
         final var b = ByteBuffer.allocate(8);
         final var v = new java.sql.Timestamp(new java.util.Date().getTime());
-        __PersistenceCryptoService.sql_timestamp_8(b, v);
-        assertThat(__PersistenceCryptoService.sql_timestamp_8(b.flip())).isEqualTo(v);
+        sql_timestamp_8(b, v);
+        assertThat(sql_timestamp_8(b.flip())).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -237,8 +265,8 @@ class __PersistenceCryptoService_StaticTest {
     void bytes__0() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new byte[0];
-        __PersistenceCryptoService.bytes_4_(b, v);
-        assertThat(__PersistenceCryptoService.bytes_4_(b.flip())).isEqualTo(v);
+        bytes_4_(b, v);
+        assertThat(bytes_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("byte[]"))
@@ -246,8 +274,8 @@ class __PersistenceCryptoService_StaticTest {
     void bytes__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = randomBytes(0, 128);
-        __PersistenceCryptoService.bytes_4_(b, v);
-        assertThat(__PersistenceCryptoService.bytes_4_(b.flip())).isEqualTo(v);
+        bytes_4_(b, v);
+        assertThat(bytes_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("byte[0]"))
@@ -255,8 +283,8 @@ class __PersistenceCryptoService_StaticTest {
     void Bytes__0() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new Byte[0];
-        __PersistenceCryptoService.Bytes_4_(b, v);
-        assertThat(__PersistenceCryptoService.Bytes_4_(b.flip())).isEqualTo(v);
+        Bytes_4_(b, v);
+        assertThat(Bytes_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("byte[]"))
@@ -271,8 +299,8 @@ class __PersistenceCryptoService_StaticTest {
                 v[i] = bytes[i];
             }
         }
-        __PersistenceCryptoService.Bytes_4_(b, v);
-        assertThat(__PersistenceCryptoService.Bytes_4_(b.flip())).isEqualTo(v);
+        Bytes_4_(b, v);
+        assertThat(Bytes_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("char[0]"))
@@ -280,8 +308,8 @@ class __PersistenceCryptoService_StaticTest {
     void chars__0() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new char[0];
-        __PersistenceCryptoService.chars_4_(b, v);
-        assertThat(__PersistenceCryptoService.chars_4_(b.flip())).isEqualTo(v);
+        chars_4_(b, v);
+        assertThat(chars_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("char[]"))
@@ -289,8 +317,8 @@ class __PersistenceCryptoService_StaticTest {
     void chars__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = randomChars(0, 128);
-        __PersistenceCryptoService.chars_4_(b, v);
-        assertThat(__PersistenceCryptoService.chars_4_(b.flip())).isEqualTo(v);
+        chars_4_(b, v);
+        assertThat(chars_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("Character[0]"))
@@ -298,8 +326,8 @@ class __PersistenceCryptoService_StaticTest {
     void Characters__0() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new Character[0];
-        __PersistenceCryptoService.Characters_4_(b, v);
-        assertThat(__PersistenceCryptoService.Characters_4_(b.flip())).isEqualTo(v);
+        Characters_4_(b, v);
+        assertThat(Characters_4_(b.flip())).isEqualTo(v);
     }
 
     @DisplayName(("Character[]"))
@@ -314,8 +342,8 @@ class __PersistenceCryptoService_StaticTest {
                 v[i] = chars[i];
             }
         }
-        __PersistenceCryptoService.Characters_4_(b, v);
-        assertThat(__PersistenceCryptoService.Characters_4_(b.flip())).isEqualTo(v);
+        Characters_4_(b, v);
+        assertThat(Characters_4_(b.flip())).isEqualTo(v);
     }
 
     private enum MyEnum {
@@ -327,8 +355,8 @@ class __PersistenceCryptoService_StaticTest {
     @ParameterizedTest
     void enum__(final MyEnum v) {
         final var b = ByteBuffer.allocate(1024);
-        __PersistenceCryptoService.enum_(b, v);
-        assertThat(__PersistenceCryptoService.enum_(b.flip(), MyEnum.class)).isSameAs(v);
+        enum_(b, v);
+        assertThat(enum_(b.flip(), MyEnum.class)).isSameAs(v);
     }
 
     @EqualsAndHashCode
@@ -346,7 +374,7 @@ class __PersistenceCryptoService_StaticTest {
     void serializable__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new MySerializable();
-        __PersistenceCryptoService.serializable_4_(b, v);
-        assertThat((MySerializable) __PersistenceCryptoService.serializable_4_(b.flip())).isEqualTo(v);
+        serializable_4_(b, v);
+        assertThat((MySerializable) serializable_4_(b.flip())).isEqualTo(v);
     }
 }

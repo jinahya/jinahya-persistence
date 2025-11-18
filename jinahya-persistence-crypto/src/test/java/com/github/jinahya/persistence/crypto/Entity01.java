@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 
 @EntityListeners({
-        _PersistenceCryptoListener.class
+        _EncryptionListener.class
 })
 @Entity
 @Table(name = "entity01")
@@ -59,37 +59,21 @@ class Entity01 extends __MappedEntity<Long> {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public byte getB1() {
-        return b1;
+    public Byte getByte1() {
+        return byte1;
     }
 
-    public void setB1(final byte b1) {
-        this.b1 = b1;
+    public void setByte1(Byte b2) {
+        this.byte1 = b2;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public Byte getB2() {
-        return b2;
+    public Short getShort1() {
+        return short1;
     }
 
-    public void setB2(Byte b2) {
-        this.b2 = b2;
-    }
-
-    public short getS1() {
-        return s1;
-    }
-
-    public void setS1(short s1) {
-        this.s1 = s1;
-    }
-
-    public Short getS2() {
-        return s2;
-    }
-
-    public void setS2(Short s2) {
-        this.s2 = s2;
+    public void setShort1(Short s2) {
+        this.short1 = s2;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -104,38 +88,24 @@ class Entity01 extends __MappedEntity<Long> {
     String cryptoIdentifier;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute("b1Enc")
-    @Basic(optional = false)
-    @Column(name = "b1", nullable = false, insertable = true, updatable = true)
-    byte b1;
-
-    byte[] b1Enc;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute("b2Enc")
+    @__EncryptedAttribute("byte1Enc")
     @Basic(optional = true)
     @Column(name = "b2", nullable = true, insertable = true, updatable = true)
-    Byte b2;
+    Byte byte1;
 
-    byte[] b2Enc;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute("s1Enc")
-    @Basic(optional = false)
-    @Column(name = "s1", nullable = false, insertable = true, updatable = true)
-    short s1;
-
-    byte[] s1Enc;
+    @Basic(optional = true)
+    @Column(name = "byte1_enc", nullable = true, insertable = true, updatable = true)
+    byte[] byte1Enc;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute("s2Enc")
+    @__EncryptedAttribute("short1Enc")
     @Basic(optional = true)
     @Column(name = "s2", nullable = true, insertable = true, updatable = true)
-    Short s2;
+    Short short1;
 
     @Basic(optional = true)
-    @Column(name = "s2_enc", nullable = true, insertable = true, updatable = true)
-    byte[] s2Enc;
+    @Column(name = "short1_enc", nullable = true, insertable = true, updatable = true)
+    byte[] short1Enc;
 
     // -----------------------------------------------------------------------------------------------------------------
 }

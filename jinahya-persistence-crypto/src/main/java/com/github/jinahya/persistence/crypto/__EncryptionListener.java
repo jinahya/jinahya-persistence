@@ -22,12 +22,12 @@ import java.util.Optional;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __PersistenceCryptoListener {
+public abstract class __EncryptionListener {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __PersistenceCryptoListener() {
+    protected __EncryptionListener() {
         super();
     }
 
@@ -52,11 +52,11 @@ public abstract class __PersistenceCryptoListener {
         logger.log(System.Logger.Level.DEBUG, "onShutdown({0})", shutdown);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------- PERSIST
     @PrePersist
     protected void onPrePersist(final @Nonnull Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "onPrePersist({0})", entityInstance);
-        final var cryptoService = getCryptoService();
+        final var cryptoService = getEncryptionService();
         logger.log(System.Logger.Level.DEBUG, "cryptoService: {0}", cryptoService);
         assert cryptoService != null;
         cryptoService.encrypt(entityInstance);
@@ -68,22 +68,22 @@ public abstract class __PersistenceCryptoListener {
         logger.log(System.Logger.Level.DEBUG, "onPostPersist({0})", entityInstance);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------- REMOVE
     @PreRemove
     protected void onPreRemove(final @Nonnull Object entityInstance) {
-        // empty
+        logger.log(System.Logger.Level.DEBUG, "onPreRemove({0})", entityInstance);
     }
 
     @PostRemove
     protected void onPostRemove(final @Nonnull Object entityInstance) {
-        // empty
+        logger.log(System.Logger.Level.DEBUG, "onPostRemove({0})", entityInstance);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------- UPDATE
     @PreUpdate
     protected void onPreUpdate(final @Nonnull Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "onPreUpdate({0})", entityInstance);
-        final var cryptoService = getCryptoService();
+        final var cryptoService = getEncryptionService();
         logger.log(System.Logger.Level.DEBUG, "cryptoService: {0}", cryptoService);
         assert cryptoService != null;
         cryptoService.encrypt(entityInstance);
@@ -95,25 +95,25 @@ public abstract class __PersistenceCryptoListener {
         logger.log(System.Logger.Level.DEBUG, "onPostUpdate({0})", entityInstance);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------------ LOAD
     @PostLoad
     protected void onPostLoad(final @Nonnull Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "onPostLoad({0})", entityInstance);
-        final var cryptoService = getCryptoService();
+        final var cryptoService = getEncryptionService();
         logger.log(System.Logger.Level.DEBUG, "cryptoService: {0}", cryptoService);
         assert cryptoService != null;
         cryptoService.decrypt(entityInstance);
         logger.log(System.Logger.Level.DEBUG, "decrypted entity instance: {0}", entityInstance);
     }
 
-    // --------------------------------------------------------------------------------------------------- cryptoService
-    protected __PersistenceCryptoService getCryptoService() {
-        return Optional.ofNullable(cryptoService).orElseGet(() -> {
-            return CDI.current().select(__PersistenceCryptoService.class).get();
-        });
+    // ----------------------------------------------------------------------------------------------- encryptionService
+    protected __EncryptionService getEncryptionService() {
+        return Optional.ofNullable(encryptionService)
+                .orElseGet(() -> CDI.current().select(__EncryptionService.class).get())
+                ;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Inject
-    private __PersistenceCryptoService cryptoService;
+    private __EncryptionService encryptionService;
 }
