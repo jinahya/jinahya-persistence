@@ -123,7 +123,7 @@ public abstract class __EncryptionService {
 
     // -----------------------------------------------------------------------------------------------------------------
     private void check(final Attribute<?, ?> decryptedAttribute,
-                       final __EncryptedAttribute encryptionAnnotation, final Attribute<?, ?> encryptedAttribute) {
+                       final __Encrypted encryptionAnnotation, final Attribute<?, ?> encryptedAttribute) {
         // decrypted attribute should be optional
         {
             final var basic = JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, Basic.class);
@@ -176,7 +176,7 @@ public abstract class __EncryptionService {
             }
             final var javaType = decryptedAttribute.getJavaType();
             final var encryptionAnnotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
+                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __Encrypted.class);
             if (encryptionAnnotation == null) {
                 continue;
             }
@@ -293,7 +293,7 @@ public abstract class __EncryptionService {
             }
             final var javaType = decryptedAttribute.getJavaType();
             final var annotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
+                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __Encrypted.class);
             if (annotation == null) {
                 continue;
             }

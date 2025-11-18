@@ -88,7 +88,7 @@ class Entity01 extends __MappedEntity<Long> {
     String cryptoIdentifier;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute("byte1Enc")
+    @__Encrypted("byte1Enc")
     @Basic(optional = true)
     @Column(name = "b2", nullable = true, insertable = true, updatable = true)
     Byte byte1;
@@ -98,7 +98,7 @@ class Entity01 extends __MappedEntity<Long> {
     byte[] byte1Enc;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute("short1Enc")
+    @__Encrypted("short1Enc")
     @Basic(optional = true)
     @Column(name = "s2", nullable = true, insertable = true, updatable = true)
     Short short1;
