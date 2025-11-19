@@ -18,7 +18,6 @@ import java.time.Year;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_decimal_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_integer_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.boolean_1;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.char_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.double_8;
@@ -34,7 +33,7 @@ import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.off
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.short_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
@@ -80,66 +79,58 @@ class __EncryptionService_StaticTest {
 
     @Test
     void short__() {
-        final var b = ByteBuffer.allocate(Short.BYTES);
         final var v = (short) ThreadLocalRandom.current().nextInt();
-        short_2(b, v);
-        assertThat(short_2(b.flip())).isEqualTo(v);
+        final var b = short_2(new byte[2], 0, v);
+        assertThat(short_2(b, 0)).isEqualTo(v);
     }
 
     @Test
     void int__() {
-        final var b = ByteBuffer.allocate(Integer.BYTES);
         final var v = ThreadLocalRandom.current().nextInt();
-        int_4(b, v);
-        assertThat(int_4(b.flip())).isEqualTo(v);
+        final var b = int_4(new byte[4], 0, v);
+        assertThat(int_4(b, 0)).isEqualTo(v);
     }
 
     @Test
     void long__() {
-        final var b = ByteBuffer.allocate(Long.BYTES);
         final var v = ThreadLocalRandom.current().nextLong();
-        long_8(b, v);
-        assertThat(long_8(b.flip())).isEqualTo(v);
+        final var b = long_8(new byte[8], 0, v);
+        assertThat(long_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void float__() {
-        final var b = ByteBuffer.allocate(Float.BYTES);
         final var v = Float.intBitsToFloat(ThreadLocalRandom.current().nextInt());
-        float_4(b, v);
-        assertThat(float_4(b.flip())).isEqualTo(v);
+        final var b = float_4(new byte[4], 0, v);
+        assertThat(float_4(b, 0)).isEqualTo(v);
     }
 
     @Test
     void double__() {
-        final var b = ByteBuffer.allocate(Double.BYTES);
         final var v = Double.longBitsToDouble(ThreadLocalRandom.current().nextLong());
-        double_8(b, v);
-        assertThat(double_8(b.flip())).isEqualTo(v);
+        final var b = double_8(new byte[8], 0, v);
+        assertThat(double_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void char__() {
-        final var b = ByteBuffer.allocate(Character.BYTES);
         final var v = (char) Double.longBitsToDouble(ThreadLocalRandom.current().nextInt());
-        char_2(b, v);
-        assertThat(char_2(b.flip())).isEqualTo(v);
+        final var b = char_2(new byte[2], 0, v);
+        assertThat(char_2(b, 0)).isEqualTo(v);
     }
 
     @Test
     void string__() {
-        final var b = ByteBuffer.allocate(1024);
         final var v = new RandomStringGenerator.Builder().build().generate(ThreadLocalRandom.current().nextInt(128));
-        final var encoded = __EncryptionSerivceUtils.string_(v);
-        assertThat(string_(encoded)).isEqualTo(v);
+        final var b = string_(v);
+        assertThat(string_(b)).isEqualTo(v);
     }
 
     @Test
     void big_integer__() {
-        final var b = ByteBuffer.allocate(1024);
         final var v = new BigInteger(randomBytes(1, 128));
-        final var encoded = big_integer_(v);
-        assertThat(big_integer_(encoded)).isEqualTo(v);
+        final var b = v.toByteArray();
+        assertThat(new BigInteger(b)).isEqualTo(v);
     }
 
     @Test
@@ -153,100 +144,88 @@ class __EncryptionService_StaticTest {
     // -----------------------------------------------------------------------------------------------------------------
     @Test
     void local_date__() {
-        final var b = ByteBuffer.allocate(Long.BYTES);
         final var v = LocalDate.now();
-        local_date_8(b, v);
-        assertThat(local_date_8(b.flip())).isEqualTo(v);
+        final var b = local_date_8(new byte[8], 0, v);
+        assertThat(local_date_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void local_time__() {
-        final var b = ByteBuffer.allocate(Long.BYTES);
         final var v = LocalTime.now();
-        local_time_8(b, v);
-        assertThat(local_time_8(b.flip())).isEqualTo(v);
+        final var b = local_time_8(new byte[8], 0, v);
+        assertThat(local_time_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void local_date_time__() {
-        final var b = ByteBuffer.allocate(Long.BYTES << 1);
         final var v = LocalDateTime.now();
-        local_date_time_16(b, v);
-        assertThat(local_date_time_16(b.flip())).isEqualTo(v);
+        final var b = local_date_time_16(new byte[16], 0, v);
+        assertThat(local_date_time_16(b, 0)).isEqualTo(v);
     }
 
     @Test
     void offset_time__() {
-        final var b = ByteBuffer.allocate(12);
         final var v = OffsetTime.now();
-        offset_time_12(b, v);
-        assertThat(offset_time_12(b.flip())).isEqualTo(v);
+        final var b = offset_time_12(new byte[12], 0, v);
+        assertThat(offset_time_12(b, 0)).isEqualTo(v);
     }
 
     @Test
     void offset_date_time__() {
-        final var b = ByteBuffer.allocate(20);
         final var v = OffsetDateTime.now();
-        offset_date_time_20(b, v);
-        assertThat(offset_date_time_20(b.flip())).isEqualTo(v);
+        final var b = offset_date_time_20(new byte[20], 0, v);
+        assertThat(offset_date_time_20(b, 0)).isEqualTo(v);
     }
 
     @Test
     void instant__() {
-        final var b = ByteBuffer.allocate(16);
         final var v = Instant.now();
-        instant_16(b, v);
-        assertThat(instant_16(b.flip())).isEqualTo(v);
+        final var b = instant_16(new byte[16], 0, v);
+        assertThat(instant_16(b, 0)).isEqualTo(v);
     }
 
     @Test
     void year__() {
-        final var b = ByteBuffer.allocate(4);
         final var v = Year.now();
-        year_4(b, v);
-        assertThat(year_4(b.flip())).isEqualTo(v);
+        final var b = year_4(new byte[4], 0, v);
+        assertThat(year_4(b, 0)).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Test
     void util_date__() {
-        final var b = ByteBuffer.allocate(8);
         final var v = new java.util.Date();
-        util_date_8(b, v);
-        assertThat(util_date_8(b.flip())).isEqualTo(v);
+        final var b = util_date_8(new byte[8], 0, v);
+        assertThat(util_date_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void util_calendar__() {
-        final var b = ByteBuffer.allocate(8);
         final var v = java.util.Calendar.getInstance();
-        util_calendar_8(b, v);
-        assertThat(util_calendar_8(b.flip())).isEqualTo(v);
+        final var b = util_calendar_8(new byte[8], 0, v);
+        assertThat(util_calendar_8(b, 0)).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Test
     void sql_date__() {
-        final var b = ByteBuffer.allocate(8);
         final var v = new java.sql.Date(new java.util.Date().getTime());
-        sql_date_8(b, v);
-        assertThat(sql_date_8(b.flip())).isEqualTo(v);
+        final var b = sql_date_8(new byte[8], 0, v);
+        assertThat(sql_date_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void sql_time__() {
-        final var b = ByteBuffer.allocate(8);
         final var v = new java.sql.Time(new java.util.Date().getTime());
-        sql_time_8(b, v);
-        assertThat(sql_time_8(b.flip())).isEqualTo(v);
+        final var b = sql_time_8(new byte[8], 0, v);
+        assertThat(sql_time_8(b, 0)).isEqualTo(v);
     }
 
     @Test
     void sql_timestamp__() {
-        final var b = ByteBuffer.allocate(8);
         final var v = new java.sql.Timestamp(new java.util.Date().getTime());
-        sql_timestamp_8(b, v);
-        assertThat(sql_timestamp_8(b.flip())).isEqualTo(v);
+        final var b = sql_timestamp_16(new byte[16], 0, v);
+        assertThat(sql_timestamp_16(b, 0)).isEqualTo(v);
     }
 
 //    // -----------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,5 @@
 package com.github.jinahya.persistence.crypto;
 
-import jakarta.enterprise.inject.Disposes;
-import jakarta.enterprise.inject.Produces;
-
 import java.lang.invoke.MethodHandles;
 
 public class __PersistenceCryptoProducer {

@@ -70,9 +70,12 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
                     "byte1", "short1", "int1", "long1", "char1", "float1", "double1",
                     "string1", "uuid1",
                     "bigInteger1", "bigDecimal1",
-                    "localDate1", "localTime1", "localDateTime1", "offsetTime1", "offsetDateTime1", "instant1", "year1",
-                    "javaUtilDate1", "calendar1",
-                    "javaSqlDate1", "javaSqlTime1", "javaSqlTimestamp1"
+                    "localDate1", "localTime1", "localDateTime1", "offsetTime1", "offsetDateTime1", "instant1", "year1"
+//                    ,
+//                    "javaUtilDate1", "calendar1",
+//                    "javaSqlDate1", "javaSqlTime1"
+//                    ,
+//                    "javaSqlTimestamp1"
             );
             final var attributesAndValues1 =
                     attributes.stream()

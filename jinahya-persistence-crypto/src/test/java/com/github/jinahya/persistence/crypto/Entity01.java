@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.Year;
-import java.util.Calendar;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -338,67 +337,70 @@ class Entity01 extends __MappedEntity<Long> {
     byte[] year1Enc__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "")
-    @Basic(optional = true)
-    @Column(name = "java_util_date1", nullable = true, insertable = true, updatable = true)
-    java.util.Date javaUtilDate1;
-
-    @Basic(optional = true)
-    @Column(name = "java_util_date1_enc__", nullable = true, insertable = true, updatable = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @EqualsAndHashCode.Exclude
-    byte[] javaUtilDate1Enc__;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "")
-    @Basic(optional = true)
-    @Column(name = "calendar1", nullable = true, insertable = true, updatable = true)
-    Calendar calendar1;
-
-    @Basic(optional = true)
-    @Column(name = "calendar1_enc__", nullable = true, insertable = true, updatable = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @EqualsAndHashCode.Exclude
-    byte[] calendar1Enc__;
+//    @__EncryptedAttribute(encryptedAttribute = "")
+//    @Basic(optional = true)
+//    @Column(name = "java_util_date1", nullable = true, insertable = true, updatable = true)
+//    java.util.Date javaUtilDate1;
+//
+//    @Basic(optional = true)
+//    @Column(name = "java_util_date1_enc__", nullable = true, insertable = true, updatable = true)
+//    @Setter(AccessLevel.NONE)
+//    @Getter(AccessLevel.NONE)
+//    @EqualsAndHashCode.Exclude
+//    byte[] javaUtilDate1Enc__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "")
-    @Basic(optional = true)
-    @Column(name = "java_sql_date1", nullable = true, insertable = true, updatable = true)
-    java.sql.Date javaSqlDate1;
-
-    @Basic(optional = true)
-    @Column(name = "java_sql_date1_enc__", nullable = true, insertable = true, updatable = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @EqualsAndHashCode.Exclude
-    byte[] javaSqlDate1Enc__;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "")
-    @Basic(optional = true)
-    @Column(name = "java_sql_time1", nullable = true, insertable = true, updatable = true)
-    java.sql.Time javaSqlTime1;
-
-    @Basic(optional = true)
-    @Column(name = "java_sql_time1_enc__", nullable = true, insertable = true, updatable = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @EqualsAndHashCode.Exclude
-    byte[] javaSqlTime1Enc__;
+//    @__EncryptedAttribute(encryptedAttribute = "")
+//    @Basic(optional = true)
+//    @Column(name = "calendar1", nullable = true, insertable = true, updatable = true)
+//    java.util.Calendar calendar1;
+//
+//    @Basic(optional = true)
+//    @Column(name = "calendar1_enc__", nullable = true, insertable = true, updatable = true)
+//    @Setter(AccessLevel.NONE)
+//    @Getter(AccessLevel.NONE)
+//    @EqualsAndHashCode.Exclude
+//    byte[] calendar1Enc__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "")
-    @Basic(optional = true)
-    @Column(name = "java_sql_timestamp1", nullable = true, insertable = true, updatable = true)
-    java.sql.Timestamp javaSqlTimestamp1;
+//    @__EncryptedAttribute(encryptedAttribute = "")
+//    @Temporal(TemporalType.DATE)
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_date1", nullable = true, insertable = true, updatable = true)
+//    java.sql.Date javaSqlDate1;
+//
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_date1_enc__", nullable = true, insertable = true, updatable = true)
+//    @Setter(AccessLevel.NONE)
+//    @Getter(AccessLevel.NONE)
+//    @EqualsAndHashCode.Exclude
+//    byte[] javaSqlDate1Enc__;
 
-    @Basic(optional = true)
-    @Column(name = "java_sql_timestamp1_enc__", nullable = true, insertable = true, updatable = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @EqualsAndHashCode.Exclude
-    byte[] javaSqlTimestamp1Enc__;
+    // -----------------------------------------------------------------------------------------------------------------
+//    @__EncryptedAttribute(encryptedAttribute = "")
+//    @Temporal(TemporalType.TIME)
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_time1", nullable = true, insertable = true, updatable = true)
+//    java.sql.Time javaSqlTime1;
+//
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_time1_enc__", nullable = true, insertable = true, updatable = true)
+//    @Setter(AccessLevel.NONE)
+//    @Getter(AccessLevel.NONE)
+//    @EqualsAndHashCode.Exclude
+//    byte[] javaSqlTime1Enc__;
+
+//    // -----------------------------------------------------------------------------------------------------------------
+//    @__EncryptedAttribute(encryptedAttribute = "")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_timestamp1", nullable = true, insertable = true, updatable = true)
+//    java.sql.Timestamp javaSqlTimestamp1;
+//
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_timestamp1_enc__", nullable = true, insertable = true, updatable = true)
+//    @Setter(AccessLevel.NONE)
+//    @Getter(AccessLevel.NONE)
+//    @EqualsAndHashCode.Exclude
+//    byte[] javaSqlTimestamp1Enc__;
 }

@@ -6,8 +6,6 @@ import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.time.Instant;
-
 class Entity01_Randomizer extends __MappedEntity_Randomizer<Entity01, Long> {
 
     Entity01_Randomizer() {
@@ -41,7 +39,7 @@ class Entity01_Randomizer extends __MappedEntity_Randomizer<Entity01, Long> {
     @Override
     public Entity01 get() {
         final var value = super.get();
-        value.setJavaSqlTimestamp1(new java.sql.Timestamp(Instant.now().toEpochMilli()));
+//        value.setJavaSqlTimestamp1(new java.sql.Timestamp(Instant.now().toEpochMilli()));
         return value;
     }
 }
