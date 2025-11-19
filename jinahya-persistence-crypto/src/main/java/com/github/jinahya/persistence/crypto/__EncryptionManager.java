@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+@SuppressWarnings({
+        "java:S114" // Interface names should comply with a naming convention
+})
 public interface __EncryptionManager {
 
     /**

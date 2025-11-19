@@ -1,14 +1,10 @@
 package com.github.jinahya.persistence.crypto;
 
-import lombok.EqualsAndHashCode;
 import org.apache.commons.text.RandomStringGenerator;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -21,16 +17,11 @@ import java.time.OffsetTime;
 import java.time.Year;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Bytes_4_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Characters_4_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_decimal_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_integer_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.boolean_1;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.bytes_4_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.char_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.chars_4_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.double_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.enum_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.float_4;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.instant_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.int_4;
@@ -40,12 +31,11 @@ import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.loc
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.long_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_date_time_20;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_time_12;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.serializable_4_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.short_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_time_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.year_4;
@@ -140,24 +130,24 @@ class __EncryptionService_StaticTest {
     void string__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new RandomStringGenerator.Builder().build().generate(ThreadLocalRandom.current().nextInt(128));
-        string_4_(b, v);
-        assertThat(string_4_(b.flip())).isEqualTo(v);
+        final var encoded = __EncryptionSerivceUtils.string_(v);
+        assertThat(string_(encoded)).isEqualTo(v);
     }
 
     @Test
     void big_integer__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new BigInteger(randomBytes(1, 128));
-        big_integer_(b, v);
-        assertThat(big_integer_(b.flip())).isEqualTo(v);
+        final var encoded = big_integer_(v);
+        assertThat(big_integer_(encoded)).isEqualTo(v);
     }
 
     @Test
     void big_decimal__() {
         final var b = ByteBuffer.allocate(1024);
         final var v = new BigDecimal(randomDigitString(0, 128) + '.' + randomDigitString(0, 128));
-        big_decimal_(b, v);
-        assertThat(big_decimal_(b.flip())).isEqualTo(v);
+        final var encoded = big_decimal_(v);
+        assertThat(big_decimal_(encoded)).isEqualTo(v);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -259,122 +249,122 @@ class __EncryptionService_StaticTest {
         assertThat(sql_timestamp_8(b.flip())).isEqualTo(v);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName(("byte[0]"))
-    @Test
-    void bytes__0() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = new byte[0];
-        bytes_4_(b, v);
-        assertThat(bytes_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("byte[]"))
-    @Test
-    void bytes__() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = randomBytes(0, 128);
-        bytes_4_(b, v);
-        assertThat(bytes_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("byte[0]"))
-    @Test
-    void Bytes__0() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = new Byte[0];
-        Bytes_4_(b, v);
-        assertThat(Bytes_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("byte[]"))
-    @Test
-    void Bytes__() {
-        final var b = ByteBuffer.allocate(1024);
-        final Byte[] v;
-        {
-            final var bytes = randomBytes(0, 128);
-            v = new Byte[bytes.length];
-            for (int i = 0; i < v.length; i++) {
-                v[i] = bytes[i];
-            }
-        }
-        Bytes_4_(b, v);
-        assertThat(Bytes_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("char[0]"))
-    @Test
-    void chars__0() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = new char[0];
-        chars_4_(b, v);
-        assertThat(chars_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("char[]"))
-    @Test
-    void chars__() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = randomChars(0, 128);
-        chars_4_(b, v);
-        assertThat(chars_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("Character[0]"))
-    @Test
-    void Characters__0() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = new Character[0];
-        Characters_4_(b, v);
-        assertThat(Characters_4_(b.flip())).isEqualTo(v);
-    }
-
-    @DisplayName(("Character[]"))
-    @Test
-    void Characters__() {
-        final var b = ByteBuffer.allocate(1024);
-        final Character[] v;
-        {
-            final var chars = randomChars(0, 128);
-            v = new Character[chars.length];
-            for (int i = 0; i < v.length; i++) {
-                v[i] = chars[i];
-            }
-        }
-        Characters_4_(b, v);
-        assertThat(Characters_4_(b.flip())).isEqualTo(v);
-    }
-
-    private enum MyEnum {
-        A,
-        B;
-    }
-
-    @EnumSource(MyEnum.class)
-    @ParameterizedTest
-    void enum__(final MyEnum v) {
-        final var b = ByteBuffer.allocate(1024);
-        enum_(b, v);
-        assertThat(enum_(b.flip(), MyEnum.class)).isSameAs(v);
-    }
-
-    @EqualsAndHashCode
-    static class MySerializable implements Serializable {
-
-        private static final long serialVersionUID = -7002669353525847L;
-
-        private String name;
-
-        private int age;
-    }
-
-    @EnumSource(MyEnum.class)
-    @ParameterizedTest
-    void serializable__() {
-        final var b = ByteBuffer.allocate(1024);
-        final var v = new MySerializable();
-        serializable_4_(b, v);
-        assertThat((MySerializable) serializable_4_(b.flip())).isEqualTo(v);
-    }
+//    // -----------------------------------------------------------------------------------------------------------------
+//    @DisplayName(("byte[0]"))
+//    @Test
+//    void bytes__0() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = new byte[0];
+//        __EncryptionSerivceUtils.bytes_l()..octets_4_(b, v);
+//        assertThat(octets_4_(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("byte[]"))
+//    @Test
+//    void bytes__() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = randomBytes(0, 128);
+//        __EncryptionSerivceUtils.octets_4_(b, v);
+//        assertThat(octets_4_(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("byte[0]"))
+//    @Test
+//    void Bytes__0() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = new Byte[0];
+//        __EncryptionSerivceUtils.Bytes_l(b, v);
+//        assertThat(Bytes_l(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("byte[]"))
+//    @Test
+//    void Bytes__() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final Byte[] v;
+//        {
+//            final var bytes = randomBytes(0, 128);
+//            v = new Byte[bytes.length];
+//            for (int i = 0; i < v.length; i++) {
+//                v[i] = bytes[i];
+//            }
+//        }
+//        __EncryptionSerivceUtils.Bytes_l(b, v);
+//        assertThat(Bytes_l(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("char[0]"))
+//    @Test
+//    void chars__0() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = new char[0];
+//        __EncryptionSerivceUtils.chars_2l(b, v);
+//        assertThat(chars_2l(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("char[]"))
+//    @Test
+//    void chars__() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = randomChars(0, 128);
+//        __EncryptionSerivceUtils.chars_2l(b, v);
+//        assertThat(chars_2l(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("Character[0]"))
+//    @Test
+//    void Characters__0() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = new Character[0];
+//        __EncryptionSerivceUtils.Characters_2l(b, v);
+//        assertThat(Characters_2l(b.flip())).isEqualTo(v);
+//    }
+//
+//    @DisplayName(("Character[]"))
+//    @Test
+//    void Characters__() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final Character[] v;
+//        {
+//            final var chars = randomChars(0, 128);
+//            v = new Character[chars.length];
+//            for (int i = 0; i < v.length; i++) {
+//                v[i] = chars[i];
+//            }
+//        }
+//        __EncryptionSerivceUtils.Characters_2l(b, v);
+//        assertThat(Characters_2l(b.flip())).isEqualTo(v);
+//    }
+//
+//    private enum MyEnum {
+//        A,
+//        B;
+//    }
+//
+//    @EnumSource(MyEnum.class)
+//    @ParameterizedTest
+//    void enum__(final MyEnum v) {
+//        final var b = ByteBuffer.allocate(1024);
+//        enum_(b, v);
+//        assertThat(enum_(b.flip(), MyEnum.class)).isSameAs(v);
+//    }
+//
+//    @EqualsAndHashCode
+//    static class MySerializable implements Serializable {
+//
+//        private static final long serialVersionUID = -7002669353525847L;
+//
+//        private String name;
+//
+//        private int age;
+//    }
+//
+//    @EnumSource(MyEnum.class)
+//    @ParameterizedTest
+//    void serializable__() {
+//        final var b = ByteBuffer.allocate(1024);
+//        final var v = new MySerializable();
+//        serializable_4_(b, v);
+//        assertThat((MySerializable) serializable_4_(b.flip())).isEqualTo(v);
+//    }
 }

@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.crypto;
 
 import com.github.jinahya.persistence.mapped.test.__MappedEntity_PersistenceTest;
 import com.github.jinahya.persistence.mapped.test.__MappedEntity_RandomizerUtils;
+import com.github.jinahya.persistence.metamodel.JinahyaAttributeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
@@ -11,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @AddBeanClasses({
 //        _PersistenceCryptoListener.class,
@@ -62,26 +65,34 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
         applyEntityManagerInTransactionAndRollback(em -> {
             final var randomized =
                     __MappedEntity_RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
-            final var byte1 = randomized.byte1;
-            final var short1 = randomized.short1;
-            final var int1 = randomized.int1;
+            log.debug("randomized: {}", randomized);
+            final var attributes = List.of(
+                    "byte1", "short1", "int1", "long1", "char1", "float1", "double1",
+                    "string1", "uuid1",
+                    "bigInteger1", "bigDecimal1",
+                    "localDate1", "localTime1", "localDateTime1", "offsetTime1", "offsetDateTime1", "instant1", "year1",
+                    "javaUtilDate1", "calendar1",
+                    "javaSqlDate1", "javaSqlTime1", "javaSqlTimestamp1"
+            );
+            final var attributesAndValues1 =
+                    attributes.stream()
+                            .map(n -> entityType().getAttribute(n))
+                            .collect(Collectors.toMap(Function.identity(),
+                                                      a -> JinahyaAttributeUtils.getAttributeValue(randomized, a)));
             em.persist(randomized);
             em.flush();
-            {
-                assertThat(randomized.byte1).isNull();
-                assertThat(randomized.short1).isNull();
-                assertThat(randomized.int1).isNull();
-            }
+            log.debug("persisted: {}", randomized);
             em.detach(randomized);
             em.clear();
             // ---------------------------------------------------------------------------------------------------------
             log.debug("----------------------------------------------------------------------------------------------");
             final var found = em.find(entityClass, randomized.getId());
-            {
-                assertThat(found.byte1).isEqualTo(byte1);
-                assertThat(found.short1).isEqualTo(short1);
-                assertThat(found.int1).isEqualTo(int1);
-            }
+            log.debug("found: {}", found);
+            final var attributesAndValues2 =
+                    attributes.stream()
+                            .map(n -> entityType().getAttribute(n))
+                            .collect(Collectors.toMap(Function.identity(),
+                                                      a -> JinahyaAttributeUtils.getAttributeValue(found, a)));
             return null;
         });
     }

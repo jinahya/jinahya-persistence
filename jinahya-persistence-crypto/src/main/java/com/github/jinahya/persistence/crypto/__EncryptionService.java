@@ -22,8 +22,6 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,19 +30,23 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Bytes_4_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Characters_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Bytes_l;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Characters_2l;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_decimal_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.char_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.chars_4_;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.chars_2l;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.double_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.enum_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.float_4;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.instant_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.int_4;
@@ -54,10 +56,12 @@ import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.loc
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.long_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_date_time_20;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.serializable_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.short_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_16;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.uuid_16;
@@ -79,6 +83,13 @@ public abstract class __EncryptionService {
     // -----------------------------------------------------------------------------------------------------------------
     private static final Map<EntityType<?>, Map<String, Attribute<?, ?>>> ATTRIBUTES = new ConcurrentHashMap<>();
 
+    /**
+     * Returns an unmodifiable map of attribute names and attributes of the specified entity type.
+     *
+     * @param entityType the entity type whose attributes are returned; must not be {@code null}
+     * @return a map of attribute names and attributes of the {@code entityType}
+     * @apiNote this method is thread-safe.
+     */
     protected static Map<String, Attribute<?, ?>> getAttributes(@Nonnull final EntityType<?> entityType) {
         Objects.requireNonNull(entityType, "entityType is null");
         return ATTRIBUTES.computeIfAbsent(
@@ -93,6 +104,10 @@ public abstract class __EncryptionService {
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    /**
+     * Creates a new instance.
+     */
     protected __EncryptionService() {
         super();
     }
@@ -124,8 +139,9 @@ public abstract class __EncryptionService {
 
     // -----------------------------------------------------------------------------------------------------------------
     private void check(final Attribute<?, ?> decryptedAttribute,
-                       final __EncryptedAttribute encryptionAnnotation, final Attribute<?, ?> encryptedAttribute) {
-        // decrypted attribute should be optional
+                       final __EncryptedAttribute encryptionAnnotation, final Attribute<?, ?> encryptedAttribute,
+                       final Set<Attribute<?, ?>> encryptedAttributes) {
+        // the decrypted attribute should be optional
         {
             final var basic = JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, Basic.class);
             final var optional = Optional.ofNullable(basic).map(Basic::optional).orElse(true);
@@ -146,7 +162,7 @@ public abstract class __EncryptionService {
                     "; encrypted attribute: " + encryptedAttribute
             );
         }
-        // encrypted attribute should be optional
+        // the encrypted attribute should be optional
         {
             final var mapping = JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, Basic.class);
             final var optional = Optional.ofNullable(mapping).map(Basic::optional).orElse(true);
@@ -159,6 +175,24 @@ public abstract class __EncryptionService {
                 );
             }
         }
+        // the encrypted attribute's javaType should be byte[]
+        if (encryptedAttribute.getJavaType() != byte[].class) {
+            throw new RuntimeException(
+                    "encrypted attribute's java type should be byte[]" +
+                    "; decrypted attribute: " + decryptedAttribute +
+                    "; encryption annotation: " + encryptionAnnotation +
+                    "; encrypted attribute: " + encryptedAttribute
+            );
+        }
+        // the encrypted attribute should not be duplicate
+        if (!encryptedAttributes.add(encryptedAttribute)) {
+            throw new RuntimeException(
+                    "duplicat´encrypted attribute" +
+                    "; decrypted attribute: " + decryptedAttribute +
+                    "; encryption annotation: " + encryptionAnnotation +
+                    "; encrypted attribute: " + encryptedAttribute
+            );
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -168,6 +202,7 @@ public abstract class __EncryptionService {
         final var entityClass = entity.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
+        final var encryptedAttributes = new HashSet<Attribute<?, ?>>();
         for (final var entry : attributes.entrySet()) {
             final var name = entry.getKey();
             final var decryptedAttribute = entry.getValue();
@@ -188,90 +223,81 @@ public abstract class __EncryptionService {
                             "; decrypted attribute: " + decryptedAttribute +
                             "; encryption annotation: " + attributeAnnotation
                     ));
-            check(decryptedAttribute, attributeAnnotation, encryptedAttribute);
-            {
-                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
-                if (encryptedValue != null) {
-                    logger.log(System.Logger.Level.DEBUG,
-                               "seems already encrypted" +
-                               "; decrypted attribute: " + decryptedAttribute +
-                               "; encryption annotation: " + attributeAnnotation +
-                               "; encrypted attribute: " + decryptedAttribute +
-                               "; encrypted value: " + encryptedValue
-                    );
-                    continue;
-                }
-            }
+            check(decryptedAttribute, attributeAnnotation, encryptedAttribute, encryptedAttributes);
             final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
             if (decryptedValue == null) {
+                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
+                if (encryptedValue != null) {
+                    // already encrypted
+                    continue;
+                }
                 JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, null);
                 continue;
             }
             final byte[] decryptedBytes;
             final var javaType = decryptedAttribute.getJavaType();
-            if (javaType == byte.class || javaType == Byte.class) {
-                decryptedBytes = new byte[]{(byte) decryptedValue};
-            } else if (javaType == short.class || javaType == Short.class) {
-                decryptedBytes = short_2(ByteBuffer.allocate(Short.BYTES), (short) decryptedValue).array();
-            } else if (javaType == int.class || javaType == Integer.class) {
-                decryptedBytes = int_4(ByteBuffer.allocate(Integer.BYTES), (int) decryptedValue).array();
-            } else if (javaType == long.class || javaType == Long.class) {
-                decryptedBytes = long_8(ByteBuffer.allocate(Long.BYTES), (long) decryptedValue).array();
-            } else if (javaType == char.class || javaType == Character.class) {
-                decryptedBytes = char_2(ByteBuffer.allocate(Character.BYTES), (char) decryptedValue).array();
-            } else if (javaType == float.class || javaType == Float.class) {
-                decryptedBytes = float_4(ByteBuffer.allocate(Float.BYTES), (float) decryptedValue).array();
-            } else if (javaType == double.class || javaType == Double.class) {
-                decryptedBytes = double_8(ByteBuffer.allocate(Double.BYTES), (double) decryptedValue).array();
-            } else if (javaType == String.class) {
-                final var string = (String) decryptedValue;
-                decryptedBytes = string.getBytes(StandardCharsets.UTF_8);
-            } else if (javaType == UUID.class) {
-                decryptedBytes = uuid_16(ByteBuffer.allocate(16), (UUID) decryptedValue).array();
-            } else if (javaType == BigInteger.class) {
-                decryptedBytes = ((BigInteger) decryptedValue).toByteArray();
-            } else if (javaType == BigDecimal.class) {
-                decryptedBytes = ((BigDecimal) decryptedValue).toPlainString().getBytes(StandardCharsets.UTF_8);
-            } else if (javaType == LocalDate.class) {
-                decryptedBytes = local_date_8(ByteBuffer.allocate(8), (LocalDate) decryptedValue).array();
-            } else if (javaType == LocalTime.class) {
-                decryptedBytes = local_time_8(ByteBuffer.allocate(8), (LocalTime) decryptedValue).array();
-            } else if (javaType == LocalDateTime.class) {
-                decryptedBytes = local_date_time_16(ByteBuffer.allocate(16), (LocalDateTime) decryptedValue).array();
-            } else if (javaType == OffsetTime.class) {
-                decryptedBytes = offset_time_12(ByteBuffer.allocate(12), (OffsetTime) decryptedValue).array();
-            } else if (javaType == OffsetDateTime.class) {
-                decryptedBytes = offset_date_time_20(ByteBuffer.allocate(20), (OffsetDateTime) decryptedValue).array();
-            } else if (javaType == Instant.class) {
-                decryptedBytes = instant_16(ByteBuffer.allocate(16), (Instant) decryptedValue).array();
-            } else if (javaType == Year.class) {
-                decryptedBytes = year_4(ByteBuffer.allocate(4), (Year) decryptedValue).array();
-            } else if (javaType == java.util.Date.class) {
-                decryptedBytes = util_date_8(ByteBuffer.allocate(8), (java.util.Date) decryptedValue).array();
-            } else if (javaType == java.util.Calendar.class) {
-                decryptedBytes = util_calendar_8(ByteBuffer.allocate(8), (java.util.Calendar) decryptedValue).array();
-            } else if (javaType == java.sql.Date.class) {
-                decryptedBytes = sql_date_8(ByteBuffer.allocate(8), (java.sql.Date) decryptedValue).array();
-            } else if (javaType == java.sql.Time.class) {
-                decryptedBytes = sql_time_8(ByteBuffer.allocate(8), (java.sql.Time) decryptedValue).array();
-            } else if (javaType == java.sql.Timestamp.class) {
-                decryptedBytes = sql_timestamp_8(ByteBuffer.allocate(8), (java.sql.Timestamp) decryptedValue).array();
-            } else if (javaType == byte[].class) {
-                decryptedBytes = (byte[]) decryptedValue;
-            } else if (javaType == Byte[].class) {
-                final var cast = (Byte[]) decryptedValue;
-                decryptedBytes = Bytes_4_(ByteBuffer.allocate(4 + (cast.length << 1)), cast).array();
-            } else if (javaType == char[].class) {
-                final var cast = (char[]) decryptedValue;
-                decryptedBytes = chars_4_(ByteBuffer.allocate(4 + (cast.length << 1)), cast).array();
-            } else if (javaType == Character[].class) {
-                final var cast = (Character[]) decryptedValue;
-                decryptedBytes = Characters_4_(ByteBuffer.allocate(4 + (cast.length * 3)), cast).array();
-            } else if (javaType.isEnum()) {
-                decryptedBytes = ((Enum<?>) decryptedValue).name().getBytes(StandardCharsets.UTF_8);
-            } else if (Serializable.class.isAssignableFrom(javaType)) {
-                // not platform-independent
-                throw new RuntimeException("unsupported java type: " + javaType);
+            if (decryptedValue instanceof Boolean b) {
+                decryptedBytes = new byte[]{(byte) (b ? 1 : 0)};
+            } else if (decryptedValue instanceof Byte b) {
+                decryptedBytes = new byte[]{b};
+            } else if (decryptedValue instanceof Short s) {
+                decryptedBytes = short_2(new byte[Short.BYTES], 0, s);
+            } else if (decryptedValue instanceof Integer i) {
+                decryptedBytes = int_4(new byte[Integer.BYTES], 0, i);
+            } else if (decryptedValue instanceof Long l) {
+                decryptedBytes = long_8(new byte[Long.BYTES], 0, l);
+            } else if (decryptedValue instanceof Character c) {
+                decryptedBytes = char_2(new byte[Character.BYTES], 0, c);
+            } else if (decryptedValue instanceof Float f) {
+                decryptedBytes = float_4(new byte[Float.BYTES], 0, f);
+            } else if (decryptedValue instanceof Double d) {
+                decryptedBytes = double_8(new byte[Double.BYTES], 0, d);
+            } else if (decryptedValue instanceof String s) {
+                decryptedBytes = string_(s);
+            } else if (decryptedValue instanceof UUID u) {
+                decryptedBytes = uuid_16(u);
+            } else if (decryptedValue instanceof BigInteger v) {
+                decryptedBytes = v.toByteArray();
+            } else if (decryptedValue instanceof BigDecimal v) {
+                decryptedBytes = big_decimal_(v);
+            } else if (decryptedValue instanceof LocalDate v) {
+                decryptedBytes = local_date_8(new byte[Long.BYTES], 0, v);
+            } else if (decryptedValue instanceof LocalTime v) {
+                decryptedBytes = local_time_8(new byte[Long.BYTES], 0, v);
+            } else if (decryptedValue instanceof LocalDateTime v) {
+                decryptedBytes = local_date_time_16(new byte[Long.BYTES << 1], 0, v);
+            } else if (decryptedValue instanceof OffsetTime v) {
+                decryptedBytes = offset_time_12(new byte[12], 0, v);
+            } else if (decryptedValue instanceof OffsetDateTime v) {
+                decryptedBytes = offset_date_time_20(new byte[20], 0, v);
+            } else if (decryptedValue instanceof Instant v) {
+                decryptedBytes = instant_16(new byte[16], 0, v);
+            } else if (decryptedValue instanceof Year v) {
+                decryptedBytes = year_4(new byte[4], 0, v);
+            } else if (decryptedValue instanceof java.util.Calendar v) {
+                decryptedBytes = util_calendar_8(new byte[8], 0, v);
+            } else if (decryptedValue instanceof java.sql.Date v) {
+                decryptedBytes = sql_date_8(new byte[8], 0, v);
+            } else if (decryptedValue instanceof java.sql.Time v) {
+                decryptedBytes = sql_time_8(new byte[8], 0, v);
+            } else if (decryptedValue instanceof java.sql.Timestamp v) {
+                decryptedBytes = sql_timestamp_16(new byte[16], 0, v);
+                assert decryptedBytes.length == 16;
+            } else if (decryptedValue instanceof java.util.Date v) { // should be checked after java.sql.*
+                decryptedBytes = util_date_8(new byte[8], 0, v);
+            } else if (decryptedValue instanceof byte[] v) {
+                decryptedBytes = v;
+            } else if (decryptedValue instanceof Byte[] v) {
+                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
+                decryptedBytes = Bytes_l(v);
+            } else if (decryptedValue instanceof char[] v) {
+                decryptedBytes = chars_2l(v);
+            } else if (decryptedValue instanceof Character[] v) {
+                decryptedBytes = Characters_2l(v);
+            } else if (decryptedValue instanceof Enum<?> v) {
+                decryptedBytes = enum_(v);
+            } else if (decryptedValue instanceof Serializable v) {
+                decryptedBytes = serializable_(v);
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
@@ -287,6 +313,7 @@ public abstract class __EncryptionService {
         final var entityClass = entity.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
+        final var encryptedAttributes = new HashSet<Attribute<?, ?>>();
         for (final var entry : attributes.entrySet()) {
             final var name = entry.getKey();
             final var decryptedAttribute = entry.getValue();
@@ -307,11 +334,12 @@ public abstract class __EncryptionService {
                             "; decrypted attribute: " + decryptedAttribute +
                             "; attribute annotation: " + attributeAnnotation
                     ));
-            check(decryptedAttribute, attributeAnnotation, encryptedAttribute);
+            check(decryptedAttribute, attributeAnnotation, encryptedAttribute, encryptedAttributes);
             final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
             if (encryptedBytes == null) {
                 final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
                 if (decryptedValue != null) {
+                    // the encrypted column may be defined later
                     continue;
                 }
                 JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
@@ -320,65 +348,69 @@ public abstract class __EncryptionService {
             final var decryptedBytes = encryptionManager.decrypt(encryptionIdentifier, encryptedBytes);
             final Object decryptedValue;
             final var javaType = decryptedAttribute.getJavaType();
-            if (javaType == byte.class || javaType == Byte.class) {
+            if (javaType == boolean.class || javaType == Boolean.class) {
+                decryptedValue = decryptedBytes[0] == 1;
+            } else if (javaType == byte.class || javaType == Byte.class) {
                 decryptedValue = decryptedBytes[0];
             } else if (javaType == short.class || javaType == Short.class) {
-                decryptedValue = short_2(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = short_2(decryptedBytes, 0);
             } else if (javaType == int.class || javaType == Integer.class) {
-                decryptedValue = int_4(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = int_4(decryptedBytes, 0);
             } else if (javaType == long.class || javaType == Long.class) {
-                decryptedValue = long_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = long_8(decryptedBytes, 0);
             } else if (javaType == char.class || javaType == Character.class) {
-                decryptedValue = char_2(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = char_2(decryptedBytes, 0);
             } else if (javaType == float.class || javaType == Float.class) {
-                decryptedValue = float_4(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = float_4(decryptedBytes, 0);
             } else if (javaType == double.class || javaType == Double.class) {
-                decryptedValue = double_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = double_8(decryptedBytes, 0);
             } else if (javaType == String.class) {
-                decryptedValue = new String(decryptedBytes, StandardCharsets.UTF_8);
+                decryptedValue = string_(decryptedBytes);
             } else if (javaType == UUID.class) {
-                decryptedValue = uuid_16(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = uuid_16(decryptedBytes);
             } else if (javaType == BigInteger.class) {
                 decryptedValue = new BigInteger(decryptedBytes);
             } else if (javaType == BigDecimal.class) {
-                decryptedValue = new BigDecimal(new String(decryptedBytes, StandardCharsets.UTF_8));
+                decryptedValue = big_decimal_(decryptedBytes);
             } else if (javaType == LocalDate.class) {
-                decryptedValue = local_date_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = local_date_8(decryptedBytes, 0);
             } else if (javaType == LocalTime.class) {
-                decryptedValue = local_time_8(ByteBuffer.wrap((decryptedBytes)));
+                decryptedValue = local_time_8(decryptedBytes, 0);
             } else if (javaType == LocalDateTime.class) {
-                decryptedValue = local_date_time_16(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = local_date_time_16(decryptedBytes, 0);
             } else if (javaType == OffsetTime.class) {
-                decryptedValue = offset_time_12(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = offset_time_12(decryptedBytes, 0);
             } else if (javaType == OffsetDateTime.class) {
-                decryptedValue = offset_date_time_20(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = offset_date_time_20(decryptedBytes, 0);
             } else if (javaType == Instant.class) {
-                decryptedValue = instant_16(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = instant_16(decryptedBytes, 0);
             } else if (javaType == Year.class) {
-                decryptedValue = year_4(ByteBuffer.wrap(decryptedBytes));
-            } else if (javaType == java.util.Date.class) {
-                decryptedValue = util_date_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = year_4(decryptedBytes, 0);
             } else if (javaType == Calendar.class) {
-                decryptedValue = util_calendar_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = util_calendar_8(decryptedBytes, 0);
             } else if (javaType == java.sql.Date.class) {
-                decryptedValue = sql_date_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = sql_date_8(decryptedBytes, 0);
             } else if (javaType == java.sql.Time.class) {
-                decryptedValue = sql_time_8(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = sql_time_8(decryptedBytes, 0);
             } else if (javaType == java.sql.Timestamp.class) {
-                decryptedValue = sql_timestamp_8(ByteBuffer.wrap(decryptedBytes));
+                assert decryptedBytes.length == 16;
+                decryptedValue = sql_timestamp_16(decryptedBytes, 0);
+            } else if (javaType == java.util.Date.class) { // should be checked after java.sql.*
+                decryptedValue = util_date_8(decryptedBytes, 0);
             } else if (javaType == byte[].class) {
                 decryptedValue = decryptedBytes;
             } else if (javaType == Byte[].class) {
-                decryptedValue = Bytes_4_(ByteBuffer.wrap(decryptedBytes));
+                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
+                decryptedValue = Bytes_l(decryptedBytes);
             } else if (javaType == char[].class) {
-                decryptedValue = chars_4_(ByteBuffer.wrap(decryptedBytes));
+                decryptedValue = chars_2l(decryptedBytes);
             } else if (javaType == Character[].class) {
-                decryptedValue = Characters_4_(ByteBuffer.wrap(decryptedBytes));
+                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
+                decryptedValue = Characters_2l(decryptedBytes);
             } else if (javaType.isEnum()) {
-                decryptedValue = Enum.valueOf((Class) javaType, new String(decryptedBytes, StandardCharsets.UTF_8));
+                decryptedValue = enum_(decryptedBytes, (Class) javaType);
             } else if (Serializable.class.isAssignableFrom(javaType)) {
-                // not platform-independent
-                throw new RuntimeException("unsupported java type: " + javaType);
+                decryptedValue = javaType.cast(serializable_(encryptedBytes));
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
