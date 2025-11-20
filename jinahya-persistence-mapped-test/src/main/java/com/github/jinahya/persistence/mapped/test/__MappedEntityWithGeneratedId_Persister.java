@@ -44,7 +44,7 @@ public abstract class __MappedEntityWithGeneratedId_Persister<
      *
      * @param entityClass the entity class to persist.
      * @param idClass     the type of {@link ID} of the {@code entityClass}.
-     * @see #type
+     * @see #entityClass
      * @see #idClass
      */
     protected __MappedEntityWithGeneratedId_Persister(final @Nonnull Class<ENTITY> entityClass,
