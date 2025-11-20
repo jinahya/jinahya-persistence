@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence-more-test</artifactId>
+  <version>0.3.10-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Interfaces/classes for testing classes/interfaces created with jinahya-persistence-more</description>

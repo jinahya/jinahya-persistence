@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence-mapped</artifactId>
+  <version>0.3.10-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Interfaces/class for creating entity classes</description>

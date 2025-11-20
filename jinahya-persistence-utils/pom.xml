@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence-utils</artifactId>
+  <version>0.3.10-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Utilities for Jakarta Persistence</description>

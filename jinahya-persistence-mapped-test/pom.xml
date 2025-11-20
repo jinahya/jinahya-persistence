@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence-mapped-test</artifactId>
+  <version>0.3.10-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Interfaces/Class for testing classes create with jinahya-persistence-mapped</description>

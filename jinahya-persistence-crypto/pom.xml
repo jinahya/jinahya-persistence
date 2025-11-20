@@ -5,10 +5,12 @@
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-persistence</artifactId>
-    <version>${revision}</version>
+    <!--    <version>${revision}</version>-->
+    <version>0.3.10-SNAPSHOT</version>
   </parent>
 
   <artifactId>jinahya-persistence-crypto</artifactId>
+  <version>0.3.10-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Crypto for Jakarta Persistence</description>
@@ -27,19 +29,23 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-mapped</artifactId>
-      <version>${revision}</version>
+      <!--  <version>${revision}</version>-->
+<!--      <version>${revision}</version>-->
+      <version>0.3.10-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-mapped-test</artifactId>
-      <version>${revision}</version>
+      <!--      <version>${revision}</version>-->
+      <version>0.3.10-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-utils</artifactId>
-      <version>${revision}</version>
+      <!--      <version>${revision}</version>-->
+      <version>0.3.10-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

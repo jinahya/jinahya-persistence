@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>coverage-report-aggregated</artifactId>
+  <version>0.3.10-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Aggregate Coverage Report</description>
