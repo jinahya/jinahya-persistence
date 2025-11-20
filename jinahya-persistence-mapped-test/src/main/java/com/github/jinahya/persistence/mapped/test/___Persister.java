@@ -29,37 +29,56 @@ import java.util.Objects;
 /**
  * An abstract class for persisting a specific class.
  *
- * @param <T> entity type parameter
+ * @param <ENTITY> entity type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
-public abstract class ___Persister<T> {
+public abstract class ___Persister<ENTITY> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
+    // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Creates a new instance for persisting specified class.
+     * Returns a new persisted instance of the specified entity class.
      *
-     * @param type the class to persist.
+     * @param entityManager an entity manager.
+     * @param entityClass   the entity class.
+     * @param <ENTITY>      entity type parameter
+     * @return a new persisted instance of the {@code entityClass}.
      */
-    protected ___Persister(@Nonnull final Class<T> type) {
-        super();
-        this.type = Objects.requireNonNull(type, "type is null");
+    protected static <ENTITY> ENTITY newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
+                                                            final @Nonnull Class<ENTITY> entityClass) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        return ___PersisterUtils.newPersistedInstanceOf(entityManager, entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Persists specified instance of {@link T} using specified entity manager.
+     * Creates a new instance for persisting specified class.
+     *
+     * @param entityClass the class to persist.
+     */
+    protected ___Persister(final @Nonnull Class<ENTITY> entityClass) {
+        super();
+        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Persists specified instance of {@link ENTITY} using specified entity manager.
      *
      * @param entityManager  the entity manager to use.
-     * @param entityInstance the instance of {@link T} to persist.
+     * @param entityInstance the instance of {@link ENTITY} to persist.
      * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
      */
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final T entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull ENTITY entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(System.Logger.Level.DEBUG, "persisting {0}", entityInstance);
@@ -68,10 +87,22 @@ public abstract class ___Persister<T> {
         ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
+    // ----------------------------------------------------------------------------------------------------- entityClass
+
+    /**
+     * Returns a new persisted instance of the {@link #entityClass}.
+     *
+     * @param entityManager an entity manager.
+     * @return a new persisted instance of the {@link #entityClass}.
+     */
+    protected ENTITY newPersistedEntityInstance(final @Nonnull EntityManager entityManager) {
+        return newPersistedInstanceOf(entityManager, entityClass);
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The entity class to persist.
      */
-    protected final Class<T> type;
+    protected final Class<ENTITY> entityClass;
 }

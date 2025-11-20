@@ -32,7 +32,7 @@ public abstract class ___Builder<
      *
      * @param targetClass the class of {@link TARGET} to build.
      */
-    protected ___Builder(@Nonnull final Class<TARGET> targetClass) {
+    protected ___Builder(final @Nonnull Class<TARGET> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
@@ -54,7 +54,7 @@ public abstract class ___Builder<
      * @return an instance of {@link #targetClass} built by specified function applied to this builder.
      */
     @Nonnull
-    public TARGET build(@Nonnull final Function<? super SELF, ? extends TARGET> function) {
+    public TARGET build(final @Nonnull Function<? super SELF, ? extends TARGET> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply((SELF) this);
     }

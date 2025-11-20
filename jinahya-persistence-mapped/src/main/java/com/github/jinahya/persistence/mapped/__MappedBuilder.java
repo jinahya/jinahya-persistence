@@ -26,7 +26,7 @@ public abstract class __MappedBuilder<
      *
      * @param targetClass the entity class.
      */
-    protected __MappedBuilder(@Nonnull final Class<TARGET> targetClass) {
+    protected __MappedBuilder(final @Nonnull Class<TARGET> targetClass) {
         super(targetClass);
     }
 

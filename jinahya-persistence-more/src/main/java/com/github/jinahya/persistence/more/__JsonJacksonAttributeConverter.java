@@ -25,7 +25,7 @@ public abstract class __JsonJacksonAttributeConverter<X> extends __JsonAttribute
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __JsonJacksonAttributeConverter(@Nonnull final Class<X> attributeClass) {
+    protected __JsonJacksonAttributeConverter(final @Nonnull Class<X> attributeClass) {
         super();
         this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
     }

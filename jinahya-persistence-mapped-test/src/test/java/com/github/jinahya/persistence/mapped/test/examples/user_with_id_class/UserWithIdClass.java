@@ -64,7 +64,7 @@ class UserWithIdClass extends __MappedEntity<IdForUserWithIdClass> {
         return name;
     }
 
-    protected void setName(@Nonnull final String name) {
+    protected void setName(final @Nonnull String name) {
         this.name = name;
     }
 
@@ -74,7 +74,7 @@ class UserWithIdClass extends __MappedEntity<IdForUserWithIdClass> {
         return age;
     }
 
-    protected void setAge(@Nonnull final Integer age) {
+    protected void setAge(final @Nonnull Integer age) {
         this.age = age;
     }
 

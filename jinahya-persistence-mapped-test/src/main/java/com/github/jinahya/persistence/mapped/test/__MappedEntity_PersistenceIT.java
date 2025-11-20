@@ -217,7 +217,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @see #_Mapped_AllTableColumnNames()
      * @see __Disable_TableColumnNames_Test
      */
-    protected void _Mapped_AllTableColumnNames(@Nonnull final Collection<String> remainingTableColumnNames) {
+    protected void _Mapped_AllTableColumnNames(final @Nonnull Collection<String> remainingTableColumnNames) {
         Objects.requireNonNull(remainingTableColumnNames, "remainingTableColumnNames is null");
         logger.log(Level.DEBUG, "number of remaining table columns: {0}", remainingTableColumnNames.size());
         remainingTableColumnNames.forEach(tcn -> {
@@ -261,7 +261,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      *
      * @param remainingEntityColumnNames the remaining entity column names that all table column names are removed.
      */
-    protected void _Empty_AllEntityColumnNames(@Nonnull final Collection<String> remainingEntityColumnNames) {
+    protected void _Empty_AllEntityColumnNames(final @Nonnull Collection<String> remainingEntityColumnNames) {
         Objects.requireNonNull(remainingEntityColumnNames, "remainingEntityColumnNames is null");
         logger.log(Level.DEBUG, "number of remaining entity columns: {0}", remainingEntityColumnNames.size());
         remainingEntityColumnNames.forEach(ecn -> {
@@ -340,8 +340,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @param nullable the nullability of the table column.
      * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
      */
-    protected boolean _MatchTableColumnNullable_EntityColumnNullable(@Nonnull final Member member,
-                                                                     @Nonnull final Column column,
+    protected boolean _MatchTableColumnNullable_EntityColumnNullable(final @Nonnull Member member,
+                                                                     final @Nonnull Column column,
                                                                      final boolean nullable) {
         return true;
     }
@@ -411,8 +411,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @param nullable the nullability of the table column.
      * @return {@code true} if the annotation should be tested; {@code false} for skipping the attribute.
      */
-    protected boolean _MatchTableColumnNullable_EntityJoinColumnNullable(@Nonnull final Member member,
-                                                                         @Nonnull final JoinColumn column,
+    protected boolean _MatchTableColumnNullable_EntityJoinColumnNullable(final @Nonnull Member member,
+                                                                         final @Nonnull JoinColumn column,
                                                                          final boolean nullable) {
         return true;
     }
@@ -500,21 +500,21 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @param mapping the mapping.
      * @return {@code true} if the mapping should be verified; {@code false} for skipping the mapping.
      */
-    protected boolean _MatchColumnNullable_EntityMappingOptional(@Nonnull final Member member,
-                                                                 @Nonnull final Column column,
-                                                                 @Nonnull final Basic mapping) {
+    protected boolean _MatchColumnNullable_EntityMappingOptional(final @Nonnull Member member,
+                                                                 final @Nonnull Column column,
+                                                                 final @Nonnull Basic mapping) {
         return true;
     }
 
-    protected boolean _MatchColumnNullable_EntityMappingOptional(@Nonnull final Member member,
-                                                                 @Nonnull final Column column,
-                                                                 @Nonnull final OneToOne mapping) {
+    protected boolean _MatchColumnNullable_EntityMappingOptional(final @Nonnull Member member,
+                                                                 final @Nonnull Column column,
+                                                                 final @Nonnull OneToOne mapping) {
         return true;
     }
 
-    protected boolean _MatchColumnNullable_EntityMappingOptional(@Nonnull final Member member,
-                                                                 @Nonnull final Column column,
-                                                                 @Nonnull final ManyToOne mapping) {
+    protected boolean _MatchColumnNullable_EntityMappingOptional(final @Nonnull Member member,
+                                                                 final @Nonnull Column column,
+                                                                 final @Nonnull ManyToOne mapping) {
         return true;
     }
 
@@ -623,13 +623,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     protected boolean _ShouldNotBeAnnotatedWithAnyNonNull_AttributeWithColumnNullable(
-            @Nonnull final Member entityMember, @Nonnull final Column entityColum, @Nonnull final Object nonNull) {
+            final @Nonnull Member entityMember, final @Nonnull Column entityColum, final @Nonnull Object nonNull) {
         return true;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     protected final <R> R applyTableColumnsAndEntityAttributes(
-            @Nonnull final Function<
+            final @Nonnull Function<
                     ? super Map<String, Map<String, Object>>,
                     ? extends Function<
                             ? super Map<Attribute<? super ENTITY, ?>, List<Annotation>>,
@@ -751,7 +751,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      * @param entityInstance the entity instance.
      * @see #selectRandomEntityInstance()
      */
-    protected void selectRandomEntityInstance(@Nonnull final ENTITY entityInstance) {
+    protected void selectRandomEntityInstance(final @Nonnull ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(Level.DEBUG, "randomly selected entity instance: {0}", entityInstance);
     }

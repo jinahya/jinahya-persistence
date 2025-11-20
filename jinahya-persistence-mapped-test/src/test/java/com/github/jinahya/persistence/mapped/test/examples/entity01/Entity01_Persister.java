@@ -32,7 +32,7 @@ class Entity01_Persister extends __MappedEntity_Persister<Entity01, Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final Entity01 entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull Entity01 entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }

@@ -47,7 +47,7 @@ public abstract class ___Instantiator<T> {
      * @param target the class to be instantiated.
      * @see #target
      */
-    protected ___Instantiator(@Nonnull final Class<T> target) {
+    protected ___Instantiator(final @Nonnull Class<T> target) {
         super();
         this.target = Objects.requireNonNull(target, "target is null");
     }

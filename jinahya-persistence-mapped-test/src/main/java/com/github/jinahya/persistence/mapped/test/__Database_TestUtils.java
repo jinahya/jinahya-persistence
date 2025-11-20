@@ -54,8 +54,8 @@ public final class __Database_TestUtils {
          * @see <a
          *         href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/USER_TAB_PRIVS.html">USER_SYS_PRIVS</a>
          */
-        public static void USER_SYS_PRIVS(@Nonnull final Connection connection,
-                                          @Nonnull final Consumer<? super ResultSet> consumer)
+        public static void USER_SYS_PRIVS(final @Nonnull Connection connection,
+                                          final @Nonnull Consumer<? super ResultSet> consumer)
                 throws SQLException {
             Objects.requireNonNull(connection, "connection is null");
             Objects.requireNonNull(consumer, "consumer is null");
@@ -66,7 +66,7 @@ public final class __Database_TestUtils {
             }
         }
 
-        public static List<String> USER_SYS_PRIVS__PRIVILEGES(@Nonnull final Connection connection)
+        public static List<String> USER_SYS_PRIVS__PRIVILEGES(final @Nonnull Connection connection)
                 throws SQLException {
             final var privileges = new ArrayList<String>();
             USER_SYS_PRIVS(
@@ -92,8 +92,8 @@ public final class __Database_TestUtils {
          * @see <a
          *         href="https://docs.oracle.com/en/database/oracle/oracle-database/19/refrn/USER_TAB_PRIVS.html">USER_TAB_PRIVS</a>
          */
-        public static void USER_TAB_PRIVS(@Nonnull final Connection connection,
-                                          @Nonnull final Consumer<? super ResultSet> consumer)
+        public static void USER_TAB_PRIVS(final @Nonnull Connection connection,
+                                          final @Nonnull Consumer<? super ResultSet> consumer)
                 throws SQLException {
             Objects.requireNonNull(connection, "connection is null");
             Objects.requireNonNull(consumer, "consumer is null");
@@ -104,7 +104,7 @@ public final class __Database_TestUtils {
             }
         }
 
-        public static List<String> USER_TAB_PRIVS__PRIVILEGES(@Nonnull final Connection connection)
+        public static List<String> USER_TAB_PRIVS__PRIVILEGES(final @Nonnull Connection connection)
                 throws SQLException {
             final var privileges = new ArrayList<String>();
             USER_TAB_PRIVS(
@@ -125,8 +125,8 @@ public final class __Database_TestUtils {
 
     public static final class MySQL {
 
-        public static void SHOW_GRANTS(@Nonnull final Connection connection,
-                                       @Nonnull final Consumer<? super ResultSet> consumer)
+        public static void SHOW_GRANTS(final @Nonnull Connection connection,
+                                       final @Nonnull Consumer<? super ResultSet> consumer)
                 throws SQLException {
             Objects.requireNonNull(connection, "connection is null");
             Objects.requireNonNull(consumer, "consumer is null");
@@ -137,8 +137,8 @@ public final class __Database_TestUtils {
             }
         }
 
-        public static <C extends Collection<String>> C SHOW_GRANTS(@Nonnull final Connection connection,
-                                                                   @Nonnull final C collection
+        public static <C extends Collection<String>> C SHOW_GRANTS(final @Nonnull Connection connection,
+                                                                   final @Nonnull C collection
         ) throws SQLException {
             Objects.requireNonNull(collection, "collection is null");
             SHOW_GRANTS(
@@ -156,7 +156,7 @@ public final class __Database_TestUtils {
             return collection;
         }
 
-        public static List<String> SHOW_GRANTS(@Nonnull final Connection connection) throws SQLException {
+        public static List<String> SHOW_GRANTS(final @Nonnull Connection connection) throws SQLException {
             return SHOW_GRANTS(
                     connection,
                     new ArrayList<>()

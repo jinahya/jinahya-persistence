@@ -53,8 +53,8 @@ final class ____HibernateTestUtils {
      */
     @SuppressWarnings({"unchecked"})
     // https://stackoverflow.com/a/44214469/330457
-    static <R> R applyConnection(@Nonnull final EntityManager entityManager,
-                                 @Nonnull final Function<? super Connection, ? extends R> function) {
+    static <R> R applyConnection(final @Nonnull EntityManager entityManager,
+                                 final @Nonnull Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
         try {
@@ -82,8 +82,8 @@ final class ____HibernateTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static List<String> getEntityColumnNames(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                             @Nonnull final Class<?> entityClass) {
+    static List<String> getEntityColumnNames(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                             final @Nonnull Class<?> entityClass) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         try {

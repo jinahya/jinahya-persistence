@@ -12,7 +12,7 @@ class UserWithIdClass_Persister extends __MappedEntity_Persister<UserWithIdClass
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public void persist(@Nonnull final EntityManager entityManager, @Nonnull final UserWithIdClass entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull UserWithIdClass entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }

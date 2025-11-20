@@ -36,10 +36,10 @@ import java.util.Optional;
 public interface __MappedEntityCriteria<ENTITY extends __MappedEntity<ID>, ID> extends __MappedCriteria<ENTITY> {
 
     static <T extends __MappedEntity<U>, U> Optional<T> findById(
-            @Nonnull final EntityManager entityManager,
-            @Nonnull final Class<T> entityClass,
-            @Nonnull final SingularAttribute<? super T, U> idAttribute,
-            @Nonnull final U idValue) {
+            final @Nonnull EntityManager entityManager,
+            final @Nonnull Class<T> entityClass,
+            final @Nonnull SingularAttribute<? super T, U> idAttribute,
+            final @Nonnull U idValue) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(idValue, "idValue is null");

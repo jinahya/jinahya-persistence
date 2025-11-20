@@ -35,8 +35,8 @@ public abstract class __MappedEntityBuilder_Test<
      * @deprecated Usee {@link #__MappedEntityBuilder_Test(Class, Class)}
      */
     @Deprecated(forRemoval = true)
-    protected __MappedEntityBuilder_Test(@Nonnull final Class<BUILDER> builderClass,
-                                         @Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass) {
+    protected __MappedEntityBuilder_Test(final @Nonnull Class<BUILDER> builderClass,
+                                         final @Nonnull Class<ENTITY> entityClass, final @Nonnull Class<ID> idClass) {
         super(builderClass, entityClass);
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }
@@ -47,8 +47,8 @@ public abstract class __MappedEntityBuilder_Test<
      * @param builderClass the builder class to test.
      * @param entityClass  a target entity class of the {@code builderClass}.
      */
-    protected __MappedEntityBuilder_Test(@Nonnull final Class<BUILDER> builderClass,
-                                         @Nonnull final Class<ENTITY> entityClass) {
+    protected __MappedEntityBuilder_Test(final @Nonnull Class<BUILDER> builderClass,
+                                         final @Nonnull Class<ENTITY> entityClass) {
         super(builderClass, entityClass);
         this.idClass = __MappedEntity_TestUtils.getIdClass(entityClass);
     }

@@ -100,7 +100,7 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
      */
     //    @TestTemplate
     protected void convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(
-            @Nonnull final __AttributeConverterTestCase<X, Y> testCase) {
+            final @Nonnull __AttributeConverterTestCase<X, Y> testCase) {
         // ------------------------------------------------------------------------------------------------------- given
         final var instance = newConverterInstance();
         final var attribute = testCase.getAttribute();
@@ -124,7 +124,7 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
      */
     //    @TestTemplate
     protected void convertToEntityAttribute_ResultEqualsToExpectedAttribute_GivenDbData(
-            @Nonnull final __AttributeConverterTestCase<X, Y> testCase) {
+            final @Nonnull __AttributeConverterTestCase<X, Y> testCase) {
         // ------------------------------------------------------------------------------------------------------- given
         final var instance = newConverterInstance();
         final var dbData = testCase.getDbData();

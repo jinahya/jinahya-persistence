@@ -104,7 +104,7 @@ abstract class __MappedEntityCriteria_Persistence_<
      * @see #acceptEntityManagerFactory(Consumer)
      */
     protected final <R> R applyEntityManagerFactory(
-            @Nonnull final Function<? super EntityManagerFactory, ? extends R> function) {
+            final @Nonnull Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return function.apply(getEntityManagerFactory());
     }
@@ -115,7 +115,7 @@ abstract class __MappedEntityCriteria_Persistence_<
      * @param consumer the consumer.
      * @see #applyEntityManagerFactory(Function)
      */
-    protected final void acceptEntityManagerFactory(@Nonnull final Consumer<? super EntityManagerFactory> consumer) {
+    protected final void acceptEntityManagerFactory(final @Nonnull Consumer<? super EntityManagerFactory> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
         applyEntityManagerFactory(emf -> {
             consumer.accept(emf);
@@ -144,7 +144,7 @@ abstract class __MappedEntityCriteria_Persistence_<
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
      */
-    protected final <R> R applyEntityManager(@Nonnull final Function<? super EntityManager, ? extends R> function) {
+    protected final <R> R applyEntityManager(final @Nonnull Function<? super EntityManager, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         if (true) {
             return function.apply(entityManager);
@@ -159,7 +159,7 @@ abstract class __MappedEntityCriteria_Persistence_<
 
     @Deprecated(forRemoval = true)
     protected final <R> R applyEntityManagerInTransaction(
-            @Nonnull final Function<? super EntityManager, ? extends R> function,
+            final @Nonnull Function<? super EntityManager, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManager(em -> ___JakartaPersistence_TestUtils.getInTransaction(
@@ -177,7 +177,7 @@ abstract class __MappedEntityCriteria_Persistence_<
      * @return the result of the {@code function}.
      */
     protected final <R> R applyEntityManagerInTransactionAndRollback(
-            @Nonnull final Function<? super EntityManager, ? extends R> function) {
+            final @Nonnull Function<? super EntityManager, ? extends R> function) {
         return applyEntityManagerInTransaction(
                 function,
                 true
@@ -197,7 +197,7 @@ abstract class __MappedEntityCriteria_Persistence_<
      */
     @Deprecated(forRemoval = true)
     protected final <R> R applyConnectionInTransaction(
-            @Nonnull final Function<? super Connection, ? extends R> function,
+            final @Nonnull Function<? super Connection, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerInTransaction(
@@ -215,7 +215,7 @@ abstract class __MappedEntityCriteria_Persistence_<
      * @return the result of the {@code function}.
      */
     protected final <R> R applyConnectionInTransactionAndRollback(
-            @Nonnull final Function<? super Connection, ? extends R> function) {
+            final @Nonnull Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
                 entityManager,

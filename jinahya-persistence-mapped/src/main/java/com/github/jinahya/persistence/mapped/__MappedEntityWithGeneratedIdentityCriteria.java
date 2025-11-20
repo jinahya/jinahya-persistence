@@ -34,9 +34,9 @@ public interface __MappedEntityWithGeneratedIdentityCriteria<ENTITY extends __Ma
         extends __MappedEntityWithGeneratedIdCriteria<ENTITY, Long> {
 
     static <T extends __MappedEntityWithGeneratedIdentity> Optional<T> findById(
-            @Nonnull final EntityManager entityManager,
-            @Nonnull final Class<T> entityClass,
-            @Nonnull final Long idValue) {
+            final @Nonnull EntityManager entityManager,
+            final @Nonnull Class<T> entityClass,
+            final @Nonnull Long idValue) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(idValue, "idValue is null");

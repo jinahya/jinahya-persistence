@@ -25,7 +25,7 @@ public abstract class __JsonJsonbAttributeConverter<X> extends __JsonAttributeCo
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected __JsonJsonbAttributeConverter(@Nonnull final Class<X> type) {
+    protected __JsonJsonbAttributeConverter(final @Nonnull Class<X> type) {
         super();
         this.type = Objects.requireNonNull(type, "type is null");
     }

@@ -63,7 +63,7 @@ class UserWithStringId extends __MappedEntity<String> {
         return name;
     }
 
-    public void setName(@Nonnull final String name) {
+    public void setName(final @Nonnull String name) {
         this.name = name;
     }
 

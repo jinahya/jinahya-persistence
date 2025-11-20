@@ -98,7 +98,7 @@ public abstract class __MappedLocation2d extends __Mapped {
         return DoubleBuffer.allocate(2).put(latitude.doubleValue()).put(longitude.doubleValue()).array();
     }
 
-    public void fromArrayOfDoubles(@Nonnull final double[] array) {
+    public void fromArrayOfDoubles(final @Nonnull double[] array) {
         if (Objects.requireNonNull(array, "array is null").length < 2) {
             throw new IllegalArgumentException("array.length(" + array.length + ") is less than 2");
         }
@@ -114,7 +114,7 @@ public abstract class __MappedLocation2d extends __Mapped {
         return buffer.array();
     }
 
-    public void fromArrayOfDoubles(@Nonnull final byte[] array) {
+    public void fromArrayOfDoubles(final @Nonnull byte[] array) {
         if (Objects.requireNonNull(array, "array is null").length < (Double.BYTES << 1)) {
             throw new IllegalArgumentException("array.length(" + array.length + ") is less than 16");
         }
@@ -129,7 +129,7 @@ public abstract class __MappedLocation2d extends __Mapped {
         return latitude;
     }
 
-    public void setLatitude(@Nonnull final BigDecimal latitude) {
+    public void setLatitude(final @Nonnull BigDecimal latitude) {
         this.latitude = latitude;
     }
 
@@ -174,7 +174,7 @@ public abstract class __MappedLocation2d extends __Mapped {
         return longitude;
     }
 
-    public void setLongitude(@Nonnull final BigDecimal longitude) {
+    public void setLongitude(final @Nonnull BigDecimal longitude) {
         this.longitude = longitude;
     }
 

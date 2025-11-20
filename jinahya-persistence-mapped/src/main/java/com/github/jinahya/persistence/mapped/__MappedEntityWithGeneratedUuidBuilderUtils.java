@@ -11,7 +11,7 @@ import java.util.Objects;
 public final class __MappedEntityWithGeneratedUuidBuilderUtils {
 
     public static <BUILDER extends __MappedEntityWithGeneratedUuidBuilder<BUILDER, ?>> BUILDER reset(
-            @Nonnull final BUILDER instance) {
+            final @Nonnull BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
         return ___BuilderUtils.reset(instance);
     }

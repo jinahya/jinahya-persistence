@@ -10,7 +10,7 @@ import java.util.Objects;
 })
 public final class __MappedEntityBuilderUtils {
 
-    public static <BUILDER extends __MappedEntityBuilder<BUILDER, ?>> BUILDER reset(@Nonnull final BUILDER instance) {
+    public static <BUILDER extends __MappedEntityBuilder<BUILDER, ?>> BUILDER reset(final @Nonnull BUILDER instance) {
         Objects.requireNonNull(instance, "instance is null");
         return ___BuilderUtils.reset(instance);
     }

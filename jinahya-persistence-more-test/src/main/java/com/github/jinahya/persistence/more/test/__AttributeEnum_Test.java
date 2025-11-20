@@ -120,7 +120,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @param consumer the consumer.
      */
     protected void acceptEachEnumConstantAndAttributeValue(
-            @Nonnull final BiConsumer<? super ENUM, ? super ATTRIBUTE> consumer) {
+            final @Nonnull BiConsumer<? super ENUM, ? super ATTRIBUTE> consumer) {
         __AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
     }
 
@@ -133,7 +133,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @return the result of the {@code function}.
      * @see #acceptEnumConstantStream(Consumer)
      */
-    protected final <R> R applyEnumConstantStream(@Nonnull final Function<? super Stream<ENUM>, ? extends R> function) {
+    protected final <R> R applyEnumConstantStream(final @Nonnull Function<? super Stream<ENUM>, ? extends R> function) {
         return __AttributeEnum_TestUtils.applyEnumConstantStream(enumClass, function);
     }
 
@@ -143,7 +143,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @param consumer the consumer.
      * @see #applyEnumConstantStream(Function)
      */
-    protected final void acceptEnumConstantStream(@Nonnull final Consumer<? super Stream<ENUM>> consumer) {
+    protected final void acceptEnumConstantStream(final @Nonnull Consumer<? super Stream<ENUM>> consumer) {
         __AttributeEnum_TestUtils.acceptEnumConstantStream(enumClass, consumer);
     }
 
@@ -155,7 +155,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @see #acceptAttributeValueStream(Consumer)
      */
     protected final <R> R applyAttributeValueStream(
-            @Nonnull final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
+            final @Nonnull Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
         return __AttributeEnum_TestUtils.applyAttributeValueStream(enumClass, function);
     }
 
@@ -165,7 +165,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @param consumer the consumer.
      * @see #applyAttributeValueStream(Function)
      */
-    protected final void acceptAttributeValueStream(@Nonnull final Consumer<? super Stream<ATTRIBUTE>> consumer) {
+    protected final void acceptAttributeValueStream(final @Nonnull Consumer<? super Stream<ATTRIBUTE>> consumer) {
         __AttributeEnum_TestUtils.acceptAttributeValueStream(enumClass, consumer);
     }
 

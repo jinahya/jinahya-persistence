@@ -43,8 +43,8 @@ public final class __AttributeConverterUtils {
      */
     @Nonnull
     public static <X, Y> AttributeConverter<X, Y> using(
-            @Nonnull final Function<? super X, ? extends Y> toDatabaseColumn,
-            @Nonnull final Function<? super Y, ? extends X> toEntityAttribute) {
+            final @Nonnull Function<? super X, ? extends Y> toDatabaseColumn,
+            final @Nonnull Function<? super Y, ? extends X> toEntityAttribute) {
         Objects.requireNonNull(toDatabaseColumn, "toDatabaseColumn is null");
         Objects.requireNonNull(toEntityAttribute, "toEntityAttribute is null");
         return new AttributeConverter<>() { // @formatter:off
@@ -70,8 +70,8 @@ public final class __AttributeConverterUtils {
      */
     @Nonnull
     public static <T, U, V> AttributeConverter<T, V> chaining(
-            @Nonnull final AttributeConverter<T, U> attributeConverter1,
-            @Nonnull final AttributeConverter<U, V> attributeConverter2) {
+            final @Nonnull AttributeConverter<T, U> attributeConverter1,
+            final @Nonnull AttributeConverter<U, V> attributeConverter2) {
         Objects.requireNonNull(attributeConverter1, "attributeConverter1 is null");
         Objects.requireNonNull(attributeConverter2, "attributeConverter2 is null");
         return new AttributeConverter<>() { // @formatter:off
@@ -89,9 +89,9 @@ public final class __AttributeConverterUtils {
     }
 
     static <T, U, V, W> AttributeConverter<T, W> chaining(
-            @Nonnull final AttributeConverter<T, U> attributeConverter1,
-            @Nonnull final AttributeConverter<U, V> attributeConverter2,
-            @Nonnull final AttributeConverter<V, W> attributeConverter3) {
+            final @Nonnull AttributeConverter<T, U> attributeConverter1,
+            final @Nonnull AttributeConverter<U, V> attributeConverter2,
+            final @Nonnull AttributeConverter<V, W> attributeConverter3) {
         if (ThreadLocalRandom.current().nextBoolean()) {
             return chaining(
                     attributeConverter1,
@@ -106,10 +106,10 @@ public final class __AttributeConverterUtils {
     }
 
     static <T, U, V, W, X> AttributeConverter<T, X> chaining(
-            @Nonnull final AttributeConverter<T, U> attributeConverter1,
-            @Nonnull final AttributeConverter<U, V> attributeConverter2,
-            @Nonnull final AttributeConverter<V, W> attributeConverter3,
-            @Nonnull final AttributeConverter<W, X> attributeConverter4) {
+            final @Nonnull AttributeConverter<T, U> attributeConverter1,
+            final @Nonnull AttributeConverter<U, V> attributeConverter2,
+            final @Nonnull AttributeConverter<V, W> attributeConverter3,
+            final @Nonnull AttributeConverter<W, X> attributeConverter4) {
         return switch (ThreadLocalRandom.current().nextInt(3)) {
             case 0 -> chaining(
                     attributeConverter1,
@@ -127,11 +127,11 @@ public final class __AttributeConverterUtils {
     }
 
     static <T, U, V, W, X, Y> AttributeConverter<T, Y> chaining(
-            @Nonnull final AttributeConverter<T, U> attributeConverter1,
-            @Nonnull final AttributeConverter<U, V> attributeConverter2,
-            @Nonnull final AttributeConverter<V, W> attributeConverter3,
-            @Nonnull final AttributeConverter<W, X> attributeConverter4,
-            @Nonnull final AttributeConverter<X, Y> attributeConverter5) {
+            final @Nonnull AttributeConverter<T, U> attributeConverter1,
+            final @Nonnull AttributeConverter<U, V> attributeConverter2,
+            final @Nonnull AttributeConverter<V, W> attributeConverter3,
+            final @Nonnull AttributeConverter<W, X> attributeConverter4,
+            final @Nonnull AttributeConverter<X, Y> attributeConverter5) {
         return switch (ThreadLocalRandom.current().nextInt(4)) {
             case 0 -> chaining(
                     attributeConverter1,
@@ -153,12 +153,12 @@ public final class __AttributeConverterUtils {
     }
 
     static <T, U, V, W, X, Y, Z> AttributeConverter<T, Z> chaining(
-            @Nonnull final AttributeConverter<T, U> attributeConverter1,
-            @Nonnull final AttributeConverter<U, V> attributeConverter2,
-            @Nonnull final AttributeConverter<V, W> attributeConverter3,
-            @Nonnull final AttributeConverter<W, X> attributeConverter4,
-            @Nonnull final AttributeConverter<X, Y> attributeConverter5,
-            @Nonnull final AttributeConverter<Y, Z> attributeConverter6) {
+            final @Nonnull AttributeConverter<T, U> attributeConverter1,
+            final @Nonnull AttributeConverter<U, V> attributeConverter2,
+            final @Nonnull AttributeConverter<V, W> attributeConverter3,
+            final @Nonnull AttributeConverter<W, X> attributeConverter4,
+            final @Nonnull AttributeConverter<X, Y> attributeConverter5,
+            final @Nonnull AttributeConverter<Y, Z> attributeConverter6) {
         return switch (ThreadLocalRandom.current().nextInt(5)) {
             case 0 -> chaining(
                     attributeConverter1,

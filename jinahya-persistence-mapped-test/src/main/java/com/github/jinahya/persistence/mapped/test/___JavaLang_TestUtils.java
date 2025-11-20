@@ -46,9 +46,9 @@ final class ___JavaLang_TestUtils {
      * @return the sibling class meets given conditions; {@code null} when not found.
      */
     @Nullable
-    static Class<?> siblingClassForPostfix(@Nonnull final Class<?> type,
+    static Class<?> siblingClassForPostfix(final @Nonnull Class<?> type,
                                            @Nullable final Class<?> supertype,
-                                           @Nonnull final String... postfixes) {
+                                           final @Nonnull String... postfixes) {
         Objects.requireNonNull(type, "type is null");
         if (Objects.requireNonNull(postfixes, "postfixes is null").length == 0) {
             throw new IllegalArgumentException("postfixes is empty");

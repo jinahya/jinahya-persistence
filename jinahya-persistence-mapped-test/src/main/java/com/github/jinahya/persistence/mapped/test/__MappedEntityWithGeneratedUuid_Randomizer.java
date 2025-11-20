@@ -40,7 +40,7 @@ public abstract class __MappedEntityWithGeneratedUuid_Randomizer<
         >
         extends __MappedEntityWithGeneratedId_Randomizer<ENTITY, UUID> {
 
-    protected __MappedEntityWithGeneratedUuid_Randomizer(@Nonnull final Class<ENTITY> entityClass,
+    protected __MappedEntityWithGeneratedUuid_Randomizer(final @Nonnull Class<ENTITY> entityClass,
                                                          final String... excludedFields) {
         super(entityClass, UUID.class, excludedFields);
     }

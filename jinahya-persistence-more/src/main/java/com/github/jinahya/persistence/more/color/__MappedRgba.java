@@ -78,7 +78,7 @@ public abstract class __MappedRgba extends __MappedRgb {
         return alpha;
     }
 
-    public void setAlpha(@Nonnull final Double alpha) {
+    public void setAlpha(final @Nonnull Double alpha) {
         this.alpha = alpha;
     }
 

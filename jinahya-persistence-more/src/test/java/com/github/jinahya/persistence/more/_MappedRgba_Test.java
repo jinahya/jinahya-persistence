@@ -23,7 +23,7 @@ class _MappedRgba_Test extends __Mapped_Test<_MappedRgba> {
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<_MappedRgba> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<_MappedRgba> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<_MappedRgba> equalsVerifier) {
         return EqualsVerifier.simple().forClass(mappedClass)
                 ;
     }

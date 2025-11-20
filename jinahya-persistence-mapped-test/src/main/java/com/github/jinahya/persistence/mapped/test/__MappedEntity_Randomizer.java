@@ -49,8 +49,8 @@ public abstract class __MappedEntity_Randomizer<ENTITY extends __MappedEntity<ID
      * @param excludedFields the names of the fields to be excluded from randomization.
      * @see #idClass
      */
-    protected __MappedEntity_Randomizer(@Nonnull final Class<ENTITY> entityClass, @Nonnull final Class<ID> idClass,
-                                        @Nonnull final String... excludedFields) {
+    protected __MappedEntity_Randomizer(final @Nonnull Class<ENTITY> entityClass, final @Nonnull Class<ID> idClass,
+                                        final @Nonnull String... excludedFields) {
         super(entityClass, excludedFields);
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
     }

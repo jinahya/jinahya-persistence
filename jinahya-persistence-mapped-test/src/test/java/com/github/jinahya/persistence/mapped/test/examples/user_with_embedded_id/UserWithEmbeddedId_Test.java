@@ -37,7 +37,7 @@ class UserWithEmbeddedId_Test extends __MappedEntity_Test<UserWithEmbeddedId, Id
     @Nonnull
     @Override
     protected SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equalsVerifier) {
+            final @Nonnull SingleTypeEqualsVerifierApi<UserWithEmbeddedId> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.SURROGATE_KEY);
     }

@@ -38,8 +38,8 @@ final class __MappedUtils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     static <TARGET extends __Mapped>
-    void setPropertiesFrom(@Nonnull final TARGET target,
-                           @Nonnull final __MappedBuilder<?, ? extends TARGET> builder)
+    void setPropertiesFrom(final @Nonnull TARGET target,
+                           final @Nonnull __MappedBuilder<?, ? extends TARGET> builder)
             throws IntrospectionException {
         Objects.requireNonNull(builder, "builder is null");
         Objects.requireNonNull(target, "target is null");

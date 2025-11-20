@@ -42,7 +42,7 @@ import java.util.function.Predicate;
 })
 public class __Mapped_TestUtils {
 
-    static <MAPPED extends __Mapped> Table getTableAnnotation(@Nonnull final Class<MAPPED> mappedClass) {
+    static <MAPPED extends __Mapped> Table getTableAnnotation(final @Nonnull Class<MAPPED> mappedClass) {
         Objects.requireNonNull(mappedClass, "mappedClass is null");
         return ___JavaLangReflect_TestUtils.findAnnotation(mappedClass, Table.class)
                 .orElseThrow(
@@ -50,9 +50,9 @@ public class __Mapped_TestUtils {
                 );
     }
 
-    public static <MAPPED extends __Mapped> MAPPED setFieldValue(@Nonnull final Class<MAPPED> mappedClass,
-                                                                 @Nonnull final MAPPED mappedInstance,
-                                                                 @Nonnull final Predicate<Field> fieldPredicate,
+    public static <MAPPED extends __Mapped> MAPPED setFieldValue(final @Nonnull Class<MAPPED> mappedClass,
+                                                                 final @Nonnull MAPPED mappedInstance,
+                                                                 final @Nonnull Predicate<Field> fieldPredicate,
                                                                  final Object fieldValue) {
         final var field = ReflectionUtils
                 .findFields(mappedClass, fieldPredicate, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP).stream()
@@ -69,9 +69,9 @@ public class __Mapped_TestUtils {
         return mappedInstance;
     }
 
-    public static <MAPPED extends __Mapped> MAPPED setFieldValue(@Nonnull final Class<MAPPED> mappedClass,
-                                                                 @Nonnull final MAPPED mappedInstance,
-                                                                 @Nonnull final String fieldName,
+    public static <MAPPED extends __Mapped> MAPPED setFieldValue(final @Nonnull Class<MAPPED> mappedClass,
+                                                                 final @Nonnull MAPPED mappedInstance,
+                                                                 final @Nonnull String fieldName,
                                                                  final Object fieldValue) {
         Objects.requireNonNull(fieldName, "fieldName is null");
         return setFieldValue(

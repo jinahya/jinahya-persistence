@@ -121,7 +121,7 @@ public abstract class __MappedRgb extends __Mapped {
      *            {@value DECIMAL_MIN_COMPONENT_NORMALIZED} and {@value DECIMAL_MAX_COMPONENT_NORMALIZED}, both
      *            inclusive.
      */
-    public void setRed(@Nonnull final Double red) {
+    public void setRed(final @Nonnull Double red) {
         this.red = red;
     }
 
@@ -159,7 +159,7 @@ public abstract class __MappedRgb extends __Mapped {
         return green;
     }
 
-    public void setGreen(@Nonnull final Double green) {
+    public void setGreen(final @Nonnull Double green) {
         this.green = green;
     }
 
@@ -185,7 +185,7 @@ public abstract class __MappedRgb extends __Mapped {
         return blue;
     }
 
-    public void setBlue(@Nonnull final Double blue) {
+    public void setBlue(final @Nonnull Double blue) {
         this.blue = blue;
     }
 

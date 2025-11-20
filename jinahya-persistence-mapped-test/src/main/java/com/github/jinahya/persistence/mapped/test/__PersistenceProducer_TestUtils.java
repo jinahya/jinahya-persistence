@@ -52,13 +52,12 @@ public final class __PersistenceProducer_TestUtils {
      *
      * @param entityManagerFactory the entity manager factory.
      * @return given {@code entityManagerFactory}.
-     * @see <a
-     *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a12384">8.2.1.11.
      *         properties</a>
      */
     @Nonnull
     public static EntityManagerFactory assertSchemagenDatabaseActionNone(
-            @Nonnull final EntityManagerFactory entityManagerFactory) {
+            final @Nonnull EntityManagerFactory entityManagerFactory) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
@@ -84,7 +83,7 @@ public final class __PersistenceProducer_TestUtils {
      */
     @Nonnull
     public static EntityManagerFactory assertEclipselinkDdlGenerationNone(
-            @Nonnull final EntityManagerFactory entityManagerFactory) {
+            final @Nonnull EntityManagerFactory entityManagerFactory) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(
@@ -109,7 +108,7 @@ public final class __PersistenceProducer_TestUtils {
      */
     @Nonnull
     public static EntityManagerFactory assertHibernateHbm2ddlAutoNone(
-            @Nonnull final EntityManagerFactory entityManagerFactory) {
+            final @Nonnull EntityManagerFactory entityManagerFactory) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         final var properties = entityManagerFactory.getProperties();
         final var value = properties.getOrDefault(

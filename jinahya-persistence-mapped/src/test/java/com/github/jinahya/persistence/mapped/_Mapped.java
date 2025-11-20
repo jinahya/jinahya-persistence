@@ -28,7 +28,7 @@ abstract class _Mapped extends __Mapped {
         super();
     }
 
-    protected _Mapped(@Nonnull final _MappedBuilder<?, ?> builder) {
+    protected _Mapped(final @Nonnull _MappedBuilder<?, ?> builder) {
         super(builder);
     }
 }

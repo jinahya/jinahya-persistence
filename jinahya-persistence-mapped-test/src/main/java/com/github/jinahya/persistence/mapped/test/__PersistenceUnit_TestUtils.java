@@ -33,8 +33,8 @@ import java.util.Optional;
 })
 final class __PersistenceUnit_TestUtils {
 
-    private static Optional<String> getProperty(@Nonnull final EntityManagerFactory entityManagerFactory,
-                                                @Nonnull final String propertyName) {
+    private static Optional<String> getProperty(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                                final @Nonnull String propertyName) {
         return Optional
                 .ofNullable(
                         (String) entityManagerFactory.getProperties().get(propertyName)

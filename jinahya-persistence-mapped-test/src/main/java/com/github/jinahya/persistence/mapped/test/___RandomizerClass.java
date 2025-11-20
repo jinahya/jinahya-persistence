@@ -26,6 +26,6 @@ package com.github.jinahya.persistence.mapped.test;
 })
 public @interface ___RandomizerClass {
 
-//    Class<? extends ___Randomizer<?>> value();
+    //    Class<? extends ___Randomizer<?>> value();
     Class<?> value();
 }
