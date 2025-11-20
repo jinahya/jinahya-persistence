@@ -16,6 +16,11 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>jinahya-persistence-crypto</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-mapped</artifactId>
       <version>${project.version}</version>
     </dependency>

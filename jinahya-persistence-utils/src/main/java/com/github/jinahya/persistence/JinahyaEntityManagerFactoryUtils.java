@@ -4,9 +4,12 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
+import jakarta.persistence.metamodel.Metamodel;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.WeakHashMap;
 
 /**
  * A utility class for {@link EntityManagerFactory}.
@@ -15,52 +18,53 @@ import java.util.Optional;
  */
 public final class JinahyaEntityManagerFactoryUtils {
 
-    /**
-     * Returns the id of the specified entity as the specified type.
-     *
-     * @param factory an entity manager factory.
-     * @param entity  the entity instance whose id is to be returned.
-     * @param type    the type of the id.
-     * @param <ID>    identifier type parameter
-     * @return the id of the {@code entity} cast as {@link ID}; {@code null} when the {@code entity} does not yet have
-     *         an id.
-     * @apiNote this method is just a shortcut for
-     *         {@code factory.getPersistenceUnitUtil().getIdentifier(entity)}.
-     * @see EntityManagerFactory#getPersistenceUnitUtil()
-     * @see PersistenceUnitUtil#getIdentifier(Object)
-     */
-    public static <ID> @Nullable ID getIdentifier(final @Nonnull EntityManagerFactory factory,
-                                                  final @Nonnull Object entity, final @Nonnull Class<ID> type) {
+    private static final Map<EntityManagerFactory, PersistenceUnitUtil> PERSISTENCE_UNIT_UTILS =
+            Collections.synchronizedMap(new WeakHashMap<>());
+
+    static @Nonnull PersistenceUnitUtil getPersistenceUnitUtil(final @Nonnull EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
-        Objects.requireNonNull(entity, "entity is null");
-        Objects.requireNonNull(type, "type is null");
-        return Optional
-                .ofNullable(factory.getPersistenceUnitUtil().getIdentifier(entity))
-                .map(type::cast)
-                .orElse(null);
+        return PERSISTENCE_UNIT_UTILS.computeIfAbsent(
+                factory,
+                EntityManagerFactory::getPersistenceUnitUtil
+        );
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+//    private static final Map<Object, Object> IDENTIFIERS = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Returns the id of the specified entity.
      *
      * @param factory an entity manager factory.
      * @param entity  the entity instance whose id is to be returned.
-     * @param <ID>    identifier type parameter
-     * @return the id of the {@code entity} cast as {@link ID}; {@code null} when the {@code entity} does not yet have
-     *         an id.
-     * @apiNote This method invokes
-     *         {@link #getIdentifier(EntityManagerFactory, Object, Class) getIdentifier(factory, entity, type)} method
-     *         with {@code factory}, {@code entity}, and {@code Object.class}, and returns the result cast as
-     *         {@link ID}, which means this method is just a shortcut for
-     *         {@code (ID) factory.getPersistenceUnitUtil().getIdentifier(entity)}.
+     * @param <Y>     identifier type parameter
+     * @return the id of the {@code entity} cast as {@link Y}; {@code null} when the {@code entity} does not yet have an
+     *         id.
      * @see EntityManagerFactory#getPersistenceUnitUtil()
      * @see PersistenceUnitUtil#getIdentifier(Object)
      */
-    public static <ID> @Nullable ID getIdentifier(final @Nonnull EntityManagerFactory factory,
-                                                  final @Nonnull Object entity) {
-        @SuppressWarnings({"unchecked"})
-        final var id = (ID) getIdentifier(factory, entity, Object.class);
-        return id;
+    @SuppressWarnings({"unchecked"})
+    public static <Y> @Nullable Y getIdentifier(final @Nonnull EntityManagerFactory factory,
+                                                final @Nonnull Object entity) {
+        Objects.requireNonNull(factory, "factory is null");
+        Objects.requireNonNull(entity, "entity is null");
+//        return (T) IDENTIFIERS.computeIfAbsent(
+//                entity,
+//                k -> getPersistenceUnitUtil(factory).getIdentifier(k)
+//        );
+        return (Y) getPersistenceUnitUtil(factory).getIdentifier(entity);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private static final Map<EntityManagerFactory, Metamodel> METAMODELS =
+            Collections.synchronizedMap(new WeakHashMap<>());
+
+    public static @Nonnull Metamodel getMetamodel(final @Nonnull EntityManagerFactory factory) {
+        Objects.requireNonNull(factory, "factory is null");
+        return METAMODELS.computeIfAbsent(
+                factory,
+                EntityManagerFactory::getMetamodel
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

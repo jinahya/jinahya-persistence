@@ -20,25 +20,16 @@ package com.github.jinahya.persistence.metamodel;
  * #L%
  */
 
+import com.github.jinahya.persistence.JinahyaEntityManagerFactoryUtils;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import java.util.WeakHashMap;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings({
@@ -49,8 +40,16 @@ public final class JinahyaEntityTypeUtils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static final Map<Class<?>, EntityType<?>> ENTITY_TYPES = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, EntityType<?>> ENTITY_TYPES = Collections.synchronizedMap(new WeakHashMap<>());
 
+    /**
+     * Returns the {@link EntityType} of the specified entity class.
+     *
+     * @param entityClass            the entity class whose {@link EntityType} is returned.
+     * @param entityManagerFactories an iterable of entity manager factories.
+     * @param <X>                    represented entity type
+     * @return the {@link EntityType} of the {@code entityClass}.
+     */
     public static <X> EntityType<X> getEntityType(
             final @Nonnull Class<X> entityClass,
             final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
@@ -70,7 +69,8 @@ public final class JinahyaEntityTypeUtils {
                         // empty
                     }
                     return StreamSupport.stream(entityManagerFactories.spliterator(), false)
-                            .map(EntityManagerFactory::getMetamodel)
+//                            .map(EntityManagerFactory::getMetamodel)
+                            .map(JinahyaEntityManagerFactoryUtils::getMetamodel)
                             .map(m -> {
                                 try {
                                     return m.entity(entityClass);
@@ -82,161 +82,12 @@ public final class JinahyaEntityTypeUtils {
                             .findFirst()
                             .orElseThrow(
                                     () -> new IllegalArgumentException(
-                                            "no entity type found for entity class: " + entityClass)
+                                            "no entity type found for entity class: " + entityClass
+                                    )
                             );
                 }
         );
         return entityType;
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    public static <T, R> R applyJavaMember(
-            final @Nonnull Attribute<?, ? extends T> attribute,
-            final @Nonnull Function<? super Method, ? extends Function<? super Field, ? extends R>> function) {
-        Objects.requireNonNull(attribute, "attribute is null");
-        Objects.requireNonNull(function, "function is null");
-        final var member = attribute.getJavaMember();
-        if (member instanceof Method method) {
-            return function.apply(method).apply(null);
-        } else if (member instanceof Field field) {
-            return function.apply(null).apply(field);
-        }
-        throw new RuntimeException(
-                """
-                        unhandled [java member](%1$s) \
-                        of [attribute](%2$s)"""
-                        .formatted(member, attribute));
-    }
-
-    public static <T, A extends Annotation> @Nullable A getJavaMemberAnnotation(
-            final @Nonnull Attribute<?, ? extends T> attribute, final @Nonnull Class<A> annotationClass) {
-        Objects.requireNonNull(annotationClass, "annotationClass is null");
-        return applyJavaMember(
-                attribute,
-                m -> f -> {
-                    if (m != null) {
-                        return m.getAnnotation(annotationClass);
-                    }
-                    assert f != null;
-                    return f.getAnnotation(annotationClass);
-                }
-        );
-    }
-
-    public static <X, T> T getAttributeValue(final @Nonnull X entity,
-                                             final @Nonnull Attribute<? extends X, ? extends T> attribute) {
-        Objects.requireNonNull(entity, "entity is null");
-        return applyJavaMember(
-                attribute,
-                m -> f -> {
-                    if (m != null) {
-                        if (m.canAccess(entity)) {
-                            m.setAccessible(true);
-                        }
-                        try {
-                            return (T) m.invoke(entity);
-                        } catch (final ReflectiveOperationException roe) {
-                            throw new RuntimeException(
-                                    """
-                                            failed to get value of \
-                                            [java member of method](%1$s) \
-                                            of [attribute](%2$s) \
-                                            on [entity](%3$s)"""
-                                            .formatted(m, attribute, entity),
-                                    roe
-                            );
-                        }
-                    }
-                    assert f != null;
-                    if (!f.canAccess(entity)) {
-                        f.setAccessible(true);
-                    }
-                    try {
-                        return (T) f.get(entity);
-                    } catch (final ReflectiveOperationException roe) {
-                        throw new RuntimeException(
-                                """
-                                        failed to get value of \
-                                        [java member of field](%1$s) \
-                                        of [attribute](%2$s) \
-                                        on [entity](%3$s)"""
-                                        .formatted(f, attribute, entity),
-                                roe
-                        );
-                    }
-                }
-        );
-    }
-
-    private static final Map<Attribute<?, ?>, Method> SETTERS = new ConcurrentHashMap<>();
-
-    private static Method getSetter(final @Nonnull Class<?> clazz, final @Nonnull Attribute<?, ?> attribute) {
-        return SETTERS.computeIfAbsent(
-                attribute,
-                k -> {
-                    final BeanInfo beanInfo;
-                    try {
-                        beanInfo = Introspector.getBeanInfo(clazz);
-                    } catch (final IntrospectionException ie) {
-                        throw new RuntimeException("failed to introspect " + clazz, ie);
-                    }
-                    return Arrays.stream(beanInfo.getPropertyDescriptors())
-                            .filter(d -> {
-                                return d.getName().equals(k.getName()) &&
-                                       k.getJavaType().isAssignableFrom(d.getPropertyType());
-                            })
-                            .map(PropertyDescriptor::getWriteMethod)
-                            .findFirst()
-                            .orElseThrow(() -> new RuntimeException("no setter found for " + attribute));
-                }
-        );
-    }
-
-    public static <X, T> T setAttributeValue(final @Nonnull X entity,
-                                             final @Nonnull Attribute<? extends X, ? extends T> attribute,
-                                             final @Nullable Object value) {
-        Objects.requireNonNull(entity, "entity is null");
-        return applyJavaMember(
-                attribute,
-                m -> f -> {
-                    if (m != null) {
-                        assert m.getName().startsWith("get");
-                        if (m.canAccess(entity)) {
-                            m.setAccessible(true);
-                        }
-                        try {
-                            return (T) m.invoke(entity);
-                        } catch (final ReflectiveOperationException roe) {
-                            throw new RuntimeException(
-                                    """
-                                            failed to get value of \
-                                            [java member of method](%1$s) \
-                                            of [attribute](%2$s) \
-                                            on [entity](%3$s)"""
-                                            .formatted(m, attribute, entity),
-                                    roe
-                            );
-                        }
-                    }
-                    assert f != null;
-                    if (!f.canAccess(entity)) {
-                        f.setAccessible(true);
-                    }
-                    try {
-                        return (T) f.get(entity);
-                    } catch (final ReflectiveOperationException roe) {
-                        throw new RuntimeException(
-                                """
-                                        failed to get value of \
-                                        [java member of field](%1$s) \
-                                        of [attribute](%2$s) \
-                                        on [entity](%3$s)"""
-                                        .formatted(f, attribute, entity),
-                                roe
-                        );
-                    }
-                }
-        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

@@ -29,37 +29,13 @@ public final class JinahyaEntityManagerUtils {
      *
      * @param manager .
      * @param entity  .
-     * @param idClass .
-     * @param <ID>    .
-     * @return .
-     * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object, Class)
-     * @deprecated Use {@link JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object, Class)}
-     */
-    @Deprecated(forRemoval = true)
-    public static <ID> @Nullable ID getIdentifier(final @Nonnull EntityManager manager,
-                                                  final @Nonnull Object entity,
-                                                  final @Nonnull Class<ID> idClass) {
-        Objects.requireNonNull(manager, "manager is null");
-        return JinahyaEntityManagerFactoryUtils.getIdentifier(
-                manager.getEntityManagerFactory(),
-                entity,
-                idClass
-        );
-    }
-
-    /**
-     * .
-     *
-     * @param manager .
-     * @param entity  .
-     * @param <ID>    identifier type parameter
+     * @param <Y>     .
      * @return .
      * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
-     * @deprecated Use {@link JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)}
      */
     @Deprecated(forRemoval = true)
-    public static <ID> @Nullable ID getIdentifier(final @Nonnull EntityManager manager,
-                                                  final @Nonnull Object entity) {
+    public static <Y> @Nullable Y getIdentifier(final @Nonnull EntityManager manager,
+                                                final @Nonnull Object entity) {
         Objects.requireNonNull(manager, "manager is null");
         return JinahyaEntityManagerFactoryUtils.getIdentifier(
                 manager.getEntityManagerFactory(),
@@ -103,7 +79,7 @@ public final class JinahyaEntityManagerUtils {
         } catch (final Exception e) {
             transaction.rollback();
             throw new RuntimeException(
-                    "failed to apply, in transaction" +
+                    "failed to get, in transaction" +
                     "; manager: " + manager +
                     "; supplier: " + supplier +
                     "; rollback: " + rollback,
@@ -122,8 +98,8 @@ public final class JinahyaEntityManagerUtils {
     }
 
     /**
-     * Applies the specified entity manager, as joined to a transaction, to the specified function, and returns the
-     * result.
+     * Starts a resource-level transaction of the specified entity manaager, applies it to the specified function, and
+     * returns the result.
      *
      * @param manager  the entity manager.
      * @param function the function to be applied to the {@code manager}.
@@ -131,6 +107,7 @@ public final class JinahyaEntityManagerUtils {
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
      * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @see #applyUnwrappedConnectionInTransactionAndRollback(EntityManager, Function)
      */
     public static <R> R applyInTransaction(final @Nonnull EntityManager manager,
                                            final @Nonnull Function<? super EntityManager, ? extends R> function,
@@ -164,6 +141,7 @@ public final class JinahyaEntityManagerUtils {
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
      * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @apiNote this method does not close the unwrapped connection.
      */
     public static <R> R applyUnwrappedConnection(final @Nonnull EntityManager manager,
                                                  final @Nonnull Function<? super Connection, ? extends R> function) {
@@ -196,7 +174,6 @@ public final class JinahyaEntityManagerUtils {
             final @Nonnull EntityManager manager,
             final @Nonnull Function<? super Connection, ? extends R> function,
             final boolean rollback) {
-        Objects.requireNonNull(manager, "manager is null");
         Objects.requireNonNull(function, "function is null");
         return getInTransaction(
                 manager,

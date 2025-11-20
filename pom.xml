@@ -71,11 +71,11 @@
     <revision>0.3.10-SNAPSHOT</revision>
     <!-- https://endoflife.date/eclipse-temurin -->
     <!-- https://endoflife.date/amazon-corretto -->
-    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
     <!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
-    <maven.compiler.testSource>21</maven.compiler.testSource>
+    <maven.compiler.testSource>25</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <doclint>none</doclint>
@@ -658,6 +658,9 @@
     </profile>
     <profile>
       <id>jakarta-ee-11.0.0</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <!-- https://central.sonatype.com/artifact/jakarta.platform/jakartaee-api-parent/11.0.0 -->
         <!-- jakarta.enterprise.cdi-api.version: 4.1.0 -->
@@ -693,6 +696,9 @@
       <id>hibernate-orm-7.1-jakarta-ee-11</id>
       <!-- Jakarta Persistence: 3.2 -->
       <!-- Jakarta EE: 11 -->
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
         <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
@@ -756,6 +762,9 @@
       <id>hibernate-validator-9.1-jakarta-ee-11</id>
       <!-- Jakarta Bean Validation: 3.1 -->
       <!-- Jakarta EE: 11 -->
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <!-- https://hibernate.org/validator/releases/ -->
         <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
@@ -773,6 +782,9 @@
     </profile>
     <profile>
       <id>weld-6-jakarta-ee-11</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <!-- https://weld.cdi-spec.org/download/ -->
         <!-- https://central.sonatype.com/artifact/org.jboss.weld/weld-junit5/versions -->

@@ -46,6 +46,30 @@ public final class JinahyaAttributeUtils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Applies the {@link Attribute#getJavaMember() javaMember} of either a method or a field, of the specified
+     * attribute to the specified function, and returns the result.
+     * {@snippet lang = "java":
+     * applyJavaMember(
+     *         attribute,
+     *         (Method m) -> (Field f) -> {
+     *             // either m or f is not null, exclusively
+     *             if (m != null ) {
+     *                 assert f == null;
+     *             } else {
+     *                 assert f != null;
+     *             }
+     *             return null;
+     *         }
+     * );
+     *}
+     *
+     * @param attribute the attribute.
+     * @param function  the function.
+     * @param <R>       result type parameter
+     * @return the result of the {@code function}.
+     */
     public static <R> R applyJavaMember(
             final @Nonnull Attribute<?, ?> attribute,
             final @Nonnull Function<? super Method, ? extends Function<? super Field, ? extends R>> function) {
@@ -59,13 +83,22 @@ public final class JinahyaAttributeUtils {
         }
         throw new RuntimeException(
                 """
-                        unknown java member
+                        unknown java member type
                         ; attribute: %1$s
                         ; java member: %2$s"""
                         .formatted(attribute, javaMember)
         );
     }
 
+    /**
+     * Returns an instance of the specified annotation class on the specified attribute's java member.
+     *
+     * @param attribute       the attribute.
+     * @param annotationClass the annotation class.
+     * @param <A>             annotation type parameter
+     * @return an instance of the {@code annotation} on the {@code attribute}'s java member; {@code null} when not
+     *         found.
+     */
     public static <A extends Annotation> @Nullable A getJavaMemberAnnotation(
             final @Nonnull Attribute<?, ?> attribute, final @Nonnull Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass, "annotationClass is null");
@@ -81,8 +114,16 @@ public final class JinahyaAttributeUtils {
         );
     }
 
-    public static <T> T getAttributeValue(final @Nonnull Object entity,
-                                          final @Nonnull Attribute<?, ? extends T> attribute) {
+    /**
+     * Returns the value of the specified attribute of the specified entity.
+     *
+     * @param entity    the entity.
+     * @param attribute the attribute of the {@code entity}.
+     * @param <Y>       attribute type parameter
+     * @return the value of the {@code attribute} of the {@code entity}.
+     */
+    public static <Y> Y getAttributeValue(final @Nonnull Object entity,
+                                          final @Nonnull Attribute<?, ? extends Y> attribute) {
         Objects.requireNonNull(entity, "entity is null");
         return applyJavaMember(
                 attribute,
@@ -92,7 +133,7 @@ public final class JinahyaAttributeUtils {
                             m.setAccessible(true);
                         }
                         try {
-                            return (T) m.invoke(entity);
+                            return (Y) m.invoke(entity);
                         } catch (final ReflectiveOperationException roe) {
                             throw new RuntimeException(
                                     """
@@ -110,7 +151,7 @@ public final class JinahyaAttributeUtils {
                         f.setAccessible(true);
                     }
                     try {
-                        return (T) f.get(entity);
+                        return (Y) f.get(entity);
                     } catch (final ReflectiveOperationException roe) {
                         throw new RuntimeException(
                                 """
@@ -136,7 +177,7 @@ public final class JinahyaAttributeUtils {
                     try {
                         beanInfo = Introspector.getBeanInfo(clazz);
                     } catch (final IntrospectionException ie) {
-                        throw new RuntimeException("failed to introspect " + clazz, ie);
+                        throw new RuntimeException("failed to get bean info of " + clazz, ie);
                     }
                     return Arrays.stream(beanInfo.getPropertyDescriptors())
                             .filter(d -> {
