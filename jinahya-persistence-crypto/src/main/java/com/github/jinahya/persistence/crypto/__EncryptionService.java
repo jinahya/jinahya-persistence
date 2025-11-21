@@ -195,10 +195,10 @@ public abstract class __EncryptionService {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public void encrypt(final @Valid @NotNull Object entity) {
-        Objects.requireNonNull(entity, "entity is null");
-        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(entity);
-        final var entityClass = entity.getClass();
+    public void encrypt(final @Valid @NotNull Object object) {
+        Objects.requireNonNull(object, "object is null");
+        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
+        final var entityClass = object.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
         final var encryptedAttributes = new HashSet<Attribute<?, ?>>();
@@ -223,14 +223,14 @@ public abstract class __EncryptionService {
                             "; encryption annotation: " + attributeAnnotation
                     ));
             check(decryptedAttribute, attributeAnnotation, encryptedAttribute, encryptedAttributes);
-            final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
+            final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
             if (decryptedValue == null) {
-                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
+                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
                 if (encryptedValue != null) {
                     // already encrypted
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, null);
+                JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
                 continue;
             }
             final byte[] decryptedBytes;
@@ -294,15 +294,15 @@ public abstract class __EncryptionService {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
             final var encrypted = encryptionManager.encrypt(encryptionIdentifier, decryptedBytes);
-            JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, encrypted);
-            JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
+            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, encrypted);
+            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
         }
     }
 
-    public void decrypt(final @Valid @NotNull Object entity) {
-        Objects.requireNonNull(entity, "entity is null");
-        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(entity);
-        final var entityClass = entity.getClass();
+    public void decrypt(final @Valid @NotNull Object object) {
+        Objects.requireNonNull(object, "object is null");
+        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
+        final var entityClass = object.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
         final var encryptedAttributes = new HashSet<Attribute<?, ?>>();
@@ -318,6 +318,7 @@ public abstract class __EncryptionService {
             if (attributeAnnotation == null) {
                 continue;
             }
+            // TODO: @Embedded
             final var encryptedAttribute = Optional.of(attributeAnnotation.encryptedAttribute())
                     .map(v -> v.isBlank() ? decryptedAttribute.getName() + "Enc__" : v)
                     .map(attributes::get)
@@ -327,14 +328,14 @@ public abstract class __EncryptionService {
                             "; attribute annotation: " + attributeAnnotation
                     ));
             check(decryptedAttribute, attributeAnnotation, encryptedAttribute, encryptedAttributes);
-            final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
+            final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
             if (encryptedBytes == null) {
-                final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
+                final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
                 if (decryptedValue != null) {
                     // the encrypted column may be defined later
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
+                JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
                 continue;
             }
             final var decryptedBytes = encryptionManager.decrypt(encryptionIdentifier, encryptedBytes);
@@ -406,8 +407,8 @@ public abstract class __EncryptionService {
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-            JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, decryptedValue);
-            JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, null);
+            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, decryptedValue);
+            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
         }
     }
 
