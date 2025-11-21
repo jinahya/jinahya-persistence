@@ -7,7 +7,6 @@ import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
 import jakarta.enterprise.inject.spi.CDI;
-import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
@@ -16,8 +15,9 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.util.Optional;
+import java.util.Arrays;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -96,9 +96,16 @@ public abstract class __EncryptionListener {
 
     // ----------------------------------------------------------------------------------------------- encryptionService
     protected __EncryptionService getEncryptionService() {
-        return Optional.ofNullable(encryptionService)
-                .orElseGet(() -> CDI.current().select(__EncryptionService.class).get())
-                ;
+        __EncryptionService result = encryptionService;
+        if (result == null) {
+            final var qualifier = Arrays.stream(getClass().getAnnotations())
+                    .filter(a -> a instanceof __EncryptionServiceQualifier)
+                    .findFirst()
+                    .orElse(null);
+            final var qualifiers = qualifier == null ? new Annotation[0] : new Annotation[]{qualifier};
+            result = encryptionService = CDI.current().select(__EncryptionService.class, qualifiers).get();
+        }
+        return result;
     }
 
     protected void encrypt(final Object entityInstance) {
@@ -128,6 +135,5 @@ public abstract class __EncryptionListener {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Inject
-    private __EncryptionService encryptionService;
+    private volatile __EncryptionService encryptionService;
 }
