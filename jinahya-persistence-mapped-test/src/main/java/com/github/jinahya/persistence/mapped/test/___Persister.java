@@ -83,7 +83,7 @@ public abstract class ___Persister<ENTITY> {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(System.Logger.Level.DEBUG, "persisting {0}", entityInstance);
         entityManager.persist(entityInstance);
-        entityManager.flush(); // required?
+//        entityManager.flush(); // required?
         ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
