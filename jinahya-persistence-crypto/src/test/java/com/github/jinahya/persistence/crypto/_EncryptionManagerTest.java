@@ -13,6 +13,7 @@ class _EncryptionManagerTest {
         final var manager = new _EncryptionManager();
         final var plain = new byte[0];
         final var encrypted = manager.encrypt("irrelevant", plain);
+        assertThat(encrypted).hasSize(12 + 16);
         final var decrypted = manager.decrypt("irrelevant", encrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
@@ -22,6 +23,7 @@ class _EncryptionManagerTest {
         final var manager = new _EncryptionManager();
         final var plain = new byte[ThreadLocalRandom.current().nextInt(1048576)];
         final var encrypted = manager.encrypt("irrelevant", plain);
+        assertThat(encrypted).hasSize(12 + 16 + plain.length);
         final var decrypted = manager.decrypt("irrelevant", encrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
