@@ -20,9 +20,10 @@ import java.util.stream.Collectors;
 //        _PersistenceCryptoListener.class,
 //        __PersistenceProducer.class,
 //        __PersistenceCryptoProducer.class
-        _EncryptionListener.class,
-        _EncryptionService.class,
-        _EncryptionManager.class,
+//        _EncryptionListener.class,
+//        _EncryptionService.class,
+//        _EncryptionManager.class,
+        _EncryptionProducer.class
 })
 //@ExtendWith(WeldJunit5AutoExtension.class)
 @Slf4j

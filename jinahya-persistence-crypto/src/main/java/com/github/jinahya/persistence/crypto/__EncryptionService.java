@@ -8,9 +8,6 @@ import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
-import jakarta.enterprise.inject.Any;
-import jakarta.enterprise.inject.Instance;
-import jakarta.inject.Inject;
 import jakarta.persistence.Basic;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
@@ -31,6 +28,7 @@ import java.time.OffsetTime;
 import java.time.Year;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,11 +56,7 @@ import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.off
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_time_12;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.serializable_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.short_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_date_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql_timestamp_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.uuid_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.year_4;
@@ -107,9 +101,14 @@ public abstract class __EncryptionService {
 
     /**
      * Creates a new instance.
+     *
+     * @param encryptionManager the encryption manager; must not be {@code null}
      */
-    protected __EncryptionService() {
+    protected __EncryptionService(final EntityManagerFactory entityManagerFactory,
+                                  final __EncryptionManager encryptionManager) {
         super();
+        this.entityManagerFactory = Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        this.encryptionManager = Objects.requireNonNull(encryptionManager, "encryptionManager is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -118,7 +117,7 @@ public abstract class __EncryptionService {
     @PostConstruct
     protected void onPostConstruct() {
         logger.log(System.Logger.Level.DEBUG, "onPostConstruct()");
-        logger.log(System.Logger.Level.DEBUG, "factoryInstance: {0}", factoryInstance);
+        logger.log(System.Logger.Level.DEBUG, "entityManagerFactory: {0}", entityManagerFactory);
         logger.log(System.Logger.Level.DEBUG, "encryptionManager: {0}", encryptionManager);
     }
 
@@ -196,10 +195,10 @@ public abstract class __EncryptionService {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    public void encrypt(final @Valid @NotNull Object entity) {
-        Objects.requireNonNull(entity, "entity is null");
-        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(entity);
-        final var entityClass = entity.getClass();
+    public void encrypt(final @Valid @NotNull Object object) {
+        Objects.requireNonNull(object, "object is null");
+        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
+        final var entityClass = object.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
         final var encryptedAttributes = new HashSet<Attribute<?, ?>>();
@@ -224,14 +223,14 @@ public abstract class __EncryptionService {
                             "; encryption annotation: " + attributeAnnotation
                     ));
             check(decryptedAttribute, attributeAnnotation, encryptedAttribute, encryptedAttributes);
-            final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
+            final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
             if (decryptedValue == null) {
-                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
+                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
                 if (encryptedValue != null) {
                     // already encrypted
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, null);
+                JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
                 continue;
             }
             final byte[] decryptedBytes;
@@ -275,16 +274,9 @@ public abstract class __EncryptionService {
             } else if (decryptedValue instanceof Year v) {
                 decryptedBytes = year_4(new byte[4], 0, v);
             } else if (decryptedValue instanceof java.util.Calendar v) {
-                decryptedBytes = util_calendar_8(new byte[8], 0, v);
-            } else if (decryptedValue instanceof java.sql.Date v) {
-                decryptedBytes = sql_date_8(new byte[8], 0, v);
-            } else if (decryptedValue instanceof java.sql.Time v) {
-                decryptedBytes = sql_time_8(new byte[8], 0, v);
-            } else if (decryptedValue instanceof java.sql.Timestamp v) {
-                decryptedBytes = sql_timestamp_16(new byte[16], 0, v);
-                assert decryptedBytes.length == 16;
+                decryptedBytes = util_date_8(new byte[8], 0, v.getTime());
             } else if (decryptedValue instanceof java.util.Date v) { // should be checked after java.sql.*
-                decryptedBytes = util_date_8(new byte[8], 0, v);
+                decryptedBytes = long_8(new byte[8], 0, v.getTime());
             } else if (decryptedValue instanceof byte[] v) {
                 decryptedBytes = v;
             } else if (decryptedValue instanceof Byte[] v) {
@@ -302,15 +294,15 @@ public abstract class __EncryptionService {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
             final var encrypted = encryptionManager.encrypt(encryptionIdentifier, decryptedBytes);
-            JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, encrypted);
-            JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
+            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, encrypted);
+            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
         }
     }
 
-    public void decrypt(final @Valid @NotNull Object entity) {
-        Objects.requireNonNull(entity, "entity is null");
-        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(entity);
-        final var entityClass = entity.getClass();
+    public void decrypt(final @Valid @NotNull Object object) {
+        Objects.requireNonNull(object, "object is null");
+        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
+        final var entityClass = object.getClass();
         final var entityType = getEntityType(entityClass);
         final var attributes = getAttributes(entityType);
         final var encryptedAttributes = new HashSet<Attribute<?, ?>>();
@@ -326,6 +318,7 @@ public abstract class __EncryptionService {
             if (attributeAnnotation == null) {
                 continue;
             }
+            // TODO: @Embedded
             final var encryptedAttribute = Optional.of(attributeAnnotation.encryptedAttribute())
                     .map(v -> v.isBlank() ? decryptedAttribute.getName() + "Enc__" : v)
                     .map(attributes::get)
@@ -335,14 +328,14 @@ public abstract class __EncryptionService {
                             "; attribute annotation: " + attributeAnnotation
                     ));
             check(decryptedAttribute, attributeAnnotation, encryptedAttribute, encryptedAttributes);
-            final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(entity, encryptedAttribute);
+            final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
             if (encryptedBytes == null) {
-                final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(entity, decryptedAttribute);
+                final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
                 if (decryptedValue != null) {
                     // the encrypted column may be defined later
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, null);
+                JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
                 continue;
             }
             final var decryptedBytes = encryptionManager.decrypt(encryptionIdentifier, encryptedBytes);
@@ -387,16 +380,16 @@ public abstract class __EncryptionService {
             } else if (javaType == Year.class) {
                 decryptedValue = year_4(decryptedBytes, 0);
             } else if (javaType == Calendar.class) {
-                decryptedValue = util_calendar_8(decryptedBytes, 0);
-            } else if (javaType == java.sql.Date.class) {
-                decryptedValue = sql_date_8(decryptedBytes, 0);
-            } else if (javaType == java.sql.Time.class) {
-                decryptedValue = sql_time_8(decryptedBytes, 0);
-            } else if (javaType == java.sql.Timestamp.class) {
-                assert decryptedBytes.length == 16;
-                decryptedValue = sql_timestamp_16(decryptedBytes, 0);
-            } else if (javaType == java.util.Date.class) { // should be checked after java.sql.*
-                decryptedValue = util_date_8(decryptedBytes, 0);
+                final var date = util_date_8(decryptedBytes, 0);
+                decryptedValue = Calendar.getInstance();
+                ((Calendar) decryptedValue).setTime(date);
+            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+                final var time = long_8(decryptedBytes, 0);
+                try {
+                    decryptedValue = javaType.getConstructor(long.class).newInstance(time);
+                } catch (final ReflectiveOperationException roe) {
+                    throw new RuntimeException(roe);
+                }
             } else if (javaType == byte[].class) {
                 decryptedValue = decryptedBytes;
             } else if (javaType == Byte[].class) {
@@ -414,31 +407,32 @@ public abstract class __EncryptionService {
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-            JinahyaAttributeUtils.setAttributeValue(entity, decryptedAttribute, decryptedValue);
-            JinahyaAttributeUtils.setAttributeValue(entity, encryptedAttribute, null);
+            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, decryptedValue);
+            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
         }
     }
 
     // ----------------------------------------------------------------------------------------------------- entityTypes
-
-    // ------------------------------------------------------------------------------------------------- factoryInstance
     protected @Nonnull EntityType<?> getEntityType(@Nonnull final Class<?> entityClass) {
         return entityTypes.computeIfAbsent(
                 Objects.requireNonNull(entityClass, "entityClass is null"),
-                k -> JinahyaEntityTypeUtils.getEntityType(k, factoryInstance)
+                k -> JinahyaEntityTypeUtils.getEntityType(k, List.of(entityManagerFactory))
         );
     }
+
+    // -------------------------------------------------------------------------------------------- entityManagerFactory
 
     // ----------------------------------------------------------------------------------------------- encryptionManager
 
     // -----------------------------------------------------------------------------------------------------------------
     private final Map<Class<?>, EntityType<?>> entityTypes = new ConcurrentHashMap<>();
 
-    @Any
-    @Inject
-    private Instance<EntityManagerFactory> factoryInstance;
+//    @Any
+//    @Inject
+//    private Instance<EntityManagerFactory> factoryInstance;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @Inject
-    private __EncryptionManager encryptionManager;
+    private final EntityManagerFactory entityManagerFactory;
+
+    private final __EncryptionManager encryptionManager;
 }

@@ -6,15 +6,16 @@ import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 
-class Entity01_Randomizer extends __MappedEntity_Randomizer<Entity01, Long> {
+class Entity02_Randomizer extends __MappedEntity_Randomizer<Entity02, Long> {
 
-    Entity01_Randomizer() {
-        super(Entity01.class, Long.class,
+    Entity02_Randomizer() {
+        super(Entity02.class, Long.class,
               "id",
               "encryptionIdentifier",
-              "javaSqlTimestamp1"
+//              "javaSqlTimestamp1",
+              "embeddable01.javaSqlTimestamp1"
         );
     }
 
@@ -39,9 +40,9 @@ class Entity01_Randomizer extends __MappedEntity_Randomizer<Entity01, Long> {
 
     @Nonnull
     @Override
-    public Entity01 get() {
+    public Entity02 get() {
         final var value = super.get();
-        value.setJavaSqlTimestamp1(new java.sql.Timestamp(System.currentTimeMillis()));
+//        value.getEmbeddable01().setJavaSqlTimestamp1(new Timestamp(System.currentTimeMillis()));
         return value;
     }
 }

@@ -1,14 +1,8 @@
 package com.github.jinahya.persistence.crypto;
 
-import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.DecimalMax;
@@ -29,44 +23,21 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.Year;
-import java.util.Objects;
+import java.util.UUID;
 
-@EntityListeners({
-        _EncryptionListener.class
-})
-@__EncryptedEntity(encryptionIdentifierAttribute = "__encryptionIdentifier")
-@Entity
-@Table(name = "entity01")
+@Embeddable
 @Setter
 @Getter
 @ToString
 @Slf4j
-class Entity01 extends __MappedEntity<Long> {
+class Embeddable01 {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected Entity01() {
+    protected Embeddable01() {
         super();
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
-    @Override
-    public final boolean equals(final Object obj) {
-        if (!(obj instanceof Entity01 that)) {
-            return false;
-        }
-        return Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.hashCode(getId());
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, insertable = false, updatable = false)
-    private Long id;
 
     // -----------------------------------------------------------------------------------------------------------------
     @Basic(optional = true)
@@ -198,7 +169,7 @@ class Entity01 extends __MappedEntity<Long> {
     @__EncryptedAttribute(encryptedAttribute = "")
     @Basic(optional = true)
     @Column(name = "uuid1", nullable = true, insertable = true, updatable = true)
-    java.util.UUID uuid1;
+    UUID uuid1;
 
     @Size(min = 0, max = 1024)
     @Basic(optional = true)
@@ -385,16 +356,16 @@ class Entity01 extends __MappedEntity<Long> {
     byte[] javaSqlTime1Enc__;
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute(encryptedAttribute = "")
-    @Temporal(TemporalType.TIMESTAMP)
-    @Basic(optional = true)
-    @Column(name = "java_sql_timestamp1", nullable = true, insertable = true, updatable = true)
-    java.sql.Timestamp javaSqlTimestamp1;
-
-    @Basic(optional = true)
-    @Column(name = "java_sql_timestamp1_enc__", nullable = true, insertable = true, updatable = true)
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
-    @EqualsAndHashCode.Exclude
-    byte[] javaSqlTimestamp1Enc__;
+//    @__EncryptedAttribute(encryptedAttribute = "")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_timestamp1", nullable = true, insertable = true, updatable = true)
+//    java.sql.Timestamp javaSqlTimestamp1;
+//
+//    @Basic(optional = true)
+//    @Column(name = "java_sql_timestamp1_enc__", nullable = true, insertable = true, updatable = true)
+//    @Setter(AccessLevel.NONE)
+//    @Getter(AccessLevel.NONE)
+//    @EqualsAndHashCode.Exclude
+//    byte[] javaSqlTimestamp1Enc__;
 }
