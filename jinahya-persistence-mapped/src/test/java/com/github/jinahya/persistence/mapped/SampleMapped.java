@@ -22,10 +22,12 @@ package com.github.jinahya.persistence.mapped;
 
 class SampleMapped extends _Mapped {
 
+    // -----------------------------------------------------------------------------------------------------------------
     private SampleMapped(final SampleMappedBuilder builder) {
         super(builder);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -34,6 +36,7 @@ class SampleMapped extends _Mapped {
                '}';
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     Integer getAge() {
         return age;
     }
@@ -42,6 +45,7 @@ class SampleMapped extends _Mapped {
         this.age = age;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     String getName() {
         return name;
     }
@@ -50,6 +54,7 @@ class SampleMapped extends _Mapped {
         this.name = name;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     private Integer age;
 
     private String name;

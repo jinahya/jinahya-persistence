@@ -34,10 +34,9 @@ public abstract class __Mapped {
     protected __Mapped(final __MappedBuilder<?, ?> builder) {
         this();
         try {
-            final var values = ___ReflectionUtils.getValues(builder);
-            ___ReflectionUtils.setValues(this, values);
+            ___BuilderUtils.setValues(builder, this);
         } catch (final Exception ie) {
-            throw new RuntimeException("failed to get values from " + builder, ie);
+            throw new RuntimeException("failed to set values from " + builder, ie);
         }
     }
 }

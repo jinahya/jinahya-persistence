@@ -81,6 +81,7 @@ public final class ___PersisterUtils {
                 .orElseThrow(() -> new RuntimeException("no persisterInstance instance for " + entityClass));
         logger.log(System.Logger.Level.DEBUG, "persisterInstance: {0}", persisterInstance);
         persisterInstance.persist(entityManager, entityInstance);
+//        entityManager.flush();
         return entityInstance;
     }
 

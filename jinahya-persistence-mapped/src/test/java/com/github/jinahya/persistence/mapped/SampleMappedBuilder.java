@@ -33,6 +33,7 @@ class SampleMappedBuilder extends _MappedBuilder<SampleMappedBuilder, SampleMapp
         super(SampleMapped.class);
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -41,6 +42,7 @@ class SampleMappedBuilder extends _MappedBuilder<SampleMappedBuilder, SampleMapp
                '}';
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     private Integer age;
 
     private String name;
