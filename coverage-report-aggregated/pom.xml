@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-persistence</artifactId>
-    <version>0.4.2</version>
+    <version>0.4.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>coverage-report-aggregated</artifactId>
-  <version>0.4.2</version>
+  <version>0.4.3-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Aggregate Coverage Report</description>
