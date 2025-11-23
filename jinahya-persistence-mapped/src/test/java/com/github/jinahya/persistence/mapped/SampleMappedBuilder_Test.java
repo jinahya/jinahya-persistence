@@ -19,8 +19,10 @@ class SampleMappedBuilder_Test {
 //                .name(Long.toString(System.nanoTime()))
                 ;
         log.debug("builder: {}", builder);
+        // -------------------------------------------------------------------------------------------------------- when
         final var built = builder.build();
         log.debug("built: {}", built);
+        // -------------------------------------------------------------------------------------------------------- then
         assertThat(built.getAge())
                 .as("age")
                 .isEqualTo(builder.age());

@@ -1,12 +1,15 @@
 package com.github.jinahya.persistence.mapped;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -166,6 +169,32 @@ final class ___ReflectionUtils {
     static void setValues(final @Nonnull Object object, final @Nonnull Map<String, Object> values)
             throws IntrospectionException, ReflectiveOperationException {
         setValuesHelper(object.getClass(), object, values);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static @Nullable Method getPropertySetter(final @Nonnull Class<?> clazz, final @Nonnull String name,
+                                              final @Nonnull Class<?> type) {
+        final var methodName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            final var found = Arrays.stream(c.getDeclaredMethods())
+                    .filter(m -> {
+                        if (m.getReturnType() != void.class) {
+                            return false;
+                        }
+                        if (m.getParameterCount() != 1) {
+                            return false;
+                        }
+                        if (!m.getParameterTypes()[0].isAssignableFrom(type)) {
+                            return false;
+                        }
+                        return m.getName().equals(methodName);
+                    })
+                    .findFirst();
+            if (found.isPresent()) {
+                return found.get();
+            }
+        }
+        return null;
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS

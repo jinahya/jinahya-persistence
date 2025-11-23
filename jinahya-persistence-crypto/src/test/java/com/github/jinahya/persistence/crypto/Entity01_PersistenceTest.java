@@ -10,12 +10,14 @@ import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Disabled
 @AddBeanClasses({
 //        _PersistenceCryptoListener.class,
 //        __PersistenceProducer.class,

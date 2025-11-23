@@ -31,7 +31,7 @@ public final class ___Builder_TestUtils {
         Objects.requireNonNull(targetInstance, "targetInstance is null");
         final var builderInstance = ReflectionUtils.newInstance(builderClass);
         try {
-            final var beanInfo = Introspector.getBeanInfo(targetInstance.getClass());
+            final var beanInfo = Introspector.getBeanInfo(targetInstance.getClass(), Introspector.USE_ALL_BEANINFO);
             final var propertyDescriptors = beanInfo.getPropertyDescriptors();
             for (var propertyDescriptor : propertyDescriptors) {
                 final var targetPropertyReader = propertyDescriptor.getReadMethod();
@@ -67,13 +67,16 @@ public final class ___Builder_TestUtils {
         }
     }
 
-    public static <BUILDER extends ___Builder<BUILDER, T>, T>
+    public static <
+            BUILDER extends ___Builder<BUILDER, TARGET>,
+            TARGET
+            >
     Optional<BUILDER> newBuilderInstanceFromRandomizedInstanceOf(final @Nonnull Class<BUILDER> builderClass,
-                                                                 final @Nonnull Class<T> targetClass) {
+                                                                 final @Nonnull Class<TARGET> targetClass) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetClass, "targetClass is null");
         return ___RandomizerUtils.newRandomizedInstanceOf(targetClass)
-                .map(ti -> newBuilderInstanceFrom(builderClass, ti));
+                .map(i -> newBuilderInstanceFrom(builderClass, i));
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS

@@ -128,20 +128,32 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
                     .as("%s on %s", __Disable_PersistEntityInstance_Test.class, clazz)
                     .isEmpty();
         }
-        final var persisted = applyEntityManagerInTransaction(
-                em -> {
-                    return __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
-                },
-                true
-        );
-        __persistEntityInstance(persisted);
+        applyEntityManagerInTransactionAndRollback(em -> {
+            final var persisted = __MappedEntity_PersisterUtils.newPersistedInstanceOf(em, entityClass);
+            __persistEntityInstance(em, persisted);
+            __persistEntityInstance(persisted);
+            return null;
+        });
     }
 
     /**
-     * Notifies that the specified entity instance has been persisted.
+     * Gets notified, from the {@link #__persistEntityInstance()} method, the specified entity instance which has been
+     * persisted to the specified entity manager.
+     *
+     * @param entityManager the entity manager.
+     * @param persisted     the entity instance persisted.
+     */
+    protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persisted) {
+    }
+
+    /**
+     * Gets notified, from the {@link #__persistEntityInstance()} method, with the specified entity instance which has
+     * been persisted.
      *
      * @param persisted the entity instance persisted.
+     * @deprecated use {@link #__persistEntityInstance(EntityManager, __MappedEntity)}
      */
+    @Deprecated(forRemoval = true)
     protected void __persistEntityInstance(final ENTITY persisted) {
         logger.log(Level.DEBUG, "persisted: {0}", persisted);
     }

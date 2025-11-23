@@ -16,5 +16,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 })
 public @interface __EncryptedEntity {
 
-    String encryptionIdentifierAttribute() default "encryptionIdentifier__";
+    String DEFAULT_ENCRYPTION_IDENTIFIER = "encryptionIdentifier__";
+
+    //    String encryptionIdentifierAttribute() default "__encryptionIdentifier";
+    String encryptionIdentifierAttribute() default "";
 }
