@@ -11,7 +11,6 @@ import jakarta.enterprise.event.Startup;
 import jakarta.persistence.Basic;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
-import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -117,10 +116,11 @@ public abstract class __EncryptionService {
     /**
      * Creates a new instance.
      *
-     * @param encryptionManager the encryption manager; must not be {@code null}
+     * @param entityManagerFactory an entity manager factory; must not be {@code null}.
+     * @param encryptionManager    the encryption manager; must not be {@code null}.
      */
-    protected __EncryptionService(final EntityManagerFactory entityManagerFactory,
-                                  final __EncryptionManager encryptionManager) {
+    protected __EncryptionService(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                  final @Nonnull __EncryptionManager encryptionManager) {
         super();
         this.entityManagerFactory = Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         this.encryptionManager = Objects.requireNonNull(encryptionManager, "encryptionManager is null");
