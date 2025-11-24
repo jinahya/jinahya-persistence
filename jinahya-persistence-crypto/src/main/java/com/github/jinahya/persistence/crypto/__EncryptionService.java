@@ -257,14 +257,14 @@ public abstract class __EncryptionService {
             final var javaType = decryptedAttribute.getJavaType();
             if (decryptedValue instanceof Boolean b) {
                 decryptedBytes = new byte[]{(byte) (b ? 1 : 0)};
-            } else if (decryptedValue instanceof Byte b) {
-                decryptedBytes = new byte[]{b};
-            } else if (decryptedValue instanceof Short s) {
-                decryptedBytes = short_2(new byte[Short.BYTES], 0, s);
-            } else if (decryptedValue instanceof Integer i) {
-                decryptedBytes = int_4(new byte[Integer.BYTES], 0, i);
-            } else if (decryptedValue instanceof Long l) {
-                decryptedBytes = long_8(new byte[Long.BYTES], 0, l);
+            } else if (decryptedValue instanceof Byte v) {
+                decryptedBytes = new byte[]{v};
+            } else if (decryptedValue instanceof Short v) {
+                decryptedBytes = short_2(v);
+            } else if (decryptedValue instanceof Integer v) {
+                decryptedBytes = int_4(v);
+            } else if (decryptedValue instanceof Long v) {
+                decryptedBytes = long_8(new byte[Long.BYTES], 0, v);
             } else if (decryptedValue instanceof Character c) {
                 decryptedBytes = char_2(new byte[Character.BYTES], 0, c);
             } else if (decryptedValue instanceof Float f) {
@@ -480,7 +480,7 @@ public abstract class __EncryptionService {
             } else if (javaType == byte.class || javaType == Byte.class) {
                 decryptedValue = decryptedBytes[0];
             } else if (javaType == short.class || javaType == Short.class) {
-                decryptedValue = short_2(decryptedBytes, 0);
+                decryptedValue = short_2(decryptedBytes);
             } else if (javaType == int.class || javaType == Integer.class) {
                 decryptedValue = int_4(decryptedBytes, 0);
             } else if (javaType == long.class || javaType == Long.class) {
