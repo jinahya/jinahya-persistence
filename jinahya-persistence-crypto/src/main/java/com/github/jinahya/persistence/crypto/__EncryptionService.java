@@ -522,7 +522,7 @@ public abstract class __EncryptionService {
                 try {
                     decryptedValue = javaType.getConstructor(long.class).newInstance(time);
                 } catch (final ReflectiveOperationException roe) {
-                    throw new RuntimeException(roe);
+                    throw new RuntimeException("failed to construct " + javaType + " with " + time, roe);
                 }
             } else if (javaType == byte[].class) {
                 decryptedValue = decryptedBytes;
