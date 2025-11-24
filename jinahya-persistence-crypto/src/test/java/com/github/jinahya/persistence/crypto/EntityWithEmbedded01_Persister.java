@@ -4,15 +4,15 @@ import com.github.jinahya.persistence.mapped.test.__MappedEntity_Persister;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
-class Entity02_Persister extends __MappedEntity_Persister<Entity02, Long> {
+class EntityWithEmbedded01_Persister extends __MappedEntity_Persister<EntityWithEmbedded01, Long> {
 
-    Entity02_Persister() {
-        super(Entity02.class, Long.class);
+    EntityWithEmbedded01_Persister() {
+        super(EntityWithEmbedded01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull Entity02 entityInstance) {
+    public void persist(final @Nonnull EntityManager entityManager, final @Nonnull EntityWithEmbedded01 entityInstance) {
         super.persist(entityManager, entityInstance);
     }
 }

@@ -77,24 +77,24 @@ public abstract class __EncryptionService {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static final Map<EntityType<?>, Map<String, Attribute<?, ?>>> ENTITY_TYPES_AND_ATTRIBUTES =
-            new ConcurrentHashMap<>();
-
-    /**
-     * Returns an unmodifiable map of attribute names and attributes of the specified entity type.
-     *
-     * @param entityType the entity type whose attributes are returned; must not be {@code null}
-     * @return a map of attribute names and attributes of the {@code entityType}
-     * @apiNote this method is thread-safe.
-     */
-    protected static Map<String, Attribute<?, ?>> getAttributes(@Nonnull final EntityType<?> entityType) {
-        Objects.requireNonNull(entityType, "entityType is null");
-        return ENTITY_TYPES_AND_ATTRIBUTES.computeIfAbsent(
-                entityType,
-                k -> k.getAttributes().stream()
-                        .collect(Collectors.toUnmodifiableMap(Attribute::getName, Function.identity()))
-        );
-    }
+//    private static final Map<EntityType<?>, Map<String, Attribute<?, ?>>> ENTITY_TYPES_AND_ATTRIBUTES =
+//            new ConcurrentHashMap<>();
+//
+//    /**
+//     * Returns an unmodifiable map of attribute names and attributes of the specified entity type.
+//     *
+//     * @param entityType the entity type whose attributes are returned; must not be {@code null}
+//     * @return a map of attribute names and attributes of the {@code entityType}
+//     * @apiNote this method is thread-safe.
+//     */
+//    protected static Map<String, Attribute<?, ?>> getAttributes(@Nonnull final EntityType<?> entityType) {
+//        Objects.requireNonNull(entityType, "entityType is null");
+//        return ENTITY_TYPES_AND_ATTRIBUTES.computeIfAbsent(
+//                entityType,
+//                k -> k.getAttributes().stream()
+//                        .collect(Collectors.toUnmodifiableMap(Attribute::getName, Function.identity()))
+//        );
+//    }
 
     private static final Map<ManagedType<?>, Map<String, Attribute<?, ?>>> MANAGED_TYPES_AND_ATTRIBUTES =
             new ConcurrentHashMap<>();

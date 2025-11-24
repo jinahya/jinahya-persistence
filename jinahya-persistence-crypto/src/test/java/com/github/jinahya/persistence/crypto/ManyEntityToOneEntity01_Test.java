@@ -5,18 +5,17 @@ import jakarta.annotation.Nonnull;
 import nl.jqno.equalsverifier.Warning;
 import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 
-class Entity02_Test extends __MappedEntity_Test<Entity02, Long> {
+class ManyEntityToOneEntity01_Test extends __MappedEntity_Test<ManyEntityToOneEntity01, Long> {
 
-    Entity02_Test() {
-        super(Entity02.class, Long.class);
+    ManyEntityToOneEntity01_Test() {
+        super(ManyEntityToOneEntity01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
     @Nonnull
     @Override
-    protected SingleTypeEqualsVerifierApi<Entity02> equals_Verify_(
-            @Nonnull final SingleTypeEqualsVerifierApi<Entity02> equalsVerifier) {
+    protected SingleTypeEqualsVerifierApi<ManyEntityToOneEntity01> equals_Verify_(
+            @Nonnull SingleTypeEqualsVerifierApi<ManyEntityToOneEntity01> equalsVerifier) {
         return super.equals_Verify_(equalsVerifier)
                 .suppress(Warning.SURROGATE_KEY);
     }

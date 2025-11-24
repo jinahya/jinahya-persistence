@@ -21,11 +21,11 @@ import org.jboss.weld.junit5.auto.AddBeanClasses;
 })
 //@ExtendWith(WeldJunit5AutoExtension.class)
 @Slf4j
-class Entity02_PersistenceTest extends __MappedEntity_PersistenceTest<Entity02, Long> {
+class EntityWithEmbedded01_PersistenceTest extends __MappedEntity_PersistenceTest<EntityWithEmbedded01, Long> {
 
     // -----------------------------------------------------------------------------------------------------------------
-    Entity02_PersistenceTest() {
-        super(Entity02.class, Long.class);
+    EntityWithEmbedded01_PersistenceTest() {
+        super(EntityWithEmbedded01.class, Long.class);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -51,12 +51,12 @@ class Entity02_PersistenceTest extends __MappedEntity_PersistenceTest<Entity02, 
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    protected void __persistEntityInstance(final EntityManager entityManager, final Entity02 persisted) {
+    protected void __persistEntityInstance(final EntityManager entityManager, final EntityWithEmbedded01 persisted) {
         super.__persistEntityInstance(entityManager, persisted);
     }
 
     @Override
-    protected void __persistEntityInstance(final Entity02 persisted) {
+    protected void __persistEntityInstance(final EntityWithEmbedded01 persisted) {
         log.debug("persisted: {}", persisted);
     }
 }

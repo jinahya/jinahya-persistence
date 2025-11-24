@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.annotation.Nonnull;
+import nl.jqno.equalsverifier.api.SingleTypeEqualsVerifierApi;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
@@ -55,6 +56,14 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
     protected __MappedEntity_Test(final @Nonnull Class<ENTITY> entityClass, final @Nonnull Class<ID> idClass) {
         super(entityClass);
         this.idClass = Objects.requireNonNull(idClass, "idClass is null");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nonnull
+    @Override
+    protected SingleTypeEqualsVerifierApi<ENTITY> equals_Verify_(
+            @Nonnull final SingleTypeEqualsVerifierApi<ENTITY> equalsVerifier) {
+        return super.equals_Verify_(equalsVerifier);
     }
 
     // --------------------------------------------------------------------------------------------------------- idClass
