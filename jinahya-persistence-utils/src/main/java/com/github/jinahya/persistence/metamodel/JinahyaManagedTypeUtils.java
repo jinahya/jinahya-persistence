@@ -52,7 +52,7 @@ public final class JinahyaManagedTypeUtils {
                         .map(EntityManagerFactory::getMetamodel)
                         .map(m -> {
                             try {
-                                return m.entity(typeClass);
+                                return m.managedType(typeClass);
                             } catch (final IllegalArgumentException iae) {
                                 return null;
                             }

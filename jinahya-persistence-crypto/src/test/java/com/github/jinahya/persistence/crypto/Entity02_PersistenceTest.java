@@ -6,11 +6,10 @@ import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
-import org.junit.jupiter.api.Disabled;
 
-@Disabled
 @AddBeanClasses({
 //        _PersistenceCryptoListener.class,
 //        __PersistenceProducer.class,
@@ -51,6 +50,11 @@ class Entity02_PersistenceTest extends __MappedEntity_PersistenceTest<Entity02, 
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    protected void __persistEntityInstance(final EntityManager entityManager, final Entity02 persisted) {
+        super.__persistEntityInstance(entityManager, persisted);
+    }
+
     @Override
     protected void __persistEntityInstance(final Entity02 persisted) {
         log.debug("persisted: {}", persisted);
