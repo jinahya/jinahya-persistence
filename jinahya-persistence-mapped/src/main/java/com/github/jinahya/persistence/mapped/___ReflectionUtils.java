@@ -178,16 +178,28 @@ final class ___ReflectionUtils {
         for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
             final var found = Arrays.stream(c.getDeclaredMethods())
                     .filter(m -> {
-                        if (m.getReturnType() != void.class) {
-                            return false;
-                        }
-                        if (m.getParameterCount() != 1) {
-                            return false;
-                        }
-                        if (!m.getParameterTypes()[0].isAssignableFrom(type)) {
-                            return false;
-                        }
-                        return m.getName().equals(methodName);
+                        return m.getName().equals(methodName)
+                               && m.getParameterCount() == 1
+                               && m.getParameterTypes()[0].isAssignableFrom(type)
+                               && m.getReturnType() == void.class;
+                    })
+                    .findFirst();
+            if (found.isPresent()) {
+                return found.get();
+            }
+        }
+        return null;
+    }
+
+    static @Nullable Method getPropertyGetter(final @Nonnull Class<?> clazz, final @Nonnull String name,
+                                              final @Nonnull Class<?> type) {
+        final var methodName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            final var found = Arrays.stream(c.getDeclaredMethods())
+                    .filter(m -> {
+                        return m.getName().equals(methodName)
+                               && m.getParameterCount() == 0
+                               && type.isAssignableFrom(m.getReturnType());
                     })
                     .findFirst();
             if (found.isPresent()) {

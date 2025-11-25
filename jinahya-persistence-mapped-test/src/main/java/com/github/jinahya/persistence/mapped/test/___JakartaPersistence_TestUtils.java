@@ -496,6 +496,16 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the result of the specified function applied to a connection unwrapped from the specified entity
+     * manager.
+     *
+     * @param entityManager the entity manager from which a connection is unwrapped.
+     * @param function      the function.
+     * @param <R>           result type parameter.
+     * @return the result of the {@code function} applied to the connection unwrapped from the {@code entityManager}.
+     */
     public static <R> R applyUnwrappedConnection(final @Nonnull EntityManager entityManager,
                                                  final @Nonnull Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(entityManager, "entityManager is null");
@@ -520,24 +530,14 @@ public final class ___JakartaPersistence_TestUtils {
         }
     }
 
-    static <R> R applyConnection(final EntityManager entityManager,
-                                 final Function<? super Connection, ? extends R> function) {
-        Objects.requireNonNull(entityManager, "entityManager is null");
-        Objects.requireNonNull(function, "function is null");
-        return applyUnwrappedConnection(
-                entityManager,
-                function
-        );
-    }
-
     public static <R> R applyConnection(final EntityManager entityManager,
                                         final Function<? super Connection, ? extends R> function,
                                         final boolean rollback) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(function, "function is null");
-        return applyEntityManagerInTransaction(
+        return getInTransaction(
                 entityManager,
-                em -> applyUnwrappedConnection(em, function),
+                () -> applyUnwrappedConnection(entityManager, function),
                 rollback
         );
     }
@@ -550,7 +550,7 @@ public final class ___JakartaPersistence_TestUtils {
 // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Counts the number of entities in the table from which the specified entity maps.
+     * Counts the number of entities in the table from which the specified entity class maps.
      *
      * @param entityManager an entity manager
      * @param entityClass   the entity class
@@ -570,16 +570,25 @@ public final class ___JakartaPersistence_TestUtils {
     /**
      * Applies {@link #count(EntityManager, Class) count} of the specified entity class and a random index([0, count))
      * to the specified function, and returns the result.
+     * <p>
+     * {@snippet lang = "java":
+     * applyCountAndRandomIndex(c -> i -> {
+     *     assert c > 0L;
+     *     assert i >= 0L;
+     *     assert i < c;
+     *     return null;
+     * });
+     *}
      *
      * @param entityManager an entity manager
      * @param entityClass   the entity class
      * @param function      the function.
      * @param <R>           result type parameter
      * @return the result of the {@code function}; {@code null} when the {@link #count(EntityManager, Class) count} of
-     *         the entity class is {@code zero}.
+     *         the {@code entityClass} is {@code zero}.
      */
     @Nullable
-    public static <R> R applyCountAndIndex(
+    public static <R> R applyCountAndRandomIndex(
             final @Nonnull EntityManager entityManager, final @Nonnull Class<?> entityClass,
             final @Nonnull LongFunction<? extends LongFunction<? extends R>> function) {
         final var count = count(entityManager, entityClass);
@@ -595,8 +604,31 @@ public final class ___JakartaPersistence_TestUtils {
         return function.apply(count).apply(index);
     }
 
+    /**
+     * Applies the count, a random index([0, count]), and an instance of the specified entity class selected at random
+     * index to the specified function, and returns the result.
+     * <p>
+     * {@snippet lang = "java":
+     * applyCountRandomIndexAndEntity(c -> i -> e -> {
+     *     assert c > 0L;
+     *     assert i >= 0L;
+     *     assert i < c;
+     *     assert e != null;
+     *     return null;
+     * });
+     *}
+     *
+     * @param entityManager an entity manager.
+     * @param entityClass   the entity class.
+     * @param function      the function.
+     * @param <T>           entity type parameter
+     * @param <R>           result type parameter
+     * @return an optional of the result of the {@code function}; {@link Optional#empty() empty} when the
+     *         {@link #count(EntityManager, Class) count} of the {@code entityClass} is {@code zero}.
+     * @see #applyCountAndRandomIndex(EntityManager, Class, LongFunction)
+     */
     @Nonnull
-    public static <T, R> Optional<R> applyCountIndexAndEntity(
+    public static <T, R> Optional<R> applyCountRandomIndexAndEntity(
             final @Nonnull EntityManager entityManager,
             final @Nonnull Class<T> entityClass,
             final @Nonnull LongFunction<? extends LongFunction<? extends Function<? super T, ? extends R>>> function) {
@@ -604,7 +636,7 @@ public final class ___JakartaPersistence_TestUtils {
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(function, "function is null");
         return Optional.ofNullable(
-                applyCountAndIndex(
+                applyCountAndRandomIndex(
                         entityManager,
                         entityClass,
                         c -> i -> {
@@ -627,7 +659,7 @@ public final class ___JakartaPersistence_TestUtils {
     }
 
     /**
-     * Selects an entity of the specified type at a random index.
+     * Selects a random instance of the specified entity class.
      *
      * @param entityManager an entity manager
      * @param entityClass   the entity type
@@ -639,7 +671,7 @@ public final class ___JakartaPersistence_TestUtils {
                                                final @Nonnull Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
-        return applyCountIndexAndEntity(
+        return applyCountRandomIndexAndEntity(
                 entityManager,
                 entityClass,
                 c -> i -> e -> e

@@ -134,8 +134,8 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 .orElseGet(table::catalog);
         final var schema = applyEntityManagerFactory(__PersistenceUnit_TestUtils::getJinahyaTableSchema)
                 .orElseGet(table::schema);
-        final var tableColumnNames = applyEntityManager(
-                em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
+        final var tableColumnNames = applyEntityManagerInTransactionAndRollback(
+                em -> ___JakartaPersistence_TestUtils.applyUnwrappedConnection(
                         em,
                         c -> ___JavaSql_TestUtils.addAllColumnNames(
                                 c,
@@ -281,15 +281,16 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         // -------------------------------------------------------------------------------------------------------------
         final var entityTableName = getEntityTableName();
         final var tableColumnNamesAndIsNullables =
-                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
-                        em,
-                        c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
-                                c,
-                                getJinahyaTableCatalog(),
-                                getJinahyaTableSchema(),
-                                entityTableName
-                        )
-                ));
+                applyEntityManagerInTransactionAndRollback(
+                        em -> ___JakartaPersistence_TestUtils.applyUnwrappedConnection(
+                                em,
+                                c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
+                                        c,
+                                        getJinahyaTableCatalog(),
+                                        getJinahyaTableSchema(),
+                                        entityTableName
+                                )
+                        ));
         managedType().getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final Column entityColumn;
@@ -356,15 +357,16 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         // -------------------------------------------------------------------------------------------------------------
         final var entityTableName = getEntityTableName();
         final var tableColumnNamesAndIsNullables =
-                applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
-                        em,
-                        c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
-                                c,
-                                getJinahyaTableCatalog(),
-                                getJinahyaTableSchema(),
-                                entityTableName
-                        )
-                ));
+                applyEntityManagerInTransactionAndRollback(
+                        em -> ___JakartaPersistence_TestUtils.applyUnwrappedConnection(
+                                em,
+                                c -> ___JavaSql_TestUtils.getColumnNameAndIsNullable(
+                                        c,
+                                        getJinahyaTableCatalog(),
+                                        getJinahyaTableSchema(),
+                                        entityTableName
+                                )
+                        ));
         managedType().getAttributes().forEach(a -> {
             final var entityMember = a.getJavaMember();
             final JoinColumn entityJoinColumn;

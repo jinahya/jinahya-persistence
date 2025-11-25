@@ -137,11 +137,11 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     }
 
     /**
-     * Gets notified, from the {@link #__persistEntityInstance()} method, the specified entity instance which has been
-     * persisted to the specified entity manager.
+     * Gets notified, from the {@link #__persistEntityInstance()} method, with the specified entity instance which has
+     * been persisted to the specified entity manager.
      *
-     * @param entityManager the entity manager.
-     * @param persisted     the entity instance persisted.
+     * @param entityManager the entity manager to which the entity instance has been persisted.
+     * @param persisted     the entity instance persisted to the {@code entityManager}.
      */
     protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persisted) {
     }
@@ -298,7 +298,7 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
     @Nullable
     protected <R> R applyCountAndRandomIndex(
             final @Nonnull LongFunction<? extends LongFunction<? extends R>> function) {
-        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyCountAndIndex(
+        return applyEntityManager(em -> ___JakartaPersistence_TestUtils.applyCountAndRandomIndex(
                 em,
                 entityClass,
                 function

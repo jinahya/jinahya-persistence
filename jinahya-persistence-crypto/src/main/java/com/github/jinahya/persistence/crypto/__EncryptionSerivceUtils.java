@@ -65,6 +65,14 @@ final class __EncryptionSerivceUtils {
         return b;
     }
 
+    static byte[] short_2(final byte[] b, final short v) {
+        return short_2(b, 0, v);
+    }
+
+    static byte[] short_2(final short v) {
+        return short_2(new byte[Short.BYTES], v);
+    }
+
     static short short_2(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
@@ -73,6 +81,10 @@ final class __EncryptionSerivceUtils {
                 ((b[i] & 0xFF) << Byte.SIZE)
                 | b[i + 1] & 0xFF
         );
+    }
+
+    static short short_2(final byte[] b) {
+        return short_2(b, 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -91,6 +103,19 @@ final class __EncryptionSerivceUtils {
         assert i + Integer.BYTES <= b.length;
         return (short_2(b, i) << Short.SIZE)
                | (short_2(b, i + Short.BYTES) & 0xFFFF);
+    }
+
+    static byte[] int_4(final int v) {
+        final var b = new byte[Integer.BYTES];
+        short_2(b, 0, (short) (v >> Short.SIZE));
+        short_2(b, Short.BYTES, (short) (v & 0xFFFF));
+        return b;
+    }
+
+    static int int_4(final byte[] b) {
+        assert b != null;
+        return (short_2(b, 0) << Short.SIZE)
+               | (short_2(b, Short.BYTES) & 0xFFFF);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -237,7 +262,7 @@ final class __EncryptionSerivceUtils {
         return offset_4(
                 local_time_8(
                         b,
-                        0,
+                        i,
                         v.toLocalTime()
                 ),
                 Long.BYTES,

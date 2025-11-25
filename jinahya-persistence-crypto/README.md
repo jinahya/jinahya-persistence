@@ -42,35 +42,35 @@ class MyEntity {
 
 * No primitive types are supported.
 
-| attribute                  | decrypted                                           | notes                    |
-|----------------------------|-----------------------------------------------------|--------------------------|
-| `java.lang.Byte`           | `byte[1]` of the value                              |                          |
-| `java.lang.Short`          | `byte[2]` bytes in big endian                       |                          |
-| `java.lang.Integer`        | `byte[4]` bytes in big endian                       |                          |
-| `java.lang.Long`           | `byte[8]` bytes in big endian                       |                          |
-| `java.lang.Character`      | `byte[2]` bytes in big endian                       |                          |
-| `java.lang.Float`          | `byte[4]` of the raw `32`-bit int                   |                          |
-| `java.lang.Double`         | `byte[8]` of the raw `64`-bit long                  |                          |
-| `java.lang.Boolean`        | `byte[1]`, of `0` for `false`, `1` for `true`       |                          |
-| `java.lang.String`         | `_octet_(v)`, of the utf-8` encoded bytes           |                          |
-| `java.uti.UUID`            | two `Long`s of msb and lsb                          |                          |
-| `java.math.BigIntger`      | `_octet_` of the two's complement, big-endian bytes |                          |
-| `java.math.BigDecimal`     | An encrypted field.                                 |                          |
-| `java.time.LocalDate`      | An encrypted field.                                 |                          |
-| `java.time.LocalTime`      | An encrypted field.                                 |                          |
-| `java.time.LocalDateTime`  | An encrypted field.                                 |                          |
-| `java.time.OffsetTime`     | An encrypted field.                                 |                          |
-| `java.time.OffsetDateTime` | An encrypted field.                                 |                          |
-| `java.time.Instant`        | An encrypted field.                                 |                          |
-| `java.time.Year`           | An encrypted field.                                 |                          |
-| `java.util.Date`           | An encrypted field.                                 |                          |
-| `java.util.Calendar`       | An encrypted field.                                 |                          |
-| `java.sql.Date`            | An encrypted field.                                 |                          |
-| `java.sql.Time`            | An encrypted field.                                 |                          |
-| `java.sql.TimeStamp`       | An encrypted field.                                 |                          |
-| `byte[]`                   | An encrypted field.                                 |                          |
-| `Byte[]`                   | An encrypted field.                                 |                          |
-| `char[]`                   | An encrypted field.                                 |                          |
-| `Character[]`              | An encrypted field.                                 |                          |
-| `enum`                     | the `name` of the constant using `java.lang.String` |                          |
-| `java.io.Serializable`     |                                                     | not platform-independent |
+| attribute              | size  | component1                                    | component2                                 | notes                    |
+|------------------------|-------|-----------------------------------------------|--------------------------------------------|--------------------------|
+| `Byte`                 | `8`   | `byte[1]` of the value                        |                                            |                          |
+| `Short`                | `16`  | `byte[2]` bytes in big endian                 |                                            |                          |
+| `Integer`              | `16`  | `byte[4]` bytes in big endian                 |                                            |                          |
+| `Long`                 | `64`  | `byte[8]` bytes in big endian                 |                                            |                          |
+| `Character`            | `16`  | `byte[2]` bytes in big endian                 |                                            |                          |
+| `Float`                | `32`  | `byte[4]` of the raw `32`-bit int             |                                            |                          |
+| `Double`               | `64`  | `byte[8]` of the raw `64`-bit long            |                                            |                          |
+| `Boolean`              | `8`   | `byte[1]`, of `0` for `false`, `1` for `true` |                                            |                          |
+| `String`               |       | `byte[]`, of the `utf-8` encoded bytes        |                                            |                          |
+| `UUID`                 | `128` | `getMostSignificantBits()`(`Long`)            | `getLeastSignificantBits()`(`Long`)        |                          |
+| `BigIntger`            |       | `toByteArray()`(`byte[]`)                     |                                            |                          |
+| `BigDecimal`           |       | `toPlainString()(`String`)                    |                                            |                          |
+| `LocalDate`            | `64`  | `toEpochDay()`(`Long`)                        |                                            |                          |
+| `LocalTime`            | `64`  | `toNanoOfDay()`(`Long`)                       |                                            |                          |
+| `LocalDateTime`        | `128` | `toLocalDate()`(`LocalDate`)                  | `toLocalTime()`(`Long`)                    |                          |
+| `OffsetTime`           | `96`  | `toLocalDateTime()`(`LocalDateTime`)          | `getOffset().getTotalSeconds()`(`Integer`) |                          |
+| `OffsetDateTime`       | `160` | `toLocalDateTime()`(`LocalDateTime`)          | `getOffset().getTotalSeconds()`(`Integer`) |                          |
+| `Instant`              | `128` | `toEpochSecond()`(`Long`)                     | `getNanos()`(`Long`)                       |                          |
+| `Year`                 | `32`  | `getValue()`(`Integer`)                       |                                            |                          |
+| `Date`                 | `64`  | `getTime()`(`Long`)                           |                                            |                          |
+| `Calendar`             | `64`  | `getTime()`(`Date`)                           |                                            |                          |
+| `java.sql.Date`        |       | `Date`                                        |                                            |                          |
+| `java.sql.Time`        |       | `Date`                                        |                                            |                          |
+| `java.sql.TimeStamp`   |       | `Date`                                        |                                            |                          |
+| `byte[]`               |       | `length`                                      |                                            |                          |
+| `Byte[]`               |       | `byte[]`                                      |                                            |                          |
+| `char[]`               |       | `length << 1`                                 |                                            |                          |
+| `Character[]`          |       | `char[]`                                      |                                            |                          |
+| `enum`                 |       | `name()`(`java.lang.String`)                  |                                            |                          |
+| `java.io.Serializable` |       |                                               | _                                          | not platform-independent |

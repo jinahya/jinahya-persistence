@@ -31,7 +31,8 @@
     <provider>${persistence-unit.provider}</provider>
     <!--    <class>com.github.jinahya.persistence.crypto.__EncryptionListener</class>-->
     <class>com.github.jinahya.persistence.crypto.Entity01</class>
-    <class>com.github.jinahya.persistence.crypto.Entity02</class>
+    <class>com.github.jinahya.persistence.crypto.EntityWithEmbedded01</class>
+    <class>com.github.jinahya.persistence.crypto.ManyEntityToOneEntity01</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
@@ -69,7 +70,8 @@
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.crypto.Entity01</class>
-    <class>com.github.jinahya.persistence.crypto.Entity02</class>
+    <class>com.github.jinahya.persistence.crypto.EntityWithEmbedded01</class>
+    <class>com.github.jinahya.persistence.crypto.ManyEntityToOneEntity01</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>

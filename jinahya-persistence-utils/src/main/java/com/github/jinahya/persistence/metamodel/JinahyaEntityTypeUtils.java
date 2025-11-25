@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.JinahyaEntityManagerFactoryUtils;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.ManagedType;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -38,6 +39,42 @@ import java.util.stream.StreamSupport;
 public final class JinahyaEntityTypeUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private static final Map<Class<?>, ManagedType<?>> MANAGED_TYPES = Collections.synchronizedMap(new WeakHashMap<>());
+
+    /**
+     * Returns the {@link ManagedType} of the specified entity class.
+     *
+     * @param entityClass            the entity class whose {@link ManagedType} is returned.
+     * @param entityManagerFactories an iterable of entity manager factories.
+     * @param <X>                    represented entity type
+     * @return the {@link ManagedType} of the {@code entityClass}.
+     */
+    public static <X> ManagedType<X> getManagedType(
+            final @Nonnull Class<X> entityClass,
+            final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
+        @SuppressWarnings({"unchecked"})
+        final var managedType = (ManagedType<X>) MANAGED_TYPES.computeIfAbsent(
+                entityClass,
+                k -> {
+                    return StreamSupport.stream(entityManagerFactories.spliterator(), false)
+//                            .map(EntityManagerFactory::getMetamodel)
+                            .map(JinahyaEntityManagerFactoryUtils::getMetamodel)
+                            .map(m -> m.managedType(entityClass))
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .orElseThrow(
+                                    () -> new IllegalArgumentException(
+                                            "no entity type found for entity class: " + entityClass
+                                    )
+                            );
+                }
+        );
+        return managedType;
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     private static final Map<Class<?>, EntityType<?>> ENTITY_TYPES = Collections.synchronizedMap(new WeakHashMap<>());

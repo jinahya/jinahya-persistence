@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 import com.github.jinahya.persistence.mapped.__MappedEntity;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.jboss.weld.junit5.auto.AddBeanClasses;
 import org.jboss.weld.junit5.auto.WeldJunit5AutoExtension;
@@ -50,6 +51,17 @@ public abstract class __MappedEntity_PersistenceTest<ENTITY extends __MappedEnti
      */
     protected __MappedEntity_PersistenceTest(final Class<ENTITY> entityClass, final Class<ID> idClass) {
         super(entityClass, idClass);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Override
+    protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persisted) {
+        super.__persistEntityInstance(entityManager, persisted);
+    }
+
+    @Override
+    protected void __persistEntityInstance(final ENTITY persisted) {
+        super.__persistEntityInstance(persisted);
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
