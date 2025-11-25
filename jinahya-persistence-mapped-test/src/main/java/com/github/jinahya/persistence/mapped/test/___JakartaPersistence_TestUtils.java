@@ -550,7 +550,7 @@ public final class ___JakartaPersistence_TestUtils {
 // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Counts the number of entities in the table from which the specified entity maps.
+     * Counts the number of entities in the table from which the specified entity class maps.
      *
      * @param entityManager an entity manager
      * @param entityClass   the entity class
