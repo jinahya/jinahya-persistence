@@ -15,7 +15,15 @@ import jakarta.persistence.PreUpdate;
 
 public class _EncryptionListener extends __EncryptionListener {
 
-    protected _EncryptionListener() {
+    /**
+     * .
+     * <blockquote>The entity listener class must have a public no-arg constructor.</blockquote>
+     *
+     * @see <a
+     *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#entity-listeners">3.6.1.
+     *         Entity Listeners</a> (Jakarta Persistence 3.2 Specification Document)
+     */
+    public _EncryptionListener() {
         super();
     }
 
