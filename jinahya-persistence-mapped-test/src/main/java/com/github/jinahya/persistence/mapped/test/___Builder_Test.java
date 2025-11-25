@@ -46,35 +46,35 @@ public abstract class ___Builder_Test<
         }).doesNotThrowAnyException();
     }
 
-//    @DisplayName("<randomized> -> build() should return non-null <TARGET>")
-//    @Test
-//    protected void build_NotNull_newRandomizedBuilderInstance() {
-//        final var instance = newRandomizedBuilderInstance();
-//        assumeThat(instance)
-//                .as("optional of new randomized builder instance of %1$s", targetClass)
-//                .isNotEmpty();
-//        final var built = instance.get().build();
-//        logger.log(System.Logger.Level.DEBUG, "built: {0}", built);
-//        assertThat(built).isNotNull();
-//    }
+    @DisplayName("<randomized> -> build() should return non-null <TARGET>")
+    @Test
+    protected void build_NotNull_newRandomizedBuilderInstance() {
+        final var instance = newRandomizedBuilderInstance();
+        assumeThat(instance)
+                .as("optional of new randomized builder instance of %1$s", targetClass)
+                .isNotEmpty();
+        final var built = instance.get().build();
+        logger.log(System.Logger.Level.DEBUG, "built: {0}", built);
+        assertThat(built).isNotNull();
+    }
 
     // ---------------------------------------------------------------------------------------------------- builderClass
     protected BUILDER newBuilderInstance() {
         return ReflectionUtils.newInstance(builderClass);
     }
 
-//    protected Optional<BUILDER> newRandomizedBuilderInstance() {
-//        return ___Builder_TestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
-//    }
+    protected Optional<BUILDER> newRandomizedBuilderInstance() {
+        return ___Builder_TestUtils.newBuilderInstanceFromRandomizedInstanceOf(builderClass, targetClass);
+    }
 
     // ----------------------------------------------------------------------------------------------------- targetClass
     protected TARGET newTargetInstance() {
         return ReflectionUtils.newInstance(targetClass);
     }
 
-//    protected Optional<TARGET> newRandomizedTargetInstance() {
-//        return ___RandomizerUtils.newRandomizedInstanceOf(targetClass);
-//    }
+    protected Optional<TARGET> newRandomizedTargetInstance() {
+        return ___RandomizerUtils.newRandomizedInstanceOf(targetClass);
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     protected final Class<BUILDER> builderClass;
