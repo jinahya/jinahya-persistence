@@ -201,7 +201,7 @@ abstract class __MappedEntityCriteria_Persistence_<
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return applyEntityManagerInTransaction(
-                em -> ___JakartaPersistence_TestUtils.applyConnection(em, function),
+                em -> ___JakartaPersistence_TestUtils.applyUnwrappedConnection(em, function),
                 rollback
         );
     }
@@ -217,10 +217,7 @@ abstract class __MappedEntityCriteria_Persistence_<
     protected final <R> R applyConnectionInTransactionAndRollback(
             final @Nonnull Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
-        return ___JakartaPersistence_TestUtils.applyConnectionAndRollback(
-                entityManager,
-                function
-        );
+        return applyConnectionInTransaction(function, true);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

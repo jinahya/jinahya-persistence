@@ -34,6 +34,7 @@ import java.util.Objects;
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
+        "java:S119", // Type parameter names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public abstract class ___Persister<ENTITY> {
@@ -49,6 +50,7 @@ public abstract class ___Persister<ENTITY> {
      * @param entityClass   the entity class.
      * @param <ENTITY>      entity type parameter
      * @return a new persisted instance of the {@code entityClass}.
+     * @see ___PersisterUtils#newPersistedInstanceOf(EntityManager, Class)
      */
     protected static <ENTITY> ENTITY newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
                                                             final @Nonnull Class<ENTITY> entityClass) {
@@ -76,14 +78,13 @@ public abstract class ___Persister<ENTITY> {
      *
      * @param entityManager  the entity manager to use.
      * @param entityInstance the instance of {@link ENTITY} to persist.
-     * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
+     * @apiNote This method does not flush the specified entity manager.
      */
     public void persist(final @Nonnull EntityManager entityManager, final @Nonnull ENTITY entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(System.Logger.Level.DEBUG, "persisting {0}", entityInstance);
         entityManager.persist(entityInstance);
-//        entityManager.flush(); // required?
         ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
