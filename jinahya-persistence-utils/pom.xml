@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-persistence</artifactId>
-    <version>0.4.4</version>
+    <version>0.4.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>jinahya-persistence-utils</artifactId>
-  <version>0.4.4</version>
+  <version>0.4.5-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Utilities for Jakarta Persistence</description>
