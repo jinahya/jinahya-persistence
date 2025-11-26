@@ -24,7 +24,7 @@ public interface __EncryptionManager {
      *
      * @param encryptionIdentifier an identifier for the entity instance.
      * @param decryptedBytes       the decrypted bytes to encrypt.
-     * @return an array of encrypted bytes of the {@code decryptedBytes}.
+     * @return an encryption result to be decrypted via {@link #decrypt(String, byte[])} method.
      */
     @NotNull
     byte[] encrypt(@NotBlank String encryptionIdentifier, @NotNull byte[] decryptedBytes);
@@ -34,8 +34,8 @@ public interface __EncryptionManager {
      * {@link #getEncryptionIdentifier(Object)}.
      *
      * @param encryptionIdentifier an identifier for the entity instance.
-     * @param encryptedBytes       the encrypted bytes to decrypt.
-     * @return an array of decrypted bytes of the {@code encryptedBytes}.
+     * @param encryptedBytes       an array of bytes resulted via {@link #encrypt(String, byte[])} method.
+     * @return an array of bytes decrypted from the {@code encryptedBytes}.
      */
     @NotNull
     byte[] decrypt(@NotBlank String encryptionIdentifier, @NotNull byte[] encryptedBytes);

@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.crypto;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
@@ -12,8 +13,8 @@ import jakarta.persistence.EntityManagerFactory;
 public class _EncryptionService extends __EncryptionService {
 
     @Inject
-    protected _EncryptionService(final EntityManagerFactory entityManagerFactory,
-                                 final __EncryptionManager encryptionManager) {
+    protected _EncryptionService(final @Nonnull EntityManagerFactory entityManagerFactory,
+                                 final @Nonnull __EncryptionManager encryptionManager) {
         super(entityManagerFactory, encryptionManager);
     }
 
