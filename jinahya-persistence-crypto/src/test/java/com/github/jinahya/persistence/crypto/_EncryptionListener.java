@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
+import jakarta.enterprise.inject.spi.CDI;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
@@ -12,6 +13,9 @@ import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
+
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 public class _EncryptionListener extends __EncryptionListener {
 
@@ -25,6 +29,20 @@ public class _EncryptionListener extends __EncryptionListener {
      */
     public _EncryptionListener() {
         super();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    protected __EncryptionService getEncryptionService() {
+        __EncryptionService result = encryptionService;
+        if (result == null) {
+            final var qualifier = Arrays.stream(getClass().getAnnotations())
+                    .filter(a -> a instanceof __EncryptionServiceQualifier)
+                    .findFirst()
+                    .orElse(null);
+            final var qualifiers = qualifier == null ? new Annotation[0] : new Annotation[]{qualifier};
+            result = encryptionService = CDI.current().select(__EncryptionService.class, qualifiers).get();
+        }
+        return result;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -61,6 +79,7 @@ public class _EncryptionListener extends __EncryptionListener {
     @Override
     protected void onPostPersist(@Nonnull Object entityInstance) {
         super.onPostPersist(entityInstance);
+        encrypt(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -74,6 +93,7 @@ public class _EncryptionListener extends __EncryptionListener {
     @Override
     protected void onPostUpdate(final @Nonnull Object entityInstance) {
         super.onPostUpdate(entityInstance);
+        encrypt(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -94,5 +114,9 @@ public class _EncryptionListener extends __EncryptionListener {
     @Override
     protected void onPostLoad(@Nonnull Object entityInstance) {
         super.onPostLoad(entityInstance);
+        decrypt(entityInstance);
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private volatile __EncryptionService encryptionService;
 }

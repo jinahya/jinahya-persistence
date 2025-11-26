@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @AddBeanClasses({
 //        _PersistenceCryptoListener.class,
 //        __PersistenceProducer.class,
@@ -104,6 +106,12 @@ class Entity01_PersistenceTest extends __MappedEntity_PersistenceTest<Entity01, 
                             .map(n -> entityType().getAttribute(n))
                             .collect(Collectors.toMap(Function.identity(),
                                                       a -> JinahyaAttributeUtils.getAttributeValue(found, a)));
+            for (final var entry2 : attributesAndValues2.entrySet()) {
+//                assertThat(attributesAndValues2).containsEntry(entry2.getKey(), entry2.getValue());
+                assertThat(attributesAndValues1.get(entry2.getKey()))
+                        .as("attribute: %s", entry2.getKey())
+                        .isEqualTo(entry2.getValue());
+            }
             return null;
         });
     }
