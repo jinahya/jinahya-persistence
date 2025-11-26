@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -42,7 +43,7 @@
         <role>developer</role>
       </roles>
       <timezone>Asia/Seoul</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
 
@@ -413,7 +414,7 @@
             </goals>
             <configuration>
               <rules>
-                <requireProfileIdsExist />
+                <requireProfileIdsExist/>
               </rules>
             </configuration>
           </execution>
@@ -661,7 +662,38 @@
       </build>
     </profile>
     <profile>
-      <id>jakarta-ee-11.0.0</id>
+      <id>jakarta-persistence-3.0-eclipselink</id>
+    </profile>
+    <profile>
+      <id>jakarta-persistence-3.1-eclipselink</id>
+    </profile>
+    <profile>
+      <id>jakarta-persistence-3.2-eclipselink</id>
+    </profile>
+    <profile>
+      <id>jakarta-persistence-3.0-hibernate</id>
+    </profile>
+    <profile>
+      <id>jakarta-persistence-3.1-hibernate</id>
+    </profile>
+    <profile>
+      <id>jakarta-persistence-3.2-hibernate</id>
+    </profile>
+    <profile>
+      <id>_jakarta-ee-10.0.0</id>
+      <properties>
+        <!-- https://central.sonatype.com/artifact/jakarta.platform/jakartaee-api-parent/10.0.0 -->
+        <!-- jakarta.enterprise.cdi-api.version: 4.1.0 -->
+        <!-- jakarta.persistence-api.version: 3.2.0 -->
+        <!-- jakarta.validation-api.version: 3.1.0 -->
+        <!-- jakarta.el-api.version: 6.0.1 -->
+        <persistence.version>3.0</persistence.version>
+        <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd</persistence.schemaLocation>
+        <version.jakarta.platform>10.0.0</version.jakarta.platform>
+      </properties>
+    </profile>
+    <profile>
+      <id>_jakarta-ee-11.0.0</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -672,11 +704,35 @@
         <!-- jakarta.validation-api.version: 3.1.0 -->
         <!-- jakarta.el-api.version: 6.0.1 -->
         <persistence.version>3.2</persistence.version>
+        <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd</persistence.schemaLocation>
         <version.jakarta.platform>11.0.0</version.jakarta.platform>
       </properties>
     </profile>
     <profile>
-      <id>eclipselink</id>
+      <id>__eclipselink-4.0.8-jakarta-ee-10</id>
+      <properties>
+        <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
+        <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
+        <metamodel.generator.artifactId>org.eclipse.persistence.jpa.modelgen.processor</metamodel.generator.artifactId>
+        <metamodel.generator.version>${version.org.eclipse.persistence}</metamodel.generator.version>
+        <version.org.eclipse.persistence>4.0.8</version.org.eclipse.persistence>
+      </properties>
+      <dependencies>
+        <!--        <dependency>-->
+        <!--          <groupId>org.eclipse.persistence</groupId>-->
+        <!--          <artifactId>eclipselink</artifactId>-->
+        <!--          <scope>test</scope>-->
+        <!--        </dependency>-->
+        <dependency>
+          <groupId>org.eclipse.persistence</groupId>
+          <artifactId>org.eclipse.persistence.jpa</artifactId>
+          <version>${version.org.eclipse.persistence}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>__eclipselink</id>
       <properties>
         <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
         <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
@@ -697,7 +753,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>hibernate-orm-7.1-jakarta-ee-11</id>
+      <id>__hibernate-orm-7.1-jakarta-ee-11</id>
       <!-- https://hibernate.org/orm/releases/7.1/ -->
       <!-- Jakarta Persistence: 3.2 -->
       <!-- Jakarta EE: 11 -->
@@ -722,7 +778,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>hibernate-orm-7.2-jakarta-ee-11</id>
+      <id>__hibernate-orm-7.2-jakarta-ee-11</id>
       <!-- https://hibernate.org/orm/releases/7.2/ -->
       <!-- Jakarta Persistence: 3.2 -->
       <!-- Jakarta EE: 11 -->
@@ -746,7 +802,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>hibernate-validator-9.0-jakarta-ee-11</id>
+      <id>___hibernate-validator-9.0-jakarta-ee-11</id>
       <!-- https://hibernate.org/validator/releases/9.0/ -->
       <!-- Jakarta Bean Validation: 3.1 -->
       <!-- Jakarta EE: 11 -->
@@ -766,7 +822,7 @@
       </properties>
     </profile>
     <profile>
-      <id>hibernate-validator-9.1-jakarta-ee-11</id>
+      <id>___hibernate-validator-9.1-jakarta-ee-11</id>
       <!-- https://hibernate.org/validator/releases/9.1/ -->
       <!-- Jakarta Bean Validation: 3.1 -->
       <!-- Jakarta EE: 11 -->
@@ -789,7 +845,7 @@
       </properties>
     </profile>
     <profile>
-      <id>weld-6-jakarta-ee-11</id>
+      <id>___weld-6-jakarta-ee-11</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
