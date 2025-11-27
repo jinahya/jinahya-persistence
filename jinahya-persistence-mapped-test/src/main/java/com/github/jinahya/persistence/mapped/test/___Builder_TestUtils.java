@@ -31,7 +31,7 @@ public final class ___Builder_TestUtils {
         Objects.requireNonNull(targetInstance, "targetInstance is null");
         final var builderInstance = ReflectionUtils.newInstance(builderClass);
         try {
-            ___BuilderUtils.getValuesFromTarget(targetInstance, builderInstance);
+            ___BuilderUtils.setBuilderValues(targetInstance, builderInstance);
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException(
                     "failed to set properties of " + builderInstance + " from " + targetInstance,

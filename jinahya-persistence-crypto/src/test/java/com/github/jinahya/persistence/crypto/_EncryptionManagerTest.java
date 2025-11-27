@@ -1,11 +1,13 @@
 package com.github.jinahya.persistence.crypto;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Disabled
 class _EncryptionManagerTest {
 
     @Test

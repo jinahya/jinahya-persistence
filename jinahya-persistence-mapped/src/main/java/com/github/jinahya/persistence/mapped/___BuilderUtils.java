@@ -61,7 +61,7 @@ public final class ___BuilderUtils {
         return methods;
     }
 
-    static void setValuesToTarget(final @Nonnull ___Builder<?, ?> builder, final @Nonnull Object target)
+    static void getTargetValues(final @Nonnull ___Builder<?, ?> builder, final @Nonnull Object target)
             throws ReflectiveOperationException {
         Objects.requireNonNull(builder, "builder is null");
         Objects.requireNonNull(target, "target is null");
@@ -86,7 +86,7 @@ public final class ___BuilderUtils {
         }
     }
 
-    public static void getValuesFromTarget(final @Nonnull Object target, final @Nonnull ___Builder<?, ?> builder)
+    public static void setBuilderValues(final @Nonnull Object target, final @Nonnull ___Builder<?, ?> builder)
             throws ReflectiveOperationException {
         Objects.requireNonNull(target, "target is null");
         Objects.requireNonNull(builder, "builder is null");
@@ -94,7 +94,7 @@ public final class ___BuilderUtils {
             final var getter = ___ReflectionUtils.getPropertyGetter(
                     target.getClass(),
                     writer.getName(),
-                    writer.getReturnType()
+                    writer.getParameterTypes()[0]
             );
             if (getter == null) {
                 logger.log(System.Logger.Level.DEBUG, "no getter found for {0}", writer);
