@@ -372,12 +372,19 @@ final class __EncryptionSerivceUtils {
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] util_date_8(final byte[] b, final int i, final java.util.Date v) {
+        assert b != null;
+        assert i >= 0;
+        assert i + 8 <= b.length;
+        assert v != null;
         return long_8(b, i, v.getTime());
     }
 
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static java.util.Date util_date_8(final byte[] b, final int i) {
+        assert b != null;
+        assert i >= 0;
+        assert i + 8 <= b.length;
         return new java.util.Date(long_8(b, i));
     }
 
@@ -397,12 +404,19 @@ final class __EncryptionSerivceUtils {
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] util_calendar_8(final byte[] b, final int i, final Calendar v) {
+        assert b != null;
+        assert i >= 0;
+        assert i + 8 <= b.length;
+        assert v != null;
         return util_date_8(b, i, v.getTime());
     }
 
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static Calendar util_calendar_8(final byte[] b, final int i) {
+        assert b != null;
+        assert i >= 0;
+        assert i + 8 <= b.length;
         final var v = Calendar.getInstance();
         v.setTime(util_date_8(b, i));
         return v;

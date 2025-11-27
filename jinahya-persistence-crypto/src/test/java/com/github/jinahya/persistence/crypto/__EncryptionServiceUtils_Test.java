@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -212,9 +213,16 @@ class __EncryptionServiceUtils_Test {
 
     @Test
     void util_calendar__() {
-        final var v = java.util.Calendar.getInstance();
-        final var b = util_calendar_8(v);
-        assertThat(util_calendar_8(b)).isEqualTo(v);
+        {
+            final var v = java.util.Calendar.getInstance();
+            final var b = util_calendar_8(v);
+            assertThat(util_calendar_8(b)).isEqualTo(v);
+        }
+        {
+            final var v = java.util.GregorianCalendar.getInstance();
+            final var b = util_calendar_8(v);
+            assertThat(util_calendar_8(b)).isEqualTo(v);
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
