@@ -34,7 +34,7 @@ public abstract class __Mapped {
     protected __Mapped(final __MappedBuilder<?, ?> builder) {
         this();
         try {
-            ___BuilderUtils.setValuesToTarget(builder, this);
+            ___BuilderUtils.getTargetValues(builder, this);
         } catch (final Exception ie) {
             throw new RuntimeException("failed to set values from " + builder, ie);
         }
