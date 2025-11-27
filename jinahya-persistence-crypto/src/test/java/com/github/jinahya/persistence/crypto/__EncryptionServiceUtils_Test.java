@@ -3,11 +3,11 @@ package com.github.jinahya.persistence.crypto;
 import org.apache.commons.text.RandomStringGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,14 +15,17 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Bytes_l;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Characters_2l;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_decimal_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.boolean_1;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.char_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.chars_2l;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.double_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.enum_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.float_4;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.instant_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.int_4;
@@ -39,6 +42,7 @@ import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.sql
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.uuid_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.year_4;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -128,6 +132,13 @@ class __EncryptionServiceUtils_Test {
     }
 
     @Test
+    void uuid__() {
+        final var v = UUID.randomUUID();
+        final var b = uuid_16(v);
+        assertThat(uuid_16(b)).isEqualTo(v);
+    }
+
+    @Test
     void big_integer__() {
         final var v = new BigInteger(randomBytes(1, 128));
         final var b = v.toByteArray();
@@ -136,7 +147,6 @@ class __EncryptionServiceUtils_Test {
 
     @Test
     void big_decimal__() {
-        final var b = ByteBuffer.allocate(1024);
         final var v = new BigDecimal(randomDigitString(0, 128) + '.' + randomDigitString(0, 128));
         final var encoded = big_decimal_(v);
         assertThat(big_decimal_(encoded)).isEqualTo(v);
@@ -248,14 +258,41 @@ class __EncryptionServiceUtils_Test {
 
     // ---------------------------------------------------------------------------------------------------------- char[]
     @Test
-    void chars_l__() {
+    void chars_2l__() {
         final var v = new char[ThreadLocalRandom.current().nextInt(128)];
         for (int i = 0; i < v.length; i++) {
             v[i] = (char) ThreadLocalRandom.current().nextInt(65536);
         }
         final var b = chars_2l(v);
-        assertThat(chars_2l(b)).isEqualTo(v);
+        final var actual = chars_2l(b);
+        assertThat(actual).isEqualTo(v);
     }
 
     // ----------------------------------------------------------------------------------------------------- Character[]
+    @Test
+    void Characters_l__() {
+        final Character[] v;
+        {
+            final var p = new char[ThreadLocalRandom.current().nextInt(128)];
+            v = new Character[p.length];
+            for (int i = 0; i < v.length; i++) {
+                v[i] = (char) i;
+            }
+        }
+        final var b = Characters_2l(v);
+        assertThat(Characters_2l(b)).isEqualTo(v);
+    }
+
+    // ------------------------------------------------------------------------------------------------------------ enum
+    private static enum A {
+        B,
+        C,
+    }
+
+    @EnumSource(A.class)
+    @ParameterizedTest
+    void Enums_l__(final A v) {
+        final var b = enum_(v);
+        assertThat(enum_(b, A.class)).isSameAs(v);
+    }
 }

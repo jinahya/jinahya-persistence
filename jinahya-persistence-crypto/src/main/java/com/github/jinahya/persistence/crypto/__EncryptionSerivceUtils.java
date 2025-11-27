@@ -520,9 +520,9 @@ final class __EncryptionSerivceUtils {
         assert i >= 0;
         assert v != null;
         assert i + (v.length << 1) <= b.length;
-        for (; i < v.length; ) {
-            b[i++] = (byte) (v[i] >> Byte.SIZE);
-            b[i++] = (byte) (v[i] & 0xFF);
+        for (int j = 0; j < v.length; j++) {
+            b[i++] = (byte) (v[j] >> Byte.SIZE);
+            b[i++] = (byte) (v[j] & 0xFF);
         }
         return b;
     }
@@ -532,29 +532,21 @@ final class __EncryptionSerivceUtils {
         assert i >= 0;
         assert (b.length - i) % 2 == 0;
         final var v = new char[(b.length - i) >> 1];
-        for (; i < b.length; ) {
-            v[i] = (char) (((b[i++] << Byte.SIZE) & 0xFF) | (b[i++] & 0xFF));
+        for (int j = 0; j < v.length; j++) {
+            v[j] = (char) (
+                    (b[i++] << Byte.SIZE)
+                    | (b[i++] & 0xFF)
+            );
         }
         return v;
     }
 
     static byte[] chars_2l(final char[] v) {
-        final var b = new byte[v.length << 1];
-        var j = 0;
-        for (int i = 0; i < v.length; i++) {
-            b[j++] = (byte) (v[i] >> Byte.SIZE);
-            b[j++] = (byte) (v[i] & 0xFF);
-        }
-        return b;
+        return chars_2l(new byte[v.length << 1], 0, v);
     }
 
     static char[] chars_2l(final byte[] b) {
-        final var v = new char[b.length >> 1];
-        var j = 0;
-        for (int i = 0; i < v.length; i++) {
-            v[i] = (char) (((b[j++] << Byte.SIZE) & 0xFF) | (b[j++] & 0xFF));
-        }
-        return v;
+        return chars_2l(b, 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
