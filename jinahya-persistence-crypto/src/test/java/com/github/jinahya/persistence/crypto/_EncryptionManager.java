@@ -15,7 +15,6 @@ import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 @ApplicationScoped
@@ -26,25 +25,31 @@ public class _EncryptionManager implements __EncryptionManager {
     // -----------------------------------------------------------------------------------------------------------------
     private static final String ALGORITHM = "AES";
 
-    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final String MODE = "GCM";
+
+    private static final String PADDING = "NoPadding";
+
+    private static final String TRANSFORMATION = ALGORITHM + '/' + MODE + '/' + PADDING;
 
     // -----------------------------------------------------------------------------------------------------------------
     private static final int IV_SIZE = 96; // 12 bytes
 
-    private static final int IV_BYTES = IV_SIZE >> 3;
+    static final int IV_BYTES = IV_SIZE >> 3;
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static final int KEY_SIZE = 128;
+    private static final int KEY_SIZE = 256;
 
-    private static final int KEY_BYTES = KEY_SIZE >> 3;
+    static final int KEY_BYTES = KEY_SIZE >> 3;
 
     // -----------------------------------------------------------------------------------------------------------------
     private static final int AAD_SIZE = 128; // 16 bytes
 
-    private static final int AAD_BYTES = AAD_SIZE >> 3;
+    static final int AAD_BYTES = AAD_SIZE >> 3;
 
     // -----------------------------------------------------------------------------------------------------------------
     private static final int TAG_SIZE = 128; // 16 bytes
+
+    static final int TAG_BYTES = TAG_SIZE >>> 3; // 16 bytes
 
     // -----------------------------------------------------------------------------------------------------------------
     protected _EncryptionManager() {
@@ -87,7 +92,11 @@ public class _EncryptionManager implements __EncryptionManager {
             throw new RuntimeException(nsae);
         }
         final var key = new byte[KEY_BYTES];
-        ThreadLocalRandom.current().nextBytes(key);
+        try {
+            SecureRandom.getInstanceStrong().nextBytes(key);
+        } catch (final NoSuchAlgorithmException nsae) {
+            throw new RuntimeException(nsae);
+        }
         final var keySpec = new SecretKeySpec(key, ALGORITHM);
         try {
             final var cipher = Cipher.getInstance(TRANSFORMATION);
@@ -110,21 +119,27 @@ public class _EncryptionManager implements __EncryptionManager {
 
     @Override
     public @Nonnull byte[] decrypt(final @Nonnull String encryptionIdentifier, final @Nonnull byte[] encryptedBytes) {
-        final var buffer = ByteBuffer.wrap(encryptedBytes);
-        final var iv = new byte[IV_BYTES];
-        buffer.get(iv);
-        final var key = new byte[KEY_BYTES];
-        buffer.get(key);
-        final var aad = new byte[AAD_BYTES];
-        buffer.get(aad);
+        final byte[] iv;
+        final byte[] key;
+        final byte[] aad;
+        final byte[] input;
+        {
+            final var buffer = ByteBuffer.wrap(encryptedBytes);
+            iv = new byte[IV_BYTES];
+            buffer.get(iv);
+            key = new byte[KEY_BYTES];
+            buffer.get(key);
+            aad = new byte[AAD_BYTES];
+            buffer.get(aad);
+            input = new byte[buffer.remaining()];
+            buffer.get(input);
+        }
         final var keySpec = new SecretKeySpec(key, ALGORITHM);
         try {
             final var cipher = Cipher.getInstance(TRANSFORMATION);
             final var parameterSpec = new GCMParameterSpec(TAG_SIZE, iv);
             cipher.init(Cipher.DECRYPT_MODE, keySpec, parameterSpec);
             cipher.updateAAD(aad);
-            final var input = new byte[buffer.remaining()];
-            buffer.get(input);
             return cipher.doFinal(input);
         } catch (final Exception e) {
             throw new RuntimeException(e);
