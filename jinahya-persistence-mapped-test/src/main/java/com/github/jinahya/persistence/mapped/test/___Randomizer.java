@@ -29,9 +29,11 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import uk.co.jemos.podam.api.RandomDataProviderStrategyImpl;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * An abstract class for randomizing a specific class.
@@ -45,23 +47,53 @@ import java.util.stream.Collectors;
 })
 public abstract class ___Randomizer<T> {
 
+    protected static Collection<? super String> moreExcludedFields(
+            final @Nonnull Collection<? super String> excludedFields,
+            final @Nonnull Iterable<String> moreExcludedFields) {
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
+        moreExcludedFields.forEach(excludedFields::add);
+        return excludedFields;
+    }
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance for initializing a randomized instance of the specified class.
      *
-     * @param target         the class to be randomized.
+     * @param targetClass    the class to be randomized.
+     * @param excludedFields fields to be excluded from randomization.
+     * @deprecated Use {@link #___Randomizer(Class, Iterable)}
+     */
+    @Deprecated(forRemoval = true)
+    protected ___Randomizer(final @Nonnull Class<T> targetClass, final @Nonnull String... excludedFields) {
+//        super();
+//        this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
+//        this.excludedFields = Arrays
+//                .stream(Objects.requireNonNull(excludedFields, "excludedFields is null"))
+//                .filter(Objects::nonNull)
+//                .map(String::strip)
+//                .filter(v -> !v.isBlank())
+//                .collect(Collectors.toSet());
+        this(targetClass, Arrays.asList(excludedFields));
+    }
+
+    /**
+     * Creates a new instance for initializing a randomized instance of the specified class.
+     *
+     * @param targetClass    the class to be randomized.
      * @param excludedFields fields to be excluded from randomization.
      */
-    protected ___Randomizer(final @Nonnull Class<T> target, final @Nonnull String... excludedFields) {
+    protected ___Randomizer(final @Nonnull Class<T> targetClass, final @Nonnull Iterable<String> excludedFields) {
         super();
-        this.target = Objects.requireNonNull(target, "target is null");
-        this.excludedFields = Arrays
-                .stream(Objects.requireNonNull(excludedFields, "excludedFields is null"))
+        Objects.requireNonNull(targetClass, "targetClass is null");
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        this.targetClass = targetClass;
+        this.excludedFields = StreamSupport.stream(excludedFields.spliterator(), false)
                 .filter(Objects::nonNull)
                 .map(String::strip)
                 .filter(v -> !v.isBlank())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -102,31 +134,31 @@ public abstract class ___Randomizer<T> {
     @Nonnull
     protected ClassInfoStrategy getClassInfoStrategy() {
         final var classInfoStrategy = DefaultClassInfoStrategy.getInstance();
-        excludedFields.forEach(v -> classInfoStrategy.addExcludedField(target, v));
+        excludedFields.forEach(v -> classInfoStrategy.addExcludedField(targetClass, v));
         return classInfoStrategy;
     }
 
     /**
-     * Returns a randomized instance of the {@link #target}.
+     * Returns a randomized instance of the {@link #targetClass}.
      *
-     * @return a randomized instance of the {@link #target}.
+     * @return a randomized instance of the {@link #targetClass}.
      */
     @Nonnull
     public T get() {
-        return ___InstantiatorUtils.newInstantiatedInstanceOf(target)
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(targetClass)
                 .map(o -> getPodamFactory().populatePojo(o))
-                .orElseGet(() -> getPodamFactory().manufacturePojo(target));
+                .orElseGet(() -> getPodamFactory().manufacturePojo(targetClass));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The type to be randomized.
+     * The target type to randomized.
      */
-    protected final Class<T> target;
+    protected final Class<T> targetClass;
 
     /**
-     * The fields to be excluded from randomization.
+     * An unmodifiable set of field names ot exclude form the randomization.
      */
     protected final Set<String> excludedFields;
 }

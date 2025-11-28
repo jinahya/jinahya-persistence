@@ -26,8 +26,6 @@ import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.Objects;
-
 /**
  * An abstract class for creating randomized instances of a subclasses of {@link __Mapped}.
  *
@@ -44,13 +42,18 @@ public abstract class __Mapped_Randomizer<MAPPED extends __Mapped>
     /**
      * Creates a new instance for randomizing the specified mapped class.
      *
-     * @param mappedClass    the mapped class to be randomized.
+     * @param targetClass    the mapped class to be randomized.
      * @param excludedFields the names of the fields to be excluded from randomization.
-     * @see #mappedClass
      */
-    protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> mappedClass, final @Nonnull String... excludedFields) {
-        super(mappedClass, excludedFields);
-        this.mappedClass = Objects.requireNonNull(mappedClass, "mappedClass is null");
+    protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> targetClass, final @Nonnull String... excludedFields) {
+        super(targetClass, excludedFields);
+//        this.mappedClass = Objects.requireNonNull(targetClass, "targetClass is null");
+    }
+
+    protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> targetClass,
+                                  final @Nonnull Iterable<String> excludedFields) {
+        super(targetClass, excludedFields);
+//        this.mappedClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -84,10 +87,10 @@ public abstract class __Mapped_Randomizer<MAPPED extends __Mapped>
         return super.get();
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * The mapped class to be randomized.
-     */
-    protected final Class<MAPPED> mappedClass;
+//    // -----------------------------------------------------------------------------------------------------------------
+//
+//    /**
+//     * The mapped class to be randomized.
+//     */
+//    protected final Class<MAPPED> mappedClass;
 }

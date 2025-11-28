@@ -44,33 +44,34 @@ public abstract class ___Instantiator<T> {
     /**
      * Creates a new instance for instantiating the specified class.
      *
-     * @param target the class to be instantiated.
-     * @see #target
+     * @param targetClass the class to be instantiated.
+     * @see #targetClass
      */
-    protected ___Instantiator(final @Nonnull Class<T> target) {
+    protected ___Instantiator(final @Nonnull Class<T> targetClass) {
         super();
-        this.target = Objects.requireNonNull(target, "target is null");
+        this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Instantiates {@link #target}.
+     * Instantiates {@link #targetClass}.
      *
-     * @return a new instance of {@link #target}.
+     * @return a new instance of {@link #targetClass}.
+     * @see ReflectionUtils#newInstance(Class, Object...)
      */
     @Nonnull
     @SuppressWarnings({
             "java:S112" // Generic exceptions should never be thrown
     })
     public T get() {
-        return ReflectionUtils.newInstance(target);
+        return ReflectionUtils.newInstance(targetClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The class to instantiate.
+     * The target type to instantiate.
      */
-    protected final Class<T> target;
+    protected final Class<T> targetClass;
 }

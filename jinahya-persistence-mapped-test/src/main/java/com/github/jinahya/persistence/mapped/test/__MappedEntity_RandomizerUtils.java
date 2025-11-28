@@ -44,7 +44,9 @@ public final class __MappedEntity_RandomizerUtils {
      * @return an optional of a randomized instance of {@code entityClass}; {@link Optional#empty() empty} when no
      *         randomizer found.
      * @see ___RandomizerUtils#newRandomizedInstanceOf(Class)
+     * @deprecated use {@link ___RandomizerUtils#newRandomizedInstanceOf(Class)} instead.
      */
+    @Deprecated(forRemoval = true)
     @Nonnull
     @SuppressWarnings({
             "java:S119" // Type parameter names should comply with a naming convention

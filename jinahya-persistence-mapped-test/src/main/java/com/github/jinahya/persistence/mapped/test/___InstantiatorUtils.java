@@ -74,7 +74,7 @@ public final class ___InstantiatorUtils {
         assert target != null;
         return getInstantiatorClassOf(target)
                 .map(ReflectionUtils::newInstance)
-                .filter(i -> target.isAssignableFrom(((___Instantiator<?>) i).target))
+                .filter(i -> target.isAssignableFrom(((___Instantiator<?>) i).targetClass))
                 .map(i -> (___Instantiator<T>) i);
     }
 

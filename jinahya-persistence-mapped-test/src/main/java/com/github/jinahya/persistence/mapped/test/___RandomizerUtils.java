@@ -24,6 +24,7 @@ import jakarta.annotation.Nonnull;
 import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -47,6 +48,13 @@ public final class ___RandomizerUtils {
         return result;
     }
 
+    public static Collection<String> moreExcludedFields(final @Nonnull Collection<String> excludedFields,
+                                                        final @Nonnull Iterable<String> moreExcludedFields) {
+        moreExcludedFields.forEach(excludedFields::add);
+        return excludedFields;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Nonnull
     private static Optional<Class<?>> getRandomizerClassOf(final @Nonnull Class<?> target) {
         assert target != null;
@@ -92,7 +100,7 @@ public final class ___RandomizerUtils {
         assert target != null;
         return getRandomizerClassOf(target)
                 .map(ReflectionUtils::newInstance)
-                .filter(i -> target.isAssignableFrom(((___Randomizer<?>) i).target))
+                .filter(i -> target.isAssignableFrom(((___Randomizer<?>) i).targetClass))
                 .map(i -> (___Randomizer<T>) i);
     }
 
