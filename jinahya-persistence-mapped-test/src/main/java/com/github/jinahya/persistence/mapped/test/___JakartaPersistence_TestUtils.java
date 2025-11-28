@@ -515,10 +515,10 @@ public final class ___JakartaPersistence_TestUtils {
             if (connection == null) {
                 throw new RuntimeException("null unwrapped from " + entityManager);
             }
-            logger.log(Level.DEBUG, "unwrapped connection: {0}", connection);
+            logger.log(Level.TRACE, "unwrapped connection: {0}", connection);
             return function.apply(connection);
         } catch (final Exception e1) {
-            logger.log(Level.DEBUG, "failed to unwrap connection from " + entityManager, e1);
+            logger.log(Level.TRACE, "failed to unwrap connection from " + entityManager, e1);
             try {
                 return ____HibernateTestUtils.applyConnection(
                         entityManager,
