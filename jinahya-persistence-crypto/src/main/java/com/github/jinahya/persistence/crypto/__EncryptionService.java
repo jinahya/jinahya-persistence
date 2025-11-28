@@ -39,28 +39,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Bytes_l;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.Characters_2l;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.big_decimal_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.char_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.chars_2l;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.double_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.enum_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.float_4;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.instant_16;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.int_4;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.local_date_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.local_date_time_16;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.local_time_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.long_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_date_time_20;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.offset_time_12;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.serializable_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.short_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.string_;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.util_date_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.uuid_16;
-import static com.github.jinahya.persistence.crypto.__EncryptionSerivceUtils.year_4;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.Bytes_l;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.Characters_2l;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.big_decimal_;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.big_integer_;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.char_2;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.chars_2l;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.double_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.enum_;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.float_4;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.instant_12;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.int_4;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.local_date_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.local_date_time_16;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.local_time_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.long_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.offset_date_time_20;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.serializable_;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.short_2;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.string_;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.util_date_8;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.uuid_16;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.year_4;
 
 /**
  * .
@@ -275,11 +276,11 @@ public abstract class __EncryptionService {
             } else if (decryptedValue instanceof UUID u) {
                 decryptedBytes = uuid_16(u);
             } else if (decryptedValue instanceof BigInteger v) {
-                decryptedBytes = v.toByteArray();
+                decryptedBytes = big_integer_(v);
             } else if (decryptedValue instanceof BigDecimal v) {
                 decryptedBytes = big_decimal_(v);
             } else if (decryptedValue instanceof LocalDate v) {
-                decryptedBytes = local_date_8(new byte[Long.BYTES], 0, v);
+                decryptedBytes = local_date_8(v);
             } else if (decryptedValue instanceof LocalTime v) {
                 decryptedBytes = local_time_8(v);
             } else if (decryptedValue instanceof LocalDateTime v) {
@@ -289,7 +290,7 @@ public abstract class __EncryptionService {
             } else if (decryptedValue instanceof OffsetDateTime v) {
                 decryptedBytes = offset_date_time_20(v);
             } else if (decryptedValue instanceof Instant v) {
-                decryptedBytes = instant_16(v);
+                decryptedBytes = __EncryptionServiceUtils.instant_12(v);
             } else if (decryptedValue instanceof Year v) {
                 decryptedBytes = year_4(v);
             } else if (decryptedValue instanceof java.util.Calendar v) {
@@ -390,11 +391,11 @@ public abstract class __EncryptionService {
             } else if (javaType == UUID.class) {
                 decryptedValue = uuid_16(decryptedBytes);
             } else if (javaType == BigInteger.class) {
-                decryptedValue = new BigInteger(decryptedBytes);
+                decryptedValue = big_integer_(decryptedBytes);
             } else if (javaType == BigDecimal.class) {
                 decryptedValue = big_decimal_(decryptedBytes);
             } else if (javaType == LocalDate.class) {
-                decryptedValue = local_date_8(decryptedBytes, 0);
+                decryptedValue = local_date_8(decryptedBytes);
             } else if (javaType == LocalTime.class) {
                 decryptedValue = local_time_8(decryptedBytes);
             } else if (javaType == LocalDateTime.class) {
@@ -404,7 +405,7 @@ public abstract class __EncryptionService {
             } else if (javaType == OffsetDateTime.class) {
                 decryptedValue = offset_date_time_20(decryptedBytes);
             } else if (javaType == Instant.class) {
-                decryptedValue = instant_16(decryptedBytes);
+                decryptedValue = instant_12(decryptedBytes);
             } else if (javaType == Year.class) {
                 decryptedValue = year_4(decryptedBytes);
             } else if (javaType == Calendar.class) {

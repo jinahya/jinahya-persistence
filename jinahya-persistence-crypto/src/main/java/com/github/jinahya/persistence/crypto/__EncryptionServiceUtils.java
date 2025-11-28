@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -17,18 +18,17 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
 import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.UUID;
 
-final class __EncryptionSerivceUtils {
-
-    // -----------------------------------------------------------------------------------------------------------------
+final class __EncryptionServiceUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
     private static byte[] boolean_1(final byte[] b, final int i, final boolean v) {
         assert b != null;
         assert i >= 0;
-        assert i + 1 <= b.length;
+        assert i + Byte.BYTES <= b.length;
         b[i] = (byte) (v ? 1 : 0);
         return b;
     }
@@ -36,7 +36,7 @@ final class __EncryptionSerivceUtils {
     private static boolean boolean_1(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
-        assert i + 1 <= b.length;
+        assert i + Byte.BYTES <= b.length;
         return b[i] == 1;
     }
 
@@ -49,22 +49,22 @@ final class __EncryptionSerivceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static byte[] short_2(final byte[] b, final int i, final short v) {
+    private static byte[] short_2(final byte[] b, int i, final short v) {
         assert b != null;
         assert i >= 0;
         assert i + Short.BYTES <= b.length;
         b[i] = (byte) (v >> Byte.SIZE);
-        b[i + 1] = (byte) (v & 0xFF);
+        b[++i] = (byte) (v & 0xFF);
         return b;
     }
 
-    private static short short_2(final byte[] b, final int i) {
+    private static short short_2(final byte[] b, int i) {
         assert b != null;
         assert i >= 0;
         assert i + Short.BYTES <= b.length;
         return (short) (
-                (b[i] << Byte.SIZE)
-                | (b[i + 1] & 0xFF)
+                (b[i] << Byte.SIZE) |
+                (b[++i] & 0xFF)
         );
     }
 
@@ -90,8 +90,8 @@ final class __EncryptionSerivceUtils {
         assert b != null;
         assert i >= 0;
         assert i + Integer.BYTES <= b.length;
-        return (short_2(b, i) << Short.SIZE)
-               | (short_2(b, i + Short.BYTES) & 0xFFFF);
+        return (short_2(b, i) << Short.SIZE) |
+               (short_2(b, i + Short.BYTES) & 0xFFFF);
     }
 
     static byte[] int_4(final int v) {
@@ -116,8 +116,8 @@ final class __EncryptionSerivceUtils {
         assert b != null;
         assert i >= 0;
         assert i + Long.BYTES <= b.length;
-        return (((long) int_4(b, i)) << Integer.SIZE)
-               | (int_4(b, i + Integer.BYTES) & 0xFFFFFFFFL);
+        return ((long) int_4(b, i) << Integer.SIZE) |
+               (int_4(b, i + Integer.BYTES) & 0xFFFFFFFFL);
     }
 
     static byte[] long_8(final long v) {
@@ -175,40 +175,70 @@ final class __EncryptionSerivceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------------ UUID
-    static byte[] uuid_16(final UUID v) {
-        final var b = new byte[Long.BYTES << 1];
-        long_8(b, 0, v.getMostSignificantBits());
-        long_8(b, Long.BYTES, v.getLeastSignificantBits());
+    private static byte[] uuid_16(final byte[] b, final int i, final UUID v) {
+        assert b != null;
+        assert i >= 0;
+        assert i + (Long.BYTES << 1) <= b.length;
+        assert v != null;
+        long_8(b, i, v.getMostSignificantBits());
+        long_8(b, i + Long.BYTES, v.getLeastSignificantBits());
         return b;
     }
 
-    static UUID uuid_16(final byte[] b) {
+    private static UUID uuid_16(final byte[] b, final int i) {
         assert b != null;
-        assert b.length >= Long.BYTES << 1;
+        assert i >= 0;
+        assert i + (Long.BYTES << 1) <= b.length;
         return new UUID(
-                long_8(b, 0),
-                long_8(b, Long.BYTES)
+                long_8(b, i),
+                long_8(b, i + Long.BYTES)
         );
+    }
+
+    static byte[] uuid_16(final UUID v) {
+        return uuid_16(new byte[Long.BYTES << 1], 0, v);
+    }
+
+    static UUID uuid_16(final byte[] b) {
+        return uuid_16(b, 0);
+    }
+
+    // ------------------------------------------------------------------------------------------------------- java.math
+    static byte[] big_integer_(final BigInteger v) {
+        assert v != null;
+        return v.toByteArray();
+    }
+
+    static BigInteger big_integer_(final byte[] b) {
+        return new BigInteger(b);
     }
 
     // ------------------------------------------------------------------------------------------------------- java.math
     static byte[] big_decimal_(final BigDecimal v) {
-        return string_(v.toPlainString());
+        assert v != null;
+        final var encodedScale = int_4(v.scale());
+        final var encodedUnscaledValue = big_integer_(v.unscaledValue());
+        final var b = new byte[encodedScale.length + encodedUnscaledValue.length];
+        System.arraycopy(encodedScale, 0, b, 0, encodedScale.length);
+        System.arraycopy(encodedUnscaledValue, 0, b, encodedScale.length, encodedUnscaledValue.length);
+        return b;
     }
 
-    static BigDecimal big_decimal_(final byte[] v) {
-        return new BigDecimal(string_(v));
+    static BigDecimal big_decimal_(final byte[] b) {
+        final var scale = int_4(b, 0);
+        final var unscaledValue = big_integer_(Arrays.copyOfRange(b, Integer.BYTES, b.length));
+        return new BigDecimal(unscaledValue, scale);
     }
 
     // ------------------------------------------------------------------------------------------------------- java.time
-    static byte[] local_date_8(final byte[] b, final int i, final LocalDate v) {
+    private static byte[] local_date_8(final byte[] b, final int i, final LocalDate v) {
         assert v != null;
         assert i >= 0;
         assert i + Long.BYTES <= b.length;
         return long_8(b, i, v.toEpochDay());
     }
 
-    static LocalDate local_date_8(final byte[] b, final int i) {
+    private static LocalDate local_date_8(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
         assert i + Long.BYTES <= b.length;
@@ -240,17 +270,21 @@ final class __EncryptionSerivceUtils {
         return LocalTime.ofNanoOfDay(long_8(b, 0));
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------- java.time.LocalDateTime
     private static byte[] local_date_time_16(final byte[] b, final int i, final LocalDateTime v) {
         assert b != null;
         assert i >= 0;
         assert i + (Long.BYTES << 1) <= b.length;
+        assert v != null;
         local_date_8(b, i, v.toLocalDate());
         local_time_8(b, i + Long.BYTES, v.toLocalTime());
         return b;
     }
 
     private static LocalDateTime local_date_time_16(final byte[] b, final int i) {
+        assert b != null;
+        assert i >= 0;
+        assert i + (Long.BYTES << 1) <= b.length;
         return LocalDateTime.of(
                 local_date_8(b, i),
                 local_time_8(b, i + Long.BYTES)
@@ -265,17 +299,26 @@ final class __EncryptionSerivceUtils {
         return local_date_time_16(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    static byte[] offset_4(final byte[] b, final int i, final ZoneOffset v) {
+    // ------------------------------------------------------------------------------------------------ java.time.Offset
+    private static byte[] offset_4(final byte[] b, final int i, final ZoneOffset v) {
+        assert v != null;
         return int_4(b, i, v.getTotalSeconds());
     }
 
-    static ZoneOffset offset_4(final byte[] b, final int i) {
+    private static ZoneOffset offset_4(final byte[] b, final int i) {
         return ZoneOffset.ofTotalSeconds(int_4(b, i));
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    private static byte[] offset_time_12(final byte[] b, final int i, final OffsetTime v) {
+    static byte[] offset_4(final ZoneOffset v) {
+        return offset_4(new byte[4], 0, v);
+    }
+
+    static ZoneOffset offset_4(final byte[] b) {
+        return offset_4(b, 0);
+    }
+
+    // -------------------------------------------------------------------------------------------- java.time.OffsetTime
+    private static byte[] offset_time_12(final byte[] b, final int i, final java.time.OffsetTime v) {
         return offset_4(
                 local_time_8(
                         b,
@@ -287,26 +330,26 @@ final class __EncryptionSerivceUtils {
         );
     }
 
-    private static OffsetTime offset_time_12(final byte[] b, final int i) {
+    private static java.time.OffsetTime offset_time_12(final byte[] b, final int i) {
         return OffsetTime.of(
                 local_time_8(b, i),
-                offset_4(b, Long.BYTES)
+                offset_4(b, i + Long.BYTES)
         );
     }
 
-    static byte[] offset_time_12(final OffsetTime v) {
+    static byte[] offset_time_12(final java.time.OffsetTime v) {
         return offset_time_12(new byte[12], 0, v);
     }
 
-    static OffsetTime offset_time_12(final byte[] b) {
+    static java.time.OffsetTime offset_time_12(final byte[] b) {
         return offset_time_12(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------- java.time.OffsetDateTime
     private static byte[] offset_date_time_20(final byte[] b, final int i, final OffsetDateTime v) {
         return offset_4(
                 local_date_time_16(b, i, v.toLocalDateTime()),
-                i + (Long.BYTES << 1),
+                i + 16,
                 v.getOffset()
         );
     }
@@ -314,7 +357,7 @@ final class __EncryptionSerivceUtils {
     private static OffsetDateTime offset_date_time_20(final byte[] b, final int i) {
         return OffsetDateTime.of(
                 local_date_time_16(b, i),
-                offset_4(b, i + (Long.BYTES << 1))
+                offset_4(b, i + 16)
         );
     }
 
@@ -326,31 +369,31 @@ final class __EncryptionSerivceUtils {
         return offset_date_time_20(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    private static byte[] instant_16(final byte[] b, final int i, final Instant v) {
-        return long_8(
+    // ----------------------------------------------------------------------------------------------- java.time.Instant
+    private static byte[] instant_12(final byte[] b, final int i, final Instant v) {
+        return int_4(
                 long_8(b, i, v.getEpochSecond()),
-                i + Long.BYTES,
+                i + 8,
                 v.getNano()
         );
     }
 
-    private static Instant instant_16(final byte[] b, final int i) {
+    private static Instant instant_12(final byte[] b, final int i) {
         return Instant.ofEpochSecond(
                 long_8(b, i),
-                long_8(b, i + Long.BYTES)
+                int_4(b, i + 8)
         );
     }
 
-    static byte[] instant_16(final Instant v) {
-        return instant_16(new byte[16], 0, v);
+    static byte[] instant_12(final Instant v) {
+        return instant_12(new byte[12], 0, v);
     }
 
-    static Instant instant_16(final byte[] b) {
-        return instant_16(b, 0);
+    static Instant instant_12(final byte[] b) {
+        return instant_12(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------- java.time.Year
     private static byte[] year_4(final byte[] b, final int i, final Year v) {
         return int_4(b, i, v.getValue());
     }
@@ -368,7 +411,7 @@ final class __EncryptionSerivceUtils {
         return year_4(b, 0);
     }
 
-    // ------------------------------------------------------------------------------------------------------- java.util
+    // -------------------------------------------------------------------------------------------------- java.util.Date
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] util_date_8(final byte[] b, final int i, final java.util.Date v) {
@@ -379,7 +422,6 @@ final class __EncryptionSerivceUtils {
         return long_8(b, i, v.getTime());
     }
 
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static java.util.Date util_date_8(final byte[] b, final int i) {
         assert b != null;
@@ -388,19 +430,17 @@ final class __EncryptionSerivceUtils {
         return new java.util.Date(long_8(b, i));
     }
 
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     static byte[] util_date_8(final java.util.Date v) {
         return util_date_8(new byte[8], 0, v);
     }
 
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     static java.util.Date util_date_8(final byte[] b) {
         return util_date_8(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------- java.util.Calendar
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] util_calendar_8(final byte[] b, final int i, final Calendar v) {
@@ -411,7 +451,6 @@ final class __EncryptionSerivceUtils {
         return util_date_8(b, i, v.getTime());
     }
 
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static Calendar util_calendar_8(final byte[] b, final int i) {
         assert b != null;
@@ -432,7 +471,7 @@ final class __EncryptionSerivceUtils {
         return util_calendar_8(b, 0);
     }
 
-    // -------------------------------------------------------------------------------------------------------- java.sql
+    // --------------------------------------------------------------------------------------------------- java.sql.Date
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] sql_date_8(final byte[] b, final int i, final java.sql.Date v) {
@@ -454,7 +493,7 @@ final class __EncryptionSerivceUtils {
         return sql_date_8(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------- java.sql.Time
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] sql_time_8(final byte[] b, final int i, final java.sql.Time v) {
@@ -476,7 +515,7 @@ final class __EncryptionSerivceUtils {
         return sql_time_8(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------- java.sql.Timestamp
     // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static byte[] sql_timestamp_16(final byte[] b, final int i, final java.sql.Timestamp v) {
@@ -484,16 +523,15 @@ final class __EncryptionSerivceUtils {
         assert i >= 0;
         assert i + 16 <= b.length;
         assert v != null;
-        return instant_16(b, i, v.toInstant());
+        return instant_12(b, i, v.toInstant());
     }
 
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     private static java.sql.Timestamp sql_timestamp_16(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
         assert i + 16 <= b.length;
-        return Timestamp.from(instant_16(b, i));
+        return Timestamp.from(instant_12(b, i));
     }
 
     @Deprecated
@@ -501,34 +539,33 @@ final class __EncryptionSerivceUtils {
         return sql_timestamp_16(new byte[16], 0, v);
     }
 
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
     @Deprecated
     static java.sql.Timestamp sql_timestamp_16(final byte[] b) {
         return sql_timestamp_16(b, 0);
     }
 
-    // --------------------------------------------------------------------- byte[], or Bytes[], char[], or Characters[]
+    // ---------------------------------------------------------------------------------------------------------- byte[]
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------- Byte[]
     @Deprecated
     static byte[] Bytes_l(final Byte[] v) {
         final var p = new byte[v.length];
-        for (int i = 0; i < v.length; i++) {
+        for (int i = 0; i < p.length; i++) {
             v[i] = p[i];
         }
         return p;
     }
 
     @Deprecated
-    static Byte[] Bytes_l(final byte[] p) {
-        final var v = new Byte[p.length];
+    static Byte[] Bytes_l(final byte[] b) {
+        final var v = new Byte[b.length];
         for (int i = 0; i < v.length; i++) {
-            v[i] = p[i];
+            v[i] = b[i];
         }
         return v;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------- char[]
     private static byte[] chars_2l(final byte[] b, int i, final char[] v) {
         assert b != null;
         assert i >= 0;
@@ -563,7 +600,7 @@ final class __EncryptionSerivceUtils {
         return chars_2l(b, 0);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------- Character[]
     static byte[] Characters_2l(final Character[] v) {
         final var p = new char[v.length];
         for (int i = 0; i < p.length; i++) {
@@ -583,15 +620,22 @@ final class __EncryptionSerivceUtils {
 
     // ------------------------------------------------------------------------------------------------------------ enum
     static byte[] enum_(final Enum<?> v) {
-        return string_(v.name());
+        assert v != null;
+        final var name = v.name();
+        return string_(name);
     }
 
-    static <E extends Enum<E>> E enum_(final byte[] v, final Class<E> enumClass) {
-        return Enum.valueOf(enumClass, string_(v));
+    static <E extends Enum<E>> E enum_(final byte[] b, final Class<E> enumClass) {
+        assert b != null;
+        assert b.length > 0;
+        assert enumClass != null;
+        final var name = string_(b);
+        return Enum.valueOf(enumClass, name);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     static byte[] serializable_(final Serializable v) {
+        assert v != null;
         try (var baos = new ByteArrayOutputStream();
              var oos = new ObjectOutputStream(baos)) {
             oos.writeObject(v);
@@ -603,6 +647,8 @@ final class __EncryptionSerivceUtils {
     }
 
     static <T extends Serializable> T serializable_(final byte[] b) {
+        assert b != null;
+        assert b.length > 0;
         try (var bais = new ByteArrayInputStream(b);
              var ois = new ObjectInputStream(bais)) {
             try {
@@ -616,7 +662,7 @@ final class __EncryptionSerivceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __EncryptionSerivceUtils() {
+    private __EncryptionServiceUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
