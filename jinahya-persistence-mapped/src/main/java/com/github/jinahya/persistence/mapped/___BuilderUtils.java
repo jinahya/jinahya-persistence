@@ -52,7 +52,7 @@ public final class ___BuilderUtils {
                     continue;
                 }
                 final var returnType = method.getReturnType();
-                if (!builderClass.isAssignableFrom(returnType)) {
+                if (!returnType.isAssignableFrom(c)) {
                     continue;
                 }
                 methods.add(method);
