@@ -83,9 +83,8 @@ public abstract class ___Persister<ENTITY> {
     public void persist(final @Nonnull EntityManager entityManager, final @Nonnull ENTITY entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        logger.log(System.Logger.Level.DEBUG, "persisting {0}", entityInstance);
+        logger.log(System.Logger.Level.TRACE, "persisting {0}", entityInstance);
         entityManager.persist(entityInstance);
-        ___JakartaValidation_TestUtils.requireValid(entityInstance);
     }
 
     // ----------------------------------------------------------------------------------------------------- entityClass

@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -47,13 +48,22 @@ import java.util.stream.StreamSupport;
 })
 public abstract class ___Randomizer<T> {
 
-    protected static Collection<? super String> moreExcludedFields(
-            final @Nonnull Collection<? super String> excludedFields,
-            final @Nonnull Iterable<String> moreExcludedFields) {
+    protected static Collection<String> moreExcludedFields(final @Nonnull Collection<String> excludedFields,
+                                                           final @Nonnull Iterable<String> moreExcludedFields) {
         Objects.requireNonNull(excludedFields, "excludedFields is null");
         Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
         moreExcludedFields.forEach(excludedFields::add);
         return excludedFields;
+    }
+
+    protected static Collection<String> moreExcludedFields(final @Nonnull Iterable<String> excludedFields,
+                                                           final @Nonnull String... moreExcludedFields) {
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
+        return Stream.concat(
+                StreamSupport.stream(excludedFields.spliterator(), false),
+                Stream.of(moreExcludedFields)
+        ).toList();
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
