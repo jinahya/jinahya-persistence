@@ -350,7 +350,6 @@ public final class ___JakartaPersistence_TestUtils {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(collection, "collection is null");
-
         if (true) {
             if (___JakartaPersistence_TestUtils.isEclipseLink()) {
                 collection.addAll(____EclipseLinkTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));

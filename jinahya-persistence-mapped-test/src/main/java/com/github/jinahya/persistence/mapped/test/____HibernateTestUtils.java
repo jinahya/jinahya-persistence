@@ -82,11 +82,19 @@ final class ____HibernateTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    // https://docs.hibernate.org/orm/current/javadocs/org/hibernate/persister/entity/AbstractEntityPersister.html
     static List<String> getEntityColumnNames(final @Nonnull EntityManagerFactory entityManagerFactory,
                                              final @Nonnull Class<?> entityClass) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         try {
+            // > final var mappingMetamodel = (MappingMatamodel) entityManagerFactory.getMetamodel();
+            // > final var entityDescriptor = mappingMetamodel.getEntityDescriptor(entityClass);
+            // > final var entityPersister = EntityMappingType.getEntityPersister(entityDescriptor);
+            // > final var abstractEntityPersister = (AbstractEntityPersister) entityPersister;
+            // > final String[] identifierColumnNames = abstractEntityPersister.getIdentifierColumnNames();
+            // > String[] propertyNames = abstractEntityPersister.getPropertyNames()
+            // > final String[] columnNames = abstractEntityPersister.toColumns(propertyName)
             // ---------------------------------------------------------------------------------------------------------
             final var mappingMetamodelClass = Class.forName("org.hibernate.metamodel.MappingMetamodel");
             final var mappingMetamodel = mappingMetamodelClass.cast(entityManagerFactory.getMetamodel());
@@ -112,7 +120,8 @@ final class ____HibernateTestUtils {
             final var toColumnsMethod = abstractEntityPersisterClass.getMethod("toColumns", String.class);
             final var propertyColumnNames = Arrays.stream(propertyNames).flatMap(pn -> {
                 try {
-                    return Arrays.stream((String[]) toColumnsMethod.invoke(abstractEntityPersister, pn));
+                    final var columnNames = (String[]) toColumnsMethod.invoke(abstractEntityPersister, pn);
+                    return Arrays.stream(columnNames);
                 } catch (final ReflectiveOperationException e) {
                     throw new RuntimeException(
                             "failed to invoke " + toColumnsMethod + " with " + abstractEntityPersister + " and " + pn,
@@ -120,7 +129,6 @@ final class ____HibernateTestUtils {
                     );
                 }
             }).toArray(String[]::new);
-            // ---------------------------------------------------------------------------------------------------------
             return Stream.concat(
                             Arrays.stream(identifierColumnNames),
                             Arrays.stream(propertyColumnNames)
