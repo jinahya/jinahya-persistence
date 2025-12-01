@@ -117,6 +117,13 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns all table column names defined in the target table of the {@link #entityClass}.
+     *
+     * @return all table column names defined in the target table of the {@link #entityClass}.
+     * @see #getEntityColumnNames()
+     */
     protected Collection<String> getTableColumnNames() {
         if (true) {
             final var columnMetaData = applyConnection(c -> {
@@ -155,6 +162,12 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         return tableColumnNames;
     }
 
+    /**
+     * Returns all mapped table column names mapped with {@link #entityClass}..
+     *
+     * @return all mapped table column names mapped with {@link #entityClass}.
+     * @see #getTableColumnNames()
+     */
     protected Collection<String> getEntityColumnNames() {
         final var entityColumnNames = applyEntityManagerFactory(
                 emf -> ___JakartaPersistence_TestUtils.addAllEntityColumNames(
@@ -192,14 +205,14 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         assumeNotAnnotatedWith(__Disable_TableColumnNames_Test.class);
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = getTableColumnNames();
-        logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
+        logger.log(Level.TRACE, "number of table columns: {0}", tableColumnNames.size());
         tableColumnNames.forEach(tcn -> {
-            logger.log(Level.DEBUG, "\ttable column name: {0}", tcn);
+            logger.log(Level.TRACE, "\ttable column name: {0}", tcn);
         });
         final var entityColumnNames = Collections.unmodifiableCollection(getEntityColumnNames());
-        logger.log(Level.DEBUG, "number of entity columns: {0}", entityColumnNames.size());
+        logger.log(Level.TRACE, "number of entity columns: {0}", entityColumnNames.size());
         entityColumnNames.forEach(acn -> {
-            logger.log(Level.DEBUG, "\tentity column name: {0}", acn);
+            logger.log(Level.TRACE, "\tentity column name: {0}", acn);
         });
         // -------------------------------------------------------------------------------------------------------- when
         tableColumnNames.removeAll(entityColumnNames);
@@ -219,7 +232,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected void _Mapped_AllTableColumnNames(final @Nonnull Collection<String> remainingTableColumnNames) {
         Objects.requireNonNull(remainingTableColumnNames, "remainingTableColumnNames is null");
-        logger.log(Level.DEBUG, "number of remaining table columns: {0}", remainingTableColumnNames.size());
+        logger.log(Level.TRACE, "number of remaining table columns: {0}", remainingTableColumnNames.size());
         remainingTableColumnNames.forEach(tcn -> {
             logger.log(Level.WARNING, "\tremaining table column name: {0}", tcn);
         });
@@ -238,14 +251,14 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
         assumeNotAnnotatedWith(__Disable_EnittyColumnNames_Test.class);
         // ------------------------------------------------------------------------------------------------------- given
         final var tableColumnNames = Collections.unmodifiableCollection(getTableColumnNames());
-        logger.log(Level.DEBUG, "number of table columns: {0}", tableColumnNames.size());
+        logger.log(Level.TRACE, "number of table columns: {0}", tableColumnNames.size());
         tableColumnNames.forEach(tcn -> {
-            logger.log(Level.DEBUG, "\ttable column name: {0}", tcn);
+            logger.log(Level.TRACE, "\ttable column name: {0}", tcn);
         });
         final var entityColumnNames = getEntityColumnNames();
-        logger.log(Level.DEBUG, "number of entity columns: {0}", entityColumnNames.size());
+        logger.log(Level.TRACE, "number of entity columns: {0}", entityColumnNames.size());
         entityColumnNames.forEach(acn -> {
-            logger.log(Level.DEBUG, "\tentity column name: {0}", acn);
+            logger.log(Level.TRACE, "\tentity column name: {0}", acn);
         });
         // -------------------------------------------------------------------------------------------------------- when
         entityColumnNames.removeAll(tableColumnNames);
@@ -263,7 +276,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected void _Empty_AllEntityColumnNames(final @Nonnull Collection<String> remainingEntityColumnNames) {
         Objects.requireNonNull(remainingEntityColumnNames, "remainingEntityColumnNames is null");
-        logger.log(Level.DEBUG, "number of remaining entity columns: {0}", remainingEntityColumnNames.size());
+        logger.log(Level.TRACE, "number of remaining entity columns: {0}", remainingEntityColumnNames.size());
         remainingEntityColumnNames.forEach(ecn -> {
             logger.log(Level.WARNING, "\tremaining entity column name: {0}", ecn);
         });
@@ -302,7 +315,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 throw new RuntimeException("unknown entity member type: " + entityMember);
             }
             if (entityColumn == null) {
-                logger.log(Level.DEBUG, "no @Column annotation on {0}", entityMember);
+                logger.log(Level.TRACE, "no @Column annotation on {0}", entityMember);
                 return;
             }
             final var entityColumnName = entityColumn.name();
@@ -378,7 +391,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
                 throw new RuntimeException("unknown entity member type: " + entityMember);
             }
             if (entityJoinColumn == null) {
-                logger.log(Level.DEBUG, "no @JoinColumn annotation on {0}", entityMember);
+                logger.log(Level.TRACE, "no @JoinColumn annotation on {0}", entityMember);
                 return;
             }
             final var entityColumnName = entityJoinColumn.name();
@@ -755,7 +768,7 @@ public abstract class __MappedEntity_PersistenceIT<ENTITY extends __MappedEntity
      */
     protected void selectRandomEntityInstance(final @Nonnull ENTITY entityInstance) {
         Objects.requireNonNull(entityInstance, "entityInstance is null");
-        logger.log(Level.DEBUG, "randomly selected entity instance: {0}", entityInstance);
+        logger.log(Level.TRACE, "randomly selected entity instance: {0}", entityInstance);
     }
 
     // -------------------------------------------------------------------------------------- super.entityManagerFactory
