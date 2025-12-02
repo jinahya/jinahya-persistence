@@ -107,10 +107,18 @@ class __DatabaseConstantsTest {
             @DisplayName("MIN_NUMBER_ABSOLUTE_INCLUSIVE")
             @Test
             void MIN_NUMBER_ABSOLUTE_INCLUSIVE__() {
-                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE);
-                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.toPlainString());
-                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate());
-                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate().toPlainString());
+                {
+                    log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE);
+                    log.debug("p: {}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.precision());
+                    log.debug("s: {}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.scale());
+                    log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.toPlainString());
+                }
+                {
+                    log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate());
+                    log.debug("p: {}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate().precision());
+                    log.debug("s: {}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate().scale());
+                    log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate().toPlainString());
+                }
             }
 
             @DisplayName("MAX_NUMBER_ABSOLUTE_EXCLUSIVE")

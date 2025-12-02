@@ -215,9 +215,9 @@ public final class __DatabaseConstants {
 
         public static final int BYTES_MAX_NUMBER = 22;
 
-        public static final BigDecimal MIN_NUMBER_ABSOLUTE_INCLUSIVE = BigDecimal.valueOf(1.0d).scaleByPowerOfTen(-130);
+        public static final BigDecimal MIN_NUMBER_ABSOLUTE_INCLUSIVE = new BigDecimal("1.0").scaleByPowerOfTen(-130);
 
-        public static final BigDecimal MAX_NUMBER_ABSOLUTE_EXCLUSIVE = BigDecimal.valueOf(1.0d).scaleByPowerOfTen(126);
+        public static final BigDecimal MAX_NUMBER_ABSOLUTE_EXCLUSIVE = new BigDecimal("1.0").scaleByPowerOfTen(126);
 
         // -------------------------------------------------------------------------------------------------------------
         private Oracle() {
