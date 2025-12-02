@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -94,5 +95,32 @@ class __DatabaseConstantsTest {
     @Nested
     class __PostgreSqlTest {
 
+    }
+
+    @Nested
+    class Oracle_Test {
+
+        @DisplayName("NUMBER")
+        @Nested
+        class Number_Test {
+
+            @DisplayName("MIN_NUMBER_ABSOLUTE_INCLUSIVE")
+            @Test
+            void MIN_NUMBER_ABSOLUTE_INCLUSIVE__() {
+                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE);
+                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.toPlainString());
+                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate());
+                log.debug("{}", __DatabaseConstants.Oracle.MIN_NUMBER_ABSOLUTE_INCLUSIVE.negate().toPlainString());
+            }
+
+            @DisplayName("MAX_NUMBER_ABSOLUTE_EXCLUSIVE")
+            @Test
+            void MAX_NUMBER_ABSOLUTE_EXCLUSIVE() {
+                log.debug("{}", __DatabaseConstants.Oracle.MAX_NUMBER_ABSOLUTE_EXCLUSIVE);
+                log.debug("{}", __DatabaseConstants.Oracle.MAX_NUMBER_ABSOLUTE_EXCLUSIVE.toPlainString());
+                log.debug("{}", __DatabaseConstants.Oracle.MAX_NUMBER_ABSOLUTE_EXCLUSIVE.negate());
+                log.debug("{}", __DatabaseConstants.Oracle.MAX_NUMBER_ABSOLUTE_EXCLUSIVE.negate().toPlainString());
+            }
+        }
     }
 }
