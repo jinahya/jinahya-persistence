@@ -24,7 +24,7 @@ class _MappedRgba_Test extends __Mapped_Test<_MappedRgba> {
     @Override
     protected SingleTypeEqualsVerifierApi<_MappedRgba> equals_Verify_(
             final @Nonnull SingleTypeEqualsVerifierApi<_MappedRgba> equalsVerifier) {
-        return EqualsVerifier.simple().forClass(mappedClass)
+        return EqualsVerifier.simple().forClass(targetClass)
                 ;
     }
 
@@ -34,7 +34,7 @@ class _MappedRgba_Test extends __Mapped_Test<_MappedRgba> {
 
         @Test
         void __() {
-            final var instance = newRandomizedMappedInstance().orElseThrow();
+            final var instance = newRandomizedTargetInstance().orElseThrow();
             final var notation = instance.toHexNotation();
             logger.log(System.Logger.Level.DEBUG, "instance: {0}, notation: {1}", instance, notation);
         }

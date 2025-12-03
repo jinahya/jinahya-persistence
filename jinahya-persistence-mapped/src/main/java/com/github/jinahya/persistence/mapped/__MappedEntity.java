@@ -23,6 +23,9 @@ package com.github.jinahya.persistence.mapped;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.MappedSuperclass;
 
+import java.util.Objects;
+import java.util.function.Function;
+
 /**
  * An abstract mapped superclass for entities.
  *
@@ -31,6 +34,7 @@ import jakarta.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 @SuppressWarnings({
+        "java:S101", // Class names should comply with a naming convention
         "java:S114", // Interface names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
@@ -54,5 +58,26 @@ public abstract class __MappedEntity<ID> extends __Mapped {
      */
     protected __MappedEntity(final @Nonnull __MappedEntityBuilder<?, ?> builder) {
         super(builder);
+    }
+
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
+    // TODO: is this usable?
+    protected final boolean equalsWithId(final Function<Object, ? extends ID> mapper, final Object obj) {
+        Objects.requireNonNull(mapper, "mapper is null");
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != getClass()) {
+            return false;
+        }
+        final var thisId = Objects.requireNonNull(mapper.apply(this), "null id resulted from " + this);
+        final var thatId = Objects.requireNonNull(mapper.apply(obj), "null id resulted from " + obj);
+        return Objects.equals(thisId, thatId);
+    }
+
+    // TODO: is this usable?
+    protected final int hashCodeWithId(final Function<Object, ? extends ID> mapper) {
+        Objects.requireNonNull(mapper, "mapper is null");
+        return Objects.hash(mapper.apply(this));
     }
 }

@@ -24,11 +24,10 @@ public abstract class __MappedEntityBuilder<
     /**
      * Creates a new instance with the specified entity class.
      *
-     * @param targetClass the entity class.
+     * @param entityClass the entity class.
+     * @see #targetClass
      */
-    protected __MappedEntityBuilder(final @Nonnull Class<TARGET> targetClass) {
-        super(targetClass);
+    protected __MappedEntityBuilder(final @Nonnull Class<TARGET> entityClass) {
+        super(entityClass);
     }
-
-    // ------------------------------------------------------------------------------------------------ java.lang.Object
 }

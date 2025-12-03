@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * An abstract class for building a specific target type.
+ * An abstract class for building instances of a specific target type.
  *
  * @param <SELF>   self type parameter
  * @param <TARGET> target type parameter

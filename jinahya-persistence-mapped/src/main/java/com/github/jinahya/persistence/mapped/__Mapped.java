@@ -27,10 +27,24 @@ package com.github.jinahya.persistence.mapped;
 })
 public abstract class __Mapped {
 
+    // -------------------------------------------------------------------------------------------------------- BUILDERS
+
+    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
+
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
+    /**
+     * Creates a new instance.
+     */
     protected __Mapped() {
         super();
     }
 
+    /**
+     * Creates a new instance built from the specified builder.
+     *
+     * @param builder the builder from which a new instance is built.
+     */
     protected __Mapped(final __MappedBuilder<?, ?> builder) {
         this();
         try {
