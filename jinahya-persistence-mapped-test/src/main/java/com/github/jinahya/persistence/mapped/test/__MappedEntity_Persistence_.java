@@ -140,22 +140,23 @@ abstract class __MappedEntity_Persistence_<ENTITY extends __MappedEntity<ID>, ID
      * Gets notified, from the {@link #__persistEntityInstance()} method, with the specified entity instance which has
      * been persisted to the specified entity manager.
      *
-     * @param entityManager the entity manager to which the entity instance has been persisted.
-     * @param persisted     the entity instance persisted to the {@code entityManager}.
+     * @param entityManager   the entity manager to which the entity instance has been persisted.
+     * @param persistedEntity the entity instance persisted to the {@code entityManager}.
      */
-    protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persisted) {
+    protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persistedEntity) {
+        logger.log(Level.TRACE, "persistedEntity: {0}", persistedEntity);
     }
 
     /**
      * Gets notified, from the {@link #__persistEntityInstance()} method, with the specified entity instance which has
      * been persisted.
      *
-     * @param persisted the entity instance persisted.
+     * @param persistedEntity the entity instance persisted.
      * @deprecated use {@link #__persistEntityInstance(EntityManager, __MappedEntity)}
      */
     @Deprecated(forRemoval = true)
-    protected void __persistEntityInstance(final ENTITY persisted) {
-        logger.log(Level.DEBUG, "persisted: {0}", persisted);
+    protected void __persistEntityInstance(final ENTITY persistedEntity) {
+        logger.log(Level.TRACE, "persistedEntity: {0}", persistedEntity);
     }
 
     // ----------------------------------------------------------------------------------------------- super.entityClass

@@ -29,6 +29,7 @@
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
+    <class>com.github.jinahya.persistence.mapped.test.examples.embeddable01.Embedding01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUserWithEmbeddedId</class>
@@ -72,6 +73,7 @@
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
+    <class>com.github.jinahya.persistence.mapped.test.examples.embeddable01.Embedding01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity01.Entity01</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.entity02.Entity02</class>
     <class>com.github.jinahya.persistence.mapped.test.examples.user_with_embedded_id.IdForUserWithEmbeddedId</class>
