@@ -98,7 +98,7 @@ public final class JinahyaEntityManagerUtils {
     }
 
     /**
-     * Starts a resource-level transaction of the specified entity manaager, applies it to the specified function, and
+     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function, and
      * returns the result.
      *
      * @param manager  the entity manager.
