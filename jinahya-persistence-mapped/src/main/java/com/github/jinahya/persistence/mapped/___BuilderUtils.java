@@ -41,26 +41,6 @@ public final class ___BuilderUtils {
         return methods;
     }
 
-    private static List<Method> writers(final @Nonnull Class<?> builderClass) {
-        Objects.requireNonNull(builderClass, "builderClass is null");
-        final var methods = new ArrayList<Method>();
-        for (Class<?> c = builderClass;
-             c != null && ___Builder.class.isAssignableFrom(c); c = c.getSuperclass()) {
-            for (final var method : c.getDeclaredMethods()) {
-                final var parameters = method.getParameters();
-                if (parameters.length != 1) {
-                    continue;
-                }
-                final var returnType = method.getReturnType();
-                if (!returnType.isAssignableFrom(c)) {
-                    continue;
-                }
-                methods.add(method);
-            }
-        }
-        return methods;
-    }
-
     static void getTargetValues(final @Nonnull ___Builder<?, ?> builder, final @Nonnull Object target)
             throws ReflectiveOperationException {
         Objects.requireNonNull(builder, "builder is null");
@@ -86,30 +66,6 @@ public final class ___BuilderUtils {
         }
     }
 
-    public static void setBuilderValues(final @Nonnull Object target, final @Nonnull ___Builder<?, ?> builder)
-            throws ReflectiveOperationException {
-        Objects.requireNonNull(target, "target is null");
-        Objects.requireNonNull(builder, "builder is null");
-        for (final var writer : writers(builder.getClass())) {
-            final var getter = ___ReflectionUtils.getPropertyGetter(
-                    target.getClass(),
-                    writer.getName(),
-                    writer.getParameterTypes()[0]
-            );
-            if (getter == null) {
-                logger.log(System.Logger.Level.DEBUG, "no getter found for {0}", writer);
-                continue;
-            }
-            if (!getter.canAccess(target)) {
-                getter.setAccessible(true);
-            }
-            if (!writer.canAccess(builder)) {
-                writer.setAccessible(true);
-            }
-            final var value = getter.invoke(target);
-            writer.invoke(builder, value);
-        }
-    }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     private ___BuilderUtils() {

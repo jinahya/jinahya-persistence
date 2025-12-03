@@ -50,7 +50,7 @@ public abstract class __MappedEntity_Test<ENTITY extends __MappedEntity<ID>, ID>
      *
      * @param entityClass the entity class to test.
      * @param idClass     the id class of the {@code entityClass}.
-     * @see #mappedClass
+     * @see #targetClass
      * @see #idClass
      */
     protected __MappedEntity_Test(final @Nonnull Class<ENTITY> entityClass, final @Nonnull Class<ID> idClass) {

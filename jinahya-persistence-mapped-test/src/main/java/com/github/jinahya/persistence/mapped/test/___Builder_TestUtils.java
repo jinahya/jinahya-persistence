@@ -6,6 +6,9 @@ import jakarta.annotation.Nonnull;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,13 +28,59 @@ public final class ___Builder_TestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    private static List<Method> writers(final @Nonnull Class<?> builderClass) {
+        Objects.requireNonNull(builderClass, "builderClass is null");
+        final var methods = new ArrayList<Method>();
+        for (Class<?> c = builderClass;
+             c != null && ___Builder.class.isAssignableFrom(c); c = c.getSuperclass()) {
+            for (final var method : c.getDeclaredMethods()) {
+                final var parameters = method.getParameters();
+                if (parameters.length != 1) {
+                    continue;
+                }
+                final var returnType = method.getReturnType();
+                if (!returnType.isAssignableFrom(c)) {
+                    continue;
+                }
+                methods.add(method);
+            }
+        }
+        return methods;
+    }
+
+    static void setBuilderValues(final @Nonnull Object target, final @Nonnull ___Builder<?, ?> builder)
+            throws ReflectiveOperationException {
+        Objects.requireNonNull(target, "target is null");
+        Objects.requireNonNull(builder, "builder is null");
+        for (final var writer : writers(builder.getClass())) {
+            final var getter = ___Reflection_TestUtils.getPropertyGetter(
+                    target.getClass(),
+                    writer.getName(),
+                    writer.getParameterTypes()[0]
+            );
+            if (getter == null) {
+                logger.log(System.Logger.Level.DEBUG, "no getter found for {0}", writer);
+                continue;
+            }
+            if (!getter.canAccess(target)) {
+                getter.setAccessible(true);
+            }
+            if (!writer.canAccess(builder)) {
+                writer.setAccessible(true);
+            }
+            final var value = getter.invoke(target);
+            writer.invoke(builder, value);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     public static <BUILDER extends ___Builder<BUILDER, T>, T>
     BUILDER newBuilderInstanceFrom(final @Nonnull Class<BUILDER> builderClass, final @Nonnull T targetInstance) {
         Objects.requireNonNull(builderClass, "builderClass is null");
         Objects.requireNonNull(targetInstance, "targetInstance is null");
         final var builderInstance = ReflectionUtils.newInstance(builderClass);
         try {
-            ___BuilderUtils.setBuilderValues(targetInstance, builderInstance);
+            setBuilderValues(targetInstance, builderInstance);
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException(
                     "failed to set properties of " + builderInstance + " from " + targetInstance,

@@ -112,10 +112,10 @@ final class ___ReflectionUtils {
         return getValues(type, type.cast(object));
     }
 
-    static Map<String, Object> getValues(final @Nonnull Object object)
-            throws IntrospectionException, ReflectiveOperationException {
-        return getValuesHelper(object.getClass(), object);
-    }
+//    static Map<String, Object> getValues(final @Nonnull Object object)
+//            throws IntrospectionException, ReflectiveOperationException {
+//        return getValuesHelper(object.getClass(), object);
+//    }
 
     static <T> void setValues(final @Nonnull Class<T> type, final @Nonnull T object,
                               @Nonnull Map<String, Object> values)
@@ -166,10 +166,10 @@ final class ___ReflectionUtils {
         setValues(type, type.cast(object), values);
     }
 
-    static void setValues(final @Nonnull Object object, final @Nonnull Map<String, Object> values)
-            throws IntrospectionException, ReflectiveOperationException {
-        setValuesHelper(object.getClass(), object, values);
-    }
+//    static void setValues(final @Nonnull Object object, final @Nonnull Map<String, Object> values)
+//            throws IntrospectionException, ReflectiveOperationException {
+//        setValuesHelper(object.getClass(), object, values);
+//    }
 
     // -----------------------------------------------------------------------------------------------------------------
     static @Nullable Method getPropertySetter(final @Nonnull Class<?> clazz, final @Nonnull String name,
@@ -191,23 +191,23 @@ final class ___ReflectionUtils {
         return null;
     }
 
-    static @Nullable Method getPropertyGetter(final @Nonnull Class<?> clazz, final @Nonnull String name,
-                                              final @Nonnull Class<?> type) {
-        final var methodName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            final var found = Arrays.stream(c.getDeclaredMethods())
-                    .filter(m -> {
-                        return m.getName().equals(methodName)
-                               && m.getParameterCount() == 0
-                               && type.isAssignableFrom(m.getReturnType());
-                    })
-                    .findFirst();
-            if (found.isPresent()) {
-                return found.get();
-            }
-        }
-        return null;
-    }
+//    static @Nullable Method getPropertyGetter(final @Nonnull Class<?> clazz, final @Nonnull String name,
+//                                              final @Nonnull Class<?> type) {
+//        final var methodName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+//        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+//            final var found = Arrays.stream(c.getDeclaredMethods())
+//                    .filter(m -> {
+//                        return m.getName().equals(methodName)
+//                               && m.getParameterCount() == 0
+//                               && type.isAssignableFrom(m.getReturnType());
+//                    })
+//                    .findFirst();
+//            if (found.isPresent()) {
+//                return found.get();
+//            }
+//        }
+//        return null;
+//    }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     private ___ReflectionUtils() {

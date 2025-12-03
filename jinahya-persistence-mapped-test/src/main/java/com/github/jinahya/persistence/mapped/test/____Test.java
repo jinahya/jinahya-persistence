@@ -55,7 +55,7 @@ import static org.mockito.Mockito.spy;
         "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-public abstract class ___Object_Test<T> {
+public abstract class ____Test<T> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -67,7 +67,7 @@ public abstract class ___Object_Test<T> {
      * @param targetClass the target class to test.
      * @see #targetClass
      */
-    protected ___Object_Test(final @Nonnull Class<T> targetClass) {
+    protected ____Test(final @Nonnull Class<T> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
