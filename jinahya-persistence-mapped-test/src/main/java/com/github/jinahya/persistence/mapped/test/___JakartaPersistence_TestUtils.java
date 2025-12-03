@@ -343,6 +343,16 @@ public final class ___JakartaPersistence_TestUtils {
         );
     }
 
+    /**
+     * Adds all attribute column names of the specified entity class to the specified collection.
+     *
+     * @param entityManagerFactory an entity manager factory.
+     * @param entityClass          the entity class.
+     * @param collection           the collection.
+     * @param <ENTITY>             entity type parameter.
+     * @param <C>                  collection type parameter.
+     * @return given {@code collection}.
+     */
     public static <ENTITY extends __MappedEntity<?>, C extends Collection<? super String>>
     C addAllEntityColumNames(final @Nonnull EntityManagerFactory entityManagerFactory,
                              final @Nonnull Class<ENTITY> entityClass,
@@ -350,20 +360,21 @@ public final class ___JakartaPersistence_TestUtils {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(collection, "collection is null");
-        if (true) {
-            if (___JakartaPersistence_TestUtils.isEclipseLink()) {
-                collection.addAll(____EclipseLinkTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
-            } else if (___JakartaPersistence_TestUtils.isHibernate()) {
-                collection.addAll(____HibernateTestUtils.getEntityColumnNames(entityManagerFactory, entityClass));
-            }
-            return collection;
+        if (___JakartaPersistence_TestUtils.isEclipseLink()) {
+            return ____EclipseLinkTestUtils.addAllEntityColumnNames(
+                    entityManagerFactory,
+                    entityClass,
+                    collection
+            );
+        } else if (___JakartaPersistence_TestUtils.isHibernate()) {
+            return ____HibernateTestUtils.addAllEntityColumnNames(
+                    entityManagerFactory,
+                    entityClass,
+                    collection
+            );
+        } else {
+            throw new RuntimeException("unknown persistence provider");
         }
-        acceptEntityColumName(
-                entityManagerFactory,
-                entityClass,
-                collection::add
-        );
-        return collection;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
