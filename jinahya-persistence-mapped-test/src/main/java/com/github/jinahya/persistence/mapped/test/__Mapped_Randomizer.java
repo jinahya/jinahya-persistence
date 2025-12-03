@@ -44,16 +44,25 @@ public abstract class __Mapped_Randomizer<MAPPED extends __Mapped>
      *
      * @param targetClass    the mapped class to be randomized.
      * @param excludedFields the names of the fields to be excluded from randomization.
+     * @deprecated use {@link #__Mapped_Randomizer(Class, Iterable)} instead.
      */
+    @Deprecated(forRemoval = true)
     protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> targetClass, final @Nonnull String... excludedFields) {
         super(targetClass, excludedFields);
 //        this.mappedClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
-    protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> targetClass,
+    /**
+     * Creates a new instance for randomizing the specified target class.
+     *
+     * @param mappedClass    the target class to be randomized.
+     * @param excludedFields the names of the fields to be excluded from randomization.
+     * @see #targetClass
+     */
+    protected __Mapped_Randomizer(final @Nonnull Class<MAPPED> mappedClass,
                                   final @Nonnull Iterable<String> excludedFields) {
-        super(targetClass, excludedFields);
-//        this.mappedClass = Objects.requireNonNull(targetClass, "targetClass is null");
+        super(mappedClass, excludedFields);
+//        this.mappedClass = Objects.requireNonNull(mappedClass, "mappedClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -86,11 +95,4 @@ public abstract class __Mapped_Randomizer<MAPPED extends __Mapped>
     public MAPPED get() {
         return super.get();
     }
-
-//    // -----------------------------------------------------------------------------------------------------------------
-//
-//    /**
-//     * The mapped class to be randomized.
-//     */
-//    protected final Class<MAPPED> mappedClass;
 }

@@ -41,6 +41,7 @@ import java.util.stream.StreamSupport;
  *
  * @param <T> type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see ___RandomizerUtils
  * @see ___Instantiator
  */
 @SuppressWarnings({
@@ -93,6 +94,7 @@ public abstract class ___Randomizer<T> {
      *
      * @param targetClass    the class to be randomized.
      * @param excludedFields fields to be excluded from randomization.
+     * @see ___RandomizerUtils#moreExcludedFields(Iterable, Iterable)
      */
     protected ___Randomizer(final @Nonnull Class<T> targetClass, final @Nonnull Iterable<String> excludedFields) {
         super();
@@ -168,7 +170,7 @@ public abstract class ___Randomizer<T> {
     protected final Class<T> targetClass;
 
     /**
-     * An unmodifiable set of field names ot exclude form the randomization.
+     * An unmodifiable set of field names ot exclude from the randomization.
      */
     protected final Set<String> excludedFields;
 }

@@ -2,7 +2,7 @@ package com.github.jinahya.persistence.mapped.test;
 
 /*-
  * #%L
- * jinahya-persistence-entity-test
+ * jinahya-persistence-mapped-test
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -31,6 +31,7 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mockito;
 
 import java.beans.Introspector;
+import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InaccessibleObjectException;
 import java.util.Objects;
@@ -43,23 +44,32 @@ import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.mockito.Mockito.spy;
 
 /**
- * A class for testing a specific entity class.
+ * An abstract class for testing a specific class.
  *
- * @param <T> entity type parameter
+ * @param <T> target type parameter
+ * @see ___Randomizer
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
+        "java:S119", // Type parameter names should comply with a naming convention
         "java:S5960" // Assertions should not be used in production code
 })
-public abstract class ___Entity_Test<T> {
+public abstract class ___Object_Test<T> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
-    protected ___Entity_Test(final @Nonnull Class<T> entityClass) {
+
+    /**
+     * Creates a new instance to test the specified target class.
+     *
+     * @param targetClass the target class to test.
+     * @see #targetClass
+     */
+    protected ___Object_Test(final @Nonnull Class<T> targetClass) {
         super();
-        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+        this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
     // -------------------------------------------------------------------------------------------------------- toString
@@ -67,17 +77,17 @@ public abstract class ___Entity_Test<T> {
     /**
      * Verifies that the result of {@link Object#toString() toString()} is not blank.
      *
-     * @param entityInstance the instance to test.
-     * @see #toString_NotBlank_newEntityInstance()
-     * @see #toString_NotBlank_newRandomizedEntityInstance()
+     * @param targetInstance the instance to test.
+     * @see #toString_NotBlank_newInstantiatedTargetInstance()
+     * @see #toString_NotBlank_newRandomizedTargetInstance()
      */
-    private void toString_NotBlank_(final @Nonnull T entityInstance) {
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
-        final var string = entityInstance.toString();
+    private void toString_NotBlank_(final @Nonnull T targetInstance) {
+        Objects.requireNonNull(targetInstance, "targetInstance is null");
+        final var string = targetInstance.toString();
         assertThat(string)
-                .as("%s.toString()", entityInstance)
+                .as("%s.toString()", targetInstance)
                 .isNotBlank();
-        logger.log(System.Logger.Level.DEBUG, "instance: {0}", entityInstance);
+        logger.log(Level.DEBUG, "instance: {0}", targetInstance);
     }
 
     private void assumeToStringTestNotDisabled() {
@@ -90,34 +100,32 @@ public abstract class ___Entity_Test<T> {
 
     /**
      * Verifies that the result of {@link Object#toString() toString()} of an instance from the
-     * {@link #newEntityInstance()} is not blank.
+     * {@link #newInstantiatedTargetInstance()} is not blank.
      *
      * @see __Disable_ToString_Test
-     * @see #newEntityInstance()
-     * @see #toString_NotBlank_(Object)
+     * @see #newInstantiatedTargetInstance()
      */
     @DisplayName("<instantiated>.toString()!blank")
     @Test
-    final void toString_NotBlank_newEntityInstance() {
+    final void toString_NotBlank_newInstantiatedTargetInstance() {
         assumeToStringTestNotDisabled();
-        toString_NotBlank_(newEntityInstance());
+        toString_NotBlank_(newInstantiatedTargetInstance());
     }
 
     /**
      * Verifies that the result of {@link Object#toString() toString()} of an instance from the
-     * {@link #newRandomizedEntityInstance()} is not blank.
+     * {@link #newRandomizedTargetInstance()} is not blank.
      *
      * @see __Disable_ToString_Test
-     * @see #newRandomizedEntityInstance()
-     * @see #toString_NotBlank_(Object)
+     * @see #newRandomizedTargetInstance()
      */
     @DisplayName("<randomized>.toString()!blank")
     @Test
-    final void toString_NotBlank_newRandomizedEntityInstance() {
+    final void toString_NotBlank_newRandomizedTargetInstance() {
         assumeToStringTestNotDisabled();
-        final var randomized = newRandomizedEntityInstance().orElse(null);
+        final var randomized = newRandomizedTargetInstance().orElse(null);
         assumeThat(randomized)
-                .as("new randomized entity instance")
+                .as("new randomized target instance")
                 .isNotNull();
         toString_NotBlank_(randomized);
     }
@@ -125,7 +133,7 @@ public abstract class ___Entity_Test<T> {
     // ------------------------------------------------------------------------------------------------- equals/hashCode
 
     /**
-     * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #entityClass} using an
+     * Verifies the {@link #equals(Object)} method (and {@link #hashCode()} method) of the {@link #targetClass} using an
      * equals-verifier.
      *
      * @see __Disable_EqualsVerifier_Test
@@ -143,11 +151,11 @@ public abstract class ___Entity_Test<T> {
                     .isEmpty();
         }
         if (true) {
-            final var verifier = equals_Verify_(EqualsVerifier.forClass(entityClass));
+            final var verifier = equals_Verify_(EqualsVerifier.forClass(targetClass));
             verifier.verify();
             return;
         }
-        final var equalsVerifierReference = new AtomicReference<>(EqualsVerifier.forClass(entityClass));
+        final var equalsVerifierReference = new AtomicReference<>(EqualsVerifier.forClass(targetClass));
         ReflectionUtils.findMethods(
                 getClass(),
                 m -> {
@@ -163,7 +171,7 @@ public abstract class ___Entity_Test<T> {
                 ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP
         ).forEach(m -> {
             final var equalsVerifier = equalsVerifierReference.get();
-            logger.log(System.Logger.Level.DEBUG, "invoking {0}({1})", m, equalsVerifier);
+            logger.log(Level.DEBUG, "invoking {0}({1})", m, equalsVerifier);
             if (!m.canAccess(this)) {
                 m.setAccessible(true);
             }
@@ -191,7 +199,7 @@ public abstract class ___Entity_Test<T> {
      *
      * @param equalsVerifier the equals verifier to configure.
      * @return given {@code equalsVerifier}, or a new equals verifier if required.
-     * @apiNote the {@code equals_Verify_(SingleTypeEqualsVerifierApi)} method of {@code __Entity_Test} class
+     * @apiNote the {@code equals_Verify_(SingleTypeEqualsVerifierApi)} method of {@code __Object_Test} class
      *         simply returns the {@code equalsVerifier}.
      */
     @Nonnull
@@ -206,15 +214,15 @@ public abstract class ___Entity_Test<T> {
     /**
      * Tests standard accessors with the specified instance.
      *
-     * @param entityInstance the instance to test.
+     * @param targetInstance the instance to test.
      */
     @SuppressWarnings({
             "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
     })
-    private void propertyAccessors_DoesNotThrow_(final @Nonnull T entityInstance) {
-        Objects.requireNonNull(entityInstance, "entityInstance is null");
+    private void propertyAccessors_DoesNotThrow_(final @Nonnull T targetInstance) {
+        Objects.requireNonNull(targetInstance, "targetInstance is null");
         try {
-            final var info = Introspector.getBeanInfo(entityClass);
+            final var info = Introspector.getBeanInfo(targetClass);
             for (final var descriptor : info.getPropertyDescriptors()) {
                 final var reader = descriptor.getReadMethod();
                 if (reader == null
@@ -222,31 +230,31 @@ public abstract class ___Entity_Test<T> {
                     || reader.isAnnotationPresent(__Disable_PropertyAccessor_Test.class)) {
                     continue;
                 }
-                if (!reader.canAccess(entityInstance)) {
+                if (!reader.canAccess(targetInstance)) {
                     try {
                         reader.setAccessible(true);
                     } catch (final InaccessibleObjectException ioe) {
-                        logger.log(System.Logger.Level.WARNING, "failed to set accessible for " + reader, ioe);
+                        logger.log(Level.WARNING, "failed to set accessible for " + reader, ioe);
                     }
                 }
-                final var value = reader.invoke(entityInstance);
+                final var value = reader.invoke(targetInstance);
                 final var writer = descriptor.getWriteMethod();
                 if (writer == null || writer.isAnnotationPresent(Transient.class)) {
                     continue;
                 }
-                if (!writer.canAccess(entityInstance)) {
+                if (!writer.canAccess(targetInstance)) {
                     try {
                         writer.setAccessible(true);
                     } catch (final InaccessibleObjectException ioe) {
-                        logger.log(System.Logger.Level.WARNING, "failed to set accessible for " + writer, ioe);
+                        logger.log(Level.WARNING, "failed to set accessible for " + writer, ioe);
                     }
                 }
-                assertThatCode(() -> writer.invoke(entityInstance, value))
-                        .as("%s.%s(%s)", entityInstance, writer.getName(), value)
+                assertThatCode(() -> writer.invoke(targetInstance, value))
+                        .as("%s.%s(%s)", targetInstance, writer.getName(), value)
                         .doesNotThrowAnyException();
             }
         } catch (final Exception e) {
-            throw new RuntimeException("failed to test accessors of " + entityInstance, e);
+            throw new RuntimeException("failed to test accessors of " + targetInstance, e);
         }
     }
 
@@ -259,80 +267,84 @@ public abstract class ___Entity_Test<T> {
     }
 
     /**
-     * Tests standard accessors with a new instance of {@link #entityClass}.
+     * Tests standard accessors with a new instance of {@link #targetClass}.
      *
      * @see __Disable_PropertyAccessors_Test
      * @see __Disable_PropertyAccessor_Test
-     * @see #newEntityInstance()
+     * @see #newInstantiatedTargetInstance()
      */
     @DisplayName("<instantiated>.accessors_DoesNotThrow_()")
     @Test
-    final void propertyAccessors_DoesNotThrow_newEntityInstance() {
+    final void propertyAccessors_DoesNotThrow_newInstantiatedTargetInstance() {
         assumePropertyAccessorsTestNotDisabled();
-        propertyAccessors_DoesNotThrow_(newEntityInstance());
+        propertyAccessors_DoesNotThrow_(newInstantiatedTargetInstance());
     }
 
     /**
-     * Tests standard accessors with a new randomized instance of {@link #entityClass}.
+     * Tests standard accessors with a new randomized instance of {@link #targetClass}.
      *
      * @see __Disable_PropertyAccessors_Test
      * @see __Disable_PropertyAccessor_Test
-     * @see #newRandomizedEntityInstance()
+     * @see #newRandomizedTargetInstance()
      */
     @DisplayName("<randomized>.accessors_DoesNotThrow_()")
     @Test
-    final void propertyAccessors_DoesNotThrow_newRandomizedEntityInstance() {
+    final void propertyAccessors_DoesNotThrow_newRandomizedTargetInstance() {
         assumePropertyAccessorsTestNotDisabled();
-        final var randomized = newRandomizedEntityInstance();
+        final var randomized = newRandomizedTargetInstance();
         assumeThat(randomized).isNotEmpty();
         propertyAccessors_DoesNotThrow_(randomized.get());
     }
 
-    // ----------------------------------------------------------------------------------------------------- entityClass
+    // ----------------------------------------------------------------------------------------------------- targetClass
 
     /**
-     * Returns a new instance of {@link #entityClass}.
+     * Returns a new instance of {@link #targetClass}.
      *
-     * @return a new instance of {@link #entityClass}.
+     * @return a new instance of {@link #targetClass}.
      */
     @Nonnull
-    protected final T newEntityInstance() {
-        return ___InstantiatorUtils.newInstantiatedInstanceOf(entityClass)
-                .orElseGet(() -> ReflectionUtils.newInstance(entityClass))
+    protected final T newInstantiatedTargetInstance() {
+        return ___InstantiatorUtils.newInstantiatedInstanceOf(targetClass)
+                .orElseGet(() -> ReflectionUtils.newInstance(targetClass))
                 ;
     }
 
     /**
-     * Returns a new spy object of {@link #newEntityInstance()}.
+     * Returns a new spy object of {@link #newInstantiatedTargetInstance()}.
      *
-     * @return a new spy object of {@link #newEntityInstance()}.
+     * @return a new spy object of {@link #newInstantiatedTargetInstance()}.
      */
     @Nonnull
-    protected final T newEntityInstanceSpy() {
-        return spy(newEntityInstance());
+    protected final T newInstantiatedTargetInstanceSpy() {
+        return spy(newInstantiatedTargetInstance());
     }
 
     /**
-     * Returns a new randomized instance of {@link #entityClass}.
+     * Returns a new randomized instance of {@link #targetClass}.
      *
-     * @return a new randomized instance of {@link #entityClass}.
+     * @return a new randomized instance of {@link #targetClass}.
      */
     @Nonnull
-    protected final Optional<T> newRandomizedEntityInstance() {
-        return ___RandomizerUtils.newRandomizedInstanceOf(entityClass);
+    protected final Optional<T> newRandomizedTargetInstance() {
+        return ___RandomizerUtils.newRandomizedInstanceOf(targetClass);
     }
 
     /**
-     * Returns a new spy object of a new randomized instance of {@link #entityClass}.
+     * Returns a new spy object of a new randomized instance of {@link #targetClass}.
      *
-     * @return a new spy object of a new randomized instance of {@link #entityClass}; {@link Optional#empty() empty}
+     * @return a new spy object of a new randomized instance of {@link #targetClass}; {@link Optional#empty() empty}
      *         when no randomizer found.
      */
     @Nonnull
-    protected final Optional<T> newRandomizedEntityInstanceSpy() {
-        return newRandomizedEntityInstance().map(Mockito::spy);
+    protected final Optional<T> newRandomizedTargetInstanceSpy() {
+        return newRandomizedTargetInstance().map(Mockito::spy);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected final Class<T> entityClass;
+
+    /**
+     * The class of {@link T} to test.
+     */
+    protected final Class<T> targetClass;
 }

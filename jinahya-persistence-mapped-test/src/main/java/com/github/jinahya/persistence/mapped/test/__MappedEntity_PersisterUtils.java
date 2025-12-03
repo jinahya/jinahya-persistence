@@ -40,7 +40,9 @@ public final class __MappedEntity_PersisterUtils {
      * @see ___PersisterUtils#newPersistedInstanceOf(EntityManager, Class)
      */
     @Nonnull
-    public static <ENTITY extends __MappedEntity<?>>
+    public static <
+            ENTITY extends __MappedEntity<?>
+            >
     ENTITY newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
                                   final @Nonnull Class<ENTITY> entityClass) {
         return ___PersisterUtils.newPersistedInstanceOf(entityManager, entityClass);

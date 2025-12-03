@@ -27,6 +27,8 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Utilities for {@link ___Randomizer}.
@@ -52,6 +54,26 @@ public final class ___RandomizerUtils {
                                                         final @Nonnull Iterable<String> moreExcludedFields) {
         moreExcludedFields.forEach(excludedFields::add);
         return excludedFields;
+    }
+
+    public static Collection<String> moreExcludedFields(final @Nonnull Iterable<String> excludedFields,
+                                                        final @Nonnull String... moreExcludedFields) {
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
+        return Stream.concat(
+                StreamSupport.stream(excludedFields.spliterator(), false),
+                Stream.of(moreExcludedFields)
+        ).toList();
+    }
+
+    public static Collection<String> moreExcludedFields(final @Nonnull Iterable<String> excludedFields,
+                                                        final @Nonnull Iterable<String> moreExcludedFields) {
+        Objects.requireNonNull(excludedFields, "excludedFields is null");
+        Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
+        return Stream.concat(
+                StreamSupport.stream(excludedFields.spliterator(), false),
+                StreamSupport.stream(moreExcludedFields.spliterator(), false)
+        ).toList();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
