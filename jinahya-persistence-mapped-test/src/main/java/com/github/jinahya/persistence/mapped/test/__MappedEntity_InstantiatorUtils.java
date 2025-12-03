@@ -26,6 +26,7 @@ import jakarta.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Optional;
 
+// TODO: remove when it's not extensible
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -37,6 +38,7 @@ public final class __MappedEntity_InstantiatorUtils {
      * @param entityClass the entity class to be initialized.
      * @param <T>         entity type parameter
      * @return an optional of the initialized entity; {@link Optional#empty() empty} when no initializer found.
+     * @see ___InstantiatorUtils#newInstantiatedInstanceOf(Class)
      */
     @Nonnull
     public static <T extends __MappedEntity<?>> Optional<T> newInstanceOf(final @Nonnull Class<T> entityClass) {

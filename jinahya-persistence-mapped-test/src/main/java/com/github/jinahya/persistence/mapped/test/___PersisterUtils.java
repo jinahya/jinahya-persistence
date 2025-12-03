@@ -41,6 +41,7 @@ public final class ___PersisterUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
+    // -----------------------------------------------------------------------------------------------------------------
     static <T> Optional<Class<?>> getPersisterClassOf(final Class<T> type) {
         return Optional.ofNullable(
                 ___JavaLang_TestUtils.siblingClassForPostfix(
@@ -75,13 +76,13 @@ public final class ___PersisterUtils {
                                                final @Nonnull Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
-        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass).orElseThrow();
-        logger.log(System.Logger.Level.DEBUG, "entityInstance: {0}", entityInstance);
+        final T entityInstance = ___RandomizerUtils.newRandomizedInstanceOf(entityClass)
+                .orElseThrow(() -> new IllegalArgumentException("no randomized instance for " + entityClass));
+        logger.log(System.Logger.Level.TRACE, "entityInstance: {0}", entityInstance);
         final var persisterInstance = newPersisterInstanceOf(entityClass)
-                .orElseThrow(() -> new RuntimeException("no persisterInstance instance for " + entityClass));
-        logger.log(System.Logger.Level.DEBUG, "persisterInstance: {0}", persisterInstance);
+                .orElseThrow(() -> new IllegalArgumentException("no persister instance for " + entityClass));
+        logger.log(System.Logger.Level.TRACE, "persister instance: {0}", persisterInstance);
         persisterInstance.persist(entityManager, entityInstance);
-//        entityManager.flush();
         return entityInstance;
     }
 

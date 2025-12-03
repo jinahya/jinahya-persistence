@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.mapped;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -196,17 +197,29 @@ public final class __DatabaseConstants {
      * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
      * @see <a href="https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Data-Types.html">Data
      *         Types</a> (Oracle Database / SQL Language Reference)
+     * @see <a href="https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/Data-Types.html">Data
+     *         Types</a> (Oracle Database / SQL Language Reference)
      */
     public static final class Oracle {
 
-        public static final int MIN_NUMBER_PRECISION = 1;
+        // ------------------------------------------------------------------------------------------------------ NUMBER
+        public static final int PRECISION_MIN_NUMBER = 1;
 
-        public static final int MAX_NUMBER_PRECISION = 38;
+        public static final int PRECISION_MAX_NUMBER = 38;
 
-        public static final int MIN_NUMBER_SCALE = -84;
+        public static final int SCALE_MIN_NUMBER = -84;
 
-        public static final int MAX_NUMBER_SCALE = 128;
+        public static final int SCALE_MAX_NUMBER = 127;
 
+        public static final int BYTES_MIN_NUMBER = 1;
+
+        public static final int BYTES_MAX_NUMBER = 22;
+
+        public static final BigDecimal MIN_NUMBER_ABSOLUTE_INCLUSIVE = new BigDecimal("1.0").scaleByPowerOfTen(-130);
+
+        public static final BigDecimal MAX_NUMBER_ABSOLUTE_EXCLUSIVE = new BigDecimal("1.0").scaleByPowerOfTen(126);
+
+        // -------------------------------------------------------------------------------------------------------------
         private Oracle() {
             throw new AssertionError("instantiation is not allowed");
         }

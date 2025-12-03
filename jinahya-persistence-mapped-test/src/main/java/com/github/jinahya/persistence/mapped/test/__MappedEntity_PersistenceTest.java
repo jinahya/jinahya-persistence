@@ -55,13 +55,13 @@ public abstract class __MappedEntity_PersistenceTest<ENTITY extends __MappedEnti
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persisted) {
-        super.__persistEntityInstance(entityManager, persisted);
+    protected void __persistEntityInstance(final EntityManager entityManager, final ENTITY persistedEntity) {
+        super.__persistEntityInstance(entityManager, persistedEntity);
     }
 
     @Override
-    protected void __persistEntityInstance(final ENTITY persisted) {
-        super.__persistEntityInstance(persisted);
+    protected void __persistEntityInstance(final ENTITY persistedEntity) {
+        super.__persistEntityInstance(persistedEntity);
     }
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
