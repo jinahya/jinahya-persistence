@@ -65,10 +65,13 @@ public final class ___Builder_TestUtils {
             if (!getter.canAccess(target)) {
                 getter.setAccessible(true);
             }
+            final var value = getter.invoke(target);
+            if (value == null) {
+                continue;
+            }
             if (!writer.canAccess(builder)) {
                 writer.setAccessible(true);
             }
-            final var value = getter.invoke(target);
             writer.invoke(builder, value);
         }
     }
