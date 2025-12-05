@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.5.1</version>
+  <version>0.5.2-SNAPSHOT</version>
   <!--  <version>${revision}</version>-->
   <packaging>pom</packaging>
 
@@ -60,7 +60,7 @@
     <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
     <url>https://github.com/jinahya/${project.artifactId}</url>
-    <tag>0.5.1</tag>
+    <tag>0.4.0</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
