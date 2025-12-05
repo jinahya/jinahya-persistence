@@ -28,6 +28,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
@@ -557,7 +560,69 @@ public final class ___JakartaPersistence_TestUtils {
         return applyConnection(entityManager, function, true);
     }
 
-// -----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    public static <R> R applyCriteriaBuilder(@Nonnull final EntityManager entityManager,
+                                             @Nonnull final Function<
+                                                     ? super CriteriaBuilder,
+                                                     ? extends R
+                                                     > function) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(function, "function is null");
+        final var b = entityManager.getCriteriaBuilder();
+        return function.apply(b);
+    }
+
+    public static <R> R applyCriteriaQuery(@Nonnull final EntityManager entityManager,
+                                           @Nonnull final Class<R> resultClass,
+                                           @Nonnull final Function<
+                                                   ? super CriteriaBuilder,
+                                                   ? extends Function<
+                                                           ? super CriteriaQuery<R>,
+                                                           ? extends R
+                                                           >
+                                                   > function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyCriteriaBuilder(entityManager, b -> {
+            final var q = b.createQuery(resultClass);
+            return function.apply(b).apply(q);
+        });
+    }
+
+    public static <R, T> R applyRoot(@Nonnull final EntityManager entityManager,
+                                     @Nonnull final Class<R> resultClass,
+                                     @Nonnull final Class<T> entityClass,
+                                     @Nonnull final Function<
+                                             ? super CriteriaBuilder,
+                                             ? extends Function<
+                                                     ? super CriteriaQuery<R>,
+                                                     ? extends Function<
+                                                             ? super Root<T>,
+                                                             ? extends R
+                                                             >
+                                                     >
+                                             > function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyCriteriaQuery(entityManager, resultClass, b -> q -> {
+            final var r = q.from(entityClass);
+            return function.apply(b).apply(q).apply(r);
+        });
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @PositiveOrZero
+    static long count2(final @Nonnull EntityManager entityManager, final @Nonnull Class<?> entityClass) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        return applyRoot(
+                entityManager,
+                Long.class,
+                entityClass,
+                b -> q -> r -> {
+                    q.select(b.count(r));
+                    return entityManager.createQuery(q).getSingleResult();
+                }
+        );
+    }
 
     /**
      * Counts the number of entities in the table from which the specified entity class maps.
@@ -570,6 +635,17 @@ public final class ___JakartaPersistence_TestUtils {
     public static long count(final @Nonnull EntityManager entityManager, final @Nonnull Class<?> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
+        if (true) {
+            return applyRoot(
+                    entityManager,
+                    Long.class,
+                    entityClass,
+                    b -> q -> r -> {
+                        q.select(b.count(r));
+                        return entityManager.createQuery(q).getSingleResult();
+                    }
+            );
+        }
         final var builder = entityManager.getCriteriaBuilder();
         final var query = builder.createQuery(Long.class);
         final var root = query.from(entityClass);
