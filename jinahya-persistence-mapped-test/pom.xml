@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-persistence</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>jinahya-persistence-mapped-test</artifactId>
-  <version>0.5.1-SNAPSHOT</version>
+  <version>0.5.2-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Interfaces/Class for testing classes create with jinahya-persistence-mapped</description>
@@ -23,7 +23,7 @@
     <dependency>
       <groupId>io.github.jinahya</groupId>
       <artifactId>jinahya-persistence-mapped</artifactId>
-      <version>0.5.1-SNAPSHOT</version>
+      <version>0.5.2-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
