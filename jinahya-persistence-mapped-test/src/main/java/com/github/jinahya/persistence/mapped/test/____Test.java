@@ -37,6 +37,7 @@ import java.lang.reflect.InaccessibleObjectException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.UnaryOperator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -313,11 +314,23 @@ public abstract class ____Test<T> {
     /**
      * Returns a new spy object of {@link #newInstantiatedTargetInstance()}.
      *
+     * @param processor a processor to apply to {@link #newInstantiatedTargetInstance()} before returning a spy object
+     * @return a new spy object of {@link #newInstantiatedTargetInstance()}.
+     */
+    @Nonnull
+    protected final T newInstantiatedTargetInstanceSpy(final UnaryOperator<T> processor) {
+        Objects.requireNonNull(processor, "processor is null");
+        return spy(processor.apply(newInstantiatedTargetInstance()));
+    }
+
+    /**
+     * Returns a new spy object of {@link #newInstantiatedTargetInstance()}.
+     *
      * @return a new spy object of {@link #newInstantiatedTargetInstance()}.
      */
     @Nonnull
     protected final T newInstantiatedTargetInstanceSpy() {
-        return spy(newInstantiatedTargetInstance());
+        return newInstantiatedTargetInstanceSpy(UnaryOperator.identity());
     }
 
     /**
@@ -333,12 +346,26 @@ public abstract class ____Test<T> {
     /**
      * Returns a new spy object of a new randomized instance of {@link #targetClass}.
      *
+     * @param processor a processor to apply to a new randomized instance of {@link #targetClass} before returning a
+     *                  spy
+     * @return a new spy object of a new randomized instance of {@link #targetClass}; {@link Optional#empty() empty}
+     *         when no randomizer found.
+     */
+    @Nonnull
+    protected final Optional<T> newRandomizedTargetInstanceSpy(final UnaryOperator<T> processor) {
+        Objects.requireNonNull(processor, "processor is null");
+        return newRandomizedTargetInstance().map(processor).map(Mockito::spy);
+    }
+
+    /**
+     * Returns a new spy object of a new randomized instance of {@link #targetClass}.
+     *
      * @return a new spy object of a new randomized instance of {@link #targetClass}; {@link Optional#empty() empty}
      *         when no randomizer found.
      */
     @Nonnull
     protected final Optional<T> newRandomizedTargetInstanceSpy() {
-        return newRandomizedTargetInstance().map(Mockito::spy);
+        return newRandomizedTargetInstanceSpy(UnaryOperator.identity());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
