@@ -8,15 +8,15 @@ import java.util.Arrays;
 
 class ___Reflection_TestUtils {
 
-    static @Nullable Method getPropertyGetter(final @Nonnull Class<?> clazz, final @Nonnull String name,
-                                              final @Nonnull Class<?> type) {
-        final var methodName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+    static @Nullable Method getPropertyGetter(final @Nonnull Class<?> fromClass, final @Nonnull String propertyName,
+                                              final @Nonnull Class<?> returnType) {
+        final var methodName = "get" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
+        for (Class<?> c = fromClass; c != null; c = c.getSuperclass()) {
             final var found = Arrays.stream(c.getDeclaredMethods())
                     .filter(m -> {
                         return m.getName().equals(methodName)
                                && m.getParameterCount() == 0
-                               && type.isAssignableFrom(m.getReturnType());
+                               && returnType.isAssignableFrom(m.getReturnType());
                     })
                     .findFirst();
             if (found.isPresent()) {

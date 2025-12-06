@@ -49,11 +49,11 @@ public abstract class __PersistenceUnit_Test extends __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     final EntityManagerFactory getEntityManagerFactory() {
-        return entityManagerFactory;
+        return null;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.__testPU
     @Inject
-    private EntityManagerFactory entityManagerFactory;
+    protected EntityManagerFactory entityManagerFactory;
 }
