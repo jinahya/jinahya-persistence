@@ -25,7 +25,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import java.lang.System.Logger.Level;
 import java.lang.invoke.MethodHandles;
@@ -138,8 +137,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      * @see #_Mapped_AllDatabaseTableNames(Collection)
      */
     @DisplayName("all database table names are mapped")
-    @Test
-    void _Mapped_AllDatabaseTableNames() {
+    protected void _Mapped_AllDatabaseTableNames() {
         // ------------------------------------------------------------------------------------------------------- given
         final var databaseTableNames = getDatabaseTableNames();
         final var persistenceTableNames = Collections.unmodifiableCollection(getPersistenceTableNames());
@@ -183,8 +181,7 @@ public abstract class __PersistenceUnit_IT extends __PersistenceUnit_ {
      * @see #_Known_AllPersistenceTableNames(Collection)
      */
     @DisplayName("all persistence table names are known")
-    @Test
-    void _Known_AllPersistenceTableNames() {
+    protected void _Known_AllPersistenceTableNames() {
         // ------------------------------------------------------------------------------------------------------- given
         final var databaseTableNames = Collections.unmodifiableCollection(getDatabaseTableNames());
         final var persistenceTableNames = getPersistenceTableNames();
