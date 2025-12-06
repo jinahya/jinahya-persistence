@@ -66,8 +66,15 @@ public final class ___RandomizerUtils {
         ).toList();
     }
 
-    public static Collection<String> moreExcludedFields(final @Nonnull Iterable<String> excludedFields,
-                                                        final @Nonnull Iterable<String> moreExcludedFields) {
+    /**
+     * Merges specified iterables of excluded fields.
+     *
+     * @param excludedFields     the first iterable of excluded fields.
+     * @param moreExcludedFields the second iterable of excluded fields.
+     * @return an {@link Iterable} of merged excluded fields.
+     */
+    public static Iterable<String> moreExcludedFields(final @Nonnull Iterable<String> excludedFields,
+                                                      final @Nonnull Iterable<String> moreExcludedFields) {
         Objects.requireNonNull(excludedFields, "excludedFields is null");
         Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
         return Stream.concat(
@@ -120,7 +127,8 @@ public final class ___RandomizerUtils {
     })
     private static <T> Optional<___Randomizer<T>> newRandomizerInstanceOf(final @Nonnull Class<T> target) {
         assert target != null;
-        return getRandomizerClassOf(target)
+        final var randomizerClass = getRandomizerClassOf(target);
+        return randomizerClass
                 .map(ReflectionUtils::newInstance)
                 .filter(i -> target.isAssignableFrom(((___Randomizer<?>) i).targetClass))
                 .map(i -> (___Randomizer<T>) i);
@@ -136,8 +144,8 @@ public final class ___RandomizerUtils {
     @Nonnull
     public static <T> Optional<T> newRandomizedInstanceOf(final @Nonnull Class<T> target) {
         Objects.requireNonNull(target, "target is null");
-        return newRandomizerInstanceOf(target)
-                .map(___Randomizer::get);
+        final var randomizer = newRandomizerInstanceOf(target);
+        return randomizer.map(___Randomizer::get);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
