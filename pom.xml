@@ -42,7 +42,7 @@
         <role>developer</role>
       </roles>
       <timezone>Asia/Seoul</timezone>
-      <properties />
+      <properties/>
     </developer>
   </developers>
 
@@ -413,7 +413,7 @@
             </goals>
             <configuration>
               <rules>
-                <requireProfileIdsExist />
+                <requireProfileIdsExist/>
               </rules>
             </configuration>
           </execution>
@@ -473,6 +473,18 @@
             <!--            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>-->
           </archive>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-aggregate-javadocs</id>
+            <goals>
+              <goal>aggregate-jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
