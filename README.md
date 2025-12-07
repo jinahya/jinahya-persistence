@@ -4,6 +4,8 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jinahya_jinahya-persistence&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jinahya_jinahya-persistence)
 
 [![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence/versions)
+[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence)
+
 
 ## Modules
 

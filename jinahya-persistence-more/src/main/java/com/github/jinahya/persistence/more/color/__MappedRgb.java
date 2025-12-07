@@ -18,6 +18,15 @@ import java.util.Optional;
 public abstract class __MappedRgb extends __Mapped {
 
     // -----------------------------------------------------------------------------------------------------------------
+    public static final int MAX_COMPONENT = 255;
+
+    public static final int MIN_COMPONENT = 0;
+
+    public static final String DECIMAL_MAX_COMPONENT_NORMALIZED = "1.0";
+
+    public static final String DECIMAL_MIN_COMPONENT_NORMALIZED = "0.0";
+
+    // -----------------------------------------------------------------------------------------------------------------
     public static final String COLUMN_NAME_RED = "red";
 
     public static final String ATTRIBUTE_NAME_RED = "red";
@@ -33,30 +42,21 @@ public abstract class __MappedRgb extends __Mapped {
     public static final String ATTRIBUTE_NAME_BLUE = "blue";
 
     // -----------------------------------------------------------------------------------------------------------------
-    public static final int MAX_COMPONENT = 255;
-
-    public static final int MIN_COMPONENT = 0;
-
-    public static final String DECIMAL_MAX_COMPONENT_NORMALIZED = "1.0";
-
-    public static final String DECIMAL_MIN_COMPONENT_NORMALIZED = "0.0";
-
-    // -----------------------------------------------------------------------------------------------------------------
     static final String HEX_FORMAT = "%1$02x";
 
     // -----------------------------------------------------------------------------------------------------------------
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Creates a new instance.
+     */
     protected __MappedRgb() {
         super();
     }
 
     protected __MappedRgb(final __MappedRgbBuilder<?, ?> builder) {
-        super();
-//        super(builder);
-        red = builder.red();
-        green = builder.green();
-        blue = builder.blue();
+        super(builder);
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
@@ -71,7 +71,9 @@ public abstract class __MappedRgb extends __Mapped {
 
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof __MappedRgb that)) return false;
+        if (!(obj instanceof __MappedRgb that)) {
+            return false;
+        }
         return Objects.equals(red, that.red)
                && Objects.equals(green, that.green)
                && Objects.equals(blue, that.blue);
