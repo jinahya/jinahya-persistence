@@ -55,5 +55,5 @@ public abstract class __PersistenceUnit_Test extends __PersistenceUnit_ {
     // -----------------------------------------------------------------------------------------------------------------
     @__PersistenceProducer.__testPU
     @Inject
-    protected EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
 }
