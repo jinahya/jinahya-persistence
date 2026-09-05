@@ -53,6 +53,7 @@
     <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
+    <module>jinahya-persistence-test</module>
     <module>jinahya-persistence-utils</module>
   </modules>
 
@@ -106,6 +107,8 @@
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
     <!--    <version.nl.jqno.equalsverifier>4.1.1</version.nl.jqno.equalsverifier>-->
     <version.nl.jqno.equalsverifier>4.2.4</version.nl.jqno.equalsverifier>
+    <!-- https://central.sonatype.com/artifact/org.jeasy/easy-random-core/versions -->
+    <version.org.jeasy>5.0.0</version.org.jeasy>
     <!-- https://github.com/eclipse-ee4j/eclipselink/releases -->
     <!-- https://eclipse.dev/eclipselink/releases/index.html -->
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
@@ -245,6 +248,18 @@
         <version>${version.org.jboss.weld}</version>
       </dependency>
       <dependency>
+        <groupId>org.jeasy</groupId>
+        <artifactId>easy-random-core</artifactId>
+        <!-- https://central.sonatype.com/artifact/org.jeasy/easy-random-core/versions -->
+        <version>${version.org.jeasy}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jeasy</groupId>
+        <artifactId>easy-random-bean-validation</artifactId>
+        <!-- https://central.sonatype.com/artifact/org.jeasy/easy-random-bean-validation/versions -->
+        <version>${version.org.jeasy}</version>
+      </dependency>
+      <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <version>${version.org.junit}</version>
@@ -279,6 +294,17 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
+    <!-- test dependencies common to all modules; a module may override the scope by redeclaring the dependency -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!--    <dependency>-->
     <!--      <groupId>org.jspecify</groupId>-->
     <!--      <artifactId>jspecify</artifactId>-->
