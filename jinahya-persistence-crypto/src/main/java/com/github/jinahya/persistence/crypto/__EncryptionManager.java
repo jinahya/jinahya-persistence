@@ -4,6 +4,17 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+/**
+ * An interface for the cryptographic half of this module.
+ * <p>
+ * An implementation decides which key an entity instance is encrypted with — that is what the encryption identifier
+ * selects — and performs the encryption and decryption themselves; everything else, including finding the attributes
+ * and turning their values into bytes, is done by {@link __EncryptionService}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __EncryptionService
+ * @see __EncryptedEntity
+ */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 })

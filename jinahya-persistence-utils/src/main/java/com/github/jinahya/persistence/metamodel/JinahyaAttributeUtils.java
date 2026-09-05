@@ -2,7 +2,7 @@ package com.github.jinahya.persistence.metamodel;
 
 /*-
  * #%L
- * jinahya-persistence-mapped-test
+ * jinahya-persistence-utils
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -38,6 +38,15 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+/**
+ * A utility class for {@link Attribute}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @apiNote An {@link Attribute} is mapped either to a {@link Method} or to a {@link Field}, and the methods here hide
+ * that distinction: they read the {@link Attribute#getJavaMember() javaMember}, make it accessible when required, and
+ * work with it reflectively.
+ * @see Attribute#getJavaMember()
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -129,7 +138,7 @@ public final class JinahyaAttributeUtils {
                 attribute,
                 m -> f -> {
                     if (m != null) {
-                        if (m.canAccess(entity)) {
+                        if (!m.canAccess(entity)) {
                             m.setAccessible(true);
                         }
                         try {
@@ -169,6 +178,17 @@ public final class JinahyaAttributeUtils {
 
     private static final Map<Attribute<?, ?>, Method> SETTERS = new ConcurrentHashMap<>();
 
+    /**
+     * Returns the write method, of the specified class, for the specified attribute, caching it against the
+     * {@code attribute}.
+     *
+     * @param clazz     the class to introspect.
+     * @param attribute the attribute whose write method is returned.
+     * @return the write method for the {@code attribute}.
+     * @throws RuntimeException when the {@code clazz} cannot be introspected, or when no write method matches the
+     *                          {@code attribute}.
+     * @see Introspector#getBeanInfo(Class)
+     */
     private static Method getSetter(final @Nonnull Class<?> clazz, final @Nonnull Attribute<?, ?> attribute) {
         return SETTERS.computeIfAbsent(
                 attribute,
@@ -191,6 +211,18 @@ public final class JinahyaAttributeUtils {
         );
     }
 
+    /**
+     * Sets the value of the specified attribute, of the specified entity, to the specified value.
+     *
+     * @param entity    the entity whose attribute value is set.
+     * @param attribute the attribute of the {@code entity}.
+     * @param value     the new value for the {@code attribute}; may be {@code null}.
+     * @param <T>       attribute type parameter
+     * @return {@code null} when the {@code attribute} is mapped to a {@link Field}; the result of the write method,
+     *         otherwise.
+     * @throws RuntimeException when the value cannot be set reflectively.
+     * @see #getAttributeValue(Object, Attribute)
+     */
     public static <T> T setAttributeValue(final @Nonnull Object entity,
                                           final @Nonnull Attribute<?, ? extends T> attribute,
                                           final @Nullable Object value) {
@@ -199,13 +231,13 @@ public final class JinahyaAttributeUtils {
                 attribute,
                 m -> f -> {
                     if (m != null) {
-                        assert m.getName().startsWith("get");
+                        assert m.getName().startsWith("get") || m.getName().startsWith("is");
                         final var setter = getSetter(entity.getClass(), attribute);
                         if (!setter.canAccess(entity)) {
                             setter.setAccessible(true);
                         }
                         try {
-                            return (T) setter.invoke(entity);
+                            return (T) setter.invoke(entity, value);
                         } catch (final ReflectiveOperationException roe) {
                             throw new RuntimeException(
                                     """
@@ -214,7 +246,7 @@ public final class JinahyaAttributeUtils {
                                             ; attribute: %2$s
                                             ; value: %3$s
                                             ; method: %4$s"""
-                                            .formatted(value, attribute, entity, setter),
+                                            .formatted(entity, attribute, value, setter),
                                     roe
                             );
                         }
@@ -243,6 +275,9 @@ public final class JinahyaAttributeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private JinahyaAttributeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

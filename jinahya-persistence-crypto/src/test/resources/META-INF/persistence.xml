@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   #%L
-  jinahya-persistence-mapped-test
+  jinahya-persistence-crypto
   %%
   Copyright (C) 2024 - 2025 Jinahya, Inc.
   %%
@@ -30,9 +30,6 @@
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
     <!--    <class>com.github.jinahya.persistence.crypto.__EncryptionListener</class>-->
-    <class>com.github.jinahya.persistence.crypto.Entity01</class>
-    <class>com.github.jinahya.persistence.crypto.EntityWithEmbedded01</class>
-    <class>com.github.jinahya.persistence.crypto.ManyEntityToOneEntity01</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>
@@ -69,9 +66,6 @@
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
-    <class>com.github.jinahya.persistence.crypto.Entity01</class>
-    <class>com.github.jinahya.persistence.crypto.EntityWithEmbedded01</class>
-    <class>com.github.jinahya.persistence.crypto.ManyEntityToOneEntity01</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>

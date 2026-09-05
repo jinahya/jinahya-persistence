@@ -23,11 +23,17 @@ package com.github.jinahya.persistence.more;
 import jakarta.annotation.Nonnull;
 
 /**
- * An interface for defining enum constants with a specific type of attribute values.a
+ * An interface for defining enum constants with a specific type of attribute values.
+ * <p>
+ * An enum implementing this interface carries, for each constant, the value which is actually stored in the database,
+ * so that the persisted form does not depend on {@link Enum#name() name()} or, worse, on
+ * {@link Enum#ordinal() ordinal()}. Constants can then be renamed or reordered without a migration.
  *
  * @param <SELF>      self type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __AttributeEnumConverter
+ * @see __AttributeEnumUtils
  */
 @SuppressWarnings({
         "java:S114", // Interface names should comply with a naming convention
@@ -37,6 +43,10 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
 
     /**
      * An interface for defining enum constants with attribute values of string attribute values.
+     * <p>
+     * Note that the default {@link #attributeValue()} returns {@link Enum#name() name()}, which re-couples the
+     * persisted value to the constant's name — the very coupling {@link __AttributeEnum} exists to break. Override it
+     * in every constant whose stored value should survive a rename.
      *
      * @param <SELF> self type parameter
      */
@@ -57,6 +67,119 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
         @SuppressWarnings({"unchecked"})
         default String attributeValue() {
             return ((SELF) this).name();
+        }
+    }
+
+    /**
+     * An interface for defining enum constants with attribute values of a specific subtype of {@link Number}.
+     *
+     * @param <SELF>   self type parameter
+     * @param <NUMBER> number type parameter
+     * @apiNote This interface defines no default {@link #attributeValue()}, and cannot: the {@link Enum#name() name()}
+     * of a constant is a {@link String}, and the only numeric candidate, {@link Enum#ordinal() ordinal()}, is exactly
+     * the coupling {@link __AttributeEnum} exists to break — it changes whenever constants are reordered. Every
+     * constant therefore has to declare its own value.
+     * @apiNote The named subtypes stop at {@link __OfInteger} and {@link __OfLong} on purpose. A constant is looked up
+     * by its attribute value through {@link Object#equals(Object) equals} and {@link Object#hashCode() hashCode()}, and
+     * the remaining common numeric types do not behave under that contract the way a discriminator has to:
+     * {@link java.math.BigDecimal#equals(Object) BigDecimal.equals} is scale-sensitive, so {@code 1.0} and
+     * {@code 1.00} are different keys, which makes a lookup depend on the scale the column and the driver happen to
+     * produce; and {@link Double} and {@link Float} distinguish {@code 0.0} from {@code -0.0}, report {@code NaN} equal
+     * to itself, and need not round-trip a column bit for bit. This interface stays generic over {@code NUMBER}
+     * regardless, so an enum with a genuine need can still implement it with any {@link Number} &mdash; it simply does
+     * so knowingly, and without the convenience the named subtypes add.
+     * @see __OfString
+     */
+    @SuppressWarnings({
+            "java:S114", // Interface names should comply with a naming convention
+            "java:S119"  // Type parameter names should comply with a naming convention
+    })
+    interface __OfNumber<SELF extends Enum<SELF> & __OfNumber<SELF, NUMBER>, NUMBER extends Number>
+            extends __AttributeEnum<SELF, NUMBER> {
+
+    }
+
+    /**
+     * An interface for defining enum constants with {@link Integer} attribute values.
+     *
+     * @param <SELF> self type parameter
+     * @see __AttributeEnumConverter.__OfInteger
+     */
+    @SuppressWarnings({
+            "java:S114" // Interface names should comply with a naming convention
+    })
+    interface __OfInteger<SELF extends Enum<SELF> & __OfInteger<SELF>> extends __OfNumber<SELF, Integer> {
+
+        /**
+         * Finds the constant, of the specified enum class, whose attribute value equals the specified value.
+         *
+         * @param enumClass      the enum class to search.
+         * @param attributeValue the attribute value to look for.
+         * @param <E>            enum type parameter
+         * @return the enum constant, of the {@code enumClass}, that has the specified attribute value.
+         * @throws IllegalArgumentException when no constant of the {@code enumClass} carries the
+         *                                  {@code attributeValue}.
+         * @apiNote Taking an {@code int} keeps the value boxed as an {@link Integer}; a {@link Long} of the same
+         * numeric value does not match a constant of this interface.
+         * @see __AttributeEnumUtils#valueOfAttributeValue(Class, Object)
+         */
+        @Nonnull
+        static <E extends Enum<E> & __OfInteger<E>> E valueOfAttributeValue(final @Nonnull Class<E> enumClass,
+                                                                           final int attributeValue) {
+            return __AttributeEnumUtils.valueOfAttributeValue(enumClass, attributeValue);
+        }
+
+        /**
+         * Returns the attribute value of this enum constant, unboxed.
+         *
+         * @return the {@link #attributeValue() attributeValue} of this enum constant, as an {@code int}.
+         * @implSpec The conversion is exact; unlike {@link Number#intValue()} on an arbitrary number, nothing is
+         * narrowed or rounded here.
+         */
+        default int intValue() {
+            return attributeValue();
+        }
+    }
+
+    /**
+     * An interface for defining enum constants with {@link Long} attribute values.
+     *
+     * @param <SELF> self type parameter
+     * @see __AttributeEnumConverter.__OfLong
+     */
+    @SuppressWarnings({
+            "java:S114" // Interface names should comply with a naming convention
+    })
+    interface __OfLong<SELF extends Enum<SELF> & __OfLong<SELF>> extends __OfNumber<SELF, Long> {
+
+        /**
+         * Finds the constant, of the specified enum class, whose attribute value equals the specified value.
+         *
+         * @param enumClass      the enum class to search.
+         * @param attributeValue the attribute value to look for.
+         * @param <E>            enum type parameter
+         * @return the enum constant, of the {@code enumClass}, that has the specified attribute value.
+         * @throws IllegalArgumentException when no constant of the {@code enumClass} carries the
+         *                                  {@code attributeValue}.
+         * @apiNote Taking a {@code long} keeps the value boxed as a {@link Long}; an {@link Integer} of the same
+         * numeric value does not match a constant of this interface.
+         * @see __AttributeEnumUtils#valueOfAttributeValue(Class, Object)
+         */
+        @Nonnull
+        static <E extends Enum<E> & __OfLong<E>> E valueOfAttributeValue(final @Nonnull Class<E> enumClass,
+                                                                        final long attributeValue) {
+            return __AttributeEnumUtils.valueOfAttributeValue(enumClass, attributeValue);
+        }
+
+        /**
+         * Returns the attribute value of this enum constant, unboxed.
+         *
+         * @return the {@link #attributeValue() attributeValue} of this enum constant, as a {@code long}.
+         * @implSpec The conversion is exact; unlike {@link Number#longValue()} on an arbitrary number, nothing is
+         * narrowed or rounded here.
+         */
+        default long longValue() {
+            return attributeValue();
         }
     }
 

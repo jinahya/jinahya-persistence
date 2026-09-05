@@ -21,6 +21,14 @@ public final class JinahyaEntityManagerFactoryUtils {
     private static final Map<EntityManagerFactory, PersistenceUnitUtil> PERSISTENCE_UNIT_UTILS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
+    /**
+     * Returns the {@link PersistenceUnitUtil} of the specified entity manager factory, caching it, weakly, against the
+     * {@code factory}.
+     *
+     * @param factory the entity manager factory whose {@link PersistenceUnitUtil} is returned.
+     * @return the {@link PersistenceUnitUtil} of the {@code factory}.
+     * @see EntityManagerFactory#getPersistenceUnitUtil()
+     */
     static @Nonnull PersistenceUnitUtil getPersistenceUnitUtil(final @Nonnull EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
         return PERSISTENCE_UNIT_UTILS.computeIfAbsent(
@@ -59,6 +67,16 @@ public final class JinahyaEntityManagerFactoryUtils {
     private static final Map<EntityManagerFactory, Metamodel> METAMODELS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
+    /**
+     * Returns the {@link Metamodel} of the specified entity manager factory, caching it, weakly, against the
+     * {@code factory}.
+     *
+     * @param factory the entity manager factory whose {@link Metamodel} is returned.
+     * @return the {@link Metamodel} of the {@code factory}.
+     * @apiNote The cache is a {@link java.util.WeakHashMap}, and does not keep the {@code factory} from being garbage
+     * collected.
+     * @see EntityManagerFactory#getMetamodel()
+     */
     public static @Nonnull Metamodel getMetamodel(final @Nonnull EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
         return METAMODELS.computeIfAbsent(
@@ -68,6 +86,9 @@ public final class JinahyaEntityManagerFactoryUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private JinahyaEntityManagerFactoryUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

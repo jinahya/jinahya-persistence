@@ -27,14 +27,25 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
      */
     public abstract static class OfNumber<N extends Number> extends __StringAttributeConverter<N> {
 
+        /**
+         * Creates a new instance.
+         */
         protected OfNumber() {
             super();
         }
     }
 
+    /**
+     * A converter for an entity attribute of {@link BigDecimal}.
+     *
+     * @implSpec A value is stored as the {@link BigDecimal#toPlainString() plain string} of the attribute, which keeps the value free of an exponent.
+     */
     @Converter(autoApply = false)
     public static class OfBigDecimal extends OfNumber<BigDecimal> {
 
+        /**
+         * Creates a new instance.
+         */
         protected OfBigDecimal() {
             super();
         }
@@ -56,9 +67,17 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    /**
+     * A converter for an entity attribute of {@link Integer}.
+     *
+     * @implSpec A value is stored as the {@link Integer#toString() decimal string} of the attribute.
+     */
     @Converter(autoApply = false)
     public static class OfInteger extends OfNumber<Integer> {
 
+        /**
+         * Creates a new instance.
+         */
         protected OfInteger() {
             super();
         }
@@ -80,9 +99,17 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    /**
+     * A converter for an entity attribute of {@link Long}.
+     *
+     * @implSpec A value is stored as the {@link Long#toString() decimal string} of the attribute.
+     */
     @Converter(autoApply = false)
     public static class OfLong extends OfNumber<Long> {
 
+        /**
+         * Creates a new instance.
+         */
         protected OfLong() {
             super();
         }
@@ -104,9 +131,19 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         }
     }
 
+    /**
+     * A converter for an entity attribute of {@link Float}.
+     *
+     * @implSpec A value is widened to a {@link BigDecimal} and delegated to {@link OfBigDecimal}, so that it is stored
+     * without an exponent; note that the round-trip is that of {@link BigDecimal#valueOf(double)}, and is not
+     * bit-exact for every value.
+     */
     @Converter(autoApply = false)
     public static class OfFloat extends OfNumber<Float> {
 
+        /**
+         * Creates a new instance.
+         */
         protected OfFloat() {
             super();
             delegate = new OfBigDecimal();
@@ -131,9 +168,19 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         private final OfBigDecimal delegate;
     }
 
+    /**
+     * A converter for an entity attribute of {@link Double}.
+     *
+     * @implSpec A value is widened to a {@link BigDecimal} and delegated to {@link OfBigDecimal}, so that it is stored
+     * without an exponent; note that the round-trip is that of {@link BigDecimal#valueOf(double)}, and is not
+     * bit-exact for every value.
+     */
     @Converter(autoApply = false)
     public static class OfDouble extends OfNumber<Double> {
 
+        /**
+         * Creates a new instance.
+         */
         protected OfDouble() {
             super();
             delegate = new OfBigDecimal();
@@ -161,6 +208,9 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    /**
+     * Creates a new instance.
+     */
     protected __StringAttributeConverter() {
         super();
     }

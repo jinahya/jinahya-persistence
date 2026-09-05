@@ -22,27 +22,17 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-mapped</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-mapped-test</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-more</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-more-test</artifactId>
+      <artifactId>jinahya-persistence-more-test-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-test</artifactId>
+      <artifactId>jinahya-persistence-test-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

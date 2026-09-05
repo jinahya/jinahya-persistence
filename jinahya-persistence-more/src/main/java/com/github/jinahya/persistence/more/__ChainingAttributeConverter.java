@@ -28,16 +28,32 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * An abstract class for chaining two {@link AttributeConverter}s.
+ * <p>
+ * An instance converts an entity attribute to the database column type through an intermediate type: the first
+ * converter maps {@link T} to {@link U}, and the second maps {@link U} to {@link V}; reading a column runs the same
+ * two converters in reverse.
  *
  * @param <T> attribute type parameter
  * @param <U> intermediate type parameter
  * @param <V> database type parameter
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __AttributeConverterUtils#chaining(AttributeConverter, AttributeConverter)
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __ChainingAttributeConverter<T, U, V> implements AttributeConverter<T, V> {
 
+    /**
+     * Creates a new instance chaining the specified two attribute converters.
+     *
+     * @param attributeConverter1 the converter from the entity attribute type to the intermediate type.
+     * @param attributeConverter2 the converter from the intermediate type to the database column type.
+     * @param <T>                 entity attribute type parameter
+     * @param <U>                 intermediate type parameter
+     * @param <V>                 database column type parameter
+     * @return a new attribute converter chaining {@code attributeConverter1} and {@code attributeConverter2}.
+     */
     @Nonnull
     public static <T, U, V>
     AttributeConverter<T, V> of(final @Nonnull AttributeConverter<T, U> attributeConverter1,
@@ -150,6 +166,12 @@ public abstract class __ChainingAttributeConverter<T, U, V> implements Attribute
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    /**
+     * Creates a new instance with the specified two attribute converters.
+     *
+     * @param attributeConverter1 the converter from the entity attribute type to the intermediate type.
+     * @param attributeConverter2 the converter from the intermediate type to the database column type.
+     */
     protected __ChainingAttributeConverter(final @Nonnull AttributeConverter<T, U> attributeConverter1,
                                            final @Nonnull AttributeConverter<U, V> attributeConverter2) {
         super();
@@ -158,6 +180,12 @@ public abstract class __ChainingAttributeConverter<T, U, V> implements Attribute
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Converts the specified database column value to an entity attribute, through the intermediate type.
+     *
+     * @param dbData the database column value to convert.
+     * @return an entity attribute converted from the {@code dbData}.
+     */
     @Override
     public T convertToEntityAttribute(final V dbData) {
         return attributeConverter1.convertToEntityAttribute(
@@ -165,6 +193,12 @@ public abstract class __ChainingAttributeConverter<T, U, V> implements Attribute
         );
     }
 
+    /**
+     * Converts the specified entity attribute to a database column value, through the intermediate type.
+     *
+     * @param attribute the entity attribute to convert.
+     * @return a database column value converted from the {@code attribute}.
+     */
     @Override
     public V convertToDatabaseColumn(final T attribute) {
         return attributeConverter2.convertToDatabaseColumn(

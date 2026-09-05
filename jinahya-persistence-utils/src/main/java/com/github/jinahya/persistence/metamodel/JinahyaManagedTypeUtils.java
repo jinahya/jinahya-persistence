@@ -2,7 +2,7 @@ package com.github.jinahya.persistence.metamodel;
 
 /*-
  * #%L
- * jinahya-persistence-mapped-test
+ * jinahya-persistence-utils
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -30,6 +30,12 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
+/**
+ * A utility class for {@link ManagedType}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see JinahyaEntityTypeUtils
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -40,6 +46,18 @@ public final class JinahyaManagedTypeUtils {
     // -----------------------------------------------------------------------------------------------------------------
     static final Map<Class<?>, ManagedType<?>> MANAGED_TYPES = new ConcurrentHashMap<>();
 
+    /**
+     * Returns the {@link ManagedType} of the specified type class, from the first of the specified entity manager
+     * factories which knows it, caching the result against the {@code typeClass}.
+     *
+     * @param typeClass              the class whose {@link ManagedType} is returned; it does not have to be an entity
+     *                               class.
+     * @param entityManagerFactories an iterable of entity manager factories to look the {@code typeClass} up in.
+     * @param <X>                    represented type
+     * @return the {@link ManagedType} of the {@code typeClass}.
+     * @throws IllegalArgumentException when none of the {@code entityManagerFactories} manages the {@code typeClass}.
+     * @see jakarta.persistence.metamodel.Metamodel#managedType(Class)
+     */
     public static <X> ManagedType<X> getManagedType(
             final @Nonnull Class<X> typeClass,
             final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
@@ -67,6 +85,9 @@ public final class JinahyaManagedTypeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private JinahyaManagedTypeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

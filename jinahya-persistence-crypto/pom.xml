@@ -23,21 +23,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-mapped</artifactId>
-      <!--  <version>${revision}</version>-->
-<!--      <version>${revision}</version>-->
-      <version>0.5.5-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-mapped-test</artifactId>
-      <!--      <version>${revision}</version>-->
-      <version>0.5.5-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-utils</artifactId>
       <!--      <version>${revision}</version>-->
       <version>0.5.5-SNAPSHOT</version>
@@ -81,11 +66,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk-platform-logging</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

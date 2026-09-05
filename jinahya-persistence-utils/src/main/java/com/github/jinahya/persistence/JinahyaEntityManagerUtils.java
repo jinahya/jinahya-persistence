@@ -25,12 +25,16 @@ public final class JinahyaEntityManagerUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * .
+     * Returns the id of the specified entity, using the entity manager factory of the specified entity manager.
      *
-     * @param manager .
-     * @param entity  .
-     * @param <Y>     .
-     * @return .
+     * @param manager the entity manager whose {@link EntityManager#getEntityManagerFactory() entityManagerFactory} is
+     *                used.
+     * @param entity  the entity instance whose id is returned.
+     * @param <Y>     identifier type parameter
+     * @return the id of the {@code entity}; {@code null} when the {@code entity} does not yet have an id.
+     * @deprecated Use
+     * {@link JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)}, with the
+     * {@link EntityManager#getEntityManagerFactory() entityManagerFactory} of the {@code manager}, instead.
      * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
      */
     @Deprecated(forRemoval = true)
@@ -88,6 +92,18 @@ public final class JinahyaEntityManagerUtils {
         }
     }
 
+    /**
+     * Starts a resource-level transaction of the specified entity manager, returns the result of the specified
+     * supplier, and rolls the transaction back.
+     *
+     * @param manager  the entity manager.
+     * @param supplier the supplier to be applied to the {@code manager}.
+     * @param <R>      result type parameter
+     * @return the result of the {@code supplier}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @apiNote Nothing the {@code supplier} does is persisted; this is intended for tests.
+     * @see #getInTransaction(EntityManager, Supplier, boolean)
+     */
     public static <R> R getInTransactionAndRollback(final @Nonnull EntityManager manager,
                                                     final @Nonnull Supplier<? extends R> supplier) {
         return getInTransaction(
@@ -120,6 +136,18 @@ public final class JinahyaEntityManagerUtils {
         );
     }
 
+    /**
+     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function, and
+     * rolls the transaction back.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied to the {@code manager}.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @apiNote Nothing the {@code function} does is persisted; this is intended for tests.
+     * @see #applyInTransaction(EntityManager, Function, boolean)
+     */
     public static <R> R applyInTransactionAndRollback(
             final @Nonnull EntityManager manager,
             final @Nonnull Function<? super EntityManager, ? extends R> function) {
@@ -170,6 +198,20 @@ public final class JinahyaEntityManagerUtils {
         }
     }
 
+    /**
+     * Starts a resource-level transaction of the specified entity manager, applies a {@link Connection}, unwrapped from
+     * the {@code manager}, to the specified function, and returns the result.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied to a connection unwrapped from the {@code manager}.
+     * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @apiNote this method does not close the unwrapped connection.
+     * @see #applyUnwrappedConnection(EntityManager, Function)
+     * @see #getInTransaction(EntityManager, Supplier, boolean)
+     */
     public static <R> R applyUnwrappedConnectionInTransaction(
             final @Nonnull EntityManager manager,
             final @Nonnull Function<? super Connection, ? extends R> function,
@@ -182,6 +224,19 @@ public final class JinahyaEntityManagerUtils {
         );
     }
 
+    /**
+     * Starts a resource-level transaction of the specified entity manager, applies a {@link Connection}, unwrapped from
+     * the {@code manager}, to the specified function, and rolls the transaction back.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied to a connection unwrapped from the {@code manager}.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @apiNote this method does not close the unwrapped connection, and nothing the {@code function} does is
+     * persisted; this is intended for tests.
+     * @see #applyUnwrappedConnectionInTransaction(EntityManager, Function, boolean)
+     */
     public static <R> R applyUnwrappedConnectionInTransactionAndRollback(
             final @Nonnull EntityManager manager,
             final @Nonnull Function<? super Connection, ? extends R> function) {
@@ -193,6 +248,9 @@ public final class JinahyaEntityManagerUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private JinahyaEntityManagerUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

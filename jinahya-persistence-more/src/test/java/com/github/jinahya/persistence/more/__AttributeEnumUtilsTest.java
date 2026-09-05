@@ -173,4 +173,76 @@ class __AttributeEnumUtilsTest {
             }).isInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("invalid attribute values")
+    @Nested
+    class InvalidAttributeValues_Test {
+
+        private enum _DuplicateAttributeValueEnum
+                implements __AttributeEnum<_DuplicateAttributeValueEnum, String> {
+
+            A,
+
+            B;
+
+            @Override
+            public String attributeValue() {
+                return "SAME";
+            }
+        }
+
+        private enum _NullAttributeValueEnum
+                implements __AttributeEnum<_NullAttributeValueEnum, String> {
+
+            A;
+
+            @Override
+            public String attributeValue() {
+                return null;
+            }
+        }
+
+        @DisplayName("two constants carrying the same attribute value -> IllegalArgumentException")
+        @Test
+        void _IllegalArgumentException_DuplicateAttributeValues() {
+            assertThatThrownBy(() -> valueOfAttributeValue(_DuplicateAttributeValueEnum.class, "SAME"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("duplicate attributeValue");
+        }
+
+        @DisplayName("a constant carrying a null attribute value -> IllegalArgumentException")
+        @Test
+        void _IllegalArgumentException_NullAttributeValue() {
+            assertThatThrownBy(() -> valueOfAttributeValue(_NullAttributeValueEnum.class, "A"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("null attributeValue");
+        }
+
+        @DisplayName("an invalid enum fails on every lookup, not just the first")
+        @Test
+        void _IllegalArgumentException_NotCached() {
+            for (int i = 0; i < 2; i++) {
+                assertThatThrownBy(() -> valueOfAttributeValue(_DuplicateAttributeValueEnum.class, "SAME"))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("repeated lookups")
+    @Nested
+    class RepeatedLookups_Test {
+
+        @DisplayName("a second lookup resolves to the same constant")
+        @EnumSource(_SomeAttributeEnum1.class)
+        @ParameterizedTest
+        void __SameConstant(final _SomeAttributeEnum1 enumConstant) {
+            final var attributeValue = enumConstant.attributeValue();
+            final var first = valueOfAttributeValue(_SomeAttributeEnum1.class, attributeValue);
+            final var second = valueOfAttributeValue(_SomeAttributeEnum1.class, attributeValue);
+            assertThat(first).isSameAs(enumConstant);
+            assertThat(second).isSameAs(first);
+        }
+    }
 }

@@ -1,9 +1,0 @@
-module com.github.jinahya.persistence.test {
-    requires transitive jakarta.annotation;
-    requires transitive jakarta.persistence;
-    requires transitive easy.random.core;
-    requires transitive easy.random.bean.validation;
-    requires transitive podam;
-    exports com.github.jinahya.persistence.test;
-    opens com.github.jinahya.persistence.test;
-}

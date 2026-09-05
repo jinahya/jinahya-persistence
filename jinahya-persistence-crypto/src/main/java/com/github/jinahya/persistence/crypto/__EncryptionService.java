@@ -64,8 +64,28 @@ import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.uui
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.year_4;
 
 /**
- * .
+ * An abstract service which encrypts and decrypts the {@link __EncryptedAttribute annotated attributes} of an entity
+ * instance, in place.
+ * <p>
+ * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each
+ * {@code BASIC} attribute annotated with {@link __EncryptedAttribute @__EncryptedAttribute}:
+ * <ol>
+ *   <li>converts the plaintext value to bytes, by its java type;</li>
+ *   <li>hands those bytes to the {@link __EncryptionManager encryptionManager}, along with the
+ *       {@link __EncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
+ *   <li>stores the ciphertext in the paired {@code byte[]} attribute, and clears the plaintext one.</li>
+ * </ol>
+ * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
+ * attributes of an embeddable are covered as well.
+ * <p>
+ * The java types handled are those Jakarta Persistence calls basic types: the primitives and their wrappers,
+ * {@link String}, {@link BigInteger}, {@link BigDecimal}, the {@code java.time} types, {@link java.util.Date},
+ * {@link Calendar}, {@link UUID}, {@code byte[]}, {@code char[]} and their boxed forms, enums, and anything
+ * {@link Serializable}. Any other type is rejected with a {@link RuntimeException}.
  *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __EncryptionManager
+ * @see __EncryptionListener
  * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486">2.6. Basic
  *         Types</a> (Jakarta Persistence 3.2 Specification Document)
  */
@@ -99,6 +119,14 @@ public abstract class __EncryptionService {
     private static final Map<ManagedType<?>, Map<String, Attribute<?, ?>>> MANAGED_TYPES_AND_ATTRIBUTES =
             new ConcurrentHashMap<>();
 
+    /**
+     * Returns an unmodifiable map of attribute names and attributes of the specified managed type, caching it against
+     * the {@code managedType}.
+     *
+     * @param managedType the managed type whose attributes are returned.
+     * @return an unmodifiable map of attribute names and attributes of the {@code managedType}.
+     * @apiNote this method is thread-safe.
+     */
     protected static Map<String, Attribute<?, ?>> getAttributes(@Nonnull final ManagedType<?> managedType) {
         Objects.requireNonNull(managedType, "managedType is null");
         return MANAGED_TYPES_AND_ATTRIBUTES.computeIfAbsent(
@@ -130,6 +158,11 @@ public abstract class __EncryptionService {
     // -----------------------------------------------------------------------------------------------------------------
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Called after this instance has been constructed and its injection points have been satisfied.
+     *
+     * @implSpec The implementation of this class only logs.
+     */
     @PostConstruct
     protected void onPostConstruct() {
         logger.log(System.Logger.Level.DEBUG, "onPostConstruct()");
@@ -138,21 +171,49 @@ public abstract class __EncryptionService {
     }
 
     // https://stackoverflow.com/a/72628439/330457
+    /**
+     * Observes the CDI container {@link Startup} event.
+     *
+     * @param startup the observed event.
+     * @implSpec The implementation of this class only logs.
+     */
     protected void onStartup(@Observes final Startup startup) {
         logger.log(System.Logger.Level.DEBUG, "onStartup({0})", startup);
     }
 
+    /**
+     * Called before this instance is destroyed.
+     *
+     * @implSpec The implementation of this class only logs.
+     */
     @PreDestroy
     protected void onPreDestroy() {
         logger.log(System.Logger.Level.DEBUG, "onPreDestroy()");
     }
 
     // https://stackoverflow.com/a/72628439/330457
+    /**
+     * Observes the CDI container {@link Shutdown} event.
+     *
+     * @param shutdown the observed event.
+     * @implSpec The implementation of this class only logs.
+     */
     protected void onShutdown(@Observes final Shutdown shutdown) {
         logger.log(System.Logger.Level.DEBUG, "onShutdown({0})", shutdown);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Verifies that the specified pair of attributes can hold an encrypted value.
+     *
+     * @param decryptedAttribute  the attribute holding the plaintext.
+     * @param encryptionAnnotation the annotation found on the {@code decryptedAttribute}.
+     * @param encryptedAttribute  the attribute holding the ciphertext.
+     * @param encryptedAttributes the encrypted attributes already seen while walking the current instance.
+     * @throws RuntimeException when either attribute is not optional, when the two are the same attribute, when the
+     *                          {@code encryptedAttribute} is not typed {@code byte[]}, or when it is already paired
+     *                          with another attribute.
+     */
     private void check(final Attribute<?, ?> decryptedAttribute,
                        final __EncryptedAttribute encryptionAnnotation, final Attribute<?, ?> encryptedAttribute,
                        final Set<Attribute<?, ?>> encryptedAttributes) {
@@ -211,6 +272,15 @@ public abstract class __EncryptionService {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Encrypts the annotated attributes of the specified object with the specified encryption identifier.
+     *
+     * @param encryptionIdentifier the identifier the encryption keys are selected by.
+     * @param object               the entity, or embeddable, instance to encrypt, in place.
+     * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
+     *                          cannot be turned into bytes.
+     * @see #encrypt(Object)
+     */
     protected void encrypt(final @NotBlank String encryptionIdentifier, final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
         final var entityClass = object.getClass();
@@ -319,12 +389,30 @@ public abstract class __EncryptionService {
         }
     }
 
+    /**
+     * Encrypts the annotated attributes of the specified object, with the identifier the
+     * {@link __EncryptionManager encryptionManager} derives from it.
+     *
+     * @param object the entity instance to encrypt, in place.
+     * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
+     *                          cannot be turned into bytes.
+     * @see __EncryptionManager#getEncryptionIdentifier(Object)
+     */
     public void encrypt(final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
         final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
         encrypt(encryptionIdentifier, object);
     }
 
+    /**
+     * Decrypts the annotated attributes of the specified object with the specified encryption identifier.
+     *
+     * @param encryptionIdentifier the identifier the encryption keys are selected by.
+     * @param object               the entity, or embeddable, instance to decrypt, in place.
+     * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
+     *                          cannot be reconstructed from bytes.
+     * @see #decrypt(Object)
+     */
     protected void decrypt(final @NotBlank String encryptionIdentifier, final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
         final var entityClass = object.getClass();
@@ -441,6 +529,15 @@ public abstract class __EncryptionService {
         }
     }
 
+    /**
+     * Decrypts the annotated attributes of the specified object, with the identifier the
+     * {@link __EncryptionManager encryptionManager} derives from it.
+     *
+     * @param object the entity instance to decrypt, in place.
+     * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
+     *                          cannot be reconstructed from bytes.
+     * @see __EncryptionManager#getEncryptionIdentifier(Object)
+     */
     public void decrypt(final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
         final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
@@ -450,6 +547,14 @@ public abstract class __EncryptionService {
     // ----------------------------------------------------------------------------------------------------- entityTypes
 
     // ---------------------------------------------------------------------------------------------------- managedTypes
+    /**
+     * Returns the {@link ManagedType} of the specified class, from this service's entity manager factory, caching it
+     * against the {@code entityClass}.
+     *
+     * @param entityClass the class whose managed type is returned.
+     * @return the managed type of the {@code entityClass}.
+     * @throws IllegalArgumentException when the entity manager factory does not manage the {@code entityClass}.
+     */
     protected @Nonnull ManagedType<?> getManagedType(@Nonnull final Class<?> entityClass) {
         return managedTypes.computeIfAbsent(
                 Objects.requireNonNull(entityClass, "entityClass is null"),

@@ -2,7 +2,7 @@ package com.github.jinahya.persistence;
 
 /*-
  * #%L
- * jinahya-persistence-mapped-test
+ * jinahya-persistence-utils
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -34,6 +34,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * A utility class for working with Hibernate ORM, reflectively.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @apiNote Every Hibernate type is resolved with {@link Class#forName(String)}, so that this class, and the module it
+ * belongs to, do not require Hibernate ORM at compile-time nor at runtime. Methods here throw a
+ * {@link RuntimeException} when Hibernate is not the provider in use.
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -82,6 +90,16 @@ final class JinahyaHibernateUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Returns the names of all columns mapped by the specified entity class, identifier columns first.
+     *
+     * @param entityManagerFactory the entity manager factory whose
+     *                             {@link EntityManagerFactory#getMetamodel() metamodel} is used; it should be
+     *                             Hibernate's {@code org.hibernate.metamodel.MappingMetamodel}.
+     * @param entityClass          the entity class whose column names are returned.
+     * @return a list of distinct column names of the {@code entityClass}.
+     * @throws RuntimeException when Hibernate is not the provider in use, or when any of the reflective calls fails.
+     */
     static List<String> getEntityColumnNames(final @Nonnull EntityManagerFactory entityManagerFactory,
                                              final @Nonnull Class<?> entityClass) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
@@ -133,6 +151,9 @@ final class JinahyaHibernateUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private JinahyaHibernateUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

@@ -27,6 +27,15 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
+/**
+ * A utility class for {@link AttributeConverter}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @apiNote The converters returned by this class are plain objects, not annotated with
+ * {@link jakarta.persistence.Converter @Converter}; they are meant to be composed programmatically, and to be delegated
+ * to from a converter class which <em>is</em> registered with the persistence unit.
+ * @see __ChainingAttributeConverter
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -88,6 +97,20 @@ public final class __AttributeConverterUtils {
         };
     }
 
+    /**
+     * Creates a new 3-step attribute converter with the specified attribute converters.
+     *
+     * @param attributeConverter1 the first converter, from the entity attribute type.
+     * @param attributeConverter2 the second converter.
+     * @param attributeConverter3 the third converter, to the database column type.
+     * @param <T>                 entity attribute type parameter
+     * @param <U>                 first intermediate type parameter
+     * @param <V>                 second intermediate type parameter
+     * @param <W>                 database column type parameter
+     * @return a new attribute converter.
+     * @implNote The converters are associated in a randomly chosen order, which does not change the result; the
+     * randomness is there to keep either association exercised.
+     */
     static <T, U, V, W> AttributeConverter<T, W> chaining(
             final @Nonnull AttributeConverter<T, U> attributeConverter1,
             final @Nonnull AttributeConverter<U, V> attributeConverter2,
@@ -105,6 +128,21 @@ public final class __AttributeConverterUtils {
         }
     }
 
+    /**
+     * Creates a new 4-step attribute converter with the specified attribute converters.
+     *
+     * @param attributeConverter1 the first converter, from the entity attribute type.
+     * @param attributeConverter2 the second converter.
+     * @param attributeConverter3 the third converter.
+     * @param attributeConverter4 the fourth converter, to the database column type.
+     * @param <T>                 entity attribute type parameter
+     * @param <U>                 first intermediate type parameter
+     * @param <V>                 second intermediate type parameter
+     * @param <W>                 third intermediate type parameter
+     * @param <X>                 database column type parameter
+     * @return a new attribute converter.
+     * @implNote The converters are associated in a randomly chosen order, which does not change the result.
+     */
     static <T, U, V, W, X> AttributeConverter<T, X> chaining(
             final @Nonnull AttributeConverter<T, U> attributeConverter1,
             final @Nonnull AttributeConverter<U, V> attributeConverter2,
@@ -126,6 +164,23 @@ public final class __AttributeConverterUtils {
         };
     }
 
+    /**
+     * Creates a new 5-step attribute converter with the specified attribute converters.
+     *
+     * @param attributeConverter1 the first converter, from the entity attribute type.
+     * @param attributeConverter2 the second converter.
+     * @param attributeConverter3 the third converter.
+     * @param attributeConverter4 the fourth converter.
+     * @param attributeConverter5 the fifth converter, to the database column type.
+     * @param <T>                 entity attribute type parameter
+     * @param <U>                 first intermediate type parameter
+     * @param <V>                 second intermediate type parameter
+     * @param <W>                 third intermediate type parameter
+     * @param <X>                 fourth intermediate type parameter
+     * @param <Y>                 database column type parameter
+     * @return a new attribute converter.
+     * @implNote The converters are associated in a randomly chosen order, which does not change the result.
+     */
     static <T, U, V, W, X, Y> AttributeConverter<T, Y> chaining(
             final @Nonnull AttributeConverter<T, U> attributeConverter1,
             final @Nonnull AttributeConverter<U, V> attributeConverter2,
@@ -152,6 +207,25 @@ public final class __AttributeConverterUtils {
         };
     }
 
+    /**
+     * Creates a new 6-step attribute converter with the specified attribute converters.
+     *
+     * @param attributeConverter1 the first converter, from the entity attribute type.
+     * @param attributeConverter2 the second converter.
+     * @param attributeConverter3 the third converter.
+     * @param attributeConverter4 the fourth converter.
+     * @param attributeConverter5 the fifth converter.
+     * @param attributeConverter6 the sixth converter, to the database column type.
+     * @param <T>                 entity attribute type parameter
+     * @param <U>                 first intermediate type parameter
+     * @param <V>                 second intermediate type parameter
+     * @param <W>                 third intermediate type parameter
+     * @param <X>                 fourth intermediate type parameter
+     * @param <Y>                 fifth intermediate type parameter
+     * @param <Z>                 database column type parameter
+     * @return a new attribute converter.
+     * @implNote The converters are associated in a randomly chosen order, which does not change the result.
+     */
     static <T, U, V, W, X, Y, Z> AttributeConverter<T, Z> chaining(
             final @Nonnull AttributeConverter<T, U> attributeConverter1,
             final @Nonnull AttributeConverter<U, V> attributeConverter2,
@@ -188,6 +262,9 @@ public final class __AttributeConverterUtils {
     }
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private __AttributeConverterUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

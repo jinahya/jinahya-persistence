@@ -2,7 +2,7 @@ package com.github.jinahya.persistence.metamodel;
 
 /*-
  * #%L
- * jinahya-persistence-mapped-test
+ * jinahya-persistence-utils
  * %%
  * Copyright (C) 2024 - 2025 Jinahya, Inc.
  * %%
@@ -33,6 +33,14 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.StreamSupport;
 
+/**
+ * A utility class for {@link EntityType}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @apiNote Both methods here look a type up across an {@link Iterable} of entity manager factories, and take the first
+ * match; the result is cached, weakly, against the entity class.
+ * @see JinahyaManagedTypeUtils
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -128,6 +136,9 @@ public final class JinahyaEntityTypeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private JinahyaEntityTypeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

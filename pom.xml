@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-parent</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.9</version>
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
@@ -49,11 +50,9 @@
   <modules>
     <module>coverage-report-aggregated</module>
     <module>jinahya-persistence-crypto</module>
-    <module>jinahya-persistence-mapped</module>
-    <module>jinahya-persistence-mapped-test</module>
     <module>jinahya-persistence-more</module>
-    <module>jinahya-persistence-more-test</module>
-    <module>jinahya-persistence-test</module>
+    <module>jinahya-persistence-more-test-utils</module>
+    <module>jinahya-persistence-test-utils</module>
     <module>jinahya-persistence-utils</module>
   </modules>
 
@@ -80,69 +79,69 @@
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <doclint>none</doclint>
+    <!-- Jakarta EE 11 is the only supported platform generation; see README.md -->
     <persistence.version>3.2</persistence.version>
+    <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd</persistence.schemaLocation>
+    <!-- the Jakarta Persistence provider; overridden by __eclipselink-5.0-jakarta-ee-11 -->
+    <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
+    <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
+    <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
+    <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.language>java</sonar.language>
     <sonar.organization>jinahya-github</sonar.organization>
     <!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage -->
-    <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-mapped/target/site/jacoco/jacoco.xml,jinahya-persistence-mapped-test/target/site/jacoco/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
+    <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test-utils/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
-    <version.maven-surefire>3.5.4</version.maven-surefire>
+    <version.maven-surefire>3.6.0</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-classic/versions -->
     <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-parent -->
-    <version.ch.qus.logback>1.5.21</version.ch.qus.logback>
+    <version.ch.qus.logback>1.6.3</version.ch.qus.logback>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
-    <version.com.h2database>2.4.240</version.com.h2database>
+    <version.com.h2database>2.5.250</version.com.h2database>
     <!-- https://central.sonatype.com/artifact/com.querydsl/querydsl-jpa/versions -->
     <!--    <version.com.querydsl>5.1.0</version.com.querydsl>-->
-    <!-- https://central.sonatype.com/namespace/jakarta.platform -->
-    <!--    <version.jakarta.platform>11.0.0</version.jakarta.platform>-->
-    <!-- https://jakarta.ee/specifications/platform/10/ -->
     <!-- https://jakarta.ee/specifications/platform/11/ -->
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
+    <!-- 11.0.0 manages: jakarta.persistence-api 3.2.0, jakarta.validation-api 3.1.1, -->
+    <!--                 jakarta.enterprise.cdi-api 4.1.0, jakarta.el-api 6.0.1 -->
     <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
-    <!--    <version.nl.jqno.equalsverifier>4.1.1</version.nl.jqno.equalsverifier>-->
-    <version.nl.jqno.equalsverifier>4.2.4</version.nl.jqno.equalsverifier>
+    <version.nl.jqno.equalsverifier>4.5.2</version.nl.jqno.equalsverifier>
     <!-- https://central.sonatype.com/artifact/org.jeasy/easy-random-core/versions -->
     <version.org.jeasy>5.0.0</version.org.jeasy>
     <!-- https://github.com/eclipse-ee4j/eclipselink/releases -->
     <!-- https://eclipse.dev/eclipselink/releases/index.html -->
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
-    <version.org.eclipse.persistence>5.0.0-B11</version.org.eclipse.persistence>
-    <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
-    <!-- https://docs.jboss.org/hibernate/validator/8.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
+    <version.org.eclipse.persistence>5.0.1</version.org.eclipse.persistence>
     <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
-    <!-- hibernate-validator: 6.3 /  org.glassfish:jakarta.el:3.0.3 -->
-    <!-- hibernate-validator: 8 / expressly: 5 -->
     <!-- hibernate-validator: 9 / expressly: 6 -->
     <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly -->
-    <!--    <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>-->
     <version.org.glassfish.expressly>6.0.0</version.org.glassfish.expressly>
     <!-- https://hibernate.org/orm/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-platform/versions -->
-    <version.org.hibernate.orm>7.1.4.Final</version.org.hibernate.orm>
+    <version.org.hibernate.orm>7.4.7.Final</version.org.hibernate.orm>
     <!-- https://hibernate.org/validator/releases/ -->
     <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
-    <!--    <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>-->
-    <version.org.hibernate.validator>9.1.0.Final</version.org.hibernate.validator>
+    <version.org.hibernate.validator>9.1.3.Final</version.org.hibernate.validator>
     <!-- https://weld.cdi-spec.org/download/ -->
     <!-- https://central.sonatype.com/artifact/org.jboss.weld/weld-junit5/versions -->
-    <version.org.jboss.weld>5.0.2.Final</version.org.jboss.weld>
+    <version.org.jboss.weld>5.0.3.Final</version.org.jboss.weld>
     <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
     <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/versions -->
-    <version.org.junit>5.14.0</version.org.junit>
+    <version.org.junit>5.14.4</version.org.junit>
     <!-- https://github.com/weld/weld-testing/issues/293 -->
     <version.org.junit.jupiter>${version.org.junit}</version.org.junit.jupiter>
     <!-- https://central.sonatype.com/artifact/org.mockito/mockito-junit-jupiter/versions -->
-    <version.org.mockito>5.28.0</version.org.mockito>
-    <version.org.projectlombok>1.18.42</version.org.projectlombok>
+    <!-- https://central.sonatype.com/artifact/org.mockito/mockito-bom/versions -->
+    <version.org.mockito>5.23.0</version.org.mockito>
+    <version.org.projectlombok>1.18.48</version.org.projectlombok>
     <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-parent -->
     <!-- https://central.sonatype.com/artifact/org.slf4j/slf4j-bom/versions -->
-    <version.org.slf4j>2.0.17</version.org.slf4j>
+    <version.org.slf4j>2.0.19</version.org.slf4j>
   </properties>
 
   <dependencyManagement>
@@ -152,13 +151,6 @@
         <artifactId>logback-classic</artifactId>
         <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-parent -->
         <version>${version.ch.qus.logback}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
-        <artifactId>jackson-bom</artifactId>
-        <version>2.20.1</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
@@ -188,7 +180,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
-        <version>1.14.0</version>
+        <version>1.15.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -197,9 +189,10 @@
         <!--        <version>3.25.3</version>-->
         <version>4.0.0-M1</version>
         <exclusions>
+          <!-- assertj pins an older byte-buddy than mockito needs; let mockito's own version win -->
           <exclusion>
-            <groupId>org.bytebuddy</groupId>
-            <artifactId>bytebuddy</artifactId>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -269,8 +262,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-bom</artifactId>
-        <!-- https://central.sonatype.com/artifact/org.mockito/mockito-bom/versions -->
-        <version>5.20.0</version>
+        <version>${version.org.mockito}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -305,6 +297,16 @@
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk-platform-logging</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!--    <dependency>-->
     <!--      <groupId>org.jspecify</groupId>-->
     <!--      <artifactId>jspecify</artifactId>-->
@@ -329,7 +331,9 @@
             <links>
               <link>https://docs.oracle.com/en/java/javase/${maven.compiler.release}/docs/api/</link>
               <link>https://jakarta.ee/specifications/platform/11/apidocs/</link>
-              <link>https://static.javadoc.io/nl.jqno.equalsverifier/equalsverifier/${version.nl.jqno.equalsverifier}/</link>
+              <!-- not pinned to ${version.nl.jqno.equalsverifier}: javadoc.io only hosts
+                   an element-list for some releases, and a missing one fails the build -->
+              <link>https://javadoc.io/doc/nl.jqno.equalsverifier/equalsverifier/latest/</link>
               <!--              <link>https://docs.spring.io/spring-data/jpa/reference/api/java</link>-->
             </links>
             <tags>
@@ -376,7 +380,7 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
           <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/sonar-maven-plugin/versions -->
-          <version>2.20.1</version>
+          <version>2.21.0</version>
           <configuration>
             <processDependencyManagement>false</processDependencyManagement>
           </configuration>
@@ -390,13 +394,14 @@
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
           <!--          <version>5.2.0.4988</version>-->
-          <version>5.3.0.6276</version>
+          <!--          <version>5.3.0.6276</version>-->
+          <version>5.7.0.6970</version>
         </plugin>
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <!-- https://central.sonatype.com/artifact/org.jacoco/jacoco-maven-plugin/versions -->
-          <version>0.8.14</version>
+          <version>0.8.15</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -404,7 +409,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.6.2</version>
+        <version>3.6.3</version>
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -449,24 +454,20 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <!-- https://central.sonatype.com/artifact/org.apache.maven.plugins/maven-compiler-plugin/versions -->
-        <version>3.14.1</version>
+        <version>3.16.0</version>
         <configuration>
           <annotationProcessorPaths>
+            <!-- follows the selected persistence provider; see the __* profiles -->
             <path>
-              <groupId>org.hibernate.orm</groupId>
-              <artifactId>hibernate-jpamodelgen</artifactId>
-              <version>${version.org.hibernate.orm}</version>
+              <groupId>${metamodel.generator.groupId}</groupId>
+              <artifactId>${metamodel.generator.artifactId}</artifactId>
+              <version>${metamodel.generator.version}</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
               <version>${version.org.projectlombok}</version>
             </path>
-            <!--            <path>-->
-            <!--              <groupId>${metamodel.generator.groupId}</groupId>-->
-            <!--              <artifactId>${metamodel.generator.artifactId}</artifactId>-->
-            <!--              <version>${metamodel.generator.version}</version>-->
-            <!--            </path>-->
             <!--            &lt;!&ndash; =================================================================================================== &ndash;&gt;-->
             <!--            <path>-->
             <!--              <groupId>com.querydsl</groupId>-->
@@ -520,7 +521,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.1</version>
         <configuration>
           <licenseName>apache_v2</licenseName>
         </configuration>
@@ -699,78 +700,11 @@
       </build>
     </profile>
     <profile>
-      <id>jakarta-persistence-3.0-eclipselink</id>
-    </profile>
-    <profile>
-      <id>jakarta-persistence-3.1-eclipselink</id>
-    </profile>
-    <profile>
-      <id>jakarta-persistence-3.2-eclipselink</id>
-    </profile>
-    <profile>
-      <id>jakarta-persistence-3.0-hibernate</id>
-    </profile>
-    <profile>
-      <id>jakarta-persistence-3.1-hibernate</id>
-    </profile>
-    <profile>
-      <id>jakarta-persistence-3.2-hibernate</id>
-    </profile>
-    <profile>
-      <id>_jakarta-ee-10.0.0</id>
+      <id>__eclipselink-5.0-jakarta-ee-11</id>
+      <!-- https://eclipse.dev/eclipselink/releases/5.0.html -->
+      <!-- Jakarta Persistence: 3.2 / Jakarta EE: 11 / latest stable series -->
       <properties>
-        <!-- https://central.sonatype.com/artifact/jakarta.platform/jakartaee-api-parent/10.0.0 -->
-        <!-- jakarta.enterprise.cdi-api.version: 4.1.0 -->
-        <!-- jakarta.persistence-api.version: 3.2.0 -->
-        <!-- jakarta.validation-api.version: 3.1.0 -->
-        <!-- jakarta.el-api.version: 6.0.1 -->
-        <persistence.version>3.0</persistence.version>
-        <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd</persistence.schemaLocation>
-        <version.jakarta.platform>10.0.0</version.jakarta.platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>_jakarta-ee-11.0.0</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <!-- https://central.sonatype.com/artifact/jakarta.platform/jakartaee-api-parent/11.0.0 -->
-        <!-- jakarta.enterprise.cdi-api.version: 4.1.0 -->
-        <!-- jakarta.persistence-api.version: 3.2.0 -->
-        <!-- jakarta.validation-api.version: 3.1.0 -->
-        <!-- jakarta.el-api.version: 6.0.1 -->
-        <persistence.version>3.2</persistence.version>
-        <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd</persistence.schemaLocation>
-        <version.jakarta.platform>11.0.0</version.jakarta.platform>
-      </properties>
-    </profile>
-    <profile>
-      <id>__eclipselink-4.0.8-jakarta-ee-10</id>
-      <properties>
-        <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
-        <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
-        <metamodel.generator.artifactId>org.eclipse.persistence.jpa.modelgen.processor</metamodel.generator.artifactId>
-        <metamodel.generator.version>${version.org.eclipse.persistence}</metamodel.generator.version>
-        <version.org.eclipse.persistence>4.0.8</version.org.eclipse.persistence>
-      </properties>
-      <dependencies>
-        <!--        <dependency>-->
-        <!--          <groupId>org.eclipse.persistence</groupId>-->
-        <!--          <artifactId>eclipselink</artifactId>-->
-        <!--          <scope>test</scope>-->
-        <!--        </dependency>-->
-        <dependency>
-          <groupId>org.eclipse.persistence</groupId>
-          <artifactId>org.eclipse.persistence.jpa</artifactId>
-          <version>${version.org.eclipse.persistence}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>__eclipselink</id>
-      <properties>
+        <version.org.eclipse.persistence>5.0.1</version.org.eclipse.persistence>
         <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
         <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
         <metamodel.generator.artifactId>org.eclipse.persistence.jpa.modelgen.processor</metamodel.generator.artifactId>
@@ -790,19 +724,14 @@
       </dependencies>
     </profile>
     <profile>
-      <id>__hibernate-orm-7.1-jakarta-ee-11</id>
-      <!-- https://hibernate.org/orm/releases/7.1/ -->
-      <!-- Jakarta Persistence: 3.2 -->
-      <!-- Jakarta EE: 11 -->
+      <id>__hibernate-orm-7.4-jakarta-ee-11</id>
+      <!-- https://hibernate.org/orm/releases/7.4/ -->
+      <!-- Jakarta Persistence: 3.2 / Jakarta EE: 11 / latest stable series -->
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
-        <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
-        <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
-        <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
-        <vesion.org.hibernate.orm>7.1.8</vesion.org.hibernate.orm>
+        <version.org.hibernate.orm>7.4.7.Final</version.org.hibernate.orm>
       </properties>
       <dependencies>
         <dependency>
@@ -817,16 +746,10 @@
     <profile>
       <id>__hibernate-orm-7.2-jakarta-ee-11</id>
       <!-- https://hibernate.org/orm/releases/7.2/ -->
-      <!-- Jakarta Persistence: 3.2 -->
-      <!-- Jakarta EE: 11 -->
+      <!-- Jakarta Persistence: 3.2 / Jakarta EE: 11 / limited support -->
       <properties>
-        <!-- https://hibernate.org/orm/releases/ -->
         <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-core/versions -->
-        <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
-        <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
-        <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
-        <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
-        <vesion.org.hibernate.orm>7.2.0.CR2</vesion.org.hibernate.orm>
+        <version.org.hibernate.orm>7.2.24.Final</version.org.hibernate.orm>
       </properties>
       <dependencies>
         <dependency>
@@ -841,17 +764,12 @@
     <profile>
       <id>___hibernate-validator-9.0-jakarta-ee-11</id>
       <!-- https://hibernate.org/validator/releases/9.0/ -->
-      <!-- Jakarta Bean Validation: 3.1 -->
-      <!-- Jakarta EE: 11 -->
+      <!-- Jakarta Validation: 3.1 / Jakarta EE: 11 / limited support -->
       <properties>
         <!-- https://hibernate.org/validator/releases/ -->
         <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
         <version.org.hibernate.validator>9.0.1.Final</version.org.hibernate.validator>
-        <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
-        <!-- https://docs.jboss.org/hibernate/validator/8.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
         <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
-        <!-- hibernate-validator: 6.3 /  org.glassfish:jakarta.el:3.0.3 -->
-        <!-- hibernate-validator: 8 / expressly: 5 -->
         <!-- hibernate-validator: 9 / expressly: 6 -->
         <!-- https://projects.eclipse.org/projects/ee4j.expressly -->
         <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly/versions -->
@@ -861,20 +779,15 @@
     <profile>
       <id>___hibernate-validator-9.1-jakarta-ee-11</id>
       <!-- https://hibernate.org/validator/releases/9.1/ -->
-      <!-- Jakarta Bean Validation: 3.1 -->
-      <!-- Jakarta EE: 11 -->
+      <!-- Jakarta Validation: 3.1 / Jakarta EE: 11 / latest stable series -->
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
         <!-- https://hibernate.org/validator/releases/ -->
         <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
-        <version.org.hibernate.validator>9.1.0.Final</version.org.hibernate.validator>
-        <!-- https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-gettingstarted-uel -->
-        <!-- https://docs.jboss.org/hibernate/validator/8.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
+        <version.org.hibernate.validator>9.1.3.Final</version.org.hibernate.validator>
         <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
-        <!-- hibernate-validator: 6.3 /  org.glassfish:jakarta.el:3.0.3 -->
-        <!-- hibernate-validator: 8 / expressly: 5 -->
         <!-- hibernate-validator: 9 / expressly: 6 -->
         <!-- https://projects.eclipse.org/projects/ee4j.expressly -->
         <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly/versions -->
@@ -883,6 +796,9 @@
     </profile>
     <profile>
       <id>___weld-6-jakarta-ee-11</id>
+      <!-- Jakarta CDI: 4.1 / Jakarta EE: 11 -->
+      <!-- note: version.org.jboss.weld is the weld-junit5 (weld-testing) version; -->
+      <!--       weld-junit5 5.0.x pulls weld-se-core 6.0.x, i.e. Weld 6 / CDI 4.1 -->
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
