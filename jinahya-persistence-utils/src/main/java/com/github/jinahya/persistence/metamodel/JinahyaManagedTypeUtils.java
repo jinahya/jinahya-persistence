@@ -20,11 +20,9 @@ package com.github.jinahya.persistence.metamodel;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.ManagedType;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,8 +38,6 @@ import java.util.stream.StreamSupport;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaManagedTypeUtils {
-
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
     static final Map<Class<?>, ManagedType<?>> MANAGED_TYPES = new ConcurrentHashMap<>();
@@ -59,8 +55,8 @@ public final class JinahyaManagedTypeUtils {
      * @see jakarta.persistence.metamodel.Metamodel#managedType(Class)
      */
     public static <X> ManagedType<X> getManagedType(
-            final @Nonnull Class<X> typeClass,
-            final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
+            final Class<X> typeClass,
+            final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
         Objects.requireNonNull(typeClass, "typeClass is null");
         Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
         @SuppressWarnings({"unchecked"})
@@ -85,6 +81,7 @@ public final class JinahyaManagedTypeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

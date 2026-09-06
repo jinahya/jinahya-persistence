@@ -24,6 +24,7 @@ final class __EncryptedAttributeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

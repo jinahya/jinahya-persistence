@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.crypto;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -25,6 +26,7 @@ import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.Cha
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.big_decimal_;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.big_integer_;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.boolean_1;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.byte_1;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.char_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.chars_2l;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.double_8;
@@ -38,6 +40,7 @@ import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.loc
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.long_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.offset_date_time_20;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.serializable_;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.short_2;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.sql_date_8;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.sql_time_8;
@@ -48,6 +51,7 @@ import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.uti
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.uuid_16;
 import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.year_4;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * .
@@ -99,6 +103,15 @@ class __EncryptionServiceUtils_Test {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @ValueSource(bytes = {Byte.MIN_VALUE, -1, 0, 1, Byte.MAX_VALUE})
+    @ParameterizedTest
+    void byte__(final byte v) {
+        final var encoded = byte_1(v);
+        assertThat(encoded).hasSize(Byte.BYTES);
+        assertThat(byte_1(encoded)).isEqualTo(v);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @Test
     void short__() {
         final var v = (short) ThreadLocalRandom.current().nextInt();
@@ -136,7 +149,8 @@ class __EncryptionServiceUtils_Test {
         final var v = Float.intBitsToFloat(ThreadLocalRandom.current().nextInt());
         final var encoded = float_4(v);
         final var decoded = float_4(encoded);
-        assertThat(decoded).isEqualTo(v);
+        // raw bits, not ==: a random bit pattern can be NaN, and NaN != NaN
+        assertThat(Float.floatToRawIntBits(decoded)).isEqualTo(Float.floatToRawIntBits(v));
     }
 
     @Test
@@ -144,7 +158,8 @@ class __EncryptionServiceUtils_Test {
         final var v = Double.longBitsToDouble(ThreadLocalRandom.current().nextLong());
         final var encoded = double_8(v);
         final var decoded = double_8(encoded);
-        assertThat(decoded).isEqualTo(v);
+        // raw bits, not ==: a random bit pattern can be NaN, and NaN != NaN
+        assertThat(Double.doubleToRawLongBits(decoded)).isEqualTo(Double.doubleToRawLongBits(v));
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.String
@@ -309,16 +324,40 @@ class __EncryptionServiceUtils_Test {
     // ---------------------------------------------------------------------------------------------------------- Byte[]
     @Test
     void Bytes_l__() {
-        final Byte[] v;
-        {
-            final var p = randomBytes(0, 128);
-            v = new Byte[p.length];
-            for (int i = 0; i < v.length; i++) {
-                v[i] = (byte) i;
-            }
+        final var p = randomBytes(1, 128);
+        final var v = new Byte[p.length];
+        for (int i = 0; i < v.length; i++) {
+            v[i] = p[i];
         }
+        // an expected value which the call under test cannot reach
+        final var expected = v.clone();
+
         final var b = Bytes_l(v);
-        assertThat(Bytes_l(b)).isEqualTo(v);
+
+        assertThat(b).as("the encoded bytes").isEqualTo(p);
+        assertThat(v).as("the argument must not be modified").isEqualTo(expected);
+        assertThat(Bytes_l(b)).as("the round trip").isEqualTo(expected);
+    }
+
+    @DisplayName("an odd number of bytes is rejected, not silently truncated")
+    @Test
+    void chars_2l__odd() {
+        assertThatThrownBy(() -> chars_2l(new byte[]{1, 2, 3}))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("odd number of bytes");
+    }
+
+    @DisplayName("Characters_2l round-trips without modifying its argument")
+    @Test
+    void Characters_2l__() {
+        final var v = new Character[]{'j', 'i', 'n', '\u00e4', '\uD55C', '\uFFFF', '\u0080'};
+        final var expected = v.clone();
+
+        final var b = Characters_2l(v);
+
+        assertThat(b).as("two bytes per character").hasSize(v.length << 1);
+        assertThat(v).as("the argument must not be modified").isEqualTo(expected);
+        assertThat(Characters_2l(b)).as("the round trip").isEqualTo(expected);
     }
 
     // ---------------------------------------------------------------------------------------------------------- char[]
@@ -358,5 +397,73 @@ class __EncryptionServiceUtils_Test {
         final var encoded = enum_(v);
         final var decoded = enum_(encoded, A.class);
         assertThat(decoded).isSameAs(v);
+    }
+
+    // ---------------------------------------------------------------------------------------------------- Serializable
+
+    /**
+     * A value with a nested object graph, for verifying that the filter pins the root type without rejecting what the
+     * root holds.
+     */
+    static class Holder implements java.io.Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        Holder(final String name, final BigDecimal amount) {
+            this.name = name;
+            this.amount = amount;
+        }
+
+        final String name;
+
+        final BigDecimal amount;
+    }
+
+    @DisplayName("serializable_ round-trips a graph whose members are not of the expected type")
+    @Test
+    void serializable__nestedGraph() {
+        final var v = new Holder("jane", new BigDecimal("12.34"));
+        final var encoded = serializable_(v);
+        final var decoded = (Holder) serializable_(encoded, Holder.class);
+        assertThat(decoded.name).isEqualTo("jane");
+        assertThat(decoded.amount).isEqualByComparingTo(new BigDecimal("12.34"));
+    }
+
+    @DisplayName("serializable_ round-trips a value which serializes through a proxy")
+    @Test
+    void serializable__serializationProxy() {
+        // every java.time type writes a java.time.Ser proxy as the stream root; pinning the root to the declared
+        // type rejected these outright
+        final var v = java.time.MonthDay.of(9, 6);
+        final var encoded = serializable_(v);
+        assertThat(serializable_(encoded, java.time.MonthDay.class)).isEqualTo(v);
+    }
+
+    @DisplayName("serializable_ rejects a graph whose root is not of the expected type")
+    @Test
+    void serializable__wrongRoot() {
+        final var encoded = serializable_(new Holder("jane", BigDecimal.ONE));
+        // the cast enforces the type; the filter only caps resources, so that serialization proxies still work
+        assertThatThrownBy(() -> serializable_(encoded, BigDecimal.class))
+                .isInstanceOf(ClassCastException.class);
+    }
+
+    @DisplayName("serializable_ refuses to WRITE what it could never read back")
+    @Test
+    void serializable__oversizedIsRejectedOnWrite() {
+        // a value larger than the reader's stream cap used to encrypt and store happily, and then fail
+        // every subsequent read -- with the plaintext already cleared, so the row was unrecoverable
+        final var oversized = new byte[(1 << 20) + 1024];
+        assertThatThrownBy(() -> serializable_((java.io.Serializable) oversized))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("too large");
+    }
+
+    @DisplayName("a value within the cap still round-trips")
+    @Test
+    void serializable__withinTheCapRoundTrips() {
+        final var fine = new byte[1024];
+        final var encoded = serializable_((java.io.Serializable) fine);
+        assertThat((byte[]) serializable_(encoded, byte[].class)).hasSize(1024);
     }
 }

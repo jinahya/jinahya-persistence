@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +14,12 @@ class __Randomizer_Test {
 
     /**
      * A target class which can only be stamped by a constructor, and, hence, only through its instantiator.
+     *
+     * @implNote Accessors, and {@code public} visibility, are required by {@link __Randomizer.___OfPodam},
+     *         which writes a property through its setter and never assigns a field; a field-only class would be left
+     *         entirely unpopulated, making any assertion made here vacuous.
      */
-    static class Stamped {
+    public static class Stamped {
 
         static final String STAMP = "stamped";
 
@@ -25,9 +28,28 @@ class __Randomizer_Test {
             this.stamp = stamp;
         }
 
+        public String getStamp() {
+            return stamp;
+        }
+
+        public void setStamp(final String stamp) {
+            this.stamp = stamp;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(final String value) {
+            this.value = value;
+        }
+
         String stamp;
 
-        int value;
+        /**
+         * A property which no randomizer excludes; a control, for evidence that the randomization actually happened.
+         */
+        String value;
     }
 
     static class StampedInstantiator extends __Instantiator<Stamped> {
@@ -36,7 +58,6 @@ class __Randomizer_Test {
             super(Stamped.class);
         }
 
-        @Nonnull
         @Override
         public Stamped get() {
             return new Stamped(Stamped.STAMP);
@@ -63,6 +84,7 @@ class __Randomizer_Test {
     void get_InstantiatedByTheInstantiator_OfPodam() {
         final var instance = new StampedPodamRandomizer().get();
         assertThat(instance).isNotNull();
+        assertThat(instance.value).as("the control property is randomized").isNotNull();
         assertThat(instance.stamp).isEqualTo(Stamped.STAMP);
     }
 
@@ -71,6 +93,7 @@ class __Randomizer_Test {
     void get_NotInstantiatedByTheInstantiator_OfEasyRandomBean() {
         final var instance = new StampedEasyRandomBeanRandomizer().get();
         assertThat(instance).isNotNull();
+        assertThat(instance.value).as("the control property is randomized").isNotNull();
         // Easy Random creates the instance itself, bypassing every constructor, so the stamp is never applied
         assertThat(instance.stamp).isNull();
     }

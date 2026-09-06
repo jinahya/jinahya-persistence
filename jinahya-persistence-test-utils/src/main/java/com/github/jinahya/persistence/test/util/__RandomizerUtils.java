@@ -1,7 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,13 +24,13 @@ public final class __RandomizerUtils {
      * @param moreExcludedFields the second iterable of excluded fields.
      * @return an {@link Iterable} of merged excluded fields.
      * @throws NullPointerException when either argument is {@code null}.
-     * @apiNote This method is for a subclass which adds to the exclusions of the randomizer it extends. Elements are
-     *         concatenated as they are, in order, with neither deduplication nor validation; the
+     * @apiNote This method is for a subclass which adds to the exclusions of the randomizer it extends.
+     *         Elements are concatenated as they are, in order, with neither deduplication nor validation; the
      *         {@link __Randomizer#__Randomizer(Class, Iterable) randomizer constructor} strips them, drops the blank
      *         and the {@code null} ones, and deduplicates the rest.
      */
-    public static Iterable<String> moreExcludedFields(final @Nonnull Iterable<String> excludedFields,
-                                                      final @Nonnull Iterable<String> moreExcludedFields) {
+    public static Iterable<String> moreExcludedFields(final Iterable<String> excludedFields,
+                                                      final Iterable<String> moreExcludedFields) {
         Objects.requireNonNull(excludedFields, "excludedFields is null");
         Objects.requireNonNull(moreExcludedFields, "moreExcludedFields is null");
         return Stream.concat(
@@ -41,7 +39,7 @@ public final class __RandomizerUtils {
         ).toList();
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     @SuppressWarnings({
             "unchecked"
     })
@@ -51,6 +49,7 @@ public final class __RandomizerUtils {
         assert locator != null;
         return Optional.ofNullable(locator.apply(target))
                 .filter(__Randomizer.class::isAssignableFrom)
+                .filter(c -> ___Utils.canInstantiate(c, target))
                 .map(___Utils::newInstance)
                 .filter(i -> ___Utils.canProduce(target, ((__Randomizer<?>) i).targetClass, i))
                 .map(i -> (__Randomizer<T>) i);
@@ -71,13 +70,12 @@ public final class __RandomizerUtils {
      * @return an optional of randomized instance of the {@code target}; {@code empty} when the {@code locator} locates
      *         no randomizer.
      * @throws NullPointerException when either argument is {@code null}.
-     * @throws RuntimeException     when the located randomizer class declares no accessible no-argument constructor,
-     *                              or when the randomizer itself throws.
+     * @throws RuntimeException     when the located randomizer class declares no accessible no-argument constructor, or
+     *                              when the randomizer itself throws.
      * @see __RandomizerLocator#STANDARD
      */
-    @Nonnull
-    public static <T> Optional<T> newRandomizedInstanceOf(final @Nonnull Class<T> target,
-                                                          final @Nonnull __RandomizerLocator locator) {
+    public static <T> Optional<T> newRandomizedInstanceOf(final Class<T> target,
+                                                          final __RandomizerLocator locator) {
         Objects.requireNonNull(target, "target is null");
         Objects.requireNonNull(locator, "locator is null");
         return newRandomizerInstanceOf(target, locator)
@@ -91,17 +89,16 @@ public final class __RandomizerUtils {
      * @param <T>    target type parameter
      * @return an optional of randomized instance of the {@code target}; {@code empty} when no randomizer found.
      * @throws NullPointerException when the {@code target} is {@code null}.
-     * @throws RuntimeException     when the located randomizer class declares no accessible no-argument constructor,
-     *                              or when the randomizer itself throws.
+     * @throws RuntimeException     when the located randomizer class declares no accessible no-argument constructor, or
+     *                              when the randomizer itself throws.
      * @see #newRandomizedInstanceOf(Class, __RandomizerLocator)
      * @see __RandomizerLocator#STANDARD
      */
-    @Nonnull
-    public static <T> Optional<T> newRandomizedInstanceOf(final @Nonnull Class<T> target) {
+    public static <T> Optional<T> newRandomizedInstanceOf(final Class<T> target) {
         return newRandomizedInstanceOf(target, __RandomizerLocator.STANDARD);
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     private __RandomizerUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

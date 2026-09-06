@@ -27,12 +27,16 @@ public interface __PersisterLocator extends Function<Class<?>, Class<?>> {
      * For an entity class {@code Foo}, that is, in order, {@code FooPersister}, {@code Foo_Persister},
      * {@code Foo$FooPersister}, and {@code Foo$Foo_Persister}.
      *
-     * @implNote Unlike {@link __RandomizerLocator#STANDARD} and {@link __InstantiatorLocator#STANDARD}, this locator
-     *         does not look into the persister class of an enclosing class of an entity class. A local class, or an
-     *         anonymous class, can not be located either; specify a custom locator for those classes.
+     * @implNote Unlike {@link __RandomizerLocator#STANDARD} and {@link __InstantiatorLocator#STANDARD}, this
+     *         locator does not look into the persister class of an enclosing class of an entity class. A local class,
+     *         or an anonymous class, can not be located either; specify a custom locator for those classes.
      */
     __PersisterLocator STANDARD = __PersisterLocator::locateStandard;
 
+    // NullAway: this returns null when nothing is located, but the interface extends
+    // Function<Class<?>, Class<?>>, whose apply() is modelled as @NonNull. Resolving it properly means
+    // changing the contract (Optional, or throwing), which is a deliberate API decision, not an annotation.
+    @SuppressWarnings("NullAway")
     private static Class<?> locateStandard(final Class<?> target) {
         assert target != null;
         // [targetClassPersister], [targetClass_Persister],

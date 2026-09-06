@@ -20,166 +20,51 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.AttributeConverter;
 
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * An abstract class for chaining two {@link AttributeConverter}s.
  * <p>
  * An instance converts an entity attribute to the database column type through an intermediate type: the first
- * converter maps {@link T} to {@link U}, and the second maps {@link U} to {@link V}; reading a column runs the same
- * two converters in reverse.
+ * converter maps {@link T} to {@link U}, and the second maps {@link U} to {@link V}; reading a column runs the same two
+ * converters in reverse.
  *
  * @param <T> attribute type parameter
  * @param <U> intermediate type parameter
  * @param <V> database type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __AttributeConverterUtils#chaining(AttributeConverter, AttributeConverter)
+ * @apiNote Extend this class when the composed converter has to be registered with the persistence unit: a
+ *         concrete subclass can carry {@link jakarta.persistence.Converter @Converter} and be named in
+ *         {@code persistence.xml} or in {@link jakarta.persistence.Convert @Convert}. Where none of that is needed, an
+ *         instance composes two converters inline:
+ *         {@snippet lang = "java":
+ *                 final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second);
+ *}
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __ChainingAttributeConverter<T, U, V> implements AttributeConverter<T, V> {
-
-    /**
-     * Creates a new instance chaining the specified two attribute converters.
-     *
-     * @param attributeConverter1 the converter from the entity attribute type to the intermediate type.
-     * @param attributeConverter2 the converter from the intermediate type to the database column type.
-     * @param <T>                 entity attribute type parameter
-     * @param <U>                 intermediate type parameter
-     * @param <V>                 database column type parameter
-     * @return a new attribute converter chaining {@code attributeConverter1} and {@code attributeConverter2}.
-     */
-    @Nonnull
-    public static <T, U, V>
-    AttributeConverter<T, V> of(final @Nonnull AttributeConverter<T, U> attributeConverter1,
-                                final @Nonnull AttributeConverter<U, V> attributeConverter2) {
-        return new __ChainingAttributeConverter<>(attributeConverter1, attributeConverter2) {
-        };
-    }
-
-    @Nonnull
-    static <T, U, V, W>
-    AttributeConverter<T, W> of(final @Nonnull AttributeConverter<T, U> attributeConverter1,
-                                final @Nonnull AttributeConverter<U, V> attributeConverter2,
-                                final @Nonnull AttributeConverter<V, W> attributeConverter3) {
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            return of(
-                    attributeConverter1,
-                    of(attributeConverter2, attributeConverter3)
-            );
-        } else {
-            return of(
-                    of(attributeConverter1, attributeConverter2),
-                    attributeConverter3
-            );
-        }
-    }
-
-    @Nonnull
-    static <T, U, V, W, X>
-    AttributeConverter<T, X> of(final @Nonnull AttributeConverter<T, U> attributeConverter1,
-                                final @Nonnull AttributeConverter<U, V> attributeConverter2,
-                                final @Nonnull AttributeConverter<V, W> attributeConverter3,
-                                final @Nonnull AttributeConverter<W, X> attributeConverter4) {
-        return switch (ThreadLocalRandom.current().nextInt(3)) {
-            case 0 -> of(
-                    attributeConverter1,
-                    of(attributeConverter2, attributeConverter3, attributeConverter4)
-            );
-            case 1 -> of(
-                    of(attributeConverter1, attributeConverter2),
-                    of(attributeConverter3, attributeConverter4)
-            );
-            default -> of(
-                    of(attributeConverter1, attributeConverter2, attributeConverter3),
-                    attributeConverter4
-            );
-        };
-    }
-
-    @Nonnull
-    static <T, U, V, W, X, Y>
-    AttributeConverter<T, Y> of(final @Nonnull AttributeConverter<T, U> attributeConverter1,
-                                final @Nonnull AttributeConverter<U, V> attributeConverter2,
-                                final @Nonnull AttributeConverter<V, W> attributeConverter3,
-                                final @Nonnull AttributeConverter<W, X> attributeConverter4,
-                                final @Nonnull AttributeConverter<X, Y> attributeConverter5) {
-        return switch (ThreadLocalRandom.current().nextInt(4)) {
-            case 0 -> of(
-                    attributeConverter1,
-                    of(attributeConverter2, attributeConverter3, attributeConverter4, attributeConverter5)
-            );
-            case 1 -> of(
-                    of(attributeConverter1, attributeConverter2),
-                    of(attributeConverter3, attributeConverter4, attributeConverter5)
-            );
-            case 2 -> of(
-                    of(attributeConverter1, attributeConverter2, attributeConverter3),
-                    of(attributeConverter4, attributeConverter5)
-            );
-            default -> of(
-                    of(attributeConverter1, attributeConverter2, attributeConverter3, attributeConverter4),
-                    attributeConverter5
-            );
-        };
-    }
-
-    @Nonnull
-    static <T, U, V, W, X, Y, Z>
-    AttributeConverter<T, Z> of(final @Nonnull AttributeConverter<T, U> attributeConverter1,
-                                final @Nonnull AttributeConverter<U, V> attributeConverter2,
-                                final @Nonnull AttributeConverter<V, W> attributeConverter3,
-                                final @Nonnull AttributeConverter<W, X> attributeConverter4,
-                                final @Nonnull AttributeConverter<X, Y> attributeConverter5,
-                                final @Nonnull AttributeConverter<Y, Z> attributeConverter6) {
-        return switch (ThreadLocalRandom.current().nextInt(5)) {
-            case 0 -> of(
-                    attributeConverter1,
-                    of(attributeConverter2, attributeConverter3, attributeConverter4, attributeConverter5,
-                       attributeConverter6
-                    )
-            );
-            case 1 -> of(
-                    of(attributeConverter1, attributeConverter2),
-                    of(attributeConverter3, attributeConverter4, attributeConverter5, attributeConverter6)
-            );
-            case 2 -> of(
-                    of(attributeConverter1, attributeConverter2, attributeConverter3),
-                    of(attributeConverter4, attributeConverter5, attributeConverter6)
-            );
-            case 3 -> of(
-                    of(attributeConverter1, attributeConverter2, attributeConverter3, attributeConverter4),
-                    of(attributeConverter5, attributeConverter6)
-            );
-            default -> of(
-                    of(attributeConverter1, attributeConverter2, attributeConverter3, attributeConverter4,
-                       attributeConverter5
-                    ),
-                    attributeConverter6
-            );
-        };
-    }
+public class __ChainingAttributeConverter<T, U, V> implements AttributeConverter<T, V> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+
     /**
      * Creates a new instance with the specified two attribute converters.
      *
      * @param attributeConverter1 the converter from the entity attribute type to the intermediate type.
      * @param attributeConverter2 the converter from the intermediate type to the database column type.
      */
-    protected __ChainingAttributeConverter(final @Nonnull AttributeConverter<T, U> attributeConverter1,
-                                           final @Nonnull AttributeConverter<U, V> attributeConverter2) {
+    public __ChainingAttributeConverter(final AttributeConverter<T, U> attributeConverter1,
+                                        final AttributeConverter<U, V> attributeConverter2) {
         super();
         this.attributeConverter1 = Objects.requireNonNull(attributeConverter1, "attributeConverter1 is null");
         this.attributeConverter2 = Objects.requireNonNull(attributeConverter2, "attributeConverter2 is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Converts the specified database column value to an entity attribute, through the intermediate type.
      *

@@ -110,7 +110,7 @@ Jakarta EE 9/9.1 and 10 platform generations.*
 
 ### [jinahya-persistence-more](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more)
 
-### [jinahya-persistence-more-test-utils](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more-test-utils)
+### [jinahya-persistence-more-test](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more-test)
 
 ### [jinahya-persistence-test-utils](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-test-utils)
 

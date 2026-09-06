@@ -1,7 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,7 +15,7 @@ import java.util.Optional;
 })
 public final class __InstantiatorUtils {
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     @SuppressWarnings({
             "unchecked"
     })
@@ -27,6 +25,7 @@ public final class __InstantiatorUtils {
         assert locator != null;
         return Optional.ofNullable(locator.apply(target))
                 .filter(__Instantiator.class::isAssignableFrom)
+                .filter(c -> ___Utils.canInstantiate(c, target))
                 .map(___Utils::newInstance)
                 .filter(i -> ___Utils.canProduce(target, ((__Instantiator<?>) i).targetClass, i))
                 .map(i -> (__Instantiator<T>) i);
@@ -36,9 +35,9 @@ public final class __InstantiatorUtils {
      * Instantiates a new instance of the specified class, using an instantiator located by the specified locator.
      * <p>
      * When the {@code locator} locates no instantiator for the {@code target}, the {@code target} itself is
-     * instantiated, using its no-argument constructor. The same fallback applies when the located class does not
-     * extend {@link __Instantiator}, or is declared for a class of which the {@code target} is not a supertype; both
-     * are logged, at {@link System.Logger.Level#WARNING WARNING}, as they usually indicate a misconfiguration.
+     * instantiated, using its no-argument constructor. The same fallback applies when the located class does not extend
+     * {@link __Instantiator}, or is declared for a class of which the {@code target} is not a supertype; both are
+     * logged, at {@link System.Logger.Level#WARNING WARNING}, as they usually indicate a misconfiguration.
      *
      * @param target  the class to be instantiated.
      * @param locator the locator for locating the instantiator class of the {@code target}.
@@ -49,8 +48,8 @@ public final class __InstantiatorUtils {
      *                              constructor, or when the located instantiator, or that constructor, throws.
      * @see __InstantiatorLocator#STANDARD
      */
-    public static <T> @Nonnull T newInstantiatedInstanceOf(final @Nonnull Class<T> target,
-                                                           final @Nonnull __InstantiatorLocator locator) {
+    public static <T> T newInstantiatedInstanceOf(final Class<T> target,
+                                                  final __InstantiatorLocator locator) {
         Objects.requireNonNull(target, "target is null");
         Objects.requireNonNull(locator, "locator is null");
         return newInstantiatorInstanceOf(target, locator)
@@ -75,11 +74,11 @@ public final class __InstantiatorUtils {
      * @see #newInstantiatedInstanceOf(Class, __InstantiatorLocator)
      * @see __InstantiatorLocator#STANDARD
      */
-    public static <T> @Nonnull T newInstantiatedInstanceOf(final @Nonnull Class<T> target) {
+    public static <T> T newInstantiatedInstanceOf(final Class<T> target) {
         return newInstantiatedInstanceOf(target, __InstantiatorLocator.STANDARD);
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     private __InstantiatorUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

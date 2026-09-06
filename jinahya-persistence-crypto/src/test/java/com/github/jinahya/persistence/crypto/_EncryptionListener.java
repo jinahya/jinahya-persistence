@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.crypto;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Shutdown;
@@ -71,48 +70,48 @@ public class _EncryptionListener extends __EncryptionListener {
     // -----------------------------------------------------------------------------------------------------------------
     @PrePersist
     @Override
-    protected void onPrePersist(final @Nonnull Object entityInstance) {
+    protected void onPrePersist(final Object entityInstance) {
         super.onPrePersist(entityInstance);
+        encrypt(entityInstance); // before the INSERT is built; @PostPersist would store the plaintext
     }
 
     @PostPersist
     @Override
-    protected void onPostPersist(@Nonnull Object entityInstance) {
+    protected void onPostPersist(Object entityInstance) {
         super.onPostPersist(entityInstance);
-        encrypt(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @PreUpdate
     @Override
-    protected void onPreUpdate(@Nonnull Object entityInstance) {
+    protected void onPreUpdate(Object entityInstance) {
         super.onPreUpdate(entityInstance);
+        encrypt(entityInstance); // before the UPDATE is built; @PostUpdate would store the plaintext
     }
 
     @PostUpdate
     @Override
-    protected void onPostUpdate(final @Nonnull Object entityInstance) {
+    protected void onPostUpdate(final Object entityInstance) {
         super.onPostUpdate(entityInstance);
-        encrypt(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @PreRemove
     @Override
-    protected void onPreRemove(@Nonnull Object entityInstance) {
+    protected void onPreRemove(Object entityInstance) {
         super.onPreRemove(entityInstance);
     }
 
     @PostRemove
     @Override
-    protected void onPostRemove(@Nonnull Object entityInstance) {
+    protected void onPostRemove(Object entityInstance) {
         super.onPostRemove(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     @PostLoad
     @Override
-    protected void onPostLoad(@Nonnull Object entityInstance) {
+    protected void onPostLoad(Object entityInstance) {
         super.onPostLoad(entityInstance);
         decrypt(entityInstance);
     }

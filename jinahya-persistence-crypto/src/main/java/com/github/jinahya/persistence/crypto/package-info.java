@@ -2,11 +2,11 @@
  * Interfaces, annotations and classes for encrypting entity attributes at rest.
  * <p>
  * An entity opts in by being annotated with
- * {@link com.github.jinahya.persistence.crypto.__EncryptedEntity @__EncryptedEntity}, and each attribute which is to
- * be stored encrypted with
- * {@link com.github.jinahya.persistence.crypto.__EncryptedAttribute @__EncryptedAttribute}. The annotated attribute
- * holds the plaintext and is never written with a value in it; the ciphertext lives in a second, {@code byte[]}-typed
- * attribute of the same entity, named by the annotation or derived from the first attribute's name.
+ * {@link com.github.jinahya.persistence.crypto.__EncryptedEntity @__EncryptedEntity}, and each attribute which is to be
+ * stored encrypted with {@link com.github.jinahya.persistence.crypto.__EncryptedAttribute @__EncryptedAttribute}. The
+ * annotated attribute holds the plaintext and is never written with a value in it; the ciphertext lives in a second,
+ * {@code byte[]}-typed attribute of the same entity, named by the annotation or derived from the first attribute's
+ * name.
  *
  * <h2>The pieces</h2>
  * <dl>
@@ -26,5 +26,5 @@
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-//@org.jspecify.annotations.NullMarked
+@org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.crypto;

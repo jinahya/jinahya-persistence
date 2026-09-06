@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
-
 /**
  * An interface for defining enum constants with a specific type of attribute values.
  * <p>
@@ -63,7 +61,6 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
          *         {@link Enum#name() this.name()}.
          */
         @Override
-        @Nonnull
         @SuppressWarnings({"unchecked"})
         default String attributeValue() {
             return ((SELF) this).name();
@@ -75,19 +72,20 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      *
      * @param <SELF>   self type parameter
      * @param <NUMBER> number type parameter
-     * @apiNote This interface defines no default {@link #attributeValue()}, and cannot: the {@link Enum#name() name()}
-     * of a constant is a {@link String}, and the only numeric candidate, {@link Enum#ordinal() ordinal()}, is exactly
-     * the coupling {@link __AttributeEnum} exists to break — it changes whenever constants are reordered. Every
-     * constant therefore has to declare its own value.
-     * @apiNote The named subtypes stop at {@link __OfInteger} and {@link __OfLong} on purpose. A constant is looked up
-     * by its attribute value through {@link Object#equals(Object) equals} and {@link Object#hashCode() hashCode()}, and
-     * the remaining common numeric types do not behave under that contract the way a discriminator has to:
-     * {@link java.math.BigDecimal#equals(Object) BigDecimal.equals} is scale-sensitive, so {@code 1.0} and
-     * {@code 1.00} are different keys, which makes a lookup depend on the scale the column and the driver happen to
-     * produce; and {@link Double} and {@link Float} distinguish {@code 0.0} from {@code -0.0}, report {@code NaN} equal
-     * to itself, and need not round-trip a column bit for bit. This interface stays generic over {@code NUMBER}
-     * regardless, so an enum with a genuine need can still implement it with any {@link Number} &mdash; it simply does
-     * so knowingly, and without the convenience the named subtypes add.
+     * @apiNote This interface defines no default {@link #attributeValue()}, and cannot: the
+     *         {@link Enum#name() name()} of a constant is a {@link String}, and the only numeric candidate,
+     *         {@link Enum#ordinal() ordinal()}, is exactly the coupling {@link __AttributeEnum} exists to break — it
+     *         changes whenever constants are reordered. Every constant therefore has to declare its own value.
+     * @apiNote The named subtypes stop at {@link __OfInteger} and {@link __OfLong} on purpose. A constant is
+     *         looked up by its attribute value through {@link Object#equals(Object) equals} and
+     *         {@link Object#hashCode() hashCode()}, and the remaining common numeric types do not behave under that
+     *         contract the way a discriminator has to: {@link java.math.BigDecimal#equals(Object) BigDecimal.equals} is
+     *         scale-sensitive, so {@code 1.0} and {@code 1.00} are different keys, which makes a lookup depend on the
+     *         scale the column and the driver happen to produce; and {@link Double} and {@link Float} distinguish
+     *         {@code 0.0} from {@code -0.0}, report {@code NaN} equal to itself, and need not round-trip a column bit
+     *         for bit. This interface stays generic over {@code NUMBER} regardless, so an enum with a genuine need can
+     *         still implement it with any {@link Number} &mdash; it simply does so knowingly, and without the
+     *         convenience the named subtypes add.
      * @see __OfString
      */
     @SuppressWarnings({
@@ -119,25 +117,29 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
          * @return the enum constant, of the {@code enumClass}, that has the specified attribute value.
          * @throws IllegalArgumentException when no constant of the {@code enumClass} carries the
          *                                  {@code attributeValue}.
-         * @apiNote Taking an {@code int} keeps the value boxed as an {@link Integer}; a {@link Long} of the same
-         * numeric value does not match a constant of this interface.
-         * @see __AttributeEnumUtils#valueOfAttributeValue(Class, Object)
+         * @apiNote Taking an {@code int} keeps the value boxed as an {@link Integer}; a {@link Long} of the
+         *         same numeric value does not match a constant of this interface.
+         * @see __AttributeEnumUtils#valueOf(Class, Object)
          */
-        @Nonnull
-        static <E extends Enum<E> & __OfInteger<E>> E valueOfAttributeValue(final @Nonnull Class<E> enumClass,
-                                                                           final int attributeValue) {
-            return __AttributeEnumUtils.valueOfAttributeValue(enumClass, attributeValue);
+        static <E extends Enum<E> & __OfInteger<E>> E valueOfAttributeValue(final Class<E> enumClass,
+                                                                            final int attributeValue) {
+            return __AttributeEnumUtils.valueOf(enumClass, attributeValue);
         }
 
         /**
          * Returns the attribute value of this enum constant, unboxed.
          *
          * @return the {@link #attributeValue() attributeValue} of this enum constant, as an {@code int}.
-         * @implSpec The conversion is exact; unlike {@link Number#intValue()} on an arbitrary number, nothing is
-         * narrowed or rounded here.
+         * @throws NullPointerException when this constant's {@link #attributeValue() attributeValue} is {@code null}.
+         * @implSpec The conversion is exact; unlike {@link Number#intValue()} on an arbitrary number, nothing
+         *         is narrowed or rounded here. A {@code null} {@code attributeValue} is a declaration error &mdash;
+         *         {@link __AttributeEnumUtils} rejects one outright &mdash; but this method does not go through that
+         *         map, so it names the offending constant rather than unboxing into a bare
+         *         {@link NullPointerException}.
          */
         default int intValue() {
-            return attributeValue();
+            return java.util.Objects.requireNonNull(
+                    attributeValue(), () -> "null attributeValue of " + this);
         }
     }
 
@@ -161,25 +163,29 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
          * @return the enum constant, of the {@code enumClass}, that has the specified attribute value.
          * @throws IllegalArgumentException when no constant of the {@code enumClass} carries the
          *                                  {@code attributeValue}.
-         * @apiNote Taking a {@code long} keeps the value boxed as a {@link Long}; an {@link Integer} of the same
-         * numeric value does not match a constant of this interface.
-         * @see __AttributeEnumUtils#valueOfAttributeValue(Class, Object)
+         * @apiNote Taking a {@code long} keeps the value boxed as a {@link Long}; an {@link Integer} of the
+         *         same numeric value does not match a constant of this interface.
+         * @see __AttributeEnumUtils#valueOf(Class, Object)
          */
-        @Nonnull
-        static <E extends Enum<E> & __OfLong<E>> E valueOfAttributeValue(final @Nonnull Class<E> enumClass,
-                                                                        final long attributeValue) {
-            return __AttributeEnumUtils.valueOfAttributeValue(enumClass, attributeValue);
+        static <E extends Enum<E> & __OfLong<E>> E valueOfAttributeValue(final Class<E> enumClass,
+                                                                         final long attributeValue) {
+            return __AttributeEnumUtils.valueOf(enumClass, attributeValue);
         }
 
         /**
          * Returns the attribute value of this enum constant, unboxed.
          *
          * @return the {@link #attributeValue() attributeValue} of this enum constant, as a {@code long}.
-         * @implSpec The conversion is exact; unlike {@link Number#longValue()} on an arbitrary number, nothing is
-         * narrowed or rounded here.
+         * @throws NullPointerException when this constant's {@link #attributeValue() attributeValue} is {@code null}.
+         * @implSpec The conversion is exact; unlike {@link Number#longValue()} on an arbitrary number, nothing
+         *         is narrowed or rounded here. A {@code null} {@code attributeValue} is a declaration error &mdash;
+         *         {@link __AttributeEnumUtils} rejects one outright &mdash; but this method does not go through that
+         *         map, so it names the offending constant rather than unboxing into a bare
+         *         {@link NullPointerException}.
          */
         default long longValue() {
-            return attributeValue();
+            return java.util.Objects.requireNonNull(
+                    attributeValue(), () -> "null attributeValue of " + this);
         }
     }
 
@@ -190,6 +196,5 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      *
      * @return the attribute value of this enum constant.
      */
-    @Nonnull
     ATTRIBUTE attributeValue();
 }

@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.crypto;
 
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -79,12 +78,12 @@ public class _EncryptionManager implements __EncryptionManager {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Override
-    public String getEncryptionIdentifier(final @Nonnull Object entityInstance) {
+    public String getEncryptionIdentifier(final Object entityInstance) {
         return "irrelevant";
     }
 
     @Override
-    public @Nonnull byte[] encrypt(final @Nonnull String encryptionIdentifier, final @Nonnull byte[] decryptedBytes) {
+    public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
         final var iv = new byte[IV_BYTES];
         try {
             SecureRandom.getInstanceStrong().nextBytes(iv);
@@ -118,7 +117,7 @@ public class _EncryptionManager implements __EncryptionManager {
     }
 
     @Override
-    public @Nonnull byte[] decrypt(final @Nonnull String encryptionIdentifier, final @Nonnull byte[] encryptedBytes) {
+    public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
         final byte[] iv;
         final byte[] key;
         final byte[] aad;

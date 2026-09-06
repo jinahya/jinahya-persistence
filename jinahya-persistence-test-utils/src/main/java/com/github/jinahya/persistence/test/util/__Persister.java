@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 import java.lang.invoke.MethodHandles;
@@ -33,11 +32,11 @@ public abstract class __Persister<T> implements BiFunction<EntityManager, T, T> 
      *
      * @param entityClass the class to persist.
      * @throws NullPointerException when the {@code entityClass} is {@code null}.
-     * @apiNote A subclass is expected to declare a no-argument constructor which supplies the {@code entityClass}, for
-     *         that is how a located persister class is instantiated.
+     * @apiNote A subclass is expected to declare a no-argument constructor which supplies the
+     *         {@code entityClass}, for that is how a located persister class is instantiated.
      * @see #entityClass
      */
-    protected __Persister(final @Nonnull Class<T> entityClass) {
+    protected __Persister(final Class<T> entityClass) {
         super();
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
     }
@@ -56,9 +55,8 @@ public abstract class __Persister<T> implements BiFunction<EntityManager, T, T> 
      *         {@link __PersisterUtils}, rely on the returned instance being the one they passed in.
      * @see EntityManager#persist(Object)
      */
-    @Nonnull
     @Override
-    public T apply(final @Nonnull EntityManager entityManager, final @Nonnull T entityInstance) {
+    public T apply(final EntityManager entityManager, final T entityInstance) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityInstance, "entityInstance is null");
         logger.log(System.Logger.Level.TRACE, "persisting {0}", entityInstance);

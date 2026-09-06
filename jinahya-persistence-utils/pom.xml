@@ -9,15 +9,14 @@
   </parent>
 
   <artifactId>jinahya-persistence-utils</artifactId>
-  <version>0.5.5-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Utilities for Jakarta Persistence</description>
 
   <dependencies>
     <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

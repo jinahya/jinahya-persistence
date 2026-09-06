@@ -20,7 +20,6 @@ package com.github.jinahya.persistence;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -38,9 +37,9 @@ import java.util.stream.Stream;
  * A utility class for working with Hibernate ORM, reflectively.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote Every Hibernate type is resolved with {@link Class#forName(String)}, so that this class, and the module it
- * belongs to, do not require Hibernate ORM at compile-time nor at runtime. Methods here throw a
- * {@link RuntimeException} when Hibernate is not the provider in use.
+ * @apiNote Every Hibernate type is resolved with {@link Class#forName(String)}, so that this class, and the
+ *         module it belongs to, do not require Hibernate ORM at compile-time nor at runtime. Methods here throw a
+ *         {@link RuntimeException} when Hibernate is not the provider in use.
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -61,8 +60,8 @@ final class JinahyaHibernateUtils {
      */
     @SuppressWarnings({"unchecked"})
     // https://stackoverflow.com/a/44214469/330457
-    static <R> R applyConnection(final @Nonnull EntityManager manager,
-                                 final @Nonnull Function<? super Connection, ? extends R> function) {
+    static <R> R applyConnection(final EntityManager manager,
+                                 final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(manager, "manager is null");
         Objects.requireNonNull(function, "function is null");
         try {
@@ -90,6 +89,7 @@ final class JinahyaHibernateUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Returns the names of all columns mapped by the specified entity class, identifier columns first.
      *
@@ -100,8 +100,8 @@ final class JinahyaHibernateUtils {
      * @return a list of distinct column names of the {@code entityClass}.
      * @throws RuntimeException when Hibernate is not the provider in use, or when any of the reflective calls fails.
      */
-    static List<String> getEntityColumnNames(final @Nonnull EntityManagerFactory entityManagerFactory,
-                                             final @Nonnull Class<?> entityClass) {
+    static List<String> getEntityColumnNames(final EntityManagerFactory entityManagerFactory,
+                                             final Class<?> entityClass) {
         Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         try {
@@ -151,6 +151,7 @@ final class JinahyaHibernateUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

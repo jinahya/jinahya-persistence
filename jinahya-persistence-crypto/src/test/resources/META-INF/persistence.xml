@@ -29,7 +29,18 @@
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
-    <!--    <class>com.github.jinahya.persistence.crypto.__EncryptionListener</class>-->
+    <class>com.github.jinahya.persistence.crypto._SecretEntity</class>
+    <class>com.github.jinahya.persistence.crypto._SecretEmbeddable</class>
+    <class>com.github.jinahya.persistence.crypto._LifecycleEntity</class>
+    <class>com.github.jinahya.persistence.crypto._GuardedEntity</class>
+    <class>com.github.jinahya.persistence.crypto._GraphEntity</class>
+    <class>com.github.jinahya.persistence.crypto._OverriddenEntity</class>
+    <class>com.github.jinahya.persistence.crypto._RescuedEntity</class>
+    <class>com.github.jinahya.persistence.crypto._TwoPathEntity</class>
+    <class>com.github.jinahya.persistence.crypto._MappedSecretBase</class>
+    <class>com.github.jinahya.persistence.crypto._InheritedOverrideEntity</class>
+    <class>com.github.jinahya.persistence.crypto._UnguardedEmbeddable</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
     <properties>

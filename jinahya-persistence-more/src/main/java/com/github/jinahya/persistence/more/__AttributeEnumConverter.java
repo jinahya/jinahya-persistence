@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.more;
  */
 
 import jakarta.persistence.AttributeConverter;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -37,7 +38,7 @@ import java.util.Objects;
  * @apiNote This class is not annotated with {@link jakarta.persistence.Converter @Converter}; a concrete
  *         subclass has to carry that annotation itself, or the persistence unit will not know about it.
  * @see __AttributeEnum
- * @see __AttributeEnumUtils#valueOfAttributeValue(Class, Object)
+ * @see __AttributeEnumUtils#valueOf(Class, Object)
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -157,7 +158,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      * @return a database column value; {@code null} when {@code attribute} is {@code null}.
      */
     @Override
-    public ATTRIBUTE convertToDatabaseColumn(final E attribute) {
+    public @Nullable ATTRIBUTE convertToDatabaseColumn(final @Nullable E attribute) {
         if (attribute == null) {
             return null;
         }
@@ -173,7 +174,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      *                                  no constant of {@link #enumClass} carries it.
      */
     @Override
-    public E convertToEntityAttribute(final ATTRIBUTE dbData) {
+    public @Nullable E convertToEntityAttribute(final @Nullable ATTRIBUTE dbData) {
         if (dbData == null) {
             return null;
         }
@@ -183,7 +184,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
                     "; of " + enumClass
             );
         }
-        return __AttributeEnumUtils.valueOfAttributeValue(enumClass, dbData);
+        return __AttributeEnumUtils.valueOf(enumClass, dbData);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

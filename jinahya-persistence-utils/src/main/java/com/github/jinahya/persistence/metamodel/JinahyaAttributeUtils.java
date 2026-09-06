@@ -20,21 +20,20 @@ package com.github.jinahya.persistence.metamodel;
  * #L%
  */
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.metamodel.Attribute;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -42,17 +41,15 @@ import java.util.function.Function;
  * A utility class for {@link Attribute}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote An {@link Attribute} is mapped either to a {@link Method} or to a {@link Field}, and the methods here hide
- * that distinction: they read the {@link Attribute#getJavaMember() javaMember}, make it accessible when required, and
- * work with it reflectively.
+ * @apiNote An {@link Attribute} is mapped either to a {@link Method} or to a {@link Field}, and the methods
+ *         here hide that distinction: they read the {@link Attribute#getJavaMember() javaMember}, make it accessible
+ *         when required, and work with it reflectively.
  * @see Attribute#getJavaMember()
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaAttributeUtils {
-
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -79,9 +76,12 @@ public final class JinahyaAttributeUtils {
      * @param <R>       result type parameter
      * @return the result of the {@code function}.
      */
+    // NullAway does not propagate @Nullable through the nested wildcard type arguments below; the two
+    // `apply(null)` calls are exactly what the annotated signature already declares.
+    @SuppressWarnings("NullAway")
     public static <R> R applyJavaMember(
-            final @Nonnull Attribute<?, ?> attribute,
-            final @Nonnull Function<? super Method, ? extends Function<? super Field, ? extends R>> function) {
+            final Attribute<?, ?> attribute,
+            final Function<? super @Nullable Method, ? extends Function<? super @Nullable Field, ? extends R>> function) {
         Objects.requireNonNull(attribute, "attribute is null");
         Objects.requireNonNull(function, "function is null");
         final var javaMember = attribute.getJavaMember();
@@ -109,7 +109,7 @@ public final class JinahyaAttributeUtils {
      *         found.
      */
     public static <A extends Annotation> @Nullable A getJavaMemberAnnotation(
-            final @Nonnull Attribute<?, ?> attribute, final @Nonnull Class<A> annotationClass) {
+            final Attribute<?, ?> attribute, final Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass, "annotationClass is null");
         return applyJavaMember(
                 attribute,
@@ -131,8 +131,8 @@ public final class JinahyaAttributeUtils {
      * @param <Y>       attribute type parameter
      * @return the value of the {@code attribute} of the {@code entity}.
      */
-    public static <Y> Y getAttributeValue(final @Nonnull Object entity,
-                                          final @Nonnull Attribute<?, ? extends Y> attribute) {
+    public static <Y> Y getAttributeValue(final Object entity,
+                                          final Attribute<?, ? extends Y> attribute) {
         Objects.requireNonNull(entity, "entity is null");
         return applyJavaMember(
                 attribute,
@@ -150,7 +150,7 @@ public final class JinahyaAttributeUtils {
                                             "; entity: %1$s
                                             "; attribute: %2$s
                                             "; method: %3$s"""
-                                            .formatted(entity, attribute, m),
+                                            .formatted(entity.getClass().getName(), attribute.getName(), m),
                                     roe
                             );
                         }
@@ -168,7 +168,7 @@ public final class JinahyaAttributeUtils {
                                         "; entity: %1$s
                                         "; attribute: %2$s
                                         "; field: %3$s"""
-                                        .formatted(entity, attribute, f),
+                                        .formatted(entity.getClass().getName(), attribute.getName(), f),
                                 roe
                         );
                     }
@@ -176,39 +176,90 @@ public final class JinahyaAttributeUtils {
         );
     }
 
-    private static final Map<Attribute<?, ?>, Method> SETTERS = new ConcurrentHashMap<>();
+    /**
+     * The key a write method is cached under.
+     *
+     * @param clazz     the runtime class the method was resolved against.
+     * @param attribute the attribute it writes.
+     * @implNote The class is part of the key on purpose. One {@link Attribute} of a {@code @MappedSuperclass}
+     *         is shared by every subclass which inherits it, so caching by attribute alone let the first subclass to be
+     *         written decide the write method for all of them &mdash; and a subclass which overrides the setter yields
+     *         a {@link Method} whose declaring class its siblings are not instances of.
+     */
+    private record SetterKey(Class<?> clazz, Attribute<?, ?> attribute) {
+
+    }
+
+    private static final Map<SetterKey, Method> SETTERS = new ConcurrentHashMap<>();
 
     /**
-     * Returns the write method, of the specified class, for the specified attribute, caching it against the
-     * {@code attribute}.
+     * Returns the write method, of the specified class, for the specified attribute, caching it against both.
      *
      * @param clazz     the class to introspect.
      * @param attribute the attribute whose write method is returned.
      * @return the write method for the {@code attribute}.
      * @throws RuntimeException when the {@code clazz} cannot be introspected, or when no write method matches the
      *                          {@code attribute}.
+     * @implNote {@link Introspector} reports only {@code public} write methods, while Jakarta Persistence 3.2
+     *         &sect;2.2 permits a {@code protected} property accessor; a declared-method scan up the hierarchy covers
+     *         that before giving up.
      * @see Introspector#getBeanInfo(Class)
      */
-    private static Method getSetter(final @Nonnull Class<?> clazz, final @Nonnull Attribute<?, ?> attribute) {
+    private static Method getSetter(final Class<?> clazz, final Attribute<?, ?> attribute) {
         return SETTERS.computeIfAbsent(
-                attribute,
+                new SetterKey(clazz, attribute),
                 k -> {
                     final BeanInfo beanInfo;
                     try {
-                        beanInfo = Introspector.getBeanInfo(clazz);
+                        beanInfo = Introspector.getBeanInfo(k.clazz());
                     } catch (final IntrospectionException ie) {
-                        throw new RuntimeException("failed to get bean info of " + clazz, ie);
+                        throw new RuntimeException("failed to get bean info of " + k.clazz(), ie);
                     }
-                    return Arrays.stream(beanInfo.getPropertyDescriptors())
-                            .filter(d -> {
-                                return d.getName().equals(k.getName()) &&
-                                       k.getJavaType().isAssignableFrom(d.getPropertyType());
-                            })
+                    final var introspected = Arrays.stream(beanInfo.getPropertyDescriptors())
+                            .filter(d -> d.getName().equals(k.attribute().getName()))
+                            // an indexed property reports a null propertyType
+                            .filter(d -> d.getPropertyType() != null
+                                         && k.attribute().getJavaType().isAssignableFrom(d.getPropertyType()))
+                            // a read-only property has no write method; skip it rather than mapping to null,
+                            // which findFirst() would reject with a NullPointerException
                             .map(PropertyDescriptor::getWriteMethod)
-                            .findFirst()
-                            .orElseThrow(() -> new RuntimeException("no setter found for " + attribute));
+                            .filter(Objects::nonNull)
+                            .findFirst();
+                    if (introspected.isPresent()) {
+                        return introspected.get();
+                    }
+                    return findDeclaredSetter(k.clazz(), k.attribute()).orElseThrow(
+                            () -> new RuntimeException(
+                                    "no setter found for " + k.attribute() + " on " + k.clazz())
+                    );
                 }
         );
+    }
+
+    /**
+     * Finds a write method for the specified attribute among the methods the specified class, or any of its supertypes,
+     * declares &mdash; whatever their visibility.
+     *
+     * @param clazz     the class to start from.
+     * @param attribute the attribute whose write method is looked for.
+     * @return an optional of the write method; {@link Optional#empty() empty} when none is declared.
+     */
+    private static Optional<Method> findDeclaredSetter(final Class<?> clazz, final Attribute<?, ?> attribute) {
+        final var attributeName = attribute.getName();
+        if (attributeName.isEmpty()) {
+            return Optional.empty();
+        }
+        final var name = "set" + Character.toUpperCase(attributeName.charAt(0)) + attributeName.substring(1);
+        for (var c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (final var method : c.getDeclaredMethods()) {
+                if (method.getName().equals(name)
+                    && method.getParameterCount() == 1
+                    && method.getParameterTypes()[0].isAssignableFrom(attribute.getJavaType())) {
+                    return Optional.of(method);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     /**
@@ -223,9 +274,12 @@ public final class JinahyaAttributeUtils {
      * @throws RuntimeException when the value cannot be set reflectively.
      * @see #getAttributeValue(Object, Attribute)
      */
-    public static <T> T setAttributeValue(final @Nonnull Object entity,
-                                          final @Nonnull Attribute<?, ? extends T> attribute,
-                                          final @Nullable Object value) {
+    // NullAway cannot infer a @Nullable type argument for the generic call below from the lambda body;
+    // the enclosing method is declared @Nullable and documents the null result.
+    @SuppressWarnings("NullAway")
+    public static <T> @Nullable T setAttributeValue(final Object entity,
+                                                    final Attribute<?, ? extends T> attribute,
+                                                    final @Nullable Object value) {
         Objects.requireNonNull(entity, "entity is null");
         return applyJavaMember(
                 attribute,
@@ -244,9 +298,8 @@ public final class JinahyaAttributeUtils {
                                             failed to set value
                                             ; entity: %1$s
                                             ; attribute: %2$s
-                                            ; value: %3$s
-                                            ; method: %4$s"""
-                                            .formatted(entity, attribute, value, setter),
+                                            ; method: %3$s"""
+                                            .formatted(entity.getClass().getName(), attribute.getName(), setter),
                                     roe
                             );
                         }
@@ -263,9 +316,8 @@ public final class JinahyaAttributeUtils {
                                         failed to set value
                                         ; entity: %1$s
                                         ; attribute: %2$s
-                                        ; value: %3$s
-                                        ; field: %4$s"""
-                                        .formatted(entity, attribute, value, f),
+                                        ; field: %3$s"""
+                                        .formatted(entity.getClass().getName(), attribute.getName(), f),
                                 roe
                         );
                     }
@@ -275,6 +327,7 @@ public final class JinahyaAttributeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

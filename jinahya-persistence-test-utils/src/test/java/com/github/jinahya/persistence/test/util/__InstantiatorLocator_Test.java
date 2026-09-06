@@ -75,7 +75,7 @@ class __InstantiatorLocator_Test {
 
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     @DisplayName("STANDARD.apply(Sibling.class) -> SiblingInstantiator")
     @Test
     void standard_SiblingInstantiator_Sibling() {

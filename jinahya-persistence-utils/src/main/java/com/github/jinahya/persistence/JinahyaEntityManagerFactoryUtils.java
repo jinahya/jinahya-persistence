@@ -1,10 +1,9 @@
 package com.github.jinahya.persistence;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
@@ -29,7 +28,7 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @return the {@link PersistenceUnitUtil} of the {@code factory}.
      * @see EntityManagerFactory#getPersistenceUnitUtil()
      */
-    static @Nonnull PersistenceUnitUtil getPersistenceUnitUtil(final @Nonnull EntityManagerFactory factory) {
+    static PersistenceUnitUtil getPersistenceUnitUtil(final EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
         return PERSISTENCE_UNIT_UTILS.computeIfAbsent(
                 factory,
@@ -52,8 +51,8 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @see PersistenceUnitUtil#getIdentifier(Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> @Nullable Y getIdentifier(final @Nonnull EntityManagerFactory factory,
-                                                final @Nonnull Object entity) {
+    public static <Y> @Nullable Y getIdentifier(final EntityManagerFactory factory,
+                                                final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
 //        return (T) IDENTIFIERS.computeIfAbsent(
@@ -73,11 +72,11 @@ public final class JinahyaEntityManagerFactoryUtils {
      *
      * @param factory the entity manager factory whose {@link Metamodel} is returned.
      * @return the {@link Metamodel} of the {@code factory}.
-     * @apiNote The cache is a {@link java.util.WeakHashMap}, and does not keep the {@code factory} from being garbage
-     * collected.
+     * @apiNote The cache is a {@link java.util.WeakHashMap}, and does not keep the {@code factory} from being
+     *         garbage collected.
      * @see EntityManagerFactory#getMetamodel()
      */
-    public static @Nonnull Metamodel getMetamodel(final @Nonnull EntityManagerFactory factory) {
+    public static Metamodel getMetamodel(final EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
         return METAMODELS.computeIfAbsent(
                 factory,
@@ -86,6 +85,7 @@ public final class JinahyaEntityManagerFactoryUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

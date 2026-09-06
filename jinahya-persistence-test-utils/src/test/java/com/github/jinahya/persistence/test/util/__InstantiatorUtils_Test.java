@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +34,6 @@ class __InstantiatorUtils_Test {
             super(Pojo.class);
         }
 
-        @Nonnull
         @Override
         public Pojo get() {
             return new Pojo("name");

@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 
 import java.lang.invoke.MethodHandles;
@@ -25,7 +24,7 @@ public final class __PersisterUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     @SuppressWarnings({
             "unchecked"
     })
@@ -35,6 +34,7 @@ public final class __PersisterUtils {
         assert locator != null;
         return Optional.ofNullable(locator.apply(target))
                 .filter(__Persister.class::isAssignableFrom)
+                .filter(c -> ___Utils.canInstantiate(c, target))
                 .map(___Utils::newInstance)
                 .filter(i -> ___Utils.canConsume(target, ((__Persister<?>) i).entityClass, i))
                 .map(i -> (__Persister<T>) i);
@@ -59,11 +59,10 @@ public final class __PersisterUtils {
      * @see __PersisterLocator#STANDARD
      * @see __RandomizerLocator#STANDARD
      */
-    @Nonnull
-    public static <T> T newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
-                                               final @Nonnull Class<T> entityClass,
-                                               final @Nonnull __PersisterLocator persisterLocator,
-                                               final @Nonnull __RandomizerLocator randomizerLocator) {
+    public static <T> T newPersistedInstanceOf(final EntityManager entityManager,
+                                               final Class<T> entityClass,
+                                               final __PersisterLocator persisterLocator,
+                                               final __RandomizerLocator randomizerLocator) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(persisterLocator, "persisterLocator is null");
@@ -92,10 +91,9 @@ public final class __PersisterUtils {
      * @see #newPersistedInstanceOf(EntityManager, Class, __PersisterLocator, __RandomizerLocator)
      * @see __RandomizerLocator#STANDARD
      */
-    @Nonnull
-    public static <T> T newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
-                                               final @Nonnull Class<T> entityClass,
-                                               final @Nonnull __PersisterLocator persisterLocator) {
+    public static <T> T newPersistedInstanceOf(final EntityManager entityManager,
+                                               final Class<T> entityClass,
+                                               final __PersisterLocator persisterLocator) {
         return newPersistedInstanceOf(
                 entityManager,
                 entityClass,
@@ -118,9 +116,8 @@ public final class __PersisterUtils {
      * @see __PersisterLocator#STANDARD
      * @see __RandomizerLocator#STANDARD
      */
-    @Nonnull
-    public static <T> T newPersistedInstanceOf(final @Nonnull EntityManager entityManager,
-                                               final @Nonnull Class<T> entityClass) {
+    public static <T> T newPersistedInstanceOf(final EntityManager entityManager,
+                                               final Class<T> entityClass) {
         return newPersistedInstanceOf(
                 entityManager,
                 entityClass,
@@ -128,7 +125,7 @@ public final class __PersisterUtils {
         );
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     private __PersisterUtils() {
         throw new AssertionError("instantiation is not allowed");
     }

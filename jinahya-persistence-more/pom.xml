@@ -9,15 +9,14 @@
   </parent>
 
   <artifactId>jinahya-persistence-more</artifactId>
-  <version>0.5.5-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Extended interfaces/class for creating testing classes</description>
 
   <dependencies>
     <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -40,10 +39,37 @@
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- the persistence unit under src/test/resources; the provider itself comes from the __* profiles -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- validation-mode CALLBACK needs a Jakarta Validation implementation, and it needs an EL one -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!--    <dependency>-->
     <!--      <groupId>org.projectlombok</groupId>-->
     <!--      <artifactId>lombok</artifactId>-->
     <!--      <scope>test</scope>-->
     <!--    </dependency>-->
   </dependencies>
+
+  <build>
+    <testResources>
+      <!-- persistence.xml reads ${persistence.version} and ${persistence-unit.provider} -->
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
 </project>

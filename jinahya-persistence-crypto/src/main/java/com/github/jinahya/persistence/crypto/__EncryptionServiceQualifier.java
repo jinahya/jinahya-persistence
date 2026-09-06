@@ -21,7 +21,13 @@ import java.lang.annotation.Target;
         RetentionPolicy.RUNTIME
 )
 @Target({
-        ElementType.TYPE
+        // A qualifier is declared on the bean AND named at the injection point, so it has to be
+        // applicable to both. TYPE alone made the selection this annotation documents impossible:
+        // putting it on an @Inject field, a constructor parameter or a producer method did not compile.
+        ElementType.TYPE,
+        ElementType.FIELD,
+        ElementType.METHOD,
+        ElementType.PARAMETER
 })
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

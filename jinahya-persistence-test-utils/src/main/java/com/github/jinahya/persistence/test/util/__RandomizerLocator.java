@@ -31,13 +31,17 @@ public interface __RandomizerLocator extends Function<Class<?>, Class<?>> {
      * {@code Foo$FooRandomizer}, and {@code Foo$Foo_Randomizer}, with the enclosing-class form probed first when
      * {@code Foo} is itself a nested class.
      *
-     * @implNote A local class, or an anonymous class, can not be located by this locator, for no class can be declared
-     *         with a name required by the convention; specify a custom locator for those classes. The annotation is
-     *         read with {@link Class#getDeclaredAnnotation(Class)}, so a subclass of an annotated class is resolved by
-     *         the convention, and not by the annotation of its superclass.
+     * @implNote A local class, or an anonymous class, can not be located by this locator, for no class can be
+     *         declared with a name required by the convention; specify a custom locator for those classes. The
+     *         annotation is read with {@link Class#getDeclaredAnnotation(Class)}, so a subclass of an annotated class
+     *         is resolved by the convention, and not by the annotation of its superclass.
      */
     __RandomizerLocator STANDARD = __RandomizerLocator::locateStandard;
 
+    // NullAway: this returns null when nothing is located, but the interface extends
+    // Function<Class<?>, Class<?>>, whose apply() is modelled as @NonNull. Resolving it properly means
+    // changing the contract (Optional, or throwing), which is a deliberate API decision, not an annotation.
+    @SuppressWarnings("NullAway")
     private static Class<?> locateStandard(final Class<?> target) {
         assert target != null;
         {

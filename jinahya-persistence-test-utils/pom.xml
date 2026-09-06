@@ -9,15 +9,14 @@
   </parent>
 
   <artifactId>jinahya-persistence-test-utils</artifactId>
-  <version>0.5.5-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Interfaces/classes for testing classes/interfaces created with jinahya-persistence</description>
 
   <dependencies>
     <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

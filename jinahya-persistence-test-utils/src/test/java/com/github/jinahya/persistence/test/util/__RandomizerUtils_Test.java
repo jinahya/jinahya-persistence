@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +34,6 @@ class __RandomizerUtils_Test {
             );
         }
 
-        @Nonnull
         @Override
         public Bean get() {
             return new Bean();
@@ -46,7 +44,7 @@ class __RandomizerUtils_Test {
         }
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
     @DisplayName("moreExcludedFields(a, b) -> a, then b, as they are")
     @Test
     void moreExcludedFields_Concatenated_() {

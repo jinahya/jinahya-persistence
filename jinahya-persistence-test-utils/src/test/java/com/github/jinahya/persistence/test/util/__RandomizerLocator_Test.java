@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +24,6 @@ class __RandomizerLocator_Test {
             super(Sup.class, List.of());
         }
 
-        @Nonnull
         @Override
         public Sup get() {
             return new Sup();
@@ -45,7 +43,6 @@ class __RandomizerLocator_Test {
             super(Sub.class, List.of());
         }
 
-        @Nonnull
         @Override
         public Sub get() {
             return new Sub();
@@ -61,7 +58,6 @@ class __RandomizerLocator_Test {
                 super(Enclosing.class, List.of());
             }
 
-            @Nonnull
             @Override
             public Enclosing get() {
                 return new Enclosing();

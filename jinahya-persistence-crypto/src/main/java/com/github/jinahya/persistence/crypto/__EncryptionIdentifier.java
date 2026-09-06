@@ -12,6 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * by.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @apiNote This annotation is not honored yet: the identifier comes only from
+ *         {@link __EncryptionManager#getEncryptionIdentifier(Object)}.
  * @see __EncryptedEntity#encryptionIdentifierAttribute()
  * @see __EncryptionManager#getEncryptionIdentifier(Object)
  */

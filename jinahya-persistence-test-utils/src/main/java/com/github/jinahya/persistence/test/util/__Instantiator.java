@@ -1,7 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
-
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -32,11 +30,11 @@ public abstract class __Instantiator<T> implements Supplier<T> {
      *
      * @param targetClass the class to be instantiated.
      * @throws NullPointerException when the {@code targetClass} is {@code null}.
-     * @apiNote A subclass is expected to declare a no-argument constructor which supplies the {@code targetClass}, for
-     *         that is how a located instantiator class is instantiated.
+     * @apiNote A subclass is expected to declare a no-argument constructor which supplies the
+     *         {@code targetClass}, for that is how a located instantiator class is instantiated.
      * @see #targetClass
      */
-    protected __Instantiator(final @Nonnull Class<T> targetClass) {
+    protected __Instantiator(final Class<T> targetClass) {
         super();
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
@@ -49,11 +47,10 @@ public abstract class __Instantiator<T> implements Supplier<T> {
      * @return a new instance of {@link #targetClass}.
      * @throws RuntimeException when the {@link #targetClass} declares no no-argument constructor, or when that
      *                          constructor is inaccessible, abstract, or throws.
-     * @implSpec The default implementation returns {@code ___Utils.newInstance(targetClass)}; the constructor is made
-     *         accessible when required, so that a {@code private} no-argument constructor is enough.
+     * @implSpec The default implementation returns {@code ___Utils.newInstance(targetClass)}; the constructor
+     *         is made accessible when required, so that a {@code private} no-argument constructor is enough.
      * @see ___Utils#newInstance(Class)
      */
-    @Nonnull
     @Override
     public T get() {
         return ___Utils.newInstance(targetClass);

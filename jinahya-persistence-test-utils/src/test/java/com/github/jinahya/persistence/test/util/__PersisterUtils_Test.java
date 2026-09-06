@@ -1,6 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,6 @@ class __PersisterUtils_Test {
             super(Ent.class, List.of());
         }
 
-        @Nonnull
         @Override
         public Ent get() {
             final var instance = new Ent();
@@ -58,7 +56,6 @@ class __PersisterUtils_Test {
             super(SubEnt.class, List.of());
         }
 
-        @Nonnull
         @Override
         public SubEnt get() {
             return new SubEnt();
@@ -94,7 +91,6 @@ class __PersisterUtils_Test {
             super(Unpersisted.class, List.of());
         }
 
-        @Nonnull
         @Override
         public Unpersisted get() {
             return new Unpersisted();

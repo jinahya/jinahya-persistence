@@ -21,12 +21,10 @@ package com.github.jinahya.persistence.metamodel;
  */
 
 import com.github.jinahya.persistence.JinahyaEntityManagerFactoryUtils;
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -37,8 +35,8 @@ import java.util.stream.StreamSupport;
  * A utility class for {@link EntityType}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote Both methods here look a type up across an {@link Iterable} of entity manager factories, and take the first
- * match; the result is cached, weakly, against the entity class.
+ * @apiNote Both methods here look a type up across an {@link Iterable} of entity manager factories, and take
+ *         the first match; the result is cached, weakly, against the entity class.
  * @see JinahyaManagedTypeUtils
  */
 @SuppressWarnings({
@@ -46,10 +44,7 @@ import java.util.stream.StreamSupport;
 })
 public final class JinahyaEntityTypeUtils {
 
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
     // -----------------------------------------------------------------------------------------------------------------
-    private static final Map<Class<?>, ManagedType<?>> MANAGED_TYPES = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Returns the {@link ManagedType} of the specified entity class.
@@ -60,28 +55,13 @@ public final class JinahyaEntityTypeUtils {
      * @return the {@link ManagedType} of the {@code entityClass}.
      */
     public static <X> ManagedType<X> getManagedType(
-            final @Nonnull Class<X> entityClass,
-            final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
-        @SuppressWarnings({"unchecked"})
-        final var managedType = (ManagedType<X>) MANAGED_TYPES.computeIfAbsent(
-                entityClass,
-                k -> {
-                    return StreamSupport.stream(entityManagerFactories.spliterator(), false)
-//                            .map(EntityManagerFactory::getMetamodel)
-                            .map(JinahyaEntityManagerFactoryUtils::getMetamodel)
-                            .map(m -> m.managedType(entityClass))
-                            .filter(Objects::nonNull)
-                            .findFirst()
-                            .orElseThrow(
-                                    () -> new IllegalArgumentException(
-                                            "no entity type found for entity class: " + entityClass
-                                    )
-                            );
-                }
-        );
-        return managedType;
+            final Class<X> entityClass,
+            final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
+        // Delegates rather than duplicating. This used to carry its own copy of the walk, and its own
+        // cache, and the copy was wrong: Metamodel.managedType(Class) THROWS for a class it does not
+        // manage -- it never returns null -- so the `.filter(Objects::nonNull)` was dead and the first
+        // factory which did not know the class aborted the whole lookup instead of falling through.
+        return JinahyaManagedTypeUtils.getManagedType(entityClass, entityManagerFactories);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -96,8 +76,8 @@ public final class JinahyaEntityTypeUtils {
      * @return the {@link EntityType} of the {@code entityClass}.
      */
     public static <X> EntityType<X> getEntityType(
-            final @Nonnull Class<X> entityClass,
-            final @Nonnull Iterable<? extends EntityManagerFactory> entityManagerFactories) {
+            final Class<X> entityClass,
+            final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
         @SuppressWarnings({"unchecked"})
@@ -136,6 +116,7 @@ public final class JinahyaEntityTypeUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

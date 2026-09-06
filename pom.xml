@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -51,7 +50,7 @@
     <module>coverage-report-aggregated</module>
     <module>jinahya-persistence-crypto</module>
     <module>jinahya-persistence-more</module>
-    <module>jinahya-persistence-more-test-utils</module>
+    <module>jinahya-persistence-more-test</module>
     <module>jinahya-persistence-test-utils</module>
     <module>jinahya-persistence-utils</module>
   </modules>
@@ -91,7 +90,7 @@
     <sonar.language>java</sonar.language>
     <sonar.organization>jinahya-github</sonar.organization>
     <!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage -->
-    <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test-utils/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
+    <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <!--    <sonar.coverage.jacoco.xmlReportPaths>_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
     <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
@@ -139,6 +138,14 @@
     <!-- https://central.sonatype.com/artifact/org.mockito/mockito-bom/versions -->
     <version.org.mockito>5.23.0</version.org.mockito>
     <version.org.projectlombok>1.18.48</version.org.projectlombok>
+    <!-- https://central.sonatype.com/artifact/org.jspecify/jspecify/versions -->
+    <version.org.jspecify>1.0.1</version.org.jspecify>
+    <!-- https://central.sonatype.com/artifact/com.google.errorprone/error_prone_core/versions -->
+    <version.com.google.errorprone>2.50.0</version.com.google.errorprone>
+    <!-- https://central.sonatype.com/artifact/com.uber.nullaway/nullaway/versions -->
+    <version.com.uber.nullaway>0.14.1</version.com.uber.nullaway>
+    <!-- NullAway severity for main sources; test sources do not run Error Prone at all -->
+    <nullaway.severity>ERROR</nullaway.severity>
     <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-parent -->
     <!-- https://central.sonatype.com/artifact/org.slf4j/slf4j-bom/versions -->
     <version.org.slf4j>2.0.19</version.org.slf4j>
@@ -229,12 +236,11 @@
         <artifactId>hibernate-validator-test-utils</artifactId>
         <version>${version.org.hibernate.validator}</version>
       </dependency>
-      <!--      <dependency>-->
-      <!--        <groupId>org.jspecify</groupId>-->
-      <!--        <artifactId>jspecify</artifactId>-->
-      <!--        &lt;!&ndash; https://central.sonatype.com/artifact/org.jspecify/jspecify/versions &ndash;&gt;-->
-      <!--        <version>1.0.0</version>-->
-      <!--      </dependency>-->
+      <dependency>
+        <groupId>org.jspecify</groupId>
+        <artifactId>jspecify</artifactId>
+        <version>${version.org.jspecify}</version>
+      </dependency>
       <dependency>
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-junit5</artifactId>
@@ -418,8 +424,14 @@
             </goals>
             <configuration>
               <rules>
+                <!-- The BUILD JDK. Main sources target 21 via maven.compiler.release, but the test
+                     sources are compiled at release 25, which javac can only do from 25 onwards.
+                     A [21,) bound let a JDK 21 build past this rule and fail much later, deep inside
+                     testCompile, with "release version 25 not supported". Fail here instead, where the
+                     message names the cause. Raise this together with maven.compiler.testRelease,
+                     .java-version, and the JDK in .github/workflows/maven.yml. -->
                 <requireJavaVersion>
-                  <version>[21,)</version>
+                  <version>[25,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -468,6 +480,16 @@
               <artifactId>lombok</artifactId>
               <version>${version.org.projectlombok}</version>
             </path>
+            <path>
+              <groupId>com.google.errorprone</groupId>
+              <artifactId>error_prone_core</artifactId>
+              <version>${version.com.google.errorprone}</version>
+            </path>
+            <path>
+              <groupId>com.uber.nullaway</groupId>
+              <artifactId>nullaway</artifactId>
+              <version>${version.com.uber.nullaway}</version>
+            </path>
             <!--            &lt;!&ndash; =================================================================================================== &ndash;&gt;-->
             <!--            <path>-->
             <!--              <groupId>com.querydsl</groupId>-->
@@ -481,11 +503,24 @@
             <!--            </path>-->
             <!-- =================================================================================================== -->
           </annotationProcessorPaths>
-          <!--          <compilerArgs>-->
-          <!--            &lt;!&ndash;            <arg>-Xlint</arg>&ndash;&gt;-->
-          <!--            <arg>-Aeclipselink.persistencexml=${basedir}/src/test/resource/META-INF/persistence.xml</arg>-->
-          <!--          </compilerArgs>-->
+          <!-- Error Prone + NullAway; see .mvn/jvm.config for the required add-exports/add-opens flags -->
+          <compilerArgs>
+            <arg>-XDcompilePolicy=simple</arg>
+            <arg>--should-stop=ifError=FLOW</arg>
+            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+            <!-- the generated JPA static metamodel is not ours to annotate; keep Error Prone off it -->
+            <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.* -XepOpt:NullAway:OnlyNullMarked=true -XepOpt:NullAway:JSpecifyMode=true -XepOpt:NullAway:AssertsEnabled=true -Xep:NullAway:${nullaway.severity}</arg>
+          </compilerArgs>
         </configuration>
+        <executions>
+          <execution>
+            <!-- Error Prone / NullAway are not run over test sources: tests deliberately pass null. -->
+            <id>default-testCompile</id>
+            <configuration>
+              <compilerArgs combine.self="override"/>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

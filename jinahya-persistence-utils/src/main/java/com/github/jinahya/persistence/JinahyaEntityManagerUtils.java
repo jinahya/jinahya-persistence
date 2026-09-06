@@ -1,9 +1,8 @@
 package com.github.jinahya.persistence;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
@@ -32,14 +31,13 @@ public final class JinahyaEntityManagerUtils {
      * @param entity  the entity instance whose id is returned.
      * @param <Y>     identifier type parameter
      * @return the id of the {@code entity}; {@code null} when the {@code entity} does not yet have an id.
-     * @deprecated Use
-     * {@link JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)}, with the
-     * {@link EntityManager#getEntityManagerFactory() entityManagerFactory} of the {@code manager}, instead.
      * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
+     * @deprecated Use {@link JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)}, with the
+     *         {@link EntityManager#getEntityManagerFactory() entityManagerFactory} of the {@code manager}, instead.
      */
     @Deprecated(forRemoval = true)
-    public static <Y> @Nullable Y getIdentifier(final @Nonnull EntityManager manager,
-                                                final @Nonnull Object entity) {
+    public static <Y> @Nullable Y getIdentifier(final EntityManager manager,
+                                                final Object entity) {
         Objects.requireNonNull(manager, "manager is null");
         return JinahyaEntityManagerFactoryUtils.getIdentifier(
                 manager.getEntityManagerFactory(),
@@ -59,9 +57,15 @@ public final class JinahyaEntityManagerUtils {
      * @param <R>      result type parameter
      * @return the result of the {@code supplier}.
      * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @implNote Whatever the {@code supplier}, the commit or the rollback throws propagates <em>unchanged</em>,
+     *         so a caller can still catch {@link jakarta.persistence.OptimisticLockException} and friends by type. A
+     *         failure while rolling back is attached to it as a
+     *         {@linkplain Throwable#addSuppressed(Throwable) suppressed} exception rather than replacing it. Note that
+     *         {@link jakarta.persistence.EntityTransaction#begin() begin()} runs before this guard, so a failure there
+     *         is not cleaned up here.
      */
-    public static <R> R getInTransaction(final @Nonnull EntityManager manager,
-                                         final @Nonnull Supplier<? extends R> supplier,
+    public static <R> R getInTransaction(final EntityManager manager,
+                                         final Supplier<? extends R> supplier,
                                          final boolean rollback) {
         Objects.requireNonNull(manager, "manager is null");
         if (manager.isJoinedToTransaction()) {
@@ -76,19 +80,26 @@ public final class JinahyaEntityManagerUtils {
                 logger.log(Level.DEBUG, "rolling back...");
                 transaction.rollback();
             } else {
-                logger.log(Level.WARNING, "committing...");
+                logger.log(Level.DEBUG, "committing...");
                 transaction.commit();
             }
             return result;
-        } catch (final Exception e) {
-            transaction.rollback();
-            throw new RuntimeException(
-                    "failed to get, in transaction" +
-                    "; manager: " + manager +
-                    "; supplier: " + supplier +
-                    "; rollback: " + rollback,
-                    e
-            );
+        } catch (final RuntimeException | Error e) {
+            // Clean up without ever replacing what actually went wrong. The whole check-then-roll-back is
+            // guarded, not just the rollback: EntityTransaction permits isActive() itself to throw. And the
+            // rollback is conditional because a commit which failed has already rolled the transaction back,
+            // so a second one would throw IllegalStateException -- which used to escape this catch and
+            // replace the commit failure outright.
+            try {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+            } catch (final RuntimeException | Error cleanup) {
+                if (cleanup != e) {
+                    e.addSuppressed(cleanup);
+                }
+            }
+            throw e;
         }
     }
 
@@ -104,8 +115,8 @@ public final class JinahyaEntityManagerUtils {
      * @apiNote Nothing the {@code supplier} does is persisted; this is intended for tests.
      * @see #getInTransaction(EntityManager, Supplier, boolean)
      */
-    public static <R> R getInTransactionAndRollback(final @Nonnull EntityManager manager,
-                                                    final @Nonnull Supplier<? extends R> supplier) {
+    public static <R> R getInTransactionAndRollback(final EntityManager manager,
+                                                    final Supplier<? extends R> supplier) {
         return getInTransaction(
                 manager,
                 supplier,
@@ -125,8 +136,8 @@ public final class JinahyaEntityManagerUtils {
      * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
      * @see #applyUnwrappedConnectionInTransactionAndRollback(EntityManager, Function)
      */
-    public static <R> R applyInTransaction(final @Nonnull EntityManager manager,
-                                           final @Nonnull Function<? super EntityManager, ? extends R> function,
+    public static <R> R applyInTransaction(final EntityManager manager,
+                                           final Function<? super EntityManager, ? extends R> function,
                                            final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return getInTransaction(
@@ -149,8 +160,8 @@ public final class JinahyaEntityManagerUtils {
      * @see #applyInTransaction(EntityManager, Function, boolean)
      */
     public static <R> R applyInTransactionAndRollback(
-            final @Nonnull EntityManager manager,
-            final @Nonnull Function<? super EntityManager, ? extends R> function) {
+            final EntityManager manager,
+            final Function<? super EntityManager, ? extends R> function) {
         return applyInTransaction(
                 manager,
                 function,
@@ -168,23 +179,31 @@ public final class JinahyaEntityManagerUtils {
      * @param function the function to be applied to a connection unwrapped from the {@code manager}.
      * @param <R>      result type parameter
      * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @apiNote this method does not close the unwrapped connection.
+     * @throws RuntimeException when no connection can be obtained from the {@code manager}, by either route.
+     * @apiNote this method does not close the unwrapped connection. A {@code manager} which is not joined to a
+     *         transaction is logged, at {@link System.Logger.Level#WARNING WARNING}, and otherwise accepted.
+     * @implNote An exception thrown by the {@code function} itself propagates unchanged; only a failure to
+     *         <em>obtain</em> the connection falls back to {@link JinahyaHibernateUtils}. Note that the fallback route
+     *         still acquires and applies in one step, so a {@code function} which throws there is wrapped rather than
+     *         propagated.
      */
-    public static <R> R applyUnwrappedConnection(final @Nonnull EntityManager manager,
-                                                 final @Nonnull Function<? super Connection, ? extends R> function) {
+    public static <R> R applyUnwrappedConnection(final EntityManager manager,
+                                                 final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(manager, "manager is null");
         if (!manager.isJoinedToTransaction()) {
             logger.log(Level.WARNING, "not joined to a transaction; " + manager);
         }
         Objects.requireNonNull(function, "function is null");
+        // Only the ACQUISITION of the connection is guarded here. Applying the function used to sit inside this
+        // try too, so a function which threw was reported as an unwrap failure and then run a second time
+        // through the Hibernate path -- which, for a function handed a Connection, means the work was done twice.
+        final Connection connection;
         try {
-            final var connection = manager.unwrap(Connection.class);
-            if (connection == null) {
+            final var unwrapped = manager.unwrap(Connection.class);
+            if (unwrapped == null) {
                 throw new RuntimeException("null unwrapped from " + manager);
             }
-            logger.log(Level.DEBUG, "unwrapped connection: {0}", connection);
-            return function.apply(connection);
+            connection = unwrapped;
         } catch (final Exception e1) {
             logger.log(Level.DEBUG, "failed to unwrap connection from " + manager, e1);
             try {
@@ -193,9 +212,16 @@ public final class JinahyaEntityManagerUtils {
                         function
                 );
             } catch (final Exception e2) {
-                throw new RuntimeException("failed to unwrap connection from " + manager, e2);
+                // the fallback's failure is the cause -- it is why recovery did not work; the original
+                // acquisition failure rides along as suppressed, and the wrapper is fresh so that neither
+                // a shared instance nor a suppression-disabled throwable can bite
+                final var wrapper = new RuntimeException("failed to unwrap connection from " + manager, e2);
+                wrapper.addSuppressed(e1);
+                throw wrapper;
             }
         }
+        logger.log(Level.DEBUG, "unwrapped connection: {0}", connection);
+        return function.apply(connection);
     }
 
     /**
@@ -213,8 +239,8 @@ public final class JinahyaEntityManagerUtils {
      * @see #getInTransaction(EntityManager, Supplier, boolean)
      */
     public static <R> R applyUnwrappedConnectionInTransaction(
-            final @Nonnull EntityManager manager,
-            final @Nonnull Function<? super Connection, ? extends R> function,
+            final EntityManager manager,
+            final Function<? super Connection, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return getInTransaction(
@@ -234,12 +260,12 @@ public final class JinahyaEntityManagerUtils {
      * @return the result of the {@code function}.
      * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
      * @apiNote this method does not close the unwrapped connection, and nothing the {@code function} does is
-     * persisted; this is intended for tests.
+     *         persisted; this is intended for tests.
      * @see #applyUnwrappedConnectionInTransaction(EntityManager, Function, boolean)
      */
     public static <R> R applyUnwrappedConnectionInTransactionAndRollback(
-            final @Nonnull EntityManager manager,
-            final @Nonnull Function<? super Connection, ? extends R> function) {
+            final EntityManager manager,
+            final Function<? super Connection, ? extends R> function) {
         return applyUnwrappedConnectionInTransaction(
                 manager,
                 function,
@@ -248,6 +274,7 @@ public final class JinahyaEntityManagerUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Creates a new instance, which is not allowed.
      */

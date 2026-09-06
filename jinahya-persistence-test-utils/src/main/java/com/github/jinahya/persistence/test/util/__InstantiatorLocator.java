@@ -30,11 +30,15 @@ public interface __InstantiatorLocator extends Function<Class<?>, Class<?>> {
      * {@code Foo$FooInstantiator}, and {@code Foo$Foo_Instantiator}, with the enclosing-class form probed first when
      * {@code Foo} is itself a nested class.
      *
-     * @implNote A local class, or an anonymous class, can not be located by this locator, for no class can be declared
-     *         with a name required by the convention; specify a custom locator for those classes.
+     * @implNote A local class, or an anonymous class, can not be located by this locator, for no class can be
+     *         declared with a name required by the convention; specify a custom locator for those classes.
      */
     __InstantiatorLocator STANDARD = __InstantiatorLocator::locateStandard;
 
+    // NullAway: this returns null when nothing is located, but the interface extends
+    // Function<Class<?>, Class<?>>, whose apply() is modelled as @NonNull. Resolving it properly means
+    // changing the contract (Optional, or throwing), which is a deliberate API decision, not an annotation.
+    @SuppressWarnings("NullAway")
     private static Class<?> locateStandard(final Class<?> target) {
         assert target != null;
         // if enclosed,

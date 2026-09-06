@@ -80,6 +80,47 @@ class __AttributeEnumTest {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("a null attributeValue names the constant instead of a bare NPE")
+    @Nested
+    class NullAttributeValue_Test {
+
+        private enum _NullValued implements __AttributeEnum.__OfInteger<_NullValued> {
+
+            INSTANCE;
+
+            @Override
+            public Integer attributeValue() {
+                return null;
+            }
+        }
+
+        private enum _NullValuedLong implements __AttributeEnum.__OfLong<_NullValuedLong> {
+
+            INSTANCE;
+
+            @Override
+            public Long attributeValue() {
+                return null;
+            }
+        }
+
+        @DisplayName("intValue() -> NullPointerException naming the constant")
+        @org.junit.jupiter.api.Test
+        void _NullPointerException_intValue() {
+            org.assertj.core.api.Assertions.assertThatThrownBy(_NullValued.INSTANCE::intValue)
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("INSTANCE");
+        }
+
+        @DisplayName("longValue() -> NullPointerException naming the constant")
+        @org.junit.jupiter.api.Test
+        void _NullPointerException_longValue() {
+            org.assertj.core.api.Assertions.assertThatThrownBy(_NullValuedLong.INSTANCE::longValue)
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("INSTANCE");
+        }
+    }
+
     @DisplayName("__OfLong")
     @Nested
     class OfLong_Test {
@@ -130,7 +171,7 @@ class __AttributeEnumTest {
         void valueOfAttributeValue_IllegalArgumentException_Integer() {
             // the typed overloads do not allow this; only a raw call can get an Integer in here
             assertThatThrownBy(
-                    () -> __AttributeEnumUtils.valueOfAttributeValue(
+                    () -> __AttributeEnumUtils.valueOf(
                             (Class) _SomeLongAttributeEnum.class, (Object) 22))
                     .isInstanceOf(IllegalArgumentException.class);
         }

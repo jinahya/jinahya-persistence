@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -25,10 +26,10 @@ import java.util.UUID;
 /**
  * A utility class for turning the Jakarta Persistence basic types into bytes, and back.
  * <p>
- * Each method is named after the type it handles and the number of bytes it produces — {@code int_4},
- * {@code uuid_16}, {@code local_date_time_16} — with a trailing underscore alone, as in {@code string_} or
- * {@code serializable_}, for the types whose encoding is variable in length. The encodings are big-endian and
- * self-contained, so that a value can be reconstructed from its bytes without consulting the database.
+ * Each method is named after the type it handles and the number of bytes it produces — {@code int_4}, {@code uuid_16},
+ * {@code local_date_time_16} — with a trailing underscore alone, as in {@code string_} or {@code serializable_}, for
+ * the types whose encoding is variable in length. The encodings are big-endian and self-contained, so that a value can
+ * be reconstructed from its bytes without consulting the database.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __EncryptionService
@@ -40,9 +41,9 @@ import java.util.UUID;
 final class __EncryptionServiceUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Writes the specified {@code boolean} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code boolean} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -92,9 +93,61 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Writes the specified {@code short} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code byte} value into the specified array of bytes, at the specified index.
+     *
+     * @param b the array of bytes to which the value is written.
+     * @param i the index in the {@code b} at which the value is written.
+     * @param v the value to write.
+     * @return the specified {@code b}.
+     */
+    private static byte[] byte_1(final byte[] b, final int i, final byte v) {
+        assert b != null;
+        assert i >= 0;
+        assert i + Byte.BYTES <= b.length;
+        b[i] = v;
+        return b;
+    }
+
+    /**
+     * Reads a {@code byte} value from the specified array of bytes, at the specified index.
+     *
+     * @param b the array of bytes from which the value is read.
+     * @param i the index in the {@code b} from which the value is read.
+     * @return the value read from the {@code b}.
+     */
+    private static byte byte_1(final byte[] b, final int i) {
+        assert b != null;
+        assert i >= 0;
+        assert i + Byte.BYTES <= b.length;
+        return b[i];
+    }
+
+    /**
+     * Returns an array of bytes representing the specified {@code byte} value.
+     *
+     * @param v the value to represent.
+     * @return an array of bytes representing the {@code v}.
+     */
+    static byte[] byte_1(final byte v) {
+        return byte_1(new byte[Byte.BYTES], 0, v);
+    }
+
+    /**
+     * Returns the {@code byte} value represented by the specified array of bytes.
+     *
+     * @param b the array of bytes.
+     * @return the value represented by the {@code b}.
+     */
+    static byte byte_1(final byte[] b) {
+        return byte_1(b, 0);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Writes the specified {@code short} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -148,9 +201,9 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Writes the specified {@code int} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code int} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -202,9 +255,9 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Writes the specified {@code long} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code long} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -256,9 +309,9 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Writes the specified {@code char} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code char} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -301,6 +354,7 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Returns an array of bytes representing the specified {@code float} value.
      *
@@ -322,6 +376,7 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Returns an array of bytes representing the specified {@code double} value.
      *
@@ -343,6 +398,7 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.String
+
     /**
      * Returns an array of bytes representing the specified {@code String} value.
      *
@@ -366,9 +422,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------------ UUID
+
     /**
-     * Writes the specified {@code UUID} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code UUID} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -423,6 +479,7 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------- java.math
+
     /**
      * Returns an array of bytes representing the specified {@code BigInteger} value.
      *
@@ -445,6 +502,7 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------- java.math
+
     /**
      * Returns an array of bytes representing the specified {@code BigDecimal} value.
      *
@@ -474,9 +532,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------- java.time
+
     /**
-     * Writes the specified {@code LocalDate} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code LocalDate} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -525,9 +583,9 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * Writes the specified {@code LocalTime} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code LocalTime} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -570,9 +628,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ----------------------------------------------------------------------------------------- java.time.LocalDateTime
+
     /**
-     * Writes the specified {@code LocalDateTime} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code LocalDateTime} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -627,9 +685,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------ java.time.Offset
+
     /**
-     * Writes the specified {@code ZoneOffset} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code ZoneOffset} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -673,9 +731,9 @@ final class __EncryptionServiceUtils {
     }
 
     // -------------------------------------------------------------------------------------------- java.time.OffsetTime
+
     /**
-     * Writes the specified {@code OffsetTime} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code OffsetTime} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -689,7 +747,7 @@ final class __EncryptionServiceUtils {
                         i,
                         v.toLocalTime()
                 ),
-                Long.BYTES,
+                i + Long.BYTES,
                 v.getOffset()
         );
     }
@@ -729,9 +787,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ---------------------------------------------------------------------------------------- java.time.OffsetDateTime
+
     /**
-     * Writes the specified {@code OffsetDateTime} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code OffsetDateTime} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -781,9 +839,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ----------------------------------------------------------------------------------------------- java.time.Instant
+
     /**
-     * Writes the specified {@code Instant} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Instant} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -833,9 +891,9 @@ final class __EncryptionServiceUtils {
     }
 
     // -------------------------------------------------------------------------------------------------- java.time.Year
+
     /**
-     * Writes the specified {@code Year} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Year} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -879,17 +937,20 @@ final class __EncryptionServiceUtils {
     }
 
     // -------------------------------------------------------------------------------------------------- java.util.Date
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
-    @Deprecated
+
     /**
-     * Writes the specified {@code Date} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Date} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     private static byte[] util_date_8(final byte[] b, final int i, final java.util.Date v) {
         assert b != null;
         assert i >= 0;
@@ -898,14 +959,18 @@ final class __EncryptionServiceUtils {
         return long_8(b, i, v.getTime());
     }
 
-    @Deprecated
     /**
      * Reads a {@code Date} value from the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     private static java.util.Date util_date_8(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
@@ -913,40 +978,51 @@ final class __EncryptionServiceUtils {
         return new java.util.Date(long_8(b, i));
     }
 
-    @Deprecated
     /**
      * Returns an array of bytes representing the specified {@code Date} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     static byte[] util_date_8(final java.util.Date v) {
         return util_date_8(new byte[8], 0, v);
     }
 
-    @Deprecated
     /**
      * Returns the {@code Date} value represented by the specified array of bytes.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     static java.util.Date util_date_8(final byte[] b) {
         return util_date_8(b, 0);
     }
 
     // ---------------------------------------------------------------------------------------------- java.util.Calendar
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
-    @Deprecated
+
     /**
-     * Writes the specified {@code Calendar} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Calendar} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Calendar} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     private static byte[] util_calendar_8(final byte[] b, final int i, final Calendar v) {
         assert b != null;
         assert i >= 0;
@@ -955,14 +1031,18 @@ final class __EncryptionServiceUtils {
         return util_date_8(b, i, v.getTime());
     }
 
-    @Deprecated
     /**
      * Reads a {@code Calendar} value from the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Calendar} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     private static Calendar util_calendar_8(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
@@ -972,140 +1052,181 @@ final class __EncryptionServiceUtils {
         return v;
     }
 
-    @Deprecated
     /**
      * Returns an array of bytes representing the specified {@code Calendar} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Calendar} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     static byte[] util_calendar_8(final Calendar v) {
         return util_calendar_8(new byte[8], 0, v);
     }
 
-    @Deprecated
     /**
      * Returns the {@code Calendar} value represented by the specified array of bytes.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Calendar} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     static Calendar util_calendar_8(final byte[] b) {
         return util_calendar_8(b, 0);
     }
 
     // --------------------------------------------------------------------------------------------------- java.sql.Date
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
-    @Deprecated
+
     /**
-     * Writes the specified {@code Date} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Date} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     private static byte[] sql_date_8(final byte[] b, final int i, final java.sql.Date v) {
         return long_8(b, i, v.getTime());
     }
 
-    @Deprecated
     /**
      * Reads a {@code Date} value from the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     private static java.sql.Date sql_date_8(final byte[] b, final int i) {
         return new java.sql.Date(long_8(b, i));
     }
 
-    @Deprecated
     /**
      * Returns an array of bytes representing the specified {@code Date} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     static byte[] sql_date_8(final java.sql.Date v) {
         return sql_date_8(new byte[8], 0, v);
     }
 
-    @Deprecated
     /**
      * Returns the {@code Date} value represented by the specified array of bytes.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     static java.sql.Date sql_date_8(final byte[] b) {
         return sql_date_8(b, 0);
     }
 
     // --------------------------------------------------------------------------------------------------- java.sql.Time
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
-    @Deprecated
+
     /**
-     * Writes the specified {@code Time} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Time} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     private static byte[] sql_time_8(final byte[] b, final int i, final java.sql.Time v) {
         return long_8(b, i, v.getTime());
     }
 
-    @Deprecated
     /**
      * Reads a {@code Time} value from the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     private static java.sql.Time sql_time_8(final byte[] b, final int i) {
         return new java.sql.Time(long_8(b, i));
     }
 
-    @Deprecated
     /**
      * Returns an array of bytes representing the specified {@code Time} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     static byte[] sql_time_8(final java.sql.Time v) {
         return sql_time_8(new byte[8], 0, v);
     }
 
-    @Deprecated
     /**
      * Returns the {@code Time} value represented by the specified array of bytes.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
+     *         the {@code java.time} API.
      */
+    @Deprecated
     static java.sql.Time sql_time_8(final byte[] b) {
         return sql_time_8(b, 0);
     }
 
     // ---------------------------------------------------------------------------------------------- java.sql.Timestamp
-    // https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations
-    @Deprecated
+
     /**
-     * Writes the specified {@code Timestamp} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code Timestamp} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     private static byte[] sql_timestamp_16(final byte[] b, final int i, final java.sql.Timestamp v) {
         assert b != null;
         assert i >= 0;
@@ -1114,14 +1235,18 @@ final class __EncryptionServiceUtils {
         return instant_12(b, i, v.toInstant());
     }
 
-    @Deprecated
     /**
      * Reads a {@code Timestamp} value from the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     private static java.sql.Timestamp sql_timestamp_16(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
@@ -1129,24 +1254,32 @@ final class __EncryptionServiceUtils {
         return Timestamp.from(instant_12(b, i));
     }
 
-    @Deprecated
     /**
      * Returns an array of bytes representing the specified {@code Timestamp} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     static byte[] sql_timestamp_16(final java.sql.Timestamp v) {
         return sql_timestamp_16(new byte[16], 0, v);
     }
 
-    @Deprecated
     /**
      * Returns the {@code Timestamp} value represented by the specified array of bytes.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
+     *         of the {@code java.time} API.
      */
+    @Deprecated
     static java.sql.Timestamp sql_timestamp_16(final byte[] b) {
         return sql_timestamp_16(b, 0);
     }
@@ -1154,28 +1287,37 @@ final class __EncryptionServiceUtils {
     // ---------------------------------------------------------------------------------------------------------- byte[]
 
     // ---------------------------------------------------------------------------------------------------------- Byte[]
-    @Deprecated
+
     /**
      * Returns an array of bytes representing the specified {@code Byte[]} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Byte[]} for basic attributes in favor of
+     *         {@code byte[]}.
      */
+    @Deprecated
     static byte[] Bytes_l(final Byte[] v) {
         final var p = new byte[v.length];
         for (int i = 0; i < p.length; i++) {
-            v[i] = p[i];
+            p[i] = v[i];
         }
         return p;
     }
 
-    @Deprecated
     /**
      * Returns the {@code Byte[]} value represented by the specified array of bytes.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Byte[]} for basic attributes in favor of
+     *         {@code byte[]}.
      */
+    @Deprecated
     static Byte[] Bytes_l(final byte[] b) {
         final var v = new Byte[b.length];
         for (int i = 0; i < v.length; i++) {
@@ -1185,9 +1327,9 @@ final class __EncryptionServiceUtils {
     }
 
     // ---------------------------------------------------------------------------------------------------------- char[]
+
     /**
-     * Writes the specified {@code char[]} value into the specified array of bytes, at the specified
-     * index.
+     * Writes the specified {@code char[]} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
      * @param i the index in the {@code b} at which the value is written.
@@ -1216,7 +1358,11 @@ final class __EncryptionServiceUtils {
     private static char[] chars_2l(final byte[] b, int i) {
         assert b != null;
         assert i >= 0;
-        assert (b.length - i) % 2 == 0;
+        if (((b.length - i) & 1) != 0) {
+            // an assertion would be disabled in production, and the payload would silently lose its last byte
+            throw new IllegalArgumentException(
+                    "odd number of bytes for a char[]; b.length: " + b.length + ", i: " + i);
+        }
         final var v = new char[(b.length - i) >> 1];
         for (int j = 0; j < v.length; j++) {
             v[j] = (char) (
@@ -1248,6 +1394,7 @@ final class __EncryptionServiceUtils {
     }
 
     // ----------------------------------------------------------------------------------------------------- Character[]
+
     /**
      * Returns an array of bytes representing the specified {@code Character[]} value.
      *
@@ -1278,6 +1425,7 @@ final class __EncryptionServiceUtils {
     }
 
     // ------------------------------------------------------------------------------------------------------------ enum
+
     /**
      * Returns an array of bytes representing the specified {@code Enum<?>} value.
      *
@@ -1307,6 +1455,7 @@ final class __EncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Returns an array of bytes representing the specified {@code Serializable} value.
      *
@@ -1315,30 +1464,51 @@ final class __EncryptionServiceUtils {
      */
     static byte[] serializable_(final Serializable v) {
         assert v != null;
+        final byte[] serialized;
         try (var baos = new ByteArrayOutputStream();
              var oos = new ObjectOutputStream(baos)) {
             oos.writeObject(v);
             oos.flush();
-            return baos.toByteArray();
+            serialized = baos.toByteArray();
         } catch (final IOException ioe) {
             throw new RuntimeException(ioe);
         }
+        // Refuse to write what this class could never read back. filterFor(Class) caps the stream the reader will
+        // accept, and until this check the writer accepted anything: an oversized value encrypted and stored
+        // cleanly, then failed every later read -- with the plaintext already cleared, leaving the row
+        // unrecoverable. Fail here, while the caller still holds the value.
+        if (serialized.length > MAX_SERIALIZABLE_STREAM_BYTES) {
+            throw new IllegalArgumentException(
+                    "serialized form is too large to be read back"
+                    + "; bytes: " + serialized.length
+                    + "; limit: " + MAX_SERIALIZABLE_STREAM_BYTES
+                    + "; type: " + v.getClass().getName());
+        }
+        return serialized;
     }
 
     /**
      * Returns the {@code T} value represented by the specified array of bytes.
      *
-     * @param b the array of bytes.
-     * @param <T> the type parameter
+     * @param b            the array of bytes.
+     * @param expectedType the type the deserialized value has to be an instance of.
      * @return the value represented by the {@code b}.
+     * @throws java.io.InvalidClassException when the {@code b} holds anything but an {@code expectedType}.
+     * @implNote Of the four caps this filter applies, only the stream size is also enforced when writing (see
+     *         {@link #serializable_(Serializable)}); the depth, reference-count and array-length caps remain read-side
+     *         only, so a graph which is deep or highly referential rather than merely large can still be written and
+     *         then refused on the way back.
      */
-    static <T extends Serializable> T serializable_(final byte[] b) {
+    static Serializable serializable_(final byte[] b, final Class<?> expectedType) {
         assert b != null;
         assert b.length > 0;
+        assert expectedType != null;
         try (var bais = new ByteArrayInputStream(b);
              var ois = new ObjectInputStream(bais)) {
+            // the bytes come back from the database; accept nothing but the attribute's own type
+            ois.setObjectInputFilter(filterFor(expectedType));
             try {
-                return (T) ois.readObject();
+                return (Serializable) expectedType.cast(ois.readObject());
             } catch (final ClassNotFoundException cnfe) {
                 throw new RuntimeException(cnfe);
             }
@@ -1346,6 +1516,41 @@ final class __EncryptionServiceUtils {
             throw new RuntimeException(ioe);
         }
     }
+
+    /**
+     * Returns a filter which caps the depth, the reference count, the stream length and the array lengths the stream
+     * may ask for.
+     *
+     * @param expectedType the attribute's type; retained for diagnostics and for future tightening.
+     * @return a resource-limiting filter.
+     * @see <a href="https://docs.oracle.com/en/java/javase/21/core/serialization-filtering1.html">Serialization
+     *         Filtering</a>
+     */
+    private static ObjectInputFilter filterFor(final Class<?> expectedType) {
+        assert expectedType != null;
+        return info -> {
+            if (info.depth() > MAX_SERIALIZABLE_DEPTH
+                || info.references() > MAX_SERIALIZABLE_REFERENCES
+                || info.streamBytes() > MAX_SERIALIZABLE_STREAM_BYTES
+                || info.arrayLength() > MAX_SERIALIZABLE_ARRAY_LENGTH) {
+                return ObjectInputFilter.Status.REJECTED;
+            }
+            // NOTE: the root class is deliberately NOT pinned to expectedType. A value which serializes through a
+            // proxy - every java.time type writes a java.time.Ser - presents that proxy as the root, so pinning
+            // rejects values this module claims to support. The returned object is cast to expectedType by the
+            // caller, which enforces the type; and these bytes are the encryption manager's own decrypted output,
+            // not attacker-supplied input, so the residual risk is resource exhaustion, which the caps above cover.
+            return ObjectInputFilter.Status.UNDECIDED;
+        };
+    }
+
+    private static final long MAX_SERIALIZABLE_DEPTH = 32L;
+
+    private static final long MAX_SERIALIZABLE_REFERENCES = 10_000L;
+
+    private static final long MAX_SERIALIZABLE_STREAM_BYTES = 1L << 20;
+
+    private static final long MAX_SERIALIZABLE_ARRAY_LENGTH = 1L << 20;
 
     // -----------------------------------------------------------------------------------------------------------------
     private __EncryptionServiceUtils() {

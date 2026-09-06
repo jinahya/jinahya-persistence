@@ -10,12 +10,16 @@
   </parent>
 
   <artifactId>jinahya-persistence-crypto</artifactId>
-  <version>0.5.5-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Crypto for Jakarta Persistence</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -25,7 +29,7 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>jinahya-persistence-utils</artifactId>
       <!--      <version>${revision}</version>-->
-      <version>0.5.5-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -56,6 +60,17 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the test persistence unit requests CALLBACK validation; a provider has to be on the test classpath -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
