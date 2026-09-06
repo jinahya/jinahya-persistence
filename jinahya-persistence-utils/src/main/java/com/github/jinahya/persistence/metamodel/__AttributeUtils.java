@@ -203,11 +203,10 @@ public final class __AttributeUtils {
      * @implNote {@link Introspector} reports only {@code public} write methods, while Jakarta Persistence 3.2
      *         &sect;2.2 permits a {@code protected} property accessor; a declared-method scan up the hierarchy covers
      *         that before giving up. This is the one lookup here still memoized, deliberately: unlike a metamodel
-     *         lookup, introspecting a bean and then scanning its hierarchy is not cheap, and the key pairs a class
-     *         with an attribute of that class, so the map is bounded by the mapped model rather than by traffic. The
-     *         cost is that the entries, and so the classes they name, live as long as the class holding this map
-     *         &mdash; which is only visible to a container that unloads the persistence classes without unloading
-     *         this one.
+     *         lookup, introspecting a bean and then scanning its hierarchy is not cheap, and the key pairs a class with
+     *         an attribute of that class, so the map is bounded by the mapped model rather than by traffic. The cost is
+     *         that the entries, and so the classes they name, live as long as the class holding this map &mdash; which
+     *         is only visible to a container that unloads the persistence classes without unloading this one.
      * @see Introspector#getBeanInfo(Class)
      */
     private static Method getSetter(final Class<?> clazz, final Attribute<?, ?> attribute) {

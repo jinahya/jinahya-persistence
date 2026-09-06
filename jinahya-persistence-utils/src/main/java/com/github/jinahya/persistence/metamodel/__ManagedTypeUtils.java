@@ -49,11 +49,11 @@ public final class __ManagedTypeUtils {
      * @param <X>                    represented type
      * @return the {@link ManagedType} of the {@code typeClass}.
      * @throws IllegalArgumentException when none of the {@code entityManagerFactories} manages the {@code typeClass}.
-     * @implNote The result used to be memoized in a {@code static} map keyed by the {@code typeClass} alone. That
-     *         cache answered a later call from a <em>different</em> set of factories with the first caller's factory,
-     *         and, being keyed by a {@link Class} and never evicted, pinned the application's classes for the life of
-     *         the JVM. The lookup it saved is a map lookup inside the provider's metamodel, so it is now performed on
-     *         each call.
+     * @implNote The result used to be memoized in a {@code static} map keyed by the {@code typeClass} alone.
+     *         That cache answered a later call from a <em>different</em> set of factories with the first caller's
+     *         factory, and, being keyed by a {@link Class} and never evicted, pinned the application's classes for the
+     *         life of the JVM. The lookup it saved is a map lookup inside the provider's metamodel, so it is now
+     *         performed on each call.
      * @see jakarta.persistence.metamodel.Metamodel#managedType(Class)
      */
     public static <X> ManagedType<X> getManagedType(

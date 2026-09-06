@@ -62,8 +62,8 @@ public final class __EntityManagerFactoryUtils {
      * @param factory the entity manager factory whose {@link Metamodel} is returned.
      * @return the {@link Metamodel} of the {@code factory}.
      * @implNote Memoized here until it turned out that the memoization both leaked and paid for nothing; see
-     *         {@link #getPersistenceUnitUtil(EntityManagerFactory)}, whose cache had the same shape and was removed
-     *         for the same reasons.
+     *         {@link #getPersistenceUnitUtil(EntityManagerFactory)}, whose cache had the same shape and was removed for
+     *         the same reasons.
      * @see EntityManagerFactory#getMetamodel()
      */
     public static Metamodel getMetamodel(final EntityManagerFactory factory) {

@@ -33,8 +33,8 @@ import java.util.stream.StreamSupport;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote Both methods here look a type up across an {@link Iterable} of entity manager factories, and take
- *         the first match. Neither memoizes: a lookup which took the first match found for a class, whichever
- *         factories a later caller passed, is not a cache but a wrong answer waiting for a second persistence unit.
+ *         the first match. Neither memoizes: a lookup which took the first match found for a class, whichever factories
+ *         a later caller passed, is not a cache but a wrong answer waiting for a second persistence unit.
  * @see __ManagedTypeUtils
  */
 @SuppressWarnings({
@@ -71,8 +71,8 @@ public final class __EntityTypeUtils {
      * @param entityManagerFactories an iterable of entity manager factories.
      * @param <X>                    represented entity type
      * @return the {@link EntityType} of the {@code entityClass}.
-     * @throws IllegalArgumentException when none of the {@code entityManagerFactories} maps the {@code entityClass}
-     *                                  as an entity.
+     * @throws IllegalArgumentException when none of the {@code entityManagerFactories} maps the {@code entityClass} as
+     *                                  an entity.
      */
     public static <X> EntityType<X> getEntityType(
             final Class<X> entityClass,
