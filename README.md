@@ -108,11 +108,52 @@ Jakarta EE 9/9.1 and 10 platform generations.*
 
 ## Modules
 
-### [jinahya-persistence-more](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more)
+| Module | What it holds | Depends on (within the reactor) | Maven Central |
+| --- | --- | --- | --- |
+| [`jinahya-persistence-utils`](jinahya-persistence-utils) | Static helpers over the core Jakarta Persistence types: resource-level transaction wrappers, JDBC `Connection` unwrapping, and reflective read/write of a metamodel `Attribute`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-utils)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-utils) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-utils/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-utils) |
+| [`jinahya-persistence-more`](jinahya-persistence-more) | Extended mapping building blocks: attribute enums and their converters, string/joined-string converters, self-referencing entities, and the mapped colour types. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more) |
+| [`jinahya-persistence-crypto`](jinahya-persistence-crypto) | Transparent attribute encryption for entities: the encryption service, its CDI qualifier, and the lifecycle listener which moves values between plaintext and ciphertext attributes. | `-utils` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-crypto)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-crypto) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-crypto/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-crypto) |
+| [`jinahya-persistence-more-test`](jinahya-persistence-more-test) | Abstract JUnit base classes for testing what `-more` defines — attribute converters and attribute enums. Lives in `src/main` so other projects' tests can extend it. | `-more` (`provided`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-test)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-test) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test) |
+| [`jinahya-persistence-test-utils`](jinahya-persistence-test-utils) | Randomizer / instantiator / persister SPIs, with locators, for building entity instances in a test suite. Also `src/main`, for the same reason. | — | not published yet |
+| [`coverage-report-aggregated`](coverage-report-aggregated) | Build-only: aggregates every module's JaCoCo execution data into one report. Not an artifact anyone depends on. | all five | — |
 
-### [jinahya-persistence-more-test](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-more-test)
+### Dependencies
 
-### [jinahya-persistence-test-utils](https://github.com/jinahya/jinahya-persistence/tree/develop/jinahya-persistence-test-utils)
+Per module, at the scopes a consumer sees. `test`-scoped dependencies are omitted; they are a private matter of each
+module's own build.
 
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-test-utils)
-[![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-test-utils/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-test-utils)
+Two properties hold across the whole reactor, and are worth keeping that way:
+
+- **`compile` appears exactly once** — `-crypto` on `-utils`. Every other dependency of every module is `provided`, so
+  adding one of these artifacts to a project pulls in nothing the project did not ask for.
+- **Nothing is `runtime`-scoped.** Where a runtime implementation is needed — a persistence provider, a validation
+  provider, a JDBC driver — the module leaves the choice to the consumer, and only the build picks one (see the
+  profiles above).
+
+Every `jakarta.*` version comes from the `jakarta.jakartaee-bom` umbrella and is therefore absent from the poms; the
+versions below are what the current platform (`11.0.0`) resolves to.
+
+| Module | compile | runtime | provided |
+| --- | --- | --- | --- |
+| `jinahya-persistence-utils` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.jspecify:jspecify` 1.0.1 |
+| `jinahya-persistence-more` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
+| `jinahya-persistence-crypto` | `io.github.jinahya:jinahya-persistence-utils` | — | `jakarta.annotation:jakarta.annotation-api` 3.0.0<br>`jakarta.enterprise:jakarta.enterprise.cdi-api` 4.1.0<br>`jakarta.inject:jakarta.inject-api` 2.0.1<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
+| `jinahya-persistence-more-test` | — | — | `io.github.jinahya:jinahya-persistence-more`<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1<br>`org.junit.jupiter:junit-jupiter-api` 5.14.4 |
+| `jinahya-persistence-test-utils` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.jeasy:easy-random-core` 5.0.0<br>`org.jeasy:easy-random-bean-validation` 5.0.0<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
+
+`jakarta.persistence-api` and `jspecify` are declared once, in the root pom, and inherited by every module; the rest are
+declared by the module which uses them.
+
+#### Notes on the two test-support modules
+
+Their helper types sit in `src/main`, not `src/test`, so that another project's tests can extend them. That makes the
+choice of scope for a testing library a published-API decision rather than a private one:
+
+- `-more-test` needs `junit-jupiter-api` at compile time and cannot avoid it — its base classes carry the `@Test`
+  methods a subclass inherits, and implement JUnit extension interfaces in their own signatures. It is `provided`, so a
+  consumer's JUnit version wins rather than this module's.
+- Nothing else is needed. AssertJ, Mockito and `junit-platform-commons` were each removed in favour of what
+  `org.junit.jupiter.api.Assertions` and plain reflection already provide, so a consumer needs only JUnit on the test
+  classpath.
+- `-test-utils` needs no testing library at all in `src/main`; Easy Random and PoDAM are its subject matter, and both
+  are `provided` for the same reason.

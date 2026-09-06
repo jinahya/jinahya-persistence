@@ -313,10 +313,21 @@
       <artifactId>slf4j-jdk-platform-logging</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--    <dependency>-->
-    <!--      <groupId>org.jspecify</groupId>-->
-    <!--      <artifactId>jspecify</artifactId>-->
-    <!--    </dependency>-->
+    <!-- declared once for the whole reactor: every module is annotated with it, at the same scope.
+         provided, not compile: JSpecify's annotations are CLASS-retention, so no consumer needs them
+         at runtime and no published pom should drag them in -->
+    <dependency>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- likewise: this is a Jakarta Persistence project, every module compiles against the API and
+         none of them ship it. Version comes from the umbrella BOM -->
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!--    <dependency>-->
     <!--      <groupId>com.querydsl</groupId>-->
     <!--      <artifactId>querydsl-jpa</artifactId>-->
@@ -328,6 +339,14 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <!-- pinned, and not below 3.11.0: dependency:analyze reads the module's own bytecode, and the
+               versions Maven resolves by default reject class file major version 69 (what
+               ${maven.compiler.testRelease} produces) with "byte code is corrupt" -->
+          <version>3.11.0</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>

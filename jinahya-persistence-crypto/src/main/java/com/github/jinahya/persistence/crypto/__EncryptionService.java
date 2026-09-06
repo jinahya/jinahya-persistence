@@ -639,11 +639,15 @@ public abstract class __EncryptionService {
                 continue;
             }
             final byte[] decryptedBytes;
-            final var javaType = decryptedAttribute.getJavaType();
+            final var javaType = __AttributeUtils.getJavaMemberType(decryptedAttribute);
             // The DECLARED type decides the encoding, exactly as it decides the decoding below. Dispatching on
             // the runtime class here instead let the two ladders pick different codecs for one attribute -- a
             // java.util.Date holding a java.sql.Timestamp was written as epoch seconds and read back as epoch
             // millis, silently. Keep this chain in the same order as the one in decrypt(...).
+            // Read from the java member, NOT from Attribute.getJavaType(): the latter is the provider's view and
+            // the providers disagree. Hibernate ORM 7.2 calls this java.util.Date field a java.sql.Timestamp,
+            // which made the guard below reject the Date the field actually held, and would have had the two
+            // ladders encode as Timestamp and decode as Date the moment the guard were relaxed.
             if (!javaType.isInstance(decryptedValue)) {
                 throw new RuntimeException(
                         "the value is not an instance of the attribute's declared java type" +
@@ -796,7 +800,9 @@ public abstract class __EncryptionService {
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
             }
             final Object decryptedValue;
-            final var javaType = decryptedAttribute.getJavaType();
+            // the java member, for the same reason as in encrypt(...): the two ladders must agree on the type,
+            // and only the declared member means the same thing on every provider
+            final var javaType = __AttributeUtils.getJavaMemberType(decryptedAttribute);
             try {
                 if (javaType == boolean.class || javaType == Boolean.class) {
                     decryptedValue = boolean_1(decryptedBytes);

@@ -25,11 +25,11 @@ import com.github.jinahya.persistence.more.__AttributeEnumConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.util.Objects;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * An abstract base class for testing {@link __AttributeEnumConverter} implementations.
@@ -116,7 +116,7 @@ public abstract class __AttributeEnumConverter_Test<
         @Test
         void _Null_Null() {
             final var converterInstance = newConverterInstance();
-            assertThat(converterInstance.convertToDatabaseColumn(null)).isNull();
+            assertNull(converterInstance.convertToDatabaseColumn(null));
         }
 
         @DisplayName("(enumConstant)enumConstant.attributeValue")
@@ -127,7 +127,7 @@ public abstract class __AttributeEnumConverter_Test<
                     s -> {
                         s.forEach(ec -> {
                             final var actual = converterInstance.convertToDatabaseColumn(ec);
-                            assertThat(actual).isEqualTo(ec.attributeValue());
+                            assertEquals(ec.attributeValue(), actual);
                         });
                     }
             );
@@ -146,7 +146,7 @@ public abstract class __AttributeEnumConverter_Test<
         @Test
         void _Null_Null() {
             final var converterInstance = newConverterInstance();
-            assertThat(converterInstance.convertToEntityAttribute(null)).isNull();
+            assertNull(converterInstance.convertToEntityAttribute(null));
         }
 
         @DisplayName("(attributeValue)E(attributeValue)")
@@ -155,7 +155,7 @@ public abstract class __AttributeEnumConverter_Test<
             final var converterInstance = newConverterInstance();
             acceptEachEnumConstantAndAttributeValue((ec, av) -> {
                 final var actual = converterInstance.convertToEntityAttribute(av);
-                assertThat(actual).isEqualTo(ec);
+                assertEquals(ec, actual);
             });
         }
     }
@@ -168,7 +168,7 @@ public abstract class __AttributeEnumConverter_Test<
      * @return a new instance of {@link #converterClass}.
      */
     protected CONVERTER newConverterInstance() {
-        return ReflectionUtils.newInstance(converterClass);
+        return ___Utils.newInstance(converterClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

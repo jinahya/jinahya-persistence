@@ -24,13 +24,16 @@ import com.github.jinahya.persistence.more.__AttributeEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * An abstract base class for testing {@link __AttributeEnum} implementations.
@@ -93,9 +96,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
         __AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(
                 enumClass,
                 (ec, av) -> {
-                    assertThat(av)
-                            .as("attribute values of %s", ec)
-                            .isNotNull();
+                    assertNotNull(av, () -> "null attribute value of " + ec);
                 }
         );
     }
@@ -109,9 +110,20 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
         __AttributeEnum_TestUtils.acceptAttributeValueStream(
                 enumClass,
                 s -> {
-                    assertThat(s)
-                            .as("attribute values of %s", enumClass)
-                            .doesNotHaveDuplicates();
+                    // AssertJ's doesNotHaveDuplicates() is the one assertion here with no counterpart in
+                    // org.junit.jupiter.api.Assertions; naming the offending values matters more than the
+                    // three lines it costs to find them
+                    final var seen = new HashSet<>();
+                    final var duplicates = new LinkedHashSet<>();
+                    s.forEach(av -> {
+                        if (!seen.add(av)) {
+                            duplicates.add(av);
+                        }
+                    });
+                    assertTrue(
+                            duplicates.isEmpty(),
+                            () -> "duplicate attribute values of " + enumClass + ": " + duplicates
+                    );
                 }
         );
     }

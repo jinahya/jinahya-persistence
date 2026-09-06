@@ -100,6 +100,34 @@ public final class __AttributeUtils {
     }
 
     /**
+     * Returns the type declared by the specified attribute's java member.
+     *
+     * @param attribute the attribute.
+     * @return the {@link Field#getType() type} of the field, or the {@link Method#getReturnType() return type} of the
+     *         method, the {@code attribute} is mapped to.
+     * @apiNote Prefer this over {@link Attribute#getJavaType()} wherever the answer has to mean the same thing
+     *         on every provider &mdash; picking a codec, say, or checking a value against the type which will hold
+     *         it. {@link Attribute#getJavaType()} is the provider's view of the attribute, and providers disagree:
+     *         for a {@code java.util.Date} field mapped as a timestamp, Hibernate ORM 7.4 and EclipseLink report
+     *         {@code java.util.Date}, while Hibernate ORM 7.2 reports {@code java.sql.Timestamp} &mdash; a type no
+     *         value ever actually held. The java member cannot drift that way: it is the field, or the getter, as
+     *         written.
+     * @see Attribute#getJavaType()
+     */
+    public static Class<?> getJavaMemberType(final Attribute<?, ?> attribute) {
+        return applyJavaMember(
+                attribute,
+                m -> f -> {
+                    if (m != null) {
+                        return m.getReturnType();
+                    }
+                    assert f != null;
+                    return f.getType();
+                }
+        );
+    }
+
+    /**
      * Returns an instance of the specified annotation class on the specified attribute's java member.
      *
      * @param attribute       the attribute.
