@@ -25,14 +25,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link JinahyaEntityManagerUtils}.
+ * Tests for {@link __EntityManagerUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class JinahyaEntityManagerUtils_Test {
+class __EntityManagerUtils_Test {
 
     @DisplayName("getInTransaction(manager, supplier, rollback)")
     @Nested
@@ -60,7 +60,7 @@ class JinahyaEntityManagerUtils_Test {
             doThrow(new IllegalStateException("transaction is not active")).when(transaction).rollback();
 
             final var thrown =
-                    catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> "v", false));
+                    catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> "v", false));
 
             assertThat(thrown)
                     .as("the commit failure is what the caller needs to see")
@@ -73,7 +73,7 @@ class JinahyaEntityManagerUtils_Test {
             final var cause = new OptimisticLockException("someone else won");
             when(transaction.isActive()).thenReturn(true);
 
-            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
                 throw cause;
             }, true));
 
@@ -86,7 +86,7 @@ class JinahyaEntityManagerUtils_Test {
             when(transaction.isActive()).thenReturn(true);
             final var boom = new AssertionError("a failing assertion inside a test");
 
-            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
                 throw boom;
             }, true));
 
@@ -99,7 +99,7 @@ class JinahyaEntityManagerUtils_Test {
         void __inactiveTransactionIsNotRolledBack() {
             when(transaction.isActive()).thenReturn(false);
 
-            catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
+            catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
                 throw new IllegalStateException("boom");
             }, true));
 
@@ -114,7 +114,7 @@ class JinahyaEntityManagerUtils_Test {
             when(transaction.isActive()).thenReturn(true);
             doThrow(cleanup).when(transaction).rollback();
 
-            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
                 throw cause;
             }, true));
 
@@ -129,7 +129,7 @@ class JinahyaEntityManagerUtils_Test {
             final var cleanup = new PersistenceException("cannot even tell");
             when(transaction.isActive()).thenThrow(cleanup);
 
-            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
                 throw cause;
             }, true));
 
@@ -142,7 +142,7 @@ class JinahyaEntityManagerUtils_Test {
         void __activeTransactionIsRolledBack() {
             when(transaction.isActive()).thenReturn(true);
 
-            catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
+            catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
                 throw new IllegalStateException("boom");
             }, false));
 
@@ -153,7 +153,7 @@ class JinahyaEntityManagerUtils_Test {
         @DisplayName("the happy path commits and returns")
         @Test
         void __commits() {
-            assertThat(JinahyaEntityManagerUtils.getInTransaction(manager, () -> "v", false)).isEqualTo("v");
+            assertThat(__EntityManagerUtils.getInTransaction(manager, () -> "v", false)).isEqualTo("v");
             verify(transaction).begin();
             verify(transaction).commit();
         }
@@ -161,7 +161,7 @@ class JinahyaEntityManagerUtils_Test {
         @DisplayName("rollback=true rolls back and returns")
         @Test
         void __rollsBack() {
-            assertThat(JinahyaEntityManagerUtils.getInTransaction(manager, () -> "v", true)).isEqualTo("v");
+            assertThat(__EntityManagerUtils.getInTransaction(manager, () -> "v", true)).isEqualTo("v");
             verify(transaction).rollback();
         }
     }
@@ -180,7 +180,7 @@ class JinahyaEntityManagerUtils_Test {
 
             // the unwrap succeeded; only the caller's own function failed, so that is what the
             // caller has to see -- not "failed to unwrap connection", which is a wrong diagnosis
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 throw boom;
             })).isSameAs(boom);
         }
@@ -196,7 +196,7 @@ class JinahyaEntityManagerUtils_Test {
             // capture separately, so the count is asserted even when the type assertion fails
             Throwable thrown = null;
             try {
-                JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+                __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                     calls.incrementAndGet();
                     throw new IllegalStateException("boom");
                 });
@@ -216,7 +216,7 @@ class JinahyaEntityManagerUtils_Test {
             final var connection = mock(Connection.class);
             when(manager.unwrap(Connection.class)).thenReturn(connection);
 
-            final String result = JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> "ok");
+            final String result = __EntityManagerUtils.applyUnwrappedConnection(manager, c -> "ok");
             assertThat(result).isEqualTo("ok");
         }
 
@@ -227,10 +227,10 @@ class JinahyaEntityManagerUtils_Test {
             when(manager.unwrap(Connection.class)).thenThrow(new IllegalArgumentException("no Connection here"));
             final var calls = new AtomicInteger();
 
-            // the fallback goes through JinahyaHibernateUtils; Hibernate IS on this module's test
+            // the fallback goes through ___HibernateUtils; Hibernate IS on this module's test
             // classpath (a root active-by-default test profile supplies it), but unwrap(Session.class)
             // is unstubbed and returns null, so the reflective call fails before reaching the function
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 calls.incrementAndGet();
                 return "unreachable";
             }))
@@ -246,7 +246,7 @@ class JinahyaEntityManagerUtils_Test {
         void __notAppliedTwiceEvenWhenTheFallbackWouldReachIt() throws Exception {
             // Hibernate is on the test classpath, so wire a Session whose doReturningWork actually
             // invokes the ReturningWork -- that is the path which used to apply the function a
-            // SECOND time (JinahyaHibernateUtils:79) after the first one threw.
+            // SECOND time (___HibernateUtils.applyConnection) after the first one threw.
             final Class<?> sessionClass;
             try {
                 sessionClass = Class.forName("org.hibernate.Session");
@@ -275,7 +275,7 @@ class JinahyaEntityManagerUtils_Test {
             final var calls = new AtomicInteger();
             Throwable thrown = null;
             try {
-                JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+                __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                     calls.incrementAndGet();
                     throw new IllegalStateException("boom");
                 });
@@ -317,7 +317,7 @@ class JinahyaEntityManagerUtils_Test {
             ).when(manager).unwrap(sessionClass);
 
             final var seen = new AtomicInteger();
-            final String result = JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            final String result = __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 seen.incrementAndGet();
                 assertThat(c).isSameAs(fallbackConnection);
                 return "from-fallback";
@@ -334,7 +334,7 @@ class JinahyaEntityManagerUtils_Test {
             when(manager.unwrap(Connection.class)).thenReturn(null);
             final var calls = new AtomicInteger();
 
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 calls.incrementAndGet();
                 return "unreachable";
             })).isInstanceOf(RuntimeException.class);

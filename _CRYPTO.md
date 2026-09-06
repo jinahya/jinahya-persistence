@@ -233,7 +233,7 @@ anyway — one key per row is a KMS problem, not a design.
   as a workaround from `jinahya-persistence-more` rather than chosen. **[verified]** all
   nine annotations can be removed with 66/66 tests still green on both Hibernate and
   EclipseLink, so nothing here depends on field access — but it also means
-  `JinahyaAttributeUtils.getSetter` and its `SetterKey` caching, which exist solely for
+  `__AttributeUtils.getSetter` and its `SetterKey` caching, which exist solely for
   property-access entities, are exercised by no test in this module.
 - **Concurrency.** `managedTypes`/`mappings` are `ConcurrentHashMap` and `resolve` uses
   `putIfAbsent`, so the caches look sound, but nothing tests concurrent first-use.

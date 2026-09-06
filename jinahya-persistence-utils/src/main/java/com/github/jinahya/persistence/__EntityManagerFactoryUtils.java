@@ -5,39 +5,35 @@ import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
 import org.jspecify.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 /**
  * A utility class for {@link EntityManagerFactory}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public final class JinahyaEntityManagerFactoryUtils {
-
-    private static final Map<EntityManagerFactory, PersistenceUnitUtil> PERSISTENCE_UNIT_UTILS =
-            Collections.synchronizedMap(new WeakHashMap<>());
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
+public final class __EntityManagerFactoryUtils {
 
     /**
-     * Returns the {@link PersistenceUnitUtil} of the specified entity manager factory, caching it, weakly, against the
-     * {@code factory}.
+     * Returns the {@link PersistenceUnitUtil} of the specified entity manager factory.
      *
      * @param factory the entity manager factory whose {@link PersistenceUnitUtil} is returned.
      * @return the {@link PersistenceUnitUtil} of the {@code factory}.
+     * @implNote This used to memoize the result in a {@code WeakHashMap} keyed by the {@code factory}. The
+     *         memoization could never expire &mdash; a {@link PersistenceUnitUtil} holds its factory, so the value
+     *         strongly reached its own key and the entry outlived the factory it was supposed to track &mdash; and it
+     *         bought nothing, because both providers return an already-built instance from a field.
      * @see EntityManagerFactory#getPersistenceUnitUtil()
      */
     static PersistenceUnitUtil getPersistenceUnitUtil(final EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
-        return PERSISTENCE_UNIT_UTILS.computeIfAbsent(
-                factory,
-                EntityManagerFactory::getPersistenceUnitUtil
-        );
+        return factory.getPersistenceUnitUtil();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-//    private static final Map<Object, Object> IDENTIFIERS = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Returns the id of the specified entity.
@@ -55,33 +51,24 @@ public final class JinahyaEntityManagerFactoryUtils {
                                                 final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
-//        return (T) IDENTIFIERS.computeIfAbsent(
-//                entity,
-//                k -> getPersistenceUnitUtil(factory).getIdentifier(k)
-//        );
         return (Y) getPersistenceUnitUtil(factory).getIdentifier(entity);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private static final Map<EntityManagerFactory, Metamodel> METAMODELS =
-            Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
-     * Returns the {@link Metamodel} of the specified entity manager factory, caching it, weakly, against the
-     * {@code factory}.
+     * Returns the {@link Metamodel} of the specified entity manager factory.
      *
      * @param factory the entity manager factory whose {@link Metamodel} is returned.
      * @return the {@link Metamodel} of the {@code factory}.
-     * @apiNote The cache is a {@link java.util.WeakHashMap}, and does not keep the {@code factory} from being
-     *         garbage collected.
+     * @implNote Memoized here until it turned out that the memoization both leaked and paid for nothing; see
+     *         {@link #getPersistenceUnitUtil(EntityManagerFactory)}, whose cache had the same shape and was removed
+     *         for the same reasons.
      * @see EntityManagerFactory#getMetamodel()
      */
     public static Metamodel getMetamodel(final EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
-        return METAMODELS.computeIfAbsent(
-                factory,
-                EntityManagerFactory::getMetamodel
-        );
+        return factory.getMetamodel();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -89,7 +76,7 @@ public final class JinahyaEntityManagerFactoryUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private JinahyaEntityManagerFactoryUtils() {
+    private __EntityManagerFactoryUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

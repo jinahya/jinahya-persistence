@@ -14,14 +14,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link JinahyaAttributeUtils}.
+ * Tests for {@link __AttributeUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class JinahyaAttributeUtils_Test {
+class __AttributeUtils_Test {
 
     // a mapped-superclass-shaped root: one attribute, inherited by two subclasses
     public static class Root {
@@ -87,13 +87,13 @@ class JinahyaAttributeUtils_Test {
 
             // the overriding subclass first, so its own setValue is what gets resolved (and cached)
             final var overriding = new Overriding();
-            JinahyaAttributeUtils.setAttributeValue(overriding, attribute, "a");
+            __AttributeUtils.setAttributeValue(overriding, attribute, "a");
             assertThat(overriding.getValue()).isEqualTo("overridden:a");
 
             // then a sibling which does NOT override: a write method cached from the other subclass
             // cannot be invoked on this one
             final var plain = new Plain();
-            JinahyaAttributeUtils.setAttributeValue(plain, attribute, "b");
+            __AttributeUtils.setAttributeValue(plain, attribute, "b");
             assertThat(plain.getValue()).isEqualTo("b");
         }
 
@@ -102,7 +102,7 @@ class JinahyaAttributeUtils_Test {
         void __readOnlyPropertyIsReported() throws Exception {
             final var attribute = attributeNamed("value", String.class, ReadOnly.class.getMethod("getValue"));
 
-            assertThatThrownBy(() -> JinahyaAttributeUtils.setAttributeValue(new ReadOnly(), attribute, "x"))
+            assertThatThrownBy(() -> __AttributeUtils.setAttributeValue(new ReadOnly(), attribute, "x"))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("no setter")
                     .isNotInstanceOf(NullPointerException.class);
@@ -114,10 +114,10 @@ class JinahyaAttributeUtils_Test {
             final var attribute = attributeNamed("value", String.class, Root.class.getMethod("getValue"));
             final var root = new Root();
 
-            JinahyaAttributeUtils.setAttributeValue(root, attribute, "v");
+            __AttributeUtils.setAttributeValue(root, attribute, "v");
 
             assertThat(root.getValue()).isEqualTo("v");
-            assertThat(JinahyaAttributeUtils.getAttributeValue(root, attribute)).isEqualTo("v");
+            assertThat(__AttributeUtils.getAttributeValue(root, attribute)).isEqualTo("v");
         }
     }
 }

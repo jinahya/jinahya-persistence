@@ -17,17 +17,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link JinahyaEntityTypeUtils}.
+ * Tests for {@link __EntityTypeUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class JinahyaEntityTypeUtils_Test {
+class __EntityTypeUtils_Test {
 
-    // each test uses a class of its own: the lookups are backed by static caches keyed by class,
-    // so sharing one would let an earlier test's result answer a later one
+    // a class per test. The lookups no longer memoize anything, so this is no longer load-bearing, but it
+    // keeps each case reading against a model of its own
     private static class Alpha {
 
     }
@@ -72,7 +72,7 @@ class JinahyaEntityTypeUtils_Test {
 
             // Metamodel.managedType throws for a class it does not manage -- it never returns null --
             // so a lookup which does not catch that stops at the first factory instead of trying the rest
-            final var actual = JinahyaEntityTypeUtils.getManagedType(
+            final var actual = __EntityTypeUtils.getManagedType(
                     Alpha.class,
                     List.of(knowingNothing(), knowing(Alpha.class, expected))
             );
@@ -86,7 +86,7 @@ class JinahyaEntityTypeUtils_Test {
             final var first = mock(ManagedType.class);
             final var second = mock(ManagedType.class);
 
-            final var actual = JinahyaEntityTypeUtils.getManagedType(
+            final var actual = __EntityTypeUtils.getManagedType(
                     Bravo.class,
                     List.of(knowing(Bravo.class, first), knowing(Bravo.class, second))
             );
@@ -97,7 +97,7 @@ class JinahyaEntityTypeUtils_Test {
         @DisplayName("no factory knowing the class -> IllegalArgumentException")
         @Test
         void _IllegalArgumentException_WhenNobodyKnowsIt() {
-            assertThatThrownBy(() -> JinahyaEntityTypeUtils.getManagedType(
+            assertThatThrownBy(() -> __EntityTypeUtils.getManagedType(
                     Charlie.class,
                     List.of(knowingNothing(), knowingNothing())
             )).isInstanceOf(IllegalArgumentException.class);

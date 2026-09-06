@@ -49,7 +49,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class JinahyaAttributeUtils {
+public final class __AttributeUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -147,9 +147,9 @@ public final class JinahyaAttributeUtils {
                             throw new RuntimeException(
                                     """
                                             failed to get value
-                                            "; entity: %1$s
-                                            "; attribute: %2$s
-                                            "; method: %3$s"""
+                                            ; entity: %1$s
+                                            ; attribute: %2$s
+                                            ; method: %3$s"""
                                             .formatted(entity.getClass().getName(), attribute.getName(), m),
                                     roe
                             );
@@ -165,9 +165,9 @@ public final class JinahyaAttributeUtils {
                         throw new RuntimeException(
                                 """
                                         failed to get value
-                                        "; entity: %1$s
-                                        "; attribute: %2$s
-                                        "; field: %3$s"""
+                                        ; entity: %1$s
+                                        ; attribute: %2$s
+                                        ; field: %3$s"""
                                         .formatted(entity.getClass().getName(), attribute.getName(), f),
                                 roe
                         );
@@ -202,7 +202,12 @@ public final class JinahyaAttributeUtils {
      *                          {@code attribute}.
      * @implNote {@link Introspector} reports only {@code public} write methods, while Jakarta Persistence 3.2
      *         &sect;2.2 permits a {@code protected} property accessor; a declared-method scan up the hierarchy covers
-     *         that before giving up.
+     *         that before giving up. This is the one lookup here still memoized, deliberately: unlike a metamodel
+     *         lookup, introspecting a bean and then scanning its hierarchy is not cheap, and the key pairs a class
+     *         with an attribute of that class, so the map is bounded by the mapped model rather than by traffic. The
+     *         cost is that the entries, and so the classes they name, live as long as the class holding this map
+     *         &mdash; which is only visible to a container that unloads the persistence classes without unloading
+     *         this one.
      * @see Introspector#getBeanInfo(Class)
      */
     private static Method getSetter(final Class<?> clazz, final Attribute<?, ?> attribute) {
@@ -331,7 +336,7 @@ public final class JinahyaAttributeUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private JinahyaAttributeUtils() {
+    private __AttributeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

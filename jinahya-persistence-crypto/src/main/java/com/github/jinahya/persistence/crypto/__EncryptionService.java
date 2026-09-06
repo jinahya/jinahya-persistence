@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.crypto;
 
-import com.github.jinahya.persistence.metamodel.JinahyaAttributeUtils;
+import com.github.jinahya.persistence.metamodel.__AttributeUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
@@ -332,7 +332,7 @@ public abstract class __EncryptionService {
             // an override supplies its own @Column, with its own defaults; it replaces the member's, never merges
             return rulesOf(override.column(), "@AttributeOverride(\"" + override.name() + "\")");
         }
-        final var column = JinahyaAttributeUtils.getJavaMemberAnnotation(attribute, Column.class);
+        final var column = __AttributeUtils.getJavaMemberAnnotation(attribute, Column.class);
         return column == null
                 ? new ColumnRules(MappingFlag.YES, MappingFlag.YES, MappingFlag.YES, "@Column defaults")
                 : rulesOf(column, "@Column");
@@ -402,7 +402,7 @@ public abstract class __EncryptionService {
         for (final var decryptedAttribute : attributes.values()) {
             final var persistentAttributeType = decryptedAttribute.getPersistentAttributeType();
             final var annotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
+                    __AttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
             if (persistentAttributeType == Attribute.PersistentAttributeType.EMBEDDED) {
                 if (annotation != null) {
                     throw reject(rootType, embeddingPath, decryptedAttribute, null,
@@ -487,7 +487,7 @@ public abstract class __EncryptionService {
                 throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                              "an encrypted attribute has to be optional");
             }
-            if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, __EncryptedAttribute.class) != null) {
+            if (__AttributeUtils.getJavaMemberAnnotation(encryptedAttribute, __EncryptedAttribute.class) != null) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                              "an encrypted attribute cannot itself be annotated with @__EncryptedAttribute");
             }
@@ -620,7 +620,7 @@ public abstract class __EncryptionService {
      */
     private void encrypt(final String encryptionIdentifier, final Object object, final Mapping mapping) {
         for (final var embedded : mapping.embeddeds()) {
-            final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
+            final var embeddedValue = __AttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
                 encrypt(encryptionIdentifier, embeddedValue, embedded.mapping());
             }
@@ -628,14 +628,14 @@ public abstract class __EncryptionService {
         for (final var pair : mapping.pairs()) {
             final var decryptedAttribute = pair.decrypted();
             final var encryptedAttribute = pair.encrypted();
-            final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
+            final var decryptedValue = __AttributeUtils.getAttributeValue(object, decryptedAttribute);
             if (decryptedValue == null) {
-                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
+                final var encryptedValue = __AttributeUtils.getAttributeValue(object, encryptedAttribute);
                 if (encryptedValue != null) {
                     // already encrypted
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
+                __AttributeUtils.setAttributeValue(object, encryptedAttribute, null);
                 continue;
             }
             final byte[] decryptedBytes;
@@ -725,8 +725,8 @@ public abstract class __EncryptionService {
                 throw new RuntimeException(
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
             }
-            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, encrypted);
-            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
+            __AttributeUtils.setAttributeValue(object, encryptedAttribute, encrypted);
+            __AttributeUtils.setAttributeValue(object, decryptedAttribute, null);
         }
     }
 
@@ -772,7 +772,7 @@ public abstract class __EncryptionService {
      */
     private void decrypt(final String encryptionIdentifier, final Object object, final Mapping mapping) {
         for (final var embedded : mapping.embeddeds()) {
-            final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
+            final var embeddedValue = __AttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
                 decrypt(encryptionIdentifier, embeddedValue, embedded.mapping());
             }
@@ -780,14 +780,14 @@ public abstract class __EncryptionService {
         for (final var pair : mapping.pairs()) {
             final var decryptedAttribute = pair.decrypted();
             final var encryptedAttribute = pair.encrypted();
-            final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
+            final var encryptedBytes = (byte[]) __AttributeUtils.getAttributeValue(object, encryptedAttribute);
             if (encryptedBytes == null) {
-                final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
+                final var decryptedValue = __AttributeUtils.getAttributeValue(object, decryptedAttribute);
                 if (decryptedValue != null) {
                     // the encrypted column may be defined later
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
+                __AttributeUtils.setAttributeValue(object, decryptedAttribute, null);
                 continue;
             }
             final var decryptedBytes = encryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
@@ -887,8 +887,8 @@ public abstract class __EncryptionService {
                         e
                 );
             }
-            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, decryptedValue);
-            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
+            __AttributeUtils.setAttributeValue(object, decryptedAttribute, decryptedValue);
+            __AttributeUtils.setAttributeValue(object, encryptedAttribute, null);
         }
     }
 

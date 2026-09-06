@@ -23,28 +23,25 @@ package com.github.jinahya.persistence.metamodel;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.ManagedType;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
 /**
  * A utility class for {@link ManagedType}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see JinahyaEntityTypeUtils
+ * @see __EntityTypeUtils
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class JinahyaManagedTypeUtils {
+public final class __ManagedTypeUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
-    static final Map<Class<?>, ManagedType<?>> MANAGED_TYPES = new ConcurrentHashMap<>();
 
     /**
      * Returns the {@link ManagedType} of the specified type class, from the first of the specified entity manager
-     * factories which knows it, caching the result against the {@code typeClass}.
+     * factories which knows it.
      *
      * @param typeClass              the class whose {@link ManagedType} is returned; it does not have to be an entity
      *                               class.
@@ -52,6 +49,11 @@ public final class JinahyaManagedTypeUtils {
      * @param <X>                    represented type
      * @return the {@link ManagedType} of the {@code typeClass}.
      * @throws IllegalArgumentException when none of the {@code entityManagerFactories} manages the {@code typeClass}.
+     * @implNote The result used to be memoized in a {@code static} map keyed by the {@code typeClass} alone. That
+     *         cache answered a later call from a <em>different</em> set of factories with the first caller's factory,
+     *         and, being keyed by a {@link Class} and never evicted, pinned the application's classes for the life of
+     *         the JVM. The lookup it saved is a map lookup inside the provider's metamodel, so it is now performed on
+     *         each call.
      * @see jakarta.persistence.metamodel.Metamodel#managedType(Class)
      */
     public static <X> ManagedType<X> getManagedType(
@@ -59,25 +61,20 @@ public final class JinahyaManagedTypeUtils {
             final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
         Objects.requireNonNull(typeClass, "typeClass is null");
         Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
-        @SuppressWarnings({"unchecked"})
-        final var managedType = (ManagedType<X>) MANAGED_TYPES.computeIfAbsent(
-                typeClass,
-                k -> StreamSupport.stream(entityManagerFactories.spliterator(), false)
-                        .map(EntityManagerFactory::getMetamodel)
-                        .map(m -> {
-                            try {
-                                return m.managedType(typeClass);
-                            } catch (final IllegalArgumentException iae) {
-                                return null;
-                            }
-                        })
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .orElseThrow(
-                                () -> new IllegalArgumentException(
-                                        "no entity type found for entity class: " + typeClass)
-                        ));
-        return managedType;
+        return StreamSupport.stream(entityManagerFactories.spliterator(), false)
+                .map(EntityManagerFactory::getMetamodel)
+                .map(m -> {
+                    try {
+                        return m.<X>managedType(typeClass);
+                    } catch (final IllegalArgumentException iae) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(
+                        () -> new IllegalArgumentException("no managed type found for type class: " + typeClass)
+                );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -85,7 +82,7 @@ public final class JinahyaManagedTypeUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private JinahyaManagedTypeUtils() {
+    private __ManagedTypeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

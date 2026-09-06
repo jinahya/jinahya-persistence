@@ -17,7 +17,10 @@ import static java.lang.System.Logger.Level;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public final class JinahyaEntityManagerUtils {
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
+public final class __EntityManagerUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -31,15 +34,15 @@ public final class JinahyaEntityManagerUtils {
      * @param entity  the entity instance whose id is returned.
      * @param <Y>     identifier type parameter
      * @return the id of the {@code entity}; {@code null} when the {@code entity} does not yet have an id.
-     * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
-     * @deprecated Use {@link JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)}, with the
+     * @see __EntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
+     * @deprecated Use {@link __EntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)}, with the
      *         {@link EntityManager#getEntityManagerFactory() entityManagerFactory} of the {@code manager}, instead.
      */
     @Deprecated(forRemoval = true)
     public static <Y> @Nullable Y getIdentifier(final EntityManager manager,
                                                 final Object entity) {
         Objects.requireNonNull(manager, "manager is null");
-        return JinahyaEntityManagerFactoryUtils.getIdentifier(
+        return __EntityManagerFactoryUtils.getIdentifier(
                 manager.getEntityManagerFactory(),
                 entity
         );
@@ -183,7 +186,7 @@ public final class JinahyaEntityManagerUtils {
      * @apiNote this method does not close the unwrapped connection. A {@code manager} which is not joined to a
      *         transaction is logged, at {@link System.Logger.Level#WARNING WARNING}, and otherwise accepted.
      * @implNote An exception thrown by the {@code function} itself propagates unchanged; only a failure to
-     *         <em>obtain</em> the connection falls back to {@link JinahyaHibernateUtils}. Note that the fallback route
+     *         <em>obtain</em> the connection falls back to {@link ___HibernateUtils}. Note that the fallback route
      *         still acquires and applies in one step, so a {@code function} which throws there is wrapped rather than
      *         propagated.
      */
@@ -207,7 +210,7 @@ public final class JinahyaEntityManagerUtils {
         } catch (final Exception e1) {
             logger.log(Level.DEBUG, "failed to unwrap connection from " + manager, e1);
             try {
-                return JinahyaHibernateUtils.applyConnection(
+                return ___HibernateUtils.applyConnection(
                         manager,
                         function
                 );
@@ -278,7 +281,7 @@ public final class JinahyaEntityManagerUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private JinahyaEntityManagerUtils() {
+    private __EntityManagerUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }
