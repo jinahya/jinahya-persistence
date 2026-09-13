@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-class __PersisterLocator_Test {
+class __PersisterUtils_Convention_Test {
 
 //SEP:a sibling persister, of either postfix
 
@@ -34,19 +34,8 @@ class __PersisterLocator_Test {
         }
     }
 
-//SEP:a persister nested in its own entity class
-
-    static class Nesting {
-
-        static class NestingPersister extends __Persister<Nesting> {
-
-            NestingPersister() {
-                super(Nesting.class);
-            }
-        }
-    }
-
-//SEP:a persister nested in the persister of the enclosing class
+//SEP:a nested entity class, whose counterpart is nested in the counterpart of its enclosing class:
+//SEP:an arrangement the convention deliberately does not consult
 
     static class Outer {
 
@@ -76,34 +65,28 @@ class __PersisterLocator_Test {
     }
 
     // ---------------------------------------------------------------------------------------------------------------------
-    @DisplayName("STANDARD.apply(Ent.class) -> EntPersister")
+    @DisplayName("locateStandard(Ent.class) -> EntPersister")
     @Test
     void standard_EntPersister_Ent() {
-        assertThat(__PersisterLocator.STANDARD.apply(Ent.class)).isSameAs(EntPersister.class);
+        assertThat(__PersisterUtils.locateStandard(Ent.class)).isSameAs(EntPersister.class);
     }
 
-    @DisplayName("STANDARD.apply(Underscored.class) -> Underscored_Persister")
+    @DisplayName("locateStandard(Underscored.class) -> Underscored_Persister")
     @Test
     void standard_UnderscoredPersister_Underscored() {
-        assertThat(__PersisterLocator.STANDARD.apply(Underscored.class)).isSameAs(Underscored_Persister.class);
+        assertThat(__PersisterUtils.locateStandard(Underscored.class)).isSameAs(Underscored_Persister.class);
     }
 
-    @DisplayName("STANDARD.apply(Nesting.class) -> Nesting$NestingPersister")
-    @Test
-    void standard_NestedPersister_Nesting() {
-        assertThat(__PersisterLocator.STANDARD.apply(Nesting.class)).isSameAs(Nesting.NestingPersister.class);
-    }
-
-    @DisplayName("STANDARD.apply(Outer.Inner.class) -> null;"
-                 + " unlike the other locators, the enclosing chain is not consulted")
+    @DisplayName("locateStandard(Outer.Inner.class) -> null;"
+                 + " the enclosing chain is not consulted, so a nested entity class has no persister")
     @Test
     void standard_Null_EnclosingChainNotConsulted() {
-        assertThat(__PersisterLocator.STANDARD.apply(Outer.Inner.class)).isNull();
+        assertThat(__PersisterUtils.locateStandard(Outer.Inner.class)).isNull();
     }
 
-    @DisplayName("STANDARD.apply(Bare.class) -> null")
+    @DisplayName("locateStandard(Bare.class) -> null")
     @Test
     void standard_Null_Bare() {
-        assertThat(__PersisterLocator.STANDARD.apply(Bare.class)).isNull();
+        assertThat(__PersisterUtils.locateStandard(Bare.class)).isNull();
     }
 }

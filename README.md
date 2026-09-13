@@ -139,7 +139,7 @@ versions below are what the current platform (`11.0.0`) resolves to.
 | `jinahya-persistence-more` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-crypto` | `io.github.jinahya:jinahya-persistence-utils` | — | `jakarta.annotation:jakarta.annotation-api` 3.0.0<br>`jakarta.enterprise:jakarta.enterprise.cdi-api` 4.1.0<br>`jakarta.inject:jakarta.inject-api` 2.0.1<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-more-test` | — | — | `io.github.jinahya:jinahya-persistence-more`<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1<br>`org.junit.jupiter:junit-jupiter-api` 5.14.4 |
-| `jinahya-persistence-test-utils` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.jeasy:easy-random-core` 5.0.0<br>`org.jeasy:easy-random-bean-validation` 5.0.0<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
+| `jinahya-persistence-test-utils` | — | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.0<br>`org.jeasy:easy-random` 6.0.1<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
 
 `jakarta.persistence-api` and `jspecify` are declared once, in the root pom, and inherited by every module; the rest are
 declared by the module which uses them.

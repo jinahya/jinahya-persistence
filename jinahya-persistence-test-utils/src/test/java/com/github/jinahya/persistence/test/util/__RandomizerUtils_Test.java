@@ -44,6 +44,75 @@ class __RandomizerUtils_Test {
         }
     }
 
+//SEP:producer covariance -- a randomizer is located by name, then checked against the class it is declared for
+
+    /**
+     * A superclass whose conventionally named randomizer is declared for a subclass of it, which a randomizer of the
+     * superclass may be: every instance it produces is a {@code Sup}.
+     */
+    static class Sup {
+
+    }
+
+    static class Sub extends Sup {
+
+    }
+
+    static class SupRandomizer extends __Randomizer<Sub> {
+
+        SupRandomizer() {
+            super(Sub.class, List.of());
+        }
+
+        @Override
+        public Sub get() {
+            return new Sub();
+        }
+    }
+
+    /**
+     * A class whose conventionally named randomizer is declared for its superclass, which can not produce instances of
+     * it.
+     */
+    static class Narrowed extends Sup {
+
+    }
+
+    static class NarrowedRandomizer extends __Randomizer<Sup> {
+
+        NarrowedRandomizer() {
+            super(Sup.class, List.of());
+        }
+
+        @Override
+        public Sup get() {
+            return new Sup();
+        }
+    }
+
+    /**
+     * A class whose conventionally named randomizer is declared for an unrelated class.
+     */
+    static class Unrelated {
+
+    }
+
+    static class Foreign {
+
+    }
+
+    static class UnrelatedRandomizer extends __Randomizer<Foreign> {
+
+        UnrelatedRandomizer() {
+            super(Foreign.class, List.of());
+        }
+
+        @Override
+        public Foreign get() {
+            return new Foreign();
+        }
+    }
+
     // ---------------------------------------------------------------------------------------------------------------------
     @DisplayName("moreExcludedFields(a, b) -> a, then b, as they are")
     @Test
@@ -79,5 +148,31 @@ class __RandomizerUtils_Test {
         assertThat(__RandomizerUtils.newRandomizedInstanceOf(Bean.class))
                 .isPresent()
                 .containsInstanceOf(Bean.class);
+    }
+
+    @DisplayName("newRandomizedInstanceOf(Sup.class) -> present; a randomizer declared for a subclass produces a Sup")
+    @Test
+    void newRandomizedInstanceOf_Present_RandomizerOfSubclass() {
+        assertThat(__RandomizerUtils.newRandomizedInstanceOf(Sup.class))
+                .isPresent()
+                .containsInstanceOf(Sub.class);
+    }
+
+    @DisplayName("newRandomizedInstanceOf(Narrowed.class) -> RuntimeException;"
+                 + " NarrowedRandomizer was provided, so producing a Sup is a fault, not an absence")
+    @Test
+    void newRandomizedInstanceOf_RuntimeException_RandomizerProducesASuperclass() {
+        assertThatThrownBy(() -> __RandomizerUtils.newRandomizedInstanceOf(Narrowed.class))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessageContaining("produced a");
+    }
+
+    @DisplayName("newRandomizedInstanceOf(Unrelated.class) -> RuntimeException;"
+                 + " UnrelatedRandomizer was provided, so producing a Foreign is a fault, not an absence")
+    @Test
+    void newRandomizedInstanceOf_RuntimeException_RandomizerProducesAnUnrelatedClass() {
+        assertThatThrownBy(() -> __RandomizerUtils.newRandomizedInstanceOf(Unrelated.class))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessageContaining("produced a");
     }
 }

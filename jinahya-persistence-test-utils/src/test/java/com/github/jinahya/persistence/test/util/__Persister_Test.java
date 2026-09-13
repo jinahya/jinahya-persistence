@@ -32,5 +32,7 @@ class __Persister_Test {
         final var persister = new EntityPersister();
         assertThat(persister.apply(entityManager, entityInstance)).isSameAs(entityInstance);
         Mockito.verify(entityManager, Mockito.times(1)).persist(entityInstance);
+        // the "does not flush" contract of apply(EntityManager, Object); a caller batches, then flushes once
+        Mockito.verify(entityManager, Mockito.never()).flush();
     }
 }

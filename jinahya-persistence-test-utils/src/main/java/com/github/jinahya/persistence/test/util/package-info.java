@@ -5,11 +5,11 @@
  * {@link com.github.jinahya.persistence.test.util.__Instantiator instantiator}, a
  * {@link com.github.jinahya.persistence.test.util.__Randomizer randomizer}, and a
  * {@link com.github.jinahya.persistence.test.util.__Persister persister}, each of which is located, for the target
- * class, by a corresponding locator; see
- * {@link com.github.jinahya.persistence.test.util.__InstantiatorLocator#STANDARD},
- * {@link com.github.jinahya.persistence.test.util.__RandomizerLocator#STANDARD}, and
- * {@link com.github.jinahya.persistence.test.util.__PersisterLocator#STANDARD} for the naming conventions applied, and
- * specify a custom locator for classes which do not follow them.
+ * class, by a naming convention; see
+ * {@link com.github.jinahya.persistence.test.util.__InstantiatorUtils#locateStandard(java.lang.Class)},
+ * {@link com.github.jinahya.persistence.test.util.__RandomizerUtils#locateStandard(java.lang.Class)}, and
+ * {@link com.github.jinahya.persistence.test.util.__PersisterUtils#locateStandard(java.lang.Class)} for the conventions
+ * applied.
  *
  * <h2>The three roles</h2>
  * <dl>
@@ -20,25 +20,30 @@
  *   <dt>{@link com.github.jinahya.persistence.test.util.__Randomizer}</dt>
  *   <dd>Fills an instance with random values, excluding the fields it is told to leave alone. Required by
  *       {@link com.github.jinahya.persistence.test.util.__PersisterUtils}; pick
- *       {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfPodam} to keep the instantiator in play, or
- *       {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfEasyRandomBean} to honor bean validation
- *       constraints.</dd>
+ *       {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfPodam} to keep the instantiator in play, and
+ *       for the {@code jakarta.validation.constraints} it honors out of the box, or
+ *       {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfInstancio} to keep the instantiator in play
+ *       for a class which declares no accessors, which PODAM would leave entirely unpopulated. The other two flavors,
+ *       {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfEasyRandom} and
+ *       {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfFixtureMonkey}, construct the instance
+ *       themselves, and so ignore the instantiator. Of the four, Easy Random 6 is the one which can honor no Jakarta
+ *       constraint at all.</dd>
  *   <dt>{@link com.github.jinahya.persistence.test.util.__Persister}</dt>
  *   <dd>Persists an instance with an {@link jakarta.persistence.EntityManager}. Override it for an entity whose
  *       required associations have to be persisted first.</dd>
  * </dl>
  *
  * <h2>Conventions</h2>
- * For a target class {@code Foo}, each standard locator probes {@code FooRandomizer} and {@code Foo_Randomizer}, as a
- * sibling of {@code Foo}, then {@code Foo$FooRandomizer} and {@code Foo$Foo_Randomizer}, nested inside {@code Foo};
- * likewise for {@code Instantiator} and {@code Persister}. A randomizer may also be named by a
- * {@link com.github.jinahya.persistence.test.util.__RandomizerClass @__RandomizerClass} annotation, which takes precedence
- * over the convention.
+ * For a target class {@code Foo}, the convention probes {@code FooRandomizer} and then {@code Foo_Randomizer}, both
+ * declared beside {@code Foo}; likewise for {@code Instantiator} and {@code Persister}. That is the whole rule, and
+ * it is the same for all three roles: a counterpart is a sibling of its target class. A class nested inside another,
+ * such as an {@code @Embeddable} identifier declared inside its entity, therefore has to be declared as a top-level
+ * class to have a counterpart of its own.
  *
  * <h2>Example</h2>
  * Given an entity class {@code Foo}, declare, in the test source set:
  * <pre>{@code
- * class FooRandomizer extends __Randomizer.___OfEasyRandomBean<Foo> {
+ * class FooRandomizer extends __Randomizer.___OfEasyRandom<Foo> {
  *     FooRandomizer() {
  *         super(Foo.class, List.of("id"));  // leave the generated identifier alone
  *     }

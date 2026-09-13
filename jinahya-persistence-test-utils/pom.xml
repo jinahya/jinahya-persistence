@@ -19,16 +19,48 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- org.jeasy.random.EasyRandom, .EasyRandomParameters, and .FieldPredicates -->
+    <!-- the persistence unit under src/test/resources; the provider itself comes from the __* profiles -->
     <dependency>
-      <groupId>org.jeasy</groupId>
-      <artifactId>easy-random-core</artifactId>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- jakarta.enterprise.context/inject, for the annotations on __PersistenceProducer;
+         no <version>: the umbrella BOM decides -->
+    <dependency>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- org.jboss.weld.junit5.*; starts a Weld SE container around the producer -->
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- lombok.* on test sources only; the processor itself is already on the root pom's
+         <annotationProcessorPaths>, which the default-testCompile execution inherits -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- com.navercorp.fixturemonkey.FixtureMonkey, .ArbitraryBuilder, and the api.* introspector/property types -->
+    <dependency>
+      <groupId>com.navercorp.fixturemonkey</groupId>
+      <artifactId>fixture-monkey</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- org.jeasy.random.validation.BeanValidationRandomizerRegistry, registered through the ServiceLoader -->
+    <!-- org.instancio.Instancio, .InstancioObjectApi, .Select, and .settings.Settings -->
+    <dependency>
+      <groupId>org.instancio</groupId>
+      <artifactId>instancio-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- org.jeasy.random.EasyRandom, .EasyRandomParameters, and .FieldPredicates; 6.x is one artifact -->
     <dependency>
       <groupId>org.jeasy</groupId>
-      <artifactId>easy-random-bean-validation</artifactId>
+      <artifactId>easy-random</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
