@@ -20,20 +20,21 @@ package com.github.jinahya.persistence.metamodel;
  * #L%
  */
 
-import com.github.jinahya.persistence.__EntityManagerFactoryUtils;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.metamodel.Metamodel;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 /**
  * A utility class for {@link EntityType}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote Both methods here look a type up across an {@link Iterable} of entity manager factories, and take
- *         the first match. Neither memoizes: a lookup which took the first match found for a class, whichever factories
+ * @apiNote The methods here look a type up across an {@link Iterable} of entity manager factories, and take
+ *         the first match. None memoizes: a lookup which took the first match found for a class, whichever factories
  *         a later caller passed, is not a cache but a wrong answer waiting for a second persistence unit.
  * @see __ManagedTypeUtils
  */
@@ -51,7 +52,10 @@ public final class __EntityTypeUtils {
      * @param entityManagerFactories an iterable of entity manager factories.
      * @param <X>                    represented entity type
      * @return the {@link ManagedType} of the {@code entityClass}.
+     * @deprecated A managed type is not an entity type, and this class is about entity types; use
+     *         {@link __ManagedTypeUtils#getManagedType(Class, Iterable)}, which this now merely calls.
      */
+    @Deprecated(forRemoval = true)
     public static <X> ManagedType<X> getManagedType(
             final Class<X> entityClass,
             final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
@@ -65,7 +69,73 @@ public final class __EntityTypeUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the {@link EntityType} of the specified entity class.
+     * Finds the {@link EntityType} of the specified entity class in the metamodel of the specified entity manager
+     * factory.
+     *
+     * @param entityClass          the entity class whose {@link EntityType} is returned.
+     * @param entityManagerFactory the entity manager factory to look the {@code entityClass} up in.
+     * @param <X>                  represented entity type
+     * @return an optional of the {@link EntityType} of the {@code entityClass}; {@link Optional#empty() empty} when the
+     *         {@code entityManagerFactory} does not map it as an entity.
+     * @implNote {@link Metamodel#entity(Class)} <em>throws</em> for a class it does not map as an entity; it
+     *         never returns {@code null}.
+     * @see Metamodel#entity(Class)
+     */
+    public static <X> Optional<EntityType<X>> findEntityType(final Class<X> entityClass,
+                                                             final EntityManagerFactory entityManagerFactory) {
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        try {
+            return Optional.of(entityManagerFactory.getMetamodel().entity(entityClass));
+        } catch (final IllegalArgumentException iae) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Finds the {@link EntityType} of the specified entity class, in the first of the specified entity manager
+     * factories which maps it as an entity.
+     *
+     * @param entityClass            the entity class whose {@link EntityType} is returned.
+     * @param entityManagerFactories an iterable of entity manager factories.
+     * @param <X>                    represented entity type
+     * @return an optional of the {@link EntityType} of the {@code entityClass}; {@link Optional#empty() empty} when
+     *         none of the {@code entityManagerFactories} maps it as an entity.
+     * @see #findEntityType(Class, EntityManagerFactory)
+     */
+    public static <X> Optional<EntityType<X>> findEntityType(
+            final Class<X> entityClass,
+            final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
+        return StreamSupport.stream(entityManagerFactories.spliterator(), false)
+                .map(f -> findEntityType(entityClass, f))
+                .flatMap(Optional::stream)
+                .findFirst();
+    }
+
+    /**
+     * Returns the {@link EntityType} of the specified entity class, from the metamodel of the specified entity manager
+     * factory.
+     *
+     * @param entityClass          the entity class whose {@link EntityType} is returned.
+     * @param entityManagerFactory the entity manager factory to look the {@code entityClass} up in.
+     * @param <X>                  represented entity type
+     * @return the {@link EntityType} of the {@code entityClass}.
+     * @throws IllegalArgumentException when the {@code entityManagerFactory} does not map the {@code entityClass} as an
+     *                                  entity.
+     * @see #findEntityType(Class, EntityManagerFactory)
+     */
+    public static <X> EntityType<X> getEntityType(final Class<X> entityClass,
+                                                  final EntityManagerFactory entityManagerFactory) {
+        return findEntityType(entityClass, entityManagerFactory).orElseThrow(
+                () -> new IllegalArgumentException("no entity type found for entity class: " + entityClass)
+        );
+    }
+
+    /**
+     * Returns the {@link EntityType} of the specified entity class, from the first of the specified entity manager
+     * factories which maps it as an entity.
      *
      * @param entityClass            the entity class whose {@link EntityType} is returned.
      * @param entityManagerFactories an iterable of entity manager factories.
@@ -73,26 +143,14 @@ public final class __EntityTypeUtils {
      * @return the {@link EntityType} of the {@code entityClass}.
      * @throws IllegalArgumentException when none of the {@code entityManagerFactories} maps the {@code entityClass} as
      *                                  an entity.
+     * @see #findEntityType(Class, Iterable)
      */
     public static <X> EntityType<X> getEntityType(
             final Class<X> entityClass,
             final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
-        return StreamSupport.stream(entityManagerFactories.spliterator(), false)
-                .map(__EntityManagerFactoryUtils::getMetamodel)
-                .map(m -> {
-                    try {
-                        return m.entity(entityClass);
-                    } catch (final IllegalArgumentException iae) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(
-                        () -> new IllegalArgumentException("no entity type found for entity class: " + entityClass)
-                );
+        return findEntityType(entityClass, entityManagerFactories).orElseThrow(
+                () -> new IllegalArgumentException("no entity type found for entity class: " + entityClass)
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

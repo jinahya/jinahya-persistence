@@ -279,12 +279,19 @@ public abstract class __MappedHsl extends ___MappedHueColor {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The saturation component of this color, normalized, mapped to the {@value #COLUMN_NAME_SATURATION} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_SATURATION, nullable = false, insertable = true, updatable = true)
     private double saturation;
 
+    /**
+     * The lightness component of this color, normalized, mapped to the {@value #COLUMN_NAME_LIGHTNESS} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)

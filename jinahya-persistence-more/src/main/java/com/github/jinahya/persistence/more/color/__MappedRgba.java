@@ -142,6 +142,11 @@ public abstract class __MappedRgba extends __MappedRgb {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The alpha of this color, normalized, mapped to the {@value #COLUMN_NAME_ALPHA} column. Not a component; it
+     * defaults to fully opaque.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)

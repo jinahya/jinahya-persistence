@@ -34,10 +34,10 @@
     <class>com.github.jinahya.persistence.more.color._CmykEntity</class>
     <class>com.github.jinahya.persistence.more.color._PropertyAccessRgbaEntity</class>
     <class>com.github.jinahya.persistence.more.color._OverriddenHslEntity</class>
-    <class>com.github.jinahya.persistence.more._ConvertedEntity</class>
+    <class>com.github.jinahya.persistence.more.converter._ConvertedEntity</class>
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
-    <class>com.github.jinahya.persistence.more.__StringAttributeConverter$OfBigDecimal</class>
+    <class>com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverters$OfBigDecimal</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <!-- so that the @DecimalMin/@DecimalMax on every component are actually evaluated -->

@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.test;
 
-import com.github.jinahya.persistence.more.__JoinedStringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.__JoinedStringAttributeConverter;
 
 import java.util.List;
 import java.util.Objects;

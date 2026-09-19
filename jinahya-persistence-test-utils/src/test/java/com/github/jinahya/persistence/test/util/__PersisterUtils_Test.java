@@ -44,10 +44,17 @@ class __PersisterUtils_Test {
     }
 
     /**
-     * A subclass which has its own randomizer, but no persister of its own.
+     * A subclass whose conventionally named persister is declared for its superclass.
      */
     static class SubEnt extends Ent {
 
+    }
+
+    static class SubEntPersister extends __Persister<Ent> {
+
+        SubEntPersister() {
+            super(Ent.class);
+        }
     }
 
     static class SubEntRandomizer extends __Randomizer<SubEnt> {
@@ -97,15 +104,31 @@ class __PersisterUtils_Test {
         }
     }
 
-//SEP:an unrelated persister
+//SEP:an entity class whose conventionally named persister is declared for an unrelated class
 
     static class Foreign {
 
     }
 
-    static class ForeignPersister extends __Persister<Foreign> {
+    static class Misdeclared {
 
-        ForeignPersister() {
+    }
+
+    static class MisdeclaredRandomizer extends __Randomizer<Misdeclared> {
+
+        MisdeclaredRandomizer() {
+            super(Misdeclared.class, List.of());
+        }
+
+        @Override
+        public Misdeclared get() {
+            return new Misdeclared();
+        }
+    }
+
+    static class MisdeclaredPersister extends __Persister<Foreign> {
+
+        MisdeclaredPersister() {
             super(Foreign.class);
         }
     }
@@ -119,18 +142,16 @@ class __PersisterUtils_Test {
         assertThat(instance).isNotNull();
         assertThat(instance.name).isEqualTo("randomized");
         Mockito.verify(entityManager, Mockito.times(1)).persist(instance);
+        // the "does not flush" contract of newPersistedInstanceOf
+        Mockito.verify(entityManager, Mockito.never()).flush();
     }
 
-    @DisplayName("newPersistedInstanceOf(entityManager, SubEnt.class, c -> EntPersister.class)"
-                 + " -> persisted; a persister of a superclass accepts the subclass")
+    @DisplayName("newPersistedInstanceOf(entityManager, SubEnt.class)"
+                 + " -> persisted; SubEntPersister, declared for the superclass, accepts a SubEnt")
     @Test
     void newPersistedInstanceOf_Persisted_PersisterOfSuperclass() {
         final var entityManager = Mockito.mock(EntityManager.class);
-        final var instance = __PersisterUtils.newPersistedInstanceOf(
-                entityManager,
-                SubEnt.class,
-                c -> EntPersister.class
-        );
+        final var instance = __PersisterUtils.newPersistedInstanceOf(entityManager, SubEnt.class);
         assertThat(instance).isNotNull();
         Mockito.verify(entityManager, Mockito.times(1)).persist(instance);
     }
@@ -153,16 +174,14 @@ class __PersisterUtils_Test {
         Mockito.verifyNoInteractions(entityManager);
     }
 
-    @DisplayName("newPersistedInstanceOf(entityManager, Ent.class, c -> ForeignPersister.class)"
-                 + " -> IllegalArgumentException; the persister accepts no Ent")
+    @DisplayName("newPersistedInstanceOf(entityManager, Misdeclared.class) -> RuntimeException;"
+                 + " MisdeclaredPersister was provided, so accepting no Misdeclared is a fault, not an absence")
     @Test
-    void newPersistedInstanceOf_IllegalArgumentException_PersisterOfUnrelatedClass() {
+    void newPersistedInstanceOf_RuntimeException_PersisterOfUnrelatedClass() {
         final var entityManager = Mockito.mock(EntityManager.class);
-        assertThatThrownBy(() -> __PersisterUtils.newPersistedInstanceOf(
-                entityManager,
-                Ent.class,
-                c -> ForeignPersister.class
-        )).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> __PersisterUtils.newPersistedInstanceOf(entityManager, Misdeclared.class))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessageContaining("accepts only");
         Mockito.verifyNoInteractions(entityManager);
     }
 }

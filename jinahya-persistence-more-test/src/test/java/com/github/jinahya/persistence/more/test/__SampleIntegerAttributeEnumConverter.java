@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.__AttributeEnumConverter;
+import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
 
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention

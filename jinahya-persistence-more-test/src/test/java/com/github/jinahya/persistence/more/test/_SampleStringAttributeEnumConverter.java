@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.__AttributeEnumConverter;
+import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
 
 class _SampleStringAttributeEnumConverter
         extends __AttributeEnumConverter.__OfString<_SampleStringAttributeEnum> {

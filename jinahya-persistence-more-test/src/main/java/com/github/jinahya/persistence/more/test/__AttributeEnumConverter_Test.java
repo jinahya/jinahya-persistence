@@ -21,7 +21,7 @@ package com.github.jinahya.persistence.more.test;
  */
 
 import com.github.jinahya.persistence.more.__AttributeEnum;
-import com.github.jinahya.persistence.more.__AttributeEnumConverter;
+import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -74,10 +74,11 @@ public abstract class __AttributeEnumConverter_Test<
             extends __AttributeEnumConverter_Test<CONVERTER, ENUM, String> {
 
         /**
-         * {@inheritDoc}
+         * Creates a new instance for testing the specified converter class, whose attribute value is a
+         * {@link String}.
          *
-         * @param converterClass {@inheritDoc}.
-         * @param enumClass      {@inheritDoc}.
+         * @param converterClass the converter class to test.
+         * @param enumClass      the enum class the {@code converterClass} converts.
          * @see #converterClass
          * @see #enumClass
          */
@@ -112,6 +113,13 @@ public abstract class __AttributeEnumConverter_Test<
     @Nested
     protected class ConvertToDatabaseColumnTest {
 
+        /**
+         * Creates a new instance.
+         */
+        protected ConvertToDatabaseColumnTest() {
+            super();
+        }
+
         @DisplayName("(null)null")
         @Test
         void _Null_Null() {
@@ -141,6 +149,13 @@ public abstract class __AttributeEnumConverter_Test<
     @DisplayName("convertToEntityAttribute(E)E.attributeValue")
     @Nested
     protected class ConvertToEntityAttributeTest {
+
+        /**
+         * Creates a new instance.
+         */
+        protected ConvertToEntityAttributeTest() {
+            super();
+        }
 
         @DisplayName("(null)null")
         @Test

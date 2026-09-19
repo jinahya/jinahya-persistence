@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -44,10 +45,39 @@ class __InstantiatorUtils_Test {
 
     }
 
-    private static class UnnamedInstantiatorOfAnyName extends __Instantiator<Unnamed> {
+//SEP:producer covariance -- an instantiator is located by name, then checked against the class it is declared for
 
-        UnnamedInstantiatorOfAnyName() {
-            super(Unnamed.class);
+    private static class Sup {
+
+    }
+
+    private static class Sub extends Sup {
+
+    }
+
+    /**
+     * An instantiator, of {@code Sup}, declared for a subclass of it; every instance it produces is still a
+     * {@code Sup}.
+     */
+    private static class SupInstantiator extends __Instantiator<Sub> {
+
+        SupInstantiator() {
+            super(Sub.class);
+        }
+    }
+
+    /**
+     * A class whose conventionally named instantiator is declared for its superclass, which can not produce instances
+     * of it.
+     */
+    private static class Narrowed extends Sup {
+
+    }
+
+    private static class NarrowedInstantiator extends __Instantiator<Sup> {
+
+        NarrowedInstantiator() {
+            super(Sup.class);
         }
     }
 
@@ -66,20 +96,18 @@ class __InstantiatorUtils_Test {
         assertThat(__InstantiatorUtils.newInstantiatedInstanceOf(Unnamed.class)).isNotNull();
     }
 
-    @DisplayName("newInstantiatedInstanceOf(Unnamed.class, locator) -> instantiated by the located instantiator")
+    @DisplayName("newInstantiatedInstanceOf(Sup.class) -> a Sub; an instantiator declared for a subclass is used")
     @Test
-    void newInstantiatedInstanceOf_Instantiated_Locator() {
-        assertThat(__InstantiatorUtils.newInstantiatedInstanceOf(
-                Unnamed.class,
-                c -> c == Unnamed.class ? UnnamedInstantiatorOfAnyName.class : null
-        )).isNotNull();
+    void newInstantiatedInstanceOf_Sub_InstantiatorOfSubclass() {
+        assertThat(__InstantiatorUtils.newInstantiatedInstanceOf(Sup.class)).isInstanceOf(Sub.class);
     }
 
-    @DisplayName("newInstantiatedInstanceOf(Pojo.class, locator -> null) -> instantiated directly")
+    @DisplayName("newInstantiatedInstanceOf(Narrowed.class) -> RuntimeException;"
+                 + " NarrowedInstantiator was provided, so producing a Sup is a fault, not a fallback")
     @Test
-    void newInstantiatedInstanceOf_Instantiated_LocatorLocatesNothing() {
-        final var instance = __InstantiatorUtils.newInstantiatedInstanceOf(Pojo.class, c -> null);
-        assertThat(instance).isNotNull();
-        assertThat(instance.getName()).isNull();
+    void newInstantiatedInstanceOf_RuntimeException_InstantiatorProducesASuperclass() {
+        assertThatThrownBy(() -> __InstantiatorUtils.newInstantiatedInstanceOf(Narrowed.class))
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessageContaining("produced a");
     }
 }

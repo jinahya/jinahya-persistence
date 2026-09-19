@@ -1,9 +1,9 @@
 package com.github.jinahya.persistence.more.test;
 
-import com.github.jinahya.persistence.more.__StringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 
 class _SampleStringAttributeConverter
-        extends __StringAttributeConverter<String> {
+        implements __StringAttributeConverter<String> {
 
     @Override
     public String convertToDatabaseColumn(final String attribute) {

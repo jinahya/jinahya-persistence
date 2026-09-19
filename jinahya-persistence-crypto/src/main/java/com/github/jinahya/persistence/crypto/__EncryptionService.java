@@ -946,6 +946,15 @@ public abstract class __EncryptionService {
         }
     }
 
+    /**
+     * Returns the metamodel {@link ManagedType} of the specified class.
+     *
+     * @param entityClass the class whose managed type is looked up.
+     * @return the managed type of the {@code entityClass}.
+     * @throws IllegalArgumentException when the {@code entityClass} is not a managed type of the persistence unit.
+     * @implNote The lookup is cached per class, so that a listener consulting the metamodel on every lifecycle
+     *         callback does not go back to the {@link jakarta.persistence.metamodel.Metamodel Metamodel} for each one.
+     */
     protected ManagedType<?> getManagedType(final Class<?> entityClass) {
         return managedTypes.computeIfAbsent(
                 Objects.requireNonNull(entityClass, "entityClass is null"),

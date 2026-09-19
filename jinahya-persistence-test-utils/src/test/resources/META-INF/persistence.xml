@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- https://jakarta.ee/xml/ns/persistence/ -->
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence ${persistence.schemaLocation}"
+             version="${persistence.version}">
+  <persistence-unit name="__specPU">
+    <description>Persistence Unit for exercising the instantiator, the randomizer and the persister against an
+      in-memory DB, using the specification's own example entities
+    </description>
+    <provider>${persistence-unit.provider}</provider>
+    <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
+    <class>com.github.jinahya.persistence.test.util.spec._Address</class>
+    <class>com.github.jinahya.persistence.test.util.spec._Department</class>
+    <class>com.github.jinahya.persistence.test.util.spec._Employee</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <!-- NONE: a randomized instance is not a valid one. PODAM honors only some of the Jakarta constraints, and the
+         Easy Random flavor honors none of them, so AUTO would fail a persist for reasons which say nothing about
+         the three roles under test. Constraints get their own unit when they are the subject. -->
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <!-- MODE=LEGACY: EclipseLink's H2 platform emits "BIGINT IDENTITY NOT NULL" for a
+           GenerationType.IDENTITY column, and H2 2.x accepts the IDENTITY keyword only in the legacy mode;
+           without this the schema is never created, and every insert meets an empty database -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:spec;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!-- eclipselink -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.level" value="WARNING"/>
+      <!-- hibernate -->
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.show_sql" value="false"/>
+    </properties>
+  </persistence-unit>
+</persistence>

@@ -4,6 +4,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,9 +13,9 @@ import java.util.Optional;
  * Utilities, internal to this package, for locating and instantiating classes.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __InstantiatorLocator#STANDARD
- * @see __RandomizerLocator#STANDARD
- * @see __PersisterLocator#STANDARD
+ * @see __InstantiatorUtils#locateStandard(Class)
+ * @see __RandomizerUtils#locateStandard(Class)
+ * @see __PersisterUtils#locateStandard(Class)
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -25,43 +26,21 @@ final class ___Utils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
-     * Returns the specified class, only when it extends the specified supertype.
-     *
-     * @param clazz     the class to check; may be {@code null}.
-     * @param supertype the supertype.
-     * @return the {@code clazz}; {@code null} when the {@code clazz} is {@code null}, or does not extend the
-     *         {@code supertype}.
-     * @apiNote A class which does not extend the {@code supertype} is logged, at
-     *         {@link System.Logger.Level#WARNING WARNING}, as it usually indicates a misconfiguration.
-     */
-    @Nullable
-    static Class<?> classForSupertype(final @Nullable Class<?> clazz, final Class<?> supertype) {
-        Objects.requireNonNull(supertype, "supertype is null");
-        if (clazz == null) {
-            return null;
-        }
-        if (!supertype.isAssignableFrom(clazz)) {
-            logger.log(System.Logger.Level.WARNING, "{0} does not extend {1}", clazz, supertype);
-            return null;
-        }
-        return clazz;
-    }
-
-    /**
-     * Finds a sibling class of the specified type, which (optionally) extends the specified supertype and has any of
-     * the specified postfixes.
+     * Finds a sibling class of the specified type, which has any of the specified postfixes.
      *
      * @param type      the type.
-     * @param supertype the supertype; {@code null} to ignore.
      * @param postfixes the postfix candidates, in the order they are probed.
-     * @return the sibling class meets given conditions; {@code null} when not found.
-     * @apiNote Every probed class name is logged at {@link System.Logger.Level#TRACE TRACE}, so that a class
-     *         which is not located, due to a name not following the convention, can be diagnosed.
+     * @return the first sibling class which exists; {@code null} when none does.
+     * @apiNote This method judges nothing but the name. A class which is found is returned, whatever it is, for
+     *         a class named by the convention is a class the developer meant to provide: whether it extends the
+     *         expected role, and whether it can be instantiated, is the caller's to check, and to fail on.
+     * @implNote Every probed class name is logged at {@link System.Logger.Level#TRACE TRACE}, so that a class
+     *         which is not located, due to a name not following the convention, can be diagnosed. A candidate which is
+     *         found but can not be loaded is logged at {@link System.Logger.Level#WARNING WARNING}, and the probe
+     *         continues with the next postfix.
      */
     @Nullable
-    static Class<?> siblingClassForPostfix(final Class<?> type,
-                                           final @Nullable Class<?> supertype,
-                                           final String... postfixes) {
+    static Class<?> siblingClassForPostfixes(final Class<?> type, final String... postfixes) {
         Objects.requireNonNull(type, "type is null");
         if (Objects.requireNonNull(postfixes, "postfixes is null").length == 0) {
             throw new IllegalArgumentException("postfixes is empty");
@@ -78,114 +57,154 @@ final class ___Utils {
                 continue;
             }
             final String className = typeName + postfix.strip();
-            final Class<?> clazz;
             try {
                 // no initialization; the class is merely being probed
-                clazz = Class.forName(className, false, classLoader);
+                final Class<?> clazz = Class.forName(className, false, classLoader);
+                logger.log(System.Logger.Level.TRACE, "located {0} for {1}", clazz, type);
+                return clazz;
             } catch (final ClassNotFoundException cnfe) {
                 logger.log(System.Logger.Level.TRACE, "no class named {0}", className);
-                continue;
+            } catch (final LinkageError le) {
+                // Class.forName links the class, which resolves its superclass; a candidate whose supertype is
+                // missing, or is otherwise unloadable, therefore fails with an Error rather than an exception.
+                // A probe is speculative, so this does not end it -- but, unlike a name which simply does not
+                // exist, it is a misconfiguration worth seeing.
+                logger.log(System.Logger.Level.WARNING, "failed to load " + className + "; probing further", le);
             }
-            if (supertype != null && classForSupertype(clazz, supertype) == null) {
-                continue;
-            }
-            {
-                // a candidate which can never be instantiated, such as an abstract base shared by several concrete
-                // subclasses, does not end the probe; a later postfix may still yield a usable class
-                final var reason = reasonNotInstantiable(clazz);
-                if (reason != null) {
-                    logger.log(System.Logger.Level.TRACE, "{0} is {1}; probing further", clazz, reason);
-                    continue;
-                }
-            }
-            logger.log(System.Logger.Level.TRACE, "located {0} for {1}", clazz, type);
-            return clazz;
         }
         return null;
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
 // ---------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns whether a located producer, declared for the specified class, produces instances usable as the specified
-     * target class.
+     * Returns the instance a located producer produced, as the specified target class.
      *
-     * @param target   the class the caller requires instances of.
-     * @param declared the class the {@code located} producer is declared for.
-     * @param located  the located producer; for diagnostics only.
-     * @return {@code true} when the {@code declared} class is the {@code target} class, or a subclass of it;
-     *         {@code false} otherwise.
-     * @apiNote A producer, such as an {@link __Instantiator} or a {@link __Randomizer}, is <em>covariant</em>
-     *         in the class it is declared for; one declared for a subclass of the {@code target} still produces
-     *         instances of the {@code target}, while one declared for a superclass, or for an unrelated class, does
-     *         not.
-     * @implNote An incompatible producer is logged, at {@link System.Logger.Level#WARNING WARNING}, and
-     *         rejected; the caller then proceeds as if nothing had been located.
-     * @see #canConsume(Class, Class, Object)
+     * @param target   the class the caller requires an instance of.
+     * @param producer the located producer; an {@link __Instantiator} or a {@link __Randomizer}.
+     * @param produced what the {@code producer} produced.
+     * @param <T>      the target class type parameter.
+     * @return the {@code produced} instance, as the {@code target}.
+     * @throws RuntimeException when the {@code produced} instance is {@code null}, or is not an instance of the
+     *                          {@code target}.
+     * @apiNote A producer is checked on what it <em>produced</em>, rather than on the class it is declared for,
+     *         because the declaration proves less than it appears to: a {@code __Randomizer<Foo>} whose {@code get()}
+     *         returns a {@code Bar} is well-formed at compile time, erasure leaving nothing to enforce it. The produced
+     *         instance is the evidence which matters -- it is what the caller receives, and, through
+     *         {@link __PersisterUtils}, what is handed to an {@link jakarta.persistence.EntityManager}.
+     * @implNote A producer which was located, and then produces the wrong thing, is a fault rather than an
+     *         absence: it is thrown, not logged and skipped. A developer who declares a counterpart by the naming
+     *         convention meant it to be used, and would rather be told than quietly fall back.
+     * @see #requireAccepting(Class, Class, Object)
      */
-    static boolean canProduce(final Class<?> target, final Class<?> declared,
-                              final Object located) {
+    @SuppressWarnings({
+            "java:S112" // Generic exceptions should never be thrown
+    })
+    static <T> T produced(final Class<T> target, final Object producer, final @Nullable Object produced) {
         assert target != null;
-        assert declared != null;
-        if (target.isAssignableFrom(declared)) {
-            return true;
+        assert producer != null;
+        if (produced == null) {
+            throw new RuntimeException(producer + ", located for " + target + ", produced nothing");
         }
-        logger.log(System.Logger.Level.WARNING, "{0}, located for {1}, produces {2}; rejected", located, target,
-                   declared);
-        return false;
+        if (!target.isInstance(produced)) {
+            throw new RuntimeException(
+                    producer + ", located for " + target + ", produced a " + produced.getClass()
+            );
+        }
+        return target.cast(produced);
     }
 
     /**
-     * Returns whether a located consumer, declared for the specified class, accepts instances of the specified target
+     * Requires that a located consumer, declared for the specified class, accepts instances of the specified target
      * class.
      *
      * @param target   the class the caller has instances of.
-     * @param declared the class the {@code located} consumer is declared for.
-     * @param located  the located consumer; for diagnostics only.
-     * @return {@code true} when the {@code declared} class is the {@code target} class, or a superclass of it;
-     *         {@code false} otherwise.
+     * @param declared the class the {@code consumer} is declared for.
+     * @param consumer the located consumer; for diagnostics only.
+     * @throws RuntimeException when the {@code declared} class is neither the {@code target} class nor a superclass of
+     *                          it.
      * @apiNote A consumer, such as a {@link __Persister}, is <em>contravariant</em> in the class it is declared
      *         for; one declared for a superclass of the {@code target} accepts instances of the {@code target}, while
-     *         one declared for a subclass, or for an unrelated class, does not. Note that this is the opposite of the
-     *         rule applied to producers.
-     * @implNote An incompatible consumer is logged, at {@link System.Logger.Level#WARNING WARNING}, and
-     *         rejected; the caller then proceeds as if nothing had been located.
-     * @see #canProduce(Class, Class, Object)
+     *         one declared for a subclass, or for an unrelated class, does not. This is what lets an entity hierarchy
+     *         share one implementation -- a {@code _RgbaEntityPersister extends __MappedRgbaPersister}, declared for
+     *         {@code __MappedRgba}, persists an {@code _RgbaEntity} -- without every subclass re-declaring its target
+     *         class.
+     *         <p>
+     *         Unlike a producer, a consumer is checked on its declaration rather than on a result: applying it
+     *         <em>is</em> the side effect, so there is nothing to inspect afterwards which has not already happened.
+     * @see #produced(Class, Object, Object)
      */
-    static boolean canConsume(final Class<?> target, final Class<?> declared,
-                              final Object located) {
+    @SuppressWarnings({
+            "java:S112" // Generic exceptions should never be thrown
+    })
+    static void requireAccepting(final Class<?> target, final Class<?> declared, final Object consumer) {
         assert target != null;
         assert declared != null;
-        if (declared.isAssignableFrom(target)) {
-            return true;
+        if (!declared.isAssignableFrom(target)) {
+            throw new RuntimeException(consumer + ", located for " + target + ", accepts only " + declared);
         }
-        logger.log(System.Logger.Level.WARNING, "{0}, located for {1}, accepts only {2}; rejected", located, target,
-                   declared);
-        return false;
     }
 
     /**
-     * Returns whether a located class can be instantiated, using a no-argument constructor.
+     * Requires that a located class extends the supertype of the role it was located for.
      *
-     * @param located the located class.
-     * @param target  the class the {@code located} class was located for; for diagnostics only.
-     * @return {@code true} when the {@code located} class may declare a usable no-argument constructor; {@code false}
-     *         otherwise.
-     * @implNote A class which can not be instantiated is logged, at
-     *         {@link System.Logger.Level#WARNING WARNING}, and rejected; the caller then proceeds as if nothing had
-     *         been located, rather than failing with a reflective error raised deep inside
-     *         {@link #newInstance(Class)}.
-     * @see #reasonNotInstantiable(Class)
+     * @param located   the located class.
+     * @param supertype the supertype of the role.
+     * @param target    the class the {@code located} class was located for; for diagnostics only.
+     * @return the {@code located} class.
+     * @throws RuntimeException when the {@code located} class does not extend the {@code supertype}.
+     * @apiNote A class named by the convention, which is not of the role that name claims, is a fault; the
+     *         probe does not judge it, so that the failure is reported here, where the role is known.
      */
-    static boolean canInstantiate(final Class<?> located, final Class<?> target) {
+    @SuppressWarnings({
+            "java:S112" // Generic exceptions should never be thrown
+    })
+    static Class<?> requireSubtype(final Class<?> located, final Class<?> supertype, final Class<?> target) {
         assert located != null;
-        assert target != null;
-        final var reason = reasonNotInstantiable(located);
-        if (reason == null) {
-            return true;
+        assert supertype != null;
+        if (!supertype.isAssignableFrom(located)) {
+            throw new RuntimeException(
+                    located + ", located for " + target + ", does not extend " + supertype
+            );
         }
-        logger.log(System.Logger.Level.WARNING, "{0}, located for {1}, is {2}; rejected", located, target, reason);
-        return false;
+        return located;
+    }
+
+    /**
+     * Returns a new instance of the specified located class, as the role it was located for.
+     *
+     * @param target  the class the {@code located} class was located for; for diagnostics only.
+     * @param role    the supertype of the role the {@code located} class was located for; an
+     *                {@link __Instantiator}, a {@link __Randomizer}, or a {@link __Persister}.
+     * @param located the located class; {@code null}, when none was located.
+     * @param <R>     the role type parameter.
+     * @return a new instance of the {@code located} class, as the {@code role}; {@code null}, when the
+     *         {@code located} class is {@code null}.
+     * @throws RuntimeException when the {@code located} class does not extend the {@code role}, or can not be
+     *                          instantiated.
+     * @apiNote Absence and fault are kept apart here: a {@code null} is returned for a class which was never
+     *         located, and left for the caller to interpret -- a missing instantiator is an absence to fall back on,
+     *         while a missing persister is not -- whereas a class which <em>was</em> located, and is then of the wrong
+     *         role, or is not instantiable, throws.
+     *         <p>
+     *         No check of the class the located instance is declared for is made here, for there is no single check to
+     *         make: a producer is verified on what it {@link #produced(Class, Object, Object) produced}, and a consumer
+     *         on the class it is {@link #requireAccepting(Class, Class, Object) declared for}. The two roles vary in
+     *         opposite directions, so each caller applies its own.
+     * @see #requireSubtype(Class, Class, Class)
+     * @see #newInstance(Class)
+     */
+    @Nullable
+    static <R> R newLocatedInstance(final Class<?> target, final Class<R> role, final @Nullable Class<?> located) {
+        assert target != null;
+        assert role != null;
+        if (located == null) {
+            return null;
+        }
+        requireSubtype(located, role, target);
+        return role.cast(newInstance(located));
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -215,9 +234,8 @@ final class ___Utils {
         if (clazz.isEnum()) {
             return "an enum";
         }
-        if (clazz.isRecord()) {
-            return "a record, which declares no no-argument constructor";
-        }
+        // a record is deliberately absent: its canonical constructor takes no argument when it declares no component,
+        // and it may declare a no-argument constructor explicitly in any case, so it is left to the lookup below
         if (Modifier.isAbstract(clazz.getModifiers())) {
             return "abstract";
         }
@@ -235,8 +253,8 @@ final class ___Utils {
      * @param <T>   the type of the instance to create.
      * @return a new instance of the {@code clazz}.
      * @throws IllegalArgumentException when the {@code clazz} is of a shape which can not declare a no-argument
-     *                                  constructor, such as an interface, an enum, a record, an abstract class, or an
-     *                                  inner class.
+     *                                  constructor, such as an interface, an enum, an abstract class, or an inner
+     *                                  class.
      * @throws RuntimeException         when the {@code clazz} declares no no-argument constructor, or when that
      *                                  constructor is inaccessible or throws.
      * @implNote The no-argument constructor is made
@@ -268,6 +286,10 @@ final class ___Utils {
         }
         try {
             return constructor.newInstance();
+        } catch (final InvocationTargetException ite) {
+            // the constructor itself threw; wrap what it threw, rather than the reflective wrapper around it, so
+            // that the cause of the failure is one getCause() away, as it is for every other failure here
+            throw new RuntimeException("failed to instantiate " + clazz, ite.getCause());
         } catch (final ReflectiveOperationException roe) {
             throw new RuntimeException("failed to instantiate " + clazz, roe);
         }

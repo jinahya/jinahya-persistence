@@ -39,7 +39,7 @@ platform out from under the implementations.
 
 | Spec | Version from the EE 11 BOM | Implementation | In this build | Latest released | Status |
 | --- | --- | --- | --- | --- | --- |
-| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | Hibernate ORM (`hibernate-core`) | 7.4.7.Final | 7.4.7.Final | current — latest stable series for JPA 3.2 / EE 11 |
+| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | Hibernate ORM (`hibernate-core`) | 7.4.9.Final | 7.4.9.Final | current — latest stable series for JPA 3.2 / EE 11 |
 | Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | EclipseLink (`org.eclipse.persistence.jpa`) | 5.0.1 | 5.0.1 | current — 5.0 is certified for JPA 3.2 / EE 11 |
 | Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Hibernate Validator | 9.1.3.Final | 9.1.3.Final | current |
 | Jakarta Expression Language 6.0 | `jakarta.el-api` 6.0.1 | Expressly (required by Hibernate Validator) | 6.0.0 | 6.0.0 | current |
@@ -56,8 +56,8 @@ single profile:
 
 | Axis | Profile | Implementation |
 | --- | --- | --- |
-| provider (`__`) | `__hibernate-orm-7.4-jakarta-ee-11` | Hibernate ORM 7.4.7.Final — **active by default** |
-| provider (`__`) | `__hibernate-orm-7.2-jakarta-ee-11` | Hibernate ORM 7.2.24.Final (limited-support series) |
+| provider (`__`) | `__hibernate-orm-7.4-jakarta-ee-11` | Hibernate ORM 7.4.9.Final — **active by default** |
+| provider (`__`) | `__hibernate-orm-7.2-jakarta-ee-11` | Hibernate ORM 7.2.25.Final (limited-support series) |
 | provider (`__`) | `__eclipselink-5.0-jakarta-ee-11` | EclipseLink 5.0.1 |
 | validator (`___`) | `___hibernate-validator-9.1-jakarta-ee-11` | Hibernate Validator 9.1.3.Final — active by default |
 | validator (`___`) | `___hibernate-validator-9.0-jakarta-ee-11` | Hibernate Validator 9.0.1.Final (limited-support series) |
@@ -78,18 +78,21 @@ reports which ones failed — e.g. `./_mvn_jakarta_ee_11.sh test` or
 
 ### Jakarta EE 12 — next (not adoptable yet)
 
-Jakarta EE Platform 12 is **not released**. The Eclipse project page still shows a
-planned date of 2026-05-31, but no `jakarta.jakartaee-bom` 12.x exists on Maven Central
-(the BOM's metadata was last updated 2025-04-08), and community reporting in April 2026
-pointed at the Core Profile landing in Q4 2026 with the Web Profile and Platform after
-that. Everything below is milestone/pre-release only.
+Jakarta EE Platform 12 is **not released**. Its Eclipse project page still carries a
+planned date of 2026-05-31, which has now passed with no release: no
+`jakarta.jakartaee-bom` 12.x exists on Maven Central (the BOM's metadata was last
+updated 2025-04-08), and community reporting in April 2026 pointed at the Core Profile
+landing in Q4 2026 with the Web Profile and Platform after that. The individual specs
+have started to go final on their own — `jakarta.enterprise.cdi-api` 5.0.0 was released
+on 2026-09-16 — but everything else below is still milestone/pre-release, and there is
+no platform BOM to move to.
 
 | Spec (EE 12 target) | Latest artifact on Central | Implementation | Latest artifact on Central |
 | --- | --- | --- | --- |
-| Jakarta Persistence 4.0 | `jakarta.persistence-api` 4.0.0-M6 | Hibernate ORM 8.0 (JPA 4.0 / EE 12 / Java 17+) | 8.0.0.Beta1 |
+| Jakarta Persistence 4.0 | `jakarta.persistence-api` 4.0.0-M7 | Hibernate ORM 8.0 (JPA 4.0 / EE 12 / Java 17+) | 8.0.0.Beta1 |
 | Jakarta Persistence 4.0 | — | EclipseLink | no EE 12 line published |
 | Jakarta Validation 4.0 | `jakarta.validation-api` 4.0.0-M1 | Hibernate Validator | no EE 12 line published (9.1 is Validation 3.1) |
-| Jakarta CDI 5.0 | `jakarta.enterprise.cdi-api` 5.0.0.CR1 | Weld 7 (CDI 5.0) | 7.0.0.CR1 |
+| Jakarta CDI 5.0 | `jakarta.enterprise.cdi-api` 5.0.0 (final) | Weld 7 (CDI 5.0) | 7.0.0.CR1 |
 | Jakarta Expression Language 6.1 | `jakarta.el-api` 6.1.0-M2 | Expressly | no 6.1 published |
 
 Moving to EE 12 means moving the umbrella BOM and *all* implementations at once, and
@@ -99,7 +102,7 @@ today that is only possible on milestone builds.
 Hibernate Validator 8.0 and older; EclipseLink 4.0 and older; Weld 5 and older; and the
 Jakarta EE 9/9.1 and 10 platform generations.*
 
-*Surveyed 2026-09-05 against Maven Central metadata and the upstream release pages
+*Surveyed 2026-09-19 against Maven Central metadata and the upstream release pages
 ([Hibernate ORM](https://hibernate.org/orm/releases/),
 [Hibernate Validator](https://hibernate.org/validator/releases/),
 [EclipseLink](https://eclipse.dev/eclipselink/releases/index.html),
@@ -139,7 +142,7 @@ versions below are what the current platform (`11.0.0`) resolves to.
 | `jinahya-persistence-more` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-crypto` | `io.github.jinahya:jinahya-persistence-utils` | — | `jakarta.annotation:jakarta.annotation-api` 3.0.0<br>`jakarta.enterprise:jakarta.enterprise.cdi-api` 4.1.0<br>`jakarta.inject:jakarta.inject-api` 2.0.1<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-more-test` | — | — | `io.github.jinahya:jinahya-persistence-more`<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1<br>`org.junit.jupiter:junit-jupiter-api` 5.14.4 |
-| `jinahya-persistence-test-utils` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.jeasy:easy-random-core` 5.0.0<br>`org.jeasy:easy-random-bean-validation` 5.0.0<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
+| `jinahya-persistence-test-utils` | — | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.1<br>`org.jeasy:easy-random` 6.0.1<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
 
 `jakarta.persistence-api` and `jspecify` are declared once, in the root pom, and inherited by every module; the rest are
 declared by the module which uses them.

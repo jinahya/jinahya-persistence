@@ -48,6 +48,13 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
             extends __AttributeConverterTestInvocationContextProvider {
 
         /**
+         * Creates a new instance.
+         */
+        protected __ConvertToDatabaseColumnTestInvocationContextProvider() {
+            super();
+        }
+
+        /**
          * {@inheritDoc}
          *
          * @param context {@inheritDoc}
@@ -71,6 +78,13 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
      */
     protected abstract static class __ConvertToEntityAttributeTestInvocationContextProvider
             extends __AttributeConverterTestInvocationContextProvider {
+
+        /**
+         * Creates a new instance.
+         */
+        protected __ConvertToEntityAttributeTestInvocationContextProvider() {
+            super();
+        }
 
         /**
          * {@inheritDoc}

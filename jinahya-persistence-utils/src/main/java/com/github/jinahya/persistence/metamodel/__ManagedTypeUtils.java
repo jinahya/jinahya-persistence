@@ -22,8 +22,10 @@ package com.github.jinahya.persistence.metamodel;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.metamodel.Metamodel;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 /**
@@ -40,6 +42,73 @@ public final class __ManagedTypeUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Finds the {@link ManagedType} of the specified type class in the metamodel of the specified entity manager
+     * factory.
+     *
+     * @param typeClass            the class whose {@link ManagedType} is returned; it does not have to be an entity
+     *                             class.
+     * @param entityManagerFactory the entity manager factory to look the {@code typeClass} up in.
+     * @param <X>                  represented type
+     * @return an optional of the {@link ManagedType} of the {@code typeClass}; {@link Optional#empty() empty} when the
+     *         {@code entityManagerFactory} does not manage it.
+     * @implNote {@link Metamodel#managedType(Class)} <em>throws</em> for a class it does not manage; it never
+     *         returns {@code null}. That is what this method exists to turn into an answer a caller can branch on.
+     * @see Metamodel#managedType(Class)
+     */
+    public static <X> Optional<ManagedType<X>> findManagedType(final Class<X> typeClass,
+                                                               final EntityManagerFactory entityManagerFactory) {
+        Objects.requireNonNull(typeClass, "typeClass is null");
+        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
+        try {
+            return Optional.of(entityManagerFactory.getMetamodel().managedType(typeClass));
+        } catch (final IllegalArgumentException iae) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Finds the {@link ManagedType} of the specified type class, in the first of the specified entity manager factories
+     * which knows it.
+     *
+     * @param typeClass              the class whose {@link ManagedType} is returned; it does not have to be an entity
+     *                               class.
+     * @param entityManagerFactories an iterable of entity manager factories to look the {@code typeClass} up in.
+     * @param <X>                    represented type
+     * @return an optional of the {@link ManagedType} of the {@code typeClass}; {@link Optional#empty() empty} when none
+     *         of the {@code entityManagerFactories} manages it.
+     * @see #findManagedType(Class, EntityManagerFactory)
+     */
+    public static <X> Optional<ManagedType<X>> findManagedType(
+            final Class<X> typeClass,
+            final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
+        Objects.requireNonNull(typeClass, "typeClass is null");
+        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
+        return StreamSupport.stream(entityManagerFactories.spliterator(), false)
+                .map(f -> findManagedType(typeClass, f))
+                .flatMap(Optional::stream)
+                .findFirst();
+    }
+
+    /**
+     * Returns the {@link ManagedType} of the specified type class, from the metamodel of the specified entity manager
+     * factory.
+     *
+     * @param typeClass            the class whose {@link ManagedType} is returned; it does not have to be an entity
+     *                             class.
+     * @param entityManagerFactory the entity manager factory to look the {@code typeClass} up in.
+     * @param <X>                  represented type
+     * @return the {@link ManagedType} of the {@code typeClass}.
+     * @throws IllegalArgumentException when the {@code entityManagerFactory} does not manage the {@code typeClass}.
+     * @see #findManagedType(Class, EntityManagerFactory)
+     */
+    public static <X> ManagedType<X> getManagedType(final Class<X> typeClass,
+                                                    final EntityManagerFactory entityManagerFactory) {
+        return findManagedType(typeClass, entityManagerFactory).orElseThrow(
+                () -> new IllegalArgumentException("no managed type found for type class: " + typeClass)
+        );
+    }
+
+    /**
      * Returns the {@link ManagedType} of the specified type class, from the first of the specified entity manager
      * factories which knows it.
      *
@@ -54,27 +123,14 @@ public final class __ManagedTypeUtils {
      *         factory, and, being keyed by a {@link Class} and never evicted, pinned the application's classes for the
      *         life of the JVM. The lookup it saved is a map lookup inside the provider's metamodel, so it is now
      *         performed on each call.
-     * @see jakarta.persistence.metamodel.Metamodel#managedType(Class)
+     * @see #findManagedType(Class, Iterable)
      */
     public static <X> ManagedType<X> getManagedType(
             final Class<X> typeClass,
             final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
-        Objects.requireNonNull(typeClass, "typeClass is null");
-        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
-        return StreamSupport.stream(entityManagerFactories.spliterator(), false)
-                .map(EntityManagerFactory::getMetamodel)
-                .map(m -> {
-                    try {
-                        return m.<X>managedType(typeClass);
-                    } catch (final IllegalArgumentException iae) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(
-                        () -> new IllegalArgumentException("no managed type found for type class: " + typeClass)
-                );
+        return findManagedType(typeClass, entityManagerFactories).orElseThrow(
+                () -> new IllegalArgumentException("no managed type found for type class: " + typeClass)
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

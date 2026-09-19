@@ -9,12 +9,13 @@ import java.util.function.Supplier;
  * The default {@link #get() get()} method instantiates the {@link #targetClass} using its no-argument constructor;
  * override it for a class which has none, or which requires constructor arguments to be in a usable state.
  * <p>
- * An instantiator is located, for its target class, by an {@link __InstantiatorLocator}, and is applied by
- * {@link __InstantiatorUtils}; it is also what a {@link __Randomizer} uses to obtain the instance it then populates.
+ * An instantiator is located, for its target class, by {@link __InstantiatorUtils#locateStandard(Class)}, and is
+ * applied by {@link __InstantiatorUtils}; it is also what a {@link __Randomizer} uses to obtain the instance it then
+ * populates.
  *
  * @param <T> the type of the instances to instantiate.
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __InstantiatorLocator#STANDARD
+ * @see __InstantiatorUtils#locateStandard(Class)
  * @see __InstantiatorUtils#newInstantiatedInstanceOf(Class)
  * @see __Randomizer#newTargetInstance()
  */
@@ -39,7 +40,7 @@ public abstract class __Instantiator<T> implements Supplier<T> {
         this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Instantiates {@link #targetClass}, using its no-argument constructor.
@@ -56,7 +57,7 @@ public abstract class __Instantiator<T> implements Supplier<T> {
         return ___Utils.newInstance(targetClass);
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The target type to instantiate.

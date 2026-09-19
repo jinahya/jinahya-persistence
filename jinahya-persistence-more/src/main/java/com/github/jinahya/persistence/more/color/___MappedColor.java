@@ -351,7 +351,8 @@ public abstract class ___MappedColor implements Serializable {
      * which stores an alpha of its own overrides this method.
      *
      * @return a value between {@value #MIN_COMPONENT} and {@value #MAX_COMPONENT}, both inclusive.
-     * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the opacity
+     * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the
+     *         opacity
      *         property</a>
      */
     @Transient
@@ -366,7 +367,8 @@ public abstract class ___MappedColor implements Serializable {
      * {@value #MAX_COMPONENT_8_BIT} and renders indistinguishably from an opaque color, so it serializes as one.
      *
      * @return {@code true} when this color is opaque; {@code false} otherwise.
-     * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the opacity
+     * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the
+     *         opacity
      *         property</a>
      */
     @Transient

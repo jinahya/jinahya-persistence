@@ -43,9 +43,19 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * Jakarta Validation behaves differently: it <em>does</em> inherit constraint declarations from implemented interfaces,
  * so the {@link PositiveOrZero @PositiveOrZero} below genuinely constrains every implementation.
+ * <p>
+ * An entity which names its parent member on its own terms, rather than so that its accessor lines up with
+ * {@link #getHierarchyParent()}, can mark it {@link __SelfReferencingParent @__SelfReferencingParent} — the field under
+ * field access, the accessor under property access — and implement the interface method by delegating to
+ * {@link __SelfReferencingUtils#parentOf(__SelfReferencing) parentOf(this)}, which finds the member by that mark.
+ * {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal} does the same for an ordinal among siblings, which this
+ * interface does not itself declare.
  *
  * @param <T> self type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __SelfReferencingParent
+ * @see __SelfReferencingOrdinal
+ * @see __SelfReferencingUtils
  */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
@@ -58,6 +68,7 @@ public interface __SelfReferencing<T extends __SelfReferencing<T>> {
      * @return the parent of this instance; {@code null} when this instance is a root.
      * @apiNote An implementing entity which maps by property access has to mark its own accessor
      *         {@link Transient @Transient}; an annotation here would not reach it.
+     * @see __SelfReferencingUtils#parentOf(__SelfReferencing)
      */
     @Nullable
     T getHierarchyParent();
@@ -73,4 +84,23 @@ public interface __SelfReferencing<T extends __SelfReferencing<T>> {
      */
     @PositiveOrZero
     int getHierarchyDepth();
+
+    /**
+     * Returns the ordinal of this entity among its siblings, that is, the entities sharing the same
+     * {@link #getHierarchyParent() parent}.
+     *
+     * @return the ordinal of this entity, {@code 0} for the first sibling; {@code null} when the implementation type
+     *         does not order its siblings.
+     * @implSpec The default implementation reads, with reflection, the field or accessor annotated with
+     *         {@link __SelfReferencingOrdinal} in the class tree of the implementation type, and answers {@code null}
+     *         when there is no such member. The member is located once per type and the result is reused; a class tree
+     *         carrying more than one such mark fails with an {@code IllegalStateException}.
+     */
+    @Nullable
+    @PositiveOrZero
+    @Transient
+    @SuppressWarnings("unchecked")
+    default Integer getSiblingOrdinal() {
+        return __SelfReferencingUtils.ordinalOf((T) this);
+    }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests that {@link __Randomizer#excludedFields} are honored by both flavors, for the shapes a JPA entity actually
+ * Tests that {@link __Randomizer#excludedFields} are honored by every flavor, for the shapes a JPA entity actually
  * takes: a field inherited from a mapped superclass, and an instance whose runtime class is a subclass of the
  * {@link __Randomizer#targetClass targetClass}.
  *
@@ -75,8 +75,9 @@ class __Randomizer_Exclusion_Test {
     }
 
     /**
-     * Located, by the standard locator, for {@link Instantiated}; yields a subclass of it, which
-     * {@link ___Utils#canProduce(Class, Class, Object) producer covariance} explicitly permits.
+     * Located, by the naming convention, for {@link Instantiated}; yields a subclass of it, which
+     * {@link ___Utils#produced(Class, Object, Object)} accepts -- what matters is that the produced instance is usable
+     * as the target class, not which class the producer is declared for.
      */
     static class InstantiatedInstantiator extends __Instantiator<Instantiated> {
 
@@ -129,11 +130,69 @@ class __Randomizer_Exclusion_Test {
         }
     }
 
-    @DisplayName("___OfEasyRandomBean")
+    @DisplayName("___OfEasyRandom")
     @Nested
-    class OfEasyRandomBeanTest {
+    class OfEasyRandomTest {
 
-        class DerivedRandomizer extends __Randomizer.___OfEasyRandomBean<Derived> {
+        class DerivedRandomizer extends __Randomizer.___OfEasyRandom<Derived> {
+
+            DerivedRandomizer() {
+                super(Derived.class, List.of("id"));
+            }
+        }
+
+        @DisplayName("an inherited field named in excludedFields is not randomized")
+        @Test
+        void excluded_Inherited() {
+            final var instance = new DerivedRandomizer().get();
+            assertThat(instance.getName()).as("the control property is randomized").isNotNull();
+            assertThat(instance.getId()).as("the inherited, excluded property is left alone").isNull();
+        }
+    }
+
+    @DisplayName("___OfInstancio")
+    @Nested
+    class OfInstancioTest {
+
+        class DerivedRandomizer extends __Randomizer.___OfInstancio<Derived> {
+
+            DerivedRandomizer() {
+                super(Derived.class, List.of("id"));
+            }
+        }
+
+        @DisplayName("an inherited field named in excludedFields is not randomized")
+        @Test
+        void excluded_Inherited() {
+            final var instance = new DerivedRandomizer().get();
+            assertThat(instance.getName()).as("the control property is randomized").isNotNull();
+            assertThat(instance.getId()).as("the inherited, excluded property is left alone").isNull();
+        }
+
+        class InstantiatedRandomizer extends __Randomizer.___OfInstancio<Instantiated> {
+
+            InstantiatedRandomizer() {
+                super(Instantiated.class, List.of("id"));
+            }
+        }
+
+        @DisplayName("an excluded field is not randomized when the instance is a subclass of the target")
+        @Test
+        void excluded_SubclassInstance() {
+            // this flavor fills the instance from newTargetInstance(), which here yields an InstantiatedSub, so the
+            // exclusions are narrowed to the runtime class rather than to the target class
+            final var instance = new InstantiatedRandomizer().get();
+            assertThat(instance).isInstanceOf(InstantiatedSub.class);
+            assertThat(instance.getName()).as("the control property is randomized").isNotNull();
+            assertThat(instance.getId()).as("the excluded property is left alone").isNull();
+        }
+    }
+
+    @DisplayName("___OfFixtureMonkey")
+    @Nested
+    class OfFixtureMonkeyTest {
+
+        class DerivedRandomizer extends __Randomizer.___OfFixtureMonkey<Derived> {
 
             DerivedRandomizer() {
                 super(Derived.class, List.of("id"));
@@ -161,6 +220,11 @@ class __Randomizer_Exclusion_Test {
         String name;
     }
 
+    /**
+     * A randomizer of the flavor which writes through setters, and so leaves {@link FieldOnly} untouched.
+     *
+     * @see __Randomizer.___OfPodam
+     */
     static class FieldOnlyPodamRandomizer extends __Randomizer.___OfPodam<FieldOnly> {
 
         FieldOnlyPodamRandomizer() {
@@ -168,9 +232,39 @@ class __Randomizer_Exclusion_Test {
         }
     }
 
-    static class FieldOnlyEasyRandomizer extends __Randomizer.___OfEasyRandomBean<FieldOnly> {
+    /**
+     * A randomizer of the flavor which assigns fields reflectively, bypassing every constructor.
+     *
+     * @see __Randomizer.___OfEasyRandom
+     */
+    static class FieldOnlyEasyRandomRandomizer extends __Randomizer.___OfEasyRandom<FieldOnly> {
 
-        FieldOnlyEasyRandomizer() {
+        FieldOnlyEasyRandomRandomizer() {
+            super(FieldOnly.class, List.of("id"));
+        }
+    }
+
+    /**
+     * A randomizer of the flavor which fills, reflectively, the instance {@link __Randomizer#newTargetInstance()}
+     * yields.
+     *
+     * @see __Randomizer.___OfInstancio
+     */
+    static class FieldOnlyInstancioRandomizer extends __Randomizer.___OfInstancio<FieldOnly> {
+
+        FieldOnlyInstancioRandomizer() {
+            super(FieldOnly.class, List.of("id"));
+        }
+    }
+
+    /**
+     * A randomizer of the flavor which assigns fields reflectively, on an instance of its own making.
+     *
+     * @see __Randomizer.___OfFixtureMonkey
+     */
+    static class FieldOnlyFixtureMonkeyRandomizer extends __Randomizer.___OfFixtureMonkey<FieldOnly> {
+
+        FieldOnlyFixtureMonkeyRandomizer() {
             super(FieldOnly.class, List.of("id"));
         }
     }
@@ -184,10 +278,26 @@ class __Randomizer_Exclusion_Test {
         assertThat(instance.id).isNull();
     }
 
-    @DisplayName("___OfEasyRandomBean populates a field-only class, honoring the exclusion")
+    @DisplayName("___OfEasyRandom populates a field-only class, honoring the exclusion")
     @Test
-    void fieldOnly_Populated_OfEasyRandomBean() {
-        final var instance = new FieldOnlyEasyRandomizer().get();
+    void fieldOnly_Populated_OfEasyRandom() {
+        final var instance = new FieldOnlyEasyRandomRandomizer().get();
+        assertThat(instance.name).as("the control field is randomized").isNotNull();
+        assertThat(instance.id).as("the excluded field is left alone").isNull();
+    }
+
+    @DisplayName("___OfInstancio populates a field-only class, honoring the exclusion")
+    @Test
+    void fieldOnly_Populated_OfInstancio() {
+        final var instance = new FieldOnlyInstancioRandomizer().get();
+        assertThat(instance.name).as("the control field is randomized").isNotNull();
+        assertThat(instance.id).as("the excluded field is left alone").isNull();
+    }
+
+    @DisplayName("___OfFixtureMonkey populates a field-only class, honoring the exclusion")
+    @Test
+    void fieldOnly_Populated_OfFixtureMonkey() {
+        final var instance = new FieldOnlyFixtureMonkeyRandomizer().get();
         assertThat(instance.name).as("the control field is randomized").isNotNull();
         assertThat(instance.id).as("the excluded field is left alone").isNull();
     }

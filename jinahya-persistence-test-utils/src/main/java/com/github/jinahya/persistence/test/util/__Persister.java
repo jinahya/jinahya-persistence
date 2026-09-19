@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
  *
  * @param <T> the entity type to persist.
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __PersisterLocator#STANDARD
+ * @see __PersisterUtils#locateStandard(Class)
  * @see __PersisterUtils#newPersistedInstanceOf(EntityManager, Class)
  */
 @SuppressWarnings({
@@ -30,18 +30,18 @@ public abstract class __Persister<T> implements BiFunction<EntityManager, T, T> 
     /**
      * Creates a new instance for persisting specified class.
      *
-     * @param entityClass the class to persist.
-     * @throws NullPointerException when the {@code entityClass} is {@code null}.
+     * @param targetClass the class to persist.
+     * @throws NullPointerException when the {@code targetClass} is {@code null}.
      * @apiNote A subclass is expected to declare a no-argument constructor which supplies the
-     *         {@code entityClass}, for that is how a located persister class is instantiated.
-     * @see #entityClass
+     *         {@code targetClass}, for that is how a located persister class is instantiated.
+     * @see #targetClass
      */
-    protected __Persister(final Class<T> entityClass) {
+    protected __Persister(final Class<T> targetClass) {
         super();
-        this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
+        this.targetClass = Objects.requireNonNull(targetClass, "targetClass is null");
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Persists specified instance of {@code T}, using specified entity manager, and returns the instance.
@@ -64,10 +64,10 @@ public abstract class __Persister<T> implements BiFunction<EntityManager, T, T> 
         return entityInstance;
     }
 
-// ---------------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The entity class to persist.
      */
-    protected final Class<T> entityClass;
+    protected final Class<T> targetClass;
 }
