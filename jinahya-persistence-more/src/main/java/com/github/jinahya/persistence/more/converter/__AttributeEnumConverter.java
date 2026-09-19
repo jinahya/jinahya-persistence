@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.converter;
 
 /*-
  * #%L
@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+import com.github.jinahya.persistence.more.__AttributeEnum;
+import com.github.jinahya.persistence.more.__AttributeEnumUtils;
 import jakarta.persistence.AttributeConverter;
 import org.jspecify.annotations.Nullable;
 

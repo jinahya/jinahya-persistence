@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.test;
 
-import com.github.jinahya.persistence.more.__StringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 
 /**
  * An abstract class for testing {@link __StringAttributeConverter} implementations, whose database column type is

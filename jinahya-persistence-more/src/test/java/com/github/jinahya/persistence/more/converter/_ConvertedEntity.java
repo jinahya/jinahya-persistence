@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.converter;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -12,8 +12,8 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 
 /**
- * An entity which registers {@link __StringAttributeConverter.OfBigDecimal} on a real attribute, so that the provider —
- * not a unit test — is what instantiates the converter.
+ * An entity which registers {@link __NumberStringAttributeConverters.OfBigDecimal} on a real attribute, so that the
+ * provider — not a unit test — is what instantiates the converter.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -26,7 +26,7 @@ public class _ConvertedEntity {
     @Column(name = "id", nullable = false)
     public Long id;
 
-    @Convert(converter = __StringAttributeConverter.OfBigDecimal.class)
+    @Convert(converter = __NumberStringAttributeConverters.OfBigDecimal.class)
     @Basic(optional = true)
     @Column(name = "amount", nullable = true, length = 64, columnDefinition = "VARCHAR(64)")
     public BigDecimal amount;

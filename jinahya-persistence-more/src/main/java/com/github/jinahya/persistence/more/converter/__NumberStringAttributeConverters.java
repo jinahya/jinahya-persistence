@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.converter;
 
 /*-
  * #%L
@@ -20,48 +20,38 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 /**
- * An abstract class for converting {@code String} db data to a specific type of entity attribute, and vice versa.
+ * Concrete {@link __NumberStringAttributeConverter}s, one per {@link Number} type which has an exact decimal spelling
+ * and reads back from it.
+ * <p>
+ * Every one of them keeps the digits rather than the bits: a value is written as text and parsed back, so what the
+ * column holds is what a person reading the table sees. {@link OfFloat} and {@link OfDouble} are the two which cannot
+ * promise that entirely, and say so.
  *
- * @param <X> entity attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see __NumberStringAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __StringAttributeConverter<X> implements AttributeConverter<X, String> {
+public final class __NumberStringAttributeConverters {
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    /**
-     * An abstract class for converting {@code String} db data to an entity attribute of aspecific subtype of
-     * {@link Number}, and vice versa.
-     *
-     * @param <N> number type parameter
-     * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
-     */
     /**
      * The three {@code double}/{@code float} values which {@link BigDecimal} cannot represent, in the exact spelling
      * {@link Double#toString(double)} and {@link Float#toString(float)} both produce, and which
      * {@link Double#valueOf(String)} and {@link Float#valueOf(String)} both read back.
      */
-    private static final java.util.Set<String> NON_FINITE = java.util.Set.of("NaN", "Infinity", "-Infinity");
+    private static final Set<String> NON_FINITE = Set.of("NaN", "Infinity", "-Infinity");
 
-    public abstract static class OfNumber<N extends Number> extends __StringAttributeConverter<N> {
-
-        /**
-         * Creates a new instance.
-         */
-        protected OfNumber() {
-            super();
-        }
-    }
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * A converter for an entity attribute of {@link BigDecimal}.
@@ -70,7 +60,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
      *         which keeps the value free of an exponent.
      */
     @Converter(autoApply = false)
-    public static class OfBigDecimal extends OfNumber<BigDecimal> {
+    public static class OfBigDecimal extends __NumberStringAttributeConverter<BigDecimal> {
 
         /**
          * Creates a new instance.
@@ -106,7 +96,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
      * @implSpec A value is stored as the {@link Integer#toString() decimal string} of the attribute.
      */
     @Converter(autoApply = false)
-    public static class OfInteger extends OfNumber<Integer> {
+    public static class OfInteger extends __NumberStringAttributeConverter<Integer> {
 
         /**
          * Creates a new instance.
@@ -138,7 +128,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
      * @implSpec A value is stored as the {@link Long#toString() decimal string} of the attribute.
      */
     @Converter(autoApply = false)
-    public static class OfLong extends OfNumber<Long> {
+    public static class OfLong extends __NumberStringAttributeConverter<Long> {
 
         /**
          * Creates a new instance.
@@ -175,7 +165,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
      *         signed zero, so {@code -0.0} reads back as {@code 0.0}.
      */
     @Converter(autoApply = false)
-    public static class OfFloat extends OfNumber<Float> {
+    public static class OfFloat extends __NumberStringAttributeConverter<Float> {
 
         /**
          * Creates a new instance.
@@ -224,7 +214,7 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
      *         signed zero, so {@code -0.0} reads back as {@code 0.0}.
      */
     @Converter(autoApply = false)
-    public static class OfDouble extends OfNumber<Double> {
+    public static class OfDouble extends __NumberStringAttributeConverter<Double> {
 
         /**
          * Creates a new instance.
@@ -262,14 +252,12 @@ public abstract class __StringAttributeConverter<X> implements AttributeConverte
         private final OfBigDecimal delegate;
     }
 
-    // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
-
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance.
+     * Creates a new instance, which is not allowed.
      */
-    protected __StringAttributeConverter() {
-        super();
+    private __NumberStringAttributeConverters() {
+        throw new AssertionError("instantiation is not allowed");
     }
 }

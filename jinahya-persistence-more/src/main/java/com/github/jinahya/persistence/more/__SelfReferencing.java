@@ -45,8 +45,8 @@ import org.jspecify.annotations.Nullable;
  * so the {@link PositiveOrZero @PositiveOrZero} below genuinely constrains every implementation.
  * <p>
  * An entity which names its parent member on its own terms, rather than so that its accessor lines up with
- * {@link #getHierarchyParent()}, can mark it {@link __SelfReferencingParent @__SelfReferencingParent} — the field
- * under field access, the accessor under property access — and implement the interface method by delegating to
+ * {@link #getHierarchyParent()}, can mark it {@link __SelfReferencingParent @__SelfReferencingParent} — the field under
+ * field access, the accessor under property access — and implement the interface method by delegating to
  * {@link __SelfReferencingUtils#parentOf(__SelfReferencing) parentOf(this)}, which finds the member by that mark.
  * {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal} does the same for an ordinal among siblings, which this
  * interface does not itself declare.

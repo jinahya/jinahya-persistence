@@ -30,7 +30,7 @@ package com.github.jinahya.persistence.more;
  * @param <SELF>      self type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __AttributeEnumConverter
+ * @see com.github.jinahya.persistence.more.converter.__AttributeEnumConverter
  * @see __AttributeEnumUtils
  */
 @SuppressWarnings({
@@ -101,7 +101,7 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      * An interface for defining enum constants with {@link Integer} attribute values.
      *
      * @param <SELF> self type parameter
-     * @see __AttributeEnumConverter.__OfInteger
+     * @see com.github.jinahya.persistence.more.converter.__AttributeEnumConverter.__OfInteger
      */
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention
@@ -147,7 +147,7 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      * An interface for defining enum constants with {@link Long} attribute values.
      *
      * @param <SELF> self type parameter
-     * @see __AttributeEnumConverter.__OfLong
+     * @see com.github.jinahya.persistence.more.converter.__AttributeEnumConverter.__OfLong
      */
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention

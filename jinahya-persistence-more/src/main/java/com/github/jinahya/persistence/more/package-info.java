@@ -1,22 +1,24 @@
 /**
  * Interfaces and classes which complement Jakarta Persistence when creating a persistence unit.
- * <p>
- * Two themes live here.
- *
- * <h2>Attribute converters</h2>
- * {@link com.github.jinahya.persistence.more.__StringAttributeConverter} is the base for storing a value as a
- * {@code String}, and carries ready-made converters for the {@link java.lang.Number} types.
- * {@link com.github.jinahya.persistence.more.__JoinedStringAttributeConverter} stores a whole list in one delimited
- * column. Converters can be composed rather than written from scratch:
- * {@link com.github.jinahya.persistence.more.__ChainingAttributeConverter} builds one converter out of two, through an
- * intermediate type, and {@link com.github.jinahya.persistence.more.__AttributeConverterUtils} builds one out of a pair
- * of functions.
  *
  * <h2>Enums with stable persisted values</h2>
  * {@link com.github.jinahya.persistence.more.__AttributeEnum} lets an enum constant declare the value actually written
- * to the database, so the persisted form survives renaming and reordering of constants;
- * {@link com.github.jinahya.persistence.more.__AttributeEnumConverter} is the converter for it, and
- * {@link com.github.jinahya.persistence.more.__AttributeEnumUtils} looks a constant up by its attribute value.
+ * to the database, so the persisted form survives renaming and reordering of constants, and
+ * {@link com.github.jinahya.persistence.more.__AttributeEnumUtils} looks a constant up by its attribute value. The
+ * converter which carries a value in either direction,
+ * {@link com.github.jinahya.persistence.more.converter.__AttributeEnumConverter}, lives with the other converters.
+ *
+ * <h2>Entities which reference their own type</h2>
+ * {@link com.github.jinahya.persistence.more.__SelfReferencing} is the view of an entity's position within a hierarchy
+ * of its own type — its parent, and its depth from the root. An entity which names its members on its own terms marks
+ * them {@link com.github.jinahya.persistence.more.__SelfReferencingParent @__SelfReferencingParent} and
+ * {@link com.github.jinahya.persistence.more.__SelfReferencingOrdinal @__SelfReferencingOrdinal}, and
+ * {@link com.github.jinahya.persistence.more.__SelfReferencingUtils} reads them.
+ *
+ * <h2>Subpackages</h2>
+ * {@link com.github.jinahya.persistence.more.converter} holds the attribute converters — the base for storing a value
+ * as a {@code String}, a whole list in one delimited column, and the two ways of composing a converter rather than
+ * writing one. {@link com.github.jinahya.persistence.more.color} holds the mapped superclasses for colors.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

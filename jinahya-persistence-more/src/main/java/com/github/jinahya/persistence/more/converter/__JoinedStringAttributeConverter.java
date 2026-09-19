@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more;
+package com.github.jinahya.persistence.more.converter;
 
 /*-
  * #%L
@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class __JoinedStringAttributeConverter<X> extends __StringAttributeConverter<List<X>> {
+public class __JoinedStringAttributeConverter<X> implements __StringAttributeConverter<List<X>> {
 
     /**
      * An abstract class for converting a {@link List} of {@link String} elements, which requires no element
