@@ -89,13 +89,12 @@ public final class __RandomizerUtils {
      */
     public static <T> Optional<T> newRandomizedInstanceOf(final Class<T> target) {
         Objects.requireNonNull(target, "target is null");
-        final Class<?> located = locateStandard(target);
-        if (located == null) {
+        final __Randomizer<?> randomizer =
+                ___Utils.newLocatedInstance(target, __Randomizer.class, locateStandard(target));
+        if (randomizer == null) {
             return Optional.empty();
         }
         // one is provided, so it is meant to be used; from here, anything wrong with it is a fault
-        ___Utils.requireSubtype(located, __Randomizer.class, target);
-        final var randomizer = (__Randomizer<?>) ___Utils.newInstance(located);
         return Optional.of(___Utils.produced(target, randomizer, randomizer.get()));
     }
 

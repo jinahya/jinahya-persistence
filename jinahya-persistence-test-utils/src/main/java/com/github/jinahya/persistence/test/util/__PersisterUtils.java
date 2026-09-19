@@ -55,13 +55,12 @@ public final class __PersisterUtils {
     })
     private static <T> Optional<__Persister<T>> newPersisterInstanceOf(final Class<T> target) {
         assert target != null;
-        final Class<?> located = locateStandard(target);
-        if (located == null) {
+        final __Persister<?> persister =
+                ___Utils.newLocatedInstance(target, __Persister.class, locateStandard(target));
+        if (persister == null) {
             return Optional.empty();
         }
         // one is provided, so it is meant to be used; from here, anything wrong with it is a fault
-        ___Utils.requireSubtype(located, __Persister.class, target);
-        final var persister = (__Persister<?>) ___Utils.newInstance(located);
         ___Utils.requireAccepting(target, persister.targetClass, persister);
         return Optional.of((__Persister<T>) persister);
     }

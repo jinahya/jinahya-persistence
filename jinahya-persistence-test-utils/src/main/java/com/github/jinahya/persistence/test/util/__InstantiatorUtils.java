@@ -62,15 +62,13 @@ public final class __InstantiatorUtils {
      */
     public static <T> T newInstantiatedInstanceOf(final Class<T> target) {
         Objects.requireNonNull(target, "target is null");
-        final Class<?> located = locateStandard(target);
-        if (located == null) {
+        final __Instantiator<?> instantiator =
+                ___Utils.newLocatedInstance(target, __Instantiator.class, locateStandard(target));
+        if (instantiator == null) {
             // none is provided; the target instantiates itself, through its own no-argument constructor
             return ___Utils.newInstance(target);
         }
         // one is provided, so it is meant to be used; from here, anything wrong with it is a fault
-        ___Utils.requireSubtype(located, __Instantiator.class, target);
-        // and we can test 'targetClass' field for result compatibility?
-        final var instantiator = (__Instantiator<?>) ___Utils.newInstance(located);
         return ___Utils.produced(target, instantiator, instantiator.get());
     }
 

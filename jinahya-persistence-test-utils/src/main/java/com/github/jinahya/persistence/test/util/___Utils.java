@@ -172,6 +172,41 @@ final class ___Utils {
         return located;
     }
 
+    /**
+     * Returns a new instance of the specified located class, as the role it was located for.
+     *
+     * @param target  the class the {@code located} class was located for; for diagnostics only.
+     * @param role    the supertype of the role the {@code located} class was located for; an
+     *                {@link __Instantiator}, a {@link __Randomizer}, or a {@link __Persister}.
+     * @param located the located class; {@code null}, when none was located.
+     * @param <R>     the role type parameter.
+     * @return a new instance of the {@code located} class, as the {@code role}; {@code null}, when the
+     *         {@code located} class is {@code null}.
+     * @throws RuntimeException when the {@code located} class does not extend the {@code role}, or can not be
+     *                          instantiated.
+     * @apiNote Absence and fault are kept apart here: a {@code null} is returned for a class which was never
+     *         located, and left for the caller to interpret -- a missing instantiator is an absence to fall back on,
+     *         while a missing persister is not -- whereas a class which <em>was</em> located, and is then of the wrong
+     *         role, or is not instantiable, throws.
+     *         <p>
+     *         No check of the class the located instance is declared for is made here, for there is no single check to
+     *         make: a producer is verified on what it {@link #produced(Class, Object, Object) produced}, and a consumer
+     *         on the class it is {@link #requireAccepting(Class, Class, Object) declared for}. The two roles vary in
+     *         opposite directions, so each caller applies its own.
+     * @see #requireSubtype(Class, Class, Class)
+     * @see #newInstance(Class)
+     */
+    @Nullable
+    static <R> R newLocatedInstance(final Class<?> target, final Class<R> role, final @Nullable Class<?> located) {
+        assert target != null;
+        assert role != null;
+        if (located == null) {
+            return null;
+        }
+        requireSubtype(located, role, target);
+        return role.cast(newInstance(located));
+    }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
     /**
