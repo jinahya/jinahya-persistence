@@ -255,12 +255,19 @@ public abstract class __MappedHwb extends ___MappedHueColor {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The whiteness component of this color, normalized, mapped to the {@value #COLUMN_NAME_WHITENESS} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_WHITENESS, nullable = false, insertable = true, updatable = true)
     private double whiteness;
 
+    /**
+     * The blackness component of this color, normalized, mapped to the {@value #COLUMN_NAME_BLACKNESS} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)

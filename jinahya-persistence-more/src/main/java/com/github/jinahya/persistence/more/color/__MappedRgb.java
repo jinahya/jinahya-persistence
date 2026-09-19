@@ -325,18 +325,28 @@ public abstract class __MappedRgb extends ___MappedColor {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The red component of this color, normalized, mapped to the {@value #COLUMN_NAME_RED} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_RED, nullable = false, insertable = true, updatable = true)
     private double red;
 
+    /**
+     * The green component of this color, normalized, mapped to the {@value #COLUMN_NAME_GREEN} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_GREEN, nullable = false, insertable = true, updatable = true)
     private double green;
 
+    /**
+     * The blue component of this color, normalized, mapped to the {@value #COLUMN_NAME_BLUE} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)

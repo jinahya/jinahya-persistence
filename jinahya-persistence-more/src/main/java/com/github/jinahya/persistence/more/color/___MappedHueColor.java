@@ -186,6 +186,11 @@ public abstract class ___MappedHueColor extends ___MappedColor {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The hue of this color, in degrees rather than normalized &mdash; the unit CSS Color 4 gives it &mdash; mapped to
+     * the {@value #COLUMN_NAME_HUE} column.
+     */
     @DecimalMax(value = DECIMAL_MAX_HUE, inclusive = false)
     @DecimalMin(DECIMAL_MIN_HUE)
     @Basic(optional = false)

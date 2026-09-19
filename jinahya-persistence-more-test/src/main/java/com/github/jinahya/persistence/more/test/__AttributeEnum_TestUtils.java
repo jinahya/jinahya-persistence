@@ -206,10 +206,11 @@ public final class __AttributeEnum_TestUtils {
      * Returns the result of the specified function, applied with a randomly selected attribute value of the specified
      * enum class.
      *
-     * @param enumClass the enum class.
-     * @param function  the function.
-     * @param <ENUM>    enum type parameter
-     * @param <R>       result type parameter
+     * @param enumClass   the enum class.
+     * @param function    the function.
+     * @param <ENUM>      enum type parameter
+     * @param <ATTRIBUTE> attribute type parameter
+     * @param <R>         result type parameter
      * @return the result of the {@code function}; {@code null} if the {@code enumClass} doesn't have any constant.
      * @see #getRandomAttributeValue(Class)
      */
@@ -224,10 +225,11 @@ public final class __AttributeEnum_TestUtils {
     /**
      * Returns a random attribute value of the specified enum class.
      *
-     * @param enumClass the enum class.
-     * @param <ENUM>    enum type parameter
-     * @return a random attribute value of the {@code enumClass}; {@code null} if the {@code enumClass} doesn't have any
-     *         constant.
+     * @param enumClass   the enum class.
+     * @param <ENUM>      enum type parameter
+     * @param <ATTRIBUTE> attribute type parameter
+     * @return a random attribute value of the {@code enumClass}; {@code null} if the {@code enumClass} doesn't have
+     *         any constant.
      * @see #applyRandomAttributeValue(Class, Function)
      */
     @Nullable

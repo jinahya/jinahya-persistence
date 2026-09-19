@@ -354,24 +354,37 @@ public abstract class __MappedCmyk extends ___MappedColor {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * The cyan component of this color, normalized, mapped to the {@value #COLUMN_NAME_CYAN} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_CYAN, nullable = false, insertable = true, updatable = true)
     private double cyan;
 
+    /**
+     * The magenta component of this color, normalized, mapped to the {@value #COLUMN_NAME_MAGENTA} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_MAGENTA, nullable = false, insertable = true, updatable = true)
     private double magenta;
 
+    /**
+     * The yellow component of this color, normalized, mapped to the {@value #COLUMN_NAME_YELLOW} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)
     @Column(name = COLUMN_NAME_YELLOW, nullable = false, insertable = true, updatable = true)
     private double yellow;
 
+    /**
+     * The black component of this color, normalized, mapped to the {@value #COLUMN_NAME_BLACK} column.
+     */
     @DecimalMax(DECIMAL_MAX_COMPONENT)
     @DecimalMin(DECIMAL_MIN_COMPONENT)
     @Basic(optional = false)

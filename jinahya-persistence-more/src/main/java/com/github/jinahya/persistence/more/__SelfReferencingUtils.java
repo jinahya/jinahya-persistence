@@ -35,32 +35,28 @@ import java.util.Optional;
  * that an entity whose members are named on its own terms can still answer
  * {@link __SelfReferencing#getHierarchyParent() getHierarchyParent()}:
  * {@snippet lang = "java":
- * @Nullable
- * @Transient
- * @Override
- * public Category getHierarchyParent() {
- *     return __SelfReferencingUtils.parentOf(this);
- * }
- *}
- * <p>
- * This is the back door, not the front one. An entity which names its member so that its own accessor already
- * implements {@code getHierarchyParent()} never comes here, and is better off for it.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __SelfReferencing
- * @see __SelfReferencingParent
- * @see __SelfReferencingOrdinal
- * @implNote The members are found by {@link ___Utils#findMember(Class, Class) ___Utils.findMember(type, mark)} and the
- *         results cached in {@link ClassValue}s, computed once per type and safe to share between threads, so that
- *         walking a hierarchy — which calls back into these methods for every step — does not rescan a class tree on
- *         every read. A {@code ClassValue} also ties each entry to the class it was computed from, so
- *         that neither outlives the other and a redeployed application does not leak its class loader.
+ * @Nullable
+ * @Transient
+ * @Override public Category getHierarchyParent() { return __SelfReferencingUtils.parentOf(this); }}
+ *         <p>
+ *         This is the back door, not the front one. An entity which names its member so that its own accessor already
+ *         implements {@code getHierarchyParent()} never comes here, and is better off for it.
+ * @implNote The members are found by {@link ___Utils#findMember(Class, Class) ___Utils.findMember(type, mark)}
+ *         and the results cached in {@link ClassValue}s, computed once per type and safe to share between threads, so
+ *         that walking a hierarchy — which calls back into these methods for every step — does not rescan a class tree
+ *         on every read. A {@code ClassValue} also ties each entry to the class it was computed from, so that neither
+ *         outlives the other and a redeployed application does not leak its class loader.
  *         <p>
  *         That these caches are here, rather than in {@link __SelfReferencing} itself, is what this class is for: a
  *         field of an interface is {@code public static final} with no way to say otherwise, so a cache declared there
  *         would be inherited by every implementing type, reachable as {@code Category.PARENT_MEMBERS}, and would stand
  *         in the published contract next to the constants which are meant to be read. An interface can hide a method;
  *         it can not hide a field.
+ * @see __SelfReferencing
+ * @see __SelfReferencingParent
+ * @see __SelfReferencingOrdinal
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -70,10 +66,10 @@ public final class __SelfReferencingUtils {
     /**
      * The member annotated with {@link __SelfReferencingParent @__SelfReferencingParent}, of each type.
      *
-     * @implNote The lookup itself is {@link ___Utils#findMember(Class, Class) ___Utils.findMember(type, mark)}, which
-     *         accepts the mark on a field or on an accessor and knows nothing of what it means. What is decided here is
-     *         the rule: carrying the mark nowhere fails, because a missing mark is a broken implementation, not an
-     *         entity without a parent.
+     * @implNote The lookup itself is {@link ___Utils#findMember(Class, Class) ___Utils.findMember(type, mark)},
+     *         which accepts the mark on a field or on an accessor and knows nothing of what it means. What is decided
+     *         here is the rule: carrying the mark nowhere fails, because a missing mark is a broken implementation, not
+     *         an entity without a parent.
      */
     private static final ClassValue<Member> PARENT_MEMBERS = new ClassValue<>() {
         @Override
@@ -93,10 +89,10 @@ public final class __SelfReferencingUtils {
     /**
      * The member annotated with {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, of each type.
      *
-     * @implNote Unlike the parent, <em>absence is the normal case</em> — an entity which does not order its siblings
-     *         carries no mark — so a failure to find one is cached as {@link Optional#empty()} rather than thrown.
-     *         Finding one which is not typed {@link Integer} does fail: a primitive {@code int} can not tell the first
-     *         position among siblings from no ordering at all.
+     * @implNote Unlike the parent, <em>absence is the normal case</em> — an entity which does not order its
+     *         siblings carries no mark — so a failure to find one is cached as {@link Optional#empty()} rather than
+     *         thrown. Finding one which is not typed {@link Integer} does fail: a primitive {@code int} can not tell
+     *         the first position among siblings from no ordering at all.
      */
     private static final ClassValue<Optional<Member>> ORDINAL_MEMBERS = new ClassValue<>() {
         @Override
@@ -127,7 +123,8 @@ public final class __SelfReferencingUtils {
      * @param <T>      self-referencing type parameter
      * @return the parent of the {@code instance}; {@code null} when the {@code instance} is a root.
      * @throws IllegalStateException when the class tree of the {@code instance} carries no member annotated with
-     *                               {@link __SelfReferencingParent @__SelfReferencingParent}, or carries more than one.
+     *                               {@link __SelfReferencingParent @__SelfReferencingParent}, or carries more than
+     *                               one.
      * @apiNote The member is read directly, and the name it is declared under is never looked at.
      *         <p>
      *         Which member carries the mark decides one thing beyond where it sits. A marked <em>field</em> is read as
@@ -172,8 +169,8 @@ public final class __SelfReferencingUtils {
      *                               with {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, or carries one
      *                               which is not typed {@link Integer}.
      * @apiNote Note what the two {@code null}s have in common and what they do not: an entity which orders its
-     *          siblings but has not been given an ordinal yet, and an entity which does not order them at all, answer
-     *          alike here. Where the difference matters, ask the type, not the instance.
+     *         siblings but has not been given an ordinal yet, and an entity which does not order them at all, answer
+     *         alike here. Where the difference matters, ask the type, not the instance.
      * @see __SelfReferencingOrdinal
      */
     public static <T extends __SelfReferencing<T>> @Nullable Integer ordinalOf(final T instance) {

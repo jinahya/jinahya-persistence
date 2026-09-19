@@ -59,10 +59,10 @@ final class ___Utils {
      *         such member.
      * @throws IllegalStateException when the class tree of the {@code type} carries more than one such field, more than
      *                               one such accessor, or an annotated method which is not an accessor.
-     * @implNote Fields and methods are scanned alike, because the access type belongs to the annotated class and is not
-     *         visible from here. An accessor found alongside a field wins: invoking it goes through whatever a
-     *         persistence provider put in front of the property, where reading a field does not, so the accessor is the
-     *         read which initializes a lazy proxy rather than answering out of an empty field.
+     * @implNote Fields and methods are scanned alike, because the access type belongs to the annotated class
+     *         and is not visible from here. An accessor found alongside a field wins: invoking it goes through whatever
+     *         a persistence provider put in front of the property, where reading a field does not, so the accessor is
+     *         the read which initializes a lazy proxy rather than answering out of an empty field.
      *         <p>
      *         The climb starts at the type itself — which may well be a provider's proxy subclass — and stops at, but
      *         does not include, {@link Object}.
@@ -146,9 +146,9 @@ final class ___Utils {
      * @param instance the instance to read from.
      * @return the value of the {@code member} of the {@code instance}.
      * @throws ReflectiveOperationException when the {@code member} can not be read.
-     * @implNote An exception thrown by an accessor is rethrown as it is, rather than wrapped: an annotated accessor
-     *         which derives the value it holds is running its caller's own code here, and burying its failure inside a
-     *         reflection error would hide the only part of the stack which explains it.
+     * @implNote An exception thrown by an accessor is rethrown as it is, rather than wrapped: an annotated
+     *         accessor which derives the value it holds is running its caller's own code here, and burying its failure
+     *         inside a reflection error would hide the only part of the stack which explains it.
      */
     static @Nullable Object valueOf(final Member member, final Object instance) throws ReflectiveOperationException {
         assert member != null;
