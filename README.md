@@ -114,11 +114,57 @@ Jakarta EE 9/9.1 and 10 platform generations.*
 | Module | What it holds | Depends on (within the reactor) | Maven Central |
 | --- | --- | --- | --- |
 | [`jinahya-persistence-utils`](jinahya-persistence-utils) | Static helpers over the core Jakarta Persistence types: resource-level transaction wrappers, JDBC `Connection` unwrapping, and reflective read/write of a metamodel `Attribute`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-utils)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-utils) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-utils/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-utils) |
-| [`jinahya-persistence-more`](jinahya-persistence-more) | Extended mapping building blocks: attribute enums and their converters, string/joined-string converters, self-referencing entities, and the mapped colour types. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more) |
+| [`jinahya-persistence-more`](jinahya-persistence-more) | Extended mapping building blocks, in three packages: attribute enums and self-referencing entities; the attribute converters (see [below](#inside-jinahya-persistence-more)); and the mapped colour types. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more) |
 | [`jinahya-persistence-crypto`](jinahya-persistence-crypto) | Transparent attribute encryption for entities: the encryption service, its CDI qualifier, and the lifecycle listener which moves values between plaintext and ciphertext attributes. | `-utils` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-crypto)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-crypto) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-crypto/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-crypto) |
 | [`jinahya-persistence-more-test`](jinahya-persistence-more-test) | Abstract JUnit base classes for testing what `-more` defines — attribute converters and attribute enums. Lives in `src/main` so other projects' tests can extend it. | `-more` (`provided`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-test)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-test) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test) |
 | [`jinahya-persistence-test-utils`](jinahya-persistence-test-utils) | Randomizer / instantiator / persister SPIs, with locators, for building entity instances in a test suite. Also `src/main`, for the same reason. | — | not published yet |
 | [`coverage-report-aggregated`](coverage-report-aggregated) | Build-only: aggregates every module's JaCoCo execution data into one report. Not an artifact anyone depends on. | all five | — |
+
+### Inside `jinahya-persistence-more`
+
+Three packages, by what they are for:
+
+| Package | What it holds |
+| --- | --- |
+| `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type. |
+| `…persistence.more.converter` | Everything which converts an attribute. See below. |
+| `…persistence.more.color` | Mapped superclasses for colours in several models — RGB, RGBA, HSL, HWB, CMYK — sharing one way of addressing their components, and following CSS Color 4 for every conversion. |
+
+#### The converter package
+
+A converter is pinned by two independent things, and the package keeps them apart. The **column axis** says what the
+column is and leaves the attribute open; the **attribute axis** says what the attribute is and leaves the column open.
+Both are interfaces carrying nothing, so a converter pinned on both implements one of each and still has its single
+inheritance to spend elsewhere:
+
+```java
+public abstract class __NumberStringAttributeConverter<X extends Number>
+        implements __StringAttributeConverter<X>, __NumberAttributeConverter<X, String> { … }
+```
+
+Every abstract contract sits alone in its file, and the concrete converters — the ones carrying `@Converter` and
+registrable in a persistence unit — live in a `…Converters` holder per family:
+
+| Holder | Converters |
+| --- | --- |
+| `__NumberStringAttributeConverters` | `BigDecimal`, `Integer`, `Long`, `Float`, `Double`, each stored as its exact decimal text |
+| `__TemporalAccessorStringAttributeConverters` | the ten `java.time` types with a `parse(CharSequence)`, in ISO-8601 or through a `DateTimeFormatter` |
+| `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
+| `__BooleanYnAttributeConverters` | a legacy `'Y'`/`'N'` flag, as a `Character` or a `String`, strict or lenient |
+
+`__AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
+a converter has to name its enum class and that class belongs to the consumer.
+
+#### Upgrading to 0.5.5
+
+Two breaking changes land together, so that a call site is edited once rather than twice:
+
+- every converter moved from `com.github.jinahya.persistence.more` to `…more.converter`;
+- `__StringAttributeConverter` became an **interface**, so a class which `extends` it now `implements` it, and the
+  numeric converters it used to nest moved to `__NumberStringAttributeConverters`.
+
+A converter named in `persistence.xml` or in `@Convert` has to be renamed accordingly —
+`…more.__StringAttributeConverter$OfBigDecimal` is now `…more.converter.__NumberStringAttributeConverters$OfBigDecimal`.
 
 ### Dependencies
 
