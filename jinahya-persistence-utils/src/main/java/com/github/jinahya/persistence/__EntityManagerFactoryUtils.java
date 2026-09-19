@@ -1,5 +1,25 @@
 package com.github.jinahya.persistence;
 
+/*-
+ * #%L
+ * jinahya-persistence-utils
+ * %%
+ * Copyright (C) 2024 - 2025 Jinahya, Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
@@ -28,7 +48,7 @@ public final class __EntityManagerFactoryUtils {
      *         bought nothing, because both providers return an already-built instance from a field.
      * @see EntityManagerFactory#getPersistenceUnitUtil()
      */
-    static PersistenceUnitUtil getPersistenceUnitUtil(final EntityManagerFactory factory) {
+    public static PersistenceUnitUtil getPersistenceUnitUtil(final EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
         return factory.getPersistenceUnitUtil();
     }
@@ -47,11 +67,27 @@ public final class __EntityManagerFactoryUtils {
      * @see PersistenceUnitUtil#getIdentifier(Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> @Nullable Y getIdentifier(final EntityManagerFactory factory,
-                                                final Object entity) {
+    public static <Y> @Nullable Y getIdentifier(final EntityManagerFactory factory, final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
         return (Y) getPersistenceUnitUtil(factory).getIdentifier(entity);
+    }
+
+    /**
+     * Returns the version of the specified entity.
+     *
+     * @param factory an entity manager factory.
+     * @param entity  the entity instance whose version is to be returned.
+     * @param <Y>     version type parameter
+     * @return the version of the {@code entity} cast as {@link Y}; {@code null} when the {@code entity} has no version
+     *         attribute, or does not yet have a version.
+     * @see PersistenceUnitUtil#getVersion(Object)
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <Y> @Nullable Y getVersion(final EntityManagerFactory factory, final Object entity) {
+        Objects.requireNonNull(factory, "factory is null");
+        Objects.requireNonNull(entity, "entity is null");
+        return (Y) getPersistenceUnitUtil(factory).getVersion(entity);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

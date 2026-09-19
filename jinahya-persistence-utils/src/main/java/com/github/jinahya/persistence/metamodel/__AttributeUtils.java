@@ -75,6 +75,8 @@ public final class __AttributeUtils {
      * @param function  the function.
      * @param <R>       result type parameter
      * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code attribute}'s java member is neither a {@link Method} nor a
+     *                                  {@link Field}.
      */
     // NullAway does not propagate @Nullable through the nested wildcard type arguments below; the two
     // `apply(null)` calls are exactly what the annotated signature already declares.
@@ -90,7 +92,7 @@ public final class __AttributeUtils {
         } else if (javaMember instanceof Field field) {
             return function.apply(null).apply(field);
         }
-        throw new RuntimeException(
+        throw new IllegalArgumentException(
                 """
                         unknown java member type
                         ; attribute: %1$s
@@ -157,10 +159,16 @@ public final class __AttributeUtils {
      * @param entity    the entity.
      * @param attribute the attribute of the {@code entity}.
      * @param <Y>       attribute type parameter
-     * @return the value of the {@code attribute} of the {@code entity}.
+     * @return the value of the {@code attribute} of the {@code entity}; possibly {@code null}.
+     * @throws RuntimeException when the value cannot be read reflectively.
+     * @apiNote The result is {@link Nullable @Nullable} because an attribute value simply is: an optional
+     *         basic column, an unset association, or a not-yet-assigned generated id all read back as {@code null}.
+     *         Callers must check.
+     * @see #setAttributeValue(Object, Attribute, Object)
      */
-    public static <Y> Y getAttributeValue(final Object entity,
-                                          final Attribute<?, ? extends Y> attribute) {
+    @SuppressWarnings({"unchecked"})
+    public static <Y> @Nullable Y getAttributeValue(final Object entity,
+                                                    final Attribute<?, ? extends Y> attribute) {
         Objects.requireNonNull(entity, "entity is null");
         return applyJavaMember(
                 attribute,
@@ -204,94 +212,130 @@ public final class __AttributeUtils {
         );
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
     /**
-     * The key a write method is cached under.
+     * Write methods already resolved, per class, keyed by attribute name.
      *
-     * @param clazz     the runtime class the method was resolved against.
-     * @param attribute the attribute it writes.
      * @implNote The class is part of the key on purpose. One {@link Attribute} of a {@code @MappedSuperclass}
      *         is shared by every subclass which inherits it, so caching by attribute alone let the first subclass to be
      *         written decide the write method for all of them &mdash; and a subclass which overrides the setter yields
      *         a {@link Method} whose declaring class its siblings are not instances of.
+     *         <p>
+     *         A {@link ClassValue}, rather than a {@code static} map keyed by the class, so that nothing here outlives
+     *         what it describes: the entries hang off the class they were computed for and go when it does. The inner
+     *         map is keyed by the attribute <em>name</em> rather than by the {@link Attribute} itself for the same
+     *         reason &mdash; an {@link Attribute} reaches its metamodel, and so the factory which built it, and a build
+     *         which opens and closes a factory per test would otherwise accumulate one live persistence unit per
+     *         entry. A class cannot declare two attributes of one name, so the name is as selective as the instance.
+     *         <p>
+     *         The lookup is memoized at all because, unlike a metamodel lookup, introspecting a bean and then scanning
+     *         its hierarchy is not cheap.
+     * @see Introspector#getBeanInfo(Class)
      */
-    private record SetterKey(Class<?> clazz, Attribute<?, ?> attribute) {
-
-    }
-
-    private static final Map<SetterKey, Method> SETTERS = new ConcurrentHashMap<>();
+    private static final ClassValue<Map<String, Method>> SETTERS = new ClassValue<>() {
+        @Override
+        protected Map<String, Method> computeValue(final Class<?> type) {
+            return new ConcurrentHashMap<>();
+        }
+    };
 
     /**
-     * Returns the write method, of the specified class, for the specified attribute, caching it against both.
+     * Returns the write method, of the specified class, for the specified attribute.
      *
      * @param clazz     the class to introspect.
      * @param attribute the attribute whose write method is returned.
      * @return the write method for the {@code attribute}.
      * @throws RuntimeException when the {@code clazz} cannot be introspected, or when no write method matches the
      *                          {@code attribute}.
-     * @implNote {@link Introspector} reports only {@code public} write methods, while Jakarta Persistence 3.2
-     *         &sect;2.2 permits a {@code protected} property accessor; a declared-method scan up the hierarchy covers
-     *         that before giving up. This is the one lookup here still memoized, deliberately: unlike a metamodel
-     *         lookup, introspecting a bean and then scanning its hierarchy is not cheap, and the key pairs a class with
-     *         an attribute of that class, so the map is bounded by the mapped model rather than by traffic. The cost is
-     *         that the entries, and so the classes they name, live as long as the class holding this map &mdash; which
-     *         is only visible to a container that unloads the persistence classes without unloading this one.
-     * @see Introspector#getBeanInfo(Class)
      */
     private static Method getSetter(final Class<?> clazz, final Attribute<?, ?> attribute) {
-        return SETTERS.computeIfAbsent(
-                new SetterKey(clazz, attribute),
-                k -> {
-                    final BeanInfo beanInfo;
-                    try {
-                        beanInfo = Introspector.getBeanInfo(k.clazz());
-                    } catch (final IntrospectionException ie) {
-                        throw new RuntimeException("failed to get bean info of " + k.clazz(), ie);
-                    }
-                    final var introspected = Arrays.stream(beanInfo.getPropertyDescriptors())
-                            .filter(d -> d.getName().equals(k.attribute().getName()))
-                            // an indexed property reports a null propertyType
-                            .filter(d -> d.getPropertyType() != null
-                                         && k.attribute().getJavaType().isAssignableFrom(d.getPropertyType()))
-                            // a read-only property has no write method; skip it rather than mapping to null,
-                            // which findFirst() would reject with a NullPointerException
-                            .map(PropertyDescriptor::getWriteMethod)
-                            .filter(Objects::nonNull)
-                            .findFirst();
-                    if (introspected.isPresent()) {
-                        return introspected.get();
-                    }
-                    return findDeclaredSetter(k.clazz(), k.attribute()).orElseThrow(
-                            () -> new RuntimeException(
-                                    "no setter found for " + k.attribute() + " on " + k.clazz())
-                    );
-                }
+        return SETTERS.get(clazz).computeIfAbsent(
+                attribute.getName(),
+                n -> resolveSetter(clazz, n, getJavaMemberType(attribute))
         );
     }
 
     /**
-     * Finds a write method for the specified attribute among the methods the specified class, or any of its supertypes,
-     * declares &mdash; whatever their visibility.
+     * Resolves the write method, of the specified class, for a property of the specified name holding values of the
+     * specified type.
      *
-     * @param clazz     the class to start from.
-     * @param attribute the attribute whose write method is looked for.
-     * @return an optional of the write method; {@link Optional#empty() empty} when none is declared.
+     * @param clazz      the class to introspect.
+     * @param name       the property name.
+     * @param memberType the type the property's java member declares.
+     * @return the write method.
+     * @throws RuntimeException when the {@code clazz} cannot be introspected, or when no write method is found.
+     * @implNote {@link Introspector} reports only {@code public} write methods, while Jakarta Persistence 3.2
+     *         &sect;2.2 permits a {@code protected} property accessor; a declared-method scan up the hierarchy covers
+     *         that before giving up.
+     *         <p>
+     *         Both steps admit a candidate by asking whether its <em>parameter</em> accepts the member type, which is
+     *         the only direction that means anything for a write method. This used to compare
+     *         {@link Attribute#getJavaType()} against {@link PropertyDescriptor#getPropertyType()} &mdash; the
+     *         <em>read</em> type &mdash; the other way round, so the provider disagreement described on
+     *         {@link #getJavaMemberType(Attribute)} could make the introspected step reject the very setter it was
+     *         looking for, and only the hierarchy scan, which happened to compare the other way, saved it.
      */
-    private static Optional<Method> findDeclaredSetter(final Class<?> clazz, final Attribute<?, ?> attribute) {
-        final var attributeName = attribute.getName();
-        if (attributeName.isEmpty()) {
+    private static Method resolveSetter(final Class<?> clazz, final String name, final Class<?> memberType) {
+        final BeanInfo beanInfo;
+        try {
+            beanInfo = Introspector.getBeanInfo(clazz);
+        } catch (final IntrospectionException ie) {
+            throw new RuntimeException("failed to get bean info of " + clazz, ie);
+        }
+        final var introspected = Arrays.stream(beanInfo.getPropertyDescriptors())
+                .filter(d -> d.getName().equals(name))
+                // a read-only property has no write method; skip it rather than mapping to null,
+                // which findFirst() would reject with a NullPointerException
+                .map(PropertyDescriptor::getWriteMethod)
+                .filter(Objects::nonNull)
+                // an indexed property's write method takes (int, value); it is not what we want
+                .filter(m -> m.getParameterCount() == 1)
+                .filter(m -> m.getParameterTypes()[0].isAssignableFrom(memberType))
+                .findFirst();
+        if (introspected.isPresent()) {
+            return introspected.get();
+        }
+        return findDeclaredSetter(clazz, name, memberType).orElseThrow(
+                () -> new RuntimeException("no setter found for '" + name + "' on " + clazz)
+        );
+    }
+
+    /**
+     * Finds a write method for a property of the specified name among the methods the specified class, or any of its
+     * supertypes, declares &mdash; whatever their visibility.
+     *
+     * @param clazz      the class to start from.
+     * @param name       the property name.
+     * @param memberType the type the property's java member declares.
+     * @return an optional of the write method; {@link Optional#empty() empty} when none is declared.
+     * @implNote Two passes, so that the choice does not depend on the unspecified order
+     *         {@link Class#getDeclaredMethods()} returns: a setter whose parameter accepts the member type wins over
+     *         any other single-argument setter of that name, and only a class which overloads its setter can tell the
+     *         difference. The second pass exists for the one shape the first cannot match &mdash; a property whose
+     *         getter and setter disagree across the primitive/wrapper boundary.
+     */
+    private static Optional<Method> findDeclaredSetter(final Class<?> clazz, final String name,
+                                                       final Class<?> memberType) {
+        if (name.isEmpty()) {
             return Optional.empty();
         }
-        final var name = "set" + Character.toUpperCase(attributeName.charAt(0)) + attributeName.substring(1);
+        final var setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        Method fallback = null;
         for (var c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
             for (final var method : c.getDeclaredMethods()) {
-                if (method.getName().equals(name)
-                    && method.getParameterCount() == 1
-                    && method.getParameterTypes()[0].isAssignableFrom(attribute.getJavaType())) {
+                if (!method.getName().equals(setterName) || method.getParameterCount() != 1) {
+                    continue;
+                }
+                if (method.getParameterTypes()[0].isAssignableFrom(memberType)) {
                     return Optional.of(method);
+                }
+                if (fallback == null) {
+                    fallback = method;
                 }
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(fallback);
     }
 
     /**
@@ -308,7 +352,7 @@ public final class __AttributeUtils {
      */
     // NullAway cannot infer a @Nullable type argument for the generic call below from the lambda body;
     // the enclosing method is declared @Nullable and documents the null result.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({"NullAway", "unchecked"})
     public static <T> @Nullable T setAttributeValue(final Object entity,
                                                     final Attribute<?, ? extends T> attribute,
                                                     final @Nullable Object value) {
@@ -317,7 +361,6 @@ public final class __AttributeUtils {
                 attribute,
                 m -> f -> {
                     if (m != null) {
-                        assert m.getName().startsWith("get") || m.getName().startsWith("is");
                         final var setter = getSetter(entity.getClass(), attribute);
                         if (!setter.canAccess(entity)) {
                             setter.setAccessible(true);
