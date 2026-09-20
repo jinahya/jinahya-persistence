@@ -32,44 +32,106 @@ import org.jspecify.annotations.Nullable;
 /**
  * An abstract mapped superclass for an interval, from an inclusive start to an exclusive end.
  * <p>
- * Two columns are mapped — {@value #COLUMN_NAME_START} and {@value #COLUMN_NAME_END} — and either may be {@code NULL},
- * for an interval with no lower or no upper bound. Nothing else is stored: the {@code [start, end)} convention is fixed
- * by {@link __Interval}, so there is no bound to record and nothing to canonicalize.
+ * Two columns are mapped — {@value #COLUMN_NAME_INTERVAL_START} and {@value #COLUMN_NAME_INTERVAL_END} — and either
+ * may be {@code NULL}, for an interval with no lower or no upper bound. Nothing else is stored: the
+ * {@code [start, end)} convention is fixed by {@link __Interval}, so there is no bound to record and nothing to
+ * canonicalize.
  * <p>
- * The type of the two points is left to the subclass, which is what lets one class serve every axis. Whether a provider
- * resolves it is a question about the provider, not about this design: Hibernate reads a type variable off the concrete
- * subclass, and EclipseLink is the one to verify. <strong>That verification has not been done.</strong> If it fails,
- * the fallback is one mapped superclass per point type, and only this class changes.
+ * The type of the two points is left to the subclass, which is what lets one class serve every axis. Both providers
+ * resolve the type variable off the concrete subclass: Hibernate and EclipseLink have each been run against an entity
+ * extending this hierarchy and against an {@link jakarta.persistence.Embeddable @Embeddable} embedded twice, and both
+ * map the two columns and read them back. The design does not rest on an unverified assumption.
  *
- * <h2>Column names</h2>
- * The columns are named for the concept rather than after the attributes they hold, because {@code END} is a reserved
- * word in the SQL standard — it closes a {@code CASE} — and in H2, PostgreSQL, SQL Server and Oracle with it, so a
- * column of that name fails at {@code CREATE TABLE}. The prefix earns its place a second time in a table carrying more
- * than one interval, where an {@link jakarta.persistence.AttributeOverride @AttributeOverride} is wanted anyway.
- *
- * <h2>The invariant is validated, because it cannot be enforced</h2>
- * A value class checks that the end does not precede the start where an instance is created. This class has no such
- * place: a provider builds an instance through the no-argument constructor and then assigns, so between
- * {@link #setStart(Comparable)} and {@link #setEnd(Comparable)} the pair is momentarily whatever the caller's order
- * makes it, whichever order that is. Rejecting it in a setter would reject legitimate sequences.
+ * <h2>Why everything here is prefixed</h2>
+ * Both bare words are reserved. {@code END} closes a {@code CASE} in the SQL standard and {@code START} is reserved
+ * alongside it, and a check against the keyword sets of H2, PostgreSQL, MySQL, MariaDB, Oracle, SQL Server, DB2 and
+ * HSQLDB finds both reserved in every one of them — as is {@code INTERVAL} by itself. Gluing them together is what
+ * makes them ordinary identifiers, which is why the columns are {@value #COLUMN_NAME_INTERVAL_START} and
+ * {@value #COLUMN_NAME_INTERVAL_END} and the attributes {@code intervalStart} and {@code intervalEnd}.
  * <p>
- * So it is a constraint rather than a guard — {@link #isStartNotAfterEnd()}, annotated
- * {@link AssertTrue @AssertTrue}, checked when the instance is complete and admitting a {@code null} on either side.
- * The method is named for the violation it reports rather than for what it computes: a constraint on a property is
- * reported against that property's path, and {@code startNotAfterEnd} tells a reader what went wrong where
- * {@code ordered} would not.
+ * The attributes are prefixed for a second reason: they are also what a query names. Both providers happen to accept
+ * {@code i.end} in a path expression today, but {@code END} is a reserved identifier in the query language too, so the
+ * shorter name would have been leaning on leniency rather than on the grammar.
+ *
+ * <h2>The order of the two points is not validated</h2>
+ * Nothing here rejects an interval whose start is after its end. That is deliberate, and a change: this class used
+ * to carry an {@link AssertTrue @AssertTrue} constraint for it.
+ * <p>
+ * The reasoning is that a reversed pair is data the caller wrote, and what a schema does about it is the schema's
+ * business. Bean Validation runs only where a persistence unit is wired for it, so the constraint was never a
+ * guarantee in the first place — it was a default policy, imposed on consumers who had not asked for one and
+ * silently absent for the rest.
+ * <p>
+ * What to know before deciding to do nothing about it. A reversed interval is <em>inert</em> under containment:
+ * {@code interval_start <= :t AND interval_end > :t} matches no {@code :t} at all. It is <em>not</em> inert under
+ * overlap — the usual test, {@code a.start <= b.end AND b.start <= a.end}, reports a reversed interval as
+ * overlapping things it cannot overlap — and {@code MIN(interval_start)} / {@code MAX(interval_end)} widen silently
+ * around one. PostgreSQL refuses such a range outright, and Guava throws from its factory; neither treats it as
+ * data.
+ * <p>
+ * Where enforcement is wanted, the database is the better place for it, and these column types make it available:
+ * {@snippet lang = "sql":
+ * CHECK (interval_start IS NULL OR interval_end IS NULL OR interval_start <= interval_end)
+ *}
+ * That holds for every writer, including one which never loads this class — which the constraint it replaces did
+ * not.
+ *
+ * <h2>One caution about the bound</h2>
+ * {@code Comparable<? super T>} admits {@link java.time.OffsetDateTime} and {@link java.time.ZonedDateTime}, whose
+ * natural order is not the timeline: it falls through to the local value once two instants agree, so two points naming
+ * the same moment in different zones compare as distinct. Measuring such an interval is still correct, since
+ * {@link java.time.Duration#between(java.time.temporal.Temporal, java.time.temporal.Temporal) Duration.between} works
+ * on instants. It is comparing them that is not — and the constraint above compares them.
  *
  * <h2>No {@code equals} or {@code hashCode}</h2>
  * Deliberately. Both columns are mutable and neither is an identifier, so value equality here would change under a
  * setter and take an instance's position in a hash-based collection with it. Identity belongs to the entity which
  * extends this class, and it is the entity's to define.
  *
+ * <h2>Two intervals in one table</h2>
+ * A downstream entity extends this hierarchy and gets one interval, because a {@code @MappedSuperclass} is inherited
+ * once. A table which carries two — a stay and a hold, an effective period and a billing period — needs the second
+ * form: a downstream {@link jakarta.persistence.Embeddable @Embeddable} of its own extending one of these classes,
+ * embedded as many times as wanted, each with its own
+ * {@link jakarta.persistence.AttributeOverride @AttributeOverride} pair.
+ * {@snippet lang = "java":
+ * @Embeddable
+ * @Access(AccessType.FIELD)
+ * public class DateInterval extends __MappedLocalDateInterval {}
+ *
+ * @Entity
+ * public class Booking {
+ *     @Embedded
+ *     @AttributeOverride(name = "intervalStart", column = @Column(name = "stay_start"))
+ *     @AttributeOverride(name = "intervalEnd", column = @Column(name = "stay_end"))
+ *     private DateInterval stay;
+ *
+ *     @Embedded
+ *     @AttributeOverride(name = "intervalStart", column = @Column(name = "hold_start"))
+ *     @AttributeOverride(name = "intervalEnd", column = @Column(name = "hold_end"))
+ *     private DateInterval hold;
+ * }
+ *}
+ * Which is what settles what this class is entitled to fix and what it is not. The column names below are
+ * <em>defaults</em>: a downstream with two intervals replaces both pairs, and {@value #COLUMN_NAME_INTERVAL_START} is
+ * then never written to a schema at all. The attribute names are the opposite — {@code intervalStart} and
+ * {@code intervalEnd} are declared here and a downstream cannot rename them, so they are what it must spell exactly,
+ * in an {@code @AttributeOverride}, in a {@link jakarta.persistence.Convert @Convert}({@code attributeName}), and in
+ * every query path. They are ordinary Java identifiers, visible on the accessors, and the static metamodel names them
+ * type-safely.
+ *
  * <h2>Access type</h2>
  * As in {@link com.github.jinahya.persistence.more.color the colour package}, {@link Access @Access}({@code FIELD}) is
  * forced: an entity which puts its {@link jakarta.persistence.Id @Id} on a getter would otherwise flip this hierarchy
- * to property access, and the {@link Transient @Transient} accessors below — {@link #isStartNotAfterEnd()} among them,
- * which is shaped exactly like a JavaBeans property — would then unmap the two columns themselves. An entity extending
+ * to property access, and the {@link Transient @Transient} accessors inherited from {@link __Interval} —
+ * {@link __Interval#isBounded() isBounded} and {@link __Interval#isEmpty() isEmpty}, both shaped exactly like
+ * JavaBeans properties — would then be taken for columns of their own. An entity extending
  * this class should declare {@code @Access(AccessType.FIELD)} too: Hibernate infers it, EclipseLink does not.
+ * <p>
+ * Every mapped superclass in this hierarchy carries it for the same reason, and the embeddable form above is what
+ * forces the issue: EclipseLink walks the mapped-superclass chain of an {@code @Embeddable} and fails with a
+ * {@link NullPointerException} — in {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata} — where any link in
+ * that chain has no access type of its own. Hibernate infers one and never notices.
  *
  * @param <T> the type of the two points limiting this interval
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -88,28 +150,18 @@ public abstract class __MappedInterval<T extends Comparable<? super T>> implemen
     // ---------------------------------------------------------------------------------------------------------- start
 
     /**
-     * The name of the column, {@value}, of the {@value #ATTRIBUTE_NAME_START} attribute.
+     * The name of the column, {@value}, holding the {@code intervalStart} attribute.
      */
-    public static final String COLUMN_NAME_START = "interval_start";
+    public static final String COLUMN_NAME_INTERVAL_START = "interval_start";
+
+    // ------------------------------------------------------------------------------------------------------------- end
 
     /**
-     * The name of the attribute, {@value}, mapped to the {@value #COLUMN_NAME_START} column.
+     * The name of the column, {@value}, holding the {@code intervalEnd} attribute.
      */
-    public static final String ATTRIBUTE_NAME_START = "start";
+    public static final String COLUMN_NAME_INTERVAL_END = "interval_end";
 
-    // ------------------------------------------------------------------------------------------------------------ end
-
-    /**
-     * The name of the column, {@value}, of the {@value #ATTRIBUTE_NAME_END} attribute.
-     */
-    public static final String COLUMN_NAME_END = "interval_end";
-
-    /**
-     * The name of the attribute, {@value}, mapped to the {@value #COLUMN_NAME_END} column.
-     */
-    public static final String ATTRIBUTE_NAME_END = "end";
-
-    // --------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
@@ -118,7 +170,7 @@ public abstract class __MappedInterval<T extends Comparable<? super T>> implemen
         super();
     }
 
-    // ----------------------------------------------------------------------------------------------- java.lang.Object
+    // ------------------------------------------------------------------------------------------------ java.lang.Object
 
     /**
      * Returns a string representation of this interval, in the mathematical notation for a half-open interval.
@@ -127,26 +179,10 @@ public abstract class __MappedInterval<T extends Comparable<? super T>> implemen
      */
     @Override
     public String toString() {
-        return '[' + String.valueOf(start) + ", " + end + ')';
+        return '[' + String.valueOf(intervalStart) + ", " + intervalEnd + ')';
     }
 
-    // ----------------------------------------------------------------------------------------------------- VALIDATION
-
-    /**
-     * Returns whether this interval meets the one requirement an interval has, that its start is not after its end.
-     *
-     * @return {@code true} when either point of this interval is absent, or when its {@link #getStart() start} is not
-     *         after its {@link #getEnd() end}; {@code false} otherwise.
-     * @implSpec This method delegates to {@link #isOrdered()}, and exists to carry the constraint under a name which
-     *         reads as the violation it reports.
-     */
-    @AssertTrue
-    @Transient
-    protected boolean isStartNotAfterEnd() {
-        return isOrdered();
-    }
-
-    // ---------------------------------------------------------------------------------------------------------- start
+    // ----------------------------------------------------------------------------------------------------------- start
 
     /**
      * {@inheritDoc}
@@ -154,21 +190,21 @@ public abstract class __MappedInterval<T extends Comparable<? super T>> implemen
      * @return {@inheritDoc}
      */
     @Override
-    public @Nullable T getStart() {
-        return start;
+    public @Nullable T getIntervalStart() {
+        return intervalStart;
     }
 
     /**
      * Replaces the point at which this interval starts, which it contains.
      *
-     * @param startInclusive new value for the {@value #ATTRIBUTE_NAME_START} attribute; {@code null} for no lower
+     * @param startInclusive new value for the {@code intervalStart} attribute; {@code null} for no lower
      *                       bound.
      */
-    public void setStart(final @Nullable T startInclusive) {
-        start = startInclusive;
+    public void setIntervalStart(final @Nullable T startInclusive) {
+        intervalStart = startInclusive;
     }
 
-    // ------------------------------------------------------------------------------------------------------------ end
+    // ------------------------------------------------------------------------------------------------------------- end
 
     /**
      * {@inheritDoc}
@@ -176,33 +212,34 @@ public abstract class __MappedInterval<T extends Comparable<? super T>> implemen
      * @return {@inheritDoc}
      */
     @Override
-    public @Nullable T getEnd() {
-        return end;
+    public @Nullable T getIntervalEnd() {
+        return intervalEnd;
     }
 
     /**
      * Replaces the point at which this interval ends, which it does not contain.
      *
-     * @param endExclusive new value for the {@value #ATTRIBUTE_NAME_END} attribute; {@code null} for no upper bound.
+     * @param endExclusive new value for the {@code intervalEnd} attribute; {@code null} for no upper bound.
      */
-    public void setEnd(final @Nullable T endExclusive) {
-        end = endExclusive;
+    public void setIntervalEnd(final @Nullable T endExclusive) {
+        intervalEnd = endExclusive;
     }
 
-    // ----------------------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * The point at which this interval starts, which it contains, mapped to the {@value #COLUMN_NAME_START} column.
+     * The point at which this interval starts, which it contains, mapped to the
+     * {@value #COLUMN_NAME_INTERVAL_START} column.
      */
     @Basic(optional = true)
-    @Column(name = COLUMN_NAME_START, nullable = true, insertable = true, updatable = true)
-    private @Nullable T start;
+    @Column(name = COLUMN_NAME_INTERVAL_START, nullable = true, insertable = true, updatable = true)
+    private @Nullable T intervalStart;
 
     /**
-     * The point at which this interval ends, which it does not contain, mapped to the {@value #COLUMN_NAME_END}
-     * column.
+     * The point at which this interval ends, which it does not contain, mapped to the
+     * {@value #COLUMN_NAME_INTERVAL_END} column.
      */
     @Basic(optional = true)
-    @Column(name = COLUMN_NAME_END, nullable = true, insertable = true, updatable = true)
-    private @Nullable T end;
+    @Column(name = COLUMN_NAME_INTERVAL_END, nullable = true, insertable = true, updatable = true)
+    private @Nullable T intervalEnd;
 }

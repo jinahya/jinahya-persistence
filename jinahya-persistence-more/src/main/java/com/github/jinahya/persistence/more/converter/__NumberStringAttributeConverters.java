@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.jspecify.annotations.Nullable;
 
@@ -60,7 +61,8 @@ public final class __NumberStringAttributeConverters {
      *         which keeps the value free of an exponent.
      */
     @Converter(autoApply = false)
-    public static class OfBigDecimal extends __NumberStringAttributeConverter<BigDecimal> {
+    public static class OfBigDecimal extends __NumberStringAttributeConverter<BigDecimal>
+            implements AttributeConverter<BigDecimal, String> {
 
         /**
          * Creates a new instance.
@@ -96,7 +98,8 @@ public final class __NumberStringAttributeConverters {
      * @implSpec A value is stored as the {@link Integer#toString() decimal string} of the attribute.
      */
     @Converter(autoApply = false)
-    public static class OfInteger extends __NumberStringAttributeConverter<Integer> {
+    public static class OfInteger extends __NumberStringAttributeConverter<Integer>
+            implements AttributeConverter<Integer, String> {
 
         /**
          * Creates a new instance.
@@ -128,7 +131,8 @@ public final class __NumberStringAttributeConverters {
      * @implSpec A value is stored as the {@link Long#toString() decimal string} of the attribute.
      */
     @Converter(autoApply = false)
-    public static class OfLong extends __NumberStringAttributeConverter<Long> {
+    public static class OfLong extends __NumberStringAttributeConverter<Long>
+            implements AttributeConverter<Long, String> {
 
         /**
          * Creates a new instance.
@@ -165,7 +169,8 @@ public final class __NumberStringAttributeConverters {
      *         signed zero, so {@code -0.0} reads back as {@code 0.0}.
      */
     @Converter(autoApply = false)
-    public static class OfFloat extends __NumberStringAttributeConverter<Float> {
+    public static class OfFloat extends __NumberStringAttributeConverter<Float>
+            implements AttributeConverter<Float, String> {
 
         /**
          * Creates a new instance.
@@ -214,7 +219,8 @@ public final class __NumberStringAttributeConverters {
      *         signed zero, so {@code -0.0} reads back as {@code 0.0}.
      */
     @Converter(autoApply = false)
-    public static class OfDouble extends __NumberStringAttributeConverter<Double> {
+    public static class OfDouble extends __NumberStringAttributeConverter<Double>
+            implements AttributeConverter<Double, String> {
 
         /**
          * Creates a new instance.

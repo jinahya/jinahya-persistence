@@ -28,9 +28,9 @@ import java.util.Objects;
 /**
  * An interface for an interval, running from an inclusive start to an exclusive end.
  * <p>
- * An instance implementing this interface exposes the two points which limit it. Either may be absent: an interval
- * which has begun and has no planned end, or one which has always been in effect, is as ordinary in a schema as one
- * with both points known.
+ * An instance implementing this interface exposes the two points which limit it, and nothing else. Either may be
+ * absent: an interval which has begun and has no planned end, or one which has always been in effect, is as ordinary
+ * in a schema as one with both points known.
  *
  * <h2>The requirement is order, and only order</h2>
  * The one thing an interval has to be able to say is that its start is not after its end. That needs its two points
@@ -42,10 +42,31 @@ import java.util.Objects;
  * {@link java.time.ZonedDateTime} likewise compare against their {@code Chrono} interfaces. The tighter bound would
  * reject all three.
  * <p>
- * What the bound does <em>not</em> promise is that the natural order is the one a caller has in mind. Every point type
- * in {@code java.time} is {@link Comparable}, and for the offset-carrying ones the comparison falls through to the
- * local value once the instants agree — so an interval of those is ordered as the type orders itself, which is not the
- * timeline. An implementation whose points are of such a type has to say so, or not exist.
+ * The requirement is stated where it can be enforced, which is not here: {@link __MappedInterval} carries it as a
+ * constraint on the mapped attributes, checked when an instance is complete.
+ *
+ * <h2>What is derived here, and what is not</h2>
+ * Three questions are answered from the two points alone and are defaulted below: whether both are present, whether
+ * they coincide, and whether a given point falls between them. Nothing else is. The length is
+ * {@link __TemporalInterval}'s, because measuring needs arithmetic; a step back from the exclusive end belongs to the
+ * classes whose axis is discrete, because only those have a predecessor to step to.
+ * <p>
+ * {@link #contains(Comparable)} is for a point in hand, and is not how rows are found. An interval is stored so that
+ * {@code interval_start <= :t AND (interval_end IS NULL OR interval_end > :t)} can run against an index over the two
+ * columns; an entity already loaded was found by that query, and asking it the same thing afterwards answers nothing
+ * new. What the method is for is the point which has not been to the database — a value being validated, a candidate
+ * being checked against an interval already in hand.
+ *
+ * <h2>Two of the three read the order, which is not always the timeline</h2>
+ * {@link #isBounded()} asks only whether the points are present, so it is right for every {@code T}.
+ * {@link #isEmpty()} and {@link #contains(Comparable)} compare, and a comparison is only as good as the order the
+ * point type gives — which for {@link java.time.OffsetDateTime} and {@link java.time.ZonedDateTime} falls through to
+ * the local value once two instants agree, so two spellings of one moment compare as distinct.
+ * <p>
+ * They are defaulted here regardless, because they are right for every point type this package ships but one, and the
+ * one overrides them: see {@link __MappedOffsetDateTimeInterval}, which redefines both against
+ * {@link java.time.OffsetDateTime#toInstant() instants}, as it already redefines the invariant. A point type added
+ * later whose order is not the timeline has to do the same, or not be added.
  *
  * <h2>The convention is fixed: {@code [start, end)}</h2>
  * The start belongs to the interval and the end does not. It is not a per-instance choice, and there is deliberately
@@ -62,27 +83,29 @@ import java.util.Objects;
  * own parameters {@code startInclusive} and {@code endExclusive} throughout, and ISO 8601-1:2019, clause 4.4, gives the
  * {@code <start>/<end>} form.
  *
- * <h2>An absent bound is not an exception to it</h2>
+ * <h2>Points, not an amount</h2>
+ * Of the three self-contained forms ISO 8601-1:2019 gives an interval — start and end, start and duration, duration and
+ * end — only the first can express an absent bound at all, and only it derives the other two without ambiguity:
+ * calendar arithmetic does not run backwards, so a stored amount and a stored point disagree about the third value
+ * across a month boundary. The two points are what is kept.
+ *
+ * <h2>An absent bound is not an exception to the convention</h2>
  * Where there is no point, there is nothing to include or to exclude. The convention is in fact more uniform than it
  * looks: under {@code [start, end)} every bound is the same kind of cut — <em>at or after this point</em> — so an
  * interval is a pair drawn from one family of cuts, and absence is the improper member of that same family. Which is
- * why half-open tiles an axis, and why the methods below treat an absent bound as holding on its side rather than as a
- * special case.
+ * why half-open tiles an axis.
  *
  * <h2>This is a view, not a mapping</h2>
- * As with {@link com.github.jinahya.persistence.more.__SelfReferencing}, these methods describe a view and are not
+ * As with {@link com.github.jinahya.persistence.more.__SelfReferencing}, these two methods describe a view and are not
  * meant to be mapped, on their own, to persistent attributes. An implementing entity decides how the two points are
  * actually stored — two columns, either nullable.
  * <p>
- * Where an annotation here does and does not reach is worth being exact about. {@link #getStart()} and
- * {@link #getEnd()} are abstract: the implementation declares them and carries its own annotations, so annotating them
- * here would reach nothing and would suggest otherwise. The {@code boolean} methods below are different — they are
- * shaped like JavaBeans getters <em>and</em> are inherited as declared, which is the one way a member of this interface
- * could be taken for a persistent property by an implementation mapping by property access. They are annotated
- * {@link Transient @Transient} for that reason.
+ * Both are abstract, which is what keeps that true: the implementation declares them and carries its own annotations,
+ * so an annotation here would reach nothing and would suggest otherwise.
  *
  * @param <T> the type of the two points limiting this interval
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @see <a href="https://www.iso.org/standard/70907.html">ISO 8601-1:2019</a>
  */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
@@ -95,77 +118,66 @@ public interface __Interval<T extends Comparable<? super T>> {
      * @return the inclusive start of this interval; {@code null} when this interval has no lower bound.
      */
     @Nullable
-    T getStart();
+    T getIntervalStart();
 
     /**
      * Returns the point at which this interval ends, which does not belong to it.
      *
      * @return the exclusive end of this interval; {@code null} when this interval has no upper bound.
-     * @see #getStart()
+     * @see #getIntervalStart()
      */
     @Nullable
-    T getEnd();
+    T getIntervalEnd();
 
     /**
      * Returns whether both points limiting this interval are present.
      *
-     * @return {@code true} when neither {@link #getStart() start} nor {@link #getEnd() end} is {@code null};
-     *         {@code false} otherwise.
-     * @implSpec The default implementation reads both points and answers whether neither is {@code null}.
+     * @return {@code true} when neither {@link #getIntervalStart() start} nor {@link #getIntervalEnd() end} is
+     *         {@code null}; {@code false} otherwise.
+     * @implSpec The default implementation reads both points and answers whether neither is {@code null}. It compares
+     *         nothing, so no point type can make it wrong.
      */
     @Transient
     default boolean isBounded() {
-        return getStart() != null && getEnd() != null;
+        return getIntervalStart() != null && getIntervalEnd() != null;
     }
 
     /**
-     * Returns whether this interval meets the one requirement an interval has, that its start is not after its end.
-     *
-     * @return {@code true} when either point of this interval is absent, or when its {@link #getStart() start} is not
-     *         after its {@link #getEnd() end}; {@code false} otherwise.
-     * @implSpec The default implementation compares the two points, and answers {@code true} where either is absent —
-     *         an absent bound cannot be out of order, having no point to be out of order with.
-     * @apiNote An interval whose two points compare equal meets this. It is {@link #isEmpty() empty}, which is a shape
-     *         an interval may legitimately have rather than a violation.
-     */
-    @Transient
-    default boolean isOrdered() {
-        final T start = getStart();
-        final T end = getEnd();
-        return start == null || end == null || start.compareTo(end) <= 0;
-    }
-
-    /**
-     * Returns whether this interval contains no point at all.
+     * Returns whether the two points limiting this interval coincide, leaving it containing no point at all.
      *
      * @return {@code true} when this interval is {@link #isBounded() bounded} and its two points compare equal;
      *         {@code false} otherwise.
      * @implSpec The default implementation compares the two points rather than asking whether they are
-     *         {@link Object#equals(Object) equal}, so that emptiness is decided by the same order everything else here
-     *         is decided by.
+     *         {@link Object#equals(Object) equal}, so that emptiness is decided by the same order the invariant is.
+     * @apiNote An empty interval is a shape an interval may legitimately have rather than a violation: its start is
+     *         not after its end, so it satisfies the invariant, and it {@link #contains(Comparable) contains} no
+     *         point.
      */
     @Transient
     default boolean isEmpty() {
-        final T start = getStart();
-        final T end = getEnd();
-        return start != null && end != null && start.compareTo(end) == 0;
+        final T startInclusive = getIntervalStart();
+        final T endExclusive = getIntervalEnd();
+        return startInclusive != null && endExclusive != null && startInclusive.compareTo(endExclusive) == 0;
     }
 
     /**
      * Returns whether the specified point falls within this interval.
      *
      * @param point the point to test.
-     * @return {@code true} when the {@code point} is not before the {@link #getStart() start} of this interval and is
-     *         before its {@link #getEnd() end}; {@code false} otherwise.
+     * @return {@code true} when the {@code point} is not before the {@link #getIntervalStart() start} of this interval
+     *         and is before its {@link #getIntervalEnd() end}; {@code false} otherwise.
      * @throws NullPointerException when the {@code point} is {@code null}.
      * @implSpec The default implementation compares the {@code point} against each present bound, and treats an absent
      *         bound as holding — so an interval with neither bound contains every point, and an
      *         {@link #isEmpty() empty} one contains none.
+     * @apiNote This takes an argument, so it is not shaped like a JavaBeans getter and cannot be mistaken for a
+     *         persistent property. The two methods above are, and carry {@link Transient @Transient} for that reason.
      */
     default boolean contains(final T point) {
         Objects.requireNonNull(point, "point is null");
-        final T start = getStart();
-        final T end = getEnd();
-        return (start == null || start.compareTo(point) <= 0) && (end == null || point.compareTo(end) < 0);
+        final T startInclusive = getIntervalStart();
+        final T endExclusive = getIntervalEnd();
+        return (startInclusive == null || startInclusive.compareTo(point) <= 0)
+               && (endExclusive == null || point.compareTo(endExclusive) < 0);
     }
 }

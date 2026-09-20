@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.time.Instant;
@@ -67,7 +68,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         {@code "Z"}.
      */
     @Converter(autoApply = false)
-    public static class OfInstant extends __TemporalAccessorStringAttributeConverter<Instant> {
+    public static class OfInstant extends __TemporalAccessorStringAttributeConverter<Instant>
+            implements AttributeConverter<Instant, String> {
 
         /**
          * Creates a new instance.
@@ -101,7 +103,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      * @implSpec A value is stored as {@link LocalDate#toString()}, e.g. {@code "2026-09-19"}.
      */
     @Converter(autoApply = false)
-    public static class OfLocalDate extends __TemporalAccessorStringAttributeConverter<LocalDate> {
+    public static class OfLocalDate extends __TemporalAccessorStringAttributeConverter<LocalDate>
+            implements AttributeConverter<LocalDate, String> {
 
         /**
          * Creates a new instance.
@@ -133,7 +136,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         value.
      */
     @Converter(autoApply = false)
-    public static class OfLocalDateTime extends __TemporalAccessorStringAttributeConverter<LocalDateTime> {
+    public static class OfLocalDateTime extends __TemporalAccessorStringAttributeConverter<LocalDateTime>
+            implements AttributeConverter<LocalDateTime, String> {
 
         /**
          * Creates a new instance.
@@ -164,7 +168,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         zero.
      */
     @Converter(autoApply = false)
-    public static class OfLocalTime extends __TemporalAccessorStringAttributeConverter<LocalTime> {
+    public static class OfLocalTime extends __TemporalAccessorStringAttributeConverter<LocalTime>
+            implements AttributeConverter<LocalTime, String> {
 
         /**
          * Creates a new instance.
@@ -195,7 +200,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         preserved as written, not normalized to UTC.
      */
     @Converter(autoApply = false)
-    public static class OfOffsetDateTime extends __TemporalAccessorStringAttributeConverter<OffsetDateTime> {
+    public static class OfOffsetDateTime extends __TemporalAccessorStringAttributeConverter<OffsetDateTime>
+            implements AttributeConverter<OffsetDateTime, String> {
 
         /**
          * Creates a new instance.
@@ -225,7 +231,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      * @implSpec A value is stored as {@link OffsetTime#toString()}, offset included.
      */
     @Converter(autoApply = false)
-    public static class OfOffsetTime extends __TemporalAccessorStringAttributeConverter<OffsetTime> {
+    public static class OfOffsetTime extends __TemporalAccessorStringAttributeConverter<OffsetTime>
+            implements AttributeConverter<OffsetTime, String> {
 
         /**
          * Creates a new instance.
@@ -259,7 +266,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         longest form here; size the column for the zone ids actually stored.
      */
     @Converter(autoApply = false)
-    public static class OfZonedDateTime extends __TemporalAccessorStringAttributeConverter<ZonedDateTime> {
+    public static class OfZonedDateTime extends __TemporalAccessorStringAttributeConverter<ZonedDateTime>
+            implements AttributeConverter<ZonedDateTime, String> {
 
         /**
          * Creates a new instance.
@@ -290,7 +298,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         years and a signed, wider form outside them &mdash; {@code "+12345"}, {@code "-0001"}.
      */
     @Converter(autoApply = false)
-    public static class OfYear extends __TemporalAccessorStringAttributeConverter<Year> {
+    public static class OfYear extends __TemporalAccessorStringAttributeConverter<Year>
+            implements AttributeConverter<Year, String> {
 
         /**
          * Creates a new instance.
@@ -320,7 +329,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      * @implSpec A value is stored as {@link YearMonth#toString()}, e.g. {@code "2026-09"}.
      */
     @Converter(autoApply = false)
-    public static class OfYearMonth extends __TemporalAccessorStringAttributeConverter<YearMonth> {
+    public static class OfYearMonth extends __TemporalAccessorStringAttributeConverter<YearMonth>
+            implements AttributeConverter<YearMonth, String> {
 
         /**
          * Creates a new instance.
@@ -351,7 +361,8 @@ public final class __TemporalAccessorStringAttributeConverters {
      *         ISO-8601 form &mdash; {@code "--09-19"}.
      */
     @Converter(autoApply = false)
-    public static class OfMonthDay extends __TemporalAccessorStringAttributeConverter<MonthDay> {
+    public static class OfMonthDay extends __TemporalAccessorStringAttributeConverter<MonthDay>
+            implements AttributeConverter<MonthDay, String> {
 
         /**
          * Creates a new instance.

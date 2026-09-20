@@ -20,37 +20,57 @@ package com.github.jinahya.persistence.more.interval;
  * #L%
  */
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.time.Period;
 
 /**
- * An abstract mapped superclass for an interval between two dates.
+ * An abstract mapped superclass for an interval between two dates, mapped to two {@code DATE} columns.
  * <p>
- * The two columns come from {@link __MappedInterval}, the measuring from {@link __MappedTemporalInterval}, and
- * everything order alone decides from {@link __Interval}. Dates are where a type's natural order and the order an
- * interval wants agree, so all of it is correct here as inherited, and what this class adds is what only dates can
- * answer.
+ * The two columns come from {@link __MappedInterval}, the measuring from {@link __TemporalInterval}, and the two
+ * points from {@link __Interval}. What this class fixes is the point type, and with it the amount an interval of
+ * dates is measured in.
  *
- * <h2>What a discrete axis affords</h2>
- * {@link #getEndInclusive()} has no counterpart on a continuous axis. A date has a predecessor, so the day before the
- * exclusive end is an exact answer, and the closed form people speak in — a conference <em>runs</em> through its last
- * day — converts without loss. An instant has none, which is why nothing above declares it.
+ * <h2>The point type is {@link LocalDate}, and only {@link LocalDate}</h2>
+ * There is deliberately no version of this class generic over
+ * {@link java.time.chrono.ChronoLocalDate}, admitting a {@link java.time.chrono.HijrahDate} or a
+ * {@link java.time.chrono.JapaneseDate}. Such a class could not be mapped: the basic types Jakarta Persistence
+ * defines include the {@code java.time} date and time types and no member of {@code java.time.chrono}, so a date in
+ * another calendar system would fall through to the serializable-type rule and land in the column as bytes — and two
+ * columns of bytes cannot answer {@code interval_start <= :t AND interval_end > :t}, which is what an interval is
+ * stored for.
  * <p>
- * The JDK agrees on the convention and says so in its own signature: {@link LocalDate#datesUntil(LocalDate)} walks from
- * a date up to, and not including, the one given.
+ * The JDK gives the same advice for ordinary reasons, in bold, in {@link java.time.chrono.ChronoLocalDate}'s own
+ * javadoc: most applications should declare their signatures, fields and variables as {@code LocalDate} and not as
+ * that interface. Where a non-ISO calendar system really is what a schema holds, the conversion belongs in an
+ * {@link jakarta.persistence.AttributeConverter} applied to the two inherited attributes, the way
+ * {@link __MappedLocalTimeInterval} sets out, rather than in a type parameter here.
+ *
+ * <h2>This is the {@code DATE} column of a schema</h2>
+ * {@link LocalDate} is a basic type, so the two inherited columns need no converter, and a provider maps them to the
+ * database's own {@code DATE} — the one column type every database has and agrees about.
+ * <p>
+ * The JDK agrees on the half-open convention and says so in its own signature:
+ * {@link LocalDate#datesUntil(LocalDate)} walks from a date up to, and not including, the one given.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __MappedTemporalInterval
+ * @see __DiscreteInterval
+ * @see __TemporalInterval
  */
+@Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedLocalDateInterval extends __MappedTemporalInterval<LocalDate> {
+public abstract class __MappedLocalDateInterval extends __MappedTemporalInterval<LocalDate>
+        implements __DiscreteInterval<LocalDate> {
 
     // --------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -66,35 +86,32 @@ public abstract class __MappedLocalDateInterval extends __MappedTemporalInterval
     /**
      * {@inheritDoc}
      *
-     * @return the period from the {@link #getStart() start} of this interval to its {@link #getEnd() end};
-     *         {@code null} when this interval is not {@link #isBounded() bounded}.
+     * @return {@link ChronoUnit#DAYS}, the step between two adjacent dates.
+     */
+    @Override
+    @Transient
+    public TemporalUnit getGranularity() {
+        return ChronoUnit.DAYS;
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return the period from the {@link #getIntervalStart() start} of this interval to its
+     *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
      * @implNote The return type is narrowed to {@link Period}, the amount dates measure in, so that a caller holding
      *         this type needs no cast.
      */
     @Override
     @Transient
     public @Nullable Period getTemporalAmount() {
-        final LocalDate start = getStart();
-        final LocalDate end = getEnd();
-        if (start == null || end == null) {
+        final LocalDate startInclusive = getIntervalStart();
+        final LocalDate endExclusive = getIntervalEnd();
+        if (startInclusive == null || endExclusive == null) {
             return null;
         }
-        return Period.between(start, end);
-    }
-
-    /**
-     * Returns the last date which this interval contains.
-     *
-     * @return the date before the {@link #getEnd() end} of this interval; {@code null} when this interval has no upper
-     *         bound or is {@link #isEmpty() empty}.
-     * @apiNote This is the closed form people speak in, and it is exact only because dates are discrete.
-     */
-    @Transient
-    public @Nullable LocalDate getEndInclusive() {
-        final LocalDate end = getEnd();
-        if (end == null || isEmpty()) {
-            return null;
-        }
-        return end.minusDays(1L);
+        return Period.between(startInclusive, endExclusive);
     }
 }
