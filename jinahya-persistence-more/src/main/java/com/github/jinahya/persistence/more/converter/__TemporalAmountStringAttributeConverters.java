@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.jspecify.annotations.Nullable;
 
@@ -54,7 +55,8 @@ public final class __TemporalAmountStringAttributeConverters {
      *         {@link java.lang.reflect.Method#invoke(Object, Object...)} when the type is known here.
      */
     @Converter(autoApply = false)
-    public static class OfDuration extends __TemporalAmountStringAttributeConverter<Duration> {
+    public static class OfDuration extends __TemporalAmountStringAttributeConverter<Duration>
+            implements AttributeConverter<Duration, String> {
 
         /**
          * Creates a new instance.
@@ -88,7 +90,8 @@ public final class __TemporalAmountStringAttributeConverters {
      * @implNote The read is overridden for the same reason as in {@link OfDuration}.
      */
     @Converter(autoApply = false)
-    public static class OfPeriod extends __TemporalAmountStringAttributeConverter<Period> {
+    public static class OfPeriod extends __TemporalAmountStringAttributeConverter<Period>
+            implements AttributeConverter<Period, String> {
 
         /**
          * Creates a new instance.
