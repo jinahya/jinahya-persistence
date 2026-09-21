@@ -48,13 +48,15 @@ import org.jspecify.annotations.Nullable;
  * {@link #getHierarchyParent()}, can mark it {@link __SelfReferencingParent @__SelfReferencingParent} — the field under
  * field access, the accessor under property access — and implement the interface method by delegating to
  * {@link __SelfReferencingUtils#parentOf(__SelfReferencing) parentOf(this)}, which finds the member by that mark.
- * {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal} does the same for an ordinal among siblings, which this
- * interface does not itself declare.
+ * <p>
+ * Nothing here says anything about the <em>order</em> of the instances sharing a parent, because a hierarchy does not
+ * have one: the children of an instance are a set. An entity whose children are a sequence implements
+ * {@link __SelfReferencingOrdered} instead, which adds the ordinal and the mark that locates it.
  *
  * @param <T> self type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __SelfReferencingParent
- * @see __SelfReferencingOrdinal
+ * @see __SelfReferencingOrdered
  * @see __SelfReferencingUtils
  */
 @SuppressWarnings({
@@ -84,23 +86,4 @@ public interface __SelfReferencing<T extends __SelfReferencing<T>> {
      */
     @PositiveOrZero
     int getHierarchyDepth();
-
-    /**
-     * Returns the ordinal of this entity among its siblings, that is, the entities sharing the same
-     * {@link #getHierarchyParent() parent}.
-     *
-     * @return the ordinal of this entity, {@code 0} for the first sibling; {@code null} when the implementation type
-     *         does not order its siblings.
-     * @implSpec The default implementation reads, with reflection, the field or accessor annotated with
-     *         {@link __SelfReferencingOrdinal} in the class tree of the implementation type, and answers {@code null}
-     *         when there is no such member. The member is located once per type and the result is reused; a class tree
-     *         carrying more than one such mark fails with an {@code IllegalStateException}.
-     */
-    @Nullable
-    @PositiveOrZero
-    @Transient
-    @SuppressWarnings("unchecked")
-    default Integer getSiblingOrdinal() {
-        return __SelfReferencingUtils.ordinalOf((T) this);
-    }
 }

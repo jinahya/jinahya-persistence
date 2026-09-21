@@ -50,7 +50,7 @@ class __SelfReferencingUtils_Test {
     /**
      * An implementation which marks its fields, as an entity using field access declares them.
      */
-    static class FieldMarked implements __SelfReferencing<FieldMarked> {
+    static class FieldMarked implements __SelfReferencingOrdered<FieldMarked> {
 
         @__SelfReferencingParent
         FieldMarked parent;
@@ -73,7 +73,7 @@ class __SelfReferencingUtils_Test {
      * An implementation which marks its accessors, as an entity using property access declares them, and whose ordinal
      * is <em>derived</em> — there is no field to mark for it.
      */
-    static class AccessorMarked implements __SelfReferencing<AccessorMarked> {
+    static class AccessorMarked implements __SelfReferencingOrdered<AccessorMarked> {
 
         AccessorMarked parent;
 
@@ -179,7 +179,7 @@ class __SelfReferencingUtils_Test {
     /**
      * An implementation which marks a method which is not an accessor.
      */
-    static class NonAccessorMarked implements __SelfReferencing<NonAccessorMarked> {
+    static class NonAccessorMarked implements __SelfReferencingOrdered<NonAccessorMarked> {
 
         @__SelfReferencingOrdinal
         public void setOrdinal(final Integer ordinal) {
@@ -198,10 +198,10 @@ class __SelfReferencingUtils_Test {
     }
 
     /**
-     * An implementation whose marked ordinal accessor returns a primitive, which can not tell the first position among
-     * siblings from no ordering at all.
+     * An implementation whose marked ordinal accessor returns a primitive, which an ordered type may: within
+     * {@link __SelfReferencingOrdered} there is no absence for {@code 0} to also stand for.
      */
-    static class PrimitiveOrdinalMarked implements __SelfReferencing<PrimitiveOrdinalMarked> {
+    static class PrimitiveOrdinalMarked implements __SelfReferencingOrdered<PrimitiveOrdinalMarked> {
 
         @__SelfReferencingOrdinal
         public int getOrdinal() {
@@ -210,6 +210,44 @@ class __SelfReferencingUtils_Test {
 
         @Override
         public PrimitiveOrdinalMarked getHierarchyParent() {
+            return null;
+        }
+
+        @Override
+        public int getHierarchyDepth() {
+            return 0;
+        }
+    }
+
+    /**
+     * An implementation whose marked ordinal accessor holds neither an {@code int} nor an {@link Integer}.
+     */
+    static class WrongTypeOrdinalMarked implements __SelfReferencingOrdered<WrongTypeOrdinalMarked> {
+
+        @__SelfReferencingOrdinal
+        public long getOrdinal() {
+            return 1L;
+        }
+
+        @Override
+        public WrongTypeOrdinalMarked getHierarchyParent() {
+            return null;
+        }
+
+        @Override
+        public int getHierarchyDepth() {
+            return 0;
+        }
+    }
+
+    /**
+     * An implementation which declares that its siblings are ordered and then carries no mark saying where the ordinal
+     * is, which is a broken implementation rather than a hierarchy without an order.
+     */
+    static class OrderedUnmarked implements __SelfReferencingOrdered<OrderedUnmarked> {
+
+        @Override
+        public OrderedUnmarked getHierarchyParent() {
             return null;
         }
 
@@ -319,7 +357,7 @@ class __SelfReferencingUtils_Test {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * A nested class for testing {@link __SelfReferencingUtils#ordinalOf(__SelfReferencing)}.
+     * A nested class for testing {@link __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered)}.
      */
     @DisplayName("ordinalOf(instance)")
     @Nested
@@ -350,19 +388,32 @@ class __SelfReferencingUtils_Test {
             assertThat(child.getSiblingOrdinal()).isEqualTo(7);
         }
 
+        @DisplayName("reads a marked accessor which returns a primitive")
+        @Test
+        void __primitive() {
+            final var instance = new PrimitiveOrdinalMarked();
+            assertThat(__SelfReferencingUtils.ordinalOf(instance)).isEqualTo(1);
+            assertThat(instance.getSiblingOrdinal()).isEqualTo(1);
+        }
+
         @DisplayName("answers null when the marked member holds no value")
         @Test
         void __empty() {
+            // an ordinal which was never assigned is not read as 0, and does not fail the read either:
+            // @NotNull on getSiblingOrdinal() is what reports it, and a throw here would abort the very
+            // validation pass which does the reporting
             assertThat(__SelfReferencingUtils.ordinalOf(new FieldMarked())).isNull();
             assertThat(__SelfReferencingUtils.ordinalOf(new AccessorMarked())).isNull();
+            assertThat(new FieldMarked().getSiblingOrdinal()).isNull();
         }
 
-        @DisplayName("answers null for a type which does not order its siblings")
+        @DisplayName("fails for an ordered type which carries no mark")
         @Test
         void __unmarked() {
-            final var instance = new Unmarked();
-            assertThat(__SelfReferencingUtils.ordinalOf(instance)).isNull();
-            assertThat(instance.getSiblingOrdinal()).isNull();
+            final var instance = new OrderedUnmarked();
+            assertThatThrownBy(() -> __SelfReferencingUtils.ordinalOf(instance))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("no member annotated");
         }
 
         @DisplayName("fails on a marked method which is not an accessor")
@@ -374,13 +425,13 @@ class __SelfReferencingUtils_Test {
                     .hasMessageContaining("is not an accessor");
         }
 
-        @DisplayName("fails on a marked accessor which returns a primitive")
+        @DisplayName("fails on a marked member typed neither int nor Integer")
         @Test
-        void __primitive() {
-            final var instance = new PrimitiveOrdinalMarked();
+        void __wrongType() {
+            final var instance = new WrongTypeOrdinalMarked();
             assertThatThrownBy(() -> __SelfReferencingUtils.ordinalOf(instance))
                     .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("is not typed " + Integer.class.getSimpleName());
+                    .hasMessageContaining("typed neither int nor " + Integer.class.getSimpleName());
         }
     }
 

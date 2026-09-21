@@ -20,17 +20,18 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Member;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Utilities for {@link __SelfReferencing}, reading the values which the interface itself can not hold.
  * <p>
- * An implementing entity declares the parent association, and possibly an ordinal among siblings, as its own members,
- * and marks them {@link __SelfReferencingParent @__SelfReferencingParent} and
+ * An implementing entity declares the parent association, and — when it implements {@link __SelfReferencingOrdered} —
+ * an ordinal among siblings, as its own members, and marks them
+ * {@link __SelfReferencingParent @__SelfReferencingParent} and
  * {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}. The methods here find those members and read them, so
  * that an entity whose members are named on its own terms can still answer
  * {@link __SelfReferencing#getHierarchyParent() getHierarchyParent()}:
@@ -55,6 +56,7 @@ import java.util.Optional;
  *         in the published contract next to the constants which are meant to be read. An interface can hide a method;
  *         it can not hide a field.
  * @see __SelfReferencing
+ * @see __SelfReferencingOrdered
  * @see __SelfReferencingParent
  * @see __SelfReferencingOrdinal
  */
@@ -89,27 +91,37 @@ public final class __SelfReferencingUtils {
     /**
      * The member annotated with {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, of each type.
      *
-     * @implNote Unlike the parent, <em>absence is the normal case</em> — an entity which does not order its
-     *         siblings carries no mark — so a failure to find one is cached as {@link Optional#empty()} rather than
-     *         thrown. Finding one which is not typed {@link Integer} does fail: a primitive {@code int} can not tell
-     *         the first position among siblings from no ordering at all.
+     * @implNote The rule decided here is the parent's rule: carrying the mark nowhere fails. Only a type
+     *         implementing {@link __SelfReferencingOrdered} ever reaches this cache, and within that interface an
+     *         ordinal always exists, so a missing mark is a broken implementation rather than an entity which does not
+     *         order its siblings. A type which does not order them implements {@link __SelfReferencing} alone and is
+     *         not accepted by {@link #ordinalOf(__SelfReferencingOrdered) ordinalOf(instance)} in the first place.
+     *         <p>
+     *         Both {@code int} and {@link Integer} are accepted, and which one an entity declares is its own decision.
+     *         It is not an empty one: an {@link Integer} member constrained {@code @NotNull} turns a forgotten
+     *         assignment into a validation failure before the insert, where an {@code int} member reads {@code 0} and
+     *         quietly puts the instance at the head of its siblings.
      */
-    private static final ClassValue<Optional<Member>> ORDINAL_MEMBERS = new ClassValue<>() {
+    private static final ClassValue<Member> ORDINAL_MEMBERS = new ClassValue<>() {
         @Override
-        protected Optional<Member> computeValue(final Class<?> type) {
+        protected Member computeValue(final Class<?> type) {
             assert type != null;
             final var member = ___Utils.findMember(type, __SelfReferencingOrdinal.class);
             if (member == null) {
-                return Optional.empty();
+                throw new IllegalStateException(
+                        "no member annotated with @" + __SelfReferencingOrdinal.class.getSimpleName() +
+                        " in the class tree of " + type
+                );
             }
-            if (___Utils.valueTypeOf(member) != Integer.class) {
+            final var valueType = ___Utils.valueTypeOf(member);
+            if (valueType != int.class && valueType != Integer.class) {
                 throw new IllegalStateException(
                         "the member annotated with @" + __SelfReferencingOrdinal.class.getSimpleName() +
-                        " is not typed " + Integer.class.getSimpleName() + "; " + member +
+                        " is typed neither int nor " + Integer.class.getSimpleName() + "; " + member +
                         "; in the class tree of " + type
                 );
             }
-            return Optional.of(member);
+            return member;
         }
     };
 
@@ -161,24 +173,29 @@ public final class __SelfReferencingUtils {
      * {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}.
      *
      * @param instance the instance whose ordinal is read.
-     * @param <T>      self-referencing type parameter
-     * @return the ordinal of the {@code instance}, {@code 0} for the first sibling; {@code null} when the member holds
-     *         no value, or when the class tree of the {@code instance} carries no such member at all — an entity which
-     *         does not order its siblings.
-     * @throws IllegalStateException when the class tree of the {@code instance} carries more than one member annotated
-     *                               with {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, or carries one
-     *                               which is not typed {@link Integer}.
-     * @apiNote Note what the two {@code null}s have in common and what they do not: an entity which orders its
-     *         siblings but has not been given an ordinal yet, and an entity which does not order them at all, answer
-     *         alike here. Where the difference matters, ask the type, not the instance.
+     * @param <T>      ordered self-referencing type parameter
+     * @return the ordinal of the {@code instance}, {@code 0} for the first sibling; {@code null} when the marked member
+     *         holds no value, which is an instance whose ordinal has not been assigned.
+     * @throws IllegalStateException when the class tree of the {@code instance} carries no member annotated with
+     *                               {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, carries more than one,
+     *                               or carries one which is typed neither {@code int} nor {@link Integer}.
+     * @apiNote The parameter is an {@link __SelfReferencingOrdered}, not a {@link __SelfReferencing}, and that is
+     *         the whole point of the distinction. The two absences which used to answer alike are now separated, and
+     *         each is reported by whatever can actually see it: a type which does not order its siblings is turned
+     *         away here by the compiler, and an instance which orders them but has not been given its ordinal answers
+     *         {@code null}, for {@link NotNull @NotNull} to report.
+     *         <p>
+     *         That second one deliberately does <em>not</em> fail here. Jakarta Validation evaluates the constraints
+     *         on {@link __SelfReferencingOrdered#getSiblingOrdinal() getSiblingOrdinal()} by calling it, so a read
+     *         which threw on an unassigned ordinal would abort the very validation pass which exists to name the
+     *         problem — Hibernate Validator reports {@code HV000090: Unable to access getSiblingOrdinal} and no
+     *         violation at all. Reading the member and answering with what is there leaves the judgment to the
+     *         constraint.
      * @see __SelfReferencingOrdinal
      */
-    public static <T extends __SelfReferencing<T>> @Nullable Integer ordinalOf(final T instance) {
+    public static <T extends __SelfReferencingOrdered<T>> @Nullable Integer ordinalOf(final T instance) {
         Objects.requireNonNull(instance, "instance is null");
-        final var member = ORDINAL_MEMBERS.get(instance.getClass()).orElse(null);
-        if (member == null) {
-            return null;
-        }
+        final var member = ORDINAL_MEMBERS.get(instance.getClass());
         try {
             return (Integer) ___Utils.valueOf(member, instance);
         } catch (final ReflectiveOperationException roe) {

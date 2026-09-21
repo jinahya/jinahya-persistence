@@ -126,7 +126,7 @@ Three packages, by what they are for:
 
 | Package | What it holds |
 | --- | --- |
-| `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type. |
+| `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
 | `…persistence.more.color` | Mapped superclasses for colours in several models — RGB, RGBA, HSL, HWB, CMYK — sharing one way of addressing their components, and following CSS Color 4 for every conversion. |
 

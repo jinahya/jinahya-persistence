@@ -25,7 +25,8 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence ${persistence.schemaLocation}"
              version="${persistence.version}">
   <persistence-unit name="__colorPU">
-    <description>Persistence Unit for exercising the color mapped superclasses against an in-memory DB</description>
+    <description>Persistence Unit for exercising this module's mapped superclasses, converters and marks against
+      an in-memory DB</description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
     <class>com.github.jinahya.persistence.more.color._RgbaEntity</class>
@@ -35,6 +36,8 @@
     <class>com.github.jinahya.persistence.more.color._PropertyAccessRgbaEntity</class>
     <class>com.github.jinahya.persistence.more.color._OverriddenHslEntity</class>
     <class>com.github.jinahya.persistence.more.converter._ConvertedEntity</class>
+    <class>com.github.jinahya.persistence.more._CategoryEntity</class>
+    <class>com.github.jinahya.persistence.more._PropertyAccessNodeEntity</class>
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
     <class>com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverters$OfBigDecimal</class>

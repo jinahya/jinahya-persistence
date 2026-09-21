@@ -10,7 +10,9 @@
  *
  * <h2>Entities which reference their own type</h2>
  * {@link com.github.jinahya.persistence.more.__SelfReferencing} is the view of an entity's position within a hierarchy
- * of its own type — its parent, and its depth from the root. An entity which names its members on its own terms marks
+ * of its own type — its parent, and its depth from the root. The children of an instance are a set there;
+ * {@link com.github.jinahya.persistence.more.__SelfReferencingOrdered} is the interface for hierarchies where they are
+ * a sequence instead, and adds the ordinal among siblings. An entity which names its members on its own terms marks
  * them {@link com.github.jinahya.persistence.more.__SelfReferencingParent @__SelfReferencingParent} and
  * {@link com.github.jinahya.persistence.more.__SelfReferencingOrdinal @__SelfReferencingOrdinal}, and
  * {@link com.github.jinahya.persistence.more.__SelfReferencingUtils} reads them.
