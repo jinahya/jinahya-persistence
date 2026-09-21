@@ -65,22 +65,22 @@
     <description>Persistence Unit for exercising the interval mapped superclasses against an in-memory DB</description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
-    <class>com.github.jinahya.persistence.more.interval._LocalDateIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._LocalTimeIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._LocalDateTimeIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._InstantIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._OffsetDateTimeIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._YearIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._YearMonthIntervalEntity</class>
-    <class>com.github.jinahya.persistence.more.interval._DateIntervalEmbeddable</class>
-    <class>com.github.jinahya.persistence.more.interval._BookingEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._LocalDateIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._LocalTimeIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._LocalDateTimeIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._InstantIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._OffsetDateTimeIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._YearIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._YearMonthIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._DateIntervalEmbeddable</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._BookingEntity</class>
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does.
          __MappedYearMonthInterval names this one, and without it a YearMonth would be stored as bytes. -->
     <class>com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverters$OfYearMonth</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
-    <!-- so that the @AssertTrue invariant on __MappedInterval is actually evaluated -->
+    <!-- so that the @AssertTrue invariant on __MappedTemporalInterval is actually evaluated -->
     <validation-mode>CALLBACK</validation-mode>
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
@@ -101,17 +101,17 @@
   <persistence-unit name="__rangePU">
     <description>a unit for the range package</description>
     <provider>${persistence-unit.provider}</provider>
-    <class>com.github.jinahya.persistence.more.range._LocalDateRangeEntity</class>
-    <class>com.github.jinahya.persistence.more.range._IntegerRangeEntity</class>
-    <class>com.github.jinahya.persistence.more.range._PrefixUnsafeStringRangeEntity</class>
-    <class>com.github.jinahya.persistence.more.range._DateRangeEmbeddable</class>
-    <class>com.github.jinahya.persistence.more.range._ReservationEntity</class>
-    <class>com.github.jinahya.persistence.more.range._PropertyAccessRangeEntity</class>
+    <class>com.github.jinahya.persistence.more.orderedrange._LocalDateRangeEntity</class>
+    <class>com.github.jinahya.persistence.more.orderedrange._IntegerRangeEntity</class>
+    <class>com.github.jinahya.persistence.more.orderedrange._PrefixUnsafeStringRangeEntity</class>
+    <class>com.github.jinahya.persistence.more.orderedrange._DateRangeEmbeddable</class>
+    <class>com.github.jinahya.persistence.more.orderedrange._ReservationEntity</class>
+    <class>com.github.jinahya.persistence.more.orderedrange._PropertyAccessRangeEntity</class>
     <!-- EclipseLink resolves a converter only against the unit's listed classes under
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
-    <!-- so that the @AssertTrue invariant on __MappedRange is actually evaluated -->
+    <!-- so that the @AssertTrue invariant on __MappedOrderedRange is actually evaluated -->
     <validation-mode>CALLBACK</validation-mode>
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>

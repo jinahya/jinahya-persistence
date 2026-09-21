@@ -114,7 +114,7 @@ Jakarta EE 9/9.1 and 10 platform generations.*
 | Module | What it holds | Depends on (within the reactor) | Maven Central |
 | --- | --- | --- | --- |
 | [`jinahya-persistence-utils`](jinahya-persistence-utils) | Static helpers over the core Jakarta Persistence types: resource-level transaction wrappers, JDBC `Connection` unwrapping, and reflective read/write of a metamodel `Attribute`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-utils)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-utils) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-utils/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-utils) |
-| [`jinahya-persistence-more`](jinahya-persistence-more) | Extended mapping building blocks, in three packages: attribute enums and self-referencing entities; the attribute converters (see [below](#inside-jinahya-persistence-more)); and the mapped colour types. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more) |
+| [`jinahya-persistence-more`](jinahya-persistence-more) | Extended mapping building blocks, in five packages: attribute enums and self-referencing entities; the attribute converters (see [below](#inside-jinahya-persistence-more)); the mapped colour types; and mapped superclasses for temporal intervals and for ordered ranges. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more) |
 | [`jinahya-persistence-crypto`](jinahya-persistence-crypto) | Transparent attribute encryption for entities: the encryption service, its CDI qualifier, and the lifecycle listener which moves values between plaintext and ciphertext attributes. | `-utils` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-crypto)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-crypto) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-crypto/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-crypto) |
 | [`jinahya-persistence-more-test`](jinahya-persistence-more-test) | Abstract JUnit base classes for testing what `-more` defines — attribute converters and attribute enums. Lives in `src/main` so other projects' tests can extend it. | `-more` (`provided`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-test)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-test) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test) |
 | [`jinahya-persistence-test-utils`](jinahya-persistence-test-utils) | Randomizer / instantiator / persister SPIs, with locators, for building entity instances in a test suite. Also `src/main`, for the same reason. | — | not published yet |
@@ -122,13 +122,15 @@ Jakarta EE 9/9.1 and 10 platform generations.*
 
 ### Inside `jinahya-persistence-more`
 
-Three packages, by what they are for:
+Five packages, by what they are for:
 
 | Package | What it holds |
 | --- | --- |
 | `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
 | `…persistence.more.color` | Mapped superclasses for colours in several models — RGB, RGBA, HSL, HWB, CMYK — sharing one way of addressing their components, and following CSS Color 4 for every conversion. |
+| `…persistence.more.temporalinterval` | Mapped superclasses for an interval on a temporal axis — `[start, end)`, either bound optional, one class per `java.time` point type, each measuring in the amount natural to it. Bound by `Temporal`, so the length of an interval is itself a value. |
+| `…persistence.more.orderedrange` | Mapped superclasses for a range over anything merely `Comparable` — `Duration`, `BigDecimal`, `Integer`, `String` — carrying the full open/closed bound lattice, encoded into a column which still sorts by its endpoint. No axis, so no length. |
 
 #### The converter package
 

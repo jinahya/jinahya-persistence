@@ -43,7 +43,7 @@ import java.util.function.ToLongFunction;
  * <p>
  * That is harmless where the column is only read back, which is what the string converters are for. It is fatal
  * where the column is compared — an amount used as an endpoint in
- * {@link com.github.jinahya.persistence.more.range the range package}, or as any bound a query filters on. This
+ * {@link com.github.jinahya.persistence.more.orderedrange the ordered-range package}, or as any bound a query filters on. This
  * converter is for that case.
  *
  * @param <X> temporal amount type parameter
