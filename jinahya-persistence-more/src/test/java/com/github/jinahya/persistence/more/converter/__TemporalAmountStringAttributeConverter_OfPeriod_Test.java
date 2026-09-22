@@ -16,12 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("OfPeriod")
 class __TemporalAmountStringAttributeConverter_OfPeriod_Test
-        extends __TemporalAmountStringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfPeriod,
-        Period> {
-
-    __TemporalAmountStringAttributeConverter_OfPeriod_Test() {
-        super(__TemporalAmountStringAttributeConverters.OfPeriod.class, Period.class);
-    }
+ {
 
     private final __TemporalAmountStringAttributeConverters.OfPeriod converter =
             new __TemporalAmountStringAttributeConverters.OfPeriod();

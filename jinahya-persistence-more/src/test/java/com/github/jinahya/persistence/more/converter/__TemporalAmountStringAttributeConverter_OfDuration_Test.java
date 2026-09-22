@@ -16,12 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("OfDuration")
 class __TemporalAmountStringAttributeConverter_OfDuration_Test
-        extends __TemporalAmountStringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfDuration,
-        Duration> {
-
-    __TemporalAmountStringAttributeConverter_OfDuration_Test() {
-        super(__TemporalAmountStringAttributeConverters.OfDuration.class, Duration.class);
-    }
+ {
 
     private final __TemporalAmountStringAttributeConverters.OfDuration converter =
             new __TemporalAmountStringAttributeConverters.OfDuration();

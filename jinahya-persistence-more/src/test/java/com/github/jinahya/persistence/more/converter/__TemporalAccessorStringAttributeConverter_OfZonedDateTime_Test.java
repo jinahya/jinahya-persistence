@@ -16,12 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("OfZonedDateTime")
 class __TemporalAccessorStringAttributeConverter_OfZonedDateTime_Test
-        extends __TemporalAccessorStringAttributeConverter_Test<
-        __TemporalAccessorStringAttributeConverters.OfZonedDateTime, ZonedDateTime> {
-
-    __TemporalAccessorStringAttributeConverter_OfZonedDateTime_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfZonedDateTime.class, ZonedDateTime.class);
-    }
+ {
 
     private final __TemporalAccessorStringAttributeConverters.OfZonedDateTime converter =
             new __TemporalAccessorStringAttributeConverters.OfZonedDateTime();

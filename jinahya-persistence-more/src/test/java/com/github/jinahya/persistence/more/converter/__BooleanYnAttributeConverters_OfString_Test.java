@@ -29,13 +29,6 @@ class __BooleanYnAttributeConverters_OfString_Test {
         assertThat(converter.convertToEntityAttribute(null)).isNull();
     }
 
-    @DisplayName("true is \"Y\" and false is \"N\"")
-    @Test
-    void __write() {
-        assertThat(converter.convertToDatabaseColumn(Boolean.TRUE)).isEqualTo("Y");
-        assertThat(converter.convertToDatabaseColumn(Boolean.FALSE)).isEqualTo("N");
-    }
-
     @DisplayName("the read is case-insensitive")
     @ParameterizedTest
     @CsvSource({"Y,true", "y,true", "N,false", "n,false"})

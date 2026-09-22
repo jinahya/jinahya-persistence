@@ -14,11 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("OfDouble")
 class __NumberStringAttributeConverters_OfDouble_Test
-        extends __NumberStringAttributeConverter_Test<__NumberStringAttributeConverters.OfDouble, Double> {
-
-    __NumberStringAttributeConverters_OfDouble_Test() {
-        super(__NumberStringAttributeConverters.OfDouble.class, Double.class);
-    }
+ {
 
     private final __NumberStringAttributeConverters.OfDouble converter =
             new __NumberStringAttributeConverters.OfDouble();

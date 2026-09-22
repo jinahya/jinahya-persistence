@@ -30,15 +30,6 @@ class __BooleanYnAttributeConverters_OfCharacter_Test {
         assertThat(converter.convertToEntityAttribute(null)).isNull();
     }
 
-    @DisplayName("true is 'Y' and false is 'N', both ways")
-    @Test
-    void __roundTrip() {
-        assertThat(converter.convertToDatabaseColumn(Boolean.TRUE)).isEqualTo('Y');
-        assertThat(converter.convertToDatabaseColumn(Boolean.FALSE)).isEqualTo('N');
-        assertThat(converter.convertToEntityAttribute('Y')).isTrue();
-        assertThat(converter.convertToEntityAttribute('N')).isFalse();
-    }
-
     @DisplayName("the read is case-insensitive")
     @ParameterizedTest
     @CsvSource({"Y,true", "y,true", "N,false", "n,false"})

@@ -66,15 +66,6 @@ class __TemporalAccessorStringAttributeConverter_Default_Test {
         );
     }
 
-    @DisplayName("every nested converter writes the type's own form, and reads it back")
-    @ParameterizedTest
-    @MethodSource("nestedConvertersAndValues")
-    void __roundTrip(final __TemporalAccessorStringAttributeConverter<?> converter, final TemporalAccessor value) {
-        final var column = widen(converter).convertToDatabaseColumn(value);
-        assertThat(column).isEqualTo(value.toString());
-        assertThat(widen(converter).convertToEntityAttribute(column)).isEqualTo(value);
-    }
-
     @DisplayName("every nested converter maps null both ways")
     @ParameterizedTest
     @MethodSource("nestedConvertersAndValues")

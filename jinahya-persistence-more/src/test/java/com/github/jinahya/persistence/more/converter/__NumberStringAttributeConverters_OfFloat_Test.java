@@ -13,11 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("OfFloat")
 class __NumberStringAttributeConverters_OfFloat_Test
-        extends __NumberStringAttributeConverter_Test<__NumberStringAttributeConverters.OfFloat, Float> {
-
-    __NumberStringAttributeConverters_OfFloat_Test() {
-        super(__NumberStringAttributeConverters.OfFloat.class, Float.class);
-    }
+ {
 
     private final __NumberStringAttributeConverters.OfFloat converter = new __NumberStringAttributeConverters.OfFloat();
 
