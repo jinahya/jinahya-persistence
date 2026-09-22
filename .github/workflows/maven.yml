@@ -60,16 +60,56 @@ jobs:
 #      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
       uses: advanced-security/maven-dependency-submission-action@v4
 
-  # CLAUDE.md requires that both persistence providers stay buildable and that a change made for
-  # one be checked against the other. Nothing enforced that -- the job above runs only the
-  # activeByDefault profiles, i.e. Hibernate. This runs the alternate provider.
+  # Every supported Jakarta EE 11 combination, which CLAUDE.md asks for by name: "Check convergence
+  # across all six supported EE 11 combinations, not just the defaults". The job above runs exactly
+  # one of the six -- whatever is activeByDefault -- so hibernate-orm-7.2 and hibernate-validator-9.0
+  # were never exercised anywhere but on a developer's machine, via _mvn_jakarta_ee_11.sh. This is
+  # that script, as a matrix.
   #
-  # Naming any profile deactivates every activeByDefault profile, so a profile from EACH axis has
-  # to be named: provider, validator, and CDI. A lone provider -P would leave the build with no
-  # validator. See _mvn_jakarta_ee_11.sh, which does the same for all six combinations locally.
-  eclipselink:
+  # Naming any profile on the command line deactivates every activeByDefault profile, so a profile
+  # from EACH axis has to be named: provider, validator, and CDI. A lone provider -P would leave the
+  # build with no validator at all. That is why ___weld-6 is repeated in every cell rather than left
+  # to the default, and why the validator is named even when it is the default one.
+  #
+  # NOTE: no Sonar here, deliberately, and none should be added. The analysis belongs to the single
+  # canonical build above. Six analyses of one branch would race each other over the same project
+  # and leave the dashboard reporting whichever happened to finish last.
+  #
+  # `test` rather than `verify`: the convergence enforcer is bound to `validate`, so it runs in every
+  # cell already, and there is nothing at `verify` -- no integration tests exist -- that varies by
+  # provider.
+  #
+  # KNOWN LIMITED: both __hibernate-orm-7.2 cells fail today, and did before this job existed --
+  # which is the point of adding it. __MappedOrderedRange_PersistenceTest cannot build its factory
+  # because ORM 7.2 reports `_PropertyAccessRangeEntity` as "has no identifier". That entity puts
+  # its @Id on a getter while its mapped superclass forces @Access(FIELD); 7.4 and EclipseLink read
+  # the subclass's own access type from where it puts @Id, 7.2 does not. The pom already calls 7.2
+  # "limited support", so those two cells run and report but do not fail the workflow. Decide it
+  # properly -- fix the mapping, skip that one test on 7.2, or drop the profile -- and delete the
+  # `limited` flag with the decision. Everything else on 7.2 passes: 364 tests, one error.
+  combinations:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      # one broken combination should not hide the state of the other five
+      fail-fast: false
+      matrix:
+        provider:
+          - __hibernate-orm-7.4-jakarta-ee-11
+          - __hibernate-orm-7.2-jakarta-ee-11
+          - __eclipselink-5.0-jakarta-ee-11
+        validator:
+          - ___hibernate-validator-9.1-jakarta-ee-11
+          - ___hibernate-validator-9.0-jakarta-ee-11
+        include:
+          - provider: __hibernate-orm-7.2-jakarta-ee-11
+            limited: true
+
+    name: ${{ matrix.provider }} / ${{ matrix.validator }}
+
+    # reports red on the job, green on the workflow -- visible, not blocking
+    continue-on-error: ${{ matrix.limited == true }}
 
     steps:
     - uses: actions/checkout@v4
@@ -79,7 +119,7 @@ jobs:
         java-version: '25'
         distribution: 'temurin'
         cache: maven
-    - name: Test against EclipseLink
+    - name: Test
       run: >
         mvn -B test
-        -P__eclipselink-5.0-jakarta-ee-11,___hibernate-validator-9.1-jakarta-ee-11,___weld-6-jakarta-ee-11
+        -P${{ matrix.provider }},${{ matrix.validator }},___weld-6-jakarta-ee-11
