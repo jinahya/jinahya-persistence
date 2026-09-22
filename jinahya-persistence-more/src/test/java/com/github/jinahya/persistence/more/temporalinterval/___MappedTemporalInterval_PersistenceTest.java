@@ -449,4 +449,33 @@ class ___MappedTemporalInterval_PersistenceTest {
             });
         }
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * What an entity mapping by property access does to a hierarchy which forces field access.
+     */
+    @Nested
+    class AccessTypeTest {
+
+        @DisplayName("an entity with @Id on a getter still maps both interval columns")
+        @Test
+        void idOnGetterDoesNotUnmapTheInterval__() {
+            assertThat(columnNamesOf(_PropertyAccessIntervalEntity.TABLE_NAME))
+                    .as("without @Access(FIELD) on ___MappedTemporalInterval these columns would not exist")
+                    .contains(___MappedTemporalInterval.COLUMN_NAME_INTERVAL_START,
+                              ___MappedTemporalInterval.COLUMN_NAME_INTERVAL_END);
+            final var entity = new _PropertyAccessIntervalEntity();
+            entity.setIntervalStart(LocalDate.of(2026, 1, 1));
+            entity.setIntervalEnd(LocalDate.of(2026, 1, 5));
+            persistAndFind(entity, _PropertyAccessIntervalEntity.class, found -> {
+                assertThat(found.getIntervalStart()).isEqualTo(LocalDate.of(2026, 1, 1));
+                assertThat(found.getIntervalEnd()).isEqualTo(LocalDate.of(2026, 1, 5));
+                assertThat(found.getIntervalEndInclusive())
+                        .as("the discrete form still answers, so the columns really are the mapped ones")
+                        .isEqualTo(LocalDate.of(2026, 1, 4));
+                return null;
+            });
+        }
+    }
 }

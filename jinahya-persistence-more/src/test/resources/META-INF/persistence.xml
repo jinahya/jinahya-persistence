@@ -73,6 +73,7 @@
     <class>com.github.jinahya.persistence.more.temporalinterval._OffsetDateTimeIntervalEntity</class>
     <class>com.github.jinahya.persistence.more.temporalinterval._YearIntervalEntity</class>
     <class>com.github.jinahya.persistence.more.temporalinterval._YearMonthIntervalEntity</class>
+    <class>com.github.jinahya.persistence.more.temporalinterval._PropertyAccessIntervalEntity</class>
     <class>com.github.jinahya.persistence.more.temporalinterval._DateIntervalEmbeddable</class>
     <class>com.github.jinahya.persistence.more.temporalinterval._BookingEntity</class>
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with

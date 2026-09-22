@@ -165,6 +165,16 @@ import java.time.temporal.Temporal;
  * forces the issue: EclipseLink walks the mapped-superclass chain of an {@code @Embeddable} and fails with a
  * {@link NullPointerException} — in {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata} — where any link in
  * that chain has no access type of its own. Hibernate infers one and never notices.
+ * <p>
+ * An entity which uses <em>property</em> access has to say so, for the mirror reason: {@code @Access(FIELD)} here is
+ * scoped to this class by Jakarta Persistence 3.2 &sect;2.3.2, and &sect;2.3.1 decides the hierarchy's default from the
+ * classes which do <em>not</em> declare one &mdash; so an {@code @Id} on a getter settles it as {@code PROPERTY}.
+ * Hibernate ORM 7.4 and EclipseLink read it that way. ORM 7.2 instead pushes the <em>root</em> mapped superclass's
+ * access type onto the entity, looks for an {@code @Id} among its fields, finds none, and rejects the class as having
+ * no identifier. This class is that root, so the entity has to declare {@code @Access(AccessType.PROPERTY)} itself.
+ * <p>
+ * Between the two, the rule is simply: <strong>an entity extending this class should state its access type, whichever
+ * one it is.</strong> Inference is unreliable in both directions, and in opposite providers.
  *
  * @param <T> the type of the two points limiting this interval
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
