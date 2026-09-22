@@ -15,7 +15,7 @@ class __TemporalAccessorStringAttributeConverters_OfOffsetTime_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetTime, OffsetTime> {
 
     __TemporalAccessorStringAttributeConverters_OfOffsetTime_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfOffsetTime.class, OffsetTime.class);
+        super(__TemporalAccessorStringAttributeConverters.OfOffsetTime.class);
     }
 
     @Override

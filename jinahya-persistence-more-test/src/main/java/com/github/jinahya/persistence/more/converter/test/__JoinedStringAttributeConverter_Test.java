@@ -3,7 +3,6 @@ package com.github.jinahya.persistence.more.converter.test;
 import com.github.jinahya.persistence.more.converter.__JoinedStringAttributeConverter;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * An abstract class for testing {@link __JoinedStringAttributeConverter} implementations.
@@ -26,20 +25,8 @@ public abstract class __JoinedStringAttributeConverter_Test<
      * Creates a new instance for testing the specified converter class.
      *
      * @param converterClass the converter class to test.
-     * @param elementClass   the type of the elements of the list.
      */
-    @SuppressWarnings({"unchecked"})
-    protected __JoinedStringAttributeConverter_Test(final Class<CONVERTER> converterClass,
-                                                    final Class<X> elementClass) {
-        // List<X>.class cannot be written down; the erasure is all the superclass uses it for
-        super(converterClass, (Class<List<X>>) (Class<?>) List.class);
-        this.elementClass = Objects.requireNonNull(elementClass, "elementClass is null");
+    protected __JoinedStringAttributeConverter_Test(final Class<CONVERTER> converterClass) {
+        super(converterClass);
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * The class of the elements of the list.
-     */
-    protected final Class<X> elementClass;
 }

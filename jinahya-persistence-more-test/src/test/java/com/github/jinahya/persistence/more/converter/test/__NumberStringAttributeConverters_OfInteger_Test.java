@@ -11,7 +11,7 @@ class __NumberStringAttributeConverters_OfInteger_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfInteger, Integer> {
 
     __NumberStringAttributeConverters_OfInteger_Test() {
-        super(__NumberStringAttributeConverters.OfInteger.class, Integer.class);
+        super(__NumberStringAttributeConverters.OfInteger.class);
     }
 
     @Override

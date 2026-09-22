@@ -21,9 +21,8 @@ public abstract class __StringAttributeConverter_Test<C extends __StringAttribut
      * Creates a new instance for testing the specified converter class.
      *
      * @param converterClass the converter class to test.
-     * @param attributeClass the type of the entity attribute.
      */
-    protected __StringAttributeConverter_Test(final Class<C> converterClass, final Class<X> attributeClass) {
-        super(converterClass, attributeClass, String.class);
+    protected __StringAttributeConverter_Test(final Class<C> converterClass) {
+        super(converterClass);
     }
 }

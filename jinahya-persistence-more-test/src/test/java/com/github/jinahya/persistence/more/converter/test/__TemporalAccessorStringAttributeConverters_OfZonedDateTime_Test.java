@@ -15,7 +15,7 @@ class __TemporalAccessorStringAttributeConverters_OfZonedDateTime_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfZonedDateTime, ZonedDateTime> {
 
     __TemporalAccessorStringAttributeConverters_OfZonedDateTime_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfZonedDateTime.class, ZonedDateTime.class);
+        super(__TemporalAccessorStringAttributeConverters.OfZonedDateTime.class);
     }
 
     @Override

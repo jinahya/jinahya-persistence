@@ -13,7 +13,7 @@ class __TemporalAmountStringAttributeConverters_OfPeriod_Test
         extends __StringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfPeriod, Period> {
 
     __TemporalAmountStringAttributeConverters_OfPeriod_Test() {
-        super(__TemporalAmountStringAttributeConverters.OfPeriod.class, Period.class);
+        super(__TemporalAmountStringAttributeConverters.OfPeriod.class);
     }
 
     @Override

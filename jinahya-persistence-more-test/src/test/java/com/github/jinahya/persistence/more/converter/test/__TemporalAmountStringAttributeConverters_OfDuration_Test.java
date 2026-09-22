@@ -13,7 +13,7 @@ class __TemporalAmountStringAttributeConverters_OfDuration_Test
         extends __StringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfDuration, Duration> {
 
     __TemporalAmountStringAttributeConverters_OfDuration_Test() {
-        super(__TemporalAmountStringAttributeConverters.OfDuration.class, Duration.class);
+        super(__TemporalAmountStringAttributeConverters.OfDuration.class);
     }
 
     @Override

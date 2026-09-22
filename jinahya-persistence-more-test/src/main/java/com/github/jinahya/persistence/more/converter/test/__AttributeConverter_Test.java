@@ -40,19 +40,11 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * An abstract {@link TestTemplateInvocationContextProvider} for testing {@link AttributeConverter}.
-     */
-    abstract static class __AttributeConverterTestInvocationContextProvider
-            implements TestTemplateInvocationContextProvider {
-
-    }
-
-    /**
      * An abstract {@link TestTemplateInvocationContextProvider} for testing
      * {@link AttributeConverter#convertToDatabaseColumn(Object) convertToDatabaseColumn(X attribute)} method.
      */
     protected abstract static class __ConvertToDatabaseColumnTestInvocationContextProvider
-            extends __AttributeConverterTestInvocationContextProvider {
+            implements TestTemplateInvocationContextProvider {
 
         /**
          * Creates a new instance.
@@ -84,7 +76,7 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
      * {@link AttributeConverter#convertToEntityAttribute(Object) convertToEntityAttribute(Y dbData)} method.
      */
     protected abstract static class __ConvertToEntityAttributeTestInvocationContextProvider
-            extends __AttributeConverterTestInvocationContextProvider {
+            implements TestTemplateInvocationContextProvider {
 
         /**
          * Creates a new instance.
@@ -136,14 +128,9 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
      * Creates a new instance for testing specified converter class.
      *
      * @param converterClass the converter class to test.
-     * @param attributeClass the type of entity attribute.
-     * @param dbDataClass    the type of database column.
      */
-    protected __AttributeConverter_Test(final Class<C> converterClass, final Class<X> attributeClass,
-                                        final Class<Y> dbDataClass) {
+    protected __AttributeConverter_Test(final Class<C> converterClass) {
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");
-        this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
-        this.dbDataClass = Objects.requireNonNull(dbDataClass, "dbDataClass is null");
     }
 
     // ------------------------------------------------------------------------------------------------------ testCases
@@ -258,42 +245,10 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
         return ___Utils.newInstance(converterClass);
     }
 
-    // -------------------------------------------------------------------------------------------------- attributeClass
-
-    /**
-     * Creates a new instance of {@link #attributeClass}.
-     *
-     * @return a new instance of {@link #attributeClass}.
-     */
-    protected X newAttributeInstance() {
-        return ___Utils.newInstance(attributeClass);
-    }
-
-    // ----------------------------------------------------------------------------------------------------- dbDataClass
-
-    /**
-     * Creates a new instance of {@link #dbDataClass}.
-     *
-     * @return a new instance of {@link #dbDataClass}.
-     */
-    protected Y newDbDataInstance() {
-        return ___Utils.newInstance(dbDataClass);
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The converter class to test.
      */
     protected final Class<C> converterClass;
-
-    /**
-     * The type of the entity attribute.
-     */
-    protected final Class<X> attributeClass;
-
-    /**
-     * The type of the database column.
-     */
-    protected final Class<Y> dbDataClass;
 }

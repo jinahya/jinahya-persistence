@@ -18,7 +18,7 @@ class _SampleStringAttributeConverter_Test
         extends __StringAttributeConverter_Test<_SampleStringAttributeConverter, String> {
 
     _SampleStringAttributeConverter_Test() {
-        super(_SampleStringAttributeConverter.class, String.class);
+        super(_SampleStringAttributeConverter.class);
     }
 
     // supplying the cases is the whole of what a subclass has to do to get both directions checked; the provider

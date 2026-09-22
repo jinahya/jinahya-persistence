@@ -11,7 +11,7 @@ class __NumberStringAttributeConverters_OfDouble_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfDouble, Double> {
 
     __NumberStringAttributeConverters_OfDouble_Test() {
-        super(__NumberStringAttributeConverters.OfDouble.class, Double.class);
+        super(__NumberStringAttributeConverters.OfDouble.class);
     }
 
     @Override

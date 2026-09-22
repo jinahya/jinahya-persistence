@@ -48,9 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
-        "java:S112", // Generic exceptions should never be thrown
-        "java:S119", // Type parameter names should comply with a naming convention
-        "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
+        "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class __AttributeEnumConverter_Test<
         CONVERTER extends __AttributeEnumConverter<ENUM, ATTRIBUTE>,
@@ -85,7 +83,7 @@ public abstract class __AttributeEnumConverter_Test<
          * @see #enumClass
          */
         protected __OfStringTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
-            super(converterClass, enumClass, String.class);
+            super(converterClass, enumClass);
         }
     }
 
@@ -111,11 +109,9 @@ public abstract class __AttributeEnumConverter_Test<
          *
          * @param converterClass the converter class to test.
          * @param enumClass      the enum class the {@code converterClass} converts.
-         * @param attributeClass the type of the number the {@code enumClass} carries.
          */
-        protected __OfNumberTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass,
-                                 final Class<NUMBER> attributeClass) {
-            super(converterClass, enumClass, attributeClass);
+        protected __OfNumberTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
+            super(converterClass, enumClass);
         }
     }
 
@@ -141,7 +137,7 @@ public abstract class __AttributeEnumConverter_Test<
          * @param enumClass      the enum class the {@code converterClass} converts.
          */
         protected __OfIntegerTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
-            super(converterClass, enumClass, Integer.class);
+            super(converterClass, enumClass);
         }
     }
 
@@ -166,7 +162,7 @@ public abstract class __AttributeEnumConverter_Test<
          * @param enumClass      the enum class the {@code converterClass} converts.
          */
         protected __OfLongTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
-            super(converterClass, enumClass, Long.class);
+            super(converterClass, enumClass);
         }
     }
 
@@ -177,12 +173,10 @@ public abstract class __AttributeEnumConverter_Test<
      *
      * @param converterClass the converter class to test.
      * @param enumClass      the enum class the converter converts.
-     * @param attributeClass the type of the attribute value the enum carries.
      * @see #converterClass
      */
-    protected __AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass,
-                                            final Class<ATTRIBUTE> attributeClass) {
-        super(enumClass, attributeClass);
+    protected __AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
+        super(enumClass);
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");
     }
 
@@ -203,6 +197,9 @@ public abstract class __AttributeEnumConverter_Test<
             super();
         }
 
+        /**
+         * Verifies that a {@code null} constant converts to a {@code null} column.
+         */
         @DisplayName("(null)null")
         @Test
         void _Null_Null() {
@@ -210,6 +207,9 @@ public abstract class __AttributeEnumConverter_Test<
             assertNull(converterInstance.convertToDatabaseColumn(null));
         }
 
+        /**
+         * Verifies that each constant converts to the attribute value it carries.
+         */
         @DisplayName("(enumConstant)enumConstant.attributeValue")
         @Test
         void __NotNull() {
@@ -240,6 +240,9 @@ public abstract class __AttributeEnumConverter_Test<
             super();
         }
 
+        /**
+         * Verifies that a {@code null} column converts to a {@code null} constant.
+         */
         @DisplayName("(null)null")
         @Test
         void _Null_Null() {
@@ -247,6 +250,9 @@ public abstract class __AttributeEnumConverter_Test<
             assertNull(converterInstance.convertToEntityAttribute(null));
         }
 
+        /**
+         * Verifies that each attribute value converts back to the constant carrying it.
+         */
         @DisplayName("(attributeValue)E(attributeValue)")
         @Test
         void __NotNull() {

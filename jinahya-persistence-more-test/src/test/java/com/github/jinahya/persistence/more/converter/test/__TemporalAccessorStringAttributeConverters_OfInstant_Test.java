@@ -13,7 +13,7 @@ class __TemporalAccessorStringAttributeConverters_OfInstant_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfInstant, Instant> {
 
     __TemporalAccessorStringAttributeConverters_OfInstant_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfInstant.class, Instant.class);
+        super(__TemporalAccessorStringAttributeConverters.OfInstant.class);
     }
 
     @Override

@@ -67,7 +67,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
          * @param enumClass the enum class to test.
          */
         protected __OfStringTest(final Class<E> enumClass) {
-            super(enumClass, String.class);
+            super(enumClass);
         }
     }
 
@@ -84,11 +84,10 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
         /**
          * Creates a new instance for testing specific enum types.
          *
-         * @param enumClass      the enum class to test.
-         * @param attributeClass the type of the number the {@code enumClass} carries.
+         * @param enumClass the enum class to test.
          */
-        protected __OfNumberTest(final Class<E> enumClass, final Class<N> attributeClass) {
-            super(enumClass, attributeClass);
+        protected __OfNumberTest(final Class<E> enumClass) {
+            super(enumClass);
         }
     }
 
@@ -106,7 +105,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
          * @param enumClass the enum class to test.
          */
         protected __OfIntegerTest(final Class<E> enumClass) {
-            super(enumClass, Integer.class);
+            super(enumClass);
         }
     }
 
@@ -124,7 +123,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
          * @param enumClass the enum class to test.
          */
         protected __OfLongTest(final Class<E> enumClass) {
-            super(enumClass, Long.class);
+            super(enumClass);
         }
     }
 
@@ -133,13 +132,11 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
     /**
      * Creates a new instance for testing specific enum types.
      *
-     * @param enumClass      the enum class to test.
-     * @param attributeClass the type of entity attribute.
+     * @param enumClass the enum class to test.
      */
-    protected __AttributeEnum_Test(final Class<ENUM> enumClass, final Class<ATTRIBUTE> attributeClass) {
+    protected __AttributeEnum_Test(final Class<ENUM> enumClass) {
         super();
         this.enumClass = Objects.requireNonNull(enumClass, "enumClass is null");
-        this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -246,17 +243,10 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
 
     // ------------------------------------------------------------------------------------------------------- enumClass
 
-    // -------------------------------------------------------------------------------------------------- attributeClass
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The class of {@link ENUM} type.
      */
     protected final Class<ENUM> enumClass;
-
-    /**
-     * The class of {@link ATTRIBUTE} type.
-     */
-    protected final Class<ATTRIBUTE> attributeClass;
 }

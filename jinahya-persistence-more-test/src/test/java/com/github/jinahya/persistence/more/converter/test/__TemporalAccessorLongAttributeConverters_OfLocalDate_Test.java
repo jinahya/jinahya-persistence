@@ -13,7 +13,7 @@ class __TemporalAccessorLongAttributeConverters_OfLocalDate_Test
         extends __AttributeConverter_Test<__TemporalAccessorLongAttributeConverters.OfLocalDate, LocalDate, Long> {
 
     __TemporalAccessorLongAttributeConverters_OfLocalDate_Test() {
-        super(__TemporalAccessorLongAttributeConverters.OfLocalDate.class, LocalDate.class, Long.class);
+        super(__TemporalAccessorLongAttributeConverters.OfLocalDate.class);
     }
 
     @Override

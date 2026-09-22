@@ -20,13 +20,6 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!-- __AttributeConverterTestCase annotates with jakarta.validation.constraints; this used to arrive
-         transitively through podam, which is why removing podam broke the compile -->
-    <dependency>
-      <groupId>jakarta.validation</groupId>
-      <artifactId>jakarta.validation-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>

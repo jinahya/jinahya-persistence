@@ -11,7 +11,7 @@ class __NumberStringAttributeConverters_OfFloat_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfFloat, Float> {
 
     __NumberStringAttributeConverters_OfFloat_Test() {
-        super(__NumberStringAttributeConverters.OfFloat.class, Float.class);
+        super(__NumberStringAttributeConverters.OfFloat.class);
     }
 
     @Override

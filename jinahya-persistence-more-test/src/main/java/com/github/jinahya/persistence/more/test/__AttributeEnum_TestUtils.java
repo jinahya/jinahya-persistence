@@ -51,7 +51,7 @@ public final class __AttributeEnum_TestUtils {
      * @param <R>       result type parameter
      * @return the result of the {@code function}.
      */
-    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R extends @Nullable Object>
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R extends @Nullable Object>
     R applyEnumConstantStream(final Class<ENUM> enumClass,
                               final Function<? super Stream<ENUM>, ? extends R> function) {
         Objects.requireNonNull(enumClass, "enumClass is null");
@@ -68,14 +68,14 @@ public final class __AttributeEnum_TestUtils {
      *
      * @param enumClass the enum class whose constants are streamed.
      * @param consumer  the consumer to accept the stream.
-     * @param <E>       enum type parameter
+     * @param <ENUM>    enum type parameter
      * @see #applyEnumConstantStream(Class, Function)
      */
-    static <E extends Enum<E> & __AttributeEnum<E, ?>>
-    void acceptEnumConstantStream(final Class<E> enumClass,
-                                  final Consumer<? super Stream<E>> consumer) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>>
+    void acceptEnumConstantStream(final Class<ENUM> enumClass,
+                                  final Consumer<? super Stream<ENUM>> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
-        __AttributeEnum_TestUtils.<E, @Nullable Void>applyEnumConstantStream(
+        __AttributeEnum_TestUtils.<ENUM, @Nullable Void>applyEnumConstantStream(
                 enumClass,
                 s -> {
                     consumer.accept(s);
@@ -97,7 +97,7 @@ public final class __AttributeEnum_TestUtils {
      * @param <R>         result type parameter
      * @return the result of the {@code function}.
      */
-    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R extends @Nullable Object>
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R extends @Nullable Object>
     R applyAttributeValueStream(final Class<ENUM> enumClass,
                                 final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
         Objects.requireNonNull(enumClass, "enumClass is null");
@@ -116,10 +116,9 @@ public final class __AttributeEnum_TestUtils {
      * @param consumer    the consumer to accept the stream.
      * @param <ENUM>      enum type parameter
      * @param <ATTRIBUTE> attribute type parameter
-     * @param <R>         unused result type parameter
      * @see #applyAttributeValueStream(Class, Function)
      */
-    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R>
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
     void acceptAttributeValueStream(final Class<ENUM> enumClass,
                                     final Consumer<? super Stream<ATTRIBUTE>> consumer) {
         Objects.requireNonNull(enumClass, "enumClass is null");
@@ -143,7 +142,7 @@ public final class __AttributeEnum_TestUtils {
      * @param <ENUM>      enum type parameter
      * @param <ATTRIBUTE> attribute type parameter
      */
-    static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
     void acceptEachEnumConstantAndAttributeValue(final Class<ENUM> enumClass,
                                                  final BiConsumer<? super ENUM, ? super ATTRIBUTE> consumer) {
         Objects.requireNonNull(enumClass, "enumClass is null");

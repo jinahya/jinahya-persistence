@@ -13,7 +13,7 @@ class __TemporalAccessorStringAttributeConverters_OfYearMonth_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfYearMonth, YearMonth> {
 
     __TemporalAccessorStringAttributeConverters_OfYearMonth_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfYearMonth.class, YearMonth.class);
+        super(__TemporalAccessorStringAttributeConverters.OfYearMonth.class);
     }
 
     @Override

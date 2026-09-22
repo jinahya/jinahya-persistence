@@ -13,7 +13,7 @@ class __TemporalAmountLongAttributeConverters_OfDuration_Test
         extends __AttributeConverter_Test<__TemporalAmountLongAttributeConverters.OfDuration, Duration, Long> {
 
     __TemporalAmountLongAttributeConverters_OfDuration_Test() {
-        super(__TemporalAmountLongAttributeConverters.OfDuration.class, Duration.class, Long.class);
+        super(__TemporalAmountLongAttributeConverters.OfDuration.class);
     }
 
     @Override

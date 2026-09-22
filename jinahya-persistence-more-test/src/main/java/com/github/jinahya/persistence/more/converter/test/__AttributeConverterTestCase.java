@@ -1,7 +1,5 @@
 package com.github.jinahya.persistence.more.converter.test;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.util.Objects;
 
 /**
@@ -72,9 +70,14 @@ public class __AttributeConverterTestCase<X, Y> {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @NotNull
+
+    /**
+     * The entity attribute value of this test case; never {@code null}, as the constructor requires.
+     */
     private final X attribute;
 
-    @NotNull
+    /**
+     * The database column value of this test case; never {@code null}, as the constructor requires.
+     */
     private final Y dbData;
 }

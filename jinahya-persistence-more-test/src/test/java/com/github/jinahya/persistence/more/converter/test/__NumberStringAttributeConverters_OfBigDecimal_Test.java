@@ -13,7 +13,7 @@ class __NumberStringAttributeConverters_OfBigDecimal_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigDecimal, BigDecimal> {
 
     __NumberStringAttributeConverters_OfBigDecimal_Test() {
-        super(__NumberStringAttributeConverters.OfBigDecimal.class, BigDecimal.class);
+        super(__NumberStringAttributeConverters.OfBigDecimal.class);
     }
 
     @Override

@@ -11,7 +11,7 @@ class __NumberStringAttributeConverters_OfLong_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfLong, Long> {
 
     __NumberStringAttributeConverters_OfLong_Test() {
-        super(__NumberStringAttributeConverters.OfLong.class, Long.class);
+        super(__NumberStringAttributeConverters.OfLong.class);
     }
 
     @Override

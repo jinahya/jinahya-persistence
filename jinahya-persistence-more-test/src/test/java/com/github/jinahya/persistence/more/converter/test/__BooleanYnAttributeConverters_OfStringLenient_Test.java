@@ -11,7 +11,7 @@ class __BooleanYnAttributeConverters_OfStringLenient_Test
         extends __AttributeConverter_Test<__BooleanYnAttributeConverters.OfStringLenient, Boolean, String> {
 
     __BooleanYnAttributeConverters_OfStringLenient_Test() {
-        super(__BooleanYnAttributeConverters.OfStringLenient.class, Boolean.class, String.class);
+        super(__BooleanYnAttributeConverters.OfStringLenient.class);
     }
 
     @Override

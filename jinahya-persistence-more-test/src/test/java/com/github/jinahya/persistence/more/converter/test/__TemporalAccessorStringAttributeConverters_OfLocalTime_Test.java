@@ -13,7 +13,7 @@ class __TemporalAccessorStringAttributeConverters_OfLocalTime_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalTime, LocalTime> {
 
     __TemporalAccessorStringAttributeConverters_OfLocalTime_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfLocalTime.class, LocalTime.class);
+        super(__TemporalAccessorStringAttributeConverters.OfLocalTime.class);
     }
 
     @Override
