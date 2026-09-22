@@ -78,15 +78,6 @@ jobs:
   # `test` rather than `verify`: the convergence enforcer is bound to `validate`, so it runs in every
   # cell already, and there is nothing at `verify` -- no integration tests exist -- that varies by
   # provider.
-  #
-  # KNOWN LIMITED: both __hibernate-orm-7.2 cells fail today, and did before this job existed --
-  # which is the point of adding it. __MappedOrderedRange_PersistenceTest cannot build its factory
-  # because ORM 7.2 reports `_PropertyAccessRangeEntity` as "has no identifier". That entity puts
-  # its @Id on a getter while its mapped superclass forces @Access(FIELD); 7.4 and EclipseLink read
-  # the subclass's own access type from where it puts @Id, 7.2 does not. The pom already calls 7.2
-  # "limited support", so those two cells run and report but do not fail the workflow. Decide it
-  # properly -- fix the mapping, skip that one test on 7.2, or drop the profile -- and delete the
-  # `limited` flag with the decision. Everything else on 7.2 passes: 364 tests, one error.
   combinations:
 
     runs-on: ubuntu-latest
@@ -102,14 +93,8 @@ jobs:
         validator:
           - ___hibernate-validator-9.1-jakarta-ee-11
           - ___hibernate-validator-9.0-jakarta-ee-11
-        include:
-          - provider: __hibernate-orm-7.2-jakarta-ee-11
-            limited: true
 
     name: ${{ matrix.provider }} / ${{ matrix.validator }}
-
-    # reports red on the job, green on the workflow -- visible, not blocking
-    continue-on-error: ${{ matrix.limited == true }}
 
     steps:
     - uses: actions/checkout@v4
