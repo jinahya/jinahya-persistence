@@ -28,6 +28,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 
+/**
+ * Tests what these colour models do which a downstream implementation is not also expected to do.
+ * <p>
+ * The parts of {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} which every implementation
+ * shares — the component index, its bounds and its rejections, and sRGB into a model and back — are run against all
+ * five classes of this package by {@code ___MappedColor_Test} in {@code jinahya-persistence-more-test}, from that
+ * module's own tests.
+ * <p>
+ * What stays here is the colour science and the claims which span models: the conversions themselves, CMYK's
+ * projection onto maximum black, a hue reduced onto a half-open circle, the eight-bit setters, the exact notation
+ * strings, and the design claims — that an alpha is not a component, that a model without an alpha column is opaque,
+ * and that no equality is inherited. None of that is a contract a downstream inherits, and none of it can be asserted
+ * without reaching the {@code protected} helpers this package keeps to itself.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
@@ -123,34 +139,6 @@ class ___MappedColor_Test {
             assertThat(rgba.getAlpha()).isEqualTo(.75d);
         }
 
-        @DisplayName("every component round-trips through its index, in every model")
-        @Test
-        void componentByIndexRoundTrips__() {
-            for (final ___MappedColor color : new ___MappedColor[]{new Rgba(), new Hsl(), new Hwb(), new Cmyk()}) {
-                for (var i = 0; i < color.getComponentCount(); i++) {
-                    color.setComponent(i, .25d);
-                    assertThat(color.getComponent(i))
-                            .as("%s[%d]", color.getClass().getSimpleName(), i)
-                            .isCloseTo(.25d, within(TOLERANCE));
-                }
-            }
-        }
-
-        @DisplayName("writing past the last coordinate is rejected")
-        @Test
-        void setComponentIndexOutOfRange__IndexOutOfBoundsException() {
-            assertThatThrownBy(() -> new Rgba().setComponent(3, .5d)).isInstanceOf(IndexOutOfBoundsException.class);
-            assertThatThrownBy(() -> new Cmyk().setComponent(4, .5d)).isInstanceOf(IndexOutOfBoundsException.class);
-        }
-
-        @DisplayName("an index past the last coordinate is rejected, alpha or not")
-        @Test
-        void componentIndexOutOfRange__IndexOutOfBoundsException() {
-            assertThatThrownBy(() -> new Hsl().getComponent(3)).isInstanceOf(IndexOutOfBoundsException.class);
-            assertThatThrownBy(() -> new Rgba().getComponent(3)).isInstanceOf(IndexOutOfBoundsException.class);
-            assertThatThrownBy(() -> new Cmyk().getComponent(4)).isInstanceOf(IndexOutOfBoundsException.class);
-        }
-
         @DisplayName("a hue is persisted in degrees, but reported normalized")
         @Test
         void hueIsNormalizedAsAComponent__() {
@@ -168,14 +156,6 @@ class ___MappedColor_Test {
             assertThat(hsl(-1.0e-15d, .0d, .0d).getHue())
                     .isGreaterThanOrEqualTo(___MappedHueColor.MIN_HUE)
                     .isLessThan(___MappedHueColor.MAX_HUE);
-        }
-
-        @DisplayName("a component out of [0.0, 1.0], or NaN, is rejected")
-        @Test
-        void componentOutOfRange__IllegalArgumentException() {
-            assertThatThrownBy(() -> rgba(1.5d, .0d, .0d)).isInstanceOf(IllegalArgumentException.class);
-            assertThatThrownBy(() -> rgba(.0d, .0d, .0d, -.1d)).isInstanceOf(IllegalArgumentException.class);
-            assertThatThrownBy(() -> rgba(Double.NaN, .0d, .0d)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("an eight-bit setter reports the value the caller actually passed")
@@ -275,21 +255,6 @@ class ___MappedColor_Test {
                     .containsExactly(.0d, .0d, .0d);
         }
 
-        @DisplayName("setSrgb is the inverse of applySrgb, for every model")
-        @Test
-        void setSrgbRoundTrips__() {
-            final var r = .2d;
-            final var g = .7d;
-            final var b = .4d;
-            for (final ___MappedColor color : new ___MappedColor[]{new Hsl(), new Hwb(), new Cmyk(), new Rgba()}) {
-                color.setSrgb(r, g, b);
-                assertThat(color.toComponentArrayInSrgb())
-                        .as("%s", color.getClass().getSimpleName())
-                        .usingComparatorWithPrecision(TOLERANCE)
-                        .containsExactly(r, g, b);
-            }
-        }
-
         @DisplayName("sRGB -> CMYK -> sRGB is exact, not approximate")
         @Test
         void cmykInverseIsExact__() {
@@ -339,20 +304,6 @@ class ___MappedColor_Test {
             assertThat(cmyk.getMagenta()).isCloseTo(1.0d, within(TOLERANCE));
             assertThat(cmyk.getYellow()).isCloseTo(.0d, within(TOLERANCE));
             assertThat(cmyk.getBlack()).isCloseTo(.0d, within(TOLERANCE));
-        }
-
-        @DisplayName("setSrgb leaves the alpha alone")
-        @Test
-        void setSrgbKeepsAlpha__() {
-            final var rgba = rgba(.0d, .0d, .0d, .25d);
-            rgba.setSrgb(.1d, .2d, .3d);
-            assertThat(rgba.getAlpha()).isEqualTo(.25d);
-        }
-
-        @DisplayName("setSrgb rejects an out-of-range argument")
-        @Test
-        void setSrgbOutOfRange__IllegalArgumentException() {
-            assertThatThrownBy(() -> new Cmyk().setSrgb(1.5d, .0d, .0d)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("an out-of-gamut rgb produces a positive saturation, rotated 180 degrees, per the spec")
