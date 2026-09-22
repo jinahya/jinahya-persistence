@@ -33,7 +33,7 @@ class __EncryptionService_Test {
 
     @BeforeAll
     static void openEntityManagerFactory() {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__testPU");
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
     }
 
     @AfterAll

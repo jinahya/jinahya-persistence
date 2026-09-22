@@ -109,8 +109,6 @@
     <class>com.github.jinahya.persistence.more.orderedrange._DateRangeEmbeddable</class>
     <class>com.github.jinahya.persistence.more.orderedrange._ReservationEntity</class>
     <class>com.github.jinahya.persistence.more.orderedrange._PropertyAccessRangeEntity</class>
-    <!-- EclipseLink resolves a converter only against the unit's listed classes under
-         exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <!-- so that the @AssertTrue invariant on __MappedOrderedRange is actually evaluated -->

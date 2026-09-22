@@ -37,7 +37,7 @@ class __EncryptionLifecycle_Test {
 
     @BeforeAll
     static void openEntityManagerFactory() {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__testPU");
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
         _LifecycleListener.SERVICE = new _EncryptionService(ENTITY_MANAGER_FACTORY, new _EncryptionManager());
     }
 

@@ -24,8 +24,8 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="${persistence.version}">
-  <persistence-unit name="__testPU">
-    <description>Persistence Unit for an In-Memory DB</description>
+  <persistence-unit name="__cryptoPU">
+    <description>Persistence Unit for exercising this module against an in-memory DB</description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
@@ -72,8 +72,10 @@
       <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
-  <persistence-unit name="__itPU">
-    <description>Persistence Unit for a Physical Database</description>
+  <persistence-unit name="__cryptoItPU">
+    <description>Persistence Unit for exercising this module against a physical database: no DDL generated, no
+      classes listed, SQL logged. The URL below is a placeholder on H2 in memory — point it at the real
+      database to use this unit.</description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
