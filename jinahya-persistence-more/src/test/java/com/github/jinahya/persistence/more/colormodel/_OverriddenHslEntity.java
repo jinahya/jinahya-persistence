@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.color;
+package com.github.jinahya.persistence.more.colormodel;
 
 /*-
  * #%L
@@ -22,6 +22,8 @@ package com.github.jinahya.persistence.more.color;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,19 +31,35 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * A concrete entity, for verifying that {@link __MappedCmyk} maps as declared against a real provider.
+ * An entity which renames inherited columns, to verify that {@link jakarta.persistence.Access @Access}({@code FIELD})
+ * on the mapped superclasses does not take {@link AttributeOverride @AttributeOverride} away from a downstream user.
+ * <p>
+ * Both depths are covered: {@code saturation} is declared one level up, in {@link __MappedHsl}, and {@code hue} two
+ * levels up, in {@link ___MappedHueColor}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
+@AttributeOverride(
+        name = ___MappedHueColor.ATTRIBUTE_NAME_HUE,
+        column = @Column(name = _OverriddenHslEntity.COLUMN_NAME_HUE, nullable = false)
+)
+@AttributeOverride(
+        name = __MappedHsl.ATTRIBUTE_NAME_SATURATION,
+        column = @Column(name = _OverriddenHslEntity.COLUMN_NAME_SATURATION, nullable = false)
+)
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = _CmykEntity.TABLE_NAME)
+@Table(name = _OverriddenHslEntity.TABLE_NAME)
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class _CmykEntity extends __MappedCmyk {
+public class _OverriddenHslEntity extends __MappedHsl {
 
-    static final String TABLE_NAME = "cmyk_entity";
+    static final String TABLE_NAME = "overridden_hsl_entity";
+
+    static final String COLUMN_NAME_HUE = "hue_degrees";
+
+    static final String COLUMN_NAME_SATURATION = "chroma";
 
     public Long getId() {
         return id;

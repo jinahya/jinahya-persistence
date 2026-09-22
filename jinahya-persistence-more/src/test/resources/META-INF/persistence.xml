@@ -29,12 +29,12 @@
       an in-memory DB</description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
-    <class>com.github.jinahya.persistence.more.color._RgbaEntity</class>
-    <class>com.github.jinahya.persistence.more.color._HslEntity</class>
-    <class>com.github.jinahya.persistence.more.color._HwbEntity</class>
-    <class>com.github.jinahya.persistence.more.color._CmykEntity</class>
-    <class>com.github.jinahya.persistence.more.color._PropertyAccessRgbaEntity</class>
-    <class>com.github.jinahya.persistence.more.color._OverriddenHslEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._RgbaEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._HslEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._HwbEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._CmykEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._PropertyAccessRgbaEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._OverriddenHslEntity</class>
     <class>com.github.jinahya.persistence.more.converter._ConvertedEntity</class>
     <class>com.github.jinahya.persistence.more._CategoryEntity</class>
     <class>com.github.jinahya.persistence.more._PropertyAccessNodeEntity</class>

@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.color;
+package com.github.jinahya.persistence.more.colormodel;
 
 /*-
  * #%L
@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.more.color;
  * #L%
  */
 
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,25 +27,35 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * A concrete entity, for verifying that {@link __MappedRgba} maps as declared against a real provider.
+ * An entity which declares its identity on a <em>getter</em>, making its own access type
+ * {@link jakarta.persistence.AccessType#PROPERTY PROPERTY}.
+ * <p>
+ * This is the adversarial case for the colors: were the mapped superclasses not annotated
+ * {@link jakarta.persistence.Access @Access}({@code FIELD}), this entity would drag the whole hierarchy to property
+ * access, and the {@link jakarta.persistence.Transient @Transient} accessors sitting alongside each component —
+ * {@code getRedAsEightBits()}, {@code isOpaque()}, {@code getComponentCount()} — would unmap the components themselves.
+ * Every component would silently stop being persisted.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@Access(AccessType.FIELD)
 @Entity
-@Table(name = _RgbaEntity.TABLE_NAME)
+@Table(name = _PropertyAccessRgbaEntity.TABLE_NAME)
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class _RgbaEntity extends __MappedRgba {
+public class _PropertyAccessRgbaEntity extends __MappedRgba {
 
-    static final String TABLE_NAME = "rgba_entity";
+    static final String TABLE_NAME = "property_access_rgba_entity";
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public void setId(final Long id) {
+        this.id = id;
+    }
+
     private Long id;
 }

@@ -153,9 +153,10 @@ import java.time.temporal.Temporal;
  * type-safely.
  *
  * <h2>Access type</h2>
- * As in {@link com.github.jinahya.persistence.more.color the colour package}, {@link Access @Access}({@code FIELD}) is
- * forced: an entity which puts its {@link jakarta.persistence.Id @Id} on a getter would otherwise flip this hierarchy
- * to property access, and the {@link Transient @Transient} accessors inherited from {@link ___TemporalInterval} —
+ * As in {@link com.github.jinahya.persistence.more.colormodel the colour-model package},
+ * {@link Access @Access}({@code FIELD}) is forced: an entity which puts its {@link jakarta.persistence.Id @Id} on a
+ * getter would otherwise flip this hierarchy to property access, and the {@link Transient @Transient} accessors
+ * inherited from {@link ___TemporalInterval} —
  * {@link ___TemporalInterval#isBounded() isBounded} and {@link ___TemporalInterval#isEmpty() isEmpty}, both shaped
  * exactly like JavaBeans properties — would then be taken for columns of their own. An entity extending
  * this class should declare {@code @Access(AccessType.FIELD)} too: Hibernate infers it, EclipseLink does not.

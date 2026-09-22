@@ -128,7 +128,7 @@ Five packages, by what they are for:
 | --- | --- |
 | `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
-| `…persistence.more.color` | Mapped superclasses for colours in several models — RGB, RGBA, HSL, HWB, CMYK — sharing one way of addressing their components, and following CSS Color 4 for every conversion. |
+| `…persistence.more.colormodel` | Mapped superclasses for a colour in each of four models — RGB, CMYK, HSL, HWB, and RGB once more with an alpha column — sharing one normalized way of addressing whatever components a model has. Four models but one space: every conversion goes through sRGB, following CSS Color 4. |
 | `…persistence.more.temporalinterval` | Mapped superclasses for an interval on a temporal axis — `[start, end)`, either bound optional, one class per `java.time` point type, each measuring in the amount natural to it. Bound by `Temporal`, so the length of an interval is itself a value. |
 | `…persistence.more.orderedrange` | Mapped superclasses for a range over anything merely `Comparable` — `Duration`, `BigDecimal`, `Integer`, `String` — carrying the full open/closed bound lattice, encoded into a column which still sorts by its endpoint. No axis, so no length. |
 

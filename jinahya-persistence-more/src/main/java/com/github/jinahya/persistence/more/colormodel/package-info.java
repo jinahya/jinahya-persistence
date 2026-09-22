@@ -1,41 +1,43 @@
 /**
- * Abstract mapped superclasses for colors, of several color models, sharing one way of addressing their components.
+ * Abstract mapped superclasses for a color in each of four models, sharing one way of addressing their components.
  * <p>
- * {@link com.github.jinahya.persistence.more.color.___MappedColor} is the root. It maps no column of its own; it fixes
- * only what every color model has in common — a component count, normalized access to each component, an alpha, and a
- * conversion to and from <a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">sRGB</a> — and leaves each model to
- * declare the columns natural to it. Code which does not care which model a color is in can still read it, render it as
- * a {@linkplain com.github.jinahya.persistence.more.color.___MappedColor#toHexNotation() hex notation}, or serialize it
- * in either the {@linkplain com.github.jinahya.persistence.more.color.___MappedColor#toLegacyRgbNotation() legacy} or
- * the {@linkplain com.github.jinahya.persistence.more.color.___MappedColor#toModernRgbNotation() modern} {@code rgb()}
- * syntax of CSS Color 4.
+ * {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} is the root. It maps no column of its own;
+ * it fixes only what every color model has in common — a component count, normalized access to each component, an
+ * alpha, and a conversion to and from <a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">sRGB</a> — and leaves
+ * each model to declare the columns natural to it. Code which does not care which model a color is in can still read
+ * it, render it as a
+ * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toHexNotation() hex notation}, or
+ * serialize it in either the
+ * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toLegacyRgbNotation() legacy} or the
+ * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toModernRgbNotation() modern}
+ * {@code rgb()} syntax of CSS Color 4.
  *
  * <h2>Models</h2>
  * <ul>
- *   <li>{@link com.github.jinahya.persistence.more.color.__MappedRgb} —
+ *   <li>{@link com.github.jinahya.persistence.more.colormodel.__MappedRgb} —
  *       {@code red}, {@code green}, {@code blue}</li>
- *   <li>{@link com.github.jinahya.persistence.more.color.__MappedRgba} — the above, plus {@code alpha}</li>
- *   <li>{@link com.github.jinahya.persistence.more.color.__MappedCmyk} —
+ *   <li>{@link com.github.jinahya.persistence.more.colormodel.__MappedRgba} — the above, plus {@code alpha}</li>
+ *   <li>{@link com.github.jinahya.persistence.more.colormodel.__MappedCmyk} —
  *       {@code cyan}, {@code magenta}, {@code yellow}, {@code black}</li>
- *   <li>{@link com.github.jinahya.persistence.more.color.__MappedHsl} —
+ *   <li>{@link com.github.jinahya.persistence.more.colormodel.__MappedHsl} —
  *       {@code hue}, {@code saturation}, {@code lightness}</li>
- *   <li>{@link com.github.jinahya.persistence.more.color.__MappedHwb} —
+ *   <li>{@link com.github.jinahya.persistence.more.colormodel.__MappedHwb} —
  *       {@code hue}, {@code whiteness}, {@code blackness}</li>
  * </ul>
- * {@link com.github.jinahya.persistence.more.color.___MappedHueColor} carries the {@code hue} column the last two
- * share, and {@link com.github.jinahya.persistence.more.color.___MappedColorUtils} holds the conversions between the
- * models and sRGB, along with a parser for the hex notation.
+ * {@link com.github.jinahya.persistence.more.colormodel.___MappedHueColor} carries the {@code hue} column the last
+ * two share, and {@link com.github.jinahya.persistence.more.colormodel.___MappedColorUtils} holds the conversions
+ * between the models and sRGB, along with a parser for the hex notation.
  *
  * <h2>Components</h2>
  * Every component is persisted normalized, between
- * {@value com.github.jinahya.persistence.more.color.___MappedColor#MIN_COMPONENT} and
- * {@value com.github.jinahya.persistence.more.color.___MappedColor#MAX_COMPONENT}, with one exception: a hue is
+ * {@value com.github.jinahya.persistence.more.colormodel.___MappedColor#MIN_COMPONENT} and
+ * {@value com.github.jinahya.persistence.more.colormodel.___MappedColor#MAX_COMPONENT}, with one exception: a hue is
  * persisted in degrees, the unit CSS Color 4 gives it. Values familiar from CSS — eight-bit components, degrees —
  * remain available through {@link jakarta.persistence.Transient @Transient} accessors alongside.
  * <p>
  * The alpha is not a component. CSS Color 4 models a color as coordinates in a color space <em>plus</em> an alpha, and
  * these classes follow it: a component count never includes the alpha, and a model with no alpha column reports
- * {@value com.github.jinahya.persistence.more.color.___MappedColor#ALPHA_OPAQUE}.
+ * {@value com.github.jinahya.persistence.more.colormodel.___MappedColor#ALPHA_OPAQUE}.
  *
  * <h2>Bounds, and where they live</h2>
  * A bound is declared on the class which owns the column it constrains, in four shapes — a {@code double} pair for
@@ -70,7 +72,7 @@
  *       database, than saying no. Converted values, whose rounding is nobody's fault, are clamped instead.</li>
  *   <li><b>Value equality.</b> No {@code equals}/{@code hashCode} is defined; entities extending these classes keep
  *       their own identity. Use
- *       {@link com.github.jinahya.persistence.more.color.___MappedColor#hasSameComponentsAs(com.github.jinahya.persistence.more.color.___MappedColor)}
+ *       {@link com.github.jinahya.persistence.more.colormodel.___MappedColor#hasSameComponentsAs(com.github.jinahya.persistence.more.colormodel.___MappedColor)}
  *       for a component-wise comparison.</li>
  *   <li><b>Embeddables.</b> These are mapped superclasses, for entities. Jakarta Persistence does not portably let an
  *       {@link jakarta.persistence.Embeddable @Embeddable} extend a
@@ -123,7 +125,7 @@
  *           </tbody>
  *         </table>
  *         One conversion has <em>no</em> normative source: sRGB to CMYK. CSS defines only the direction into sRGB, so
- *         {@link com.github.jinahya.persistence.more.color.___MappedColorUtils#rgbToCmyk(double, double, double,
+ *         {@link com.github.jinahya.persistence.more.colormodel.___MappedColorUtils#rgbToCmyk(double, double, double,
  *         java.util.function.DoubleFunction) rgbToCmyk} states its own contract — the exact algebraic inverse of the naive
  *         forward conversion, under maximum black generation. Its javadoc says precisely what that guarantees.
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -132,7 +134,7 @@
  * @see <a href="https://www.w3.org/TR/css-values-4/">CSS Values and Units Module Level 4</a>
  */
 @org.jspecify.annotations.NullMarked
-package com.github.jinahya.persistence.more.color;
+package com.github.jinahya.persistence.more.colormodel;
 
 /*-
  * #%L
