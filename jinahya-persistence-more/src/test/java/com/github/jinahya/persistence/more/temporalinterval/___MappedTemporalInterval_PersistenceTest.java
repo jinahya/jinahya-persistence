@@ -47,7 +47,7 @@ class ___MappedTemporalInterval_PersistenceTest {
 
     @BeforeAll
     static void openEntityManagerFactory() {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__intervalPU");
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__temporalIntervalPU");
     }
 
     @AfterAll

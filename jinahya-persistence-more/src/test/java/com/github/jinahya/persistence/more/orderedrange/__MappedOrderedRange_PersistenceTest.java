@@ -32,7 +32,7 @@ class __MappedOrderedRange_PersistenceTest {
 
     @BeforeAll
     static void openEntityManagerFactory() {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__rangePU");
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__orderedRangePU");
     }
 
     @AfterAll

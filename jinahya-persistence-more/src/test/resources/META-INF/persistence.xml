@@ -24,7 +24,7 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence ${persistence.schemaLocation}"
              version="${persistence.version}">
-  <persistence-unit name="__colorPU">
+  <persistence-unit name="__morePU">
     <description>Persistence Unit for exercising this module's mapped superclasses, converters and marks against
       an in-memory DB</description>
     <provider>${persistence-unit.provider}</provider>
@@ -49,7 +49,7 @@
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <!-- database_to_upper=false keeps the declared column names verbatim, so they can be asserted -->
       <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
-      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:color;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:more;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->
@@ -61,8 +61,9 @@
       <property name="hibernate.show_sql" value="false"/>
     </properties>
   </persistence-unit>
-  <persistence-unit name="__intervalPU">
-    <description>Persistence Unit for exercising the interval mapped superclasses against an in-memory DB</description>
+  <persistence-unit name="__temporalIntervalPU">
+    <description>Persistence Unit for exercising the temporal-interval mapped superclasses against an in-memory
+      DB</description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
     <class>com.github.jinahya.persistence.more.temporalinterval._LocalDateIntervalEntity</class>
@@ -86,7 +87,7 @@
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <!-- database_to_upper=false keeps the declared column names verbatim, so they can be asserted -->
       <property name="jakarta.persistence.jdbc.url"
-                value="jdbc:h2:mem:interval;database_to_upper=false;MODE=LEGACY"/>
+                value="jdbc:h2:mem:temporalinterval;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->
@@ -98,8 +99,9 @@
       <property name="hibernate.show_sql" value="false"/>
     </properties>
   </persistence-unit>
-  <persistence-unit name="__rangePU">
-    <description>a unit for the range package</description>
+  <persistence-unit name="__orderedRangePU">
+    <description>Persistence Unit for exercising the ordered-range mapped superclasses against an in-memory
+      DB</description>
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.more.orderedrange._LocalDateRangeEntity</class>
     <class>com.github.jinahya.persistence.more.orderedrange._IntegerRangeEntity</class>
@@ -116,7 +118,7 @@
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="jakarta.persistence.jdbc.url"
-                value="jdbc:h2:mem:range;database_to_upper=false;MODE=LEGACY"/>
+                value="jdbc:h2:mem:orderedrange;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->
