@@ -23,7 +23,8 @@ package com.github.jinahya.persistence.more.test;
 import java.util.Objects;
 
 /**
- * Utilities shared by the abstract test classes in this package.
+ * Utilities shared by the abstract test classes of this package and of the sibling {@code .test}
+ * packages mirroring what {@code jinahya-persistence-more} lays out.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -31,7 +32,7 @@ import java.util.Objects;
         "java:S101", // Class names should comply with a naming convention
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
-final class ___Utils {
+public final class ___Utils {
 
     /**
      * Creates a new instance of the specified class, using its no-argument constructor.
@@ -45,7 +46,7 @@ final class ___Utils {
      *         marks {@code @API(status = INTERNAL)}: a published library has no business binding to a testing
      *         framework's internals, where a patch release is free to move the method out from under it.
      */
-    static <T> T newInstance(final Class<T> clazz) {
+    public static <T> T newInstance(final Class<T> clazz) {
         Objects.requireNonNull(clazz, "clazz is null");
         final java.lang.reflect.Constructor<T> constructor;
         try {

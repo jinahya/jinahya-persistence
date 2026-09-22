@@ -1,14 +1,21 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
+import com.github.jinahya.persistence.more.test.___Utils;
 import jakarta.persistence.AttributeConverter;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
+import org.junit.jupiter.api.function.Executable;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * An abstract class for testing {@link AttributeConverter} implementations.
@@ -137,6 +144,55 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");
         this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
         this.dbDataClass = Objects.requireNonNull(dbDataClass, "dbDataClass is null");
+    }
+
+    // ------------------------------------------------------------------------------------------------------ testCases
+
+    /**
+     * Returns the test cases with which both directions of the converter are checked.
+     * <p>
+     * Overriding this method is all a subclass has to do to get both assertions below running; the
+     * {@link __ConvertToDatabaseColumnTestInvocationContextProvider provider} machinery is for a subclass which wants
+     * a separate invocation, with its own display name, per case.
+     *
+     * @return the test cases; empty — as it is here — for a subclass which drives the assertions itself.
+     * @implSpec The default implementation returns an empty list, which leaves both assertions below
+     *         {@linkplain org.junit.jupiter.api.Assumptions#assumeFalse(boolean, String) skipped} rather than
+     *         passing. A test which reports green without having converted anything is the one outcome worth ruling
+     *         out here.
+     */
+    protected List<__AttributeConverterTestCase<X, Y>> testCases() {
+        return List.of();
+    }
+
+    /**
+     * Asserts that every {@link #testCases() test case} converts to its expected db data.
+     *
+     * @see #convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(__AttributeConverterTestCase)
+     */
+    @DisplayName("convertToDatabaseColumn(attribute)expected dbData, for every test case")
+    @Test
+    protected void _ExpectedDbData_EachTestCase() {
+        final var testCases = testCases();
+        assumeFalse(testCases.isEmpty(), () -> "no test case supplied by " + getClass());
+        assertAll(testCases.stream().map(
+                tc -> (Executable) () -> convertToDatabaseColumn_ResultEqualsToExpectedDbData_GivenAttribute(tc)
+        ));
+    }
+
+    /**
+     * Asserts that every {@link #testCases() test case} converts back to its expected attribute.
+     *
+     * @see #convertToEntityAttribute_ResultEqualsToExpectedAttribute_GivenDbData(__AttributeConverterTestCase)
+     */
+    @DisplayName("convertToEntityAttribute(dbData)expected attribute, for every test case")
+    @Test
+    protected void _ExpectedAttribute_EachTestCase() {
+        final var testCases = testCases();
+        assumeFalse(testCases.isEmpty(), () -> "no test case supplied by " + getClass());
+        assertAll(testCases.stream().map(
+                tc -> (Executable) () -> convertToEntityAttribute_ResultEqualsToExpectedAttribute_GivenDbData(tc)
+        ));
     }
 
     // ----------------------------------------------------------------------------------------- convertToDatabaseColumn

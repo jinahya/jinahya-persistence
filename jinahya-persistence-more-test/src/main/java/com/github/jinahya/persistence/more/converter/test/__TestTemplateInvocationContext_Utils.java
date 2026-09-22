@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.Extension;

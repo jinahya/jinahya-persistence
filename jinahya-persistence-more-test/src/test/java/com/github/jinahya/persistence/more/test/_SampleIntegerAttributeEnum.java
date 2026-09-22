@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-enum _SampleIntegerAttributeEnum implements __SampleIntegerAttributeEnum<_SampleIntegerAttributeEnum> {
+public enum _SampleIntegerAttributeEnum implements __SampleIntegerAttributeEnum<_SampleIntegerAttributeEnum> {
 
     A(0),
 

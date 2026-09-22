@@ -25,7 +25,7 @@ import com.github.jinahya.persistence.more.__AttributeEnum;
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 })
-interface __SampleIntegerAttributeEnum<E extends Enum<E> & __SampleIntegerAttributeEnum<E>>
+public interface __SampleIntegerAttributeEnum<E extends Enum<E> & __SampleIntegerAttributeEnum<E>>
         extends __AttributeEnum.__OfInteger<E> {
 
 }

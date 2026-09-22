@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __AttributeEnum_TestUtils
- * @see __AttributeEnumConverter_Test
+ * @see com.github.jinahya.persistence.more.converter.test.__AttributeEnumConverter_Test
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
@@ -68,6 +68,63 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
          */
         protected __OfStringTest(final Class<E> enumClass) {
             super(enumClass, String.class);
+        }
+    }
+
+    /**
+     * An abstract base class for testing {@link __AttributeEnum.__OfNumber} implementations.
+     *
+     * @param <E> enum type parameter
+     * @param <N> number type parameter
+     */
+    public abstract static class __OfNumberTest<E extends Enum<E> & __AttributeEnum.__OfNumber<E, N>,
+            N extends Number>
+            extends __AttributeEnum_Test<E, N> {
+
+        /**
+         * Creates a new instance for testing specific enum types.
+         *
+         * @param enumClass      the enum class to test.
+         * @param attributeClass the type of the number the {@code enumClass} carries.
+         */
+        protected __OfNumberTest(final Class<E> enumClass, final Class<N> attributeClass) {
+            super(enumClass, attributeClass);
+        }
+    }
+
+    /**
+     * An abstract base class for testing {@link __AttributeEnum.__OfInteger} implementations.
+     *
+     * @param <E> enum type parameter
+     */
+    public abstract static class __OfIntegerTest<E extends Enum<E> & __AttributeEnum.__OfInteger<E>>
+            extends __OfNumberTest<E, Integer> {
+
+        /**
+         * Creates a new instance for testing specific enum types.
+         *
+         * @param enumClass the enum class to test.
+         */
+        protected __OfIntegerTest(final Class<E> enumClass) {
+            super(enumClass, Integer.class);
+        }
+    }
+
+    /**
+     * An abstract base class for testing {@link __AttributeEnum.__OfLong} implementations.
+     *
+     * @param <E> enum type parameter
+     */
+    public abstract static class __OfLongTest<E extends Enum<E> & __AttributeEnum.__OfLong<E>>
+            extends __OfNumberTest<E, Long> {
+
+        /**
+         * Creates a new instance for testing specific enum types.
+         *
+         * @param enumClass the enum class to test.
+         */
+        protected __OfLongTest(final Class<E> enumClass) {
+            super(enumClass, Long.class);
         }
     }
 

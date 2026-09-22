@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
 /*-
  * #%L
@@ -22,6 +22,8 @@ package com.github.jinahya.persistence.more.test;
 
 import com.github.jinahya.persistence.more.__AttributeEnum;
 import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
+import com.github.jinahya.persistence.more.test.__AttributeEnum_Test;
+import com.github.jinahya.persistence.more.test.___Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -84,6 +86,87 @@ public abstract class __AttributeEnumConverter_Test<
          */
         protected __OfStringTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
             super(converterClass, enumClass, String.class);
+        }
+    }
+
+    /**
+     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfNumber}.
+     *
+     * @param <CONVERTER> converter type parameter
+     * @param <ENUM>      enum type parameter
+     * @param <NUMBER>    number type parameter
+     * @see #converterClass
+     * @see #enumClass
+     */
+    public abstract static class __OfNumberTest<
+            CONVERTER extends __AttributeEnumConverter.__OfNumber<ENUM, NUMBER>,
+            ENUM extends Enum<ENUM> & __AttributeEnum.__OfNumber<ENUM, NUMBER>,
+            NUMBER extends Number
+            >
+            extends __AttributeEnumConverter_Test<CONVERTER, ENUM, NUMBER> {
+
+        /**
+         * Creates a new instance for testing the specified converter class, whose attribute value is a
+         * {@link Number}.
+         *
+         * @param converterClass the converter class to test.
+         * @param enumClass      the enum class the {@code converterClass} converts.
+         * @param attributeClass the type of the number the {@code enumClass} carries.
+         */
+        protected __OfNumberTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass,
+                                 final Class<NUMBER> attributeClass) {
+            super(converterClass, enumClass, attributeClass);
+        }
+    }
+
+    /**
+     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfInteger}.
+     *
+     * @param <CONVERTER> converter type parameter
+     * @param <ENUM>      enum type parameter
+     * @see #converterClass
+     * @see #enumClass
+     */
+    public abstract static class __OfIntegerTest<
+            CONVERTER extends __AttributeEnumConverter.__OfInteger<ENUM>,
+            ENUM extends Enum<ENUM> & __AttributeEnum.__OfInteger<ENUM>
+            >
+            extends __OfNumberTest<CONVERTER, ENUM, Integer> {
+
+        /**
+         * Creates a new instance for testing the specified converter class, whose attribute value is an
+         * {@link Integer}.
+         *
+         * @param converterClass the converter class to test.
+         * @param enumClass      the enum class the {@code converterClass} converts.
+         */
+        protected __OfIntegerTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
+            super(converterClass, enumClass, Integer.class);
+        }
+    }
+
+    /**
+     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfLong}.
+     *
+     * @param <CONVERTER> converter type parameter
+     * @param <ENUM>      enum type parameter
+     * @see #converterClass
+     * @see #enumClass
+     */
+    public abstract static class __OfLongTest<
+            CONVERTER extends __AttributeEnumConverter.__OfLong<ENUM>,
+            ENUM extends Enum<ENUM> & __AttributeEnum.__OfLong<ENUM>
+            >
+            extends __OfNumberTest<CONVERTER, ENUM, Long> {
+
+        /**
+         * Creates a new instance for testing the specified converter class, whose attribute value is a {@link Long}.
+         *
+         * @param converterClass the converter class to test.
+         * @param enumClass      the enum class the {@code converterClass} converts.
+         */
+        protected __OfLongTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
+            super(converterClass, enumClass, Long.class);
         }
     }
 

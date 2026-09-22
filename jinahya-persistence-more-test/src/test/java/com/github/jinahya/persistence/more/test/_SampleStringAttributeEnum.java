@@ -22,7 +22,7 @@ package com.github.jinahya.persistence.more.test;
 
 import java.util.Optional;
 
-enum _SampleStringAttributeEnum implements __SampleStringAttributeEnum<_SampleStringAttributeEnum> {
+public enum _SampleStringAttributeEnum implements __SampleStringAttributeEnum<_SampleStringAttributeEnum> {
 
     A,
 

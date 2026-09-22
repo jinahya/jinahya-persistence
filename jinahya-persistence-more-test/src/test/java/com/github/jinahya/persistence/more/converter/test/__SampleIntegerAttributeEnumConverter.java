@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
 /*-
  * #%L
@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.more.test;
  */
 
 import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
+import com.github.jinahya.persistence.more.test.__SampleIntegerAttributeEnum;
 
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention

@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
 /*-
  * #%L
@@ -19,6 +19,9 @@ package com.github.jinahya.persistence.more.test;
  * limitations under the License.
  * #L%
  */
+
+import com.github.jinahya.persistence.more.test._SampleIntegerAttributeEnum;
+import com.github.jinahya.persistence.more.test.__SampleIntegerAttributeEnum;
 
 class _SampleIntegerAttributeEnumConverter
         extends __SampleIntegerAttributeEnumConverter<_SampleIntegerAttributeEnum> {

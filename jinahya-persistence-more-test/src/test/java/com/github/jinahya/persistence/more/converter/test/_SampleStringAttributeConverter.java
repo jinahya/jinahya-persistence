@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
 import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 

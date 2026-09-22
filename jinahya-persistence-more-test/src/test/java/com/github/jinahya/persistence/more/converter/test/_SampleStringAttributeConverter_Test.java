@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.test;
+package com.github.jinahya.persistence.more.converter.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.TestTemplate;
@@ -19,6 +19,17 @@ class _SampleStringAttributeConverter_Test
 
     _SampleStringAttributeConverter_Test() {
         super(_SampleStringAttributeConverter.class, String.class);
+    }
+
+    // supplying the cases is the whole of what a subclass has to do to get both directions checked; the provider
+    // below is the other path, for a subclass which wants an invocation of its own per case
+    @Override
+    protected List<__AttributeConverterTestCase<String, String>> testCases() {
+        return List.of(
+                __AttributeConverterTestCase.of("a", "a"),
+                __AttributeConverterTestCase.of("", ""),
+                __AttributeConverterTestCase.of("😀", "😀")
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
