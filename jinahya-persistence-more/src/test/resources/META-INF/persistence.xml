@@ -35,6 +35,8 @@
     <class>com.github.jinahya.persistence.more.colormodel._CmykEntity</class>
     <class>com.github.jinahya.persistence.more.colormodel._PropertyAccessRgbaEntity</class>
     <class>com.github.jinahya.persistence.more.colormodel._OverriddenHslEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._RgbEmbeddable</class>
+    <class>com.github.jinahya.persistence.more.colormodel._ThemeEntity</class>
     <class>com.github.jinahya.persistence.more.converter._ConvertedEntity</class>
     <class>com.github.jinahya.persistence.more._CategoryEntity</class>
     <class>com.github.jinahya.persistence.more._PropertyAccessNodeEntity</class>

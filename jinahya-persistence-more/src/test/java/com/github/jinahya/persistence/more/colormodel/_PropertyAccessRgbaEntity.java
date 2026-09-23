@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more.colormodel;
  * #L%
  */
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,10 +37,20 @@ import jakarta.persistence.Table;
  * access, and the {@link jakarta.persistence.Transient @Transient} accessors sitting alongside each component —
  * {@code getRedAsEightBits()}, {@code isOpaque()}, {@code getComponentCount()} — would unmap the components themselves.
  * Every component would silently stop being persisted.
+ * <p>
+ * The {@link Access @Access}({@code PROPERTY}) is stated rather than inferred. Jakarta Persistence 3.2 &sect;2.3.1
+ * decides a hierarchy's default access from the classes which do <em>not</em> declare one, so the {@code @Id} on the
+ * getter below settles it on its own and Hibernate ORM 7.4 and EclipseLink both read it that way. ORM 7.2 instead
+ * propagates the access type of the <em>root</em> mapped superclass — {@link ___MappedColor}, which declares
+ * {@code @Access(FIELD)} so that an {@link jakarta.persistence.Embeddable @Embeddable} can extend this hierarchy on
+ * EclipseLink — down onto the entity, looks for an {@code @Id} among its fields, finds none, and rejects the class as
+ * having no identifier. Saying it here costs one annotation and keeps the profile buildable; the implicit path stays
+ * covered by {@code _PropertyAccessNodeEntity}, whose roots are interfaces and declare no access type at all.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @Entity
+@Access(AccessType.PROPERTY)
 @Table(name = _PropertyAccessRgbaEntity.TABLE_NAME)
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

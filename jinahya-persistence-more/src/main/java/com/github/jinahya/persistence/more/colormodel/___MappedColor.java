@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more.colormodel;
  * #L%
  */
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import org.jspecify.annotations.Nullable;
@@ -61,10 +63,23 @@ import java.util.function.DoubleFunction;
  * A model which actually stores an alpha — {@link __MappedRgba}, for one — overrides it.
  *
  * <h2>Access type</h2>
- * The subclasses which map columns are annotated {@link jakarta.persistence.Access @Access}({@code FIELD}), so that an
+ * Every class in this hierarchy is annotated {@link jakarta.persistence.Access @Access}({@code FIELD}), so that an
  * entity declaring its {@link jakarta.persistence.Id @Id} on a getter cannot flip the hierarchy to property access and
- * unmap every component. An entity extending them should declare {@code @Access(AccessType.FIELD)} too: EclipseLink
+ * unmap every component. An entity extending one should declare {@code @Access(AccessType.FIELD)} too: EclipseLink
  * requires it, Hibernate does not.
+ * <p>
+ * This class maps no column, so the annotation looks gratuitous here and is not. It is what lets an
+ * {@link jakarta.persistence.Embeddable @Embeddable} extend this hierarchy at all — see
+ * {@linkplain com.github.jinahya.persistence.more.colormodel the package documentation} — because EclipseLink walks
+ * the mapped-superclass chain of an embeddable and fails with a {@link NullPointerException}, in
+ * {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata}, where any link in that chain has no access type of
+ * its own. This class is the last such link.
+ * <p>
+ * It has one cost, on Hibernate ORM 7.2 only, and it falls on an entity rather than here: that series propagates the
+ * <em>root</em> mapped superclass's access type down onto the entity, so an entity which extends one of these
+ * <em>and</em> puts its {@code @Id} on a getter has to declare {@code @Access(AccessType.PROPERTY)} itself, or be
+ * rejected as having no identifier. ORM 7.4 and EclipseLink read Jakarta Persistence 3.2 &sect;2.3.1 as written and
+ * need no such declaration.
  *
  * <h2>Out-of-range values</h2>
  * CSS Color 4 clamps a component outside its range rather than rejecting it. This class does not: a component is
@@ -75,6 +90,7 @@ import java.util.function.DoubleFunction;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a href="https://www.w3.org/TR/css-color-4/">CSS Color Module Level 4</a>
  */
+@Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

@@ -61,6 +61,17 @@
  * Hibernate infers it from the {@code @Id} placement and does not need it; EclipseLink does, and without it rejects
  * the entity at deployment with &quot;has no primary key specified &hellip; mixed access-type&quot; even though the
  * {@code @Id} is plainly on a field. Declaring it explicitly costs one line and works on both.
+ * <p>
+ * <strong>An entity which uses <em>property</em> access has to say so, for the mirror reason.</strong>
+ * {@code @Access(FIELD)} on a mapped superclass is scoped to the class it sits on by Jakarta Persistence 3.2
+ * &sect;2.3.2, and &sect;2.3.1 decides the hierarchy's default from the classes which do <em>not</em> declare one — so
+ * an {@code @Id} on a getter settles it as {@code PROPERTY}. Hibernate ORM 7.4 and EclipseLink read it that way.
+ * ORM 7.2 instead propagates the <em>root</em> mapped superclass's access type onto the entity, looks for an
+ * {@code @Id} among its fields, finds none, and rejects the class as having no identifier; the root here is
+ * {@link com.github.jinahya.persistence.more.colormodel.___MappedColor}, which carries {@code @Access(FIELD)} so that
+ * the embeddable form below works on EclipseLink. Between the two, the rule is simply: <strong>an entity extending
+ * one of these should state its access type, whichever one it is.</strong> Inference is unreliable in both
+ * directions, and in opposite providers.
  *
  * <h2>What is deliberately not here</h2>
  * <ul>
@@ -74,9 +85,6 @@
  *       their own identity. Use
  *       {@link com.github.jinahya.persistence.more.colormodel.___MappedColor#hasSameComponentsAs(com.github.jinahya.persistence.more.colormodel.___MappedColor)}
  *       for a component-wise comparison.</li>
- *   <li><b>Embeddables.</b> These are mapped superclasses, for entities. Jakarta Persistence does not portably let an
- *       {@link jakarta.persistence.Embeddable @Embeddable} extend a
- *       {@link jakarta.persistence.MappedSuperclass @MappedSuperclass}.</li>
  * </ul>
  *
  * <h2>Extending</h2>
@@ -103,6 +111,53 @@
  * {@snippet lang = "java":
  * hsl.applySrgb(r -> g -> b -> { cmyk.setSrgb(r, g, b); return null; });
  *}
+ *
+ * <h2>Two colors in one table</h2>
+ * An entity extends one of these classes and gets one color, because a {@code @MappedSuperclass} is inherited once. A
+ * table carrying two — a theme has a foreground and a background, which is the ordinary case — needs the second form:
+ * a downstream {@link jakarta.persistence.Embeddable @Embeddable} of its own extending one of these classes, embedded
+ * as many times as wanted, each with its own {@link jakarta.persistence.AttributeOverride @AttributeOverride} set.
+ * {@snippet lang = "java":
+ * @Embeddable
+ * @Access(AccessType.FIELD)
+ * public class Rgb extends __MappedRgb {
+ * }
+ *
+ * @Access(AccessType.FIELD)
+ * @Entity
+ * public class Theme {
+ *
+ *     @Id
+ *     @GeneratedValue(strategy = GenerationType.IDENTITY)
+ *     private Long id;
+ *
+ *     @Embedded
+ *     @AttributeOverride(name = "red", column = @Column(name = "fg_red"))
+ *     @AttributeOverride(name = "green", column = @Column(name = "fg_green"))
+ *     @AttributeOverride(name = "blue", column = @Column(name = "fg_blue"))
+ *     private Rgb foreground;
+ *
+ *     @Embedded
+ *     @AttributeOverride(name = "red", column = @Column(name = "bg_red"))
+ *     @AttributeOverride(name = "green", column = @Column(name = "bg_green"))
+ *     @AttributeOverride(name = "blue", column = @Column(name = "bg_blue"))
+ *     private Rgb background;
+ * }
+ *}
+ * Which settles what these classes may fix and what they may not. The column names they declare are
+ * <em>defaults</em>: a downstream with two colors replaces every one of them, and
+ * {@value com.github.jinahya.persistence.more.colormodel.__MappedRgb#COLUMN_NAME_RED} is then never written to a
+ * schema at all. The attribute names are the opposite —
+ * {@value com.github.jinahya.persistence.more.colormodel.__MappedRgb#ATTRIBUTE_NAME_RED} and its siblings are
+ * declared here and cannot be renamed, so they are what an {@code @AttributeOverride} and every query path must spell
+ * exactly.
+ * <p>
+ * The embeddable has to be concrete, public and have a no-arg constructor, and should carry
+ * {@code @Access(AccessType.FIELD)} like the hierarchy above it. That last one is not decoration: EclipseLink walks
+ * the mapped-superclass chain of an {@code @Embeddable} and fails with a {@link NullPointerException} — in
+ * {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata} — where any link in that chain has no access type of
+ * its own. Every class here has one for that reason, the root
+ * {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} included, even though it maps no column.
  *
  * <h2>References</h2>
  * Everything in this package is derived from these, and each class and conversion method links the section it

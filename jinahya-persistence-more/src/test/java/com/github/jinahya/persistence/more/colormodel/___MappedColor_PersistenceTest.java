@@ -294,6 +294,41 @@ class ___MappedColor_PersistenceTest {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nested
+    class EmbeddableTest {
+
+        @DisplayName("the embeddable form: two colors in one table, each overriding its three column names")
+        @Test
+        void twoColorsInOneTable__() {
+            final var foreground = new _RgbEmbeddable();
+            foreground.setSrgb(1.0d, .5d, .25d);
+            final var background = new _RgbEmbeddable();
+            background.setSrgb(.0d, .125d, 1.0d);
+            final var entity = new _ThemeEntity();
+            entity.setForeground(foreground);
+            entity.setBackground(background);
+            persistAndFind(entity, _ThemeEntity.class, found -> {
+                assertThat(found.getForeground()).isNotNull();
+                assertThat(found.getForeground().getRed()).isCloseTo(1.0d, within(TOLERANCE));
+                assertThat(found.getForeground().getGreen()).isCloseTo(.5d, within(TOLERANCE));
+                assertThat(found.getForeground().getBlue()).isCloseTo(.25d, within(TOLERANCE));
+                assertThat(found.getBackground()).isNotNull();
+                assertThat(found.getBackground().getRed()).isCloseTo(.0d, within(TOLERANCE));
+                assertThat(found.getBackground().getGreen()).isCloseTo(.125d, within(TOLERANCE));
+                assertThat(found.getBackground().getBlue()).isCloseTo(1.0d, within(TOLERANCE));
+                return null;
+            });
+            // the overridden names are the ones in the schema, and the inherited ones are not there at all
+            assertThat(columnNamesOf(_ThemeEntity.TABLE_NAME))
+                    .contains(_ThemeEntity.COLUMN_NAME_FOREGROUND_RED, _ThemeEntity.COLUMN_NAME_FOREGROUND_GREEN,
+                              _ThemeEntity.COLUMN_NAME_FOREGROUND_BLUE, _ThemeEntity.COLUMN_NAME_BACKGROUND_RED,
+                              _ThemeEntity.COLUMN_NAME_BACKGROUND_GREEN, _ThemeEntity.COLUMN_NAME_BACKGROUND_BLUE)
+                    .doesNotContain(__MappedRgb.COLUMN_NAME_RED, __MappedRgb.COLUMN_NAME_GREEN,
+                                    __MappedRgb.COLUMN_NAME_BLUE);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Nested
     class AttributeOverrideTest {
 
         @DisplayName("@Access(FIELD) on the superclasses leaves @AttributeOverride working, at any depth")

@@ -168,6 +168,24 @@ Two breaking changes land together, so that a call site is edited once rather th
 A converter named in `persistence.xml` or in `@Convert` has to be renamed accordingly —
 `…more.__StringAttributeConverter$OfBigDecimal` is now `…more.converter.__NumberStringAttributeConverters$OfBigDecimal`.
 
+One smaller change, in the colour package, which gains something and costs something:
+
+- `___MappedColor` — the root of the colour hierarchy, which maps no column of its own — now declares
+  `@Access(AccessType.FIELD)`, as every other class in the package already did.
+
+What it gains is the embeddable form the interval and range packages already had: an `@Embeddable` extending one of
+the colour classes, embedded twice in one entity, so a table can carry a foreground **and** a background colour.
+Without the annotation EclipseLink refuses to deploy such a unit, with a `NullPointerException` in
+`EmbeddableAccessor.preProcessMappedSuperclassMetadata` — it walks the mapped-superclass chain of an `@Embeddable`
+and fails where a link in that chain has no access type of its own.
+
+What it costs falls on **Hibernate ORM 7.2 only**, and only on one shape of entity: that series propagates the *root*
+mapped superclass's access type down onto the entity, so an entity which extends a colour class *and* declares its
+`@Id` on a getter must now declare `@Access(AccessType.PROPERTY)` itself, or be rejected at deployment as having no
+identifier. ORM 7.4 and EclipseLink read Jakarta Persistence 3.2 §2.3.1 as written and need no such declaration. The
+rule the package documents either way: **an entity extending one of these should state its access type, whichever one
+it is** — inference is unreliable in both directions, and in opposite providers.
+
 ### Dependencies
 
 Per module, at the scopes a consumer sees. `test`-scoped dependencies are omitted; they are a private matter of each
