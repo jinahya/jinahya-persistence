@@ -186,7 +186,10 @@ import java.time.temporal.Temporal;
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "java:S101", // Class names should comply with a naming convention
+        // intervalEnd is declared @Nullable -- an absent upper bound is the documented case, and the rule does not
+        // read the JSpecify type-use annotation on a type variable
+        "java:S2637" // "@NonNull" values should not be set to null
 })
 public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<? super T>>
         implements ___TemporalInterval<T> {

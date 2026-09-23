@@ -209,7 +209,9 @@ class ___MappedColor_Test {
             final var one = rgba(1.0d, .0d, .0d);
             final var two = rgba(1.0d, .0d, .0d);
             assertThat(one).isNotEqualTo(two);
-            assertThat(one).isEqualTo(one);
+            assertThat(one.hasSameComponentsAs(two))
+                    .as("the two are unequal despite holding the same components")
+                    .isTrue();
         }
 
         @DisplayName("toString prints each mapped column once")

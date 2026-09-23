@@ -38,7 +38,11 @@ import java.util.Optional;
  *         both allocates a defensive copy of the constants and costs {@code O(n)} on every call.
  */
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "java:S101", // Class names should comply with a naming convention
+        // attributeValue() is declared non-null, so the rule reads the guard below as dead. It is not: the
+        // constants come from a downstream enum, and every public method here documents the
+        // IllegalArgumentException it throws for a null attribute value
+        "java:S2583" // Conditionally executed code should be reachable
 })
 public final class __AttributeEnumUtils {
 

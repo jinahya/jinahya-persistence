@@ -114,6 +114,7 @@ public abstract class ___DiscreteInterval_Test<
     protected void _OneStepBack_EndInclusiveOfBounded() {
         final var instance = newInterval(earlier, later);
         final var granularity = instance.getGranularity();
+        assertNotNull(granularity, () -> "null granularity of an instance of " + intervalClass);
         assertEquals(
                 later.minus(1L, granularity),
                 instance.getIntervalEndInclusive(),

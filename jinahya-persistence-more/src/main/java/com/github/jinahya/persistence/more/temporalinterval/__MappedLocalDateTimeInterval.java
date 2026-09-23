@@ -63,7 +63,10 @@ import java.time.LocalDateTime;
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "java:S101", // Class names should comply with a naming convention
+        // the whole point of this class: its axis is local, with no zone to be aware of. Converting the two points
+        // to zone-aware types would invent an offset neither column holds -- see the javadoc above
+        "java:S8700" // Time zone should be taken into account when computing a duration
 })
 public abstract class __MappedLocalDateTimeInterval extends ___MappedTemporalInterval<LocalDateTime> {
 

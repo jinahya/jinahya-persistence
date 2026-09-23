@@ -157,5 +157,5 @@ public abstract class __SecureAttributeConveter<X, Y> implements AttributeConver
 
     // -----------------------------------------------------------------------------------------------------------------
     @Inject
-    private __EncryptionService encryptionService;
+    private @Nullable __EncryptionService encryptionService;
 }

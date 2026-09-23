@@ -189,7 +189,10 @@ import java.util.Objects;
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
+        "java:S101", // Class names should comply with a naming convention
+        // both cut fields are declared @Nullable and both setters assign null the same way; the rule sees the
+        // JSpecify type-use annotation on one of the pair and not on the other
+        "java:S2637" // "@NonNull" values should not be set to null
 })
 public abstract class __MappedOrderedRange<C extends Comparable<? super C>> implements ___OrderedRange<C> {
 
@@ -280,10 +283,9 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
 
     // --------------------------------------------------------------------------------------------- compose / decompose
     private String compose(final C value, final char boundCharacter) {
-        final var encoded = encode(value);
-        if (encoded == null) {
-            throw new IllegalStateException("encode(" + value + ") returned null");
-        }
+        // requireNonNull rather than a hand-rolled check: encode() is declared non-null and a subclass which
+        // returns null anyway is a programming error, which is what an NPE is for
+        final var encoded = Objects.requireNonNull(encode(value), () -> "encode(" + value + ") returned null");
         return encoded + boundCharacter;
     }
 
@@ -292,13 +294,9 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
             throw new IllegalStateException("a cut column holds an empty string, which carries no bound character");
         }
         final var encoded = cut.substring(0, cut.length() - 1);
-        final var decoded = decode(encoded);
-        if (decoded == null) {
-            // symmetric with compose(): a null here would make this end look unbounded while its column still
-            // holds a marker, so the endpoint and its bound type would disagree about whether the end exists.
-            throw new IllegalStateException("decode('" + encoded + "') returned null");
-        }
-        return decoded;
+        // symmetric with compose(): a null here would make this end look unbounded while its column still holds a
+        // marker, so the endpoint and its bound type would disagree about whether the end exists
+        return Objects.requireNonNull(decode(encoded), () -> "decode('" + encoded + "') returned null");
     }
 
     // --------------------------------------------------------------------------------------------------------- ___OrderedRange
