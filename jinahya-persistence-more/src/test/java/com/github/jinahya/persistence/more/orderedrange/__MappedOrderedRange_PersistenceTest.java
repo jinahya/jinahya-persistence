@@ -19,9 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Verifies {@link __MappedOrderedRange} against both persistence providers.
  * <p>
- * The claims under test are the ones the design rests on: all nine shapes are expressible <em>per row</em>, an
- * absent end is {@code NULL} and has no bound type, the columns still sort by endpoint despite carrying a marker,
- * the containment predicates run in SQL, and a converter whose encoding does not sort is rejected loudly.
+ * The claims under test are the ones the design rests on: all nine shapes are expressible <em>per row</em>, an absent
+ * end is {@code NULL} and has no bound type, the columns still sort by endpoint despite carrying a marker, the
+ * containment predicates run in SQL, and a converter whose encoding does not sort is rejected loudly.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

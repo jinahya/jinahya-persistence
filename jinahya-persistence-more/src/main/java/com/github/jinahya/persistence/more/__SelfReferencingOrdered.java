@@ -45,9 +45,9 @@ import org.jspecify.annotations.Nullable;
  * {@link #getSiblingOrdinal()}. Neither is a {@code null} the caller has to interpret.
  * <p>
  * Which is also why the ordinal stays an {@link Integer} rather than becoming a primitive. An {@code int} can not be
- * unassigned: it reads {@code 0}, the head of the sibling group, and an entity which simply forgot to place an
- * instance jumps it in front of every sibling which was placed on purpose. An {@link Integer} reads {@code null}, and
- * the constraint names the property before the insert.
+ * unassigned: it reads {@code 0}, the head of the sibling group, and an entity which simply forgot to place an instance
+ * jumps it in front of every sibling which was placed on purpose. An {@link Integer} reads {@code null}, and the
+ * constraint names the property before the insert.
  *
  * <h2>What this promises, and what it does not</h2>
  * It promises that every instance carries a sort key, and that the keys of two <em>siblings</em> may be compared. It
@@ -73,7 +73,7 @@ import org.jspecify.annotations.Nullable;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __SelfReferencing
  * @see __SelfReferencingOrdinal
- * @see __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered)
+ * @see __SelfReferencingOrderedUtils#ordinalOf(__SelfReferencingOrdered)
  */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
@@ -91,10 +91,9 @@ public interface __SelfReferencingOrdered<T extends __SelfReferencingOrdered<T>>
      *                               {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, carries more than one,
      *                               or carries one which is typed neither {@code int} nor {@link Integer}.
      * @apiNote An implementing entity which maps by property access has to mark its own accessor
-     *         {@link Transient @Transient}; an annotation here would not reach it. The
-     *         {@link NotNull @NotNull} and {@link PositiveOrZero @PositiveOrZero} constraints, by contrast, are
-     *         inherited and do apply — which is how an instance whose ordinal was never assigned is caught, by name,
-     *         on the next validation pass.
+     *         {@link Transient @Transient}; an annotation here would not reach it. The {@link NotNull @NotNull} and
+     *         {@link PositiveOrZero @PositiveOrZero} constraints, by contrast, are inherited and do apply — which is
+     *         how an instance whose ordinal was never assigned is caught, by name, on the next validation pass.
      *         <p>
      *         Note that Jakarta Validation evaluates those constraints by <em>calling</em> this method. An override
      *         which throws for an instance it considers incomplete does not produce a violation; it aborts the
@@ -108,7 +107,7 @@ public interface __SelfReferencingOrdered<T extends __SelfReferencingOrdered<T>>
      * @implSpec The default implementation reads, with reflection, the field or accessor annotated with
      *         {@link __SelfReferencingOrdinal} in the class tree of the implementation type. An entity whose own
      *         accessor already answers this question overrides it and never comes here.
-     * @see __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered)
+     * @see __SelfReferencingOrderedUtils#ordinalOf(__SelfReferencingOrdered)
      */
     @Nullable
     @NotNull
@@ -116,6 +115,6 @@ public interface __SelfReferencingOrdered<T extends __SelfReferencingOrdered<T>>
     @Transient
     @SuppressWarnings("unchecked")
     default Integer getSiblingOrdinal() {
-        return __SelfReferencingUtils.ordinalOf((T) this);
+        return __SelfReferencingOrderedUtils.ordinalOf((T) this);
     }
 }

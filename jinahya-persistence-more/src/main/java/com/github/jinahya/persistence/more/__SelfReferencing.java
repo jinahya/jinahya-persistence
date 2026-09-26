@@ -58,6 +58,7 @@ import org.jspecify.annotations.Nullable;
  * @see __SelfReferencingParent
  * @see __SelfReferencingOrdered
  * @see __SelfReferencingUtils
+ * @see __SelfReferencingQueryUtils
  */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention

@@ -12,8 +12,8 @@ import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A range of dates. The ISO form is fixed-width — the year is padded to four digits — so it sorts, is prefix-free,
- * and the encoding is nothing but {@code toString} and {@code parse}.
+ * A range of dates. The ISO form is fixed-width — the year is padded to four digits — so it sorts, is prefix-free, and
+ * the encoding is nothing but {@code toString} and {@code parse}.
  */
 @Entity
 @Table(name = _LocalDateRangeEntity.TABLE_NAME)
@@ -23,7 +23,9 @@ public class _LocalDateRangeEntity extends __MappedOrderedRange<LocalDate> {
 
     static final String TABLE_NAME = "local_date_range";
 
-    /** Counts {@link #decode(String)} calls, so a test can show that decoding happens on demand and not on load. */
+    /**
+     * Counts {@link #decode(String)} calls, so a test can show that decoding happens on demand and not on load.
+     */
     static final AtomicInteger DECODE_COUNT = new AtomicInteger();
 
     @Override

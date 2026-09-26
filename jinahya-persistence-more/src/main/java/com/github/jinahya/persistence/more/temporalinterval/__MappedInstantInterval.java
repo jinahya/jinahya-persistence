@@ -42,8 +42,8 @@ import java.time.Instant;
  * <h2>This is the axis the others approximate</h2>
  * An {@link Instant} is a point on the timeline and carries nothing else — no zone, no offset, no calendar. So
  * {@link Instant#compareTo(Instant)} compares epoch-second and then nanosecond, which is chronological order and
- * nothing standing in for it. The invariant on {@link ___MappedTemporalInterval} therefore means here exactly what it reads as,
- * which is not true of every point type that class admits.
+ * nothing standing in for it. The invariant on {@link ___MappedTemporalInterval} therefore means here exactly what it
+ * reads as, which is not true of every point type that class admits.
  * <p>
  * That is the difference between this class and an interval of {@link java.time.OffsetDateTime} or
  * {@link java.time.ZonedDateTime}, which name the same moments and do not order them the same way. Where a schema
@@ -53,8 +53,8 @@ import java.time.Instant;
  * <h2>{@link Instant} is a basic type, since Jakarta Persistence 3.2</h2>
  * The two inherited columns need no converter and no {@link jakarta.persistence.Convert @Convert}: the provider maps
  * {@code Instant} itself, to a timestamp column. Under 3.1 and earlier it was not a basic type and an interval of
- * instants had to be converted into one — which is a reason to be on this platform rather than a reason for anything
- * in this class.
+ * instants had to be converted into one — which is a reason to be on this platform rather than a reason for anything in
+ * this class.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see ___TemporalInterval
@@ -82,11 +82,11 @@ public abstract class __MappedInstantInterval extends ___MappedTemporalInterval<
      *
      * @return the duration from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The return type is narrowed to {@link Duration}, the amount instants measure in, so that a caller
-     *         holding this type needs no cast.
-     * @apiNote Unlike the {@link java.time.Period} an interval of dates measures in, this is exact: a duration is a
-     *         count of nanoseconds, so it neither depends on where the interval sits nor decomposes into components
-     *         whose lengths vary.
+     * @implNote The return type is narrowed to {@link Duration}, the amount instants measure in, so that a
+     *         caller holding this type needs no cast.
+     * @apiNote Unlike the {@link java.time.Period} an interval of dates measures in, this is exact: a duration
+     *         is a count of nanoseconds, so it neither depends on where the interval sits nor decomposes into
+     *         components whose lengths vary.
      */
     @Override
     @Transient

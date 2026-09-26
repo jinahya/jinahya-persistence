@@ -20,7 +20,6 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import jakarta.persistence.Transient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * A class for testing {@link __SelfReferencingUtils}, pinning which member the marks are read from.
+ * A class for testing {@link __SelfReferencingUtils}, pinning which member the parent is read from.
+ * <p>
+ * Which member the <em>ordinal</em> is read from is {@link __SelfReferencingOrderedUtils_Test}'s subject, as the
+ * ordinal itself belongs to {@link __SelfReferencingOrdered} rather than to {@link __SelfReferencing}.
  * <p>
  * The access type belongs to the implementing entity, so both placements have to work: a <em>field</em>, as an entity
  * using field access declares it, and an <em>accessor</em>, as an entity using property access does — including an
@@ -48,15 +50,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class __SelfReferencingUtils_Test {
 
     /**
-     * An implementation which marks its fields, as an entity using field access declares them.
+     * An implementation which marks its field, as an entity using field access declares it.
      */
-    static class FieldMarked implements __SelfReferencingOrdered<FieldMarked> {
+    static class FieldMarked implements __SelfReferencing<FieldMarked> {
 
         @__SelfReferencingParent
         FieldMarked parent;
-
-        @__SelfReferencingOrdinal
-        Integer ordinal;
 
         @Override
         public FieldMarked getHierarchyParent() {
@@ -70,22 +69,15 @@ class __SelfReferencingUtils_Test {
     }
 
     /**
-     * An implementation which marks its accessors, as an entity using property access declares them, and whose ordinal
-     * is <em>derived</em> — there is no field to mark for it.
+     * An implementation which marks its accessor, as an entity using property access declares it.
      */
-    static class AccessorMarked implements __SelfReferencingOrdered<AccessorMarked> {
+    static class AccessorMarked implements __SelfReferencing<AccessorMarked> {
 
         AccessorMarked parent;
 
         @__SelfReferencingParent
         public AccessorMarked getParent() {
             return parent;
-        }
-
-        @__SelfReferencingOrdinal
-        @Transient
-        public Integer getDisplayOrder() {
-            return parent == null ? null : 7;
         }
 
         @Override
@@ -167,87 +159,6 @@ class __SelfReferencingUtils_Test {
 
         @Override
         public Unmarked getHierarchyParent() {
-            return null;
-        }
-
-        @Override
-        public int getHierarchyDepth() {
-            return 0;
-        }
-    }
-
-    /**
-     * An implementation which marks a method which is not an accessor.
-     */
-    static class NonAccessorMarked implements __SelfReferencingOrdered<NonAccessorMarked> {
-
-        @__SelfReferencingOrdinal
-        public void setOrdinal(final Integer ordinal) {
-            // no-op; marked only to be rejected
-        }
-
-        @Override
-        public NonAccessorMarked getHierarchyParent() {
-            return null;
-        }
-
-        @Override
-        public int getHierarchyDepth() {
-            return 0;
-        }
-    }
-
-    /**
-     * An implementation whose marked ordinal accessor returns a primitive, which an ordered type may: within
-     * {@link __SelfReferencingOrdered} there is no absence for {@code 0} to also stand for.
-     */
-    static class PrimitiveOrdinalMarked implements __SelfReferencingOrdered<PrimitiveOrdinalMarked> {
-
-        @__SelfReferencingOrdinal
-        public int getOrdinal() {
-            return 1;
-        }
-
-        @Override
-        public PrimitiveOrdinalMarked getHierarchyParent() {
-            return null;
-        }
-
-        @Override
-        public int getHierarchyDepth() {
-            return 0;
-        }
-    }
-
-    /**
-     * An implementation whose marked ordinal accessor holds neither an {@code int} nor an {@link Integer}.
-     */
-    static class WrongTypeOrdinalMarked implements __SelfReferencingOrdered<WrongTypeOrdinalMarked> {
-
-        @__SelfReferencingOrdinal
-        public long getOrdinal() {
-            return 1L;
-        }
-
-        @Override
-        public WrongTypeOrdinalMarked getHierarchyParent() {
-            return null;
-        }
-
-        @Override
-        public int getHierarchyDepth() {
-            return 0;
-        }
-    }
-
-    /**
-     * An implementation which declares that its siblings are ordered and then carries no mark saying where the ordinal
-     * is, which is a broken implementation rather than a hierarchy without an order.
-     */
-    static class OrderedUnmarked implements __SelfReferencingOrdered<OrderedUnmarked> {
-
-        @Override
-        public OrderedUnmarked getHierarchyParent() {
             return null;
         }
 
@@ -357,91 +268,10 @@ class __SelfReferencingUtils_Test {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * A nested class for testing {@link __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered)}.
-     */
-    @DisplayName("ordinalOf(instance)")
-    @Nested
-    class OrdinalOfTest {
-
-        @DisplayName("rejects a null instance")
-        @Test
-        void __null() {
-            assertThatThrownBy(() -> __SelfReferencingUtils.ordinalOf(null))
-                    .isInstanceOf(NullPointerException.class);
-        }
-
-        @DisplayName("reads a marked field")
-        @Test
-        void __field() {
-            final var instance = new FieldMarked();
-            instance.ordinal = 3;
-            assertThat(__SelfReferencingUtils.ordinalOf(instance)).isEqualTo(3);
-            assertThat(instance.getSiblingOrdinal()).isEqualTo(3);
-        }
-
-        @DisplayName("reads a marked accessor which derives its value")
-        @Test
-        void __derivedAccessor() {
-            final var child = new AccessorMarked();
-            child.parent = new AccessorMarked();
-            assertThat(__SelfReferencingUtils.ordinalOf(child)).isEqualTo(7);
-            assertThat(child.getSiblingOrdinal()).isEqualTo(7);
-        }
-
-        @DisplayName("reads a marked accessor which returns a primitive")
-        @Test
-        void __primitive() {
-            final var instance = new PrimitiveOrdinalMarked();
-            assertThat(__SelfReferencingUtils.ordinalOf(instance)).isEqualTo(1);
-            assertThat(instance.getSiblingOrdinal()).isEqualTo(1);
-        }
-
-        @DisplayName("answers null when the marked member holds no value")
-        @Test
-        void __empty() {
-            // an ordinal which was never assigned is not read as 0, and does not fail the read either:
-            // @NotNull on getSiblingOrdinal() is what reports it, and a throw here would abort the very
-            // validation pass which does the reporting
-            assertThat(__SelfReferencingUtils.ordinalOf(new FieldMarked())).isNull();
-            assertThat(__SelfReferencingUtils.ordinalOf(new AccessorMarked())).isNull();
-            assertThat(new FieldMarked().getSiblingOrdinal()).isNull();
-        }
-
-        @DisplayName("fails for an ordered type which carries no mark")
-        @Test
-        void __unmarked() {
-            final var instance = new OrderedUnmarked();
-            assertThatThrownBy(() -> __SelfReferencingUtils.ordinalOf(instance))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("no member annotated");
-        }
-
-        @DisplayName("fails on a marked method which is not an accessor")
-        @Test
-        void __nonAccessor() {
-            final var instance = new NonAccessorMarked();
-            assertThatThrownBy(() -> __SelfReferencingUtils.ordinalOf(instance))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("is not an accessor");
-        }
-
-        @DisplayName("fails on a marked member typed neither int nor Integer")
-        @Test
-        void __wrongType() {
-            final var instance = new WrongTypeOrdinalMarked();
-            assertThatThrownBy(() -> __SelfReferencingUtils.ordinalOf(instance))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("typed neither int nor " + Integer.class.getSimpleName());
-        }
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * A nested class for pinning where the marks may be written, which is what lets an entity keep the mark next to the
+     * A nested class for pinning where the parent mark may be written, which is what lets an entity keep it next to the
      * mapping its own access type decides.
      */
-    @DisplayName("@Target / @Retention of the marks")
+    @DisplayName("@Target / @Retention of the mark")
     @Nested
     class MarkTest {
 
@@ -451,15 +281,6 @@ class __SelfReferencingUtils_Test {
             assertThat(__SelfReferencingParent.class.getAnnotation(Target.class).value())
                     .containsExactlyInAnyOrder(ElementType.FIELD, ElementType.METHOD);
             assertThat(__SelfReferencingParent.class.getAnnotation(Retention.class).value())
-                    .isSameAs(RetentionPolicy.RUNTIME);
-        }
-
-        @DisplayName("@__SelfReferencingOrdinal goes on a field or on a method, at runtime")
-        @Test
-        void __ordinal() {
-            assertThat(__SelfReferencingOrdinal.class.getAnnotation(Target.class).value())
-                    .containsExactlyInAnyOrder(ElementType.FIELD, ElementType.METHOD);
-            assertThat(__SelfReferencingOrdinal.class.getAnnotation(Retention.class).value())
                     .isSameAs(RetentionPolicy.RUNTIME);
         }
     }

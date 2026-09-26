@@ -23,14 +23,14 @@ package com.github.jinahya.persistence.more.orderedrange;
 /**
  * Whether one end of a range includes the endpoint it names.
  * <p>
- * This is the per-end primitive. {@link __RangeBounds} is the pair of them, and is what a range as a whole is
- * described by; this is what a single end carries when the two ends are recorded independently, as they are in
+ * This is the per-end primitive. {@link __RangeBounds} is the pair of them, and is what a range as a whole is described
+ * by; this is what a single end carries when the two ends are recorded independently, as they are in
  * {@link __MappedOrderedRange}.
  *
  * <h2>One constant, two characters</h2>
  * A closed lower bound is written {@code [} and a closed upper bound {@code ]}; the same constant, a different
- * character, because the bracket points into the range. {@link #getLowerCharacter()} and
- * {@link #getUpperCharacter()} give the two, and which one applies is decided by the end, not by this constant.
+ * character, because the bracket points into the range. {@link #getLowerCharacter()} and {@link #getUpperCharacter()}
+ * give the two, and which one applies is decided by the end, not by this constant.
  *
  * <h2>An absent endpoint has no bound type</h2>
  * Where a range has no endpoint on one side there is nothing to include or to exclude, so no constant here applies —

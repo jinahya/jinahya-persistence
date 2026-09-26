@@ -11,9 +11,9 @@ import jakarta.persistence.Table;
 /**
  * A range of integers, and the worked example of what an order-preserving encoding costs for a number.
  * <p>
- * {@code Integer.toString()} will not do — {@code "9"} sorts above {@code "10"}, and {@code "-5"} above
- * {@code "0003"}. Both problems are fixed at once by biasing the value into the unsigned range and padding it to a
- * fixed ten digits, which is exactly wide enough for {@code 0} through {@code 4294967295}.
+ * {@code Integer.toString()} will not do — {@code "9"} sorts above {@code "10"}, and {@code "-5"} above {@code "0003"}.
+ * Both problems are fixed at once by biasing the value into the unsigned range and padding it to a fixed ten digits,
+ * which is exactly wide enough for {@code 0} through {@code 4294967295}.
  */
 @Entity
 @Table(name = _IntegerRangeEntity.TABLE_NAME)

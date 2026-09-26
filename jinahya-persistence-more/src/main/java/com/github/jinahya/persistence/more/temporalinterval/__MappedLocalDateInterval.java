@@ -27,29 +27,28 @@ import jakarta.persistence.Transient;
 import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.time.Period;
 
 /**
  * An abstract mapped superclass for an interval between two dates, mapped to two {@code DATE} columns.
  * <p>
  * The two columns come from {@link ___MappedTemporalInterval}, and the two points and their measuring from
- * {@link ___TemporalInterval}. What this class fixes is the point type, and with it the amount an interval of
- * dates is measured in.
+ * {@link ___TemporalInterval}. What this class fixes is the point type, and with it the amount an interval of dates is
+ * measured in.
  *
  * <h2>The point type is {@link LocalDate}, and only {@link LocalDate}</h2>
- * There is deliberately no version of this class generic over
- * {@link java.time.chrono.ChronoLocalDate}, admitting a {@link java.time.chrono.HijrahDate} or a
- * {@link java.time.chrono.JapaneseDate}. Such a class could not be mapped: the basic types Jakarta Persistence
- * defines include the {@code java.time} date and time types and no member of {@code java.time.chrono}, so a date in
- * another calendar system would fall through to the serializable-type rule and land in the column as bytes — and two
- * columns of bytes cannot answer {@code interval_start <= :t AND interval_end > :t}, which is what an interval is
- * stored for.
+ * There is deliberately no version of this class generic over {@link java.time.chrono.ChronoLocalDate}, admitting a
+ * {@link java.time.chrono.HijrahDate} or a {@link java.time.chrono.JapaneseDate}. Such a class could not be mapped: the
+ * basic types Jakarta Persistence defines include the {@code java.time} date and time types and no member of
+ * {@code java.time.chrono}, so a date in another calendar system would fall through to the serializable-type rule and
+ * land in the column as bytes — and two columns of bytes cannot answer
+ * {@code interval_start <= :t AND interval_end > :t}, which is what an interval is stored for.
  * <p>
  * The JDK gives the same advice for ordinary reasons, in bold, in {@link java.time.chrono.ChronoLocalDate}'s own
- * javadoc: most applications should declare their signatures, fields and variables as {@code LocalDate} and not as
- * that interface. Where a non-ISO calendar system really is what a schema holds, the conversion belongs in an
+ * javadoc: most applications should declare their signatures, fields and variables as {@code LocalDate} and not as that
+ * interface. Where a non-ISO calendar system really is what a schema holds, the conversion belongs in an
  * {@link jakarta.persistence.AttributeConverter} applied to the two inherited attributes, the way
  * {@link __MappedLocalTimeInterval} sets out, rather than in a type parameter here.
  *
@@ -57,8 +56,8 @@ import java.time.Period;
  * {@link LocalDate} is a basic type, so the two inherited columns need no converter, and a provider maps them to the
  * database's own {@code DATE} — the one column type every database has and agrees about.
  * <p>
- * The JDK agrees on the half-open convention and says so in its own signature:
- * {@link LocalDate#datesUntil(LocalDate)} walks from a date up to, and not including, the one given.
+ * The JDK agrees on the half-open convention and says so in its own signature: {@link LocalDate#datesUntil(LocalDate)}
+ * walks from a date up to, and not including, the one given.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see ___DiscreteInterval
@@ -94,15 +93,13 @@ public abstract class __MappedLocalDateInterval extends ___MappedTemporalInterva
         return ChronoUnit.DAYS;
     }
 
-
-
     /**
      * {@inheritDoc}
      *
      * @return the period from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The return type is narrowed to {@link Period}, the amount dates measure in, so that a caller holding
-     *         this type needs no cast.
+     * @implNote The return type is narrowed to {@link Period}, the amount dates measure in, so that a caller
+     *         holding this type needs no cast.
      */
     @Override
     @Transient

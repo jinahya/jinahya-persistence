@@ -33,8 +33,8 @@
  * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverters} and
  * {@link com.github.jinahya.persistence.more.converter.__TemporalAmountStringAttributeConverters}.
  * <p>
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverter} stores such a value
- * as the one integral coordinate its type is measured by instead &mdash; a nanosecond of the day, an epoch day &mdash;
+ * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverter} stores such a value as
+ * the one integral coordinate its type is measured by instead &mdash; a nanosecond of the day, an epoch day &mdash;
  * which is compact, exact, and the same column on every database where a {@code TIME} or {@code TIMESTAMP} is not. Its
  * concrete converters are in
  * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverters}, and there are only

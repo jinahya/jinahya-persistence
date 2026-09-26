@@ -33,14 +33,14 @@ import java.time.LocalTime;
  * An abstract mapped superclass for an interval between two times of day, mapped to two {@code TIME} columns.
  * <p>
  * The two columns come from {@link ___MappedTemporalInterval}, and the two points and their measuring from
- * {@link ___TemporalInterval}. {@link LocalTime#compareTo(LocalTime)} compares hour, minute, second and nanosecond
- * in turn, which is chronological order within a day.
+ * {@link ___TemporalInterval}. {@link LocalTime#compareTo(LocalTime)} compares hour, minute, second and nanosecond in
+ * turn, which is chronological order within a day.
  *
  * <h2>The axis is a day, and it does not wrap</h2>
  * This is the one point type here whose axis is a closed loop in ordinary speech and a line in storage. A shift from
  * {@code 22:00} to {@code 02:00} is a real thing to want to record and is <em>not</em> an interval of this class: its
- * start is after its end, and the containment {@code interval_start <= :t AND interval_end > :t} a database would
- * run against the two columns matches nothing at all for such a row.
+ * start is after its end, and the containment {@code interval_start <= :t AND interval_end > :t} a database would run
+ * against the two columns matches nothing at all for such a row.
  * <p>
  * Such a span is two rows — {@code [22:00, null)} and {@code [null, 02:00)} — which is what a schema storing business
  * hours across midnight does regardless of the type system, and which the convention below makes exact rather than
@@ -53,8 +53,8 @@ import java.time.LocalTime;
  * {@link ___TemporalInterval}, read on an axis which happens to end.
  * <p>
  * It also supplies the answer to something otherwise unwritable. There is no {@code 24:00} in {@link LocalTime} —
- * {@link LocalTime#MAX} is {@code 23:59:59.999999999} — so a span running to the end of the day has no exclusive end
- * to name, and writing {@code MAX} as the end would be the closed-bound substitution {@link ___TemporalInterval} exists to
+ * {@link LocalTime#MAX} is {@code 23:59:59.999999999} — so a span running to the end of the day has no exclusive end to
+ * name, and writing {@code MAX} as the end would be the closed-bound substitution {@link ___TemporalInterval} exists to
  * refuse, wrong by one nanosecond and wrong by more against a second-precision {@code TIME} column. An absent end says
  * it exactly.
  *
@@ -87,25 +87,24 @@ import java.time.LocalTime;
  * There is deliberately no subclass here for it. The two columns are declared in {@link ___MappedTemporalInterval} and an
  * entity reaches them by name, so this is the whole of it, written on the entity which wants it:
  * {@snippet lang = "java":
- * @Entity
- * @Convert(attributeName = "intervalStart",
- *          converter = __TemporalAccessorLongAttributeConverters.OfLocalTime.class)
- * @Convert(attributeName = "intervalEnd",
- *          converter = __TemporalAccessorLongAttributeConverters.OfLocalTime.class)
- * public class BusinessHours extends __MappedLocalTimeInterval { ... }
- *}
- * An {@link jakarta.persistence.AttributeOverride @AttributeOverride} on the same two attribute names goes alongside
- * it where the column itself needs reshaping — a length, a precision, a name of the schema's own choosing. The
- * conversion decides what is written; the override decides what it is written into.
- * <p>
- * What is lost is legibility: the database no longer knows the column is a time, no time function applies to it, and a
- * report shows {@code 32400000000000} where it would have shown {@code 09:00:00}.
- *
- * <h2>The amount is a {@link Duration}</h2>
- * Times of day measure in elapsed time and nothing else — there are no months in a day — so
- * {@link Duration#between} is the whole of it.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @Entity
+ * @Convert(attributeName = "intervalStart", converter =
+ *         __TemporalAccessorLongAttributeConverters.OfLocalTime.class)
+ * @Convert(attributeName = "intervalEnd", converter =
+ *         __TemporalAccessorLongAttributeConverters.OfLocalTime.class) public class BusinessHours extends
+ *         __MappedLocalTimeInterval { ... }} An {@link jakarta.persistence.AttributeOverride @AttributeOverride} on the
+ *         same two attribute names goes alongside it where the column itself needs reshaping — a length, a precision, a
+ *         name of the schema's own choosing. The conversion decides what is written; the override decides what it is
+ *         written into.
+ *         <p>
+ *         What is lost is legibility: the database no longer knows the column is a time, no time function applies to
+ *         it, and a report shows {@code 32400000000000} where it would have shown {@code 09:00:00}.
+ *
+ *         <h2>The amount is a {@link Duration}</h2>
+ *         Times of day measure in elapsed time and nothing else — there are no months in a day — so
+ *         {@link Duration#between} is the whole of it.
  * @see __MappedLocalDateTimeInterval
  * @see com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverters.OfLocalTime
  */
@@ -132,10 +131,12 @@ public abstract class __MappedLocalTimeInterval extends ___MappedTemporalInterva
      *
      * @return the duration from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The return type is narrowed to {@link Duration}, so that a caller holding this type needs no cast.
-     * @apiNote This is {@code null} where either bound is absent, which on this axis means the caller has written a
-     *         span reaching an edge of the day. The length of such a span is a question about the day rather than
-     *         about the interval, and {@link #lengthIn(java.time.temporal.TemporalUnit)} answers it no differently.
+     * @implNote The return type is narrowed to {@link Duration}, so that a caller holding this type needs no
+     *         cast.
+     * @apiNote This is {@code null} where either bound is absent, which on this axis means the caller has
+     *         written a span reaching an edge of the day. The length of such a span is a question about the day rather
+     *         than about the interval, and {@link #lengthIn(java.time.temporal.TemporalUnit)} answers it no
+     *         differently.
      */
     @Override
     @Transient

@@ -151,9 +151,9 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      * Returns the two bound types of this range, as a pair.
      *
      * @return the bounds of this range; never {@code null}.
-     * @implSpec The default implementation pairs {@link #getLowerBoundType()} with {@link #getUpperBoundType()},
-     *         contributing {@link __BoundType#OPEN} for an absent end — an end with no endpoint includes nothing,
-     *         which is what {@code open} says.
+     * @implSpec The default implementation pairs {@link #getLowerBoundType()} with
+     *         {@link #getUpperBoundType()}, contributing {@link __BoundType#OPEN} for an absent end — an end with no
+     *         endpoint includes nothing, which is what {@code open} says.
      * @apiNote A pair is what the notation names and what PostgreSQL's range constructor takes — see
      *         {@link __RangeBounds#getNotation()}, which is the form a native range column is built from.
      */
@@ -170,8 +170,8 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      *
      * @return {@code true} when neither {@link #getRangeLower()} nor {@link #getRangeUpper()} is {@code null};
      *         {@code false} otherwise.
-     * @implSpec The default implementation compares nothing and reads no bound type, so no endpoint type can make it
-     *         wrong.
+     * @implSpec The default implementation compares nothing and reads no bound type, so no endpoint type can
+     *         make it wrong.
      */
     @Transient
     default boolean isBounded() {
@@ -185,13 +185,14 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      *         least one of its two ends is open; {@code false} otherwise.
      * @implSpec The default implementation compares the two endpoints rather than asking whether they are
      *         {@link Object#equals(Object) equal}, so emptiness is decided by the same order the invariant is.
-     * @apiNote An empty range is a shape a range may legitimately have. Equal endpoints mean three different things
-     *         across the four pairs: {@code [a,a]} holds exactly one value, {@code [a,a)} and {@code (a,a]} hold
-     *         none, and {@code (a,a)} is not a range at all — the invariant on {@link __MappedOrderedRange} rejects it.
+     * @apiNote An empty range is a shape a range may legitimately have. Equal endpoints mean three different
+     *         things across the four pairs: {@code [a,a]} holds exactly one value, {@code [a,a)} and {@code (a,a]} hold
+     *         none, and {@code (a,a)} is not a range at all — the invariant on {@link __MappedOrderedRange} rejects
+     *         it.
      *         <p>
-     *         This answers only the emptiness visible in the endpoints. On a discrete domain {@code (a,b)} with
-     *         nothing between {@code a} and {@code b} is equally empty, and seeing that needs a successor function,
-     *         which {@link Comparable} does not supply and this package does not ask for.
+     *         This answers only the emptiness visible in the endpoints. On a discrete domain {@code (a,b)} with nothing
+     *         between {@code a} and {@code b} is equally empty, and seeing that needs a successor function, which
+     *         {@link Comparable} does not supply and this package does not ask for.
      */
     @Transient
     default boolean isEmpty() {
@@ -209,21 +210,21 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      * @param value the value to test.
      * @return {@code true} when the {@code value} is inside both ends of this range; {@code false} otherwise.
      * @throws NullPointerException when the {@code value} is {@code null}.
-     * @implSpec The default implementation compares the {@code value} against each present endpoint, strictly where
-     *         that end is {@link __BoundType#OPEN}, and treats an absent end as holding — so a range with neither
+     * @implSpec The default implementation compares the {@code value} against each present endpoint, strictly
+     *         where that end is {@link __BoundType#OPEN}, and treats an absent end as holding — so a range with neither
      *         endpoint contains every value, and an {@link #isEmpty() empty} one contains none.
      * @apiNote This takes an argument, so it is not shaped like a JavaBeans getter and cannot be mistaken for a
      *         persistent property. The methods above are, and carry {@link Transient @Transient} for that reason.
      *         <p>
-     *         Nothing in this package validates a range, so this and {@link #isEmpty()} are what a caller wanting
-     *         to check one has — a candidate value against a range in hand, before persisting it, or a row already
-     *         loaded. They are the reason {@code C} is bound by {@link Comparable} at all: no other method here
-     *         compares anything, and storage would not need it.
+     *         Nothing in this package validates a range, so this and {@link #isEmpty()} are what a caller wanting to
+     *         check one has — a candidate value against a range in hand, before persisting it, or a row already loaded.
+     *         They are the reason {@code C} is bound by {@link Comparable} at all: no other method here compares
+     *         anything, and storage would not need it.
      *         <p>
      *         They answer by {@code compareTo}, which is the order
      *         {@link __MappedOrderedRange#encode(Comparable) the encoding} is required to agree with. An encoding which
-     *         sorts by something else leaves the database and these methods answering differently about the same
-     *         range, silently.
+     *         sorts by something else leaves the database and these methods answering differently about the same range,
+     *         silently.
      */
     default boolean contains(final C value) {
         Objects.requireNonNull(value, "value is null");

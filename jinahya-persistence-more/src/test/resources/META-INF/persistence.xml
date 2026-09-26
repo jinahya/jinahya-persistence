@@ -26,7 +26,8 @@
              version="${persistence.version}">
   <persistence-unit name="__colorPU">
     <description>Persistence Unit for exercising this module's mapped superclasses, converters and marks against
-      an in-memory DB</description>
+      an in-memory DB
+    </description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
     <class>com.github.jinahya.persistence.more.color._RgbaEntity</class>

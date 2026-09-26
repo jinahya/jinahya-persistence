@@ -33,9 +33,9 @@ import jakarta.persistence.AttributeConverter;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote An interface, carrying nothing: an implementation spends no inheritance on it, and is free to extend
  *         whatever it likes. {@link __TemporalAccessorLongAttributeConverter} is the abstract class built on it.
- * @apiNote {@code Long} rather than {@code long}: an
- *         {@link AttributeConverter AttributeConverter} carries the column type as a type argument, which cannot be a
- *         primitive, and a nullable column needs the reference type in any case.
+ * @apiNote {@code Long} rather than {@code long}: an {@link AttributeConverter AttributeConverter} carries the
+ *         column type as a type argument, which cannot be a primitive, and a nullable column needs the reference type
+ *         in any case.
  * @see __StringAttributeConverter
  */
 @SuppressWarnings({

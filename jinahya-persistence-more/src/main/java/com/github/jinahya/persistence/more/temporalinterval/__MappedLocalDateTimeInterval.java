@@ -33,8 +33,8 @@ import java.time.LocalDateTime;
  * An abstract mapped superclass for an interval between two local date-times, mapped to two {@code TIMESTAMP} columns.
  * <p>
  * The two columns come from {@link ___MappedTemporalInterval}, and the two points and their measuring from
- * {@link ___TemporalInterval}. {@link LocalDateTime#compareTo(java.time.chrono.ChronoLocalDateTime)} compares the
- * date and then the time, which on one implicit timeline is chronological order.
+ * {@link ___TemporalInterval}. {@link LocalDateTime#compareTo(java.time.chrono.ChronoLocalDateTime)} compares the date
+ * and then the time, which on one implicit timeline is chronological order.
  *
  * <h2>This is the {@code TIMESTAMP} a schema usually means</h2>
  * A column declared {@code TIMESTAMP} — {@code DATETIME} in MySQL — stores a date and a time and no zone, which is
@@ -47,10 +47,10 @@ import java.time.LocalDateTime;
  * skipped or can happen twice.
  *
  * <h2>The amount is a {@link Duration}, and it is a local one</h2>
- * {@link Duration#between} measures two local date-times by elapsed nanoseconds as though no transition ever happened
- * — which is what {@code local} means, not a defect: a gap or an overlap belongs to a zone, and this point type has
- * none. An interval spanning a spring-forward reads one hour longer than a clock in that zone would say it lasted.
- * Where that matters, the points are instants.
+ * {@link Duration#between} measures two local date-times by elapsed nanoseconds as though no transition ever happened —
+ * which is what {@code local} means, not a defect: a gap or an overlap belongs to a zone, and this point type has none.
+ * An interval spanning a spring-forward reads one hour longer than a clock in that zone would say it lasted. Where that
+ * matters, the points are instants.
  * <p>
  * The other reading, a {@link java.time.Period} of whole days and months, is a question about the dates alone and is
  * reached through {@link LocalDateTime#toLocalDate()}. It is deliberately not offered here, because only one of the two
@@ -83,7 +83,8 @@ public abstract class __MappedLocalDateTimeInterval extends ___MappedTemporalInt
      *
      * @return the duration from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The return type is narrowed to {@link Duration}, so that a caller holding this type needs no cast.
+     * @implNote The return type is narrowed to {@link Duration}, so that a caller holding this type needs no
+     *         cast.
      */
     @Override
     @Transient

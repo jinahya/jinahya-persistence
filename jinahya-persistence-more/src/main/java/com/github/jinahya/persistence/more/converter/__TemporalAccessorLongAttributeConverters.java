@@ -61,18 +61,18 @@ public final class __TemporalAccessorLongAttributeConverters {
     /**
      * A converter for an entity attribute of {@link LocalTime}, stored as its nanosecond of the day.
      * <p>
-     * The column holds {@link LocalTime#toNanoOfDay()} &mdash; {@code 0} at midnight, and
-     * {@code 86,399,999,999,999} at {@link LocalTime#MAX}, which needs a {@code BIGINT} and not an {@code INTEGER}.
-     * The round trip through {@link LocalTime#ofNanoOfDay(long)} is exact to the nanosecond.
+     * The column holds {@link LocalTime#toNanoOfDay()} &mdash; {@code 0} at midnight, and {@code 86,399,999,999,999} at
+     * {@link LocalTime#MAX}, which needs a {@code BIGINT} and not an {@code INTEGER}. The round trip through
+     * {@link LocalTime#ofNanoOfDay(long)} is exact to the nanosecond.
      *
-     * @implSpec The encoding is increasing: a later time of day is a larger number, so a column of these compares and
-     *         indexes exactly as a {@code TIME} column would.
+     * @implSpec The encoding is increasing: a later time of day is a larger number, so a column of these
+     *         compares and indexes exactly as a {@code TIME} column would.
      * @apiNote This is the converter to reach for where a {@code TIME} column is the difficulty. Oracle has no
      *         {@code TIME} type at all, and a {@link LocalTime} lands there in a {@code TIMESTAMP} carrying a dummy
      *         date; elsewhere the column keeps whole seconds by default, since
      *         {@link jakarta.persistence.Column#secondPrecision() secondPrecision} defaults to storing no fractional
-     *         seconds in a {@code TIME} column, and not every provider and dialect honour a different value. An
-     *         exact 64-bit integer column exists on every database &mdash; a {@code BIGINT}, which Oracle spells
+     *         seconds in a {@code TIME} column, and not every provider and dialect honour a different value. An exact
+     *         64-bit integer column exists on every database &mdash; a {@code BIGINT}, which Oracle spells
      *         {@code number(19,0)} &mdash; and it holds the full precision.
      */
     @Converter(autoApply = false)
@@ -82,8 +82,8 @@ public final class __TemporalAccessorLongAttributeConverters {
         /**
          * Creates a new instance.
          *
-         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-         *         persistence provider, and is documented as needing a public no-argument constructor.
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
          */
         public OfLocalTime() {
             super(LocalTime.class, LocalTime::toNanoOfDay, LocalTime::ofNanoOfDay);
@@ -100,9 +100,9 @@ public final class __TemporalAccessorLongAttributeConverters {
      * {@code BIGINT}, though every date up to the year 9999 fits an {@code INTEGER} with room to spare.
      *
      * @implSpec The encoding is increasing: a later date is a larger number.
-     * @apiNote A {@code DATE} column has no portability problem to solve &mdash; every database has one, and means the
-     *         same thing by it &mdash; so unlike {@link OfLocalTime} this is not a workaround. Use it where a schema
-     *         already counts days, or where the arithmetic wanted is subtraction rather than a date function.
+     * @apiNote A {@code DATE} column has no portability problem to solve &mdash; every database has one, and
+     *         means the same thing by it &mdash; so unlike {@link OfLocalTime} this is not a workaround. Use it where a
+     *         schema already counts days, or where the arithmetic wanted is subtraction rather than a date function.
      */
     @Converter(autoApply = false)
     public static class OfLocalDate extends __TemporalAccessorLongAttributeConverter<LocalDate>
@@ -111,8 +111,8 @@ public final class __TemporalAccessorLongAttributeConverters {
         /**
          * Creates a new instance.
          *
-         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-         *         persistence provider, and is documented as needing a public no-argument constructor.
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
          */
         public OfLocalDate() {
             super(LocalDate.class, LocalDate::toEpochDay, LocalDate::ofEpochDay);

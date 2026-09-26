@@ -56,17 +56,15 @@ import java.util.function.ToLongFunction;
  * <strong>Loss.</strong> Whatever the number does not carry cannot be read back.
  * {@link java.time.Instant#toEpochMilli()} is the cautionary one: it is exactly the shape this class serves and it
  * drops the sub-millisecond part of an {@link java.time.Instant}, so a value written through it does not survive the
- * round trip. It is why no {@code Instant} converter appears in
- * {@link __TemporalAccessorLongAttributeConverters}.
+ * round trip. It is why no {@code Instant} converter appears in {@link __TemporalAccessorLongAttributeConverters}.
  *
  * @param <X> temporal accessor type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote Jakarta Persistence maps {@link java.time.LocalDate}, {@link java.time.LocalTime} and their siblings to real
- *         date/time columns, and every converter here is
- *         {@link jakarta.persistence.Converter#autoApply() autoApply = false} so that none of that changes by
- *         accident. Reach for one of these where a real column is the problem rather than the answer &mdash; where the
- *         type has no column at all on some database in the estate, or where the precision a column keeps differs
- *         across them.
+ * @apiNote Jakarta Persistence maps {@link java.time.LocalDate}, {@link java.time.LocalTime} and their siblings
+ *         to real date/time columns, and every converter here is
+ *         {@link jakarta.persistence.Converter#autoApply() autoApply = false} so that none of that changes by accident.
+ *         Reach for one of these where a real column is the problem rather than the answer &mdash; where the type has
+ *         no column at all on some database in the estate, or where the precision a column keeps differs across them.
  * @see __TemporalAccessorStringAttributeConverter
  * @see __TemporalAccessorLongAttributeConverters
  */
@@ -86,8 +84,8 @@ public abstract class __TemporalAccessorLongAttributeConverter<X extends Tempora
      * @param encoder        the function which measures an attribute as the number written to the column.
      * @param decoder        the function which rebuilds an attribute out of the number read from the column.
      * @throws NullPointerException when any argument is {@code null}.
-     * @apiNote The two have to be inverses of one another, and the {@code encoder} has to be increasing; neither is
-     *         checked here, and the consequences of breaking either are in this class's own documentation.
+     * @apiNote The two have to be inverses of one another, and the {@code encoder} has to be increasing;
+     *         neither is checked here, and the consequences of breaking either are in this class's own documentation.
      */
     protected __TemporalAccessorLongAttributeConverter(final Class<X> attributeClass,
                                                        final ToLongFunction<? super X> encoder,
@@ -120,8 +118,8 @@ public abstract class __TemporalAccessorLongAttributeConverter<X extends Tempora
      *
      * @param dbData the database column value to convert.
      * @return an entity attribute; {@code null} when {@code dbData} is {@code null}.
-     * @implSpec The default implementation applies the {@code decoder} this converter was constructed with. Whatever
-     *         it throws for a number outside the range the type accepts &mdash; a
+     * @implSpec The default implementation applies the {@code decoder} this converter was constructed with.
+     *         Whatever it throws for a number outside the range the type accepts &mdash; a
      *         {@link java.time.DateTimeException DateTimeException} &mdash; is thrown from here unchanged, which is
      *         what a column holding something other than what this converter wrote deserves.
      */

@@ -7,9 +7,9 @@ import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
 
 /**
- * The embeddable form — what a table carrying two ranges needs, since a {@code @MappedSuperclass} is inherited
- * once. EclipseLink walks the mapped-superclass chain of an {@code @Embeddable} and has been seen to fail where a
- * link in that chain declares no access type of its own, which is why {@link __MappedOrderedRange} forces one.
+ * The embeddable form — what a table carrying two ranges needs, since a {@code @MappedSuperclass} is inherited once.
+ * EclipseLink walks the mapped-superclass chain of an {@code @Embeddable} and has been seen to fail where a link in
+ * that chain declares no access type of its own, which is why {@link __MappedOrderedRange} forces one.
  */
 @Access(AccessType.FIELD)
 @Embeddable

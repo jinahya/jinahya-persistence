@@ -35,8 +35,8 @@ import java.util.OptionalLong;
  * An interface for an interval on a temporal axis, running from an inclusive start to an exclusive end.
  * <p>
  * An instance implementing this interface exposes the two points which limit it, and nothing else. Either may be
- * absent: an interval which has begun and has no planned end, or one which has always been in effect, is as ordinary
- * in a schema as one with both points known.
+ * absent: an interval which has begun and has no planned end, or one which has always been in effect, is as ordinary in
+ * a schema as one with both points known.
  *
  * <h2>Two requirements: an axis, and an order</h2>
  * An interval has to be able to say two things. That its start is not after its end, which needs its two points
@@ -44,13 +44,13 @@ import java.util.OptionalLong;
  * {@link Temporal} for the measuring, {@link Comparable} for the order.
  * <p>
  * The length is {@link Temporal#until(Temporal, TemporalUnit) until(endExclusive, unit)}, which only {@code Temporal}
- * declares — a {@link java.time.temporal.TemporalAccessor} can be read, a {@code Temporal} can be measured and
- * shifted. Taking the narrower of the two is what makes this interface mean anything.
+ * declares — a {@link java.time.temporal.TemporalAccessor} can be read, a {@code Temporal} can be measured and shifted.
+ * Taking the narrower of the two is what makes this interface mean anything.
  * <p>
  * It also filters, which {@code Comparable} alone would not: {@link java.time.MonthDay}, {@link java.time.Month},
  * {@link java.time.DayOfWeek} and {@link java.time.ZoneOffset} are all {@code TemporalAccessor} <em>and</em>
- * {@code Comparable}, and none of them belongs at the end of an interval — the first three wrap rather than advance,
- * so there is no axis for them to bound.
+ * {@code Comparable}, and none of them belongs at the end of an interval — the first three wrap rather than advance, so
+ * there is no axis for them to bound.
  * <p>
  * The order half is written {@code Comparable<? super T>} rather than {@code Comparable<T>} because the most likely
  * point types are not comparable to themselves: {@link java.time.LocalDate} implements
@@ -59,15 +59,15 @@ import java.util.OptionalLong;
  * reject all three.
  * <p>
  * Nothing enforces the order itself — not here, and not on {@link ___MappedTemporalInterval} either. An interval whose
- * start is after its end is data a caller wrote, and what a schema does about it is the schema's business; the
- * mapped superclass says what that costs and where a {@code CHECK} constraint goes.
+ * start is after its end is data a caller wrote, and what a schema does about it is the schema's business; the mapped
+ * superclass says what that costs and where a {@code CHECK} constraint goes.
  *
  * <h2>What is derived here, and what is not</h2>
- * Four questions are answered from the two points alone and are defaulted below: whether both are present, whether
- * they coincide, whether a given point falls between them, and how long the interval is when counted in a unit.
- * Nothing else is. The amount natural to the point type is declared and left abstract, because only the class which
- * knows the point type knows which amount that is; a step back from the exclusive end belongs to the classes whose
- * axis is discrete, because only those have a predecessor to step to.
+ * Four questions are answered from the two points alone and are defaulted below: whether both are present, whether they
+ * coincide, whether a given point falls between them, and how long the interval is when counted in a unit. Nothing else
+ * is. The amount natural to the point type is declared and left abstract, because only the class which knows the point
+ * type knows which amount that is; a step back from the exclusive end belongs to the classes whose axis is discrete,
+ * because only those have a predecessor to step to.
  * <p>
  * {@link #contains(Temporal)} is for a point in hand, and is not how rows are found. An interval is stored so that
  * {@code interval_start <= :t AND (interval_end IS NULL OR interval_end > :t)} can run against an index over the two
@@ -77,17 +77,17 @@ import java.util.OptionalLong;
  *
  * <h2>An amount is particular, a unit is not</h2>
  * {@link #lengthIn(TemporalUnit)} is defaulted because {@code until} serves every point type. The amount natural to a
- * point type is not: a {@link java.time.Period} where the points are dates, a {@link java.time.Duration} where they
- * are instants. So {@link #getTemporalAmount()} is declared and left to the class which knows which it has, to answer
- * with the return type <em>narrowed</em> to it — a caller holding that class then needs no cast, and one holding this
+ * point type is not: a {@link java.time.Period} where the points are dates, a {@link java.time.Duration} where they are
+ * instants. So {@link #getTemporalAmount()} is declared and left to the class which knows which it has, to answer with
+ * the return type <em>narrowed</em> to it — a caller holding that class then needs no cast, and one holding this
  * interface still reads the result through {@link TemporalAmount#get(TemporalUnit) get(unit)} and
  * {@link TemporalAmount#getUnits() getUnits()}.
  *
  * <h2>Two of the derivations read the order, which is not always the timeline</h2>
- * {@link #isBounded()} asks only whether the points are present, so it is right for every {@code T}.
- * {@link #isEmpty()} and {@link #contains(Temporal)} compare, and a comparison is only as good as the order the
- * point type gives — which for {@link java.time.OffsetDateTime} and {@link java.time.ZonedDateTime} falls through to
- * the local value once two instants agree, so two spellings of one moment compare as distinct.
+ * {@link #isBounded()} asks only whether the points are present, so it is right for every {@code T}. {@link #isEmpty()}
+ * and {@link #contains(Temporal)} compare, and a comparison is only as good as the order the point type gives — which
+ * for {@link java.time.OffsetDateTime} and {@link java.time.ZonedDateTime} falls through to the local value once two
+ * instants agree, so two spellings of one moment compare as distinct.
  * <p>
  * They are defaulted here regardless, because they are right for every point type this package ships but one, and the
  * one overrides them: see {@link __MappedOffsetDateTimeInterval}, which redefines both against
@@ -167,8 +167,8 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      *
      * @return {@code true} when neither {@link #getIntervalStart() start} nor {@link #getIntervalEnd() end} is
      *         {@code null}; {@code false} otherwise.
-     * @implSpec The default implementation reads both points and answers whether neither is {@code null}. It compares
-     *         nothing, so no point type can make it wrong.
+     * @implSpec The default implementation reads both points and answers whether neither is {@code null}. It
+     *         compares nothing, so no point type can make it wrong.
      */
     @Transient
     default boolean isBounded() {
@@ -182,8 +182,8 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      *         {@code false} otherwise.
      * @implSpec The default implementation compares the two points rather than asking whether they are
      *         {@link Object#equals(Object) equal}, so that emptiness is decided by the same order the invariant is.
-     * @apiNote An empty interval is a shape an interval may legitimately have rather than a violation: its start is
-     *         not after its end, so it satisfies the invariant, and it {@link #contains(Temporal) contains} no
+     * @apiNote An empty interval is a shape an interval may legitimately have rather than a violation: its
+     *         start is not after its end, so it satisfies the invariant, and it {@link #contains(Temporal) contains} no
      *         point.
      */
     @Transient
@@ -200,8 +200,8 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      * @return {@code true} when the {@code point} is not before the {@link #getIntervalStart() start} of this interval
      *         and is before its {@link #getIntervalEnd() end}; {@code false} otherwise.
      * @throws NullPointerException when the {@code point} is {@code null}.
-     * @implSpec The default implementation compares the {@code point} against each present bound, and treats an absent
-     *         bound as holding — so an interval with neither bound contains every point, and an
+     * @implSpec The default implementation compares the {@code point} against each present bound, and treats an
+     *         absent bound as holding — so an interval with neither bound contains every point, and an
      *         {@link #isEmpty() empty} one contains none.
      * @apiNote This takes an argument, so it is not shaped like a JavaBeans getter and cannot be mistaken for a
      *         persistent property. The two methods above are, and carry {@link Transient @Transient} for that reason.
@@ -237,11 +237,12 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      * @throws DateTimeException                when the length cannot be measured.
      * @throws UnsupportedTemporalTypeException when the {@code unit} is not supported by the point type.
      * @throws ArithmeticException              when the result overflows a {@code long}.
-     * @implSpec The default implementation reads both points and, where neither is absent, measures from one to the
-     *         other with {@link Temporal#until(Temporal, TemporalUnit)}.
-     * @apiNote This is not {@link #getTemporalAmount()} said differently. An amount is a composite — a {@code Period}
-     *         of {@code P1M2D} answers {@code 2} for {@link java.time.temporal.ChronoUnit#DAYS DAYS}, because two days
-     *         is its day <em>component</em> — where this method answers the whole length counted in days.
+     * @implSpec The default implementation reads both points and, where neither is absent, measures from one to
+     *         the other with {@link Temporal#until(Temporal, TemporalUnit)}.
+     * @apiNote This is not {@link #getTemporalAmount()} said differently. An amount is a composite — a
+     *         {@code Period} of {@code P1M2D} answers {@code 2} for {@link java.time.temporal.ChronoUnit#DAYS DAYS},
+     *         because two days is its day <em>component</em> — where this method answers the whole length counted in
+     *         days.
      */
     default OptionalLong lengthIn(final TemporalUnit unit) {
         Objects.requireNonNull(unit, "unit is null");

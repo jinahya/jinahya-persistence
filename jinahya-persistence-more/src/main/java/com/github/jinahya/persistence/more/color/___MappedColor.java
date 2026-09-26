@@ -352,8 +352,7 @@ public abstract class ___MappedColor implements Serializable {
      *
      * @return a value between {@value #MIN_COMPONENT} and {@value #MAX_COMPONENT}, both inclusive.
      * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the
-     *         opacity
-     *         property</a>
+     *         opacity property</a>
      */
     @Transient
     public double getAlpha() {
@@ -368,8 +367,7 @@ public abstract class ___MappedColor implements Serializable {
      *
      * @return {@code true} when this color is opaque; {@code false} otherwise.
      * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the
-     *         opacity
-     *         property</a>
+     *         opacity property</a>
      */
     @Transient
     public boolean isOpaque() {

@@ -35,8 +35,8 @@ import java.util.Objects;
  * An abstract mapped superclass for an interval between two offset date-times.
  * <p>
  * The two columns come from {@link ___MappedTemporalInterval}, and the two points and their measuring from
- * {@link ___TemporalInterval}. What this class settles is the point type, the amount it is measured in, and one
- * thing the classes beside it have no need to settle: <strong>which order the interval is ordered by.</strong>
+ * {@link ___TemporalInterval}. What this class settles is the point type, the amount it is measured in, and one thing
+ * the classes beside it have no need to settle: <strong>which order the interval is ordered by.</strong>
  *
  * <h2>Why this class exists at all</h2>
  * It would otherwise be unnecessary. An interval of {@link OffsetDateTime} is, to a database, the same interval as one
@@ -46,8 +46,8 @@ import java.util.Objects;
  * <p>
  * This class exists because the point type is not always a free choice, and because the obvious way to use one anyway
  * is quietly wrong. Extending {@link ___MappedTemporalInterval}{@code <OffsetDateTime>} compiles, maps and reads back
- * correctly, and inherits an invariant which rejects intervals it should accept. There is nothing to warn a caller;
- * the rows simply fail validation.
+ * correctly, and inherits an invariant which rejects intervals it should accept. There is nothing to warn a caller; the
+ * rows simply fail validation.
  *
  * <h2>The order a database uses is not the one {@code compareTo} uses</h2>
  * {@link OffsetDateTime#compareTo(OffsetDateTime)} compares the instant first and then falls through to the local
@@ -55,14 +55,14 @@ import java.util.Objects;
  * these columns map to — {@code timestamp with time zone}, {@code datetimeoffset} — compares by the instant alone, and
  * calls the same two values equal.
  * <p>
- * An interval from {@code 2026-09-20T10:00+02:00} to {@code 2026-09-20T08:00Z} is therefore empty: one moment,
- * twice over. The database agrees. {@link OffsetDateTime#compareTo(OffsetDateTime)} does not — it reads the second
- * point as <em>before</em> the first — so anything decided on the natural order would answer differently depending
- * on which of two identical instants the caller happened to write.
+ * An interval from {@code 2026-09-20T10:00+02:00} to {@code 2026-09-20T08:00Z} is therefore empty: one moment, twice
+ * over. The database agrees. {@link OffsetDateTime#compareTo(OffsetDateTime)} does not — it reads the second point as
+ * <em>before</em> the first — so anything decided on the natural order would answer differently depending on which of
+ * two identical instants the caller happened to write.
  * <p>
  * {@link #isEmpty()} and {@link #contains(OffsetDateTime)} are overridden here to compare
- * {@link OffsetDateTime#toInstant() instants}, which is the order the column is actually kept in. That override is
- * the whole of this class.
+ * {@link OffsetDateTime#toInstant() instants}, which is the order the column is actually kept in. That override is the
+ * whole of this class.
  *
  * <h2>The instant round-trips; the offset may not</h2>
  * What comes back from these columns is reliably the same moment and not reliably the same offset, because the
@@ -103,9 +103,9 @@ public abstract class __MappedOffsetDateTimeInterval extends ___MappedTemporalIn
      *
      * @return {@code true} when this interval is {@link #isBounded() bounded} and its two points name the same
      *         {@link OffsetDateTime#toInstant() instant}; {@code false} otherwise.
-     * @implNote This overrides the inherited implementation because two spellings of one moment compare as distinct under
-     *         {@link OffsetDateTime#compareTo(OffsetDateTime)}, and an interval whose ends are two such spellings is
-     *         empty rather than merely short.
+     * @implNote This overrides the inherited implementation because two spellings of one moment compare as
+     *         distinct under {@link OffsetDateTime#compareTo(OffsetDateTime)}, and an interval whose ends are two such
+     *         spellings is empty rather than merely short.
      */
     @Override
     @Transient
@@ -125,8 +125,8 @@ public abstract class __MappedOffsetDateTimeInterval extends ___MappedTemporalIn
      *         of the {@link #getIntervalStart() start} and is before that of the {@link #getIntervalEnd() end};
      *         {@code false} otherwise.
      * @throws NullPointerException {@inheritDoc}
-     * @implNote The offsets the three values are written in do not affect the answer, which is what the column they
-     *         are stored in would also say.
+     * @implNote The offsets the three values are written in do not affect the answer, which is what the column
+     *         they are stored in would also say.
      */
     @Override
     public boolean contains(final OffsetDateTime point) {
@@ -144,8 +144,8 @@ public abstract class __MappedOffsetDateTimeInterval extends ___MappedTemporalIn
      *
      * @return the duration from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The return type is narrowed to {@link Duration}, so that a caller holding this type needs no cast.
-     *         {@link Duration#between(java.time.temporal.Temporal, java.time.temporal.Temporal) Duration.between}
+     * @implNote The return type is narrowed to {@link Duration}, so that a caller holding this type needs no
+     *         cast. {@link Duration#between(java.time.temporal.Temporal, java.time.temporal.Temporal) Duration.between}
      *         measures these by their instants, so the length is unaffected by the offsets the two points were written
      *         in.
      */

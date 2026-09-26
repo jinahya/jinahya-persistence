@@ -11,8 +11,8 @@ import java.time.LocalDate;
 /**
  * An entity which puts its {@code @Id} on a <em>getter</em>, making its own access type {@code PROPERTY}.
  * <p>
- * Without the forced {@code @Access(AccessType.FIELD)} on {@link __MappedOrderedRange}, the hierarchy would flip with it
- * and the two cut columns would be looked for on accessors instead of fields — unmapping them, and picking up the
+ * Without the forced {@code @Access(AccessType.FIELD)} on {@link __MappedOrderedRange}, the hierarchy would flip with
+ * it and the two cut columns would be looked for on accessors instead of fields — unmapping them, and picking up the
  * {@code @Transient} ones that are shaped like properties.
  */
 @Entity

@@ -20,6 +20,9 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.SingularAttribute;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
@@ -39,6 +42,10 @@ import java.util.HashSet;
  * <p>
  * Both of Jakarta Persistence's access types are accounted for throughout: a mark may sit on a field or on an accessor,
  * because the access type belongs to the entity and is not visible from here.
+ * <p>
+ * The latter half crosses from reflection into the metamodel — which persistent attribute a marked member maps, and
+ * which attribute holds an identifier. Nothing there knows what a mark means or what a hierarchy is; it is the plumbing
+ * every {@code __SelfReferencing*} utility needs and none of them owns.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -168,6 +175,104 @@ final class ___Utils {
             }
         }
         return ((Field) member).get(instance);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the name of the persistent attribute which the specified marked member maps.
+     *
+     * @param entityType      the entity type to look the attribute up in.
+     * @param member          the marked member, as {@link #findMember(Class, Class) findMember} found it.
+     * @param annotationClass the class of the mark the {@code member} carries, for the failure message.
+     * @return the name of the attribute mapping the {@code member}.
+     * @throws IllegalStateException when no attribute of the {@code entityType} maps the {@code member}.
+     * @implNote The member is matched against {@link Attribute#getJavaMember() the attribute's own member}
+     *         first, which settles it whenever the mark sits where the entity's access type maps — the field under
+     *         {@code FIELD} access, the accessor under {@code PROPERTY} access.
+     *         <p>
+     *         The mark is free to sit on the other one, though, which is the whole point of accepting both, and then
+     *         the two members are different reflective objects describing one attribute. So the fallback matches by the
+     *         name the member implies: a field's own name, an accessor's property name. That is a name convention — the
+     *         very thing the mark exists to avoid — but it is confined to this last step, it is Jakarta Persistence's
+     *         own convention rather than one invented here, and failing it raises an exception rather than quietly
+     *         reading the wrong column.
+     */
+    static String attributeNameOf(final EntityType<?> entityType, final Member member,
+                                  final Class<?> annotationClass) {
+        for (final var attribute : entityType.getSingularAttributes()) {
+            if (member.equals(attribute.getJavaMember())) {
+                return attribute.getName();
+            }
+        }
+        final var name = propertyNameOf(member);
+        for (final var attribute : entityType.getSingularAttributes()) {
+            if (attribute.getName().equals(name)) {
+                return attribute.getName();
+            }
+        }
+        throw new IllegalStateException(
+                "no persistent attribute of " + entityType.getJavaType().getName() + " maps the member annotated with @"
+                + annotationClass.getSimpleName() + "; " + member
+        );
+    }
+
+    /**
+     * Returns the name of the property which the specified member implies.
+     *
+     * @param member the member.
+     * @return the name of the {@code member}, when it is a field; the property name of the {@code member}, when it is
+     *         an accessor.
+     * @implNote The decapitalization is the JavaBeans one, down to the rule which leaves a name beginning with
+     *         two capitals alone, so that {@code getURL()} implies {@code URL} rather than {@code uRL}. It is spelled
+     *         out here rather than taken from {@code java.beans.Introspector}, which lives in the {@code java.desktop}
+     *         module and would drag a desktop dependency into a persistence library.
+     */
+    static String propertyNameOf(final Member member) {
+        if (!(member instanceof Method)) {
+            return member.getName();
+        }
+        final var name = member.getName();
+        final String stripped;
+        if (name.startsWith("get") && name.length() > 3) {
+            stripped = name.substring(3);
+        } else if (name.startsWith("is") && name.length() > 2) {
+            stripped = name.substring(2);
+        } else {
+            return name;
+        }
+        if (stripped.length() > 1 && Character.isUpperCase(stripped.charAt(0))
+            && Character.isUpperCase(stripped.charAt(1))) {
+            return stripped;
+        }
+        return Character.toLowerCase(stripped.charAt(0)) + stripped.substring(1);
+    }
+
+    /**
+     * Returns the name of the attribute holding the identifier of the specified entity type.
+     *
+     * @param entityType the entity type.
+     * @return the name of the identifier attribute; {@code null} when the {@code entityType} has no single basic
+     *         identifier attribute, which is a composite identifier.
+     * @implNote Callers want this to break a tie in an {@code order by}, which is why a composite identifier
+     *         answers {@code null} rather than failing: no single term can name one, and a query which would have
+     *         ordered by it orders by what it has instead. Where the remaining terms tie, the order is the database's
+     *         to choose.
+     *         <p>
+     *         An {@link jakarta.persistence.EmbeddedId @EmbeddedId} is a single id attribute and still not one to order
+     *         by, which is why the attribute has to be {@link Attribute.PersistentAttributeType#BASIC BASIC} and not
+     *         merely alone.
+     */
+    static @Nullable String idAttributeNameOf(final EntityType<?> entityType) {
+        if (!entityType.hasSingleIdAttribute()) {
+            return null;
+        }
+        return entityType.getSingularAttributes().stream()
+                .filter(SingularAttribute::isId)
+                .filter(a -> a.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC)
+                .map(Attribute::getName)
+                .findFirst()
+                .orElse(null);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

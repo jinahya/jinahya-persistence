@@ -92,7 +92,7 @@
  *         swatch.toHexNotation();        // #ff000080 } Converting between models goes through sRGB, in either
  *         direction:
  *         {@snippet lang = "java":
- *                 hsl.applySrgb(r -> g -> b -> { cmyk.setSrgb(r, g, b); return null; });
+ *                                 hsl.applySrgb(r -> g -> b -> { cmyk.setSrgb(r, g, b); return null; });
  *}
  *
  *         <h2>References</h2>

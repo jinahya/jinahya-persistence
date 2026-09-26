@@ -36,23 +36,23 @@ import java.util.function.ToLongFunction;
  *
  * <h2>Why an amount needs this more than a point does</h2>
  * A point type usually has a column that already sorts — a {@code DATE} sorts, and the ISO {@code uuuu-MM} text of a
- * {@link java.time.YearMonth} sorts because it is fixed-width. An amount has neither. Jakarta Persistence 3.2 lists
- * no {@link java.time.Duration} among its basic types, so an unconverted one lands in the column as bytes; and its
- * ISO-8601 text, which {@link __TemporalAmountStringAttributeConverter} writes, does not sort:
- * {@code "PT5H"} is above {@code "PT48H"} lexicographically and below it in fact.
+ * {@link java.time.YearMonth} sorts because it is fixed-width. An amount has neither. Jakarta Persistence 3.2 lists no
+ * {@link java.time.Duration} among its basic types, so an unconverted one lands in the column as bytes; and its
+ * ISO-8601 text, which {@link __TemporalAmountStringAttributeConverter} writes, does not sort: {@code "PT5H"} is above
+ * {@code "PT48H"} lexicographically and below it in fact.
  * <p>
- * That is harmless where the column is only read back, which is what the string converters are for. It is fatal
- * where the column is compared — an amount used as an endpoint in
- * {@link com.github.jinahya.persistence.more.orderedrange the ordered-range package}, or as any bound a query filters on. This
- * converter is for that case.
+ * That is harmless where the column is only read back, which is what the string converters are for. It is fatal where
+ * the column is compared — an amount used as an endpoint in
+ * {@link com.github.jinahya.persistence.more.orderedrange the ordered-range package}, or as any bound a query filters
+ * on. This converter is for that case.
  *
  * @param <X> temporal amount type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote There is deliberately no converter here for {@link java.time.Period}, and it is not an omission.
- *         {@code P1M} and {@code P30D} have no defined order — which is why {@code Period} is not
- *         {@link Comparable} — so no single number can encode one without inventing a month length. Where a period
- *         has to be stored, {@link __TemporalAmountStringAttributeConverters.OfPeriod} keeps it exactly, and the
- *         column simply cannot be ordered.
+ *         {@code P1M} and {@code P30D} have no defined order — which is why {@code Period} is not {@link Comparable} —
+ *         so no single number can encode one without inventing a month length. Where a period has to be stored,
+ *         {@link __TemporalAmountStringAttributeConverters.OfPeriod} keeps it exactly, and the column simply cannot be
+ *         ordered.
  * @see __TemporalAmountLongAttributeConverters.OfDuration
  * @see __TemporalAmountStringAttributeConverter
  */
@@ -72,8 +72,8 @@ public abstract class __TemporalAmountLongAttributeConverter<X extends TemporalA
      * @param encoder        the function which measures an attribute as the number written to the column.
      * @param decoder        the function which rebuilds an attribute out of the number read from the column.
      * @throws NullPointerException when any argument is {@code null}.
-     * @apiNote The two have to be inverses of one another, and the {@code encoder} has to be increasing; neither is
-     *         checked here.
+     * @apiNote The two have to be inverses of one another, and the {@code encoder} has to be increasing;
+     *         neither is checked here.
      */
     protected __TemporalAmountLongAttributeConverter(final Class<X> attributeClass,
                                                      final ToLongFunction<? super X> encoder,

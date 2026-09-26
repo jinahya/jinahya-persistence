@@ -30,9 +30,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Tests every mapped superclass in this package against one set of expectations.
  * <p>
  * The classes differ only in their point type and in the amount they measure in, so the behaviour worth pinning is the
- * same for all of them: what a fresh instance holds, what the order of the two points does and does not decide, and what the two derived
- * values answer when a bound is absent. {@link Case} states that once, against a point type it is told nothing about
- * beyond two ordered samples, and each nested class supplies the samples.
+ * same for all of them: what a fresh instance holds, what the order of the two points does and does not decide, and
+ * what the two derived values answer when a bound is absent. {@link Case} states that once, against a point type it is
+ * told nothing about beyond two ordered samples, and each nested class supplies the samples.
  * <p>
  * A subclass which adds behaviour of its own adds tests of its own beside the inherited ones — see
  * {@link OfOffsetDateTime}, the one class here which compares instants rather than natural order.

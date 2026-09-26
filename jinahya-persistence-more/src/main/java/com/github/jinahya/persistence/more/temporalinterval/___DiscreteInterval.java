@@ -30,13 +30,13 @@ import java.time.temporal.TemporalUnit;
  * An interval on an axis whose points are a fixed step apart, and which therefore has a last point.
  * <p>
  * A date has a predecessor, and so do a month and a year. An instant does not, and neither does a time of day at any
- * precision a schema might choose. That difference is the whole of this interface: where it holds, the exclusive end
- * of an interval converts to the closed form people speak in without losing anything, and where it does not, any
- * attempt to convert is the {@code 23:59:59} substitution {@link ___TemporalInterval} exists to refuse.
+ * precision a schema might choose. That difference is the whole of this interface: where it holds, the exclusive end of
+ * an interval converts to the closed form people speak in without losing anything, and where it does not, any attempt
+ * to convert is the {@code 23:59:59} substitution {@link ___TemporalInterval} exists to refuse.
  *
  * <h2>What implementing this asserts</h2>
- * That {@link #getGranularity()} is the step: that two adjacent points of {@code T} are exactly one of that unit
- * apart, and that nothing of {@code T} falls between them. {@link java.time.LocalDate} with
+ * That {@link #getGranularity()} is the step: that two adjacent points of {@code T} are exactly one of that unit apart,
+ * and that nothing of {@code T} falls between them. {@link java.time.LocalDate} with
  * {@link java.time.temporal.ChronoUnit#DAYS DAYS}, {@link java.time.YearMonth} with
  * {@link java.time.temporal.ChronoUnit#MONTHS MONTHS} and {@link java.time.Year} with
  * {@link java.time.temporal.ChronoUnit#YEARS YEARS} each hold to it.
@@ -65,8 +65,8 @@ public interface ___DiscreteInterval<T extends Temporal & Comparable<? super T>>
      * Returns the unit by which the points of this interval step.
      *
      * @return the unit two adjacent points of this interval's point type are apart.
-     * @implSpec An implementation returns a constant, and the same constant every time: it is a property of the point
-     *         type rather than of an instance.
+     * @implSpec An implementation returns a constant, and the same constant every time: it is a property of the
+     *         point type rather than of an instance.
      */
     @Transient
     TemporalUnit getGranularity();
@@ -82,8 +82,8 @@ public interface ___DiscreteInterval<T extends Temporal & Comparable<? super T>>
      * @implNote The result is cast to {@code T}. The cast is sound by the contract of
      *         {@link Temporal#minus(long, TemporalUnit)}, which is specified to return an object of the same type as
      *         the one it was called on; the signature says {@link Temporal} because it cannot say more.
-     * @apiNote This is the closed form people speak in — a thing <em>runs through</em> its last day — and it is exact
-     *         only because this axis is discrete.
+     * @apiNote This is the closed form people speak in — a thing <em>runs through</em> its last day — and it is
+     *         exact only because this axis is discrete.
      */
     @SuppressWarnings({
             "unchecked" // (T) Temporal, per Temporal#minus(long, TemporalUnit)

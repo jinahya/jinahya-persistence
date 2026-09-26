@@ -3,18 +3,17 @@
  *
  * <h2>One convention, fixed</h2>
  * An interval here runs from an inclusive start to an exclusive end — {@code [start, end)} — and that is not a
- * per-instance choice. {@link ___TemporalInterval} carries the reasoning; in
- * short, a closed upper bound does not exist on a continuous axis, so any attempt to write one is exact only at the
- * precision which happens to be in play, while the half-open form ends at the next point exactly and lets adjacent
- * intervals meet with neither gap nor overlap.
+ * per-instance choice. {@link ___TemporalInterval} carries the reasoning; in short, a closed upper bound does not exist
+ * on a continuous axis, so any attempt to write one is exact only at the precision which happens to be in play, while
+ * the half-open form ends at the next point exactly and lets adjacent intervals meet with neither gap nor overlap.
  * <p>
  * The consequence for a schema is that an interval is two columns and nothing else. There is no bound token to store
  * and nothing to canonicalize, so a containment reads {@code start <= :t AND end > :t} and uses an ordinary index.
  *
  * <h2>Either point may be absent</h2>
  * A schema needs that constantly — in effect from a date, with no end decided — and an absent point is simply
- * {@code null} in its column. It is not an exception to the convention above: where there is no point, there is
- * nothing to include or to exclude.
+ * {@code null} in its column. It is not an exception to the convention above: where there is no point, there is nothing
+ * to include or to exclude.
  *
  * <h2>Points, not amounts</h2>
  * Of the three self-contained forms ISO 8601-1:2019 gives an interval in clause 4.4 — start and end, start and
@@ -25,8 +24,8 @@
  *
  * <h2>Two requirements: an order, and an axis</h2>
  * An interval has to be able to say two things. That its start is not after its end, which needs its two points
- * ordered; and how long it is, which needs them measurable against each other. So {@link ___TemporalInterval} is
- * bound by {@link java.lang.Comparable} and {@link java.time.temporal.Temporal} together — the order written
+ * ordered; and how long it is, which needs them measurable against each other. So {@link ___TemporalInterval} is bound
+ * by {@link java.lang.Comparable} and {@link java.time.temporal.Temporal} together — the order written
  * {@code Comparable<? super T>}, since {@link java.time.LocalDate} and its siblings compare against their
  * {@code Chrono} interfaces rather than against themselves. The order is documented and not enforced — see
  * {@link ___MappedTemporalInterval} for why, and for the {@code CHECK} constraint which enforces it where a schema

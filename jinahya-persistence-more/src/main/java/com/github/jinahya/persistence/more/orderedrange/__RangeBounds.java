@@ -25,8 +25,8 @@ import java.util.Objects;
 /**
  * The four ways a range can include or exclude the two endpoints it has.
  * <p>
- * The pair, where {@link __BoundType} is the single end. A range carries its two ends independently — each column
- * holds its own bound character — so this is derived rather than stored: {@link ___OrderedRange#getRangeBounds()} pairs the
+ * The pair, where {@link __BoundType} is the single end. A range carries its two ends independently — each column holds
+ * its own bound character — so this is derived rather than stored: {@link ___OrderedRange#getRangeBounds()} pairs the
  * two and answers with a constant here.
  *
  * <h2>The notation</h2>
@@ -39,8 +39,8 @@ import java.util.Objects;
  * orients the bracket instead, and that is the form which round-trips.
  *
  * <h2>An absent endpoint is not one of these</h2>
- * These four describe the endpoints a range <em>has</em>. Where an endpoint is absent there is nothing to include or
- * to exclude, and {@link ___OrderedRange#getRangeBounds()} contributes {@link __BoundType#OPEN} for it — which is why a
+ * These four describe the endpoints a range <em>has</em>. Where an endpoint is absent there is nothing to include or to
+ * exclude, and {@link ___OrderedRange#getRangeBounds()} contributes {@link __BoundType#OPEN} for it — which is why a
  * range with neither endpoint reads as {@link #OPEN} and never as {@link #CLOSED}. PostgreSQL has to normalize that
  * case away, because its text form lets {@code [,]} be written; here it cannot be written at all.
  *
@@ -54,8 +54,8 @@ import java.util.Objects;
 public enum __RangeBounds {
 
     /**
-     * Both endpoints included, {@code []}. The shape of a band declared as <em>from x to y</em> — an age band, a
-     * grade band, an amount of time <em>at least</em> x and <em>at most</em> y.
+     * Both endpoints included, {@code []}. The shape of a band declared as <em>from x to y</em> — an age band, a grade
+     * band, an amount of time <em>at least</em> x and <em>at most</em> y.
      */
     CLOSED('[', ']'),
 
@@ -67,8 +67,8 @@ public enum __RangeBounds {
     CLOSED_OPEN('[', ')'),
 
     /**
-     * The lower endpoint excluded and the upper included, {@code (]}. The shape of a band declared as <em>over x, up
-     * to y</em> — a tax bracket, a tariff step.
+     * The lower endpoint excluded and the upper included, {@code (]}. The shape of a band declared as <em>over x, up to
+     * y</em> — a tax bracket, a tariff step.
      */
     OPEN_CLOSED('(', ']'),
 
@@ -104,7 +104,7 @@ public enum __RangeBounds {
     __RangeBounds(final char lowerBoundCharacter, final char upperBoundCharacter) {
         this.lowerBoundCharacter = lowerBoundCharacter;
         this.upperBoundCharacter = upperBoundCharacter;
-        this.notation = new String(new char[] {lowerBoundCharacter, upperBoundCharacter});
+        this.notation = new String(new char[]{lowerBoundCharacter, upperBoundCharacter});
     }
 
     // -------------------------------------------------------------------------------------------------------- NOTATION

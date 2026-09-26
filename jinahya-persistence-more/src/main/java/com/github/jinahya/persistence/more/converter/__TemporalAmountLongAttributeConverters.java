@@ -29,10 +29,10 @@ import java.time.Duration;
  * Concrete {@link __TemporalAmountLongAttributeConverter}s.
  * <p>
  * There is one, and the reason there is only one is the whole content of this class:
- * {@link java.time.temporal.TemporalAmount} has two implementations in {@code java.time}, and only
- * {@link Duration} can be reduced to a number that orders. See
- * {@link __TemporalAmountLongAttributeConverter} for why {@link java.time.Period} cannot, and
- * {@link __TemporalAmountStringAttributeConverters} for the pair which keeps both exactly and orders neither.
+ * {@link java.time.temporal.TemporalAmount} has two implementations in {@code java.time}, and only {@link Duration} can
+ * be reduced to a number that orders. See {@link __TemporalAmountLongAttributeConverter} for why
+ * {@link java.time.Period} cannot, and {@link __TemporalAmountStringAttributeConverters} for the pair which keeps both
+ * exactly and orders neither.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __TemporalAmountLongAttributeConverter
@@ -47,15 +47,15 @@ public final class __TemporalAmountLongAttributeConverters {
     /**
      * A converter for an entity attribute of {@link Duration}, stored as a whole number of nanoseconds.
      * <p>
-     * The column holds {@link Duration#toNanos()} and the round trip through {@link Duration#ofNanos(long)} is exact
-     * to the nanosecond, negative durations included.
+     * The column holds {@link Duration#toNanos()} and the round trip through {@link Duration#ofNanos(long)} is exact to
+     * the nanosecond, negative durations included.
      *
      * @implSpec The encoding is increasing: a longer duration is a larger number, and a negative one a smaller.
-     *         {@link Duration#compareTo(Duration)} orders by seconds and then by the nanosecond part, which is the
-     *         same order, so a column of these compares and indexes exactly as the values do.
-     * @apiNote <strong>The range is ±292 years, and passing it throws.</strong> {@link Duration#toNanos()} raises an
-     *         {@link ArithmeticException} where the value does not fit a {@code long}, so a duration measured in
-     *         centuries cannot use this converter. That is the price of one ordered column, and it is the right
+     *         {@link Duration#compareTo(Duration)} orders by seconds and then by the nanosecond part, which is the same
+     *         order, so a column of these compares and indexes exactly as the values do.
+     * @apiNote <strong>The range is ±292 years, and passing it throws.</strong> {@link Duration#toNanos()}
+     *         raises an {@link ArithmeticException} where the value does not fit a {@code long}, so a duration measured
+     *         in centuries cannot use this converter. That is the price of one ordered column, and it is the right
      *         trade for every duration a schema is likely to hold — an SLA, a session length, a billing increment.
      *         Where the value can be that large and does not have to be compared,
      *         {@link __TemporalAmountStringAttributeConverters.OfDuration} stores any {@code Duration} at all.
@@ -69,8 +69,8 @@ public final class __TemporalAmountLongAttributeConverters {
         /**
          * Creates a new instance.
          *
-         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-         *         persistence provider, and is documented as needing a public no-argument constructor.
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
          */
         public OfDuration() {
             super(Duration.class, Duration::toNanos, Duration::ofNanos);

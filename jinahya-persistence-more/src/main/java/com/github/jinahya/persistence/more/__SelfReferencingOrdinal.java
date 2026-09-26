@@ -51,12 +51,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *         types which carry it, which are the ones implementing {@link __SelfReferencingOrdered}. Ordering is declared
  *         by implementing that interface, not by whether this mark happens to be present, and an entity which does not
  *         order its siblings implements {@link __SelfReferencing} alone and never writes this annotation at all.
- *         {@link __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered) ordinalOf(instance)} will not take such an
- *         entity, so a missing mark on a type which does reach it is a broken implementation, and fails.
+ *         {@link __SelfReferencingOrderedUtils#ordinalOf(__SelfReferencingOrdered) ordinalOf(instance)} will not take
+ *         such an entity, so a missing mark on a type which does reach it is a broken implementation, and fails.
  *         <p>
  *         Type it {@code int} or {@link Integer}; both are read. The choice is the entity's, and it decides what a
- *         forgotten assignment looks like. An {@link Integer} constrained {@link jakarta.validation.constraints.NotNull
- *         @NotNull}, as above, fails validation before the insert. An {@code int} can not fail: it reads {@code 0},
+ *         forgotten assignment looks like. An {@link Integer} constrained
+ *         {@link jakarta.validation.constraints.NotNull
+ * @NotNull}, as above, fails validation before the insert. An {@code int} can not fail: it reads {@code 0},
  *         which is the <em>head</em> of the sibling group, so the instance silently jumps ahead of every sibling which
  *         was placed on purpose.
  *         <p>
@@ -89,14 +90,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *         {@link __SelfReferencingOrdered#getSiblingOrdinal() getSiblingOrdinal()} does not reach an implementation's
  *         own accessor. Omit it and the entity gains a column it never asked for.
  *         <p>
- *         A marked accessor has to take no arguments and return {@code int} or {@link Integer}; anything else fails
- *         the lookup. Marking a field <em>and</em> its own accessor is allowed, and the accessor wins.
+ *         A marked accessor has to take no arguments and return {@code int} or {@link Integer}; anything else fails the
+ *         lookup. Marking a field <em>and</em> its own accessor is allowed, and the accessor wins.
  *         <p>
  *         The retention is {@link RetentionPolicy#RUNTIME RUNTIME} because the member is looked up while the
  *         application runs; see {@link __SelfReferencingParent __SelfReferencingParent}.
  * @see __SelfReferencingOrdered
  * @see __SelfReferencingParent
- * @see __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered)
+ * @see __SelfReferencingOrderedUtils#ordinalOf(__SelfReferencingOrdered)
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

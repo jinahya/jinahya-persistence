@@ -40,7 +40,7 @@ import java.util.Objects;
  *         {@code persistence.xml} or in {@link jakarta.persistence.Convert @Convert}. Where none of that is needed, an
  *         instance composes two converters inline:
  *         {@snippet lang = "java":
- *                         final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second);
+ *                                         final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second);
  *}
  */
 @SuppressWarnings({

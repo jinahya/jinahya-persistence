@@ -93,15 +93,13 @@ public abstract class __MappedYearInterval extends ___MappedTemporalInterval<Yea
         return ChronoUnit.YEARS;
     }
 
-
-
     /**
      * {@inheritDoc}
      *
      * @return the period from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The return type is narrowed to {@link Period}, and the period carries whole years and nothing else,
-     *           since whole years are all this axis has. {@code [2026, 2029)} measures {@code P3Y}.
+     * @implNote The return type is narrowed to {@link Period}, and the period carries whole years and nothing
+     *         else, since whole years are all this axis has. {@code [2026, 2029)} measures {@code P3Y}.
      */
     @Override
     @Transient
