@@ -24,18 +24,18 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence ${persistence.schemaLocation}"
              version="${persistence.version}">
-  <persistence-unit name="__colorPU">
+  <persistence-unit name="__morePU">
     <description>Persistence Unit for exercising this module's mapped superclasses, converters and marks against
       an in-memory DB
     </description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
-    <class>com.github.jinahya.persistence.more.color._RgbaEntity</class>
-    <class>com.github.jinahya.persistence.more.color._HslEntity</class>
-    <class>com.github.jinahya.persistence.more.color._HwbEntity</class>
-    <class>com.github.jinahya.persistence.more.color._CmykEntity</class>
-    <class>com.github.jinahya.persistence.more.color._PropertyAccessRgbaEntity</class>
-    <class>com.github.jinahya.persistence.more.color._OverriddenHslEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._RgbaEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._HslEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._HwbEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._CmykEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._PropertyAccessRgbaEntity</class>
+    <class>com.github.jinahya.persistence.more.colormodel._OverriddenHslEntity</class>
     <class>com.github.jinahya.persistence.more.converter._ConvertedEntity</class>
     <class>com.github.jinahya.persistence.more._CategoryEntity</class>
     <class>com.github.jinahya.persistence.more._PropertyAccessNodeEntity</class>
@@ -50,7 +50,7 @@
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <!-- database_to_upper=false keeps the declared column names verbatim, so they can be asserted -->
       <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
-      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:color;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:more;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->

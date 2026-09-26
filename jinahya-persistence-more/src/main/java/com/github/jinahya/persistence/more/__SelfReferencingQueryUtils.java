@@ -80,23 +80,23 @@ public final class __SelfReferencingQueryUtils {
      *         the stream itself would leave that to the caller and to no-one in particular, which is why there is no
      *         overload which does — whatever shape the roots are wanted in is said in the {@code mapping}:
      *         {@snippet lang = "java":
-     *         final var byName = (BiFunction<CriteriaBuilder, Root<Category>, List<Order>>)
-     *                 (b, r) -> List.of(b.asc(r.get("name")));
+     *                         final var byName = (BiFunction<CriteriaBuilder, Root<Category>, List<Order>>)
+     *                                 (b, r) -> List.of(b.asc(r.get("name")));
      *
-     *         // as a list
-     *         final List<Category> roots = __SelfReferencingQueryUtils.selectRoots(
-     *                 entityManager, Category.class, byName, Stream::toList
-     *         );
+     *                         // as a list
+     *                         final List<Category> roots = __SelfReferencingQueryUtils.selectRoots(
+     *                                 entityManager, Category.class, byName, Stream::toList
+     *                         );
      *
-     *         // as a count, without holding any of them
-     *         final long count = __SelfReferencingQueryUtils.selectRoots(
-     *                 entityManager, Category.class, byName, Stream::count
-     *         );
+     *                         // as a count, without holding any of them
+     *                         final long count = __SelfReferencingQueryUtils.selectRoots(
+     *                                 entityManager, Category.class, byName, Stream::count
+     *                         );
      *
-     *         // as whatever else the caller is really after
-     *         final Map<String, Category> indexed = __SelfReferencingQueryUtils.selectRoots(
-     *                 entityManager, Category.class, byName,
-     *                 s -> s.collect(Collectors.toMap(Category::getName, Function.identity()))
+     *                         // as whatever else the caller is really after
+     *                         final Map<String, Category> indexed = __SelfReferencingQueryUtils.selectRoots(
+     *                                 entityManager, Category.class, byName,
+     *                                 s -> s.collect(Collectors.toMap(Category::getName, Function.identity()))
      *         );}
      *         <p>
      *         Note that the result type is inferred from what the call is assigned to, and a method which is overloaded

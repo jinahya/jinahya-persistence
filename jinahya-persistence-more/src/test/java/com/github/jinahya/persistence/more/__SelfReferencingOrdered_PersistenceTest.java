@@ -56,7 +56,7 @@ class __SelfReferencingOrdered_PersistenceTest {
 
     @BeforeAll
     static void openEntityManagerFactory() {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__colorPU");
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__morePU");
     }
 
     @AfterAll

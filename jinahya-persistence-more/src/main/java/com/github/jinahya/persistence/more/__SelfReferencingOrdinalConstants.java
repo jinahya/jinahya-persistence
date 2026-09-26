@@ -20,13 +20,26 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+/**
+ * Constants for the sibling ordinal of {@link __SelfReferencingOrdered}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 })
 public final class __SelfReferencingOrdinalConstants {
 
+    /**
+     * The ordinal of the first sibling, which is the smallest ordinal any instance may hold. The value is {@value}.
+     *
+     * @see __SelfReferencingOrdered
+     */
     public static final int MIN_ORDINAL = 0;
 
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private __SelfReferencingOrdinalConstants() {
         throw new AssertionError("instantiation is not allowed");
     }

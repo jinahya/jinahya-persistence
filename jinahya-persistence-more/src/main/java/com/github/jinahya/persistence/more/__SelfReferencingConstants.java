@@ -20,13 +20,26 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+/**
+ * Constants for {@link __SelfReferencing}.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 })
 public final class __SelfReferencingConstants {
 
+    /**
+     * The depth of a root instance, which is the smallest depth any instance may hold. The value is {@value}.
+     *
+     * @see __SelfReferencing
+     */
     public static final int MIN_DEPTH = 0;
 
+    /**
+     * Creates a new instance, which is not allowed.
+     */
     private __SelfReferencingConstants() {
         throw new AssertionError("instantiation is not allowed");
     }

@@ -48,7 +48,8 @@ class __ChainingAttributeConverter_Test {
                 s -> Optional.ofNullable(s).map(Integer::valueOf).orElse(null),
                 i -> Optional.ofNullable(i).map(Object::toString).orElse(null)
         );
-        final var converter = new __ChainingAttributeConverter<Integer, String, Integer>(converter1, converter2);
+        final var converter = new __ChainingAttributeConverter<Integer, String, Integer>(converter1, converter2) {
+        };
         assertThat(converter.convertToDatabaseColumn(null)).isNull();
         assertThat(converter.convertToDatabaseColumn(1)).isOne();
         assertThat(converter.convertToEntityAttribute(null)).isNull();

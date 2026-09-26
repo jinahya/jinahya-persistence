@@ -202,7 +202,9 @@ public final class __NumberStringAttributeConverters {
                 return Float.valueOf(dbData);
             }
             final var value = delegate.convertToEntityAttribute(dbData);
-            return value == null ? null : value.floatValue();
+            // OfBigDecimal reads null only from a null column, and dbData was rejected as null above
+            assert value != null;
+            return value.floatValue();
         }
 
         private final OfBigDecimal delegate;
@@ -252,7 +254,9 @@ public final class __NumberStringAttributeConverters {
                 return Double.valueOf(dbData);
             }
             final var value = delegate.convertToEntityAttribute(dbData);
-            return value == null ? null : value.doubleValue();
+            // OfBigDecimal reads null only from a null column, and dbData was rejected as null above
+            assert value != null;
+            return value.doubleValue();
         }
 
         private final OfBigDecimal delegate;

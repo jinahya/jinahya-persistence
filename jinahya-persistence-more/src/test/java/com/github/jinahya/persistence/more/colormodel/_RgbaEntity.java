@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.color;
+package com.github.jinahya.persistence.more.colormodel;
 
 /*-
  * #%L
@@ -29,19 +29,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * A concrete entity, for verifying that {@link __MappedHsl} maps as declared against a real provider.
+ * A concrete entity, for verifying that {@link __MappedRgba} maps as declared against a real provider.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = _HslEntity.TABLE_NAME)
+@Table(name = _RgbaEntity.TABLE_NAME)
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class _HslEntity extends __MappedHsl {
+public class _RgbaEntity extends __MappedRgba {
 
-    static final String TABLE_NAME = "hsl_entity";
+    static final String TABLE_NAME = "rgba_entity";
 
     public Long getId() {
         return id;

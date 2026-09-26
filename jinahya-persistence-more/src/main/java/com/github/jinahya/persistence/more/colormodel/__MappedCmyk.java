@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.color;
+package com.github.jinahya.persistence.more.colormodel;
 
 /*-
  * #%L

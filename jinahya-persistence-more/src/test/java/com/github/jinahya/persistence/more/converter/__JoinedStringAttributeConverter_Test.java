@@ -36,8 +36,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 })
 class __JoinedStringAttributeConverter_Test {
 
+    // the class is abstract, and a list of strings needs no element conversion
+    private static __JoinedStringAttributeConverter<String> of(final String delimiter) {
+        return new __JoinedStringAttributeConverter<>(delimiter, __AttributeConverterUtils.identity()) {
+        };
+    }
+
     private static __JoinedStringAttributeConverter<String> comma() {
-        return new __JoinedStringAttributeConverter.__OfStrings(",");
+        return of(",");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -70,7 +76,7 @@ class __JoinedStringAttributeConverter_Test {
             assertThat(converter.convertToEntityAttribute(column)).containsExactly("");
         }
 
-        @DisplayName("a single empty element now survives a round trip")
+        @DisplayName("a single empty element survives a round trip")
         @Test
         void __singleEmptyElement() {
             final var converter = comma();
@@ -107,7 +113,7 @@ class __JoinedStringAttributeConverter_Test {
         @DisplayName("'|' is not an alternation")
         @Test
         void __pipe() {
-            final var converter = new __JoinedStringAttributeConverter.__OfStrings("|");
+            final var converter = of("|");
             final var attribute = Arrays.asList("a", "b");
             assertThat(converter.convertToDatabaseColumn(attribute)).isEqualTo("a|b");
             assertThat(converter.convertToEntityAttribute("a|b")).containsExactly("a", "b");
@@ -116,7 +122,7 @@ class __JoinedStringAttributeConverter_Test {
         @DisplayName("'.' is not a wildcard")
         @Test
         void __dot() {
-            final var converter = new __JoinedStringAttributeConverter.__OfStrings(".");
+            final var converter = of(".");
             final var attribute = Arrays.asList("a", "b");
             assertThat(converter.convertToDatabaseColumn(attribute)).isEqualTo("a.b");
             assertThat(converter.convertToEntityAttribute("a.b")).containsExactly("a", "b");
@@ -124,85 +130,91 @@ class __JoinedStringAttributeConverter_Test {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("corrupting values are rejected, not silently written")
+    @DisplayName("an EMPTY delimiter is rejected by the constructor")
     @Nested
-    class Rejection_Test {
+    class EmptyDelimiter_Test {
 
-        @DisplayName("an element containing the delimiter -> IllegalArgumentException")
-        @Test
-        void _IllegalArgumentException_ElementHoldsDelimiter() {
-            final var converter = comma();
-            assertThatThrownBy(() -> converter.convertToDatabaseColumn(List.of("a,b")))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("joiningDelimiter");
-        }
-
-        @DisplayName("an element converting to null -> IllegalArgumentException")
-        @Test
-        void _IllegalArgumentException_ElementConvertsToNull() {
-            final var converter = comma();
-            assertThatThrownBy(() -> converter.convertToDatabaseColumn(Arrays.asList("a", null)))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("converted to null");
-        }
-
-        @DisplayName("a delimiter forming across an element boundary -> IllegalArgumentException")
-        @Test
-        void _IllegalArgumentException_DelimiterStraddlesABoundary() {
-            // no element contains "||", so the per-element guard passes, yet joining produces
-            // "|" + "||" + "x" == "|||x", which splits back into ["", "|x"]
-            final var converter = new __JoinedStringAttributeConverter.__OfStrings("||");
-            assertThatThrownBy(() -> converter.convertToDatabaseColumn(Arrays.asList("|", "x")))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("an EMPTY delimiter is rejected by the constructor")
+        @DisplayName("\"\" -> IllegalArgumentException")
         @Test
         void _IllegalArgumentException_EmptyDelimiter() {
-            // String.contains("") is always true, so every element would trip the per-element
-            // guard; and Pattern.quote("") matches at every position, so a read splits per character
-            assertThatThrownBy(() -> new __JoinedStringAttributeConverter.__OfStrings(""))
+            // Pattern.quote("") matches at every position, so a read would split a column per character
+            assertThatThrownBy(() -> of(""))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("a whitespace delimiter is NOT rejected; only the empty string is")
         @Test
         void __whitespaceDelimiterStillAllowed() {
-            final var converter = new __JoinedStringAttributeConverter.__OfStrings(" ");
+            final var converter = of(" ");
             final var attribute = Arrays.asList("a", "b");
             assertThat(converter.convertToDatabaseColumn(attribute)).isEqualTo("a b");
             assertThat(converter.convertToEntityAttribute("a b")).containsExactly("a", "b");
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("the contract is the caller's to keep; nothing is validated")
+    @Nested
+    class Contract_Test {
+
+        @DisplayName("an element converting to null is silently dropped, and the list shrinks")
+        @Test
+        void __nullElementDropped() {
+            final var converter = comma();
+            final var attribute = Arrays.asList("a", null, "b");
+            final var column = converter.convertToDatabaseColumn(attribute);
+            assertThat(column).isEqualTo("a,b");
+            assertThat(converter.convertToEntityAttribute(column))
+                    .hasSizeLessThan(attribute.size())
+                    .containsExactly("a", "b");
+        }
+
+        @DisplayName("a list of nothing but nulls writes an empty column")
+        @Test
+        void __allNullElementsDropped() {
+            final var converter = comma();
+            final var column = converter.convertToDatabaseColumn(Arrays.asList(null, null, null));
+            assertThat(column).isEmpty();
+            assertThat(converter.convertToEntityAttribute(column)).containsExactly("");
+        }
+
+        @DisplayName("an element holding the delimiter is written as-is, and splits back into more elements")
+        @Test
+        void __elementHoldingDelimiterIsNotRejected() {
+            final var converter = comma();
+            final var column = converter.convertToDatabaseColumn(List.of("a,b"));
+            assertThat(column).isEqualTo("a,b");
+            assertThat(converter.convertToEntityAttribute(column)).containsExactly("a", "b");
+        }
+
+        @DisplayName("a self-overlapping delimiter can form across a seam, and is not rejected either")
+        @Test
+        void __delimiterStraddlingABoundaryIsNotRejected() {
+            // no element holds "||", yet joining produces "|" + "||" + "x" == "|||x"
+            final var converter = of("||");
+            final var column = converter.convertToDatabaseColumn(Arrays.asList("|", "x"));
+            assertThat(column).isEqualTo("|||x");
+            assertThat(converter.convertToEntityAttribute(column)).containsExactly("", "|x");
         }
 
         @DisplayName("a self-overlapping delimiter is fine when no element straddles the seam")
         @Test
         void __overlappingDelimiterStillWorksWhenSafe() {
-            // "||" overlaps itself, but ["x", "|"] never forms a spurious match: the premature
-            // match has to begin inside the element PRECEDING a separator
-            final var converter = new __JoinedStringAttributeConverter.__OfStrings("||");
+            // the premature match has to begin inside the element PRECEDING a separator
+            final var converter = of("||");
             final var attribute = Arrays.asList("x", "|");
             final var column = converter.convertToDatabaseColumn(attribute);
             assertThat(column).isEqualTo("x|||");
             assertThat(converter.convertToEntityAttribute(column)).containsExactlyElementsOf(attribute);
         }
 
-        @DisplayName("'aba' straddles too, not just '||'")
+        @DisplayName("a delimiter which does not overlap itself round trips whenever no element holds it")
         @Test
-        void _IllegalArgumentException_AbaDelimiter() {
-            final var converter = new __JoinedStringAttributeConverter.__OfStrings("aba");
-            assertThatThrownBy(() -> converter.convertToDatabaseColumn(Arrays.asList("ab", "x")))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("nothing is dropped silently; pre-filter the list instead")
-        @Test
-        void __noSilentDrop() {
+        void __nonOverlappingDelimiterIsSafe() {
             final var converter = comma();
-            final var attribute = Arrays.asList("a", null, "b");
-            assertThatThrownBy(() -> converter.convertToDatabaseColumn(attribute))
-                    .isInstanceOf(IllegalArgumentException.class);
-            final var filtered = attribute.stream().filter(java.util.Objects::nonNull).toList();
-            assertThat(converter.convertToDatabaseColumn(filtered)).isEqualTo("a,b");
+            final var attribute = Arrays.asList("a", "", "b c", "d");
+            assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(attribute)))
+                    .containsExactlyElementsOf(attribute);
         }
     }
 }

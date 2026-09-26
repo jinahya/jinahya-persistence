@@ -13,7 +13,7 @@ package com.github.jinahya.persistence.test.util.spec;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see _Department_Randomizer
  * @see _Department_Persister
- * @see _Department_Podam_Randomizer_Test
+ * @see _Department_Randomizer_Podam_Test
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

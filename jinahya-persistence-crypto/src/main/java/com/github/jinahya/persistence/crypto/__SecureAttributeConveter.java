@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.AttributeConverter;
 import org.jspecify.annotations.Nullable;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 /**
@@ -28,8 +27,6 @@ import java.util.Optional;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __SecureAttributeConveter<X, Y> implements AttributeConverter<X, Y> {
-
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * A converter for a {@code byte[]} attribute.
@@ -106,53 +103,6 @@ public abstract class __SecureAttributeConveter<X, Y> implements AttributeConver
         return Optional.ofNullable(encryptionService)
                 .orElseGet(() -> CDI.current().select(__EncryptionService.class).get())
                 ;
-    }
-
-    /**
-     * Encrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
-     *
-     * @param entityInstance the entity instance to encrypt; instances of a class which is not annotated with
-     *                       {@link __EncryptedEntity @__EncryptedEntity} are silently skipped.
-     */
-    protected void encrypt(final Object entityInstance) {
-        logger.log(System.Logger.Level.DEBUG, "encrypt({0})", describe(entityInstance));
-        final var annotation = entityInstance.getClass().getAnnotation(__EncryptedEntity.class);
-        if (annotation == null) {
-            return;
-        }
-        final var encryptionService = getEncryptionService();
-        assert encryptionService != null;
-        encryptionService.encrypt(entityInstance);
-        logger.log(System.Logger.Level.DEBUG, "encrypted: {0}", describe(entityInstance));
-    }
-
-    /**
-     * Decrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
-     *
-     * @param entityInstance the entity instance to decrypt; instances of a class which is not annotated with
-     *                       {@link __EncryptedEntity @__EncryptedEntity} are silently skipped.
-     */
-    protected void decrypt(final Object entityInstance) {
-        logger.log(System.Logger.Level.DEBUG, "decrypt({0})", describe(entityInstance));
-        final var annotation = entityInstance.getClass().getAnnotation(__EncryptedEntity.class);
-        if (annotation == null) {
-            return;
-        }
-        final var encryptionService = getEncryptionService();
-        assert encryptionService != null;
-        encryptionService.decrypt(entityInstance);
-        logger.log(System.Logger.Level.DEBUG, "decrypted: {0}", describe(entityInstance));
-    }
-
-    /**
-     * Returns a description of the specified entity instance which cannot carry an attribute value.
-     *
-     * @param entityInstance the entity instance to describe.
-     * @return the instance's class name and identity hash.
-     */
-    private static String describe(final Object entityInstance) {
-        return entityInstance.getClass().getName() + '@'
-               + Integer.toHexString(System.identityHashCode(entityInstance));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

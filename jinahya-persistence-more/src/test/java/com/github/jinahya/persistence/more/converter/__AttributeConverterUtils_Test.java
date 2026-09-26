@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import jakarta.persistence.AttributeConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,33 @@ class __AttributeConverterUtils_Test {
             assertThat(converter.convertToDatabaseColumn(1)).isEqualTo("1");
             assertThat(converter.convertToEntityAttribute(null)).isNull();
             assertThat(converter.convertToEntityAttribute("1")).isOne();
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * A nested class for testing {@link __AttributeConverterUtils#identity()}.
+     */
+    @DisplayName("identity()")
+    @Nested
+    class Identity_Test {
+
+        @DisplayName("a value, and null, convert to themselves in both directions")
+        @Test
+        void __() {
+            final AttributeConverter<String, String> converter = __AttributeConverterUtils.identity();
+            assertThat(converter.convertToDatabaseColumn("a")).isEqualTo("a");
+            assertThat(converter.convertToEntityAttribute("a")).isEqualTo("a");
+            assertThat(converter.convertToDatabaseColumn(null)).isNull();
+            assertThat(converter.convertToEntityAttribute(null)).isNull();
+        }
+
+        @DisplayName("the instance is shared across type parameters")
+        @Test
+        void __shared() {
+            assertThat(__AttributeConverterUtils.<Integer>identity())
+                    .isSameAs(__AttributeConverterUtils.<String>identity());
         }
     }
 }

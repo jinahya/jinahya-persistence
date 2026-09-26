@@ -3,7 +3,6 @@ package com.github.jinahya.persistence.more.temporalinterval;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -82,26 +81,6 @@ class ___MappedTemporalInterval_PersistenceTest {
             return em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
         });
         return applyEntityManager(em -> function.apply(em.find(entityClass, id)));
-    }
-
-    /**
-     * Runs specified action, and returns the {@link ConstraintViolationException} it failed with.
-     * <p>
-     * The exception is searched for down the cause chain, and the violations are read from the exception itself rather
-     * than from its message: Hibernate throws it unwrapped where EclipseLink wraps it.
-     */
-    private static ConstraintViolationException constraintViolationOf(final Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (final Exception e) {
-            for (Throwable c = e; c != null; c = c.getCause()) {
-                if (c instanceof ConstraintViolationException cve) {
-                    return cve;
-                }
-            }
-            throw new AssertionError("not a constraint violation", e);
-        }
-        throw new AssertionError("no constraint violation was raised");
     }
 
     private static List<String> columnNamesOf(final String tableName) {

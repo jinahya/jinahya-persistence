@@ -20,7 +20,7 @@
  * <h2>Subpackages</h2>
  * {@link com.github.jinahya.persistence.more.converter} holds the attribute converters — the base for storing a value
  * as a {@code String}, a whole list in one delimited column, and the two ways of composing a converter rather than
- * writing one. {@link com.github.jinahya.persistence.more.color} holds the mapped superclasses for colors.
+ * writing one. {@link com.github.jinahya.persistence.more.colormodel} holds the mapped superclasses for colors.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

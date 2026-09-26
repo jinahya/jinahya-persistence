@@ -24,12 +24,10 @@ import jakarta.persistence.AttributeConverter;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * An abstract class for converting a {@link List} of entity attribute elements to a single delimited {@code String} db
@@ -40,61 +38,73 @@ import java.util.regex.Pattern;
  *
  * @param <X> element type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote A delimited form cannot tell an empty list from a list holding a single empty element: both convert
- *         to an empty column value, which converts back to the latter. Every other list survives a round trip <em>as
- *         far as this class is concerned</em> &mdash; a list whose joined form would not split back into the same
- *         tokens is rejected by {@link #convertToDatabaseColumn(List)} rather than written. Whether the elements
- *         themselves survive is the {@code elementConverter}'s business: one which is not injective, or whose read is
- *         not the inverse of its write, loses values that this class cannot see.
+ * @apiNote This class joins and splits. It does not escape, quote, or validate, and
+ *         {@link #convertToDatabaseColumn(List)} never rejects a list: whatever the elements convert to is written.
+ *         Keeping a list round-trippable is therefore the caller's business, and takes all of the following. None of
+ *         them is checked; a violation is not reported anywhere, and surfaces only as a different list on the next
+ *         read.
+ *         <ul>
+ *           <li>An element which the {@code elementConverter} converts to {@code null} is <em>silently dropped</em>.
+ *               A delimited form has no token meaning "null" &mdash; an empty token already means the empty element
+ *               &mdash; so such an element cannot be written at all, and the list that comes back is shorter than the
+ *               one that went out. Note that {@link #convertToEntityAttribute(String)} does <em>not</em> drop nulls
+ *               coming the other way: an {@code elementConverter} which reads a token as {@code null} yields a list
+ *               which, saved again unchanged, loses that element.</li>
+ *           <li>The {@code elementConverter} must not convert an element to a value <em>containing</em> the delimiter.
+ *               Such a value splits back into two or more elements.</li>
+ *           <li>The delimiter must not overlap itself &mdash; no non-empty proper prefix of it may equal a suffix.
+ *               A delimiter like {@code "||"} or {@code "aba"} can form across the seam between an element and the
+ *               separator which follows it even when no element holds the delimiter itself: {@code "||"} over
+ *               {@code ["|", "x"]} joins to {@code "|||x"}, which splits back into {@code ["", "|x"]}. A delimiter
+ *               with no such overlap &mdash; {@code ","}, {@code ";"}, {@code "\t"}, {@code ", "} &mdash; cannot
+ *               produce a spurious match as long as no element holds it.</li>
+ *           <li>An empty list cannot be told from a list holding a single empty element: both convert to an empty
+ *               column value, which converts back to the latter.</li>
+ *         </ul>
+ *         Whether the elements themselves survive is the {@code elementConverter}'s business: one which is not
+ *         injective, or whose read is not the inverse of its write, loses values that this class cannot see.
+ *         <p>
+ *         A {@link List} of {@link String}s needs no element conversion at all, and takes
+ *         {@link __AttributeConverterUtils#identity()} as its {@code elementConverter}. No delimiter is blessed with a
+ *         ready-made converter: registering one means subclassing this class with the delimiter the values cannot
+ *         hold, and carrying {@link jakarta.persistence.Converter @Converter} on the subclass.
+ * @see __AttributeConverterUtils#identity()
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class __JoinedStringAttributeConverter<X> implements __StringAttributeConverter<List<X>> {
-
-    /**
-     * An abstract class for converting a {@link List} of {@link String} elements, which requires no element
-     * conversion.
-     */
-    @SuppressWarnings({
-            "java:S101" // Class names should comply with a naming convention
-    })
-    public static class __OfStrings extends __JoinedStringAttributeConverter<String> {
-
-        /**
-         * Creates a new instance which joins and splits elements with the specified delimiter.
-         *
-         * @param delimiter a delimiter; taken literally, not as a regular expression.
-         */
-        public __OfStrings(final String delimiter) {
-            super(delimiter, __AttributeConverterUtils.using(UnaryOperator.identity(), UnaryOperator.identity()));
-        }
-    }
+public abstract class __JoinedStringAttributeConverter<X> implements __StringAttributeConverter<List<X>> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance which joins and splits elements with the specified delimiter.
+     * Creates a new instance which joins and splits elements with the specified joiningDelimiter.
      *
-     * @param delimiter        a delimiter; taken literally, not as a regular expression, and not empty.
+     * @param joiningDelimiter a joiningDelimiter; taken literally, not as a regular expression, and not empty.
      * @param elementConverter an attribute converter for converting elements.
-     * @throws IllegalArgumentException when the {@code delimiter} is empty.
-     * @implSpec The {@code delimiter} is {@link Pattern#quote(String) quoted} for splitting, so one carrying
-     *         regular expression metacharacters &mdash; {@code "|"} and {@code "."} among them &mdash; means what it
-     *         looks like it means.
-     * @implNote An <em>empty</em> delimiter is rejected because it breaks both directions:
-     *         {@link String#contains(CharSequence) contains("")} is always {@code true}, so every element would trip
-     *         the guard in {@link #convertToDatabaseColumn(List)}, and {@link Pattern#quote(String) quote("")} is
-     *         {@code \Q\E}, which matches at every position, so a read would split a column into one element per
-     *         character. Only the empty string is rejected: a delimiter of a space, or of a tab, is perfectly usable
-     *         and stays allowed.
+     * @throws IllegalArgumentException when the {@code joiningDelimiter} is empty.
+     * @apiNote A subclass fixes the joiningDelimiter and the element converter, and is what
+     *         {@link jakarta.persistence.Converter @Converter} goes on; a persistence provider instantiates a converter
+     *         through a no-argument constructor, and neither {@link jakarta.persistence.Convert @Convert} nor
+     *         {@code persistence.xml} can pass either argument. To hold one directly &mdash; composed into another
+     *         converter, or delegated to from one which <em>is</em> registered &mdash; an anonymous subclass does:
+     *         {@code new __JoinedStringAttributeConverter<>(",", identity()) {}}.
+     * @implSpec The {@code joiningDelimiter} is {@link Pattern#quote(String) quoted} for splitting, so one
+     *         carrying regular expression metacharacters &mdash; {@code "|"} and {@code "."} among them &mdash; means
+     *         what it looks like it means. It is otherwise not inspected; a joiningDelimiter which overlaps itself is
+     *         accepted, and the consequences are the caller's (see the class contract).
+     * @implNote An <em>empty</em> joiningDelimiter is rejected because it breaks the read:
+     *         {@link Pattern#quote(String) quote("")} is {@code \Q\E}, which matches at every position, so a column
+     *         would split into one element per character, while the write would concatenate every element into an
+     *         unsplittable run. Only the empty string is rejected: a joiningDelimiter of a space, or of a tab, is
+     *         perfectly usable and stays allowed.
      */
-    public __JoinedStringAttributeConverter(final String delimiter,
-                                            final AttributeConverter<X, String> elementConverter) {
+    protected __JoinedStringAttributeConverter(final String joiningDelimiter,
+                                               final AttributeConverter<X, String> elementConverter) {
         super();
-        this.joiningDelimiter = Objects.requireNonNull(delimiter, "delimiter is null");
+        this.joiningDelimiter = Objects.requireNonNull(joiningDelimiter, "joiningDelimiter is null");
         if (this.joiningDelimiter.isEmpty()) {
-            throw new IllegalArgumentException("delimiter is empty");
+            throw new IllegalArgumentException("joiningDelimiter is empty");
         }
         this.splittingPattern = Pattern.compile(Pattern.quote(this.joiningDelimiter));
         this.elementConverter = Objects.requireNonNull(elementConverter, "elementConverter is null");
@@ -108,61 +118,19 @@ public class __JoinedStringAttributeConverter<X> implements __StringAttributeCon
      * @param attribute the list to convert.
      * @return a string of the converted elements, joined with the delimiter; {@code null} when the {@code attribute} is
      *         {@code null}.
-     * @throws IllegalArgumentException when an element converts to {@code null}, or to a value containing the joining
-     *                                  delimiter.
+     * @implSpec Elements which the {@code elementConverter} converts to {@code null} are discarded, and the
+     *         joined value holds fewer elements than the {@code attribute} did. Nothing else is filtered, rejected, or
+     *         escaped &mdash; see the class contract for what that costs.
      */
     @Override
     public @Nullable String convertToDatabaseColumn(final @Nullable List<X> attribute) {
         if (attribute == null) {
             return null;
         }
-        final var converteds = new ArrayList<String>();
-        final var joiner = new StringJoiner(joiningDelimiter);
-        for (final var element : attribute) {
-            final var converted = elementConverter.convertToDatabaseColumn(element);
-            if (converted == null) {
-                throw new IllegalArgumentException("element converted to null: " + element);
-            }
-            if (converted.contains(joiningDelimiter)) {
-                throw new IllegalArgumentException(
-                        "element(" + element + ") converted to a value containing the joiningDelimiter(" +
-                        joiningDelimiter + "): " + converted
-                );
-            }
-            converteds.add(converted);
-            joiner.add(converted);
-        }
-        final var joined = joiner.toString();
-        // An element holding no delimiter of its own is not enough: a delimiter can also form across the seam
-        // between an element and the separator that follows it, whenever a non-empty proper suffix of the
-        // delimiter equals one of its prefixes. "||" over ["|", "x"] joins to "|||x", which splits back into
-        // ["", "|x"] -- every element passed the guard above, and the value is still lost. Rather than
-        // characterize that overlap analytically, just split the result and check it reproduces what was joined.
-        // The empty list is exempt: it joins to "", which splits into [""], and that documented asymmetry is
-        // older than this check (see the class javadoc).
-        if (!converteds.isEmpty()) {
-            final var split = splittingPattern.split(joined, -1);
-            if (!Arrays.asList(split).equals(converteds)) {
-                final var at = firstDifference(split, converteds);
-                throw new IllegalArgumentException(
-                        "joining with the joiningDelimiter(" + joiningDelimiter + ") does not survive a round trip" +
-                        "; the delimiter forms across the boundary after element " + at +
-                        " (" + converteds.get(at) + ")" +
-                        "; joined: " + joined +
-                        "; splits back into: " + Arrays.toString(split)
-                );
-            }
-        }
-        return joined;
-    }
-
-    private static int firstDifference(final String[] split, final List<String> converteds) {
-        for (int i = 0; i < converteds.size(); i++) {
-            if (i >= split.length || !split[i].equals(converteds.get(i))) {
-                return Math.max(0, i - 1);
-            }
-        }
-        return converteds.size() - 1;
+        return attribute.stream()
+                .map(elementConverter::convertToDatabaseColumn)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(joiningDelimiter));
     }
 
     /**
@@ -172,6 +140,9 @@ public class __JoinedStringAttributeConverter<X> implements __StringAttributeCon
      * @return a modifiable list of the converted elements; {@code null} when the {@code dbData} is {@code null}.
      * @implSpec The {@code dbData} is split unconditionally; splitting an empty string yields one empty token,
      *         so an empty {@code dbData} converts to a list holding a single element rather than to an empty list.
+     *         Tokens are converted as they come, including whatever the {@code elementConverter} makes of an empty one,
+     *         and a {@code null} it returns is kept in the list &mdash; unlike {@link #convertToDatabaseColumn(List)},
+     *         which drops nulls.
      */
     @Override
     @SuppressWarnings({

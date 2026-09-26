@@ -53,9 +53,6 @@ import java.time.temporal.Temporal;
  * measures in. This is the shape each of the neighbouring classes is written in, {@link __MappedYearInterval} among
  * them:
  * {@snippet lang = "java":
- *
- * @param <T> the type of the two points limiting this interval
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @Access(AccessType.FIELD)
  * @MappedSuperclass public abstract class __MappedSomeInterval extends ___MappedTemporalInterval<Year> {
  *         <p>
@@ -97,7 +94,7 @@ import java.time.temporal.Temporal;
  *         Where enforcement is wanted, the database is the better place for it, and these column types make it
  *         available:
  *         {@snippet lang = "sql":
- *                 CHECK (interval_start IS NULL OR interval_end IS NULL OR interval_start <= interval_end)
+ *                                 CHECK (interval_start IS NULL OR interval_end IS NULL OR interval_start <= interval_end)
  *} That holds for every writer, including one which never loads this class — which the constraint it replaces
  *         did not.
  *
@@ -138,7 +135,7 @@ import java.time.temporal.Temporal;
  *         ordinary Java identifiers, visible on the accessors, and the static metamodel names them type-safely.
  *
  *         <h2>Access type</h2>
- *         As in {@link com.github.jinahya.persistence.more.color the colour package},
+ *         As in {@link com.github.jinahya.persistence.more.colormodel the colour package},
  *         {@link Access @Access}({@code FIELD}) is forced: an entity which puts its {@link jakarta.persistence.Id @Id}
  *         on a getter would otherwise flip this hierarchy to property access, and the {@link Transient @Transient}
  *         accessors inherited from {@link ___TemporalInterval} — {@link ___TemporalInterval#isBounded() isBounded} and
@@ -150,6 +147,9 @@ import java.time.temporal.Temporal;
  *         what forces the issue: EclipseLink walks the mapped-superclass chain of an {@code @Embeddable} and fails with
  *         a {@link NullPointerException} — in {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata} — where any
  *         link in that chain has no access type of its own. Hibernate infers one and never notices.
+ *
+ * @param <T> the type of the two points limiting this interval
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see ___TemporalInterval
  */
 // forced, so that an entity which puts its @Id on a getter cannot flip this hierarchy to

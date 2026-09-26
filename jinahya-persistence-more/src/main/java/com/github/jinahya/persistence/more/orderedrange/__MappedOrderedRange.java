@@ -131,9 +131,6 @@ import java.util.Objects;
  * extending this class, embedded as many times as wanted, each with its own
  * {@link jakarta.persistence.AttributeOverride @AttributeOverride} pair.
  * {@snippet lang = "java":
- *
- * @param <C> the type of the two endpoints limiting this range
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @Embeddable
  * @Access(AccessType.FIELD) public class DateRange extends __MappedOrderedRange<LocalDate> { @Override
  *         protected String encode(LocalDate value) { return value.toString(); } @Override protected LocalDate
@@ -161,6 +158,9 @@ import java.util.Objects;
  *         EclipseLink does not. The embeddable form above is what forces the issue — EclipseLink walks the
  *         mapped-superclass chain of an {@code @Embeddable} and has been seen to fail where a link in that chain has no
  *         access type of its own.
+ *
+ * @param <C> the type of the two endpoints limiting this range
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __BoundType
  * @see ___OrderedRange
  */

@@ -624,7 +624,7 @@ final class __EncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static LocalTime local_time_8(final byte[] b) {
-        return LocalTime.ofNanoOfDay(long_8(b, 0));
+        return local_time_8(b, 0);
     }
 
     // ----------------------------------------------------------------------------------------- java.time.LocalDateTime

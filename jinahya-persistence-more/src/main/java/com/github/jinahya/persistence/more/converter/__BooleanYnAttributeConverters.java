@@ -190,9 +190,6 @@ public final class __BooleanYnAttributeConverters {
          */
         @Override
         public @Nullable Boolean convertToEntityAttribute(final @Nullable Character dbData) {
-            if (dbData == null) {
-                return null;
-            }
             try {
                 return strictConverter.convertToEntityAttribute(dbData);
             } catch (final IllegalArgumentException iae) {
@@ -351,9 +348,6 @@ public final class __BooleanYnAttributeConverters {
          */
         @Override
         public @Nullable Boolean convertToEntityAttribute(final @Nullable String dbData) {
-            if (dbData == null) {
-                return null;
-            }
             try {
                 return strictConverter.convertToEntityAttribute(dbData);
             } catch (final IllegalArgumentException iae) {

@@ -24,6 +24,7 @@ import jakarta.persistence.AttributeConverter;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * A utility class for {@link AttributeConverter}.
@@ -37,6 +38,33 @@ import java.util.function.Function;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __AttributeConverterUtils {
+
+    /**
+     * The converter {@link #identity()} hands out. Stateless, and holding no type of its own, so one instance serves
+     * every {@code X}.
+     */
+    private static final AttributeConverter<?, ?> IDENTITY =
+            using(UnaryOperator.identity(), UnaryOperator.identity());
+
+    /**
+     * Returns an attribute converter which stores an attribute as itself, and reads it back as itself.
+     *
+     * @param <X> entity attribute type parameter, which is also the database column type parameter.
+     * @return an attribute converter which converts in neither direction.
+     * @apiNote This is what an attribute already of the column type needs, where a converter is required but a
+     *         conversion is not &mdash; the elements of a {@link java.util.List} of {@link String}s handed to
+     *         {@link __JoinedStringAttributeConverter}, for one. {@code null} passes through unchanged in both
+     *         directions.
+     * @implNote The returned converter is shared. It carries no state and does nothing with its type parameter,
+     *         so handing the same instance to every caller is safe, and the cast is the one
+     *         {@link java.util.Collections#emptyList()} makes for the same reason.
+     */
+    @SuppressWarnings({
+            "unchecked"
+    })
+    public static <X> AttributeConverter<X, X> identity() {
+        return (AttributeConverter<X, X>) IDENTITY;
+    }
 
     /**
      * Creates a new attribute converter with specified functions.

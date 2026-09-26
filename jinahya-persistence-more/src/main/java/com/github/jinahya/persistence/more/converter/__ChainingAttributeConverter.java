@@ -36,17 +36,20 @@ import java.util.Objects;
  * @param <V> database type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote Extend this class when the composed converter has to be registered with the persistence unit: a
- *         concrete subclass can carry {@link jakarta.persistence.Converter @Converter} and be named in
- *         {@code persistence.xml} or in {@link jakarta.persistence.Convert @Convert}. Where none of that is needed, an
- *         instance composes two converters inline:
+ *         concrete subclass fixes the two converters, carries {@link jakarta.persistence.Converter @Converter}, and can
+ *         be named in {@code persistence.xml} or in {@link jakarta.persistence.Convert @Convert}. This class is
+ *         abstract precisely because a chain cannot be registered as it stands: a persistence provider instantiates a
+ *         converter through a public no-argument constructor, and nothing in {@code persistence.xml} or in
+ *         {@link jakarta.persistence.Convert @Convert} can pass the two converters. Where no registration is needed, an
+ *         anonymous subclass composes two converters inline:
  *         {@snippet lang = "java":
- *                                         final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second);
+ *                                                         final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second) {};
  *}
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class __ChainingAttributeConverter<T, U, V> implements AttributeConverter<T, V> {
+public abstract class __ChainingAttributeConverter<T, U, V> implements AttributeConverter<T, V> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -56,8 +59,8 @@ public class __ChainingAttributeConverter<T, U, V> implements AttributeConverter
      * @param attributeConverter1 the converter from the entity attribute type to the intermediate type.
      * @param attributeConverter2 the converter from the intermediate type to the database column type.
      */
-    public __ChainingAttributeConverter(final AttributeConverter<T, U> attributeConverter1,
-                                        final AttributeConverter<U, V> attributeConverter2) {
+    protected __ChainingAttributeConverter(final AttributeConverter<T, U> attributeConverter1,
+                                           final AttributeConverter<U, V> attributeConverter2) {
         super();
         this.attributeConverter1 = Objects.requireNonNull(attributeConverter1, "attributeConverter1 is null");
         this.attributeConverter2 = Objects.requireNonNull(attributeConverter2, "attributeConverter2 is null");

@@ -54,10 +54,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * .
+ * Verifies the fixed-width codecs {@link __EncryptionServiceUtils} encrypts and decrypts basic attributes through.
  *
- * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486>2.6. Basic
- *         Types</a> (Jakarta Persistence 3.2 Specification Document
+ * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486">2.6. Basic
+ *         Types</a> (Jakarta Persistence 3.2 Specification Document)
  */
 @Slf4j
 class __EncryptionServiceUtils_Test {

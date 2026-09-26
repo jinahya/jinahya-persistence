@@ -107,12 +107,12 @@ public final class __SelfReferencingOrderedQueryUtils {
      *         {@link __SelfReferencingQueryUtils#selectRoots(EntityManager, Class, BiFunction, Function) the method
      *         this one hands over to}.
      *         {@snippet lang = "java":
-     *         // as a list, in sibling order
-     *         final List<Category> roots =
-     *                 __SelfReferencingOrderedQueryUtils.selectRoots(entityManager, Category.class, Stream::toList);
+     *                         // as a list, in sibling order
+     *                         final List<Category> roots =
+     *                                 __SelfReferencingOrderedQueryUtils.selectRoots(entityManager, Category.class, Stream::toList);
      *
-     *         // as the first one, if there is one
-     *         final Optional<Category> first =
+     *                         // as the first one, if there is one
+     *                         final Optional<Category> first =
      *         __SelfReferencingOrderedQueryUtils.selectRoots(entityManager, Category.class, Stream::findFirst);}
      */
     public static <T extends __SelfReferencingOrdered<T>, R> R selectRoots(
