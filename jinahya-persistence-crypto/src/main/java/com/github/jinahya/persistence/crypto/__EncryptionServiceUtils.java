@@ -1493,7 +1493,8 @@ final class __EncryptionServiceUtils {
      * @param b            the array of bytes.
      * @param expectedType the type the deserialized value has to be an instance of.
      * @return the value represented by the {@code b}.
-     * @throws java.io.InvalidClassException when the {@code b} holds anything but an {@code expectedType}.
+     * @throws RuntimeException wrapping an {@link java.io.InvalidClassException} when the {@code b} holds anything
+     *         but an {@code expectedType}, or asks for more than the filter allows.
      * @implNote Of the four caps this filter applies, only the stream size is also enforced when writing (see
      *         {@link #serializable_(Serializable)}); the depth, reference-count and array-length caps remain read-side
      *         only, so a graph which is deep or highly referential rather than merely large can still be written and
