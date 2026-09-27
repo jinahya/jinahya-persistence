@@ -89,8 +89,11 @@ public final class __PersisterUtils {
         logger.log(System.Logger.Level.TRACE, "persister instance: {0}", persisterInstance);
         final T entityInstance = __RandomizerUtils.newRandomizedInstanceOf(entityClass)
                 .orElseThrow(() -> new IllegalArgumentException("no randomized instance for " + entityClass));
-        logger.log(System.Logger.Level.TRACE, "entityInstance: {0}", entityInstance);
-        return persisterInstance.apply(entityManager, entityInstance);
+        logger.log(System.Logger.Level.TRACE, "persisting entityInstance: {0}", entityInstance);
+        final var persisted = persisterInstance.apply(entityManager, entityInstance);
+        entityManager.flush();
+        logger.log(System.Logger.Level.TRACE, "persisted entityInstance: {0}", entityInstance);
+        return persisted;
     }
 
     // ---------------------------------------------------------------------------------------------------------------------
