@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.test.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import jakarta.persistence.EntityManager;
 import org.jspecify.annotations.Nullable;
 
@@ -89,11 +90,8 @@ public final class __PersisterUtils {
         logger.log(System.Logger.Level.TRACE, "persister instance: {0}", persisterInstance);
         final T entityInstance = __RandomizerUtils.newRandomizedInstanceOf(entityClass)
                 .orElseThrow(() -> new IllegalArgumentException("no randomized instance for " + entityClass));
-        logger.log(System.Logger.Level.TRACE, "persisting entityInstance: {0}", entityInstance);
-        final var persisted = persisterInstance.apply(entityManager, entityInstance);
-        entityManager.flush();
-        logger.log(System.Logger.Level.TRACE, "persisted entityInstance: {0}", entityInstance);
-        return persisted;
+        logger.log(System.Logger.Level.TRACE, "entity instance: {0}", entityInstance);
+        return persisterInstance.apply(entityManager, entityInstance);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------

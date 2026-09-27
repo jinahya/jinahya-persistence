@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.5.7-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <!--  <version>${revision}</version>-->
   <packaging>pom</packaging>
 
@@ -59,7 +59,7 @@
     <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
     <url>https://github.com/jinahya/${project.artifactId}</url>
-    <tag>0.4.0</tag>
+    <tag>0.5.7</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
@@ -677,12 +677,15 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <reportSets>
-          <reportSet><!-- by default, id = "default" -->
+          <reportSet><!-- distinct ids: two report sets both defaulting to "default" collapse into one when a
+                        child module inherits this section, silently dropping the first -->
+            <id>javadoc</id>
             <reports><!-- select non-aggregate reports -->
               <report>javadoc</report>
             </reports>
           </reportSet>
-          <reportSet><!-- by default, id = "default" -->
+          <reportSet>
+            <id>test-javadoc</id>
             <reports><!-- select non-aggregate reports -->
               <report>test-javadoc</report>
             </reports>
