@@ -70,11 +70,11 @@
     <!--    <revision>0.3.10-SNAPSHOT</revision>-->
     <!-- https://endoflife.date/eclipse-temurin -->
     <!-- https://endoflife.date/amazon-corretto -->
-    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.source>25</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
     <!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
-    <maven.compiler.testSource>25</maven.compiler.testSource>
+    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <doclint>none</doclint>

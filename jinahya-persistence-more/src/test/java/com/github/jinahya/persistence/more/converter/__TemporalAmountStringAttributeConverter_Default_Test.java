@@ -18,8 +18,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * direction.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote This one does not extend {@link __TemporalAmountStringAttributeConverter_Test}: its subject is an
- *         anonymous subclass, which no {@code Class} literal can name.
+ * @apiNote This one extends no shared base test: {@code __StringAttributeConverter_Test} is handed the converter as a
+ *         {@code Class} literal, and the subject here is an anonymous subclass, which no {@code Class} literal can
+ *         name.
  */
 @DisplayName("the default read finds a static parse(CharSequence)")
 @SuppressWarnings({
