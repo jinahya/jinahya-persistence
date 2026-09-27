@@ -142,6 +142,35 @@ class __RandomizerUtils_Test {
         assertThat(new BeanRandomizer().excludedFields()).containsExactlyInAnyOrder("a", "b");
     }
 
+    @DisplayName("newRandomizerInstanceOf(Bean.class) -> present, the sibling BeanRandomizer")
+    @Test
+    void newRandomizerInstanceOf_Present_Bean() {
+        assertThat(__RandomizerUtils.newRandomizerInstanceOf(Bean.class))
+                .isPresent()
+                .containsInstanceOf(BeanRandomizer.class);
+    }
+
+    @DisplayName("newRandomizerInstanceOf(Foreign.class) -> empty; no randomizer is named for it")
+    @Test
+    void newRandomizerInstanceOf_Empty_NoSibling() {
+        assertThat(__RandomizerUtils.newRandomizerInstanceOf(Foreign.class)).isEmpty();
+    }
+
+    @DisplayName("newRandomizerInstanceOf(Narrowed.class) -> present; what it produces is not checked here")
+    @Test
+    void newRandomizerInstanceOf_Present_RandomizerOfSuperclass() {
+        assertThat(__RandomizerUtils.newRandomizerInstanceOf(Narrowed.class))
+                .isPresent()
+                .containsInstanceOf(NarrowedRandomizer.class);
+    }
+
+    @DisplayName("newRandomizerInstanceOf(null) -> NullPointerException")
+    @Test
+    void newRandomizerInstanceOf_NullPointerException_Null() {
+        assertThatThrownBy(() -> __RandomizerUtils.newRandomizerInstanceOf(null))
+                .isInstanceOf(NullPointerException.class);
+    }
+
     @DisplayName("newRandomizedInstanceOf(Bean.class) -> present, from the sibling BeanRandomizer")
     @Test
     void newRandomizedInstanceOf_Present_Bean() {

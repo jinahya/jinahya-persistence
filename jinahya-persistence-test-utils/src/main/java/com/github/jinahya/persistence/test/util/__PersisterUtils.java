@@ -53,7 +53,7 @@ public final class __PersisterUtils {
     @SuppressWarnings({
             "unchecked"
     })
-    private static <T> Optional<__Persister<T>> newPersisterInstanceOf(final Class<T> target) {
+    public static <T> Optional<__Persister<T>> newPersisterInstanceOf(final Class<T> target) {
         assert target != null;
         final __Persister<?> persister =
                 ___Utils.newLocatedInstance(target, __Persister.class, locateStandard(target));

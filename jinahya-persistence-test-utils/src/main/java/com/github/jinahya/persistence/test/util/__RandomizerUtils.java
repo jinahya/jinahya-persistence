@@ -70,6 +70,43 @@ public final class __RandomizerUtils {
     // ---------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Returns, an optional of, a new instance of the randomizer class located for the specified target class by the
+     * {@link #locateStandard(Class) naming convention}.
+     * <p>
+     * An empty optional means one thing: no randomizer is located for the {@code target}. When one <em>is</em> located,
+     * it is used, and anything wrong with it -- it does not extend {@link __Randomizer}, or it can not be instantiated
+     * -- fails, rather than being reported as an absence: a class named by the convention is one the developer meant to
+     * be used.
+     *
+     * @param target the target class.
+     * @param <T>    target type parameter
+     * @return an optional of a new instance of the randomizer located for the {@code target}; {@code empty} when no
+     *         randomizer applies.
+     * @throws NullPointerException when the {@code target} is {@code null}.
+     * @throws RuntimeException     when the located randomizer is unusable.
+     * @apiNote The randomizer is returned as a {@code __Randomizer<T>} without the class it is declared for
+     *         being checked against the {@code target}, for that declaration proves less than it appears to; a
+     *         randomizer is verified on what it <em>produces</em>, which is what
+     *         {@link #newRandomizedInstanceOf(Class)} does. A caller which calls {@link __Randomizer#get() get()} on
+     *         the returned randomizer itself makes that check its own.
+     * @see #locateStandard(Class)
+     * @see #newRandomizedInstanceOf(Class)
+     */
+    @SuppressWarnings({
+            "unchecked"
+    })
+    public static <T> Optional<__Randomizer<T>> newRandomizerInstanceOf(final Class<T> target) {
+        Objects.requireNonNull(target, "target is null");
+        final __Randomizer<?> randomizer =
+                ___Utils.newLocatedInstance(target, __Randomizer.class, locateStandard(target));
+        if (randomizer == null) {
+            return Optional.empty();
+        }
+        // one is provided, so it is meant to be used; from here, anything wrong with it is a fault
+        return Optional.of((__Randomizer<T>) randomizer);
+    }
+
+    /**
      * Returns, an optional of, a randomized instance of the specified target class, using the randomizer located for it
      * by the {@link #locateStandard(Class) naming convention}.
      * <p>
@@ -85,17 +122,13 @@ public final class __RandomizerUtils {
      * @throws RuntimeException     when the located randomizer is unusable, or produces nothing, or produces something
      *                              which is not a {@code target}; and when it throws.
      * @see #locateStandard(Class)
+     * @see #newRandomizerInstanceOf(Class)
      * @see ___Utils#produced(Class, Object, Object)
      */
     public static <T> Optional<T> newRandomizedInstanceOf(final Class<T> target) {
-        Objects.requireNonNull(target, "target is null");
-        final __Randomizer<?> randomizer =
-                ___Utils.newLocatedInstance(target, __Randomizer.class, locateStandard(target));
-        if (randomizer == null) {
-            return Optional.empty();
-        }
-        // one is provided, so it is meant to be used; from here, anything wrong with it is a fault
-        return Optional.of(___Utils.produced(target, randomizer, randomizer.get()));
+        // the randomizer was located, so it is meant to be used; from here, anything wrong with it is a fault
+        return newRandomizerInstanceOf(target)
+                .map(r -> ___Utils.produced(target, r, r.get()));
     }
 
     // ---------------------------------------------------------------------------------------------------------------------
