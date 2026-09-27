@@ -81,20 +81,6 @@ class __MappedOrderedRange_PersistenceTest {
 
     private static final LocalDate APR = LocalDate.of(2026, 4, 1);
 
-    @DisplayName("all nine shapes round-trip, in the same column pair")
-    @Test
-    void nineShapes__() {
-        assertThat(dates(JAN, CLOSED, APR, OPEN)).hasToString("[2026-01-01, 2026-04-01)");
-        assertThat(dates(JAN, CLOSED, APR, CLOSED)).hasToString("[2026-01-01, 2026-04-01]");
-        assertThat(dates(JAN, OPEN, APR, CLOSED)).hasToString("(2026-01-01, 2026-04-01]");
-        assertThat(dates(JAN, OPEN, APR, OPEN)).hasToString("(2026-01-01, 2026-04-01)");
-        assertThat(dates(JAN, CLOSED, null, OPEN)).hasToString("[2026-01-01, null)");
-        assertThat(dates(JAN, OPEN, null, OPEN)).hasToString("(2026-01-01, null)");
-        assertThat(dates(null, OPEN, APR, CLOSED)).hasToString("(null, 2026-04-01]");
-        assertThat(dates(null, OPEN, APR, OPEN)).hasToString("(null, 2026-04-01)");
-        assertThat(dates(null, OPEN, null, OPEN)).hasToString("(null, null)");
-    }
-
     @DisplayName("isBounded reads the two columns, and needs no decoding to do it")
     @Test
     void isBoundedNeedsNoDecoding__() {

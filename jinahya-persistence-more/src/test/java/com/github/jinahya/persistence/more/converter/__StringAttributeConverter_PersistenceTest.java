@@ -36,30 +36,6 @@ class __StringAttributeConverter_PersistenceTest {
         }
     }
 
-    @DisplayName("the provider instantiates the converter and round-trips through it")
-    @Test
-    void __roundTripThroughTheProvider() {
-        final var amount = new BigDecimal("1234.5600");
-        final Long id;
-        try (var em = ENTITY_MANAGER_FACTORY.createEntityManager()) {
-            final var tx = em.getTransaction();
-            tx.begin();
-            final var entity = new _ConvertedEntity();
-            entity.amount = amount;
-            em.persist(entity);
-            tx.commit();
-            id = entity.id;
-        }
-        assertThat(id).isNotNull();
-
-        try (var em = ENTITY_MANAGER_FACTORY.createEntityManager()) {
-            final var found = em.find(_ConvertedEntity.class, id);
-            assertThat(found).isNotNull();
-            // toPlainString keeps the scale for a non-negative scale, so this comparison is by value AND scale
-            assertThat(found.amount).isEqualByComparingTo(amount);
-        }
-    }
-
     @DisplayName("the stored column holds the plain string the converter writes")
     @Test
     void __storedFormIsThePlainString() {

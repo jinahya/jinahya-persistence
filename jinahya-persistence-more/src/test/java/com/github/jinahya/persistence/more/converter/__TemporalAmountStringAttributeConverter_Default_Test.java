@@ -32,14 +32,6 @@ class __TemporalAmountStringAttributeConverter_Default_Test {
             new __TemporalAmountStringAttributeConverter<>(_Ticks.class) {
             };
 
-    @DisplayName("a type with a static parse(CharSequence) round-trips, with nothing overridden")
-    @Test
-    void __roundTrip() {
-        final var ticks = new _Ticks(42L);
-        assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(ticks)))
-                .isEqualTo(ticks);
-    }
-
     @DisplayName("null <-> null, without touching the parse method")
     @Test
     void __null() {

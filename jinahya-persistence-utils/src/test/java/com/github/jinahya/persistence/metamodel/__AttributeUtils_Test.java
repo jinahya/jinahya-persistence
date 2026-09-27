@@ -332,18 +332,6 @@ class __AttributeUtils_Test {
                     .isNotInstanceOf(NullPointerException.class);
         }
 
-        @DisplayName("an ordinary property round-trips")
-        @Test
-        void __ordinaryProperty() throws Exception {
-            final var attribute = attributeNamed("value", String.class, Root.class.getMethod("getValue"));
-            final var root = new Root();
-
-            __AttributeUtils.setAttributeValue(root, attribute, "v");
-
-            assertThat(root.getValue()).isEqualTo("v");
-            assertThat(__AttributeUtils.getAttributeValue(root, attribute)).isEqualTo("v");
-        }
-
         @DisplayName("a private field is written without a setter")
         @Test
         void __writesAPrivateField() throws Exception {

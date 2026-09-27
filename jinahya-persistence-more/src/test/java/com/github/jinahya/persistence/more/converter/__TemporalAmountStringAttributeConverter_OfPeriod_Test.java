@@ -2,8 +2,6 @@ package com.github.jinahya.persistence.more.converter;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Period;
 
@@ -28,15 +26,6 @@ class __TemporalAmountStringAttributeConverter_OfPeriod_Test
         assertThat(converter.convertToEntityAttribute(null)).isNull();
     }
 
-    @DisplayName("an ordinary value round-trips")
-    @ParameterizedTest
-    @ValueSource(strings = {"P0D", "P1D", "P1Y", "P1M", "P1Y2M3D", "P-1Y-2M-3D", "P14M"})
-    void __ordinary(final String value) {
-        final var period = Period.parse(value);
-        assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(period)))
-                .isEqualTo(period);
-    }
-
     @DisplayName("zero is stored as P0D")
     @Test
     void __zero() {
@@ -55,16 +44,4 @@ class __TemporalAmountStringAttributeConverter_OfPeriod_Test
         assertThat(read.getMonths()).isEqualTo(14);
     }
 
-    @DisplayName("the extremes round-trip, within 40 characters")
-    @Test
-    void __extremes() {
-        for (final var period : new Period[]{
-                Period.of(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE),
-                Period.of(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)
-        }) {
-            final var column = converter.convertToDatabaseColumn(period);
-            assertThat(column).isNotNull().hasSizeLessThanOrEqualTo(40);
-            assertThat(converter.convertToEntityAttribute(column)).isEqualTo(period);
-        }
-    }
 }

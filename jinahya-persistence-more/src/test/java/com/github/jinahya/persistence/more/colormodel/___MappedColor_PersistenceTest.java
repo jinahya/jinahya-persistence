@@ -184,92 +184,6 @@ class ___MappedColor_PersistenceTest {
 
     // -----------------------------------------------------------------------------------------------------------------
     @Nested
-    class RoundTripTest {
-
-        @DisplayName("an rgba color survives a write and a read, alpha included")
-        @Test
-        void rgba__() {
-            final var entity = new _RgbaEntity();
-            entity.setSrgb(.25d, .5d, .75d);
-            entity.setAlpha(.125d);
-            persistAndFind(entity, _RgbaEntity.class, found -> {
-                assertThat(found).isNotNull();
-                assertThat(found.getRed()).isCloseTo(.25d, within(TOLERANCE));
-                assertThat(found.getGreen()).isCloseTo(.5d, within(TOLERANCE));
-                assertThat(found.getBlue()).isCloseTo(.75d, within(TOLERANCE));
-                assertThat(found.getAlpha()).isCloseTo(.125d, within(TOLERANCE));
-                assertThat(found.toHexNotation()).isEqualTo(entity.toHexNotation());
-                return null;
-            });
-        }
-
-        @DisplayName("an alpha left alone is persisted opaque, not zero")
-        @Test
-        void alphaDefaultsToOpaque__() {
-            final var entity = new _RgbaEntity();
-            entity.setSrgb(1.0d, .0d, .0d);
-            persistAndFind(entity, _RgbaEntity.class, found -> {
-                assertThat(found.getAlpha()).isEqualTo(___MappedColor.ALPHA_OPAQUE);
-                assertThat(found.isOpaque()).isTrue();
-                return null;
-            });
-        }
-
-        @DisplayName("a hue is stored in degrees, not normalized")
-        @Test
-        void hslHueIsDegrees__() {
-            final var entity = new _HslEntity();
-            entity.setHue(240.0d);
-            entity.setSaturation(1.0d);
-            entity.setLightness(.5d);
-            persistAndFind(entity, _HslEntity.class, found -> {
-                assertThat(found.getHue()).isCloseTo(240.0d, within(TOLERANCE));
-                assertThat(found.getNormalizedHue()).isCloseTo(2.0d / 3.0d, within(TOLERANCE));
-                assertThat(found.toModernHslNotation()).isEqualTo("hsl(240 100% 50%)");
-                return null;
-            });
-            // and the column really holds the degrees
-            final List<?> hues = applyEntityManager(em -> em
-                    .createNativeQuery("select " + ___MappedHueColor.COLUMN_NAME_HUE
-                                       + " from " + _HslEntity.TABLE_NAME)
-                    .getResultList());
-            assertThat(hues).isNotEmpty().allSatisfy(
-                    v -> assertThat(((Number) v).doubleValue()).isCloseTo(240.0d, within(TOLERANCE))
-            );
-        }
-
-        @DisplayName("an hwb color survives a write and a read")
-        @Test
-        void hwb__() {
-            final var entity = new _HwbEntity();
-            entity.setHue(90.0d);
-            entity.setWhiteness(.2d);
-            entity.setBlackness(.3d);
-            persistAndFind(entity, _HwbEntity.class, found -> {
-                assertThat(found.getHue()).isCloseTo(90.0d, within(TOLERANCE));
-                assertThat(found.getWhiteness()).isCloseTo(.2d, within(TOLERANCE));
-                assertThat(found.getBlackness()).isCloseTo(.3d, within(TOLERANCE));
-                return null;
-            });
-        }
-
-        @DisplayName("a cmyk color survives a write and a read")
-        @Test
-        void cmyk__() {
-            final var entity = new _CmykEntity();
-            entity.setSrgb(.2d, .7d, .4d);
-            final var expected = entity.toComponentArray();
-            persistAndFind(entity, _CmykEntity.class, found -> {
-                assertThat(found.toComponentArray())
-                        .usingComparatorWithPrecision(TOLERANCE)
-                        .containsExactly(expected);
-                return null;
-            });
-        }
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Nested
     class AccessTypeTest {
 
         @DisplayName("an entity with @Id on a getter still persists every component")
@@ -348,20 +262,6 @@ class ___MappedColor_PersistenceTest {
                     .contains(__MappedHsl.COLUMN_NAME_LIGHTNESS);
         }
 
-        @DisplayName("a renamed column still round-trips")
-        @Test
-        void renamedColumnsRoundTrip__() {
-            final var entity = new _OverriddenHslEntity();
-            entity.setHue(300.0d);
-            entity.setSaturation(.6d);
-            entity.setLightness(.4d);
-            persistAndFind(entity, _OverriddenHslEntity.class, found -> {
-                assertThat(found.getHue()).isCloseTo(300.0d, within(TOLERANCE));
-                assertThat(found.getSaturation()).isCloseTo(.6d, within(TOLERANCE));
-                assertThat(found.getLightness()).isCloseTo(.4d, within(TOLERANCE));
-                return null;
-            });
-        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------

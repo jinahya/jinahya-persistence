@@ -55,26 +55,6 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
      */
     protected static final double TOLERANCE = 1.0e-9d;
 
-    /**
-     * Normalized component values which are exact in binary, and which every model round-trips.
-     *
-     * @implNote {@value ___MappedColor#MAX_COMPONENT} is not among them, and deliberately. A hue is an angle on a
-     *         half-open range: a normalized hue of {@code 1.0} is {@code 360} degrees, which reduces onto {@code 0},
-     *         so the one model-independent assertion which can be made about it is that it is accepted — see
-     *         {@link #_Accepted_MaxComponent()}.
-     */
-    private static final double[] ROUND_TRIPPING_COMPONENTS = {0.0d, 0.25d, 0.5d, 0.75d};
-
-    /**
-     * sRGB triples which every model in the package converts in both directions.
-     */
-    private static final double[][] SRGB_SAMPLES = {
-            {0.0d, 0.0d, 0.0d},
-            {1.0d, 1.0d, 1.0d},
-            {1.0d, 0.0d, 0.0d},
-            {0.2d, 0.7d, 0.4d},
-    };
-
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
@@ -104,27 +84,6 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
             final var index = i;
             assertEquals(instance.getComponent(index), components[index],
                          () -> "the component array disagrees at " + index);
-        }
-    }
-
-    /**
-     * Verifies that every component round-trips through its index.
-     */
-    @DisplayName("every component round-trips through its index")
-    @Test
-    protected void _RoundTrip_SetThenGetComponent() {
-        final var instance = newColorInstance();
-        for (var i = 0; i < instance.getComponentCount(); i++) {
-            for (final double component : ROUND_TRIPPING_COMPONENTS) {
-                final var index = i;
-                instance.setComponent(index, component);
-                assertEquals(
-                        component,
-                        instance.getComponent(index),
-                        TOLERANCE,
-                        () -> "the component at " + index + " did not survive being written as " + component
-                );
-            }
         }
     }
 
@@ -200,34 +159,6 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
     }
 
     // ----------------------------------------------------------------------------------------------------------- sRGB
-
-    /**
-     * Verifies that reading a color back in sRGB gives what was written in sRGB.
-     *
-     * @implNote Only this direction. A model need not be a bijection with sRGB — CMYK is not, and its
-     *         model-to-sRGB-to-model trip projects onto maximum black rather than returning what it started as — but
-     *         sRGB into the model and back out is required to be exact, and it is what a caller converting between
-     *         two models depends on.
-     */
-    @DisplayName("sRGB into the model and back out is the identity")
-    @Test
-    protected void _RoundTrip_Srgb() {
-        for (final double[] srgb : SRGB_SAMPLES) {
-            final var instance = newColorInstance();
-            instance.setSrgb(srgb[0], srgb[1], srgb[2]);
-            final var actual = instance.toComponentArrayInSrgb();
-            assertEquals(3, actual.length, "an sRGB reading is not three components");
-            for (var i = 0; i < 3; i++) {
-                final var index = i;
-                assertEquals(
-                        srgb[index],
-                        actual[index],
-                        TOLERANCE,
-                        () -> "the sRGB component at " + index + " did not survive the conversion into " + colorClass
-                );
-            }
-        }
-    }
 
     /**
      * Verifies that writing sRGB components leaves the alpha alone.

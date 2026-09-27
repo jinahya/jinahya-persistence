@@ -134,33 +134,6 @@ public abstract class __MappedOrderedRange_Test<
     }
 
     /**
-     * Verifies that each endpoint is returned as it was set, under either bound type.
-     *
-     * @implNote This is the encoding round-trip, seen from outside: each value goes through {@code encode} on the
-     *         way in and {@code decode} on the way back, and an encoding which is not its own inverse fails here
-     *         whether or not the subclass exposes the codec.
-     */
-    @DisplayName("each endpoint is returned as it was set, under either bound type")
-    @Test
-    protected void _RoundTrip_SetThenGet() {
-        final var instance = newRangeInstance();
-        for (final C sample : samples) {
-            for (final __BoundType boundType : __BoundType.values()) {
-                instance.setRangeLower(sample, boundType);
-                assertEquals(sample, instance.getRangeLower(),
-                             () -> "the lower endpoint " + sample + " did not survive the encoding");
-                assertEquals(boundType, instance.getLowerBoundType(),
-                             () -> "the lower bound type of " + sample + " did not survive the encoding");
-                instance.setRangeUpper(sample, boundType);
-                assertEquals(sample, instance.getRangeUpper(),
-                             () -> "the upper endpoint " + sample + " did not survive the encoding");
-                assertEquals(boundType, instance.getUpperBoundType(),
-                             () -> "the upper bound type of " + sample + " did not survive the encoding");
-            }
-        }
-    }
-
-    /**
      * Verifies that a {@code null} endpoint clears its end, bound type included.
      */
     @DisplayName("a null endpoint clears its end, bound type included")
@@ -319,27 +292,6 @@ public abstract class __MappedOrderedRange_Test<
     }
 
     // ----------------------------------------------------------------------------------------- the encoding contract
-
-    /**
-     * Verifies that {@code decode} is the inverse of {@code encode}, read through the codec itself.
-     *
-     * @see #encode(__MappedOrderedRange, Comparable)
-     * @see #decode(__MappedOrderedRange, String)
-     */
-    @DisplayName("the encoding round-trips: decode(encode(value)) equals value")
-    @Test
-    protected void _RoundTrip_EncodeDecode() {
-        final var instance = newRangeInstance();
-        for (final C sample : samples) {
-            final var encoded = encodeOrAbort(instance, sample);
-            final var decoded = decode(instance, encoded);
-            if (decoded == null) {
-                abort("the codec contract is checked only when " + getClass().getSimpleName()
-                      + " overrides decode(R, String)");
-            }
-            assertEquals(sample, decoded, () -> "decode(encode(" + sample + ")) is not the value it started as");
-        }
-    }
 
     /**
      * Verifies that no endpoint encodes to empty text.

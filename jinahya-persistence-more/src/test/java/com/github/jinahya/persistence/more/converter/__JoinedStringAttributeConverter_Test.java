@@ -24,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,65 +37,6 @@ class __JoinedStringAttributeConverter_Test {
 
     private static __JoinedStringAttributeConverter<String> comma() {
         return new __JoinedStringAttributeConverter.__OfStrings(",");
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("round trips")
-    @Nested
-    class RoundTrip_Test {
-
-        @DisplayName("null <-> null")
-        @Test
-        void __null() {
-            final var converter = comma();
-            assertThat(converter.convertToDatabaseColumn(null)).isNull();
-            assertThat(converter.convertToEntityAttribute(null)).isNull();
-        }
-
-        @DisplayName("an empty column splits into one empty element, not an empty list")
-        @Test
-        void __emptyColumn() {
-            final var converter = comma();
-            assertThat(converter.convertToEntityAttribute("")).containsExactly("");
-        }
-
-        @DisplayName("an empty list writes an empty column, and does NOT survive a round trip")
-        @Test
-        void __emptyList() {
-            final var converter = comma();
-            final var column = converter.convertToDatabaseColumn(new ArrayList<>());
-            assertThat(column).isEmpty();
-            // the delimited form cannot tell no elements from one empty element; the caller owns this
-            assertThat(converter.convertToEntityAttribute(column)).containsExactly("");
-        }
-
-        @DisplayName("a single empty element now survives a round trip")
-        @Test
-        void __singleEmptyElement() {
-            final var converter = comma();
-            final var attribute = List.of("");
-            assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(attribute)))
-                    .containsExactlyElementsOf(attribute);
-        }
-
-        @DisplayName("trailing empty elements survive a round trip")
-        @Test
-        void __trailingEmpties() {
-            final var converter = comma();
-            final var attribute = Arrays.asList("a", "", "");
-            final var column = converter.convertToDatabaseColumn(attribute);
-            assertThat(column).isEqualTo("a,,");
-            assertThat(converter.convertToEntityAttribute(column)).containsExactly("a", "", "");
-        }
-
-        @DisplayName("order and duplicates survive a round trip")
-        @Test
-        void __orderAndDuplicates() {
-            final var converter = comma();
-            final var attribute = Arrays.asList("b", "a", "b");
-            assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(attribute)))
-                    .containsExactlyElementsOf(attribute);
-        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------

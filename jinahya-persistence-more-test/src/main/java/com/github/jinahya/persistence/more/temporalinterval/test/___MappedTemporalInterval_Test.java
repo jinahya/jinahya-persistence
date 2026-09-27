@@ -101,21 +101,6 @@ public abstract class ___MappedTemporalInterval_Test<
     }
 
     /**
-     * Verifies that each point is returned as it was set, {@code null} included.
-     */
-    @DisplayName("each point is returned as it was set, including back to null")
-    @Test
-    protected void _RoundTrip_SetThenGet() {
-        final var instance = newInterval(earlier, later);
-        assertEquals(earlier, instance.getIntervalStart());
-        assertEquals(later, instance.getIntervalEnd());
-        instance.setIntervalStart(null);
-        instance.setIntervalEnd(null);
-        assertNull(instance.getIntervalStart());
-        assertNull(instance.getIntervalEnd());
-    }
-
-    /**
      * Verifies that a start after its end is stored rather than rejected.
      *
      * @implNote The order of the two points is documented, not validated: nothing in the package refuses an

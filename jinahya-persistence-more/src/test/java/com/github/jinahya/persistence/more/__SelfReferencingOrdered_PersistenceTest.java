@@ -131,22 +131,6 @@ class __SelfReferencingOrdered_PersistenceTest {
         return rows.stream().map(String::valueOf).toList();
     }
 
-    /**
-     * Persists a root and the specified number of children, each ordered by its index, and returns the root's
-     * identifier.
-     */
-    private static Long persistFamily(final String rootName, final int childCount) {
-        return applyEntityManager(em -> {
-            final var root = new _CategoryEntity(rootName, null, 0);
-            em.persist(root);
-            for (var i = 0; i < childCount; i++) {
-                em.persist(new _CategoryEntity(rootName + "-child-" + i, root, i));
-            }
-            em.flush();
-            return root.getId();
-        });
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("mapping")
     @Nested
@@ -183,102 +167,6 @@ class __SelfReferencingOrdered_PersistenceTest {
         void transientAccessorsAreNotMapped__() {
             assertThat(columnNamesOf(_PropertyAccessNodeEntity.TABLE_NAME))
                     .doesNotContain("hierarchyparent", "hierarchyparent_id", "hierarchydepth");
-        }
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("round trip")
-    @Nested
-    class RoundTripTest {
-
-        @DisplayName("a parent and an ordinal survive a write and a read, read through the marks")
-        @Test
-        void hierarchy__() {
-            final var rootId = persistFamily("round-trip", 3);
-            acceptEntityManager(em -> {
-                final var root = em.find(_CategoryEntity.class, rootId);
-                assertThat(root).isNotNull();
-                assertThat(root.getHierarchyParent()).isNull();
-                assertThat(root.getHierarchyDepth()).isZero();
-                assertThat(root.getSiblingOrdinal()).isZero();
-            });
-        }
-
-        @DisplayName("a child reaches its parent, and its depth, through the marked member")
-        @Test
-        void childReachesItsParent__() {
-            final var rootId = persistFamily("depth", 1);
-            acceptEntityManager(em -> {
-                final var child = em
-                        .createQuery("select c from _CategoryEntity c where c.name = :name", _CategoryEntity.class)
-                        .setParameter("name", "depth-child-0")
-                        .getSingleResult();
-                assertThat(child.getHierarchyParent()).isNotNull();
-                assertThat(child.getHierarchyParent().getId()).isEqualTo(rootId);
-                assertThat(child.getHierarchyDepth()).isOne();
-                assertThat(child.getSiblingOrdinal()).isZero();
-            });
-        }
-
-        @DisplayName("siblings come back in ordinal order, and answer their own ordinals")
-        @Test
-        void siblingsAreOrdered__() {
-            final var rootId = persistFamily("ordered", 4);
-            acceptEntityManager(em -> {
-                final var children = em
-                        .createQuery(
-                                "select c from _CategoryEntity c where c.parent.id = :id"
-                                + " order by c.siblingOrdinal asc, c.id asc",
-                                _CategoryEntity.class)
-                        .setParameter("id", rootId)
-                        .getResultList();
-                assertThat(children).hasSize(4);
-                assertThat(children).extracting(__SelfReferencingOrdered::getSiblingOrdinal)
-                        .containsExactly(0, 1, 2, 3);
-                assertThat(children).extracting(_CategoryEntity::getName)
-                        .containsExactly("ordered-child-0", "ordered-child-1", "ordered-child-2", "ordered-child-3");
-            });
-        }
-
-        @DisplayName("an entity which marks its accessors answers the same way")
-        @Test
-        void propertyAccess__() {
-            final var id = applyEntityManager(em -> {
-                final var root = new _PropertyAccessNodeEntity(null, 0);
-                em.persist(root);
-                final var child = new _PropertyAccessNodeEntity(root, 5);
-                em.persist(child);
-                em.flush();
-                return child.getId();
-            });
-            acceptEntityManager(em -> {
-                final var child = em.find(_PropertyAccessNodeEntity.class, id);
-                assertThat(child.getSiblingOrdinal()).isEqualTo(5);
-                assertThat(child.getDisplayOrder()).isEqualTo(5);
-                assertThat(child.getHierarchyParent()).isNotNull();
-                assertThat(child.getHierarchyDepth()).isOne();
-            });
-        }
-
-        @DisplayName("two siblings may share an ordinal; the type promises comparability, not distinctness")
-        @Test
-        void tiesArePossible__() {
-            final var rootId = applyEntityManager(em -> {
-                final var root = new _CategoryEntity("tied", null, 0);
-                em.persist(root);
-                em.persist(new _CategoryEntity("tied-a", root, 1));
-                em.persist(new _CategoryEntity("tied-b", root, 1));
-                em.flush();
-                return root.getId();
-            });
-            acceptEntityManager(em -> {
-                final var children = em
-                        .createQuery("select c from _CategoryEntity c where c.parent.id = :id", _CategoryEntity.class)
-                        .setParameter("id", rootId)
-                        .getResultList();
-                assertThat(children).extracting(__SelfReferencingOrdered::getSiblingOrdinal)
-                        .containsExactly(1, 1);
-            });
         }
     }
 

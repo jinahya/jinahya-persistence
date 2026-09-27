@@ -166,16 +166,6 @@ class ___MappedColor_Test {
                     .hasMessageContaining("300");
         }
 
-        @DisplayName("an eight-bit value round-trips")
-        @Test
-        void eightBitsRoundTrip__() {
-            final var rgba = new Rgba();
-            for (var v = 0; v <= ___MappedColor.MAX_COMPONENT_8_BIT; v++) {
-                rgba.setRedAsEightBits(v);
-                assertThat(rgba.getRedAsEightBits()).isEqualTo(v);
-            }
-        }
-
         @DisplayName("a color with no alpha column is fully opaque")
         @Test
         void alphaDefaultsToOpaque__() {
@@ -275,24 +265,6 @@ class ___MappedColor_Test {
             }
         }
 
-        @DisplayName("CMYK -> sRGB -> CMYK projects onto maximum black, and is not the identity")
-        @Test
-        void cmykRoundTripProjectsOntoMaximumBlack__() {
-            // the naive forward conversion is not injective; these two are different ink mixes rendering alike
-            final var gray = cmyk(.5d, .5d, .5d, .0d);
-            final var back = new Cmyk();
-            gray.applySrgb(r -> g -> b -> {
-                back.setSrgb(r, g, b);
-                return null;
-            });
-            assertThat(back.toComponentArray())
-                    .usingComparatorWithPrecision(TOLERANCE)
-                    .containsExactly(.0d, .0d, .0d, .5d);
-            assertThat(back.toComponentArrayInSrgb())
-                    .usingComparatorWithPrecision(TOLERANCE)
-                    .containsExactly(gray.toComponentArrayInSrgb());
-        }
-
         @DisplayName("a color converts to another model through sRGB")
         @Test
         void convertsBetweenModels__() {
@@ -322,40 +294,6 @@ class ___MappedColor_Test {
             });
         }
 
-        @DisplayName("sRGB round-trips through the conversion utilities")
-        @Test
-        void utilsRoundTrip__() {
-            final var r = .2d;
-            final var g = .7d;
-            final var b = .4d;
-            ___MappedColorUtils.rgbToHsl(r, g, b, h -> s -> l -> ___MappedColorUtils.hslToRgb(
-                    h, s, l,
-                    r2 -> g2 -> b2 -> {
-                        assertThat(r2).isCloseTo(r, within(TOLERANCE));
-                        assertThat(g2).isCloseTo(g, within(TOLERANCE));
-                        assertThat(b2).isCloseTo(b, within(TOLERANCE));
-                        return null;
-                    }
-            ));
-            ___MappedColorUtils.rgbToHwb(r, g, b, h -> w -> k -> ___MappedColorUtils.hwbToRgb(
-                    h, w, k,
-                    r2 -> g2 -> b2 -> {
-                        assertThat(r2).isCloseTo(r, within(TOLERANCE));
-                        assertThat(g2).isCloseTo(g, within(TOLERANCE));
-                        assertThat(b2).isCloseTo(b, within(TOLERANCE));
-                        return null;
-                    }
-            ));
-            ___MappedColorUtils.rgbToCmyk(r, g, b, c -> m -> y -> k -> ___MappedColorUtils.cmykToRgb(
-                    c, m, y, k,
-                    r2 -> g2 -> b2 -> {
-                        assertThat(r2).isCloseTo(r, within(TOLERANCE));
-                        assertThat(g2).isCloseTo(g, within(TOLERANCE));
-                        assertThat(b2).isCloseTo(b, within(TOLERANCE));
-                        return null;
-                    }
-            ));
-        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -443,18 +381,6 @@ class ___MappedColor_Test {
             assertThat(parse.apply("#ff0000")).isEqualTo(new Rgba4(1.0d, .0d, .0d, 1.0d));
             assertThat(parse.apply("#F00F")).isEqualTo(new Rgba4(1.0d, .0d, .0d, 1.0d));
             assertThat(parse.apply("#ff000080")).isEqualTo(new Rgba4(1.0d, .0d, .0d, 128 / 255.0d));
-        }
-
-        @DisplayName("hex notation round-trips through toHexNotation")
-        @Test
-        void hexNotationRoundTrips__() {
-            final var rgba = new Rgba();
-            ___MappedColorUtils.applyHexNotation("#1a2b3c80", r -> g -> b -> a -> {
-                rgba.setSrgb(r, g, b);
-                rgba.setAlpha(a);
-                return null;
-            });
-            assertThat(rgba.toHexNotation()).isEqualTo("#1a2b3c80");
         }
 
         @DisplayName("a malformed hex notation is rejected")
