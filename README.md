@@ -30,6 +30,13 @@ Removed with it: `_jakarta-ee-10.0.0`, `__eclipselink-4.0.8-jakarta-ee-10`, the
 `jakarta-persistence-3.x-{hibernate,eclipselink}` marker profiles, which covered the
 Jakarta EE 9/9.1 and 10 generations and carried no configuration.
 
+Later removed for the same reason — a version axis that tested an implementation rather
+than this project: the second-newest-series profiles `__hibernate-orm-7.2-jakarta-ee-11`
+and `___hibernate-validator-9.0-jakarta-ee-11`, and the single-choice
+`___hibernate-validator-9.1-jakarta-ee-11` / `___weld-6-jakarta-ee-11` profiles, whose
+versions moved into `<properties>`. The remaining two profiles were renamed
+`jakarta-ee-11-{hibernate-orm,eclipselink}`.
+
 ### Jakarta EE 11 — current
 
 This is the only supported generation. Its platform values live in the root
@@ -50,29 +57,28 @@ version: weld-junit5 5.0.x is the Weld 6 / CDI 4.1 line.
 
 #### Profiles
 
-The platform is fixed, so the profiles only choose implementations. They form
-independent axes — provider and validator each offer a choice, CDI currently has a
-single profile:
+The platform is fixed and so is every implementation version: each implementation is kept
+on the single release aligned with Jakarta EE 11, and the build never tests one
+implementation at two versions — that would exercise the implementation's own release
+history, not this project. What *does* vary is **which** implementation of Jakarta
+Persistence runs, because Hibernate ORM and EclipseLink are two different implementations
+of the same spec and genuinely behave differently.
 
-| Axis | Profile | Implementation |
-| --- | --- | --- |
-| provider (`__`) | `__hibernate-orm-7.4-jakarta-ee-11` | Hibernate ORM 7.4.9.Final — **active by default** |
-| provider (`__`) | `__hibernate-orm-7.2-jakarta-ee-11` | Hibernate ORM 7.2.25.Final (limited-support series) |
-| provider (`__`) | `__eclipselink-5.0-jakarta-ee-11` | EclipseLink 5.0.1 |
-| validator (`___`) | `___hibernate-validator-9.1-jakarta-ee-11` | Hibernate Validator 9.1.3.Final — active by default |
-| validator (`___`) | `___hibernate-validator-9.0-jakarta-ee-11` | Hibernate Validator 9.0.1.Final (limited-support series) |
-| CDI (`___`) | `___weld-6-jakarta-ee-11` | `weld-junit5` 5.0.3.Final — active by default |
+So there is exactly one axis, with two profiles:
 
-That is 3 × 2 = **six supported combinations**, all against the same Jakarta EE 11
-platform.
+| Profile | Provider |
+| --- | --- |
+| `jakarta-ee-11-hibernate-orm` | Hibernate ORM — **active by default** |
+| `jakarta-ee-11-eclipselink` | EclipseLink |
 
-**Name every axis you use.** The defaults are `activeByDefault`, and Maven deactivates
-all `activeByDefault` profiles as soon as any profile is named on the command line — so
-`-P___hibernate-validator-9.0-jakarta-ee-11` on its own resolves *no persistence
-provider at all*. Version properties survive (the root `<properties>` repeat the default
-profiles' values), but the provider *dependency* comes only from a provider profile.
+Validation (Hibernate Validator + Expressly) and CDI (Weld) have no profiles at all;
+their versions live in the root `<properties>` and move only when the platform does.
+The profiles choose no versions either — both provider versions are in `<properties>`,
+one per provider. A profile only decides which provider is on the test classpath, which
+`persistence-unit.provider` goes into `persistence.xml`, and which metamodel generator
+the annotation processor path uses.
 
-`./_mvn_jakarta_ee_11.sh [maven args...]` runs the given build once per combination and
+`./_mvn_jakarta_ee_11.sh [maven args...]` runs the given build once per provider and
 reports which ones failed — e.g. `./_mvn_jakarta_ee_11.sh test` or
 `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence`.
 

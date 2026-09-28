@@ -22,10 +22,16 @@ from individual artifacts:
   `persistence.schemaLocation` — deliberately *not* in a profile, so no profile
   combination can move the platform out from under the implementations. EE 10 support
   was removed; do not reintroduce a platform profile.
-- Implementation profiles are named after the platform they target — e.g.
-  `__hibernate-orm-7.4-jakarta-ee-11`, `___hibernate-validator-9.1-jakarta-ee-11`,
-  `___weld-6-jakarta-ee-11`. Anything added must carry the `-jakarta-ee-11` suffix and
-  actually be certified for that generation.
+- **There is exactly one profile axis: the persistence provider.**
+  `jakarta-ee-11-hibernate-orm` (active by default) and `jakarta-ee-11-eclipselink` are
+  the only implementation profiles, and they choose a provider, never a version. Every
+  implementation version — both providers', Hibernate Validator's, Expressly's, Weld's —
+  is a single Jakarta EE 11 aligned value in the root `<properties>`.
+- Do not add a profile to test an implementation at a second version. Hibernate ORM 7.2,
+  Hibernate Validator 9.0 and the single-choice validator/Weld profiles were removed for
+  that reason: varying them tests those projects' release history, not this one. A new
+  profile is justified only by a second *implementation* of a spec, and must be named
+  `jakarta-ee-NN-<implementation>` for the generation it is certified against.
 
 Consequences for convergence work:
 
@@ -36,13 +42,12 @@ Consequences for convergence work:
 - When a provider (Hibernate ORM/Validator, EclipseLink, Weld, Expressly) drags in a
   `jakarta.*` API newer or older than the umbrella BOM, the fix is to align the
   provider version with the platform generation — not to override the API version.
-- Check convergence across all six supported EE 11 combinations, not just the defaults:
-  `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence` runs every
-  provider × validator pairing.
-- Naming any profile on the command line deactivates every `activeByDefault` profile, so
-  always name a profile from each axis you touch — a lone validator `-P` leaves the build
-  with no persistence provider. The root `<properties>` repeat the default profiles'
-  versions so a stray `-P` cannot silently change one; keep them in sync when bumping.
+- Check convergence against both providers, not just the default:
+  `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence` runs each one.
+- Naming a profile on the command line deactivates every `activeByDefault` profile. With
+  the provider as the only axis that is harmless — `-Pjakarta-ee-11-eclipselink` names the
+  one thing the defaults were supplying — but it is also why no other configuration may
+  be parked in an `activeByDefault` profile.
 
 ### Keeping specs and implementations aligned
 
@@ -63,11 +68,11 @@ Rules:
 
 - The persistence provider is never hard-coded: `persistence-unit.provider` and
   `metamodel.generator.groupId/artifactId/version` default to Hibernate in
-  `<properties>` and are overridden by the `__eclipselink-5.0-jakarta-ee-11` profile; `persistence.xml`
-  and the annotation processor path read them. Change the profile, not the literal
-  provider class.
+  `<properties>` and are overridden by the `jakarta-ee-11-eclipselink` profile;
+  `persistence.xml` and the annotation processor path read them. Change the profile, not
+  the literal provider class.
 - Both persistence providers must stay buildable. A change made for Hibernate has to
-  be checked against EclipseLink and vice versa (`./mvnw -P__eclipselink-5.0-jakarta-ee-11 test`).
+  be checked against EclipseLink and vice versa (`./mvnw -Pjakarta-ee-11-eclipselink test`).
 - Hibernate Validator and Expressly move together: validator 8 ↔ expressly 5,
   validator 9 ↔ expressly 6 (the pom records this pairing in comments). Never bump one
   without the other.
@@ -78,8 +83,8 @@ Rules:
 
 One naming trap: `version.org.jboss.weld` holds the **weld-junit5 (weld-testing)**
 version, not the Weld version — weld-junit5 5.0.x is the Weld 6 / CDI 4.1 line, which
-is why `___weld-6-jakarta-ee-11` sets a `5.0.x` value. Verify a resolved version with
-`dependency:tree` / `help:evaluate` rather than reading the profile id.
+is why it holds a `5.0.x` value. Verify a resolved version with `dependency:tree` /
+`help:evaluate` rather than reading the property name.
 
 The current spec/implementation matrix — what each version in this build is, what the
 latest released counterpart is, and where the EE 12 line stands — is maintained in
