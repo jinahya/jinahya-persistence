@@ -12,7 +12,8 @@
 Every spec API in this build comes from a single **Jakarta EE platform umbrella BOM**
 (`jakarta.platform:jakarta.jakartaee-bom`, imported in the root `pom.xml`); only the
 implementations carry their own versions, and each is kept on a series certified for
-that platform generation. Build baseline: Java 21 (tests compiled at 25).
+that platform generation. Build baseline: Java 25 (`maven.compiler.release`, main
+and test sources alike; the enforcer requires a JDK 25 or newer to build).
 
 Subsections below are ordered by Jakarta EE version.
 
@@ -29,13 +30,6 @@ Removed with it: `_jakarta-ee-10.0.0`, `__eclipselink-4.0.8-jakarta-ee-10`, the
 `_jakarta-ee-11.0.0` profile (its values moved into `<properties>`), and the six empty
 `jakarta-persistence-3.x-{hibernate,eclipselink}` marker profiles, which covered the
 Jakarta EE 9/9.1 and 10 generations and carried no configuration.
-
-Later removed for the same reason — a version axis that tested an implementation rather
-than this project: the second-newest-series profiles `__hibernate-orm-7.2-jakarta-ee-11`
-and `___hibernate-validator-9.0-jakarta-ee-11`, and the single-choice
-`___hibernate-validator-9.1-jakarta-ee-11` / `___weld-6-jakarta-ee-11` profiles, whose
-versions moved into `<properties>`. The remaining two profiles were renamed
-`jakarta-ee-11-{hibernate-orm,eclipselink}`.
 
 ### Jakarta EE 11 — current
 
@@ -81,6 +75,13 @@ the annotation processor path uses.
 `./_mvn_jakarta_ee_11.sh [maven args...]` runs the given build once per provider and
 reports which ones failed — e.g. `./_mvn_jakarta_ee_11.sh test` or
 `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence`.
+
+Four EE 11 profiles were removed to get here. `__hibernate-orm-7.2-jakarta-ee-11` and
+`___hibernate-validator-9.0-jakarta-ee-11` were second-newest-series version axes;
+`___hibernate-validator-9.1-jakarta-ee-11` and `___weld-6-jakarta-ee-11` were choices of
+one. All four only ever held versions, which now live in `<properties>`, and the six
+provider × validator combinations they produced collapse to two. The two survivors were
+renamed `jakarta-ee-11-{hibernate-orm,eclipselink}`.
 
 ### Jakarta EE 12 — next (not adoptable yet)
 
