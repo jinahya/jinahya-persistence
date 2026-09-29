@@ -10,19 +10,27 @@ Package: `com.github.jinahya.persistence.test.util`
 
 ## Roles
 
-A target class is randomized, and then persisted, by two collaborating abstractions, each located for the target class
-by convention.
+A target class is randomized, and then persisted, by two collaborating roles, each located for the target class by
+convention.
 
-| role              | abstraction         | comes from                                                                 | required        | when none is located                     |
-|-------------------|---------------------|----------------------------------------------------------------------------|-----------------|------------------------------------------|
-| fill it with data | `ObjectRandomizer`  | [`jinahya-object-randomizer`](https://github.com/jinahya/jinahya-object-randomizer) | yes, to persist | `newRandomizedInstanceOf` returns empty  |
-| persist it        | `__Persister`       | this module                                                                | yes, to persist | `newPersistedInstanceOf` throws          |
+| role              | interface          | skeletal implementation     | comes from                                                                          | when none is located                    |
+|-------------------|--------------------|-----------------------------|-------------------------------------------------------------------------------------|-----------------------------------------|
+| fill it with data | `ObjectRandomizer` | `AbstractObjectRandomizer`  | [`jinahya-object-randomizer`](https://github.com/jinahya/jinahya-object-randomizer) | `newRandomizedInstanceOf` returns empty |
+| persist it        | `EntityPersister`  | `AbstractEntityPersister`   | this module                                                                         | `newPersisterInstanceOf` returns empty  |
+
+Each role is an interface: `ObjectRandomizer` is a `Supplier<T>`, `EntityPersister` a
+`BiFunction<EntityManager, T, T>`. The skeletal class beside it is a convenience, not the role — it remembers the
+target class, and brings the behavior most implementations want (the exclusions and the engine, for the randomizer; a
+plain `persist`, for the persister). A helper which owes nothing to that machinery implements the interface directly,
+and the convention locates it just the same.
+
+Both halves are needed to persist: `newPersistedInstanceOf` throws `IllegalArgumentException` when either is missing.
 
 The randomizer role, and the three engine flavors behind it, live in `io.github.jinahya:jinahya-object-randomizer`,
 which this module depends on at compile scope; it is on the classpath of anything that depends on this module, and
 brings nothing of its own along, every dependency it declares being `provided` or `test`.
 
-Each role has a `*Utils` class — `ObjectRandomizerUtils` and `__PersisterUtils` — which locates it by the convention
+Each role has a `*Utils` class — `ObjectRandomizerUtils` and `EntityPersisterUtils` — which locates it by the convention
 and applies it. The convention is the only mechanism: a helper is found because of how it is named, and a class the
 convention cannot reach — a local or an anonymous class — has no helper.
 
@@ -31,12 +39,16 @@ The convention spans source sets: an entity in `src/main/java/com/foo/Foo.java` 
 
 ## Convention
 
-For a target class `Foo`, `locateStandard` probes, in order:
+For a target class `Foo`, `randomizerClassOf` probes, in order:
 
 1. `FooRandomizer` — declared beside `Foo`
 2. `Foo_Randomizer` — declared beside `Foo`
 
-and likewise for `Persister`. That is the whole rule, and it is identical for both roles.
+and `persisterClassOf` likewise for `Persister`. That is the whole rule, and it is identical for both roles.
+
+A candidate is passed over, rather than failed on, when it does not exist, when it cannot be loaded, and when it does
+not implement the role its name claims — the probe continues with the next postfix, and the empty `Optional` it ends
+with carries no reason. Each of the last two is logged at `WARNING`, being a misconfiguration all the same.
 
 A counterpart is always a *sibling* of its target class. One nested inside the target is not probed — it would have to
 be declared in the target's own source, which the ordinary `main`/`test` split cannot do — and the enclosing class of a
@@ -54,7 +66,7 @@ class FooRandomizer extends PodamObjectRandomizer<Foo> {
     }
 }
 
-class FooPersister extends __Persister<Foo> {
+class FooPersister extends AbstractEntityPersister<Foo> {
     FooPersister() {
         super(Foo.class);
     }
@@ -62,10 +74,20 @@ class FooPersister extends __Persister<Foo> {
 ```
 
 ```java
-final var foo = __PersisterUtils.newPersistedInstanceOf(entityManager, Foo.class);
+final var foo = EntityPersisterUtils.newPersistedInstanceOf(entityManager, Foo.class);
 ```
 
-The instance is persisted but not flushed.
+The instance is persisted but not flushed: a test which persists several instances flushes once, when it is done.
+
+Override `apply(entityManager, entityInstance)` for an entity whose required associations have to be persisted first,
+calling `super.apply(...)` for the instance itself — the `_Employee_Persister` under `src/test` does exactly that for
+the `_Department` its entity may not be written without.
+
+A persister is a *consumer*, and so is contravariant in the class it is declared for: one declared for a superclass of
+the target accepts instances of the target, which is how an entity hierarchy shares one implementation. That is what
+`newPersisterInstanceOf` checks, and it can only check an `AbstractEntityPersister`, which remembers its target class;
+one implementing `EntityPersister` directly leaves nothing but an erased type parameter, and is taken as it is. A
+persister which *is* located and accepts no instance of the class it was located for is a fault, and throws.
 
 ## Randomizer flavors
 

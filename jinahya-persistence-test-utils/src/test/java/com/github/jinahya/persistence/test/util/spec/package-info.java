@@ -7,9 +7,9 @@
  * {@link com.github.jinahya.persistence.test.util.spec._Department Department} it belongs to, and the
  * {@link com.github.jinahya.persistence.test.util.spec._Address Address} embedded in it -- rather than shapes invented
  * for a test. They exist so that the {@link com.github.jinahya.object.randomizer.ObjectRandomizer randomizer} and the
- * {@link com.github.jinahya.persistence.test.util.__Persister persister} are exercised against a real provider, and a
- * real database, on an entity which actually has a generated identifier, a version, an embedded value, and an
- * association which may not be {@code null}.
+ * {@link EntityPersister persister} are exercised against a real provider, and a real database, on an entity
+ * which actually has a generated identifier, a version, an embedded value, and an association which may not be
+ * {@code null}.
  * <p>
  * Every class is named by the convention the {@code *Utils} classes locate by: {@code _Employee} is served by
  * {@code _Employee_Randomizer} and {@code _Employee_Persister}, declared beside it.
@@ -23,7 +23,9 @@
  * </ul>
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see com.github.jinahya.persistence.test.util.__PersisterUtils#newPersistedInstanceOf(jakarta.persistence.EntityManager,
- *         Class)
+ * @see EntityPersisterUtils#newPersistedInstanceOf(jakarta.persistence.EntityManager, Class)
  */
 package com.github.jinahya.persistence.test.util.spec;
+
+import com.github.jinahya.persistence.test.util.EntityPersister;
+import com.github.jinahya.persistence.test.util.EntityPersisterUtils;

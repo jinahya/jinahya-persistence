@@ -1,7 +1,7 @@
 package com.github.jinahya.persistence.test.util.spec;
 
 import com.github.jinahya.persistence.test.util.__PersistenceProducer;
-import com.github.jinahya.persistence.test.util.__PersisterUtils;
+import com.github.jinahya.persistence.test.util.EntityPersisterUtils;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import lombok.AccessLevel;
@@ -47,7 +47,7 @@ abstract class __Spec_PersistenceTest<T> {
     @Test
     void __persist() {
         final var instance = applyEntityManagerInTransaction(em -> {
-            final var persisted = __PersisterUtils.newPersistedInstanceOf(em, entityClass);
+            final var persisted = EntityPersisterUtils.newPersistedInstanceOf(em, entityClass);
             // flush, rather than wait for the commit: the insert has to happen while this assertion can still see it
             em.flush();
             return persisted;
