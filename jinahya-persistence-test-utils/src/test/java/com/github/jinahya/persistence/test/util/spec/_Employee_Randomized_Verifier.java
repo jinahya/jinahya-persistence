@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Verifications of a <em>randomized</em> {@link _Employee} -- of the value, that is, not of whatever produced it.
  * <p>
  * The contract splits in two, and the split is the interesting part of this entity. Everything in
- * {@link #verify(_Employee)} holds for all four flavors. The {@code hireDate} does not: only a flavor which populates
+ * {@link #verify(_Employee)} holds for all three flavors. The {@code hireDate} does not: only a flavor which populates
  * the instance from
- * {@link com.github.jinahya.persistence.test.util.__Randomizer#newTargetInstance() newTargetInstance()} sees what
- * {@link _Employee_Instantiator} assigned, and the other two, which construct the instance themselves, leave it
- * {@code null}. That is what {@link #verifyInstantiated(_Employee)} is for, and why only two of the four tests call
- * it.
+ * {@link com.github.jinahya.object.randomizer.AbstractObjectRandomizer#newTargetInstance() newTargetInstance()} sees
+ * what {@link _Employee_Randomizer_Constants#hired(_Employee) hired} assigned, and the other two, which construct the
+ * instance themselves, leave it {@code null}. That is what {@link #verifyInstantiated(_Employee)} is for, and why only
+ * two of the three tests call it.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see _Employee_Randomizer_Constants
@@ -54,7 +54,8 @@ public final class _Employee_Randomized_Verifier {
     }
 
     /**
-     * Verifies, in addition to {@link #verify(_Employee)}, that the value carries what the instantiator assigned.
+     * Verifies, in addition to {@link #verify(_Employee)}, that the value carries what
+     * {@link _Employee_Randomizer_Constants#hired(_Employee) hired} assigned.
      *
      * @param value the randomized instance to verify.
      * @return the {@code value}.
@@ -64,8 +65,8 @@ public final class _Employee_Randomized_Verifier {
     public static _Employee verifyInstantiated(final _Employee value) {
         verify(value);
         assertThat(value.getHireDate())
-                .as("excluded from randomization, so what _Employee_Instantiator assigned survives")
-                .isEqualTo(_Employee_Instantiator.HIRE_DATE);
+                .as("excluded from randomization, so what newTargetInstance() assigned survives")
+                .isEqualTo(_Employee_Randomizer_Constants.HIRE_DATE);
         return value;
     }
 

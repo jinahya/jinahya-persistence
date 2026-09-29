@@ -25,6 +25,13 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- com.github.jinahya.object.randomizer.*; the randomizer role __PersisterUtils locates, and the three engine
+         flavors a consumer extends. Every dependency it declares is 'provided' or 'test', so it brings nothing along -->
+    <dependency>
+      <groupId>io.github.jinahya</groupId>
+      <artifactId>jinahya-object-randomizer</artifactId>
+      <scope>compile</scope>
+    </dependency>
     <!-- jakarta.enterprise.context/inject, for the annotations on __PersistenceProducer;
          no <version>: the umbrella BOM decides -->
     <dependency>
@@ -45,24 +52,43 @@
       <artifactId>lombok</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- com.navercorp.fixturemonkey.FixtureMonkey, .ArbitraryBuilder, and the api.* introspector/property types -->
+    <!-- the engine behind FixtureMonkeyObjectRandomizer -->
     <dependency>
       <groupId>com.navercorp.fixturemonkey</groupId>
       <artifactId>fixture-monkey</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- org.instancio.Instancio, .InstancioObjectApi, .Select, and .settings.Settings -->
+    <!-- Fixture Monkey keeps its constraint support in a second artifact, which FixtureMonkeyObjectRandomizer
+         looks up reflectively: declaring it is what makes that flavor honor jakarta.validation.constraints, which
+         PODAM and Instancio do out of their own artifact. Without it the engine fills instances while ignoring every
+         constraint, and says so once at DEBUG. The root pom excludes the Jakarta EE 9 stack it declares at compile
+         scope; see the <exclusions> there. -->
+    <dependency>
+      <groupId>com.navercorp.fixturemonkey</groupId>
+      <artifactId>fixture-monkey-jakarta-validation</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- what backs the exclusions the root pom applies to fixture-monkey-jakarta-validation: the plugin's
+         JakartaArbitraryValidator resolves an implementation by service lookup, and throws when none is present.
+         Excluding the Jakarta EE 9 stack it declares is only safe because these two replace it, at the generation
+         the umbrella BOM pins. Hibernate Validator needs an expression language implementation of its own. -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the engine behind InstancioObjectRandomizer; instancio-core carries its constraint support -->
     <dependency>
       <groupId>org.instancio</groupId>
       <artifactId>instancio-core</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- org.jeasy.random.EasyRandom, .EasyRandomParameters, and .FieldPredicates; 6.x is one artifact -->
-    <dependency>
-      <groupId>org.jeasy</groupId>
-      <artifactId>easy-random</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    <!-- the engine behind PodamObjectRandomizer; podam carries its constraint support -->
     <dependency>
       <groupId>uk.co.jemos.podam</groupId>
       <artifactId>podam</artifactId>

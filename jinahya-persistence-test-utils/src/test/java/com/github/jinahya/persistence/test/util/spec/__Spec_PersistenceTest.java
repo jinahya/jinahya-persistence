@@ -35,9 +35,9 @@ abstract class __Spec_PersistenceTest<T> {
      * assigned it an identifier.
      * <p>
      * This is the one test every entity in this package gets for free, and it is the one a downstream project actually
-     * runs: it names no attribute, and asserts nothing about the entity beyond its being writable. An instantiator, a
-     * randomizer and a persister located by the convention, and a row in the database -- if that chain holds for an
-     * entity, this library did its job for it.
+     * runs: it names no attribute, and asserts nothing about the entity beyond its being writable. A randomizer and a
+     * persister located by the convention, and a row in the database -- if that chain holds for an entity, this library
+     * did its job for it.
      *
      * @implNote The identifier is read through
      *         {@link jakarta.persistence.PersistenceUnitUtil#getIdentifier(Object)} rather than through a getter, so

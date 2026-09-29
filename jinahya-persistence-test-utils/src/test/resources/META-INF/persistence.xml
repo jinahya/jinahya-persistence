@@ -16,9 +16,9 @@
     <class>com.github.jinahya.persistence.test.util.spec._Employee</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
-    <!-- NONE: a randomized instance is not a valid one. PODAM honors only some of the Jakarta constraints, and the
-         Easy Random flavor honors none of them, so AUTO would fail a persist for reasons which say nothing about
-         the three roles under test. Constraints get their own unit when they are the subject. -->
+    <!-- NONE: a randomized instance is not a valid one. Every flavor honors jakarta.validation.constraints, but
+         PODAM honors only some of them, so AUTO would fail a persist for reasons which say nothing about the two
+         roles under test. Constraints get their own unit when they are the subject. -->
     <validation-mode>NONE</validation-mode>
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>

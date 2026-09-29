@@ -16,9 +16,8 @@ import java.util.Set;
 /**
  * The specification's {@code Department} example; the owning side of the association an {@link _Employee} requires.
  * <p>
- * The {@code name} is unique, deliberately: a randomizer which produced a constant -- which is what
- * {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfEasyRandom ___OfEasyRandom} would do with a
- * fixed seed -- would persist the first instance and fail on the second, and that failure is worth having.
+ * The {@code name} is unique, deliberately: a randomizer which produced a constant would persist the first instance and
+ * fail on the second, and that failure is worth having.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see _Department_Randomizer

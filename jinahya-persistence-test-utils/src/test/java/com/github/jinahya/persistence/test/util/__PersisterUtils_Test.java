@@ -1,11 +1,10 @@
 package com.github.jinahya.persistence.test.util;
 
+import com.github.jinahya.object.randomizer.ObjectRandomizer;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,11 +21,7 @@ class __PersisterUtils_Test {
         String name;
     }
 
-    static class EntRandomizer extends __Randomizer<Ent> {
-
-        EntRandomizer() {
-            super(Ent.class, List.of());
-        }
+    static class EntRandomizer implements ObjectRandomizer<Ent> {
 
         @Override
         public Ent get() {
@@ -57,11 +52,7 @@ class __PersisterUtils_Test {
         }
     }
 
-    static class SubEntRandomizer extends __Randomizer<SubEnt> {
-
-        SubEntRandomizer() {
-            super(SubEnt.class, List.of());
-        }
+    static class SubEntRandomizer implements ObjectRandomizer<SubEnt> {
 
         @Override
         public SubEnt get() {
@@ -92,11 +83,7 @@ class __PersisterUtils_Test {
 
     }
 
-    static class UnpersistedRandomizer extends __Randomizer<Unpersisted> {
-
-        UnpersistedRandomizer() {
-            super(Unpersisted.class, List.of());
-        }
+    static class UnpersistedRandomizer implements ObjectRandomizer<Unpersisted> {
 
         @Override
         public Unpersisted get() {
@@ -114,11 +101,7 @@ class __PersisterUtils_Test {
 
     }
 
-    static class MisdeclaredRandomizer extends __Randomizer<Misdeclared> {
-
-        MisdeclaredRandomizer() {
-            super(Misdeclared.class, List.of());
-        }
+    static class MisdeclaredRandomizer implements ObjectRandomizer<Misdeclared> {
 
         @Override
         public Misdeclared get() {

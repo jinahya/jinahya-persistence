@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.test.util.spec;
 
-import com.github.jinahya.persistence.test.util.__Randomizer;
+import com.github.jinahya.object.randomizer.PodamObjectRandomizer;
 import uk.co.jemos.podam.api.ClassInfoStrategy;
 import uk.co.jemos.podam.api.DataProviderStrategy;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -8,12 +8,12 @@ import uk.co.jemos.podam.api.PodamFactory;
 /**
  * The randomizer located, by the naming convention, for {@link _Department}.
  * <p>
- * {@link _Department} declares no instantiator of its own, and so is built by the no-argument constructor -- which is
- * what keeps its {@code employees} set non-{@code null}. The PODAM flavor is used here for that very reason: it
- * populates the instance that {@code newTargetInstance()} returns, initializers and all.
+ * {@link _Department} overrides nothing of {@code newTargetInstance()}, and so is built by the no-argument constructor
+ * -- which is what keeps its {@code employees} set non-{@code null}. The PODAM flavor is used here for that very
+ * reason: it populates the instance that method returns, initializers and all.
  * <p>
  * The three strategy hooks below are overridden, and do nothing but delegate; they are here so that a reader can see at
- * a glance which hooks {@link __Randomizer.___OfPodam} offers, and where a subclass would step in. Only {@link #get()}
+ * a glance which hooks {@link PodamObjectRandomizer} offers, and where a subclass would step in. Only {@link #get()}
  * adds anything, and what it adds is an assertion.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -21,7 +21,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class _Department_Randomizer extends __Randomizer.___OfPodam<_Department> {
+public class _Department_Randomizer extends PodamObjectRandomizer<_Department> {
 
     /**
      * Creates a new instance.

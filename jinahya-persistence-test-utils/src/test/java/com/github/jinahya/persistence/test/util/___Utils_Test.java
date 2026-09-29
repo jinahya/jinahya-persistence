@@ -25,11 +25,11 @@ class ___Utils_Test {
 
     }
 
-    static class TargetRandomizer extends __Randomizer.___OfEasyRandom<Target> {
+    /**
+     * A sibling named by the convention; the probe judges nothing but the name, so it need be nothing more.
+     */
+    static class TargetRandomizer {
 
-        TargetRandomizer() {
-            super(Target.class, java.util.List.of());
-        }
     }
 
     /**

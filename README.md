@@ -200,8 +200,9 @@ module's own build.
 
 Two properties hold across the whole reactor, and are worth keeping that way:
 
-- **`compile` appears exactly once** — `-crypto` on `-utils`. Every other dependency of every module is `provided`, so
-  adding one of these artifacts to a project pulls in nothing the project did not ask for.
+- **`compile` appears twice** — `-crypto` on `-utils`, and `-test-utils` on `jinahya-object-randomizer`, which
+  declares every dependency of its own as `provided` or `test`. Every other dependency of every module is `provided`,
+  so adding one of these artifacts to a project pulls in nothing the project did not ask for.
 - **Nothing is `runtime`-scoped.** Where a runtime implementation is needed — a persistence provider, a validation
   provider, a JDBC driver — the module leaves the choice to the consumer, and only the build picks one (see the
   profiles above).
@@ -215,7 +216,7 @@ versions below are what the current platform (`11.0.0`) resolves to.
 | `jinahya-persistence-more` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-crypto` | `io.github.jinahya:jinahya-persistence-utils` | — | `jakarta.annotation:jakarta.annotation-api` 3.0.0<br>`jakarta.enterprise:jakarta.enterprise.cdi-api` 4.1.0<br>`jakarta.inject:jakarta.inject-api` 2.0.1<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-more-test` | — | — | `io.github.jinahya:jinahya-persistence-more`<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1<br>`org.junit.jupiter:junit-jupiter-api` 5.14.4 |
-| `jinahya-persistence-test-utils` | — | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.1<br>`org.jeasy:easy-random` 6.0.1<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
+| `jinahya-persistence-test-utils` | `io.github.jinahya:jinahya-object-randomizer` 0.0.3 | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.1<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
 
 `jakarta.persistence-api` and `jspecify` are declared once, in the root pom, and inherited by every module; the rest are
 declared by the module which uses them.
@@ -231,5 +232,11 @@ choice of scope for a testing library a published-API decision rather than a pri
 - Nothing else is needed. AssertJ, Mockito and `junit-platform-commons` were each removed in favour of what
   `org.junit.jupiter.api.Assertions` and plain reflection already provide, so a consumer needs only JUnit on the test
   classpath.
-- `-test-utils` needs no testing library at all in `src/main`; Easy Random and PoDAM are its subject matter, and both
-  are `provided` for the same reason.
+- `-test-utils` needs no testing library at all in `src/main`. The randomizer role it applies comes from
+  `jinahya-object-randomizer` at `compile` scope — a consumer extends its flavors, so it has to be on both classpaths —
+  and the three engines behind them are `provided`, so a consumer brings only the one it uses.
+  `fixture-monkey-jakarta-validation` is `provided` for the same reason: `FixtureMonkeyObjectRandomizer` looks the
+  plugin up reflectively, so declaring it is what makes that flavor honor `jakarta.validation.constraints`. The root
+  pom excludes the Jakarta EE 9 stack that artifact declares at `compile` scope, which would otherwise downgrade the
+  platform; the exclusion is backed by `hibernate-validator` and `expressly`, at the EE 11 versions, on the module's
+  test classpath.

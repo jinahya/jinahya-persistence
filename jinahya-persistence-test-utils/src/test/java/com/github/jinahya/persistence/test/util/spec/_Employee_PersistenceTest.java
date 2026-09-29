@@ -11,7 +11,6 @@ package com.github.jinahya.persistence.test.util.spec;
  * really did persist a department first. Nothing else needs to be asserted here for that to be proven.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see _Employee_Instantiator
  * @see _Employee_Randomizer
  * @see _Employee_Persister
  * @see _Employee_Randomizer_Podam_Test

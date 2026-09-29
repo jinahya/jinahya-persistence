@@ -1,5 +1,7 @@
 package com.github.jinahya.persistence.test.util;
 
+import com.github.jinahya.object.randomizer.ObjectRandomizer;
+import com.github.jinahya.object.randomizer.ObjectRandomizerUtils;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import jakarta.persistence.EntityManager;
 import org.jspecify.annotations.Nullable;
@@ -11,9 +13,8 @@ import java.util.Optional;
 /**
  * Utilities for {@link __Persister}.
  * <p>
- * The {@code newPersistedInstanceOf} methods chain the three roles of this package: an entity instance is instantiated
- * and randomized by the {@link __Randomizer} found for the entity class, then handed to the {@link __Persister} found
- * for it.
+ * The {@code newPersistedInstanceOf} methods chain the two roles: an entity instance is instantiated and randomized by
+ * the {@link ObjectRandomizer} found for the entity class, then handed to the {@link __Persister} found for it.
  * <p>
  * A persister is found for an entity class by the {@link #locateStandard(Class) naming convention}.
  *
@@ -78,17 +79,16 @@ public final class __PersisterUtils {
      * @throws IllegalArgumentException when no usable randomizer, or no usable persister, is found for the
      *                                  {@code entityClass}.
      * @see #locateStandard(Class)
-     * @see __RandomizerUtils#locateStandard(Class)
+     * @see ObjectRandomizerUtils#newRandomizedInstanceOf(Class)
      */
     public static <T> T newPersistedInstanceOf(final EntityManager entityManager, final Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
-        // the persister is resolved first: randomizing an instance which can not then be persisted is wasted work,
-        // and, for the PODAM flavor, runs the located instantiator for nothing
+        // the persister is resolved first: randomizing an instance which can not then be persisted is wasted work
         final var persisterInstance = newPersisterInstanceOf(entityClass)
                 .orElseThrow(() -> new IllegalArgumentException("no persister instance for " + entityClass));
         logger.log(System.Logger.Level.TRACE, "persister instance: {0}", persisterInstance);
-        final T entityInstance = __RandomizerUtils.newRandomizedInstanceOf(entityClass)
+        final T entityInstance = ObjectRandomizerUtils.newRandomizedInstanceOf(entityClass)
                 .orElseThrow(() -> new IllegalArgumentException("no randomized instance for " + entityClass));
         logger.log(System.Logger.Level.TRACE, "entity instance: {0}", entityInstance);
         return persisterInstance.apply(entityManager, entityInstance);

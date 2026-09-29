@@ -13,8 +13,6 @@ import java.util.Optional;
  * Utilities, internal to this package, for locating and instantiating classes.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __InstantiatorUtils#locateStandard(Class)
- * @see __RandomizerUtils#locateStandard(Class)
  * @see __PersisterUtils#locateStandard(Class)
  */
 @SuppressWarnings({
@@ -75,46 +73,7 @@ final class ___Utils {
         return null;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
 // ---------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Returns the instance a located producer produced, as the specified target class.
-     *
-     * @param target   the class the caller requires an instance of.
-     * @param producer the located producer; an {@link __Instantiator} or a {@link __Randomizer}.
-     * @param produced what the {@code producer} produced.
-     * @param <T>      the target class type parameter.
-     * @return the {@code produced} instance, as the {@code target}.
-     * @throws RuntimeException when the {@code produced} instance is {@code null}, or is not an instance of the
-     *                          {@code target}.
-     * @apiNote A producer is checked on what it <em>produced</em>, rather than on the class it is declared for,
-     *         because the declaration proves less than it appears to: a {@code __Randomizer<Foo>} whose {@code get()}
-     *         returns a {@code Bar} is well-formed at compile time, erasure leaving nothing to enforce it. The produced
-     *         instance is the evidence which matters -- it is what the caller receives, and, through
-     *         {@link __PersisterUtils}, what is handed to an {@link jakarta.persistence.EntityManager}.
-     * @implNote A producer which was located, and then produces the wrong thing, is a fault rather than an
-     *         absence: it is thrown, not logged and skipped. A developer who declares a counterpart by the naming
-     *         convention meant it to be used, and would rather be told than quietly fall back.
-     * @see #requireAccepting(Class, Class, Object)
-     */
-    @SuppressWarnings({
-            "java:S112" // Generic exceptions should never be thrown
-    })
-    static <T> T produced(final Class<T> target, final Object producer, final @Nullable Object produced) {
-        assert target != null;
-        assert producer != null;
-        if (produced == null) {
-            throw new RuntimeException(producer + ", located for " + target + ", produced nothing");
-        }
-        if (!target.isInstance(produced)) {
-            throw new RuntimeException(
-                    producer + ", located for " + target + ", produced a " + produced.getClass()
-            );
-        }
-        return target.cast(produced);
-    }
 
     /**
      * Requires that a located consumer, declared for the specified class, accepts instances of the specified target
@@ -132,9 +91,10 @@ final class ___Utils {
      *         {@code __MappedRgba}, persists an {@code _RgbaEntity} -- without every subclass re-declaring its target
      *         class.
      *         <p>
-     *         Unlike a producer, a consumer is checked on its declaration rather than on a result: applying it
-     *         <em>is</em> the side effect, so there is nothing to inspect afterwards which has not already happened.
-     * @see #produced(Class, Object, Object)
+     *         Unlike a producer -- an {@link com.github.jinahya.object.randomizer.ObjectRandomizer randomizer}, which
+     *         is checked on what it returned -- a consumer is checked on its declaration rather than on a result:
+     *         applying it <em>is</em> the side effect, so there is nothing to inspect afterwards which has not already
+     *         happened.
      */
     @SuppressWarnings({
             "java:S112" // Generic exceptions should never be thrown
@@ -176,23 +136,19 @@ final class ___Utils {
      * Returns a new instance of the specified located class, as the role it was located for.
      *
      * @param target  the class the {@code located} class was located for; for diagnostics only.
-     * @param role    the supertype of the role the {@code located} class was located for; an
-     *                {@link __Instantiator}, a {@link __Randomizer}, or a {@link __Persister}.
+     * @param role    the supertype of the role the {@code located} class was located for; a {@link __Persister}.
      * @param located the located class; {@code null}, when none was located.
      * @param <R>     the role type parameter.
-     * @return a new instance of the {@code located} class, as the {@code role}; {@code null}, when the
-     *         {@code located} class is {@code null}.
+     * @return a new instance of the {@code located} class, as the {@code role}; {@code null}, when the {@code located}
+     *         class is {@code null}.
      * @throws RuntimeException when the {@code located} class does not extend the {@code role}, or can not be
      *                          instantiated.
      * @apiNote Absence and fault are kept apart here: a {@code null} is returned for a class which was never
-     *         located, and left for the caller to interpret -- a missing instantiator is an absence to fall back on,
-     *         while a missing persister is not -- whereas a class which <em>was</em> located, and is then of the wrong
-     *         role, or is not instantiable, throws.
+     *         located, and left for the caller to interpret, whereas a class which <em>was</em> located, and is then of
+     *         the wrong role, or is not instantiable, throws.
      *         <p>
-     *         No check of the class the located instance is declared for is made here, for there is no single check to
-     *         make: a producer is verified on what it {@link #produced(Class, Object, Object) produced}, and a consumer
-     *         on the class it is {@link #requireAccepting(Class, Class, Object) declared for}. The two roles vary in
-     *         opposite directions, so each caller applies its own.
+     *         No check of the class the located instance is declared for is made here; a consumer is verified on the
+     *         class it is {@link #requireAccepting(Class, Class, Object) declared for}, which the caller applies.
      * @see #requireSubtype(Class, Class, Class)
      * @see #newInstance(Class)
      */

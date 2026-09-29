@@ -109,6 +109,10 @@
     <version.com.navercorp.fixturemonkey>1.2.3</version.com.navercorp.fixturemonkey>
     <!-- https://central.sonatype.com/artifact/com.querydsl/querydsl-jpa/versions -->
     <!--    <version.com.querydsl>5.1.0</version.com.querydsl>-->
+    <!-- the randomizer roles, and the three engines behind them, extracted out of jinahya-persistence-test-utils;
+         every engine is 'provided' there too, so this brings nothing of its own onto a classpath -->
+    <!-- https://central.sonatype.com/artifact/io.github.jinahya/jinahya-object-randomizer/versions -->
+    <version.io.github.jinahya.object-randomizer>0.0.3</version.io.github.jinahya.object-randomizer>
     <!-- https://jakarta.ee/specifications/platform/11/ -->
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
     <!-- 11.0.0 manages: jakarta.persistence-api 3.2.0, jakarta.validation-api 3.1.1, -->
@@ -119,10 +123,6 @@
     <!-- https://github.com/instancio/instancio/releases -->
     <!-- https://central.sonatype.com/artifact/org.instancio/instancio-core/versions -->
     <version.org.instancio>6.0.1</version.org.instancio>
-    <!-- https://github.com/j-easy/easy-random/releases -->
-    <!-- https://central.sonatype.com/artifact/org.jeasy/easy-random/versions -->
-    <!-- 6.x is a single artifact; easy-random-core/-bean-validation/-randomizers are gone -->
-    <version.org.jeasy>6.0.1</version.org.jeasy>
     <!-- https://github.com/eclipse-ee4j/eclipselink/releases -->
     <!-- https://eclipse.dev/eclipselink/releases/index.html -->
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
@@ -186,6 +186,34 @@
         <artifactId>fixture-monkey-jakarta-validation</artifactId>
         <!-- https://central.sonatype.com/artifact/com.navercorp.fixturemonkey/fixture-monkey-jakarta-validation/versions -->
         <version>${version.com.navercorp.fixturemonkey}</version>
+        <exclusions>
+          <!-- this artifact declares a complete Jakarta EE 9 stack at compile scope (hibernate-validator
+               7.0.5.Final, jakarta.validation-api 3.0.2 and org.glassfish:jakarta.el 4.0.2), which would quietly
+               downgrade the EE 11 platform the umbrella BOM pins. Excluding is safe only because this build
+               replaces all three: the API comes from the umbrella BOM, the implementation is hibernate-validator
+               (the plugin's own bytecode names jakarta.validation and nothing else, but its
+               JakartaArbitraryValidator calls Validation.buildDefaultValidatorFactory(), so one must be present),
+               and the expression language is expressly, which superseded org.glassfish:jakarta.el and is what
+               Hibernate Validator 9 expects. -->
+          <exclusion>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>io.github.jinahya</groupId>
+        <artifactId>jinahya-object-randomizer</artifactId>
+        <!-- https://central.sonatype.com/artifact/io.github.jinahya/jinahya-object-randomizer/versions -->
+        <version>${version.io.github.jinahya.object-randomizer}</version>
       </dependency>
       <!--      <dependency>-->
       <!--        <groupId>com.querydsl</groupId>-->
@@ -274,12 +302,6 @@
         <artifactId>instancio-core</artifactId>
         <!-- https://central.sonatype.com/artifact/org.instancio/instancio-core/versions -->
         <version>${version.org.instancio}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jeasy</groupId>
-        <artifactId>easy-random</artifactId>
-        <!-- https://central.sonatype.com/artifact/org.jeasy/easy-random/versions -->
-        <version>${version.org.jeasy}</version>
       </dependency>
       <dependency>
         <groupId>org.junit</groupId>
