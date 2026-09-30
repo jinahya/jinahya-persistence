@@ -41,7 +41,6 @@ public abstract class AbstractEntityPersister<T>
         this.entityClass = Objects.requireNonNull(entityClass, "entityClass is null");
     }
 
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
