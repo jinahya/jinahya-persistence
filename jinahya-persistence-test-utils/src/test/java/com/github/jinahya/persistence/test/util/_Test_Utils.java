@@ -1,5 +1,5 @@
 package com.github.jinahya.persistence.test.util;
 
-public class __TestUtils {
+public class _Test_Utils {
 
 }

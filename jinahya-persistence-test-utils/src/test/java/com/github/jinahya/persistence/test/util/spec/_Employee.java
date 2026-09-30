@@ -19,16 +19,15 @@ import java.time.LocalDate;
  * The specification's {@code Employee} example, carrying every shape the three roles have to cope with.
  * <p>
  * A generated {@code id} and a {@code version}, which belong to the provider; a {@code hireDate}, which the
- * {@link _Employee_Instantiator} assigns; an {@link _Address}, which is embedded rather than declared here; a
+ * {@link _Employee_Randomizer} assigns; an {@link _Address}, which is embedded rather than declared here; a
  * {@code department} which may not be {@code null}, and which the {@link _Employee_Persister} has to persist first; and
  * a {@code manager} of this very type, which is where a randomizer left alone would recurse.
  * <p>
  * Accessors are declared throughout, so that the
- * {@link com.github.jinahya.persistence.test.util.__Randomizer.___OfPodam ___OfPodam} flavor, which writes through
+ * {@link com.github.jinahya.object.randomizer.PodamObjectRandomizer PodamObjectRandomizer} flavor, which writes through
  * setters and never assigns a field, can populate it at all.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see _Employee_Instantiator
  * @see _Employee_Randomizer
  * @see _Employee_Persister
  */
@@ -170,7 +169,8 @@ public class _Employee {
     /**
      * The date this employee was hired.
      *
-     * @implNote Assigned by the {@link _Employee_Instantiator}, and excluded from randomization, so that a
+     * @implNote Assigned by {@link _Employee_Randomizer_Constants#hired(_Employee) hired}, which the
+     *         randomizers override {@code newTargetInstance()} to call, and excluded from randomization, so that a
      *         value which arrives with the instance survives all the way to the database. Keeping it out of the
      *         randomizer also keeps {@code java.time} out of the engines, which support it unevenly.
      */

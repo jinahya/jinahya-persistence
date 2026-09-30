@@ -12,7 +12,8 @@
 Every spec API in this build comes from a single **Jakarta EE platform umbrella BOM**
 (`jakarta.platform:jakarta.jakartaee-bom`, imported in the root `pom.xml`); only the
 implementations carry their own versions, and each is kept on a series certified for
-that platform generation. Build baseline: Java 21 (tests compiled at 25).
+that platform generation. Build baseline: Java 25 (`maven.compiler.release`, main
+and test sources alike; the enforcer requires a JDK 25 or newer to build).
 
 Subsections below are ordered by Jakarta EE version.
 
@@ -50,31 +51,37 @@ version: weld-junit5 5.0.x is the Weld 6 / CDI 4.1 line.
 
 #### Profiles
 
-The platform is fixed, so the profiles only choose implementations. They form
-independent axes — provider and validator each offer a choice, CDI currently has a
-single profile:
+The platform is fixed and so is every implementation version: each implementation is kept
+on the single release aligned with Jakarta EE 11, and the build never tests one
+implementation at two versions — that would exercise the implementation's own release
+history, not this project. What *does* vary is **which** implementation of Jakarta
+Persistence runs, because Hibernate ORM and EclipseLink are two different implementations
+of the same spec and genuinely behave differently.
 
-| Axis | Profile | Implementation |
-| --- | --- | --- |
-| provider (`__`) | `__hibernate-orm-7.4-jakarta-ee-11` | Hibernate ORM 7.4.9.Final — **active by default** |
-| provider (`__`) | `__hibernate-orm-7.2-jakarta-ee-11` | Hibernate ORM 7.2.25.Final (limited-support series) |
-| provider (`__`) | `__eclipselink-5.0-jakarta-ee-11` | EclipseLink 5.0.1 |
-| validator (`___`) | `___hibernate-validator-9.1-jakarta-ee-11` | Hibernate Validator 9.1.3.Final — active by default |
-| validator (`___`) | `___hibernate-validator-9.0-jakarta-ee-11` | Hibernate Validator 9.0.1.Final (limited-support series) |
-| CDI (`___`) | `___weld-6-jakarta-ee-11` | `weld-junit5` 5.0.3.Final — active by default |
+So there is exactly one axis, with two profiles:
 
-That is 3 × 2 = **six supported combinations**, all against the same Jakarta EE 11
-platform.
+| Profile | Provider |
+| --- | --- |
+| `jakarta-ee-11-hibernate-orm` | Hibernate ORM — **active by default** |
+| `jakarta-ee-11-eclipselink` | EclipseLink |
 
-**Name every axis you use.** The defaults are `activeByDefault`, and Maven deactivates
-all `activeByDefault` profiles as soon as any profile is named on the command line — so
-`-P___hibernate-validator-9.0-jakarta-ee-11` on its own resolves *no persistence
-provider at all*. Version properties survive (the root `<properties>` repeat the default
-profiles' values), but the provider *dependency* comes only from a provider profile.
+Validation (Hibernate Validator + Expressly) and CDI (Weld) have no profiles at all;
+their versions live in the root `<properties>` and move only when the platform does.
+The profiles choose no versions either — both provider versions are in `<properties>`,
+one per provider. A profile only decides which provider is on the test classpath, which
+`persistence-unit.provider` goes into `persistence.xml`, and which metamodel generator
+the annotation processor path uses.
 
-`./_mvn_jakarta_ee_11.sh [maven args...]` runs the given build once per combination and
+`./_mvn_jakarta_ee_11.sh [maven args...]` runs the given build once per provider and
 reports which ones failed — e.g. `./_mvn_jakarta_ee_11.sh test` or
 `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence`.
+
+Four EE 11 profiles were removed to get here. `__hibernate-orm-7.2-jakarta-ee-11` and
+`___hibernate-validator-9.0-jakarta-ee-11` were second-newest-series version axes;
+`___hibernate-validator-9.1-jakarta-ee-11` and `___weld-6-jakarta-ee-11` were choices of
+one. All four only ever held versions, which now live in `<properties>`, and the six
+provider × validator combinations they produced collapse to two. The two survivors were
+renamed `jakarta-ee-11-{hibernate-orm,eclipselink}`.
 
 ### Jakarta EE 12 — next (not adoptable yet)
 
@@ -193,8 +200,9 @@ module's own build.
 
 Two properties hold across the whole reactor, and are worth keeping that way:
 
-- **`compile` appears exactly once** — `-crypto` on `-utils`. Every other dependency of every module is `provided`, so
-  adding one of these artifacts to a project pulls in nothing the project did not ask for.
+- **`compile` appears twice** — `-crypto` on `-utils`, and `-test-utils` on `jinahya-object-randomizer`, which
+  declares every dependency of its own as `provided` or `test`. Every other dependency of every module is `provided`,
+  so adding one of these artifacts to a project pulls in nothing the project did not ask for.
 - **Nothing is `runtime`-scoped.** Where a runtime implementation is needed — a persistence provider, a validation
   provider, a JDBC driver — the module leaves the choice to the consumer, and only the build picks one (see the
   profiles above).
@@ -208,7 +216,7 @@ versions below are what the current platform (`11.0.0`) resolves to.
 | `jinahya-persistence-more` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-crypto` | `io.github.jinahya:jinahya-persistence-utils` | — | `jakarta.annotation:jakarta.annotation-api` 3.0.0<br>`jakarta.enterprise:jakarta.enterprise.cdi-api` 4.1.0<br>`jakarta.inject:jakarta.inject-api` 2.0.1<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1 |
 | `jinahya-persistence-more-test` | — | — | `io.github.jinahya:jinahya-persistence-more`<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.jspecify:jspecify` 1.0.1<br>`org.junit.jupiter:junit-jupiter-api` 5.14.4 |
-| `jinahya-persistence-test-utils` | — | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.1<br>`org.jeasy:easy-random` 6.0.1<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
+| `jinahya-persistence-test-utils` | `io.github.jinahya:jinahya-object-randomizer` 0.0.3 | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.1<br>`org.jspecify:jspecify` 1.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
 
 `jakarta.persistence-api` and `jspecify` are declared once, in the root pom, and inherited by every module; the rest are
 declared by the module which uses them.
@@ -224,5 +232,11 @@ choice of scope for a testing library a published-API decision rather than a pri
 - Nothing else is needed. AssertJ, Mockito and `junit-platform-commons` were each removed in favour of what
   `org.junit.jupiter.api.Assertions` and plain reflection already provide, so a consumer needs only JUnit on the test
   classpath.
-- `-test-utils` needs no testing library at all in `src/main`; Easy Random and PoDAM are its subject matter, and both
-  are `provided` for the same reason.
+- `-test-utils` needs no testing library at all in `src/main`. The randomizer role it applies comes from
+  `jinahya-object-randomizer` at `compile` scope — a consumer extends its flavors, so it has to be on both classpaths —
+  and the three engines behind them are `provided`, so a consumer brings only the one it uses.
+  `fixture-monkey-jakarta-validation` is `provided` for the same reason: `FixtureMonkeyObjectRandomizer` looks the
+  plugin up reflectively, so declaring it is what makes that flavor honor `jakarta.validation.constraints`. The root
+  pom excludes the Jakarta EE 9 stack that artifact declares at `compile` scope, which would otherwise downgrade the
+  platform; the exclusion is backed by `hibernate-validator` and `expressly`, at the EE 11 versions, on the module's
+  test classpath.

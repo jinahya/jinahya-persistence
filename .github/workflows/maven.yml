@@ -60,41 +60,36 @@ jobs:
 #      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
       uses: advanced-security/maven-dependency-submission-action@v4
 
-  # Every supported Jakarta EE 11 combination, which CLAUDE.md asks for by name: "Check convergence
-  # across all six supported EE 11 combinations, not just the defaults". The job above runs exactly
-  # one of the six -- whatever is activeByDefault -- so hibernate-orm-7.2 and hibernate-validator-9.0
-  # were never exercised anywhere but on a developer's machine, via _mvn_jakarta_ee_11.sh. This is
-  # that script, as a matrix.
+  # Both persistence providers. Jakarta EE 11 is the only supported platform generation and every
+  # implementation is pinned to its single aligned release, so the only thing worth varying is which
+  # provider implements Jakarta Persistence. The job above runs exactly one of the two -- whatever is
+  # activeByDefault -- so EclipseLink was never exercised anywhere but on a developer's machine, via
+  # _mvn_jakarta_ee_11.sh. This is that script, as a matrix.
   #
-  # Naming any profile on the command line deactivates every activeByDefault profile, so a profile
-  # from EACH axis has to be named: provider, validator, and CDI. A lone provider -P would leave the
-  # build with no validator at all. That is why ___weld-6 is repeated in every cell rather than left
-  # to the default, and why the validator is named even when it is the default one.
+  # Naming any profile on the command line deactivates every activeByDefault profile. That is
+  # harmless now that the provider is the only axis: the cell names the provider it wants, and
+  # nothing else was riding on the defaults.
   #
   # NOTE: no Sonar here, deliberately, and none should be added. The analysis belongs to the single
-  # canonical build above. Six analyses of one branch would race each other over the same project
-  # and leave the dashboard reporting whichever happened to finish last.
+  # canonical build above. Parallel analyses of one branch would race each other over the same
+  # project and leave the dashboard reporting whichever happened to finish last.
   #
   # `test` rather than `verify`: the convergence enforcer is bound to `validate`, so it runs in every
   # cell already, and there is nothing at `verify` -- no integration tests exist -- that varies by
   # provider.
-  combinations:
+  providers:
 
     runs-on: ubuntu-latest
 
     strategy:
-      # one broken combination should not hide the state of the other five
+      # one broken provider should not hide the state of the other
       fail-fast: false
       matrix:
         provider:
-          - __hibernate-orm-7.4-jakarta-ee-11
-          - __hibernate-orm-7.2-jakarta-ee-11
-          - __eclipselink-5.0-jakarta-ee-11
-        validator:
-          - ___hibernate-validator-9.1-jakarta-ee-11
-          - ___hibernate-validator-9.0-jakarta-ee-11
+          - jakarta-ee-11-hibernate-orm
+          - jakarta-ee-11-eclipselink
 
-    name: ${{ matrix.provider }} / ${{ matrix.validator }}
+    name: ${{ matrix.provider }}
 
     steps:
     - uses: actions/checkout@v4
@@ -107,4 +102,4 @@ jobs:
     - name: Test
       run: >
         mvn -B test
-        -P${{ matrix.provider }},${{ matrix.validator }},___weld-6-jakarta-ee-11
+        -P${{ matrix.provider }}

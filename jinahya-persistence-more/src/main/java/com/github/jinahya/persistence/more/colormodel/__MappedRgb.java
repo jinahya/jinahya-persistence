@@ -132,6 +132,15 @@ public abstract class __MappedRgb extends ___MappedColor {
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    /**
+     * Returns a string representation of this color.
+     *
+     * @return a string representation of this color; that of the superclass, followed by the
+     *         {@value #ATTRIBUTE_NAME_RED}, {@value #ATTRIBUTE_NAME_GREEN} and {@value #ATTRIBUTE_NAME_BLUE}
+     *         attributes.
+     * @implNote The format is unspecified, and is meant for diagnostics rather than for parsing; see
+     *         {@link #toHexNotation()} and the {@code to...RgbNotation()} methods for the CSS notations.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -143,12 +152,28 @@ public abstract class __MappedRgb extends ___MappedColor {
 
     // ----------------------------------------------------------------------------------------------------- COMPONENTS
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #COMPONENT_COUNT}; the <span style="color:red;">red</span>,
+     *         <span style="color:green;">green</span> and <span style="color:blue;">blue</span> components. An alpha,
+     *         where a subclass carries one, is never counted; see {@link #getAlpha()}.
+     */
     @Transient
     @Override
     public int getComponentCount() {
         return COMPONENT_COUNT;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @implSpec {@value #COMPONENT_INDEX_RED} reads {@link #getRed()}, {@value #COMPONENT_INDEX_GREEN} reads
+     *         {@link #getGreen()}, and {@value #COMPONENT_INDEX_BLUE} reads {@link #getBlue()}.
+     */
     @Transient
     @Override
     public double getComponent(final int index) {
@@ -160,6 +185,16 @@ public abstract class __MappedRgb extends ___MappedColor {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index     {@inheritDoc}
+     * @param component {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @throws IllegalArgumentException  {@inheritDoc}
+     * @implSpec {@value #COMPONENT_INDEX_RED} writes {@link #setRed(double)}, {@value #COMPONENT_INDEX_GREEN} writes
+     *         {@link #setGreen(double)}, and {@value #COMPONENT_INDEX_BLUE} writes {@link #setBlue(double)}.
+     */
     @Override
     public void setComponent(final int index, final double component) {
         switch (requireValidComponentIndex(index)) {
@@ -170,6 +205,16 @@ public abstract class __MappedRgb extends ___MappedColor {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This model <em>is</em> sRGB, so the components are handed over exactly as stored; nothing is converted.
+     *
+     * @param function {@inheritDoc}
+     * @param <R>      {@inheritDoc}
+     * @return {@inheritDoc}
+     * @see <a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">CSS Color 4, &sect;5 sRGB Colors</a>
+     */
     @Override
     public <R> R applySrgb(
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> function) {

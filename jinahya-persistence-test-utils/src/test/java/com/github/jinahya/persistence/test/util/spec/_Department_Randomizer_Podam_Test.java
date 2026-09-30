@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies that the PODAM flavor of {@link com.github.jinahya.persistence.test.util.__Randomizer} is wired up, and
- * honors {@link _Department_Randomizer_Constants#EXCLUDED_FIELDS}, against a real entity.
+ * Verifies that the PODAM flavor of {@link com.github.jinahya.object.randomizer.AbstractObjectRandomizer} is wired up,
+ * and honors {@link _Department_Randomizer_Constants#EXCLUDED_FIELDS}, against a real entity.
  * <p>
  * Nothing is persisted here; what the contract is, and how it is checked, belong to
  * {@link _Department_Randomized_Verifier}, so that this class says only which engine it is about.

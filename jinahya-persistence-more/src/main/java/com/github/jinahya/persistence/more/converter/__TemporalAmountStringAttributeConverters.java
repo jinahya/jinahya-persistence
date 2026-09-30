@@ -69,6 +69,16 @@ public final class __TemporalAmountStringAttributeConverters {
             super(Duration.class);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Duration} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws java.time.format.DateTimeParseException when the {@code dbData} is not in the ISO-8601 form
+         *                                                 {@link Duration#parse(CharSequence)} reads.
+         * @implSpec {@link Duration#parse(CharSequence)} is called directly, in place of the reflective default
+         *         inherited from {@link __TemporalAmountStringAttributeConverter}.
+         */
         @Override
         public @Nullable Duration convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {
@@ -100,6 +110,16 @@ public final class __TemporalAmountStringAttributeConverters {
             super(Period.class);
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Period} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws java.time.format.DateTimeParseException when the {@code dbData} is not in the ISO-8601 form
+         *                                                 {@link Period#parse(CharSequence)} reads.
+         * @implSpec {@link Period#parse(CharSequence)} is called directly, in place of the reflective default
+         *         inherited from {@link __TemporalAmountStringAttributeConverter}.
+         */
         @Override
         public @Nullable Period convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {

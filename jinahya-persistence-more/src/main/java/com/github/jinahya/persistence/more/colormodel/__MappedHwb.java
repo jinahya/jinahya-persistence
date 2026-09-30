@@ -114,6 +114,14 @@ public abstract class __MappedHwb extends ___MappedHueColor {
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    /**
+     * Returns a string representation of this color.
+     *
+     * @return a string representation of this color; that of the superclass, which carries the hue, followed by the
+     *         {@value #ATTRIBUTE_NAME_WHITENESS} and {@value #ATTRIBUTE_NAME_BLACKNESS} attributes.
+     * @implNote The format is unspecified, and is meant for diagnostics rather than for parsing; see
+     *         {@link #toHwbNotation()} for the CSS notation.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -124,12 +132,29 @@ public abstract class __MappedHwb extends ___MappedHueColor {
 
     // ----------------------------------------------------------------------------------------------------- COMPONENTS
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #COMPONENT_COUNT}; the hue, the whiteness and the blackness. The hue is declared by
+     *         {@link ___MappedHueColor}, the other two here.
+     */
     @Transient
     @Override
     public int getComponentCount() {
         return COMPONENT_COUNT;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @implSpec {@value ___MappedHueColor#COMPONENT_INDEX_HUE} reads {@link #getNormalizedHue()} &mdash; the
+     *         <em>normalized</em> hue, not the one in degrees {@link #getHue()} returns, because this method speaks
+     *         only in normalized values &mdash; {@value #COMPONENT_INDEX_WHITENESS} reads {@link #getWhiteness()},
+     *         and {@value #COMPONENT_INDEX_BLACKNESS} reads {@link #getBlackness()}.
+     */
     @Transient
     @Override
     public double getComponent(final int index) {
@@ -141,6 +166,17 @@ public abstract class __MappedHwb extends ___MappedHueColor {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index     {@inheritDoc}
+     * @param component {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @throws IllegalArgumentException  {@inheritDoc}
+     * @implSpec {@value ___MappedHueColor#COMPONENT_INDEX_HUE} writes {@link #setNormalizedHue(double)},
+     *         {@value #COMPONENT_INDEX_WHITENESS} writes {@link #setWhiteness(double)}, and
+     *         {@value #COMPONENT_INDEX_BLACKNESS} writes {@link #setBlackness(double)}.
+     */
     @Override
     public void setComponent(final int index, final double component) {
         switch (requireValidComponentIndex(index)) {
@@ -151,6 +187,19 @@ public abstract class __MappedHwb extends ___MappedHueColor {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The conversion is the one CSS Color 4 specifies. A whiteness and a blackness which sum to {@code 1.0} or more
+     * make a gray, whatever the hue, and the hue is then simply not consulted.
+     *
+     * @param function {@inheritDoc}
+     * @param <R>      {@inheritDoc}
+     * @return {@inheritDoc}
+     * @see ___MappedColorUtils#hwbToRgb(double, double, double, DoubleFunction)
+     * @see <a href="https://www.w3.org/TR/css-color-4/#hwb-to-rgb">CSS Color 4, &sect;8.1 Converting HWB Colors to
+     *         sRGB</a>
+     */
     @Override
     public <R> R applySrgb(
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> function) {

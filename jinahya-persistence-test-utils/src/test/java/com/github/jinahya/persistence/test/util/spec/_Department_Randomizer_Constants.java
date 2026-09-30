@@ -5,9 +5,9 @@ import java.util.List;
 /**
  * Constants shared by every randomizer of {@link _Department}, whichever engine it uses.
  * <p>
- * The exclusions live here, rather than on {@link _Department_Randomizer}, so that the four flavors are configured from
- * one place and can be compared on equal terms: a difference between them is then a difference in the engine, never a
- * difference in what each was told to leave alone.
+ * The exclusions live here, rather than on {@link _Department_Randomizer}, so that the three flavors are configured
+ * from one place and can be compared on equal terms: a difference between them is then a difference in the engine,
+ * never a difference in what each was told to leave alone.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see _Department_Randomized_Verifier

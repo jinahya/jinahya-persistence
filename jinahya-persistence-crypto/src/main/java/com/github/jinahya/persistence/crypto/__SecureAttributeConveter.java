@@ -47,11 +47,25 @@ public abstract class __SecureAttributeConveter<X, Y> implements AttributeConver
             super();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return {@inheritDoc}
+         * @throws UnsupportedOperationException always; this converter is not implemented yet.
+         */
         @Override
         public byte @Nullable [] convertToDatabaseColumn(final byte @Nullable [] attribute) {
             throw new UnsupportedOperationException("not implemented yet");
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return {@inheritDoc}
+         * @throws UnsupportedOperationException always; this converter is not implemented yet.
+         */
         @Override
         public byte @Nullable [] convertToEntityAttribute(final byte @Nullable [] dbData) {
             throw new UnsupportedOperationException("not implemented yet");
@@ -74,11 +88,25 @@ public abstract class __SecureAttributeConveter<X, Y> implements AttributeConver
             super();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return {@inheritDoc}
+         * @throws UnsupportedOperationException always; this converter is not implemented yet.
+         */
         @Override
         public @Nullable String convertToDatabaseColumn(final @Nullable String attribute) {
             throw new UnsupportedOperationException("not implemented yet");
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return {@inheritDoc}
+         * @throws UnsupportedOperationException always; this converter is not implemented yet.
+         */
         @Override
         public @Nullable String convertToEntityAttribute(final @Nullable String dbData) {
             throw new UnsupportedOperationException("not implemented yet");

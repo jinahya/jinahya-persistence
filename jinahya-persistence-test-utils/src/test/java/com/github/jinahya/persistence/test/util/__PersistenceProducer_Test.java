@@ -98,7 +98,7 @@ class __PersistenceProducer_Test {
         final var transaction = entityManager.getTransaction();
         transaction.begin();
         try {
-            final var employee = __PersisterUtils.newPersistedInstanceOf(entityManager, _Employee.class);
+            final var employee = EntityPersisterUtils.newPersistedInstanceOf(entityManager, _Employee.class);
             entityManager.flush();
             assertThat(employee.getId()).isNotNull();
             assertThat(employee.getDepartment()).isNotNull();

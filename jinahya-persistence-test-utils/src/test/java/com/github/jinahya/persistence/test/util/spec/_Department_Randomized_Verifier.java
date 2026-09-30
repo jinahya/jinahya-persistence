@@ -9,9 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Verifications of a <em>randomized</em> {@link _Department} -- of the value, that is, not of whatever produced it.
  * <p>
- * All four flavors are told to exclude the same {@link _Department_Randomizer_Constants#EXCLUDED_FIELDS}, so the values
- * they produce all owe the same contract; asserting it in one place is what lets each test say only which engine it is
- * about. A flavor whose values ever need their own expectation is a finding, not a reason to fork this class.
+ * All three flavors are told to exclude the same {@link _Department_Randomizer_Constants#EXCLUDED_FIELDS}, so the
+ * values they produce all owe the same contract; asserting it in one place is what lets each test say only which engine
+ * it is about. A flavor whose values ever need their own expectation is a finding, not a reason to fork this class.
  * <p>
  * Nothing here takes a randomizer. {@link #verifyVaries(Supplier)} takes a {@link Supplier} because it needs more than
  * one value, and a supplier is the plainest way to ask for them; what it asserts is still a property of the values.
@@ -57,9 +57,8 @@ public final class _Department_Randomized_Verifier {
      *
      * @param source a source of randomized instances; {@link #DRAWS} of them are drawn.
      * @implNote Asserts that the names are not all the same, rather than that they are all distinct: an engine
-     *         may draw a very short string -- Easy Random readily draws a single character -- and two of those may
-     *         legitimately collide. What would actually break the unique constraint on the column is a
-     *         <em>constant</em>, and that is what this rules out.
+     *         may draw a very short string, and two of those may legitimately collide. What would actually break the
+     *         unique constraint on the column is a <em>constant</em>, and that is what this rules out.
      */
     public static void verifyVaries(final Supplier<? extends _Department> source) {
         final var names = Stream.generate(source::get)
