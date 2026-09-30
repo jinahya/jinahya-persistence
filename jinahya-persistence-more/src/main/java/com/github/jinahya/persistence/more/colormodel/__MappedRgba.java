@@ -90,6 +90,15 @@ public abstract class __MappedRgba extends __MappedRgb {
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    /**
+     * Returns a string representation of this color.
+     *
+     * @return a string representation of this color; that of the superclass, which carries the
+     *         <span style="color:red;">red</span>, <span style="color:green;">green</span> and
+     *         <span style="color:blue;">blue</span> components, followed by the {@value #ATTRIBUTE_NAME_ALPHA}
+     *         attribute.
+     * @implNote The format is unspecified, and is meant for diagnostics rather than for parsing.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +

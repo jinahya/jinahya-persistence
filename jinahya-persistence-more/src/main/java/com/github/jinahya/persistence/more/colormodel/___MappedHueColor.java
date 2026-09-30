@@ -130,6 +130,13 @@ public abstract class ___MappedHueColor extends ___MappedColor {
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    /**
+     * Returns a string representation of this color.
+     *
+     * @return a string representation of this color; that of the superclass, followed by the
+     *         {@value #ATTRIBUTE_NAME_HUE} attribute, in degrees.
+     * @implNote The format is unspecified, and is meant for diagnostics rather than for parsing.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +

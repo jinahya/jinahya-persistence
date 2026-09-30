@@ -144,6 +144,14 @@ public abstract class __MappedCmyk extends ___MappedColor {
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    /**
+     * Returns a string representation of this color.
+     *
+     * @return a string representation of this color; that of the superclass, followed by the
+     *         {@value #ATTRIBUTE_NAME_CYAN}, {@value #ATTRIBUTE_NAME_MAGENTA}, {@value #ATTRIBUTE_NAME_YELLOW} and
+     *         {@value #ATTRIBUTE_NAME_BLACK} attributes.
+     * @implNote The format is unspecified, and is meant for diagnostics rather than for parsing.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -156,12 +164,29 @@ public abstract class __MappedCmyk extends ___MappedColor {
 
     // ----------------------------------------------------------------------------------------------------- COMPONENTS
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #COMPONENT_COUNT}; the <span style="color:cyan;">cyan</span>,
+     *         <span style="color:magenta;">magenta</span>, <span style="color:yellow;">yellow</span> and black
+     *         components. This is the one model in this package with four of them.
+     */
     @Transient
     @Override
     public int getComponentCount() {
         return COMPONENT_COUNT;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @implSpec {@value #COMPONENT_INDEX_CYAN} reads {@link #getCyan()}, {@value #COMPONENT_INDEX_MAGENTA} reads
+     *         {@link #getMagenta()}, {@value #COMPONENT_INDEX_YELLOW} reads {@link #getYellow()}, and
+     *         {@value #COMPONENT_INDEX_BLACK} reads {@link #getBlack()}.
+     */
     @Transient
     @Override
     public double getComponent(final int index) {
@@ -174,6 +199,17 @@ public abstract class __MappedCmyk extends ___MappedColor {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index     {@inheritDoc}
+     * @param component {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @throws IllegalArgumentException  {@inheritDoc}
+     * @implSpec {@value #COMPONENT_INDEX_CYAN} writes {@link #setCyan(double)}, {@value #COMPONENT_INDEX_MAGENTA}
+     *         writes {@link #setMagenta(double)}, {@value #COMPONENT_INDEX_YELLOW} writes
+     *         {@link #setYellow(double)}, and {@value #COMPONENT_INDEX_BLACK} writes {@link #setBlack(double)}.
+     */
     @Override
     public void setComponent(final int index, final double component) {
         switch (requireValidComponentIndex(index)) {
@@ -185,6 +221,21 @@ public abstract class __MappedCmyk extends ___MappedColor {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <strong>The conversion is uncalibrated.</strong> A CMYK color is device-dependent, and this applies the naive
+     * conversion CSS Color 5 specifies for
+     * <a href="https://www.w3.org/TR/css-color-5/#device-cmyk">{@code device-cmyk()}</a> when no color profile is
+     * known; it is a rendering of convenience, not a colorimetric one.
+     *
+     * @param function {@inheritDoc}
+     * @param <R>      {@inheritDoc}
+     * @return {@inheritDoc}
+     * @see ___MappedColorUtils#cmykToRgb(double, double, double, double, DoubleFunction)
+     * @see <a href="https://www.w3.org/TR/css-color-5/#device-cmyk">CSS Color 5, &sect;6 Uncalibrated CMYK Colors:
+     *         the device-cmyk() Function</a>
+     */
     @Override
     public <R> R applySrgb(
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> function) {

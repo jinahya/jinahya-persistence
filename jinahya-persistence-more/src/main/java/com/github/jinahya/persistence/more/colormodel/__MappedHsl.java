@@ -111,6 +111,14 @@ public abstract class __MappedHsl extends ___MappedHueColor {
 
     // ------------------------------------------------------------------------------------------------ java.lang.Object
 
+    /**
+     * Returns a string representation of this color.
+     *
+     * @return a string representation of this color; that of the superclass, which carries the hue, followed by the
+     *         {@value #ATTRIBUTE_NAME_SATURATION} and {@value #ATTRIBUTE_NAME_LIGHTNESS} attributes.
+     * @implNote The format is unspecified, and is meant for diagnostics rather than for parsing; see
+     *         {@link #toLegacyHslNotation()} and {@link #toModernHslNotation()} for the CSS notations.
+     */
     @Override
     public String toString() {
         return super.toString() + '{' +
@@ -121,12 +129,29 @@ public abstract class __MappedHsl extends ___MappedHueColor {
 
     // ----------------------------------------------------------------------------------------------------- COMPONENTS
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #COMPONENT_COUNT}; the hue, the saturation and the lightness. The hue is declared by
+     *         {@link ___MappedHueColor}, the other two here.
+     */
     @Transient
     @Override
     public int getComponentCount() {
         return COMPONENT_COUNT;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @implSpec {@value ___MappedHueColor#COMPONENT_INDEX_HUE} reads {@link #getNormalizedHue()} &mdash; the
+     *         <em>normalized</em> hue, not the one in degrees {@link #getHue()} returns, because this method speaks
+     *         only in normalized values &mdash; {@value #COMPONENT_INDEX_SATURATION} reads {@link #getSaturation()},
+     *         and {@value #COMPONENT_INDEX_LIGHTNESS} reads {@link #getLightness()}.
+     */
     @Transient
     @Override
     public double getComponent(final int index) {
@@ -138,6 +163,17 @@ public abstract class __MappedHsl extends ___MappedHueColor {
         };
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param index     {@inheritDoc}
+     * @param component {@inheritDoc}
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     * @throws IllegalArgumentException  {@inheritDoc}
+     * @implSpec {@value ___MappedHueColor#COMPONENT_INDEX_HUE} writes {@link #setNormalizedHue(double)},
+     *         {@value #COMPONENT_INDEX_SATURATION} writes {@link #setSaturation(double)}, and
+     *         {@value #COMPONENT_INDEX_LIGHTNESS} writes {@link #setLightness(double)}.
+     */
     @Override
     public void setComponent(final int index, final double component) {
         switch (requireValidComponentIndex(index)) {
@@ -148,6 +184,19 @@ public abstract class __MappedHsl extends ___MappedHueColor {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The conversion is the one CSS Color 4 specifies, and is lossless in this direction: every HSL color has an sRGB
+     * one. The reverse, {@link #setSrgb(double, double, double)}, is not.
+     *
+     * @param function {@inheritDoc}
+     * @param <R>      {@inheritDoc}
+     * @return {@inheritDoc}
+     * @see ___MappedColorUtils#hslToRgb(double, double, double, DoubleFunction)
+     * @see <a href="https://www.w3.org/TR/css-color-4/#hsl-to-rgb">CSS Color 4, &sect;7.1 Converting HSL Colors to
+     *         sRGB</a>
+     */
     @Override
     public <R> R applySrgb(
             final DoubleFunction<? extends DoubleFunction<? extends DoubleFunction<? extends R>>> function) {

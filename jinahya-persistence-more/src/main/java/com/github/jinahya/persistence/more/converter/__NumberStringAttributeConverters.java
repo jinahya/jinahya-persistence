@@ -75,6 +75,13 @@ public final class __NumberStringAttributeConverters {
             super();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the {@link BigDecimal#toPlainString() plain string} of the {@code attribute}; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         */
         @Override
         public @Nullable String convertToDatabaseColumn(final @Nullable BigDecimal attribute) {
             if (attribute == null) {
@@ -83,6 +90,16 @@ public final class __NumberStringAttributeConverters {
             return attribute.toPlainString();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link BigDecimal} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid representation of a
+         *                               {@link BigDecimal}.
+         * @implSpec The scale is that of the stored text, as {@link BigDecimal#BigDecimal(String)} reads it;
+         *         {@code "1.50"} reads back with a scale of two, not as {@code 1.5}.
+         */
         @Override
         public @Nullable BigDecimal convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {
@@ -108,6 +125,13 @@ public final class __NumberStringAttributeConverters {
             super();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the {@link Integer#toString() decimal string} of the {@code attribute}; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         */
         @Override
         public @Nullable String convertToDatabaseColumn(final @Nullable Integer attribute) {
             if (attribute == null) {
@@ -116,6 +140,14 @@ public final class __NumberStringAttributeConverters {
             return attribute.toString();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Integer} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid decimal, or does not fit in a
+         *                               {@link Integer}.
+         */
         @Override
         public @Nullable Integer convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {
@@ -141,6 +173,13 @@ public final class __NumberStringAttributeConverters {
             super();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the {@link Long#toString() decimal string} of the {@code attribute}; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         */
         @Override
         public @Nullable String convertToDatabaseColumn(final @Nullable Long attribute) {
             if (attribute == null) {
@@ -149,6 +188,14 @@ public final class __NumberStringAttributeConverters {
             return attribute.toString();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Long} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid decimal, or does not fit in a
+         *                               {@link Long}.
+         */
         @Override
         public @Nullable Long convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {
@@ -180,6 +227,16 @@ public final class __NumberStringAttributeConverters {
             delegate = new OfBigDecimal();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the decimal string of the {@code attribute}, free of an exponent; {@code "NaN"},
+         *         {@code "Infinity"} or {@code "-Infinity"} for a non-finite value; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         * @implSpec A finite value is widened with {@link BigDecimal#valueOf(double)} and written by
+         *         {@link OfBigDecimal}; see {@link OfFloat the class javadoc} for what that costs on the way back.
+         */
         @Override
         public @Nullable String convertToDatabaseColumn(final @Nullable Float attribute) {
             if (attribute == null) {
@@ -193,6 +250,14 @@ public final class __NumberStringAttributeConverters {
             return delegate.convertToDatabaseColumn(BigDecimal.valueOf(attribute));
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Float} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is neither one of {@code "NaN"},
+         *                               {@code "Infinity"} and {@code "-Infinity"} nor a valid decimal.
+         */
         @Override
         public @Nullable Float convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {
@@ -230,6 +295,16 @@ public final class __NumberStringAttributeConverters {
             delegate = new OfBigDecimal();
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the decimal string of the {@code attribute}, free of an exponent; {@code "NaN"},
+         *         {@code "Infinity"} or {@code "-Infinity"} for a non-finite value; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         * @implSpec A finite value is widened with {@link BigDecimal#valueOf(double)} and written by
+         *         {@link OfBigDecimal}; see {@link OfDouble the class javadoc} for what that costs on the way back.
+         */
         @Override
         public @Nullable String convertToDatabaseColumn(final @Nullable Double attribute) {
             if (attribute == null) {
@@ -243,6 +318,14 @@ public final class __NumberStringAttributeConverters {
             return delegate.convertToDatabaseColumn(BigDecimal.valueOf(attribute));
         }
 
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Double} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is neither one of {@code "NaN"},
+         *                               {@code "Infinity"} and {@code "-Infinity"} nor a valid decimal.
+         */
         @Override
         public @Nullable Double convertToEntityAttribute(final @Nullable String dbData) {
             if (dbData == null) {

@@ -27,6 +27,9 @@ class _Utils_Test {
 
     /**
      * A record which declares components, and a no-argument constructor explicitly.
+     *
+     * @param x a component.
+     * @param y another component.
      */
     record Defaulted(int x, int y) {
 
@@ -37,6 +40,8 @@ class _Utils_Test {
 
     /**
      * A record whose only constructor is a canonical one which takes arguments.
+     *
+     * @param x a component.
      */
     record Componentized(int x) {
 
