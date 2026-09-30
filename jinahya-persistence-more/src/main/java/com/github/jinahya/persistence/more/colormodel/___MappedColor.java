@@ -70,10 +70,10 @@ import java.util.function.DoubleFunction;
  * <p>
  * This class maps no column, so the annotation looks gratuitous here and is not. It is what lets an
  * {@link jakarta.persistence.Embeddable @Embeddable} extend this hierarchy at all — see
- * {@linkplain com.github.jinahya.persistence.more.colormodel the package documentation} — because EclipseLink walks
- * the mapped-superclass chain of an embeddable and fails with a {@link NullPointerException}, in
- * {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata}, where any link in that chain has no access type of
- * its own. This class is the last such link.
+ * {@linkplain com.github.jinahya.persistence.more.colormodel the package documentation} — because EclipseLink walks the
+ * mapped-superclass chain of an embeddable and fails with a {@link NullPointerException}, in
+ * {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata}, where any link in that chain has no access type of its
+ * own. This class is the last such link.
  * <p>
  * It has one cost, on Hibernate ORM 7.2 only, and it falls on an entity rather than here: that series propagates the
  * <em>root</em> mapped superclass's access type down onto the entity, so an entity which extends one of these
@@ -172,7 +172,8 @@ public abstract class ___MappedColor implements Serializable {
         if (Double.isNaN(component)) {
             throw new IllegalArgumentException("component is NaN");
         }
-        return Math.clamp(component, MIN_COMPONENT, MAX_COMPONENT);
+//        return Math.clamp(component, MIN_COMPONENT, MAX_COMPONENT);
+        return ____Utils.clamp(component, MIN_COMPONENT, MAX_COMPONENT);
     }
 
     /**
@@ -368,8 +369,7 @@ public abstract class ___MappedColor implements Serializable {
      *
      * @return a value between {@value #MIN_COMPONENT} and {@value #MAX_COMPONENT}, both inclusive.
      * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the
-     *         opacity
-     *         property</a>
+     *         opacity property</a>
      */
     @Transient
     public double getAlpha() {
@@ -384,8 +384,7 @@ public abstract class ___MappedColor implements Serializable {
      *
      * @return {@code true} when this color is opaque; {@code false} otherwise.
      * @see <a href="https://www.w3.org/TR/css-color-4/#transparency">CSS Color 4, &sect;15 Transparency: the
-     *         opacity
-     *         property</a>
+     *         opacity property</a>
      */
     @Transient
     public boolean isOpaque() {

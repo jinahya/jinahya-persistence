@@ -70,11 +70,12 @@
     <!--    <revision>0.3.10-SNAPSHOT</revision>-->
     <!-- https://endoflife.date/eclipse-temurin -->
     <!-- https://endoflife.date/amazon-corretto -->
-    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
     <!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
-    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
+<!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
+    <maven.compiler.testSource>25</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <doclint>none</doclint>
@@ -112,7 +113,7 @@
     <!-- the randomizer roles, and the three engines behind them, extracted out of jinahya-persistence-test-utils;
          every engine is 'provided' there too, so this brings nothing of its own onto a classpath -->
     <!-- https://central.sonatype.com/artifact/io.github.jinahya/jinahya-object-randomizer/versions -->
-    <version.io.github.jinahya.object-randomizer>0.0.3</version.io.github.jinahya.object-randomizer>
+    <version.io.github.jinahya.object-randomizer>0.0.4</version.io.github.jinahya.object-randomizer>
     <!-- https://jakarta.ee/specifications/platform/11/ -->
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
     <!-- 11.0.0 manages: jakarta.persistence-api 3.2.0, jakarta.validation-api 3.1.1, -->
