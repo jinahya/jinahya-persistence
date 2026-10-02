@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.metamodel;
+package com.github.jinahya.persistence.metamodel.util;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.EntityType;
@@ -19,14 +19,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link __EntityTypeUtils}.
+ * Tests for {@link JinahyaEntityTypeUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __EntityTypeUtils_Test {
+class JinahyaEntityTypeUtils_Test {
 
     private static class Alpha {
 
@@ -71,7 +71,7 @@ class __EntityTypeUtils_Test {
         void __fallsThroughToTheNextFactory() {
             final var expected = mock(EntityType.class);
 
-            final var actual = __EntityTypeUtils.getEntityType(
+            final var actual = JinahyaEntityTypeUtils.getEntityType(
                     Alpha.class,
                     List.of(knowingNothing(), knowing(Alpha.class, expected))
             );
@@ -85,7 +85,7 @@ class __EntityTypeUtils_Test {
             final var first = mock(EntityType.class);
             final var second = mock(EntityType.class);
 
-            final var actual = __EntityTypeUtils.getEntityType(
+            final var actual = JinahyaEntityTypeUtils.getEntityType(
                     Bravo.class,
                     List.of(knowing(Bravo.class, first), knowing(Bravo.class, second))
             );
@@ -96,7 +96,7 @@ class __EntityTypeUtils_Test {
         @DisplayName("no factory mapping the class -> IllegalArgumentException")
         @Test
         void _IllegalArgumentException_WhenNobodyMapsIt() {
-            assertThatThrownBy(() -> __EntityTypeUtils.getEntityType(
+            assertThatThrownBy(() -> JinahyaEntityTypeUtils.getEntityType(
                     Charlie.class,
                     List.of(knowingNothing(), knowingNothing())
             ))
@@ -109,9 +109,9 @@ class __EntityTypeUtils_Test {
         void __singleFactoryOverload() {
             final var expected = mock(EntityType.class);
 
-            assertThat(__EntityTypeUtils.getEntityType(Alpha.class, knowing(Alpha.class, expected)))
+            assertThat(JinahyaEntityTypeUtils.getEntityType(Alpha.class, knowing(Alpha.class, expected)))
                     .isSameAs(expected);
-            assertThatThrownBy(() -> __EntityTypeUtils.getEntityType(Alpha.class, knowingNothing()))
+            assertThatThrownBy(() -> JinahyaEntityTypeUtils.getEntityType(Alpha.class, knowingNothing()))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -123,8 +123,8 @@ class __EntityTypeUtils_Test {
         @DisplayName("a miss is an empty optional, not an exception")
         @Test
         void __missIsEmpty() {
-            assertThat(__EntityTypeUtils.findEntityType(Alpha.class, knowingNothing())).isEmpty();
-            assertThat(__EntityTypeUtils.findEntityType(Alpha.class, List.of(knowingNothing()))).isEmpty();
+            assertThat(JinahyaEntityTypeUtils.findEntityType(Alpha.class, knowingNothing())).isEmpty();
+            assertThat(JinahyaEntityTypeUtils.findEntityType(Alpha.class, List.of(knowingNothing()))).isEmpty();
         }
 
         @DisplayName("a hit carries the entity type")
@@ -132,9 +132,9 @@ class __EntityTypeUtils_Test {
         void __hitCarriesTheType() {
             final var expected = mock(EntityType.class);
 
-            assertThat(__EntityTypeUtils.findEntityType(Alpha.class, knowing(Alpha.class, expected)))
+            assertThat(JinahyaEntityTypeUtils.findEntityType(Alpha.class, knowing(Alpha.class, expected)))
                     .containsSame(expected);
-            assertThat(__EntityTypeUtils.findEntityType(
+            assertThat(JinahyaEntityTypeUtils.findEntityType(
                     Alpha.class,
                     List.of(knowingNothing(), knowing(Alpha.class, expected))
             )).containsSame(expected);
@@ -145,13 +145,13 @@ class __EntityTypeUtils_Test {
     @Nested
     class DeprecatedGetManagedType_Test {
 
-        @DisplayName("still answers, by delegating to __ManagedTypeUtils")
+        @DisplayName("still answers, by delegating to JinayaManagedTypeUtils")
         @Test
         @SuppressWarnings({"removal"})
         void __delegates() {
             final ManagedType<?> expected = mock(EntityType.class);
 
-            final var actual = __EntityTypeUtils.getManagedType(
+            final var actual = JinahyaEntityTypeUtils.getManagedType(
                     Alpha.class,
                     List.of(knowingNothing(), knowing(Alpha.class, (EntityType<?>) expected))
             );

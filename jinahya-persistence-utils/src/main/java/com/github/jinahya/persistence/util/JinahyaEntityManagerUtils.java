@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence;
+package com.github.jinahya.persistence.util;
 
 /*-
  * #%L
@@ -50,7 +50,7 @@ import static java.lang.System.Logger.Level;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __EntityManagerUtils {
+public final class JinahyaEntityManagerUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -438,7 +438,7 @@ public final class __EntityManagerUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private __EntityManagerUtils() {
+    private JinahyaEntityManagerUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

@@ -23,11 +23,11 @@
  * <p>
  * Each class here is a final, non-instantiable holder of {@code static} methods for a single Jakarta Persistence type:
  * <dl>
- *   <dt>{@link com.github.jinahya.persistence.__EntityManagerFactoryUtils}</dt>
+ *   <dt>{@link JinahyaEntityManagerFactoryUtils}</dt>
  *   <dd>Reads the identifier and the version of an entity, and reaches the
  *       {@link jakarta.persistence.PersistenceUnitUtil persistenceUnitUtil} and the
  *       {@link jakarta.persistence.metamodel.Metamodel metamodel} of a factory.</dd>
- *   <dt>{@link com.github.jinahya.persistence.__EntityManagerUtils}</dt>
+ *   <dt>{@link JinahyaEntityManagerUtils}</dt>
  *   <dd>Runs a {@link java.lang.Runnable runnable}, a {@link java.util.function.Supplier supplier}, a
  *       {@link java.util.function.Consumer consumer} or a {@link java.util.function.Function function} inside a
  *       resource-level transaction, either committing or rolling back, and reaches the {@link java.sql.Connection}
@@ -40,3 +40,6 @@
  */
 @org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence;
+
+import com.github.jinahya.persistence.util.JinahyaEntityManagerFactoryUtils;
+import com.github.jinahya.persistence.util.JinahyaEntityManagerUtils;

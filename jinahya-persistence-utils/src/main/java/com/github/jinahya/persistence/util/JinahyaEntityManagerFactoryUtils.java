@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence;
+package com.github.jinahya.persistence.util;
 
 /*-
  * #%L
@@ -35,7 +35,7 @@ import java.util.Objects;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __EntityManagerFactoryUtils {
+public final class JinahyaEntityManagerFactoryUtils {
 
     /**
      * Returns the {@link PersistenceUnitUtil} of the specified entity manager factory.
@@ -112,7 +112,7 @@ public final class __EntityManagerFactoryUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private __EntityManagerFactoryUtils() {
+    private JinahyaEntityManagerFactoryUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

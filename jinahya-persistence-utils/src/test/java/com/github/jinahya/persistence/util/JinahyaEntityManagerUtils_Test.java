@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence;
+package com.github.jinahya.persistence.util;
 
 import jakarta.persistence.ConnectionFunction;
 import jakarta.persistence.EntityManager;
@@ -26,14 +26,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link __EntityManagerUtils}.
+ * Tests for {@link JinahyaEntityManagerUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __EntityManagerUtils_Test {
+class JinahyaEntityManagerUtils_Test {
 
     @DisplayName("getInTransaction(manager, supplier, rollback)")
     @Nested
@@ -61,7 +61,7 @@ class __EntityManagerUtils_Test {
             doThrow(new IllegalStateException("transaction is not active")).when(transaction).rollback();
 
             final var thrown =
-                    catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> "v", false));
+                    catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> "v", false));
 
             assertThat(thrown)
                     .as("the commit failure is what the caller needs to see")
@@ -74,7 +74,7 @@ class __EntityManagerUtils_Test {
             final var cause = new OptimisticLockException("someone else won");
             when(transaction.isActive()).thenReturn(true);
 
-            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
                 throw cause;
             }, true));
 
@@ -87,7 +87,7 @@ class __EntityManagerUtils_Test {
             when(transaction.isActive()).thenReturn(true);
             final var boom = new AssertionError("a failing assertion inside a test");
 
-            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
                 throw boom;
             }, true));
 
@@ -100,7 +100,7 @@ class __EntityManagerUtils_Test {
         void __inactiveTransactionIsNotRolledBack() {
             when(transaction.isActive()).thenReturn(false);
 
-            catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
+            catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
                 throw new IllegalStateException("boom");
             }, true));
 
@@ -115,7 +115,7 @@ class __EntityManagerUtils_Test {
             when(transaction.isActive()).thenReturn(true);
             doThrow(cleanup).when(transaction).rollback();
 
-            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
                 throw cause;
             }, true));
 
@@ -130,7 +130,7 @@ class __EntityManagerUtils_Test {
             final var cleanup = new PersistenceException("cannot even tell");
             when(transaction.isActive()).thenThrow(cleanup);
 
-            final var thrown = catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
                 throw cause;
             }, true));
 
@@ -143,7 +143,7 @@ class __EntityManagerUtils_Test {
         void __activeTransactionIsRolledBack() {
             when(transaction.isActive()).thenReturn(true);
 
-            catchThrowable(() -> __EntityManagerUtils.getInTransaction(manager, () -> {
+            catchThrowable(() -> JinahyaEntityManagerUtils.getInTransaction(manager, () -> {
                 throw new IllegalStateException("boom");
             }, false));
 
@@ -154,7 +154,7 @@ class __EntityManagerUtils_Test {
         @DisplayName("the happy path commits and returns")
         @Test
         void __commits() {
-            assertThat(__EntityManagerUtils.getInTransaction(manager, () -> "v", false)).isEqualTo("v");
+            assertThat(JinahyaEntityManagerUtils.getInTransaction(manager, () -> "v", false)).isEqualTo("v");
             verify(transaction).begin();
             verify(transaction).commit();
         }
@@ -162,7 +162,7 @@ class __EntityManagerUtils_Test {
         @DisplayName("rollback=true rolls back and returns")
         @Test
         void __rollsBack() {
-            assertThat(__EntityManagerUtils.getInTransaction(manager, () -> "v", true)).isEqualTo("v");
+            assertThat(JinahyaEntityManagerUtils.getInTransaction(manager, () -> "v", true)).isEqualTo("v");
             verify(transaction).rollback();
         }
     }
@@ -189,7 +189,7 @@ class __EntityManagerUtils_Test {
         void __runCommits() {
             final var ran = new AtomicInteger();
 
-            __EntityManagerUtils.runInTransaction(manager, ran::incrementAndGet, false);
+            JinahyaEntityManagerUtils.runInTransaction(manager, ran::incrementAndGet, false);
 
             assertThat(ran).hasValue(1);
             verify(transaction).begin();
@@ -202,7 +202,7 @@ class __EntityManagerUtils_Test {
         void __runRollsBack() {
             final var ran = new AtomicInteger();
 
-            __EntityManagerUtils.runInTransactionAndRollback(manager, ran::incrementAndGet);
+            JinahyaEntityManagerUtils.runInTransactionAndRollback(manager, ran::incrementAndGet);
 
             assertThat(ran).hasValue(1);
             verify(transaction).rollback();
@@ -214,7 +214,7 @@ class __EntityManagerUtils_Test {
         void __acceptCommits() {
             final var seen = new AtomicReference<EntityManager>();
 
-            __EntityManagerUtils.acceptInTransaction(manager, seen::set, false);
+            JinahyaEntityManagerUtils.acceptInTransaction(manager, seen::set, false);
 
             assertThat(seen).hasValue(manager);
             verify(transaction).commit();
@@ -225,7 +225,7 @@ class __EntityManagerUtils_Test {
         void __acceptRollsBack() {
             final var seen = new AtomicReference<EntityManager>();
 
-            __EntityManagerUtils.acceptInTransactionAndRollback(manager, seen::set);
+            JinahyaEntityManagerUtils.acceptInTransactionAndRollback(manager, seen::set);
 
             assertThat(seen).hasValue(manager);
             verify(transaction).rollback();
@@ -237,7 +237,7 @@ class __EntityManagerUtils_Test {
             when(transaction.isActive()).thenReturn(true);
             final var boom = new IllegalStateException("boom");
 
-            final var thrown = catchThrowable(() -> __EntityManagerUtils.runInTransaction(manager, () -> {
+            final var thrown = catchThrowable(() -> JinahyaEntityManagerUtils.runInTransaction(manager, () -> {
                 throw boom;
             }, false));
 
@@ -248,10 +248,10 @@ class __EntityManagerUtils_Test {
         @DisplayName("null actions are rejected by name, before anything is begun")
         @Test
         void _NullPointerException_ForNullActions() {
-            assertThatThrownBy(() -> __EntityManagerUtils.runInTransaction(manager, null, false))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.runInTransaction(manager, null, false))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("runnable");
-            assertThatThrownBy(() -> __EntityManagerUtils.acceptInTransaction(manager, null, false))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.acceptInTransaction(manager, null, false))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("consumer");
             verify(transaction, never()).begin();
@@ -295,7 +295,7 @@ class __EntityManagerUtils_Test {
             providerHandingOut(connection);
             final var seen = new AtomicReference<Connection>();
 
-            final String result = __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            final String result = JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 seen.set(c);
                 return "ok";
             });
@@ -310,7 +310,7 @@ class __EntityManagerUtils_Test {
             providerHandingOut(connection);
             final var calls = new AtomicInteger();
 
-            __EntityManagerUtils.applyUnwrappedConnection(manager, c -> calls.incrementAndGet());
+            JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> calls.incrementAndGet());
 
             // a function handed a Connection usually writes; applying it twice would repeat that
             assertThat(calls).hasValue(1);
@@ -324,7 +324,7 @@ class __EntityManagerUtils_Test {
 
             // Hibernate ORM wraps this in a bare RuntimeException and EclipseLink in a PersistenceException,
             // so a caller could no longer catch its own failure by type. Peel it back off.
-            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 throw boom;
             })).isSameAs(boom);
         }
@@ -335,7 +335,7 @@ class __EntityManagerUtils_Test {
             providerHandingOut(connection);
             final var boom = new AssertionError("a failing assertion inside a test");
 
-            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 throw boom;
             })).isSameAs(boom);
         }
@@ -347,7 +347,7 @@ class __EntityManagerUtils_Test {
             doThrow(failure).when(manager).callWithConnection(any());
             final var calls = new AtomicInteger();
 
-            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 calls.incrementAndGet();
                 return "unreachable";
             })).isSameAs(failure);
@@ -362,7 +362,7 @@ class __EntityManagerUtils_Test {
             providerHandingOut(null);
             final var calls = new AtomicInteger();
 
-            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
                 calls.incrementAndGet();
                 return "unreachable";
             }))
@@ -379,7 +379,7 @@ class __EntityManagerUtils_Test {
             when(manager.isJoinedToTransaction()).thenReturn(false);
             providerHandingOut(connection);
 
-            final String result = __EntityManagerUtils.applyUnwrappedConnection(manager, c -> "ok");
+            final String result = JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> "ok");
 
             assertThat(result).isEqualTo("ok");
         }
@@ -387,10 +387,10 @@ class __EntityManagerUtils_Test {
         @DisplayName("null arguments are rejected by name")
         @Test
         void _NullPointerException_ForNullArguments() {
-            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(null, c -> "v"))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(null, c -> "v"))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("manager");
-            assertThatThrownBy(() -> __EntityManagerUtils.applyUnwrappedConnection(manager, null))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("function");
         }
@@ -401,7 +401,7 @@ class __EntityManagerUtils_Test {
             providerHandingOut(connection);
             final var seen = new AtomicReference<Connection>();
 
-            __EntityManagerUtils.acceptUnwrappedConnection(manager, seen::set);
+            JinahyaEntityManagerUtils.acceptUnwrappedConnection(manager, seen::set);
 
             assertThat(seen).hasValue(connection);
         }
