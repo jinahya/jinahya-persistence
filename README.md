@@ -1,7 +1,6 @@
 # jinahya-persistence
 
 [![Java CI with Maven](https://github.com/jinahya/jinahya-persistence/actions/workflows/maven.yml/badge.svg)](https://github.com/jinahya/jinahya-persistence/actions/workflows/maven.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jinahya_jinahya-persistence&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jinahya_jinahya-persistence)
 
 [![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence/versions)
 [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence)
@@ -125,7 +124,6 @@ Jakarta EE 9/9.1 and 10 platform generations.*
 | [`jinahya-persistence-crypto`](jinahya-persistence-crypto) | Transparent attribute encryption for entities: the encryption service, its CDI qualifier, and the lifecycle listener which moves values between plaintext and ciphertext attributes. | `-utils` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-crypto)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-crypto) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-crypto/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-crypto) |
 | [`jinahya-persistence-more-test`](jinahya-persistence-more-test) | Abstract JUnit base classes for testing what `-more` defines — attribute converters and attribute enums. Lives in `src/main` so other projects' tests can extend it. | `-more` (`provided`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-test)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-test) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test) |
 | [`jinahya-persistence-test-utils`](jinahya-persistence-test-utils) | Randomizer / instantiator / persister SPIs, with locators, for building entity instances in a test suite. Also `src/main`, for the same reason. | — | not published yet |
-| [`coverage-report-aggregated`](coverage-report-aggregated) | Build-only: aggregates every module's JaCoCo execution data into one report. Not an artifact anyone depends on. | all five | — |
 
 ### Inside `jinahya-persistence-more`
 

@@ -47,7 +47,6 @@
   </developers>
 
   <modules>
-    <module>coverage-report-aggregated</module>
     <module>jinahya-persistence-crypto</module>
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
@@ -90,14 +89,6 @@
     <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
     <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
     <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.language>java</sonar.language>
-    <sonar.organization>jinahya-github</sonar.organization>
-    <!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage -->
-    <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml,jinahya-persistence-more/target/site/jacoco/jacoco.xml,jinahya-persistence-more-test/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
-    <!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
-    <!--    <sonar.coverage.jacoco.xmlReportPaths>_coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
-    <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/coverage-report-aggregated/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.6.0</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-classic/versions -->
@@ -450,23 +441,11 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
-          <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/sonar-maven-plugin/versions -->
+          <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/versions-maven-plugin/versions -->
           <version>2.21.0</version>
           <configuration>
             <processDependencyManagement>false</processDependencyManagement>
           </configuration>
-        </plugin>
-        <!--        <plugin>-->
-        <!--          <groupId>org.codehaus.mojo</groupId>-->
-        <!--          <artifactId>sonar-maven-plugin</artifactId>-->
-        <!--          <version>4.0.0.4121</version>-->
-        <!--        </plugin>-->
-        <plugin>
-          <groupId>org.sonarsource.scanner.maven</groupId>
-          <artifactId>sonar-maven-plugin</artifactId>
-          <!--          <version>5.2.0.4988</version>-->
-          <!--          <version>5.3.0.6276</version>-->
-          <version>5.7.0.6970</version>
         </plugin>
         <plugin>
           <groupId>org.jacoco</groupId>
@@ -648,7 +627,7 @@
           <!--          </execution>-->
         </executions>
       </plugin>
-      <plugin><!-- https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/java-test-coverage/ -->
+      <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <executions>
@@ -669,13 +648,6 @@
                 <format>HTML</format>
               </formats>
             </configuration>
-          </execution>
-          <execution>
-            <id>report-aggregate</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>report-aggregate</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

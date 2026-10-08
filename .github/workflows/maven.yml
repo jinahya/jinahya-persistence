@@ -38,22 +38,14 @@ jobs:
 #      run: mvn -B package --file pom.xml
 
 
-    - name: Cache SonarQube packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
     - name: Cache Maven packages
       uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
-    - name: Build and analyze
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=jinahya_jinahya-persistence
+    - name: Build
+      run: mvn -B verify
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
@@ -69,10 +61,6 @@ jobs:
   # Naming any profile on the command line deactivates every activeByDefault profile. That is
   # harmless now that the provider is the only axis: the cell names the provider it wants, and
   # nothing else was riding on the defaults.
-  #
-  # NOTE: no Sonar here, deliberately, and none should be added. The analysis belongs to the single
-  # canonical build above. Parallel analyses of one branch would race each other over the same
-  # project and leave the dashboard reporting whichever happened to finish last.
   #
   # `test` rather than `verify`: the convergence enforcer is bound to `validate`, so it runs in every
   # cell already, and there is nothing at `verify` -- no integration tests exist -- that varies by
