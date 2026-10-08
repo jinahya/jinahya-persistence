@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.metamodel;
+package com.github.jinahya.persistence.metamodel.util;
 
 /*-
  * #%L
@@ -36,12 +36,12 @@ import java.util.stream.StreamSupport;
  * @apiNote The methods here look a type up across an {@link Iterable} of entity manager factories, and take
  *         the first match. None memoizes: a lookup which took the first match found for a class, whichever factories
  *         a later caller passed, is not a cache but a wrong answer waiting for a second persistence unit.
- * @see __ManagedTypeUtils
+ * @see JinayaManagedTypeUtils
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __EntityTypeUtils {
+public final class JinahyaEntityTypeUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ public final class __EntityTypeUtils {
      * @param <X>                    represented entity type
      * @return the {@link ManagedType} of the {@code entityClass}.
      * @deprecated A managed type is not an entity type, and this class is about entity types; use
-     *         {@link __ManagedTypeUtils#getManagedType(Class, Iterable)}, which this now merely calls.
+     *         {@link JinayaManagedTypeUtils#getManagedType(Class, Iterable)}, which this now merely calls.
      */
     @Deprecated(forRemoval = true)
     public static <X> ManagedType<X> getManagedType(
@@ -63,7 +63,7 @@ public final class __EntityTypeUtils {
         // cache, and the copy was wrong: Metamodel.managedType(Class) THROWS for a class it does not
         // manage -- it never returns null -- so the `.filter(Objects::nonNull)` was dead and the first
         // factory which did not know the class aborted the whole lookup instead of falling through.
-        return __ManagedTypeUtils.getManagedType(entityClass, entityManagerFactories);
+        return JinayaManagedTypeUtils.getManagedType(entityClass, entityManagerFactories);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -158,7 +158,7 @@ public final class __EntityTypeUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private __EntityTypeUtils() {
+    private JinahyaEntityTypeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

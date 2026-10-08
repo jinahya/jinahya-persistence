@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.metamodel;
+package com.github.jinahya.persistence.metamodel.util;
 
 /*-
  * #%L
@@ -49,7 +49,7 @@ import java.util.function.Function;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __AttributeUtils {
+public final class JinahyaAttributeUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -406,7 +406,7 @@ public final class __AttributeUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private __AttributeUtils() {
+    private JinahyaAttributeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

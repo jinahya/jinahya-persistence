@@ -22,12 +22,12 @@
  * Utilities for working with the Jakarta Persistence metamodel.
  * <p>
  * These classes bridge the gap between the metamodel and plain reflection:
- * {@link com.github.jinahya.persistence.metamodel.__ManagedTypeUtils} and
- * {@link com.github.jinahya.persistence.metamodel.__EntityTypeUtils} resolve a
+ * {@link JinayaManagedTypeUtils} and
+ * {@link JinahyaEntityTypeUtils} resolve a
  * {@link jakarta.persistence.metamodel.ManagedType managedType} or an
  * {@link jakarta.persistence.metamodel.EntityType entityType} for a class, from a single
  * {@link jakarta.persistence.EntityManagerFactory entityManagerFactory} or from the first of several which knows it,
- * while {@link com.github.jinahya.persistence.metamodel.__AttributeUtils} reads and writes the value of an
+ * while {@link JinahyaAttributeUtils} reads and writes the value of an
  * {@link jakarta.persistence.metamodel.Attribute attribute}, whether it is mapped to a field or to a property.
  * <p>
  * The {@code find...} methods answer with an {@link java.util.Optional optional}; the {@code get...} methods throw.
@@ -37,3 +37,7 @@
  */
 @org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.metamodel;
+
+import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
+import com.github.jinahya.persistence.metamodel.util.JinahyaEntityTypeUtils;
+import com.github.jinahya.persistence.metamodel.util.JinayaManagedTypeUtils;

@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.metamodel;
+package com.github.jinahya.persistence.metamodel.util;
 
 /*-
  * #%L
@@ -32,12 +32,12 @@ import java.util.stream.StreamSupport;
  * A utility class for {@link ManagedType}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __EntityTypeUtils
+ * @see JinahyaEntityTypeUtils
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public final class __ManagedTypeUtils {
+public final class JinayaManagedTypeUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -138,7 +138,7 @@ public final class __ManagedTypeUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private __ManagedTypeUtils() {
+    private JinayaManagedTypeUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

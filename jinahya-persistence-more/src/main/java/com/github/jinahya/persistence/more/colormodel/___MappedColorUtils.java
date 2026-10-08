@@ -46,7 +46,8 @@ public final class ___MappedColorUtils {
     private static double hslToRgb(final double n, final double h, final double s, final double l) {
         final var k = (n + h / 30.0d) % 12.0d;
         final var a = s * Math.min(l, 1.0d - l);
-        return l - a * Math.clamp(Math.min(k - 3.0d, 9.0d - k), -1.0d, 1.0d);
+//        return l - a * Math.clamp(Math.min(k - 3.0d, 9.0d - k), -1.0d, 1.0d);
+        return l - a * ____Utils.clamp(Math.min(k - 3.0d, 9.0d - k), -1.0d, 1.0d);
     }
 
     /**

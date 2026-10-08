@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.metamodel;
+package com.github.jinahya.persistence.metamodel.util;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.metamodel.Attribute;
@@ -17,14 +17,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link __AttributeUtils}.
+ * Tests for {@link JinahyaAttributeUtils}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __AttributeUtils_Test {
+class JinahyaAttributeUtils_Test {
 
     // a mapped-superclass-shaped root: one attribute, inherited by two subclasses
     public static class Root {
@@ -161,7 +161,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed("value", String.class, method);
             final var seen = new AtomicReference<Object[]>();
 
-            __AttributeUtils.applyJavaMember(attribute, m -> f -> seen.getAndSet(new Object[]{m, f}));
+            JinahyaAttributeUtils.applyJavaMember(attribute, m -> f -> seen.getAndSet(new Object[]{m, f}));
 
             assertThat(seen.get()).containsExactly(method, null);
         }
@@ -173,7 +173,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed("value", String.class, field);
             final var seen = new AtomicReference<Object[]>();
 
-            __AttributeUtils.applyJavaMember(attribute, m -> f -> seen.getAndSet(new Object[]{m, f}));
+            JinahyaAttributeUtils.applyJavaMember(attribute, m -> f -> seen.getAndSet(new Object[]{m, f}));
 
             assertThat(seen.get()).containsExactly(null, field);
         }
@@ -184,7 +184,7 @@ class __AttributeUtils_Test {
             // a Member which is neither a Method nor a Field; a provider should never produce one
             final var attribute = attributeNamed("value", String.class, Root.class.getConstructor());
 
-            assertThatThrownBy(() -> __AttributeUtils.applyJavaMember(attribute, m -> f -> null))
+            assertThatThrownBy(() -> JinahyaAttributeUtils.applyJavaMember(attribute, m -> f -> null))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("unknown java member type");
         }
@@ -193,10 +193,10 @@ class __AttributeUtils_Test {
         @Test
         void _NullPointerException_ForNullArguments() throws Exception {
             final var attribute = attributeNamed("value", String.class, Root.class.getMethod("getValue"));
-            assertThatThrownBy(() -> __AttributeUtils.applyJavaMember(null, m -> f -> null))
+            assertThatThrownBy(() -> JinahyaAttributeUtils.applyJavaMember(null, m -> f -> null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("attribute");
-            assertThatThrownBy(() -> __AttributeUtils.applyJavaMember(attribute, null))
+            assertThatThrownBy(() -> JinahyaAttributeUtils.applyJavaMember(attribute, null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("function");
         }
@@ -214,7 +214,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed(
                     "when", java.sql.Timestamp.class, Overloaded.class.getMethod("getWhen"));
 
-            assertThat(__AttributeUtils.getJavaMemberType(attribute)).isEqualTo(Date.class);
+            assertThat(JinahyaAttributeUtils.getJavaMemberType(attribute)).isEqualTo(Date.class);
         }
 
         @DisplayName("a field reports its own type")
@@ -223,7 +223,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed(
                     "value", Object.class, FieldAccess.class.getDeclaredField("value"));
 
-            assertThat(__AttributeUtils.getJavaMemberType(attribute)).isEqualTo(String.class);
+            assertThat(JinahyaAttributeUtils.getJavaMemberType(attribute)).isEqualTo(String.class);
         }
     }
 
@@ -237,7 +237,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed(
                     "value", String.class, ProtectedSetter.class.getMethod("getValue"));
 
-            assertThat(__AttributeUtils.getJavaMemberAnnotation(attribute, Column.class))
+            assertThat(JinahyaAttributeUtils.getJavaMemberAnnotation(attribute, Column.class))
                     .isNotNull()
                     .extracting(Column::name).isEqualTo("VALUE");
         }
@@ -248,7 +248,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed(
                     "value", String.class, FieldAccess.class.getDeclaredField("value"));
 
-            assertThat(__AttributeUtils.getJavaMemberAnnotation(attribute, Column.class))
+            assertThat(JinahyaAttributeUtils.getJavaMemberAnnotation(attribute, Column.class))
                     .isNotNull()
                     .extracting(Column::nullable).isEqualTo(false);
         }
@@ -258,7 +258,7 @@ class __AttributeUtils_Test {
         void __absentIsNull() throws Exception {
             final var attribute = attributeNamed("value", String.class, Root.class.getMethod("getValue"));
 
-            assertThat(__AttributeUtils.getJavaMemberAnnotation(attribute, Column.class)).isNull();
+            assertThat(JinahyaAttributeUtils.getJavaMemberAnnotation(attribute, Column.class)).isNull();
         }
     }
 
@@ -273,7 +273,7 @@ class __AttributeUtils_Test {
 
             // the declared return type has to admit this: an optional column, an unset association and a
             // not-yet-generated id all read back as null
-            assertThat(__AttributeUtils.getAttributeValue(new Root(), attribute)).isNull();
+            assertThat(JinahyaAttributeUtils.getAttributeValue(new Root(), attribute)).isNull();
         }
 
         @DisplayName("a private field is read without a getter")
@@ -284,7 +284,7 @@ class __AttributeUtils_Test {
             final var entity = new FieldAccess();
             entity.value = "v";
 
-            assertThat(__AttributeUtils.getAttributeValue(entity, attribute)).isEqualTo("v");
+            assertThat(JinahyaAttributeUtils.getAttributeValue(entity, attribute)).isEqualTo("v");
         }
 
         @DisplayName("a null entity is rejected by name")
@@ -292,7 +292,7 @@ class __AttributeUtils_Test {
         void _NullPointerException_NullEntity() throws Exception {
             final var attribute = attributeNamed("value", String.class, Root.class.getMethod("getValue"));
 
-            assertThatThrownBy(() -> __AttributeUtils.getAttributeValue(null, attribute))
+            assertThatThrownBy(() -> JinahyaAttributeUtils.getAttributeValue(null, attribute))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("entity");
         }
@@ -311,13 +311,13 @@ class __AttributeUtils_Test {
 
             // the overriding subclass first, so its own setValue is what gets resolved (and cached)
             final var overriding = new Overriding();
-            __AttributeUtils.setAttributeValue(overriding, attribute, "a");
+            JinahyaAttributeUtils.setAttributeValue(overriding, attribute, "a");
             assertThat(overriding.getValue()).isEqualTo("overridden:a");
 
             // then a sibling which does NOT override: a write method cached from the other subclass
             // cannot be invoked on this one
             final var plain = new Plain();
-            __AttributeUtils.setAttributeValue(plain, attribute, "b");
+            JinahyaAttributeUtils.setAttributeValue(plain, attribute, "b");
             assertThat(plain.getValue()).isEqualTo("b");
         }
 
@@ -326,7 +326,7 @@ class __AttributeUtils_Test {
         void __readOnlyPropertyIsReported() throws Exception {
             final var attribute = attributeNamed("value", String.class, ReadOnly.class.getMethod("getValue"));
 
-            assertThatThrownBy(() -> __AttributeUtils.setAttributeValue(new ReadOnly(), attribute, "x"))
+            assertThatThrownBy(() -> JinahyaAttributeUtils.setAttributeValue(new ReadOnly(), attribute, "x"))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("no setter")
                     .isNotInstanceOf(NullPointerException.class);
@@ -339,7 +339,7 @@ class __AttributeUtils_Test {
                     "value", String.class, FieldAccess.class.getDeclaredField("value"));
             final var entity = new FieldAccess();
 
-            assertThat(__AttributeUtils.setAttributeValue(entity, attribute, "v")).isNull();
+            assertThat(JinahyaAttributeUtils.setAttributeValue(entity, attribute, "v")).isNull();
 
             assertThat(entity.value).isEqualTo("v");
         }
@@ -352,7 +352,7 @@ class __AttributeUtils_Test {
             final var entity = new FieldAccess();
             entity.value = "v";
 
-            __AttributeUtils.setAttributeValue(entity, attribute, null);
+            JinahyaAttributeUtils.setAttributeValue(entity, attribute, null);
 
             assertThat(entity.value).isNull();
         }
@@ -364,7 +364,7 @@ class __AttributeUtils_Test {
                     "value", String.class, ProtectedSetter.class.getMethod("getValue"));
             final var entity = new ProtectedSetter();
 
-            __AttributeUtils.setAttributeValue(entity, attribute, "v");
+            JinahyaAttributeUtils.setAttributeValue(entity, attribute, "v");
 
             assertThat(entity.getValue()).isEqualTo("v");
         }
@@ -377,7 +377,7 @@ class __AttributeUtils_Test {
             final var attribute = attributeNamed("count", Integer.class, Unboxing.class.getMethod("getCount"));
             final var entity = new Unboxing();
 
-            __AttributeUtils.setAttributeValue(entity, attribute, 3);
+            JinahyaAttributeUtils.setAttributeValue(entity, attribute, 3);
 
             assertThat(entity.getCount()).isEqualTo(3);
         }
@@ -392,7 +392,7 @@ class __AttributeUtils_Test {
             final var entity = new Overloaded();
             final var when = new Date(0L);
 
-            __AttributeUtils.setAttributeValue(entity, attribute, when);
+            JinahyaAttributeUtils.setAttributeValue(entity, attribute, when);
 
             assertThat(entity.taken()).isEqualTo("Date");
             assertThat(entity.getWhen()).isEqualTo(when);
@@ -403,7 +403,7 @@ class __AttributeUtils_Test {
         void _NullPointerException_NullEntity() throws Exception {
             final var attribute = attributeNamed("value", String.class, Root.class.getMethod("getValue"));
 
-            assertThatThrownBy(() -> __AttributeUtils.setAttributeValue(null, attribute, "v"))
+            assertThatThrownBy(() -> JinahyaAttributeUtils.setAttributeValue(null, attribute, "v"))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("entity");
         }
@@ -422,12 +422,12 @@ class __AttributeUtils_Test {
             final var second = attributeNamed("value", String.class, method);
             final var entity = new Root();
 
-            __AttributeUtils.setAttributeValue(entity, first, "a");
+            JinahyaAttributeUtils.setAttributeValue(entity, first, "a");
             assertThat(entity.getValue()).isEqualTo("a");
 
             // the cache is keyed by the attribute NAME, so the second one hits the same entry rather than
             // adding one which reaches a second, now unreachable, persistence unit
-            __AttributeUtils.setAttributeValue(entity, second, "b");
+            JinahyaAttributeUtils.setAttributeValue(entity, second, "b");
             assertThat(entity.getValue()).isEqualTo("b");
         }
     }
