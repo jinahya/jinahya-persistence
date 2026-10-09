@@ -1,12 +1,11 @@
 /**
- * Interfaces, annotations and classes for encrypting entity attributes at rest.
+ * Application-level encryption of entity attributes: selected attributes are encrypted inside the application, so that
+ * the database only ever stores their ciphertext.
  * <p>
- * An entity opts in by being annotated with
- * {@link EncryptedEntity @__EncryptedEntity}, and each attribute which is to be
- * stored encrypted with {@link EncryptedAttribute @__EncryptedAttribute}. The
- * annotated attribute holds the plaintext and is never written with a value in it; the ciphertext lives in a second,
- * {@code byte[]}-typed attribute of the same entity, named by the annotation or derived from the first attribute's
- * name.
+ * An entity opts in by being annotated with {@link EncryptedEntity @EncryptedEntity}, and each attribute which is to
+ * be stored encrypted with {@link EncryptedAttribute @EncryptedAttribute}. The annotated attribute holds the plaintext
+ * and is never written with a value in it; the ciphertext lives in a second, {@code byte[]}-typed attribute of the same
+ * entity, named by the annotation or derived from the first attribute's name.
  *
  * <h2>The pieces</h2>
  * <dl>
@@ -19,10 +18,13 @@
  *       attributes are descended into.</dd>
  *   <dt>{@link EntityEncryptionListener}</dt>
  *   <dd>The entity listener which ties the service to the entity life cycle, so that an instance is encrypted before
- *       it is written and decrypted after it is read.</dd>
+ *       it is written and decrypted after it is read. Registered directly, with
+ *       {@link jakarta.persistence.EntityListeners @EntityListeners}; it takes the service from CDI.</dd>
  * </dl>
- * {@link __SecureAttributeConverter} offers the alternative shape — a single
- * attribute converter, needing no second column — and is not implemented yet.
+ * The mapping is validated before any instance is touched, and at startup under CDI; each encrypt and decrypt is
+ * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.
+ * <p>
+ * {@link __SecureAttributeConverter}, a single-attribute converter, is deprecated for removal.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

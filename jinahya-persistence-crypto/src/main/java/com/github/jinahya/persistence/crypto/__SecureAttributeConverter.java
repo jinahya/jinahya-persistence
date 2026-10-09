@@ -147,7 +147,7 @@ public abstract class __SecureAttributeConverter<X, Y> implements AttributeConve
      * Encrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
      * @param entityInstance the entity instance to encrypt; instances of a class which is not annotated with
-     *                       {@link EncryptedEntity @__EncryptedEntity} are silently skipped.
+     *                       {@link EncryptedEntity @EncryptedEntity} are silently skipped.
      */
     protected void encrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "encrypt({0})", describe(entityInstance));
@@ -165,7 +165,7 @@ public abstract class __SecureAttributeConverter<X, Y> implements AttributeConve
      * Decrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
      * @param entityInstance the entity instance to decrypt; instances of a class which is not annotated with
-     *                       {@link EncryptedEntity @__EncryptedEntity} are silently skipped.
+     *                       {@link EncryptedEntity @EncryptedEntity} are silently skipped.
      */
     protected void decrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.DEBUG, "decrypt({0})", describe(entityInstance));

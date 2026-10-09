@@ -83,9 +83,10 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
  * instance, in place.
  * <p>
  * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each {@code BASIC}
- * attribute annotated with {@link EncryptedAttribute @__EncryptedAttribute}:
+ * attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}:
  * <ol>
- *   <li>converts the plaintext value to bytes, by its java type;</li>
+ *   <li>converts the plaintext value to bytes, by its declared java type, prefixed with a header naming the format
+ *       version and the codec;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionManager encryptionManager}, along with the
  *       {@link EntityEncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
  *   <li>stores the ciphertext in the paired {@code byte[]} attribute, and clears the plaintext one.</li>
@@ -93,10 +94,14 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
  * attributes of an embeddable are covered as well.
  * <p>
+ * The mapping of a type is validated in full before any instance of it is touched, and every mapping of the
+ * persistence unit at {@link #onStartup(Startup) startup}, or by {@link #validateMappings()}. Each encrypt and decrypt
+ * is all-or-nothing per instance: every value is computed before any is assigned.
+ * <p>
  * The java types handled are those Jakarta Persistence calls basic types: the primitives and their wrappers,
  * {@link String}, {@link BigInteger}, {@link BigDecimal}, the {@code java.time} types, {@link java.util.Date},
  * {@link Calendar}, {@link UUID}, {@code byte[]}, {@code char[]} and their boxed forms, enums, and anything
- * {@link Serializable}. Any other type is rejected with a {@link RuntimeException}.
+ * {@link Serializable}. A mapping of any other type is rejected when it is validated.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see EntityEncryptionManager
@@ -482,17 +487,6 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * Validates every {@link EncryptedAttribute annotated attribute} of the specified managed type, and returns the
-     * pairs, and the embedded attributes, to walk.
-     *
-     * @param managedType the managed type to validate.
-     * @return the validated mapping of the {@code managedType}.
-     * @throws RuntimeException when any annotated attribute of the {@code managedType} is mapped inconsistently.
-     * @implNote The validation runs once per {@code (rootType, embeddingPath)}, and descends through the whole
-     * reachable embeddable graph to completion before any instance is touched, so that an inconsistent mapping
-     * cannot leave an instance half-encrypted.
-     */
-    /**
      * Whether a mapping fact holds, does not hold, or could not be established.
      */
     protected enum MappingFlag {
@@ -635,6 +629,20 @@ public abstract class AbstractEntityEncryptionService {
         return null;
     }
 
+    /**
+     * Validates every {@link EncryptedAttribute annotated attribute} of the specified managed type, and returns the
+     * pairs, and the embedded attributes, to walk.
+     *
+     * @param rootType      the managed type the walk started from.
+     * @param embeddingPath the embedding attributes from the {@code rootType} down to the {@code managedType}.
+     * @param managedType   the managed type to validate.
+     * @param visiting      the managed types on the current path, for detecting a cycle.
+     * @return the validated mapping of the {@code managedType}.
+     * @throws RuntimeException when any annotated attribute of the {@code managedType} is mapped inconsistently.
+     * @implNote The validation runs once per {@code (rootType, embeddingPath)}, and descends through the whole
+     *         reachable embeddable graph to completion before any instance is touched, so that an inconsistent
+     *         mapping cannot leave an instance half-encrypted.
+     */
     private Mapping validate(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                              final ManagedType<?> managedType, final Set<ManagedType<?>> visiting) {
         if (!visiting.add(managedType)) {
@@ -785,7 +793,7 @@ public abstract class AbstractEntityEncryptionService {
             }
             if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, EncryptedAttribute.class) != null) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute cannot itself be annotated with @__EncryptedAttribute");
+                             "an encrypted attribute cannot itself be annotated with @EncryptedAttribute");
             }
             final var encryptedRules = resolveColumnRules(rootType, embeddingPath, encryptedAttribute);
             if (encryptedRules.insertable() != MappingFlag.YES || encryptedRules.updatable() != MappingFlag.YES) {
@@ -1282,9 +1290,8 @@ public abstract class AbstractEntityEncryptionService {
             } catch (final IndexOutOfBoundsException | IllegalArgumentException | AssertionError e) {
                 // Everything the decode ladder can raise for bytes it cannot turn back into a value:
                 //   IndexOutOfBounds     a payload shorter than the fixed-width codec expects
-                //   AssertionError       the same, when assertions are enabled -- __EncryptionServiceUtils
-                //                        validates its lengths with assert, so a short payload reads the same
-                //                        way whether or not -ea is on
+                //   AssertionError       an assert in EntityEncryptionServiceUtils, when assertions are enabled;
+                //                        the payload lengths themselves are checked unconditionally
                 //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
                 //                        which is not a constant of the attribute's enum, and a payload header
                 //                        naming another format version or another codec
@@ -1326,14 +1333,6 @@ public abstract class AbstractEntityEncryptionService {
     // ----------------------------------------------------------------------------------------------------- entityTypes
 
     // ---------------------------------------------------------------------------------------------------- managedTypes
-    /**
-     * Returns the {@link ManagedType} of the specified class, from this service's entity manager factory, caching it
-     * against the {@code entityClass}.
-     *
-     * @param entityClass the class whose managed type is returned.
-     * @return the managed type of the {@code entityClass}.
-     * @throws IllegalArgumentException when the entity manager factory does not manage the {@code entityClass}.
-     */
     /**
      * Returns the class the metamodel knows the specified object by.
      *

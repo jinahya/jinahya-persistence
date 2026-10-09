@@ -75,7 +75,7 @@ The ciphertext is a sibling column in the entity's own table. There are two mode
 [source,java]
 ----
 @EncryptedEntity
-@EntityListeners(MyEncryptionListener.class)
+@EntityListeners(EntityEncryptionListener.class)
 class User {
 
     @EncryptedAttribute
@@ -496,7 +496,7 @@ Same as within_table Mode B (2.2), with the bundle as the only mapped attribute:
 ** an edit through the setter persists, and a direct field write is lost;
 ** behavior when the secondary row is missing;
 ** the A to B switch on existing data.
-* Format items (1.4), whatever the scheme.
+* *Done:* the format items (1.4), as format version 1 (#75–#80).
 * single_column:
 ** sealed bundle or per-attribute entries?
 ** bundle encoding: JSON with Base64 codecs, or binary tag/length/value?
@@ -545,7 +545,7 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
   they fail loudly.
 . *Re-encryption policy:* encrypt only when the plaintext differs from what was decrypted.
 . *A pre-switch check:* count the rows that still have plaintext and no ciphertext.
-. *Format items* (1.4): version byte, strict lengths, `Serializable` opt-in, a spec.
+. *Format items* (1.4): *done*, as format version 1 (#75–#80); `Serializable` stays as JPA supports it (#8).
 . *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
   secondary-table behavior on both providers.
 
