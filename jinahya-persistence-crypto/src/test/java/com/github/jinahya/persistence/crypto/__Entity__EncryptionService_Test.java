@@ -411,6 +411,18 @@ class __Entity__EncryptionService_Test {
             assertThatCode(() -> untouchable.decrypt(entity)).doesNotThrowAnyException();
             assertThat(entity.name).isEqualTo("plain");
         }
+
+        @DisplayName("a plaintext column which is not updatable is rejected (#73)")
+        @Test
+        void __nonUpdatablePlaintextRejected() {
+            final var entity = new _FrozenPlainEntity();
+            entity.name = "frozen";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("has to be updatable");
+            assertThat(entity.name).as("nothing was touched").isEqualTo("frozen");
+        }
     }
 
     @DisplayName("decrypt()")

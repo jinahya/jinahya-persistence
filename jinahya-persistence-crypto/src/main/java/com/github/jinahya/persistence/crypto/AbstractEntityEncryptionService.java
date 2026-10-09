@@ -581,6 +581,15 @@ public abstract class AbstractEntityEncryptionService {
                                      : "a decrypted attribute's column has to be nullable")
                              + "; encrypting nulls it (from " + rules.source() + ")");
             }
+            // a legacy row (plaintext in this column, no ciphertext) is migrated by the UPDATE which stores its
+            // ciphertext, and only that UPDATE nulls this column; a non-updatable one keeps the legacy plaintext forever
+            if (rules.updatable() != MappingFlag.YES) {
+                throw reject(rootType, embeddingPath, decryptedAttribute, null,
+                             (rules.updatable() == MappingFlag.UNKNOWN
+                                     ? "cannot establish that a decrypted attribute's column is updatable"
+                                     : "a decrypted attribute's column has to be updatable")
+                             + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
+            }
             final var name = annotation.encryptedAttribute().isBlank()
                     ? EncryptedAttributeUtils.getDefaultEncryptedAttributeName(decryptedAttribute)
                     : annotation.encryptedAttribute();

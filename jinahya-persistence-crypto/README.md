@@ -51,7 +51,9 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
 * Only `@Basic` mappings are supported; `@Embedded` attributes are descended into. An annotated attribute which is
   neither is an error, not something skipped.
 * Source (decrypted, plain) attributes must be `optional`, must not be of a primitive type, and their column must be
-  **non-insertable** and nullable.
+  **non-insertable**, nullable and **updatable**: a legacy row (plaintext, no ciphertext) is migrated by the `UPDATE`
+  which stores its ciphertext, and only that `UPDATE` nulls the plaintext column
+  ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)).
 * Target (encrypted) attributes must be `optional`, `@Basic`, typed `byte[]`, paired only once, and their column must
   be insertable, updatable and nullable.
 * An `@Embedded` attribute may not itself be annotated; annotate the attributes inside the embeddable.
@@ -69,8 +71,6 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
 
 Known gaps in this validation — each of these is currently **silent**:
 
-* the plaintext column is not required to be `updatable`, which the lazy migration of legacy rows depends on
-  ([#73](https://github.com/jinahya/jinahya-persistence/issues/73));
 * validation is lazy: a mapping is checked on its first encrypt/decrypt, not at startup
   ([#74](https://github.com/jinahya/jinahya-persistence/issues/74)).
 

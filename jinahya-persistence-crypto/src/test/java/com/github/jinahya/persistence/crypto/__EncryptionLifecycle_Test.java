@@ -192,4 +192,41 @@ class __EncryptionLifecycle_Test {
             return null;
         });
     }
+
+    @DisplayName("a legacy row is left alone by a read, and migrated, plaintext column nulled, by a write (#73)")
+    @Test
+    void observeLegacyRowMigration() {
+        final var plaintext = "legacy-" + System.nanoTime();
+        // a row written before encryption was introduced: plaintext in the column, no ciphertext
+        apply(em -> em.createNativeQuery(
+                        "INSERT INTO " + _GuardedEntity.TABLE_NAME + " (version, name, name_enc)"
+                        + " VALUES (0, '" + plaintext + "', NULL)")
+                .executeUpdate());
+        final long id = apply(em -> ((Number) em
+                .createNativeQuery("SELECT id FROM " + _GuardedEntity.TABLE_NAME + " WHERE name = '" + plaintext + "'")
+                .getSingleResult()).longValue());
+
+        // a read: @PostLoad skips a row which has no ciphertext, so the application sees the plaintext
+        final var read = apply(em -> em.find(_GuardedEntity.class, id).name);
+        assertThat(read).as("a legacy row stays readable").isEqualTo(plaintext);
+        final var afterRead = row(id);
+        log.info("[legacy] row after a read:  {}", describe(afterRead));
+        assertThat(afterRead[1]).as("a read does not migrate it").isEqualTo(plaintext);
+        assertThat(afterRead[2]).isNull();
+
+        // a batch pass: encrypt the managed instance; @PreUpdate then sees "already encrypted"
+        apply(em -> {
+            _LifecycleListenerEntity.SERVICE.encrypt(em.find(_GuardedEntity.class, id));
+            return null;
+        });
+        final var afterMigration = row(id);
+        log.info("[legacy] row after migrate: {}", describe(afterMigration));
+        assertThat(afterMigration[1])
+                .as("the UPDATE which stores the ciphertext nulls the plaintext column; this needs it updatable")
+                .isNull();
+        assertThat(afterMigration[2]).as("the row now holds the ciphertext").isNotNull();
+
+        final var reread = apply(em -> em.find(_GuardedEntity.class, id).name);
+        assertThat(reread).as("and reads back as the same value").isEqualTo(plaintext);
+    }
 }
