@@ -756,6 +756,21 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
+     * An assignment of a value to an attribute of an entity, or embeddable, instance, deferred until every assignment
+     * of a transform has been computed.
+     *
+     * @param target    the instance to assign to.
+     * @param attribute the attribute to assign.
+     * @param value     the value to assign; may be {@code null}.
+     */
+    private record Assignment(Object target, Attribute<?, ?> attribute, @Nullable Object value) {
+
+        void apply() {
+            JinahyaAttributeUtils.setAttributeValue(target, attribute, value);
+        }
+    }
+
+    /**
      * The validated mapping of a managed type.
      *
      * @param pairs     the encrypted pairs to transform.
@@ -789,7 +804,11 @@ public abstract class AbstractEntityEncryptionService {
     protected void encrypt(final @NotBlank String encryptionIdentifier, final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
-        encrypt(encryptionIdentifier, object, getMapping(getManagedType(resolveClass(object))));
+        final var mapping = getMapping(getManagedType(resolveClass(object)));
+        // computes every ciphertext before assigning any, so that a failure part-way leaves the instance as it was
+        final var assignments = new ArrayList<Assignment>();
+        encrypt(encryptionIdentifier, object, mapping, assignments);
+        assignments.forEach(Assignment::apply);
     }
 
     /**
@@ -798,15 +817,18 @@ public abstract class AbstractEntityEncryptionService {
      * @param encryptionIdentifier the identifier the encryption keys are selected by.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
      * @param mapping              the validated mapping of the {@code object}.
+     * @param assignments          the list to which every attribute assignment is added, rather than made.
      * @implNote The mapping is passed down rather than looked up again: an embeddable reached through an
      *         {@link AttributeOverride @AttributeOverride} would otherwise be re-resolved without that override in
-     *         scope.
+     *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
+     *         computed.
      */
-    private void encrypt(final String encryptionIdentifier, final Object object, final Mapping mapping) {
+    private void encrypt(final String encryptionIdentifier, final Object object, final Mapping mapping,
+                         final List<Assignment> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
-                encrypt(encryptionIdentifier, embeddedValue, embedded.mapping());
+                encrypt(encryptionIdentifier, embeddedValue, embedded.mapping(), assignments);
             }
         }
         for (final var pair : mapping.pairs()) {
@@ -819,7 +841,7 @@ public abstract class AbstractEntityEncryptionService {
                     // already encrypted
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
+                assignments.add(new Assignment(object, encryptedAttribute, null));
                 continue;
             }
             final byte[] decryptedBytes;
@@ -929,8 +951,8 @@ public abstract class AbstractEntityEncryptionService {
                 throw new RuntimeException(
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
             }
-            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, encrypted);
-            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
+            assignments.add(new Assignment(object, encryptedAttribute, encrypted));
+            assignments.add(new Assignment(object, decryptedAttribute, null));
         }
     }
 
@@ -1016,7 +1038,11 @@ public abstract class AbstractEntityEncryptionService {
     protected void decrypt(final @NotBlank String encryptionIdentifier, final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
-        decrypt(encryptionIdentifier, object, getMapping(getManagedType(resolveClass(object))));
+        final var mapping = getMapping(getManagedType(resolveClass(object)));
+        // decodes every value before assigning any, so that a failure part-way leaves the instance as it was
+        final var assignments = new ArrayList<Assignment>();
+        decrypt(encryptionIdentifier, object, mapping, assignments);
+        assignments.forEach(Assignment::apply);
     }
 
     /**
@@ -1025,15 +1051,18 @@ public abstract class AbstractEntityEncryptionService {
      * @param encryptionIdentifier the identifier the encryption keys are selected by.
      * @param object               the entity, or embeddable, instance to decrypt, in place.
      * @param mapping              the validated mapping of the {@code object}.
+     * @param assignments          the list to which every attribute assignment is added, rather than made.
      * @implNote The mapping is passed down rather than looked up again: an embeddable reached through an
      *         {@link AttributeOverride @AttributeOverride} would otherwise be re-resolved without that override in
-     *         scope.
+     *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
+     *         computed.
      */
-    private void decrypt(final String encryptionIdentifier, final Object object, final Mapping mapping) {
+    private void decrypt(final String encryptionIdentifier, final Object object, final Mapping mapping,
+                         final List<Assignment> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
-                decrypt(encryptionIdentifier, embeddedValue, embedded.mapping());
+                decrypt(encryptionIdentifier, embeddedValue, embedded.mapping(), assignments);
             }
         }
         for (final var pair : mapping.pairs()) {
@@ -1046,7 +1075,7 @@ public abstract class AbstractEntityEncryptionService {
                     // the encrypted column may be defined later
                     continue;
                 }
-                JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
+                assignments.add(new Assignment(object, decryptedAttribute, null));
                 continue;
             }
             final var framedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
@@ -1156,8 +1185,8 @@ public abstract class AbstractEntityEncryptionService {
                         e
                 );
             }
-            JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, decryptedValue);
-            JinahyaAttributeUtils.setAttributeValue(object, encryptedAttribute, null);
+            assignments.add(new Assignment(object, decryptedAttribute, decryptedValue));
+            assignments.add(new Assignment(object, encryptedAttribute, null));
         }
     }
 
