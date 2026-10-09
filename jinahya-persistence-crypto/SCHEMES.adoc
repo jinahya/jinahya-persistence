@@ -159,7 +159,9 @@ connection fail. It cannot be fixed inside JPA callbacks (1.3).
 ** JPQL on `name` silently sees NULL.
 ** Clearing a value in the encrypted state is impossible through `name`.
 ** Raw ciphertext written into `name_enc__` is accepted as is.
-* *Lazy migration relies on `name` staying updatable*, which validation does not require *[untested]*.
+* *Lazy migration relies on `name` staying updatable.* Validation now requires it (#73), and
+  `__EncryptionLifecycle_Test.observeLegacyRowMigration` measures it on both providers: a read leaves a legacy row
+  alone, and the migrating `UPDATE` nulls the plaintext column.
 
 === 2.2 Mode B: transient plaintext (steady state)
 
