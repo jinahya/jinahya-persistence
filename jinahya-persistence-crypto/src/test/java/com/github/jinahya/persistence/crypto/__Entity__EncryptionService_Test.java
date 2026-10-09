@@ -216,6 +216,20 @@ class __Entity__EncryptionService_Test {
             assertThat(entity.name).isEqualTo("Jane Roe");
         }
 
+        @DisplayName("a value which would not be read back as is, is rejected against its attribute, without the value (#77)")
+        @Test
+        void __unencodableValueRejected() {
+            final var entity = new _SecretEntity();
+            entity.name = "a\uD800b"; // an unpaired surrogate: not representable in UTF-8
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("cannot encode the value")
+                    .hasMessageContaining("decrypted attribute: name")
+                    .hasMessageNotContaining("a\uD800b");
+            assertThat(entity.name).as("the caller still holds the value").isEqualTo("a\uD800b");
+        }
+
         @DisplayName("an attribute which is null on both sides stays null")
         @Test
         void __bothNull() {
