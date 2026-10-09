@@ -45,6 +45,26 @@ final class EntityEncryptionServiceUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Returns the specified payload after checking that it is exactly as long as a fixed-width codec reads.
+     *
+     * @param b      the payload.
+     * @param length the width of the codec, in bytes.
+     * @return the {@code b}.
+     * @throws IllegalArgumentException when the {@code b} is shorter, or longer, than the {@code length}.
+     * @implNote Checked unconditionally, not with {@code assert}: a payload which is too long would otherwise be read
+     *         silently, as its first {@code length} bytes.
+     */
+    private static byte[] exactly(final byte[] b, final int length) {
+        if (b.length != length) {
+            throw new IllegalArgumentException(
+                    "a payload of " + b.length + " byte(s); this codec reads exactly " + length);
+        }
+        return b;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Writes the specified {@code boolean} value into the specified array of bytes, at the specified index.
      *
      * @param b the array of bytes to which the value is written.
@@ -91,7 +111,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static boolean boolean_1(final byte[] b) {
-        return boolean_1(b, 0);
+        return boolean_1(exactly(b, Byte.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -143,7 +163,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static byte byte_1(final byte[] b) {
-        return byte_1(b, 0);
+        return byte_1(exactly(b, Byte.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -199,7 +219,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static short short_2(final byte[] b) {
-        return short_2(b, 0);
+        return short_2(exactly(b, Short.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -253,7 +273,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static int int_4(final byte[] b) {
-        return int_4(b, 0);
+        return int_4(exactly(b, Integer.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -307,7 +327,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static long long_8(final byte[] b) {
-        return long_8(b, 0);
+        return long_8(exactly(b, Long.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -352,7 +372,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static char char_2(final byte[] b) {
-        return char_2(b, 0);
+        return char_2(exactly(b, Character.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -374,7 +394,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static float float_4(final byte[] b) {
-        return Float.intBitsToFloat(int_4(b));
+        return Float.intBitsToFloat(int_4(b)); // int_4(byte[]) checks the length
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -396,7 +416,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static double double_8(final byte[] b) {
-        return Double.longBitsToDouble(long_8(b));
+        return Double.longBitsToDouble(long_8(b)); // long_8(byte[]) checks the length
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.String
@@ -477,7 +497,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static UUID uuid_16(final byte[] b) {
-        return uuid_16(b, 0);
+        return uuid_16(exactly(b, Long.BYTES << 1), 0);
     }
 
     // ------------------------------------------------------------------------------------------------------- java.math
@@ -528,6 +548,10 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static BigDecimal big_decimal_(final byte[] b) {
+        if (b.length < Integer.BYTES) {
+            throw new IllegalArgumentException(
+                    "a payload of " + b.length + " byte(s); expected at least " + Integer.BYTES + " for the scale");
+        }
         final var scale = int_4(b, 0);
         final var unscaledValue = big_integer_(Arrays.copyOfRange(b, Integer.BYTES, b.length));
         return new BigDecimal(unscaledValue, scale);
@@ -581,7 +605,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static LocalDate local_date_8(final byte[] b) {
-        return local_date_8(b, 0);
+        return local_date_8(exactly(b, Long.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -626,7 +650,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static LocalTime local_time_8(final byte[] b) {
-        return LocalTime.ofNanoOfDay(long_8(b, 0));
+        return LocalTime.ofNanoOfDay(long_8(exactly(b, Long.BYTES), 0));
     }
 
     // ----------------------------------------------------------------------------------------- java.time.LocalDateTime
@@ -683,7 +707,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static LocalDateTime local_date_time_16(final byte[] b) {
-        return local_date_time_16(b, 0);
+        return local_date_time_16(exactly(b, Long.BYTES << 1), 0);
     }
 
     // ------------------------------------------------------------------------------------------------ java.time.Offset
@@ -729,7 +753,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static ZoneOffset offset_4(final byte[] b) {
-        return offset_4(b, 0);
+        return offset_4(exactly(b, Integer.BYTES), 0);
     }
 
     // -------------------------------------------------------------------------------------------- java.time.OffsetTime
@@ -785,7 +809,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static java.time.OffsetTime offset_time_12(final byte[] b) {
-        return offset_time_12(b, 0);
+        return offset_time_12(exactly(b, Long.BYTES + Integer.BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------- java.time.OffsetDateTime
@@ -837,7 +861,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static OffsetDateTime offset_date_time_20(final byte[] b) {
-        return offset_date_time_20(b, 0);
+        return offset_date_time_20(exactly(b, (Long.BYTES << 1) + Integer.BYTES), 0);
     }
 
     // ----------------------------------------------------------------------------------------------- java.time.Instant
@@ -889,7 +913,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static Instant instant_12(final byte[] b) {
-        return instant_12(b, 0);
+        return instant_12(exactly(b, Long.BYTES + Integer.BYTES), 0);
     }
 
     // -------------------------------------------------------------------------------------------------- java.time.Year
@@ -935,7 +959,7 @@ final class EntityEncryptionServiceUtils {
      * @return the value represented by the {@code b}.
      */
     static Year year_4(final byte[] b) {
-        return year_4(b, 0);
+        return year_4(exactly(b, Integer.BYTES), 0);
     }
 
     // -------------------------------------------------------------------------------------------------- java.util.Date
@@ -1007,7 +1031,7 @@ final class EntityEncryptionServiceUtils {
      */
     @Deprecated
     static java.util.Date util_date_8(final byte[] b) {
-        return util_date_8(b, 0);
+        return util_date_8(exactly(b, Long.BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------------- java.util.Calendar
@@ -1081,7 +1105,7 @@ final class EntityEncryptionServiceUtils {
      */
     @Deprecated
     static Calendar util_calendar_8(final byte[] b) {
-        return util_calendar_8(b, 0);
+        return util_calendar_8(exactly(b, Long.BYTES), 0);
     }
 
     // --------------------------------------------------------------------------------------------------- java.sql.Date
@@ -1146,7 +1170,7 @@ final class EntityEncryptionServiceUtils {
      */
     @Deprecated
     static java.sql.Date sql_date_8(final byte[] b) {
-        return sql_date_8(b, 0);
+        return sql_date_8(exactly(b, Long.BYTES), 0);
     }
 
     // --------------------------------------------------------------------------------------------------- java.sql.Time
@@ -1211,7 +1235,7 @@ final class EntityEncryptionServiceUtils {
      */
     @Deprecated
     static java.sql.Time sql_time_8(final byte[] b) {
-        return sql_time_8(b, 0);
+        return sql_time_8(exactly(b, Long.BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------------- java.sql.Timestamp
@@ -1283,7 +1307,7 @@ final class EntityEncryptionServiceUtils {
      */
     @Deprecated
     static java.sql.Timestamp sql_timestamp_16(final byte[] b) {
-        return sql_timestamp_16(b, 0);
+        return sql_timestamp_16(exactly(b, 16), 0);
     }
 
     // ---------------------------------------------------------------------------------------------------------- byte[]

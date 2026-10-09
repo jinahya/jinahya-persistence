@@ -194,8 +194,11 @@ was written, say `Long` to `Integer` — is rejected, naming the attribute, rath
 the header existed is not readable; the module is pre-1.0, and offers no migration for it
 ([#19](https://github.com/jinahya/jinahya-persistence/issues/19)).
 
-> **The format is not final.** Before a release that stores data, the rest of the revision lands: exact-length checks in
-> the fixed-width decoders ([#76](https://github.com/jinahya/jinahya-persistence/issues/76)), and the per-codec items
+Every fixed-width decoder reads a payload of **exactly** its width, and rejects anything shorter or longer
+([#76](https://github.com/jinahya/jinahya-persistence/issues/76)); a variable-width one rejects what it cannot read.
+The checks are unconditional, not `assert`s.
+
+> **The format is not final.** Before a release that stores data, the rest of the revision lands: the per-codec items
 > marked below.
 
 | attribute              | bytes      | encoding                                                    |

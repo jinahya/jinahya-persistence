@@ -99,14 +99,14 @@ class EncryptionServiceUtils_Test {
     }
 
     /**
-     * Asserts that decoding a payload shorter than the codec's fixed width fails, rather than reading past it.
+     * Asserts that decoding a payload of the wrong length fails, rather than reading past it or ignoring the rest.
      *
-     * @implNote The fixed-width codecs check their lengths with {@code assert}, so the failure is an
-     *         {@link AssertionError} with {@code -ea}, which surefire enables, and an {@link IndexOutOfBoundsException}
-     *         without it; the service treats both alike.
+     * @implNote The lengths are checked unconditionally, not with {@code assert} (#76), so the failure is an
+     *         {@link IllegalArgumentException} whether or not assertions are enabled; the service reports it against
+     *         the attribute.
      */
-    private static void assertShortPayloadFails(final ThrowableAssert.ThrowingCallable decode) {
-        assertThatThrownBy(decode).isInstanceOfAny(AssertionError.class, IndexOutOfBoundsException.class);
+    private static void assertWrongLengthFails(final ThrowableAssert.ThrowingCallable decode) {
+        assertThatThrownBy(decode).isInstanceOf(IllegalArgumentException.class);
     }
 
     // --------------------------------------------------------------------------------------------------------- boolean
@@ -147,7 +147,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("boolean_1(byte[]) fails on an empty array")
         @Test
         void __decodeEmpty() {
-            assertShortPayloadFails(() -> boolean_1(new byte[0]));
+            assertWrongLengthFails(() -> boolean_1(new byte[0]));
+        }
+
+        @DisplayName("boolean_1(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> boolean_1(new byte[1 + 1]));
         }
     }
 
@@ -173,7 +179,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("byte_1(byte[]) fails on an empty array")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> byte_1(new byte[0]));
+            assertWrongLengthFails(() -> byte_1(new byte[0]));
+        }
+
+        @DisplayName("byte_1(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> byte_1(new byte[1 + 1]));
         }
     }
 
@@ -199,7 +211,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("short_2(byte[]) fails on fewer than two bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> short_2(new byte[1]));
+            assertWrongLengthFails(() -> short_2(new byte[1]));
+        }
+
+        @DisplayName("short_2(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> short_2(new byte[2 + 1]));
         }
     }
 
@@ -225,7 +243,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("int_4(byte[]) fails on fewer than four bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> int_4(new byte[Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> int_4(new byte[Integer.BYTES - 1]));
+        }
+
+        @DisplayName("int_4(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> int_4(new byte[Integer.BYTES + 1]));
         }
     }
 
@@ -251,7 +275,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("long_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> long_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> long_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("long_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> long_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -277,7 +307,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("char_2(byte[]) fails on fewer than two bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> char_2(new byte[1]));
+            assertWrongLengthFails(() -> char_2(new byte[1]));
+        }
+
+        @DisplayName("char_2(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> char_2(new byte[2 + 1]));
         }
     }
 
@@ -306,7 +342,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("float_4(byte[]) fails on fewer than four bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> float_4(new byte[Float.BYTES - 1]));
+            assertWrongLengthFails(() -> float_4(new byte[Float.BYTES - 1]));
+        }
+
+        @DisplayName("float_4(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> float_4(new byte[Float.BYTES + 1]));
         }
     }
 
@@ -335,7 +377,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("double_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> double_8(new byte[Double.BYTES - 1]));
+            assertWrongLengthFails(() -> double_8(new byte[Double.BYTES - 1]));
+        }
+
+        @DisplayName("double_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> double_8(new byte[Double.BYTES + 1]));
         }
     }
 
@@ -401,7 +449,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("uuid_16(byte[]) fails on fewer than sixteen bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> uuid_16(new byte[(Long.BYTES << 1) - 1]));
+            assertWrongLengthFails(() -> uuid_16(new byte[(Long.BYTES << 1) - 1]));
+        }
+
+        @DisplayName("uuid_16(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> uuid_16(new byte[(Long.BYTES << 1) + 1]));
         }
     }
 
@@ -480,7 +534,7 @@ class EncryptionServiceUtils_Test {
         @DisplayName("big_decimal_(byte[]) fails on fewer than four bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> big_decimal_(new byte[Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> big_decimal_(new byte[Integer.BYTES - 1]));
         }
 
         @DisplayName("big_decimal_(byte[]) fails on a scale without an unscaled value")
@@ -517,7 +571,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("local_date_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> local_date_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> local_date_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("local_date_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> local_date_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -547,7 +607,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("local_time_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> local_time_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> local_time_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("local_time_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> local_time_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -581,7 +647,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("local_date_time_16(byte[]) fails on fewer than sixteen bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> local_date_time_16(new byte[(Long.BYTES << 1) - 1]));
+            assertWrongLengthFails(() -> local_date_time_16(new byte[(Long.BYTES << 1) - 1]));
+        }
+
+        @DisplayName("local_date_time_16(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> local_date_time_16(new byte[(Long.BYTES << 1) + 1]));
         }
     }
 
@@ -612,7 +684,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("offset_4(byte[]) fails on fewer than four bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> offset_4(new byte[Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> offset_4(new byte[Integer.BYTES - 1]));
+        }
+
+        @DisplayName("offset_4(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> offset_4(new byte[Integer.BYTES + 1]));
         }
 
         @DisplayName("offset_4(byte[]) fails on an offset beyond +/-18:00")
@@ -654,7 +732,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("offset_time_12(byte[]) fails on fewer than twelve bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> offset_time_12(new byte[Long.BYTES + Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> offset_time_12(new byte[Long.BYTES + Integer.BYTES - 1]));
+        }
+
+        @DisplayName("offset_time_12(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> offset_time_12(new byte[Long.BYTES + Integer.BYTES + 1]));
         }
     }
 
@@ -691,7 +775,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("offset_date_time_20(byte[]) fails on fewer than twenty bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> offset_date_time_20(new byte[(Long.BYTES << 1) + Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> offset_date_time_20(new byte[(Long.BYTES << 1) + Integer.BYTES - 1]));
+        }
+
+        @DisplayName("offset_date_time_20(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> offset_date_time_20(new byte[(Long.BYTES << 1) + Integer.BYTES + 1]));
         }
     }
 
@@ -725,7 +815,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("instant_12(byte[]) fails on fewer than twelve bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> instant_12(new byte[Long.BYTES + Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> instant_12(new byte[Long.BYTES + Integer.BYTES - 1]));
+        }
+
+        @DisplayName("instant_12(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> instant_12(new byte[Long.BYTES + Integer.BYTES + 1]));
         }
     }
 
@@ -755,7 +851,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("year_4(byte[]) fails on fewer than four bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> year_4(new byte[Integer.BYTES - 1]));
+            assertWrongLengthFails(() -> year_4(new byte[Integer.BYTES - 1]));
+        }
+
+        @DisplayName("year_4(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> year_4(new byte[Integer.BYTES + 1]));
         }
 
         @DisplayName("year_4(byte[]) fails on a value beyond Year.MAX_VALUE")
@@ -793,7 +895,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("util_date_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> util_date_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> util_date_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("util_date_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> util_date_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -832,7 +940,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("util_calendar_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> util_calendar_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> util_calendar_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("util_calendar_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> util_calendar_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -863,7 +977,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("sql_date_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> sql_date_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> sql_date_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("sql_date_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> sql_date_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -894,7 +1014,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("sql_time_8(byte[]) fails on fewer than eight bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> sql_time_8(new byte[Long.BYTES - 1]));
+            assertWrongLengthFails(() -> sql_time_8(new byte[Long.BYTES - 1]));
+        }
+
+        @DisplayName("sql_time_8(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> sql_time_8(new byte[Long.BYTES + 1]));
         }
     }
 
@@ -934,7 +1060,13 @@ class EncryptionServiceUtils_Test {
         @DisplayName("sql_timestamp_16(byte[]) fails on fewer than sixteen bytes")
         @Test
         void __decodeShort() {
-            assertShortPayloadFails(() -> sql_timestamp_16(new byte[15]));
+            assertWrongLengthFails(() -> sql_timestamp_16(new byte[15]));
+        }
+
+        @DisplayName("sql_timestamp_16(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @Test
+        void __decodeLong() {
+            assertWrongLengthFails(() -> sql_timestamp_16(new byte[16 + 1]));
         }
     }
 
