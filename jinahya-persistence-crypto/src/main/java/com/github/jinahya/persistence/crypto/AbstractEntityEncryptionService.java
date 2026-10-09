@@ -258,15 +258,33 @@ public abstract class AbstractEntityEncryptionService {
     private RuntimeException reject(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                                     final Attribute<?, ?> decryptedAttribute,
                                     final @Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
+        return reject(rootType, embeddingPath, decryptedAttribute.getName(),
+                      decryptedAttribute.getDeclaringType().getJavaType(), encryptedAttribute, reason);
+    }
+
+    /**
+     * Returns a {@link RuntimeException} naming the attributes and the reason.
+     *
+     * @param rootType           the managed type the walk started from.
+     * @param embeddingPath      the embedding attributes from the {@code rootType}.
+     * @param decryptedName      the name of the attribute, or of the transient field, holding the plaintext.
+     * @param declaringType      the class declaring the plaintext.
+     * @param encryptedAttribute the attribute holding the ciphertext; may be {@code null}.
+     * @param reason             why the mapping was rejected.
+     * @return the exception to throw.
+     */
+    private static RuntimeException reject(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
+                                           final String decryptedName, final Class<?> declaringType,
+                                           final @Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
         final var path = new StringBuilder(rootType.getJavaType().getName());
         for (final var embedding : embeddingPath) {
             path.append('.').append(embedding.getName());
         }
         return new RuntimeException(
                 reason +
-                "; decrypted attribute: " + decryptedAttribute.getName() +
+                "; decrypted attribute: " + decryptedName +
                 (encryptedAttribute == null ? "" : "; encrypted attribute: " + encryptedAttribute.getName()) +
-                "; managed type: " + decryptedAttribute.getDeclaringType().getJavaType().getName() +
+                "; managed type: " + declaringType.getName() +
                 "; path: " + path
         );
     }
@@ -300,13 +318,17 @@ public abstract class AbstractEntityEncryptionService {
             if (!((AnnotatedElement) member).isAnnotationPresent(EncryptedAttribute.class) || mapped.contains(member)) {
                 continue;
             }
+            if (member instanceof java.lang.reflect.Field field && isTransientField(field)) {
+                continue; // a transient plaintext: Mode B, validated by validateTransientPlaintexts(...)
+            }
             final var path = new StringBuilder(rootType.getJavaType().getName());
             for (final var embedding : embeddingPath) {
                 path.append('.').append(embedding.getName());
             }
             throw new RuntimeException(
-                    "an @EncryptedAttribute member is not a persistent attribute"
-                    + " (@Transient, unmapped, or not on the side the access type reads); it would never be encrypted"
+                    "an @EncryptedAttribute member is neither a persistent attribute (Mode A) nor a transient field"
+                    + " (Mode B): unmapped, a transient getter, or on the side the access type does not read; it would"
+                    + " never be encrypted"
                     + "; member: " + member.getDeclaringClass().getName() + '.' + member.getName()
                     + "; managed type: " + managedType.getJavaType().getName()
                     + "; path: " + path
@@ -419,14 +441,22 @@ public abstract class AbstractEntityEncryptionService {
      */
     private static Class<?> resolveJavaType(final Class<?> concrete, final Attribute<?, ?> attribute) {
         final var member = attribute.getJavaMember();
-        final java.lang.reflect.Type type;
         if (member instanceof java.lang.reflect.Field field) {
-            type = field.getGenericType();
+            return resolveType(concrete, field.getGenericType());
         } else if (member instanceof java.lang.reflect.Method method) {
-            type = method.getGenericReturnType();
-        } else {
-            return JinahyaAttributeUtils.getJavaMemberType(attribute);
+            return resolveType(concrete, method.getGenericReturnType());
         }
+        return JinahyaAttributeUtils.getJavaMemberType(attribute);
+    }
+
+    /**
+     * Returns the specified declared type, resolved against the specified concrete class.
+     *
+     * @param concrete the class whose instances hold the member.
+     * @param type     the generic type of the member.
+     * @return the resolved type.
+     */
+    private static Class<?> resolveType(final Class<?> concrete, final java.lang.reflect.Type type) {
         if (type instanceof Class<?> c) {
             return c;
         }
@@ -763,63 +793,217 @@ public abstract class AbstractEntityEncryptionService {
                                      : "a decrypted attribute's column has to be updatable")
                              + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
             }
-            final var name = annotation.encryptedAttribute().isBlank()
-                    ? EncryptedAttributeUtils.getDefaultEncryptedAttributeName(decryptedAttribute)
-                    : annotation.encryptedAttribute();
-            final var encryptedAttribute = attributes.get(name);
-            if (encryptedAttribute == null) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "no encrypted attribute named '" + name + "'");
-            }
-            if (encryptedAttribute == decryptedAttribute) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute cannot be the decrypted attribute itself");
-            }
-            if (encryptedAttribute.getPersistentAttributeType() != Attribute.PersistentAttributeType.BASIC) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute has to be BASIC");
-            }
-            if (encryptedAttribute.getJavaType() != byte[].class) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute has to be typed byte[]");
-            }
-            if (isIdOrVersion(encryptedAttribute)) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an identifier, or a version, attribute cannot hold the ciphertext");
-            }
-            if (!isOptional(encryptedAttribute)) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute has to be optional");
-            }
-            if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, EncryptedAttribute.class) != null) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute cannot itself be annotated with @EncryptedAttribute");
-            }
-            final var encryptedRules = resolveColumnRules(rootType, embeddingPath, encryptedAttribute);
-            if (encryptedRules.insertable() != MappingFlag.YES || encryptedRules.updatable() != MappingFlag.YES) {
-                final var unknown = encryptedRules.insertable() == MappingFlag.UNKNOWN
-                                    || encryptedRules.updatable() == MappingFlag.UNKNOWN;
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             (unknown
-                                     ? "cannot establish that an encrypted attribute's column is insertable and updatable"
-                                     : "an encrypted attribute's column has to be insertable and updatable")
-                             + "; otherwise the ciphertext cannot be stored (from " + encryptedRules.source() + ")");
-            }
-            if (encryptedRules.nullable() != MappingFlag.YES) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             (encryptedRules.nullable() == MappingFlag.UNKNOWN
-                                     ? "cannot establish that an encrypted attribute's column is nullable"
-                                     : "an encrypted attribute's column has to be nullable")
-                             + "; decrypting nulls it (from " + encryptedRules.source() + ")");
-            }
-            if (!paired.add(encryptedAttribute)) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                             "an encrypted attribute is paired more than once");
-            }
-            pairs.add(new Pair(decryptedAttribute, encryptedAttribute, javaType));
+            final var encryptedAttribute = checkEncryptedAttribute(
+                    rootType, embeddingPath, decryptedAttribute.getName(),
+                    decryptedAttribute.getDeclaringType().getJavaType(), decryptedAttribute,
+                    annotation.encryptedAttribute(), attributes, paired);
+            pairs.add(new Pair(decryptedAttribute, null, encryptedAttribute, javaType));
         }
+        validateTransientPlaintexts(rootType, embeddingPath, managedType, attributes, paired, pairs);
         visiting.remove(managedType);
         return new Mapping(List.copyOf(pairs), List.copyOf(embeddeds));
+    }
+
+    /**
+     * Returns whether the specified field is transient to Jakarta Persistence: annotated with
+     * {@link jakarta.persistence.Transient @Transient}, or declared {@code transient}.
+     *
+     * @param field the field.
+     * @return {@code true} when the {@code field} is not persistent.
+     */
+    private static boolean isTransientField(final java.lang.reflect.Field field) {
+        return field.isAnnotationPresent(jakarta.persistence.Transient.class)
+               || java.lang.reflect.Modifier.isTransient(field.getModifiers());
+    }
+
+    /**
+     * Validates every transient plaintext field (Mode B) of the specified managed type, and adds its pair.
+     *
+     * @param rootType      the managed type the walk started from.
+     * @param embeddingPath the embedding attributes from the {@code rootType}.
+     * @param managedType   the managed type whose java class, and superclasses, are searched.
+     * @param attributes    the attributes of the {@code managedType}, by name.
+     * @param paired        the attributes already paired.
+     * @param pairs         the list to which each validated pair is added.
+     * @implNote A transient field is not in the metamodel, so it is found by reflection. It has no column, so no
+     *         column rule applies to it; and since nothing ever nulls it, a Bean Validation constraint on it sees the
+     *         real value, and is allowed. What it needs instead is a setter which also nulls the ciphertext, the
+     *         provider dirty-checking only mapped attributes: {@link #checkInvalidatingSetter} proves one.
+     */
+    private void validateTransientPlaintexts(final ManagedType<?> rootType,
+                                             final List<Attribute<?, ?>> embeddingPath,
+                                             final ManagedType<?> managedType,
+                                             final Map<String, Attribute<?, ?>> attributes,
+                                             final Set<Attribute<?, ?>> paired, final List<Pair> pairs) {
+        final var concrete = managedType.getJavaType();
+        for (final var member : declaredMembers(concrete)) {
+            if (!(member instanceof java.lang.reflect.Field field) || !isTransientField(field)) {
+                continue;
+            }
+            final var annotation = field.getAnnotation(EncryptedAttribute.class);
+            if (annotation == null) {
+                continue;
+            }
+            final var declaring = field.getDeclaringClass();
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                throw reject(rootType, embeddingPath, field.getName(), declaring, null,
+                             "a transient plaintext cannot be a static field");
+            }
+            final var javaType = resolveType(concrete, field.getGenericType());
+            if (javaType.isPrimitive()) {
+                throw reject(rootType, embeddingPath, field.getName(), declaring, null,
+                             "a decrypted attribute cannot be of a primitive type; it has no value when cleared");
+            }
+            if (EntityEncryptionServiceUtils.codecOf(javaType) == null) {
+                throw reject(rootType, embeddingPath, field.getName(), declaring, null,
+                             "no codec for the declared java type " + javaType.getName());
+            }
+            final var encryptedAttribute = checkEncryptedAttribute(
+                    rootType, embeddingPath, field.getName(), declaring, null, annotation.encryptedAttribute(),
+                    attributes, paired);
+            checkInvalidatingSetter(rootType, embeddingPath, concrete, field, javaType, encryptedAttribute);
+            field.setAccessible(true);
+            pairs.add(new Pair(null, field, encryptedAttribute, javaType));
+        }
+    }
+
+    /**
+     * Checks that the specified transient plaintext has a setter which also nulls the ciphertext, by calling it on a
+     * throwaway instance.
+     *
+     * @param rootType           the managed type the walk started from.
+     * @param embeddingPath      the embedding attributes from the {@code rootType}.
+     * @param concrete           the entity, or embeddable, class.
+     * @param field              the transient plaintext field.
+     * @param javaType           the resolved type of the {@code field}.
+     * @param encryptedAttribute the attribute holding the ciphertext.
+     * @implNote Without such a setter, changing only the plaintext of a loaded instance changes nothing the provider
+     *         dirty-checks: no {@code @PreUpdate} runs, and the edit is lost. The check sets the ciphertext of a new
+     *         instance (Jakarta Persistence requires a no-arg constructor) to a dummy value, calls the setter with
+     *         {@code null}, and expects the ciphertext to be {@code null}. An abstract class is not instantiated;
+     *         its concrete subclasses are checked on their own.
+     */
+    private static void checkInvalidatingSetter(final ManagedType<?> rootType,
+                                                final List<Attribute<?, ?>> embeddingPath, final Class<?> concrete,
+                                                final java.lang.reflect.Field field, final Class<?> javaType,
+                                                final Attribute<?, ?> encryptedAttribute) {
+        final var name = "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
+        java.lang.reflect.Method setter = null;
+        search:
+        for (var c = concrete; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (final var method : c.getDeclaredMethods()) {
+                if (method.getName().equals(name) && method.getParameterCount() == 1 && !method.isBridge()
+                    && !java.lang.reflect.Modifier.isStatic(method.getModifiers())
+                    && method.getParameterTypes()[0].isAssignableFrom(javaType)) {
+                    setter = method;
+                    break search;
+                }
+            }
+        }
+        final var expectation = name + "(" + javaType.getSimpleName() + "), which sets the field and also sets "
+                                + encryptedAttribute.getName() + " to null, so that the provider sees the change";
+        if (setter == null) {
+            throw reject(rootType, embeddingPath, field.getName(), field.getDeclaringClass(), encryptedAttribute,
+                         "a transient plaintext needs a setter, " + expectation);
+        }
+        if (java.lang.reflect.Modifier.isAbstract(concrete.getModifiers())) {
+            return;
+        }
+        try {
+            final var constructor = concrete.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            final var instance = constructor.newInstance();
+            JinahyaAttributeUtils.setAttributeValue(instance, encryptedAttribute, new byte[]{0});
+            setter.setAccessible(true);
+            setter.invoke(instance, (Object) null);
+            if (JinahyaAttributeUtils.getAttributeValue(instance, encryptedAttribute) != null) {
+                throw reject(rootType, embeddingPath, field.getName(), field.getDeclaringClass(), encryptedAttribute,
+                             "the setter of a transient plaintext does not null the ciphertext; it has to be "
+                             + expectation + " (a generated setter is not enough)");
+            }
+        } catch (final ReflectiveOperationException roe) {
+            final var cause = roe instanceof java.lang.reflect.InvocationTargetException ite && ite.getCause() != null
+                    ? ite.getCause() : roe;
+            throw reject(rootType, embeddingPath, field.getName(), field.getDeclaringClass(), encryptedAttribute,
+                         "cannot verify the setter of a transient plaintext, which is called once with null on a"
+                         + " new instance (" + cause + "); it has to be " + expectation);
+        }
+    }
+
+    /**
+     * Validates the attribute holding the ciphertext of a plaintext, and returns it.
+     *
+     * @param rootType           the managed type the walk started from.
+     * @param embeddingPath      the embedding attributes from the {@code rootType}.
+     * @param decryptedName      the name of the plaintext attribute, or transient field.
+     * @param declaringType      the class declaring the plaintext.
+     * @param decryptedAttribute the plaintext attribute; {@code null} for a transient plaintext.
+     * @param named              the name given by {@link EncryptedAttribute#encryptedAttribute()}; may be blank.
+     * @param attributes         the attributes of the managed type, by name.
+     * @param paired             the attributes already paired, to which the result is added.
+     * @return the attribute holding the ciphertext.
+     */
+    private Attribute<?, ?> checkEncryptedAttribute(final ManagedType<?> rootType,
+                                                    final List<Attribute<?, ?>> embeddingPath,
+                                                    final String decryptedName, final Class<?> declaringType,
+                                                    final @Nullable Attribute<?, ?> decryptedAttribute,
+                                                    final String named,
+                                                    final Map<String, Attribute<?, ?>> attributes,
+                                                    final Set<Attribute<?, ?>> paired) {
+        final var name = named.isBlank()
+                ? decryptedName + EncryptedAttributeConstants.DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX
+                : named;
+        final var encryptedAttribute = attributes.get(name);
+        if (encryptedAttribute == null) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, null,
+                         "no encrypted attribute named '" + name + "'");
+        }
+        if (decryptedAttribute != null && encryptedAttribute == decryptedAttribute) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute cannot be the decrypted attribute itself");
+        }
+        if (encryptedAttribute.getPersistentAttributeType() != Attribute.PersistentAttributeType.BASIC) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute has to be BASIC");
+        }
+        if (encryptedAttribute.getJavaType() != byte[].class) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute has to be typed byte[]");
+        }
+        if (isIdOrVersion(encryptedAttribute)) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an identifier, or a version, attribute cannot hold the ciphertext");
+        }
+        if (!isOptional(encryptedAttribute)) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute has to be optional");
+        }
+        if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, EncryptedAttribute.class) != null) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute cannot itself be annotated with @EncryptedAttribute");
+        }
+        final var encryptedRules = resolveColumnRules(rootType, embeddingPath, encryptedAttribute);
+        if (encryptedRules.insertable() != MappingFlag.YES || encryptedRules.updatable() != MappingFlag.YES) {
+            final var unknown = encryptedRules.insertable() == MappingFlag.UNKNOWN
+                                || encryptedRules.updatable() == MappingFlag.UNKNOWN;
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         (unknown
+                                 ? "cannot establish that an encrypted attribute's column is insertable and updatable"
+                                 : "an encrypted attribute's column has to be insertable and updatable")
+                         + "; otherwise the ciphertext cannot be stored (from " + encryptedRules.source() + ")");
+        }
+        if (encryptedRules.nullable() != MappingFlag.YES) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         (encryptedRules.nullable() == MappingFlag.UNKNOWN
+                                 ? "cannot establish that an encrypted attribute's column is nullable"
+                                 : "an encrypted attribute's column has to be nullable")
+                         + "; decrypting nulls it (from " + encryptedRules.source() + ")");
+        }
+        if (!paired.add(encryptedAttribute)) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute is paired more than once");
+        }
+        return encryptedAttribute;
     }
 
     /**
@@ -866,28 +1050,82 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * A validated pair of a decrypted attribute and the attribute which holds its ciphertext.
+     * A validated pair of a plaintext and the attribute which holds its ciphertext.
+     * <p>
+     * The plaintext is either a persistent attribute (Mode A, {@code decrypted}), or a transient field (Mode B,
+     * {@code plaintextField}); exactly one of the two is set.
      *
-     * @param decrypted the attribute holding the plaintext.
-     * @param encrypted the attribute holding the ciphertext.
-     * @param javaType  the declared java type of the decrypted attribute, resolved against the concrete class.
+     * @param decrypted      the attribute holding the plaintext, in Mode A; {@code null} in Mode B.
+     * @param plaintextField the transient field holding the plaintext, in Mode B; {@code null} in Mode A.
+     * @param encrypted      the attribute holding the ciphertext.
+     * @param javaType       the declared java type of the plaintext, resolved against the concrete class.
      */
-    private record Pair(Attribute<?, ?> decrypted, Attribute<?, ?> encrypted, Class<?> javaType) {
+    private record Pair(@Nullable Attribute<?, ?> decrypted, java.lang.reflect.@Nullable Field plaintextField,
+                        Attribute<?, ?> encrypted, Class<?> javaType) {
 
+        Pair {
+            assert (decrypted == null) != (plaintextField == null);
+        }
+
+        /**
+         * Returns whether the plaintext is a transient field: Mode B.
+         */
+        boolean isTransient() {
+            return plaintextField != null;
+        }
+
+        /**
+         * Returns the name of the plaintext attribute, or field.
+         */
+        String name() {
+            return plaintextField != null ? plaintextField.getName() : Objects.requireNonNull(decrypted).getName();
+        }
+
+        @Nullable Object getPlaintext(final Object target) {
+            if (plaintextField != null) {
+                try {
+                    return plaintextField.get(target);
+                } catch (final IllegalAccessException iae) {
+                    throw new RuntimeException("failed to read " + plaintextField, iae);
+                }
+            }
+            return JinahyaAttributeUtils.getAttributeValue(target, Objects.requireNonNull(decrypted));
+        }
+
+        Assignment setPlaintext(final Object target, final @Nullable Object value) {
+            final var field = plaintextField;
+            if (field != null) {
+                return new Assignment(() -> {
+                    try {
+                        field.set(target, value);
+                    } catch (final IllegalAccessException iae) {
+                        throw new RuntimeException("failed to write " + field, iae);
+                    }
+                });
+            }
+            final var attribute = Objects.requireNonNull(decrypted);
+            return new Assignment(() -> JinahyaAttributeUtils.setAttributeValue(target, attribute, value));
+        }
+
+        byte @Nullable [] getCiphertext(final Object target) {
+            return (byte[]) JinahyaAttributeUtils.getAttributeValue(target, encrypted);
+        }
+
+        Assignment setCiphertext(final Object target, final byte @Nullable [] value) {
+            return new Assignment(() -> JinahyaAttributeUtils.setAttributeValue(target, encrypted, value));
+        }
     }
 
     /**
-     * An assignment of a value to an attribute of an entity, or embeddable, instance, deferred until every assignment
-     * of a transform has been computed.
+     * An assignment to an attribute, or a field, of an entity, or embeddable, instance, deferred until every
+     * assignment of a transform has been computed.
      *
-     * @param target    the instance to assign to.
-     * @param attribute the attribute to assign.
-     * @param value     the value to assign; may be {@code null}.
+     * @param action the assignment.
      */
-    private record Assignment(Object target, Attribute<?, ?> attribute, @Nullable Object value) {
+    private record Assignment(Runnable action) {
 
         void apply() {
-            JinahyaAttributeUtils.setAttributeValue(target, attribute, value);
+            action.run();
         }
     }
 
@@ -953,127 +1191,202 @@ public abstract class AbstractEntityEncryptionService {
             }
         }
         for (final var pair : mapping.pairs()) {
-            final var decryptedAttribute = pair.decrypted();
-            final var encryptedAttribute = pair.encrypted();
-            final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
-            if (decryptedValue == null) {
-                final var encryptedValue = JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
-                if (encryptedValue != null) {
+            final var plaintext = pair.getPlaintext(object);
+            final var ciphertext = pair.getCiphertext(object);
+            if (pair.isTransient()) {
+                // Mode B: the plaintext is never mapped, so nothing mapped is ever nulled
+                if (plaintext == null) {
+                    if (ciphertext != null) {
+                        assignments.add(pair.setCiphertext(object, null)); // cleared
+                    }
+                    continue;
+                }
+                final var framed = encode(pair, plaintext);
+                if (ciphertext != null) {
+                    // the invalidating setter nulls the ciphertext on a change; a ciphertext still present means the
+                    // plaintext is unchanged -- unless it was written directly, which this compares for, so that the
+                    // write is kept rather than lost, and an unchanged value is never re-encrypted with a new IV
+                    final var current = entityEncryptionManager.decrypt(encryptionIdentifier, ciphertext.clone());
+                    if (current != null && Arrays.equals(current, framed)) {
+                        continue;
+                    }
+                }
+                assignments.add(pair.setCiphertext(object, encryptFramed(encryptionIdentifier, pair, framed)));
+                continue;
+            }
+            // Mode A: the plaintext is mapped, so it is nulled to keep it out of the row
+            if (plaintext == null) {
+                if (ciphertext != null) {
                     // already encrypted
                     continue;
                 }
-                assignments.add(new Assignment(object, encryptedAttribute, null));
+                assignments.add(pair.setCiphertext(object, null));
                 continue;
             }
-            final byte[] decryptedBytes;
-            final var javaType = pair.javaType();
-            // The DECLARED type decides the encoding, exactly as it decides the decoding below. Dispatching on
-            // the runtime class here instead let the two ladders pick different codecs for one attribute -- a
-            // java.util.Date holding a java.sql.Timestamp was written as epoch seconds and read back as epoch
-            // millis, silently. Keep this chain in the same order as the one in decrypt(...).
-            // Read from the java member, NOT from Attribute.getJavaType(): the latter is the provider's view and
-            // the providers disagree. Hibernate ORM 7.2 calls this java.util.Date field a java.sql.Timestamp,
-            // which made the guard below reject the Date the field actually held, and would have had the two
-            // ladders encode as Timestamp and decode as Date the moment the guard were relaxed.
-            if (!javaType.isInstance(decryptedValue)) {
-                throw new RuntimeException(
-                        "the value is not an instance of the attribute's declared java type" +
-                        "; decrypted attribute: " + decryptedAttribute.getName() +
-                        "; java type: " + javaType.getName() +
-                        "; value type: " + decryptedValue.getClass().getName()
-                );
+            assignments.add(pair.setCiphertext(
+                    object, encryptFramed(encryptionIdentifier, pair, encode(pair, plaintext))));
+            assignments.add(pair.setPlaintext(object, null));
+        }
+    }
+
+    /**
+     * Returns the specified plaintext value of the specified pair, encoded by its declared java type and framed with
+     * the payload header.
+     *
+     * @param pair           the pair.
+     * @param decryptedValue the plaintext value.
+     * @return the framed encoding of the {@code decryptedValue}.
+     */
+    private static byte[] encode(final Pair pair, final Object decryptedValue) {
+        final byte[] decryptedBytes;
+        final var javaType = pair.javaType();
+        // The DECLARED type decides the encoding, exactly as it decides the decoding below. Dispatching on
+        // the runtime class here instead let the two ladders pick different codecs for one attribute -- a
+        // java.util.Date holding a java.sql.Timestamp was written as epoch seconds and read back as epoch
+        // millis, silently. Keep this chain in the same order as the one in decode(...).
+        if (!javaType.isInstance(decryptedValue)) {
+            throw new RuntimeException(
+                    "the value is not an instance of the attribute's declared java type" +
+                    "; decrypted attribute: " + pair.name() +
+                    "; java type: " + javaType.getName() +
+                    "; value type: " + decryptedValue.getClass().getName()
+            );
+        }
+        try {
+            if (javaType == Boolean.class) {
+                decryptedBytes = boolean_1((Boolean) decryptedValue);
+            } else if (javaType == Byte.class) {
+                decryptedBytes = byte_1((Byte) decryptedValue);
+            } else if (javaType == Short.class) {
+                decryptedBytes = short_2((Short) decryptedValue);
+            } else if (javaType == Integer.class) {
+                decryptedBytes = int_4((Integer) decryptedValue);
+            } else if (javaType == Long.class) {
+                decryptedBytes = long_8((Long) decryptedValue);
+            } else if (javaType == Character.class) {
+                decryptedBytes = char_2((Character) decryptedValue);
+            } else if (javaType == Float.class) {
+                decryptedBytes = float_4((Float) decryptedValue);
+            } else if (javaType == Double.class) {
+                decryptedBytes = double_8((Double) decryptedValue);
+            } else if (javaType == String.class) {
+                decryptedBytes = string_((String) decryptedValue);
+            } else if (javaType == UUID.class) {
+                decryptedBytes = uuid_16((UUID) decryptedValue);
+            } else if (javaType == BigInteger.class) {
+                decryptedBytes = big_integer_((BigInteger) decryptedValue);
+            } else if (javaType == BigDecimal.class) {
+                decryptedBytes = big_decimal_((BigDecimal) decryptedValue);
+            } else if (javaType == LocalDate.class) {
+                decryptedBytes = local_date_8((LocalDate) decryptedValue);
+            } else if (javaType == LocalTime.class) {
+                decryptedBytes = local_time_8((LocalTime) decryptedValue);
+            } else if (javaType == LocalDateTime.class) {
+                decryptedBytes = local_date_time_16((LocalDateTime) decryptedValue);
+            } else if (javaType == OffsetTime.class) {
+                decryptedBytes = offset_time_12((OffsetTime) decryptedValue);
+            } else if (javaType == OffsetDateTime.class) {
+                decryptedBytes = offset_date_time_20((OffsetDateTime) decryptedValue);
+            } else if (javaType == Instant.class) {
+                decryptedBytes = instant_12((Instant) decryptedValue);
+            } else if (javaType == Year.class) {
+                decryptedBytes = year_4((Year) decryptedValue);
+            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
+                decryptedBytes = sql_timestamp_12((java.sql.Timestamp) decryptedValue);
+            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
+                decryptedBytes = sql_date_8((java.sql.Date) decryptedValue);
+            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
+                decryptedBytes = sql_time_8((java.sql.Time) decryptedValue);
+            } else if (Calendar.class.isAssignableFrom(javaType)) {
+                decryptedBytes = util_calendar_8((Calendar) decryptedValue);
+            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+                // one branch feeds both of decrypt's generic Date branches -- the exact `== java.util.Date` one
+                // and the reflective (long) constructor one -- because both read long_8 millis
+                decryptedBytes = util_date_8((java.util.Date) decryptedValue);
+            } else if (javaType == byte[].class) {
+                decryptedBytes =
+                        ((byte[]) decryptedValue).clone(); // the manager must not be handed the instance's own array
+            } else if (javaType == Byte[].class) {
+                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
+                decryptedBytes = Bytes_l((Byte[]) decryptedValue);
+            } else if (javaType == char[].class) {
+                decryptedBytes = chars_2l((char[]) decryptedValue);
+            } else if (javaType == Character[].class) {
+                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
+                decryptedBytes = Characters_2l((Character[]) decryptedValue);
+            } else if (javaType.isEnum()) {
+                decryptedBytes = enum_((Enum<?>) decryptedValue);
+            } else if (Serializable.class.isAssignableFrom(javaType)) {
+                decryptedBytes = serializable_((Serializable) decryptedValue);
+            } else {
+                throw new RuntimeException("unsupported java type: " + javaType);
             }
-            try {
-                if (javaType == Boolean.class) {
-                    decryptedBytes = boolean_1((Boolean) decryptedValue);
-                } else if (javaType == Byte.class) {
-                    decryptedBytes = byte_1((Byte) decryptedValue);
-                } else if (javaType == Short.class) {
-                    decryptedBytes = short_2((Short) decryptedValue);
-                } else if (javaType == Integer.class) {
-                    decryptedBytes = int_4((Integer) decryptedValue);
-                } else if (javaType == Long.class) {
-                    decryptedBytes = long_8((Long) decryptedValue);
-                } else if (javaType == Character.class) {
-                    decryptedBytes = char_2((Character) decryptedValue);
-                } else if (javaType == Float.class) {
-                    decryptedBytes = float_4((Float) decryptedValue);
-                } else if (javaType == Double.class) {
-                    decryptedBytes = double_8((Double) decryptedValue);
-                } else if (javaType == String.class) {
-                    decryptedBytes = string_((String) decryptedValue);
-                } else if (javaType == UUID.class) {
-                    decryptedBytes = uuid_16((UUID) decryptedValue);
-                } else if (javaType == BigInteger.class) {
-                    decryptedBytes = big_integer_((BigInteger) decryptedValue);
-                } else if (javaType == BigDecimal.class) {
-                    decryptedBytes = big_decimal_((BigDecimal) decryptedValue);
-                } else if (javaType == LocalDate.class) {
-                    decryptedBytes = local_date_8((LocalDate) decryptedValue);
-                } else if (javaType == LocalTime.class) {
-                    decryptedBytes = local_time_8((LocalTime) decryptedValue);
-                } else if (javaType == LocalDateTime.class) {
-                    decryptedBytes = local_date_time_16((LocalDateTime) decryptedValue);
-                } else if (javaType == OffsetTime.class) {
-                    decryptedBytes = offset_time_12((OffsetTime) decryptedValue);
-                } else if (javaType == OffsetDateTime.class) {
-                    decryptedBytes = offset_date_time_20((OffsetDateTime) decryptedValue);
-                } else if (javaType == Instant.class) {
-                    decryptedBytes = instant_12((Instant) decryptedValue);
-                } else if (javaType == Year.class) {
-                    decryptedBytes = year_4((Year) decryptedValue);
-                } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                    decryptedBytes = sql_timestamp_12((java.sql.Timestamp) decryptedValue);
-                } else if (javaType == java.sql.Date.class) {      // before java.util.Date
-                    decryptedBytes = sql_date_8((java.sql.Date) decryptedValue);
-                } else if (javaType == java.sql.Time.class) {      // before java.util.Date
-                    decryptedBytes = sql_time_8((java.sql.Time) decryptedValue);
-                } else if (Calendar.class.isAssignableFrom(javaType)) {
-                    decryptedBytes = util_calendar_8((Calendar) decryptedValue);
-                } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                    // one branch feeds both of decrypt's generic Date branches -- the exact `== java.util.Date` one
-                    // and the reflective (long) constructor one -- because both read long_8 millis
-                    decryptedBytes = util_date_8((java.util.Date) decryptedValue);
-                } else if (javaType == byte[].class) {
-                    decryptedBytes =
-                            ((byte[]) decryptedValue).clone(); // the manager must not be handed the instance's own array
-                } else if (javaType == Byte[].class) {
-                    logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                    decryptedBytes = Bytes_l((Byte[]) decryptedValue);
-                } else if (javaType == char[].class) {
-                    decryptedBytes = chars_2l((char[]) decryptedValue);
-                } else if (javaType == Character[].class) {
-                    logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                    decryptedBytes = Characters_2l((Character[]) decryptedValue);
-                } else if (javaType.isEnum()) {
-                    decryptedBytes = enum_((Enum<?>) decryptedValue);
-                } else if (Serializable.class.isAssignableFrom(javaType)) {
-                    decryptedBytes = serializable_((Serializable) decryptedValue);
-                } else {
-                    throw new RuntimeException("unsupported java type: " + javaType);
-                }
-            } catch (final IllegalArgumentException iae) {
-                // a value the codec refuses to encode, because it could not be read back as it is: a string with an
-                // unpaired surrogate, an oversized serializable, ... -- reported here while the caller still holds it.
-                // The message never carries the value.
-                throw new RuntimeException(
-                        "cannot encode the value (" + iae.getMessage() + ")" +
-                        "; decrypted attribute: " + decryptedAttribute.getName() +
-                        "; java type: " + javaType.getName(),
-                        iae
-                );
+        } catch (final IllegalArgumentException iae) {
+            // a value the codec refuses to encode, because it could not be read back as it is: a string with an
+            // unpaired surrogate, an oversized serializable, ... -- reported here while the caller still holds it.
+            // The message never carries the value.
+            throw new RuntimeException(
+                    "cannot encode the value (" + iae.getMessage() + ")" +
+                    "; decrypted attribute: " + pair.name() +
+                    "; java type: " + javaType.getName(),
+                    iae
+            );
+        }
+        // the header names the format version and the codec, so that a reader can tell what wrote the bytes
+        final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+        assert codec != null : "the ladder above handled a type codecOf does not know: " + javaType;
+        return EntityEncryptionServiceUtils.frame(codec, decryptedBytes);
+    }
+
+    private byte[] encryptFramed(final String encryptionIdentifier, final Pair pair, final byte[] framed) {
+        final var encrypted = entityEncryptionManager.encrypt(encryptionIdentifier, framed);
+        if (encrypted == null) {
+            throw new RuntimeException("encryptionManager returned null; decrypted attribute: " + pair.name());
+        }
+        return encrypted;
+    }
+
+    /**
+     * Returns the number of rows of the specified entity which still hold a plaintext, and no ciphertext, in a Mode A
+     * attribute: the rows which are not migrated yet.
+     * <p>
+     * An entity is ready to be switched to Mode B, its plaintext made {@link jakarta.persistence.Transient
+     * @Transient}, when this returns {@code 0}. Run it while the entity is still in Mode A: a Mode B plaintext has no
+     * mapping left to count by.
+     *
+     * @param entityClass the entity class.
+     * @return the number of rows not migrated yet; {@code 0} when every row has its ciphertext.
+     * @throws IllegalArgumentException when the {@code entityClass} is not an entity of this service's persistence
+     *                                  unit.
+     */
+    public long countUnmigrated(final Class<?> entityClass) {
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        if (!(getManagedType(entityClass) instanceof jakarta.persistence.metamodel.EntityType<?> entityType)) {
+            throw new IllegalArgumentException("not an entity: " + entityClass);
+        }
+        final var conditions = new ArrayList<String>();
+        collectUnmigratedConditions(getMapping(entityType), "e", conditions);
+        if (conditions.isEmpty()) {
+            return 0L;
+        }
+        try (var entityManager = entityManagerFactory.createEntityManager()) {
+            return entityManager.createQuery(
+                    "SELECT COUNT(e) FROM " + entityType.getName() + " e WHERE " + String.join(" OR ", conditions),
+                    Long.class).getSingleResult();
+        }
+    }
+
+    private static void collectUnmigratedConditions(final Mapping mapping, final String path,
+                                                    final List<String> conditions) {
+        for (final var pair : mapping.pairs()) {
+            final var decrypted = pair.decrypted();
+            if (decrypted != null) { // Mode A only
+                conditions.add("(" + path + "." + decrypted.getName() + " IS NOT NULL AND "
+                               + path + "." + pair.encrypted().getName() + " IS NULL)");
             }
-            // the header names the format version and the codec, so that a reader can tell what wrote the bytes
-            final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
-            assert codec != null : "the ladder above handled a type codecOf does not know: " + javaType;
-            final var encrypted = entityEncryptionManager.encrypt(
-                    encryptionIdentifier, EntityEncryptionServiceUtils.frame(codec, decryptedBytes));
-            if (encrypted == null) {
-                throw new RuntimeException(
-                        "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
-            }
-            assignments.add(new Assignment(object, encryptedAttribute, encrypted));
-            assignments.add(new Assignment(object, decryptedAttribute, null));
+        }
+        for (final var embedded : mapping.embeddeds()) {
+            collectUnmigratedConditions(embedded.mapping(), path + "." + embedded.attribute().getName(), conditions);
         }
     }
 
@@ -1187,127 +1500,140 @@ public abstract class AbstractEntityEncryptionService {
             }
         }
         for (final var pair : mapping.pairs()) {
-            final var decryptedAttribute = pair.decrypted();
-            final var encryptedAttribute = pair.encrypted();
-            final var encryptedBytes = (byte[]) JinahyaAttributeUtils.getAttributeValue(object, encryptedAttribute);
-            if (encryptedBytes == null) {
-                final var decryptedValue = JinahyaAttributeUtils.getAttributeValue(object, decryptedAttribute);
-                if (decryptedValue != null) {
-                    // the encrypted column may be defined later
+            final var ciphertext = pair.getCiphertext(object);
+            if (ciphertext == null) {
+                if (pair.isTransient()) {
+                    // Mode B: no ciphertext is no value
+                    assignments.add(pair.setPlaintext(object, null));
                     continue;
                 }
-                assignments.add(new Assignment(object, decryptedAttribute, null));
+                // Mode A: a legacy row keeps its plaintext; it is migrated when it is next written
+                if (pair.getPlaintext(object) == null) {
+                    assignments.add(pair.setPlaintext(object, null));
+                }
                 continue;
             }
-            final var framedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
+            final var framedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, ciphertext.clone());
             if (framedBytes == null) {
-                throw new RuntimeException(
-                        "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
+                throw new RuntimeException("encryptionManager returned null; decrypted attribute: " + pair.name());
             }
-            final Object decryptedValue;
-            // the java member, for the same reason as in encrypt(...): the two ladders must agree on the type,
-            // and only the declared member means the same thing on every provider
-            final var javaType = pair.javaType();
-            final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
-            if (codec == null) {
+            assignments.add(pair.setPlaintext(object, decode(pair, framedBytes)));
+            if (!pair.isTransient()) {
+                assignments.add(pair.setCiphertext(object, null)); // Mode A only; Mode B leaves it, unchanged
+            }
+        }
+    }
+
+    /**
+     * Returns the plaintext value of the specified pair, decoded from the specified framed bytes.
+     *
+     * @param pair        the pair.
+     * @param framedBytes the decrypted, framed, bytes.
+     * @return the decoded value.
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static Object decode(final Pair pair, final byte[] framedBytes) {
+        final Object decryptedValue;
+        // the declared java type, for the same reason as in encode(...): the two ladders must agree on the type
+        final var javaType = pair.javaType();
+        final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+        if (codec == null) {
+            throw new RuntimeException("unsupported java type: " + javaType);
+        }
+        try {
+            // checks the format version, and that the codec which wrote the bytes is the one which reads them
+            final var decryptedBytes = EntityEncryptionServiceUtils.unframe(codec, framedBytes);
+            if (javaType == boolean.class || javaType == Boolean.class) {
+                decryptedValue = boolean_1(decryptedBytes);
+            } else if (javaType == byte.class || javaType == Byte.class) {
+                decryptedValue = byte_1(decryptedBytes);
+            } else if (javaType == short.class || javaType == Short.class) {
+                decryptedValue = short_2(decryptedBytes);
+            } else if (javaType == int.class || javaType == Integer.class) {
+                decryptedValue = int_4(decryptedBytes);
+            } else if (javaType == long.class || javaType == Long.class) {
+                decryptedValue = long_8(decryptedBytes);
+            } else if (javaType == char.class || javaType == Character.class) {
+                decryptedValue = char_2(decryptedBytes);
+            } else if (javaType == float.class || javaType == Float.class) {
+                decryptedValue = float_4(decryptedBytes);
+            } else if (javaType == double.class || javaType == Double.class) {
+                decryptedValue = double_8(decryptedBytes);
+            } else if (javaType == String.class) {
+                decryptedValue = string_(decryptedBytes);
+            } else if (javaType == UUID.class) {
+                decryptedValue = uuid_16(decryptedBytes);
+            } else if (javaType == BigInteger.class) {
+                decryptedValue = big_integer_(decryptedBytes);
+            } else if (javaType == BigDecimal.class) {
+                decryptedValue = big_decimal_(decryptedBytes);
+            } else if (javaType == LocalDate.class) {
+                decryptedValue = local_date_8(decryptedBytes);
+            } else if (javaType == LocalTime.class) {
+                decryptedValue = local_time_8(decryptedBytes);
+            } else if (javaType == LocalDateTime.class) {
+                decryptedValue = local_date_time_16(decryptedBytes);
+            } else if (javaType == OffsetTime.class) {
+                decryptedValue = offset_time_12(decryptedBytes);
+            } else if (javaType == OffsetDateTime.class) {
+                decryptedValue = offset_date_time_20(decryptedBytes);
+            } else if (javaType == Instant.class) {
+                decryptedValue = instant_12(decryptedBytes);
+            } else if (javaType == Year.class) {
+                decryptedValue = year_4(decryptedBytes);
+            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
+                decryptedValue = sql_timestamp_12(decryptedBytes);
+            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
+                decryptedValue = sql_date_8(decryptedBytes);
+            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
+                decryptedValue = sql_time_8(decryptedBytes);
+            } else if (Calendar.class.isAssignableFrom(javaType)) {
+                decryptedValue = util_calendar_8(decryptedBytes);
+            } else if (javaType == java.util.Date.class) {
+                decryptedValue = util_date_8(decryptedBytes);
+            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+                final var time = long_8(decryptedBytes);
+                try {
+                    decryptedValue = javaType.getConstructor(long.class).newInstance(time);
+                } catch (final ReflectiveOperationException roe) {
+                    throw new RuntimeException("failed to construct " + javaType + " with " + time, roe);
+                }
+            } else if (javaType == byte[].class) {
+                decryptedValue = decryptedBytes;
+            } else if (javaType == Byte[].class) {
+                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
+                decryptedValue = Bytes_l(decryptedBytes);
+            } else if (javaType == char[].class) {
+                decryptedValue = chars_2l(decryptedBytes);
+            } else if (javaType == Character[].class) {
+                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
+                decryptedValue = Characters_2l(decryptedBytes);
+            } else if (javaType.isEnum()) {
+                decryptedValue = enum_(decryptedBytes, (Class) javaType);
+            } else if (Serializable.class.isAssignableFrom(javaType)) {
+                decryptedValue = javaType.cast(serializable_(decryptedBytes, javaType));
+            } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-            try {
-                // checks the format version, and that the codec which wrote the bytes is the one which reads them
-                final var decryptedBytes = EntityEncryptionServiceUtils.unframe(codec, framedBytes);
-                if (javaType == boolean.class || javaType == Boolean.class) {
-                    decryptedValue = boolean_1(decryptedBytes);
-                } else if (javaType == byte.class || javaType == Byte.class) {
-                    decryptedValue = byte_1(decryptedBytes);
-                } else if (javaType == short.class || javaType == Short.class) {
-                    decryptedValue = short_2(decryptedBytes);
-                } else if (javaType == int.class || javaType == Integer.class) {
-                    decryptedValue = int_4(decryptedBytes);
-                } else if (javaType == long.class || javaType == Long.class) {
-                    decryptedValue = long_8(decryptedBytes);
-                } else if (javaType == char.class || javaType == Character.class) {
-                    decryptedValue = char_2(decryptedBytes);
-                } else if (javaType == float.class || javaType == Float.class) {
-                    decryptedValue = float_4(decryptedBytes);
-                } else if (javaType == double.class || javaType == Double.class) {
-                    decryptedValue = double_8(decryptedBytes);
-                } else if (javaType == String.class) {
-                    decryptedValue = string_(decryptedBytes);
-                } else if (javaType == UUID.class) {
-                    decryptedValue = uuid_16(decryptedBytes);
-                } else if (javaType == BigInteger.class) {
-                    decryptedValue = big_integer_(decryptedBytes);
-                } else if (javaType == BigDecimal.class) {
-                    decryptedValue = big_decimal_(decryptedBytes);
-                } else if (javaType == LocalDate.class) {
-                    decryptedValue = local_date_8(decryptedBytes);
-                } else if (javaType == LocalTime.class) {
-                    decryptedValue = local_time_8(decryptedBytes);
-                } else if (javaType == LocalDateTime.class) {
-                    decryptedValue = local_date_time_16(decryptedBytes);
-                } else if (javaType == OffsetTime.class) {
-                    decryptedValue = offset_time_12(decryptedBytes);
-                } else if (javaType == OffsetDateTime.class) {
-                    decryptedValue = offset_date_time_20(decryptedBytes);
-                } else if (javaType == Instant.class) {
-                    decryptedValue = instant_12(decryptedBytes);
-                } else if (javaType == Year.class) {
-                    decryptedValue = year_4(decryptedBytes);
-                } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                    decryptedValue = sql_timestamp_12(decryptedBytes);
-                } else if (javaType == java.sql.Date.class) {      // before java.util.Date
-                    decryptedValue = sql_date_8(decryptedBytes);
-                } else if (javaType == java.sql.Time.class) {      // before java.util.Date
-                    decryptedValue = sql_time_8(decryptedBytes);
-                } else if (Calendar.class.isAssignableFrom(javaType)) {
-                    decryptedValue = util_calendar_8(decryptedBytes);
-                } else if (javaType == java.util.Date.class) {
-                    decryptedValue = util_date_8(decryptedBytes);
-                } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                    final var time = long_8(decryptedBytes);
-                    try {
-                        decryptedValue = javaType.getConstructor(long.class).newInstance(time);
-                    } catch (final ReflectiveOperationException roe) {
-                        throw new RuntimeException("failed to construct " + javaType + " with " + time, roe);
-                    }
-                } else if (javaType == byte[].class) {
-                    decryptedValue = decryptedBytes;
-                } else if (javaType == Byte[].class) {
-                    logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                    decryptedValue = Bytes_l(decryptedBytes);
-                } else if (javaType == char[].class) {
-                    decryptedValue = chars_2l(decryptedBytes);
-                } else if (javaType == Character[].class) {
-                    logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                    decryptedValue = Characters_2l(decryptedBytes);
-                } else if (javaType.isEnum()) {
-                    decryptedValue = enum_(decryptedBytes, (Class) javaType);
-                } else if (Serializable.class.isAssignableFrom(javaType)) {
-                    decryptedValue = javaType.cast(serializable_(decryptedBytes, javaType));
-                } else {
-                    throw new RuntimeException("unsupported java type: " + javaType);
-                }
-            } catch (final IndexOutOfBoundsException | IllegalArgumentException | AssertionError e) {
-                // Everything the decode ladder can raise for bytes it cannot turn back into a value:
-                //   IndexOutOfBounds     a payload shorter than the fixed-width codec expects
-                //   AssertionError       an assert in EntityEncryptionServiceUtils, when assertions are enabled;
-                //                        the payload lengths themselves are checked unconditionally
-                //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
-                //                        which is not a constant of the attribute's enum, and a payload header
-                //                        naming another format version or another codec
-                // Without the last one, those two surfaced bare, with no clue which attribute they came from.
-                throw new RuntimeException(
-                        "cannot reconstruct the value from the decrypted bytes" +
-                        (e.getMessage() == null ? "" : " (" + e.getMessage() + ")") +
-                        "; decrypted attribute: " + decryptedAttribute.getName() +
-                        "; java type: " + javaType.getName() +
-                        "; decrypted bytes: " + framedBytes.length,
-                        e
-                );
-            }
-            assignments.add(new Assignment(object, decryptedAttribute, decryptedValue));
-            assignments.add(new Assignment(object, encryptedAttribute, null));
+        } catch (final IndexOutOfBoundsException | IllegalArgumentException | AssertionError e) {
+            // Everything the decode ladder can raise for bytes it cannot turn back into a value:
+            //   IndexOutOfBounds     a payload shorter than the fixed-width codec expects
+            //   AssertionError       an assert in EntityEncryptionServiceUtils, when assertions are enabled;
+            //                        the payload lengths themselves are checked unconditionally
+            //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
+            //                        which is not a constant of the attribute's enum, and a payload header
+            //                        naming another format version or another codec
+            // Without the last one, those two surfaced bare, with no clue which attribute they came from.
+            throw new RuntimeException(
+                    "cannot reconstruct the value from the decrypted bytes" +
+                    (e.getMessage() == null ? "" : " (" + e.getMessage() + ")") +
+                    "; decrypted attribute: " + pair.name() +
+                    "; java type: " + javaType.getName() +
+                    "; decrypted bytes: " + framedBytes.length,
+                    e
+            );
         }
+        return decryptedValue;
     }
 
     /**

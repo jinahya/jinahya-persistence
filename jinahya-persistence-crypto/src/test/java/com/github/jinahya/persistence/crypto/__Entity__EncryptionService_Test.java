@@ -388,21 +388,41 @@ class __Entity__EncryptionService_Test {
                     .hasMessageContaining("non-insertable");
         }
 
-        @DisplayName("an annotated member the metamodel does not know is rejected, not silently ignored (#70)")
+        @DisplayName("an annotated member which is neither persistent nor a transient field is rejected, not silently ignored (#70)")
         @Test
-        void __transientMemberRejected() {
+        void __misplacedAnnotationRejected() {
+            final var entity = new _MisplacedAnnotationEntity();
+            entity.name = "never-encrypted";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("neither a persistent attribute")
+                    .hasMessageContaining("_MisplacedAnnotationEntity.getName");
+            assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
+        }
+
+        @DisplayName("a transient plaintext (Mode B) without a setter is rejected (#82)")
+        @Test
+        void __transientWithoutSetterRejected() {
             final var entity = new _TransientSecretEntity();
             entity.name = "never-stored";
 
             assertThatThrownBy(() -> service.encrypt(entity))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("not a persistent attribute")
-                    .hasMessageContaining("_TransientSecretEntity.name");
-            assertThatThrownBy(() -> service.decrypt(entity))
-                    .as("the read path is guarded by the same validation")
+                    .hasMessageContaining("needs a setter")
+                    .hasMessageContaining("setName(String)");
+        }
+
+        @DisplayName("a transient plaintext (Mode B) whose setter does not null the ciphertext is rejected (#82)")
+        @Test
+        void __plainSetterRejected() {
+            final var entity = new _ModeBPlainSetterEntity();
+            entity.name = "lost-on-edit";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("not a persistent attribute");
-            assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
+                    .hasMessageContaining("does not null the ciphertext")
+                    .hasMessageContaining("nameEnc__");
         }
 
         @DisplayName("an encrypted embeddable reached through an @ElementCollection is rejected, not persisted in the clear (#71)")
@@ -589,13 +609,15 @@ class __Entity__EncryptionService_Test {
                     "crypto._GraphEntity",              // an invalid embeddable
                     "crypto._OverriddenEntity",         // an override restoring insertable = true
                     "crypto._LifecycleEntity",          // a plaintext column left insertable
-                    "crypto._TransientSecretEntity",    // #70
+                    "crypto._TransientSecretEntity",    // #82: Mode B without a setter
+                    "crypto._MisplacedAnnotationEntity", // #70
+                    "crypto._ModeBPlainSetterEntity",   // #82: a setter which does not null the ciphertext
                     "crypto._CollectionSecretEntity",   // #71
                     "crypto._UnmarkedSecretEntity",     // #72
                     "crypto._FrozenPlainEntity",        // #73
                     "crypto._ConstrainedSecretEntity"   // #9
             );
-            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(8);
+            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(10);
             assertThat(message).doesNotContain(
                     "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
         }

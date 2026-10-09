@@ -11,11 +11,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.persistence.Version;
 
 /**
- * A Mode B entity: the same table as {@link _GuardedEntity}, with the plaintext {@link Transient @Transient}, so that
- * rows written in one mode can be read in the other (#82).
+ * A Mode B entity with another mapped attribute, for verifying the safety net: a direct write to the plaintext is kept
+ * when another change makes the provider flush the instance (#82).
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -23,19 +22,13 @@ import jakarta.persistence.Version;
 @EntityListeners(_LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = _GuardedEntity.TABLE_NAME)
-public class _GuardedModeBEntity {
+@Table(name = "mode_b_note_entity")
+public class _ModeBNoteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     public Long id;
 
-    @Version
-    @Column(name = "version")
-    public long version;
-
-    // the plaintext: no column; the `name` column of the table is left over
     @EncryptedAttribute
     @Transient
     public String name;
@@ -44,12 +37,10 @@ public class _GuardedModeBEntity {
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;
 
-    /**
-     * Sets the plaintext, and invalidates the ciphertext, so that the provider sees a change and the next flush
-     * re-encrypts.
-     *
-     * @param name the plaintext.
-     */
+    @Basic(optional = true)
+    @Column(name = "note", nullable = true)
+    public String note;
+
     public void setName(final String name) {
         this.name = name;
         this.nameEnc__ = null;
