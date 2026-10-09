@@ -68,11 +68,11 @@ public class _Entity_EncryptionListener extends EntityEncryptionListener {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    // re-declared, calling super: providers ignore a callback inherited from a listener's superclass (#5)
     @PrePersist
     @Override
     protected void onPrePersist(final Object entityInstance) {
         super.onPrePersist(entityInstance);
-        encrypt(entityInstance); // before the INSERT is built; @PostPersist would store the plaintext
     }
 
     @PostPersist
@@ -86,7 +86,6 @@ public class _Entity_EncryptionListener extends EntityEncryptionListener {
     @Override
     protected void onPreUpdate(Object entityInstance) {
         super.onPreUpdate(entityInstance);
-        encrypt(entityInstance); // before the UPDATE is built; @PostUpdate would store the plaintext
     }
 
     @PostUpdate
@@ -113,7 +112,6 @@ public class _Entity_EncryptionListener extends EntityEncryptionListener {
     @Override
     protected void onPostLoad(Object entityInstance) {
         super.onPostLoad(entityInstance);
-        decrypt(entityInstance);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

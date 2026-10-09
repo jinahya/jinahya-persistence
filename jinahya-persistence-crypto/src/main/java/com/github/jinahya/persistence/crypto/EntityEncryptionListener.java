@@ -5,6 +5,8 @@ import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.Shutdown;
 import jakarta.enterprise.event.Startup;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
@@ -12,17 +14,30 @@ import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 
 /**
- * An abstract entity listener which encrypts an entity instance before it is written, and decrypts it after it is
- * read.
+ * An entity listener which encrypts an entity instance before it is written, and decrypts it after it is read.
  * <p>
- * A subclass supplies an {@link AbstractEntityEncryptionService}, and is registered with
- * {@link jakarta.persistence.EntityListeners @EntityListeners} on an {@link EncryptedEntity @__EncryptedEntity}
- * class. The life cycle callbacks here only log; override the ones an entity needs, and call {@link #encrypt(Object)}
- * or {@link #decrypt(Object)} from them.
+ * Register this class itself on an {@link EncryptedEntity @EncryptedEntity} class; nothing else is required.
+ * <pre>{@code
+ * @EncryptedEntity
+ * @EntityListeners(EntityEncryptionListener.class)
+ * @Entity
+ * class User { ... }
+ * }</pre>
+ * It encrypts on {@link PrePersist @PrePersist} and {@link PreUpdate @PreUpdate}, before the statement is built, and
+ * decrypts on {@link PostLoad @PostLoad}; the other callbacks only log, and a post-callback never encrypts, by which
+ * time the row is already written. The {@link AbstractEntityEncryptionService encryption service} comes from CDI:
+ * injected when the persistence provider creates listeners through a {@code BeanManager}, looked up from
+ * {@link CDI#current() the current container} otherwise.
+ * <p>
+ * <strong>A subclass has to re-declare every callback it wants.</strong> Neither Hibernate ORM nor EclipseLink invokes a
+ * callback annotation inherited from a listener's superclass, so a subclass which only overrides
+ * {@link #getEncryptionService()} — to supply the service without CDI, say — encrypts nothing unless it also
+ * re-declares {@code @PrePersist}, {@code @PreUpdate} and {@code @PostLoad} methods which call {@code super}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see AbstractEntityEncryptionService
@@ -31,7 +46,7 @@ import java.lang.invoke.MethodHandles;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class EntityEncryptionListener {
+public class EntityEncryptionListener {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -39,8 +54,10 @@ public abstract class EntityEncryptionListener {
 
     /**
      * Creates a new instance.
+     *
+     * @implSpec An entity listener class has to have a public no-arg constructor.
      */
-    protected EntityEncryptionListener() {
+    public EntityEncryptionListener() {
         super();
     }
 
@@ -102,20 +119,21 @@ public abstract class EntityEncryptionListener {
      * Called before the entity instance is persisted.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class {@link #encrypt(Object) encrypts} the {@code entityInstance}, before
+     *         the {@code INSERT} is built. A subclass which overrides this method, and does not call {@code super}, opts
+     *         out of that.
      */
     @PrePersist
     protected void onPrePersist(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPrePersist({0})", describe(entityInstance));
+        encrypt(entityInstance);
     }
 
     /**
      * Called after the entity instance has been persisted.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class only logs.
      */
     @PostPersist
     protected void onPostPersist(final Object entityInstance) {
@@ -128,8 +146,7 @@ public abstract class EntityEncryptionListener {
      * Called before the entity instance is removed.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class only logs.
      */
     @PreRemove
     protected void onPreRemove(final Object entityInstance) {
@@ -140,8 +157,7 @@ public abstract class EntityEncryptionListener {
      * Called after the entity instance has been removed.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class only logs.
      */
     @PostRemove
     protected void onPostRemove(final Object entityInstance) {
@@ -154,20 +170,21 @@ public abstract class EntityEncryptionListener {
      * Called before the entity instance is updated.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class {@link #encrypt(Object) encrypts} the {@code entityInstance}, before
+     *         the {@code UPDATE} is built. A subclass which overrides this method, and does not call {@code super}, opts
+     *         out of that.
      */
     @PreUpdate
     protected void onPreUpdate(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPreUpdate({0})", describe(entityInstance));
+        encrypt(entityInstance);
     }
 
     /**
      * Called after the entity instance has been updated.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class only logs.
      */
     @PostUpdate
     protected void onPostUpdate(final Object entityInstance) {
@@ -180,12 +197,13 @@ public abstract class EntityEncryptionListener {
      * Called after the entity instance has been loaded.
      *
      * @param entityInstance the entity instance.
-     * @implSpec The implementation of this class only logs; override it, and call {@link #encrypt(Object)} or
-     *         {@link #decrypt(Object)}, as the entity requires.
+     * @implSpec The implementation of this class {@link #decrypt(Object) decrypts} the {@code entityInstance}. A
+     *         subclass which overrides this method, and does not call {@code super}, opts out of that.
      */
     @PostLoad
     protected void onPostLoad(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPostLoad({0})", describe(entityInstance));
+        decrypt(entityInstance);
     }
 
     // ----------------------------------------------------------------------------------------------- encryptionService
@@ -194,8 +212,16 @@ public abstract class EntityEncryptionListener {
      * Returns the encryption service which this listener delegates to.
      *
      * @return the encryption service; never {@code null}.
+     * @implSpec The implementation of this class returns the injected service, and otherwise looks one up from
+     *         {@link CDI#current() the current container}, once.
      */
-    protected abstract AbstractEntityEncryptionService getEncryptionService();
+    protected AbstractEntityEncryptionService getEncryptionService() {
+        var result = encryptionService;
+        if (result == null) {
+            result = encryptionService = CDI.current().select(AbstractEntityEncryptionService.class).get();
+        }
+        return result;
+    }
 
     /**
      * Returns a description of the specified entity instance which cannot carry an attribute value.
@@ -247,4 +273,8 @@ public abstract class EntityEncryptionListener {
         encryptionService.decrypt(entityInstance);
         logger.log(System.Logger.Level.TRACE, "decrypted: {0}", describe(entityInstance));
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @Inject
+    private volatile @Nullable AbstractEntityEncryptionService encryptionService;
 }
