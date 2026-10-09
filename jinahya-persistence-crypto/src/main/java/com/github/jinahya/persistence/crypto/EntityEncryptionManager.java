@@ -1,8 +1,5 @@
 package com.github.jinahya.persistence.crypto;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 /**
  * An interface for the cryptographic half of this module.
@@ -17,6 +14,11 @@ import jakarta.validation.constraints.NotNull;
  * and {@link java.security.Signature} are <em>not</em> thread-safe, and one hoisted into a field produces garbage, or a
  * {@link javax.crypto.BadPaddingException}, non-deterministically and only under load. Obtain one per call, or confine
  * one per thread.
+ * <p>
+ * Every argument the service passes is non-{@code null}, and the identifier non-blank; an implementation returns a
+ * non-blank identifier, and non-{@code null} bytes. The service checks what it receives. (These are not declared as Bean
+ * Validation constraints: those would only fire under CDI method-validation interception, and an implementation could
+ * not redeclare its own without a {@code ConstraintDeclarationException}.)
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see AbstractEntityEncryptionService
@@ -51,8 +53,7 @@ public interface EntityEncryptionManager {
      * @return an identifier for the {@code entityInstance}, the same for the whole lifetime of its row.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */
-    @NotBlank
-    String getEncryptionIdentifier(@Valid @NotNull Object entityInstance);
+    String getEncryptionIdentifier(Object entityInstance);
 
     // -----------------------------------------------------------------------------------------------------------------
     /**
@@ -64,8 +65,7 @@ public interface EntityEncryptionManager {
      * @return an encryption result to be decrypted via {@link #decrypt(String, byte[])} method.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */
-    @NotNull
-    byte[] encrypt(@NotBlank String encryptionIdentifier, @NotNull byte[] decryptedBytes);
+    byte[] encrypt(String encryptionIdentifier, byte[] decryptedBytes);
 
     /**
      * Decrypts the specified encrypted bytes with the specified identifier provided via
@@ -76,6 +76,5 @@ public interface EntityEncryptionManager {
      * @return an array of bytes decrypted from the {@code encryptedBytes}.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */
-    @NotNull
-    byte[] decrypt(@NotBlank String encryptionIdentifier, @NotNull byte[] encryptedBytes);
+    byte[] decrypt(String encryptionIdentifier, byte[] encryptedBytes);
 }
