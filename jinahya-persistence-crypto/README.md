@@ -46,7 +46,10 @@ annotated attribute's name suffixed with `Enc__`. Name the counterpart explicitl
 ## Constraints
 
 Every annotated attribute of a managed type is validated once, in full, **before any instance is touched**, so an
-inconsistent mapping cannot leave an instance half-encrypted. Under CDI, the service validates **every** entity of
+inconsistent mapping cannot leave an instance half-encrypted. Each encrypt and decrypt is then **all-or-nothing** per
+instance: every value is computed before any is assigned, so a value which fails part-way (an unencodable string, an
+unreadable ciphertext, a failing manager) leaves the instance as it was
+([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). Under CDI, the service validates **every** entity of
 its persistence unit at startup (`AbstractEntityEncryptionService.validateMappings()`, called from `onStartup`), so an
 invalid mapping fails the deployment rather than its first use; all failures are reported at once
 ([#74](https://github.com/jinahya/jinahya-persistence/issues/74)). Outside a container, call `validateMappings()`

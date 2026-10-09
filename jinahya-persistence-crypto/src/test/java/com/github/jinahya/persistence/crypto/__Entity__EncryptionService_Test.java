@@ -491,6 +491,52 @@ class __Entity__EncryptionService_Test {
         }
     }
 
+    @DisplayName("a failure part-way leaves the instance as it was (#83)")
+    @Nested
+    class AllOrNothingTest {
+
+        @DisplayName("encrypt(): one unencodable attribute, and no other attribute, nor the embeddable, is touched")
+        @Test
+        void __encrypt() {
+            final var entity = populated();
+            entity.name = "a\uD800b"; // not encodable; every other attribute is
+
+            assertThatThrownBy(() -> service.encrypt(entity)).isInstanceOf(RuntimeException.class);
+
+            assertThat(entity.age).isEqualTo(37);
+            assertThat(entity.bornOn).isEqualTo(LocalDate.of(1988, 11, 3));
+            assertThat(entity.secretNumber).isEqualTo(1_234_567_890_123L);
+            assertThat(entity.secret.getNote()).isEqualTo("nested");
+            assertThat(entity.nameEnc__).isNull();
+            assertThat(entity.ageEnc__).isNull();
+            assertThat(entity.bornOnEnc__).isNull();
+            assertThat(entity.secretNumberCipher).isNull();
+            assertThat(entity.secret.getNoteEnc__()).isNull();
+        }
+
+        @DisplayName("decrypt(): one unreadable ciphertext, and no other attribute, nor the embeddable, is touched")
+        @Test
+        void __decrypt() {
+            final var manager = new _Entity_EncryptionManager();
+            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var entity = populated();
+            service.encrypt(entity);
+            final var nameEnc = entity.nameEnc__.clone();
+            final var noteEnc = entity.secret.getNoteEnc__().clone();
+            // a payload of another codec where an Integer is expected
+            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), EntityEncryptionServiceUtils.frame(
+                    EntityEncryptionServiceUtils.Codec.LONG_8, EntityEncryptionServiceUtils.long_8(37L)));
+
+            assertThatThrownBy(() -> service.decrypt(entity)).isInstanceOf(RuntimeException.class);
+
+            assertThat(entity.name).as("nothing was decrypted").isNull();
+            assertThat(entity.age).isNull();
+            assertThat(entity.secret.getNote()).isNull();
+            assertThat(entity.nameEnc__).as("and no ciphertext was cleared").isEqualTo(nameEnc);
+            assertThat(entity.secret.getNoteEnc__()).isEqualTo(noteEnc);
+        }
+    }
+
     @DisplayName("validateMappings() (#74)")
     @Nested
     class ValidateMappingsTest {
