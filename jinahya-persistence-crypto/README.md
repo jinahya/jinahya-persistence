@@ -329,8 +329,6 @@ prefer the `java.time` types.
 
 ## Deprecated for removal
 
-* `__SecureAttributeConverter` (`OfBytes`, `OfString`) — the single-attribute, single-column alternative. Its
-  conversion methods throw `UnsupportedOperationException`.
 * `@__EncryptionIdentifier`, `EncryptedEntity.encryptionIdentifierAttribute()` and
   `EncryptedEntity.DEFAULT_ENCRYPTION_IDENTIFIER` — never read; the identifier comes only from
   `EntityEncryptionManager.getEncryptionIdentifier(Object)`.

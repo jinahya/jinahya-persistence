@@ -27,8 +27,6 @@
  * <p>
  * The mapping is validated before any instance is touched, and at startup under CDI; each encrypt and decrypt is
  * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.
- * <p>
- * {@link __SecureAttributeConverter}, a single-attribute converter, is deprecated for removal.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
