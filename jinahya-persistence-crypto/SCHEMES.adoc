@@ -51,20 +51,17 @@ These four facts decide most of the trade-offs below.
 
 === 1.4 Independent of the scheme: the payload format
 
-To fix before the format is released:
+Settled as format version `1`, whatever the scheme:
 
-* A format version byte, plus an optional type tag, in every payload.
-* Fixed-width decoders that reject a payload of the *wrong* length, not just a short one. Today a `Long` changed to
-  `Integer` reads the first 4 bytes of an 8-byte payload silently.
-* `Serializable` opt-in rather than the catch-all.
-* A short format spec. The codecs are now pinned byte for byte by `EncryptionServiceUtils_Test`.
+* every payload starts with a header: the format version, then the id of the codec which wrote it (#75, #19);
+* fixed-width decoders read exactly their width (#76);
+* strings are strict UTF-8 in both directions (#77);
+* `boolean_1` accepts only `0` and `1` (#78);
+* Java serialization is opt-in, `@EncryptedAttribute(serializable = true)` (#79);
+* `java.sql.Timestamp` is 12 bytes, as `Instant` (#80).
 
-Known codec quirks pinned by those tests:
-
-* `string_` loses unpaired surrogates (`?`).
-* `sql_timestamp_16` has 4 trailing zero bytes.
-* `util_calendar_8` comes back in the default time zone.
-* `boolean_1` decodes any byte other than 1 as `false`.
+Still open: `util_calendar_8` stores the instant only, and decodes in the default time zone (#11). The codecs are
+pinned byte for byte by `EncryptionServiceUtils_Test`; a change to any of them is a new format version.
 
 [[within-table]]
 == 2. within_table

@@ -56,7 +56,7 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.short_2;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_date_8;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_12;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.string_;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_date_8;
@@ -1040,9 +1040,9 @@ class EncryptionServiceUtils_Test {
 
     // ------------------------------------------------------------------------------------------ java.sql.Timestamp
     @SuppressWarnings({"deprecation"})
-    @DisplayName("sql_timestamp_16")
+    @DisplayName("sql_timestamp_12")
     @Nested
-    class Sql_timestamp_16_Test {
+    class Sql_timestamp_12_Test {
 
         static Stream<java.sql.Timestamp> values() {
             final var preEpoch = new java.sql.Timestamp(-1_000L);
@@ -1051,36 +1051,36 @@ class EncryptionServiceUtils_Test {
             return Stream.of(preEpoch, new java.sql.Timestamp(0L), withNanos);
         }
 
-        @DisplayName("sql_timestamp_16(Timestamp) encodes instant_12, then four zero bytes")
+        @DisplayName("sql_timestamp_12(Timestamp) encodes instant_12, nothing more (#80)")
         @MethodSource("values")
         @ParameterizedTest
         void __encode(final java.sql.Timestamp v) {
             final var instant = v.toInstant();
-            // pins the current format: sixteen bytes are allocated, and instant_12 fills only the first twelve
-            assertThat(sql_timestamp_16(v)).isEqualTo(buffer(
-                    16,
-                    b -> b.putLong(instant.getEpochSecond()).putInt(instant.getNano()).putInt(0)
+            // the same twelve bytes as instant_12; the four always-zero trailing bytes are gone (#80)
+            assertThat(sql_timestamp_12(v)).isEqualTo(buffer(
+                    Long.BYTES + Integer.BYTES,
+                    b -> b.putLong(instant.getEpochSecond()).putInt(instant.getNano())
             ));
         }
 
-        @DisplayName("sql_timestamp_16(byte[]) reads back what sql_timestamp_16(Timestamp) wrote, nanos included")
+        @DisplayName("sql_timestamp_12(byte[]) reads back what sql_timestamp_12(Timestamp) wrote, nanos included")
         @MethodSource("values")
         @ParameterizedTest
         void __roundTrip(final java.sql.Timestamp v) {
             // Timestamp.equals(Timestamp) compares the nanos as well
-            assertThat(sql_timestamp_16(sql_timestamp_16(v))).isEqualTo(v);
+            assertThat(sql_timestamp_12(sql_timestamp_12(v))).isEqualTo(v);
         }
 
-        @DisplayName("sql_timestamp_16(byte[]) fails on fewer than sixteen bytes")
+        @DisplayName("sql_timestamp_12(byte[]) fails on fewer than twelve bytes")
         @Test
         void __decodeShort() {
-            assertWrongLengthFails(() -> sql_timestamp_16(new byte[15]));
+            assertWrongLengthFails(() -> sql_timestamp_12(new byte[Long.BYTES + Integer.BYTES - 1]));
         }
 
-        @DisplayName("sql_timestamp_16(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
+        @DisplayName("sql_timestamp_12(byte[]) fails on more bytes than it reads, rather than ignoring them (#76)")
         @Test
         void __decodeLong() {
-            assertWrongLengthFails(() -> sql_timestamp_16(new byte[16 + 1]));
+            assertWrongLengthFails(() -> sql_timestamp_12(new byte[Long.BYTES + Integer.BYTES + 1]));
         }
     }
 
@@ -1333,7 +1333,7 @@ class EncryptionServiceUtils_Test {
             assertThat(EntityEncryptionServiceUtils.codecOf(int.class))
                     .isSameAs(EntityEncryptionServiceUtils.Codec.INT_4);
             assertThat(EntityEncryptionServiceUtils.codecOf(java.sql.Timestamp.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.SQL_TIMESTAMP_16);
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.SQL_TIMESTAMP_12);
             assertThat(EntityEncryptionServiceUtils.codecOf(java.util.Date.class))
                     .isSameAs(EntityEncryptionServiceUtils.Codec.UTIL_DATE_8);
             assertThat(EntityEncryptionServiceUtils.codecOf(java.util.GregorianCalendar.class))
