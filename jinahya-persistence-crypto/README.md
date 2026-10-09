@@ -117,6 +117,10 @@ annotation-safe attribute unsafe — an application using such overrides has to 
 
 This module moves values between the plaintext and the ciphertext; it imposes no policy of its own.
 
+* **The encryption identifier.** `EntityEncryptionManager.getEncryptionIdentifier(Object)` is never stored; it is
+  derived again on every encrypt and decrypt, so it has to be the same for the whole lifetime of the row — from an
+  unencrypted, never-updated attribute such as a tenant column; never the version, a *current* key id, or an
+  `IDENTITY` id, which is still `null` at `@PrePersist` ([#61](https://github.com/jinahya/jinahya-persistence/issues/61)).
 * **The cipher suite.** `EntityEncryptionManager` decides the algorithm and the keys. An *authenticated* mode (AES-GCM,
   for example) is recommended: tampering with the stored ciphertext is then detected by the manager, before any byte
   is decoded.
