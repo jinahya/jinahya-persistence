@@ -269,7 +269,7 @@ version, which a reader of this version rejects.
 | `Instant`              | `12`       | `getEpochSecond()`(`8`) + `getNano()`(`4`)                  |
 | `Year`                 | `4`        | `getValue()`(`Integer`)                                     |
 | `java.util.Date`       | `8`        | `getTime()`(`Long`)                                         |
-| `java.util.Calendar`   | `8`        | `getTime().getTime()`(`Long`); the time zone is not stored ([#11](https://github.com/jinahya/jinahya-persistence/issues/11)) |
+| `java.util.Calendar`   | `8`        | `getTime().getTime()`(`Long`): the instant only, read back in the default time zone — the same value a plain `Calendar` mapping persists ([#11](https://github.com/jinahya/jinahya-persistence/issues/11)) |
 | `java.sql.Date`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Time`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Timestamp`   | `12`       | `toInstant()`(`Instant`) ([#80](https://github.com/jinahya/jinahya-persistence/issues/80)) |

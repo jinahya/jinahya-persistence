@@ -61,7 +61,8 @@ Settled as format version `1`, whatever the scheme:
   follows the JVM-wide `jdk.serialFilter` (#8, #10);
 * `java.sql.Timestamp` is 12 bytes, as `Instant` (#80).
 
-Still open: `util_calendar_8` stores the instant only, and decodes in the default time zone (#11). The codecs are
+`util_calendar_8` stores the instant only, and decodes in the default time zone: the same value a plain `Calendar`
+mapping persists (#11). The codecs are
 pinned byte for byte by `EncryptionServiceUtils_Test`; a change to any of them is a new format version.
 
 [[within-table]]
