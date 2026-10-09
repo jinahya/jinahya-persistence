@@ -352,6 +352,20 @@ class __Entity__EncryptionService_Test {
                     .hasMessageContaining("not a persistent attribute");
             assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
         }
+
+        @DisplayName("an encrypted embeddable reached through an @ElementCollection is rejected, not persisted in the clear (#71)")
+        @Test
+        void __elementCollectionRejected() {
+            final var entity = new _CollectionSecretEntity();
+            entity.secrets.add(new _SecretEmbeddable("TOP-SECRET"));
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("@ElementCollection")
+                    .hasMessageContaining("_SecretEmbeddable.note");
+            assertThat(entity.secrets.getFirst().getNote()).as("nothing was touched").isEqualTo("TOP-SECRET");
+            assertThat(entity.secrets.getFirst().getNoteEnc__()).isNull();
+        }
     }
 
     @DisplayName("decrypt()")

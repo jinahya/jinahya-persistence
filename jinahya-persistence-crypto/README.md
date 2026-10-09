@@ -60,11 +60,12 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
 * `@EncryptedAttribute` may only be placed on a persistent attribute's member — not on a `@Transient` or unmapped
   member, nor on the side the access type does not read (a field under property access)
   ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)).
+* An embeddable reached through an `@ElementCollection` — as the element, or as a map key — may not hold an
+  `@EncryptedAttribute` at any depth: collections are not walked, so it would be persisted in the clear
+  ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)).
 
 Known gaps in this validation — each of these is currently **silent**:
 
-* an `@EncryptedAttribute` inside an embeddable reached through an `@ElementCollection` is ignored, and the plaintext
-  is persisted ([#71](https://github.com/jinahya/jinahya-persistence/issues/71));
 * an `@EncryptedAttribute` on an entity without `@EncryptedEntity` is skipped
   ([#72](https://github.com/jinahya/jinahya-persistence/issues/72));
 * the plaintext column is not required to be `updatable`, which the lazy migration of legacy rows depends on
@@ -109,8 +110,8 @@ annotation-safe attribute unsafe — an application using such overrides has to 
   *stored*, which is `NULL`.
 * **Scalar projections** do not load entities, so nothing decrypts them.
 * **Collections and associations.** Only `@Basic` and `@Embedded` are walked; an encrypted embeddable inside an
-  `@ElementCollection` is not covered — and not rejected either
-  ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)) — and cascaded entities need their own listener
+  `@ElementCollection` is not covered, and is rejected
+  ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)); cascaded entities need their own listener
   registration.
 * **The shared (second-level) cache.** The test persistence units set `shared-cache-mode` to `NONE`; nothing here is
   proven against a cache hit.
