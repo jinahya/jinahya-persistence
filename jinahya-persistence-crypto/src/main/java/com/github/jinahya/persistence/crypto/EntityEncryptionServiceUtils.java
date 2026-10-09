@@ -1114,9 +1114,15 @@ final class EntityEncryptionServiceUtils {
 
     /**
      * Returns an array of bytes representing the specified {@code Calendar} value.
+     * <p>
+     * Only the instant is stored; the calendar's time zone, locale-dependent settings and calendar system are not.
+     * That is the same value a plain, unencrypted {@code Calendar} mapping persists: a {@code TIMESTAMP} column holds
+     * no zone either, and a provider reads it back as a {@code Calendar} in the default time zone. Storing the epoch
+     * millis also keeps the instant independent of the JVM's, or the JDBC driver's, time zone.
      *
      * @param v the value to represent.
-     * @return an array of bytes representing the {@code v}.
+     * @return an array of bytes representing the {@code v}; its epoch millis.
+     * @see #util_calendar_8(byte[])
      * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Calendar} in new applications in favor
@@ -1129,6 +1135,10 @@ final class EntityEncryptionServiceUtils {
 
     /**
      * Returns the {@code Calendar} value represented by the specified array of bytes.
+     *
+     * <p>
+     * The returned calendar is in the default time zone, with the default locale's settings, as a provider's own
+     * reading of a plain {@code Calendar} column is.
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
