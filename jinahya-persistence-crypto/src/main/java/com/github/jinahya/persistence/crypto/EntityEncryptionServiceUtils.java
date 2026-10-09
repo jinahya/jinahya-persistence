@@ -1590,35 +1590,154 @@ final class EntityEncryptionServiceUtils {
      */
     enum Codec {
 
+        /**
+         * The codec of {@code boolean} and {@link Boolean}; {@code boolean_1}.
+         */
         BOOLEAN_1(1),
+
+        /**
+         * The codec of {@code byte} and {@link Byte}; {@code byte_1}.
+         */
         BYTE_1(2),
+
+        /**
+         * The codec of {@code short} and {@link Short}; {@code short_2}.
+         */
         SHORT_2(3),
+
+        /**
+         * The codec of {@code int} and {@link Integer}; {@code int_4}.
+         */
         INT_4(4),
+
+        /**
+         * The codec of {@code long} and {@link Long}; {@code long_8}.
+         */
         LONG_8(5),
+
+        /**
+         * The codec of {@code char} and {@link Character}; {@code char_2}.
+         */
         CHAR_2(6),
+
+        /**
+         * The codec of {@code float} and {@link Float}; {@code float_4}.
+         */
         FLOAT_4(7),
+
+        /**
+         * The codec of {@code double} and {@link Double}; {@code double_8}.
+         */
         DOUBLE_8(8),
+
+        /**
+         * The codec of {@link String}; {@code string_}.
+         */
         STRING_(9),
+
+        /**
+         * The codec of {@link UUID}; {@code uuid_16}.
+         */
         UUID_16(10),
+
+        /**
+         * The codec of {@link BigInteger}; {@code big_integer_}.
+         */
         BIG_INTEGER_(11),
+
+        /**
+         * The codec of {@link BigDecimal}; {@code big_decimal_}.
+         */
         BIG_DECIMAL_(12),
+
+        /**
+         * The codec of {@link LocalDate}; {@code local_date_8}.
+         */
         LOCAL_DATE_8(13),
+
+        /**
+         * The codec of {@link LocalTime}; {@code local_time_8}.
+         */
         LOCAL_TIME_8(14),
+
+        /**
+         * The codec of {@link LocalDateTime}; {@code local_date_time_16}.
+         */
         LOCAL_DATE_TIME_16(15),
+
+        /**
+         * The codec of {@link OffsetTime}; {@code offset_time_12}.
+         */
         OFFSET_TIME_12(16),
+
+        /**
+         * The codec of {@link OffsetDateTime}; {@code offset_date_time_20}.
+         */
         OFFSET_DATE_TIME_20(17),
+
+        /**
+         * The codec of {@link Instant}; {@code instant_12}.
+         */
         INSTANT_12(18),
+
+        /**
+         * The codec of {@link Year}; {@code year_4}.
+         */
         YEAR_4(19),
+
+        /**
+         * The codec of {@link java.sql.Timestamp}; {@code sql_timestamp_12}.
+         */
         SQL_TIMESTAMP_12(20),
+
+        /**
+         * The codec of {@link java.sql.Date}; {@code sql_date_8}.
+         */
         SQL_DATE_8(21),
+
+        /**
+         * The codec of {@link java.sql.Time}; {@code sql_time_8}.
+         */
         SQL_TIME_8(22),
+
+        /**
+         * The codec of {@link Calendar} and its subclasses; {@code util_calendar_8}.
+         */
         UTIL_CALENDAR_8(23),
+
+        /**
+         * The codec of {@link java.util.Date} and its other subclasses; {@code util_date_8}.
+         */
         UTIL_DATE_8(24),
+
+        /**
+         * The codec of {@code byte[]}, as is.
+         */
         BYTES_L(25),
+
+        /**
+         * The codec of {@code Byte[]}; {@code Bytes_l}.
+         */
         BOXED_BYTES_L(26),
+
+        /**
+         * The codec of {@code char[]}; {@code chars_2l}.
+         */
         CHARS_2L(27),
+
+        /**
+         * The codec of {@code Character[]}; {@code Characters_2l}.
+         */
         CHARACTERS_2L(28),
+
+        /**
+         * The codec of an enum, by its name; {@code enum_}.
+         */
         ENUM_(29),
+
+        /**
+         * The codec of anything else {@link Serializable}; {@code serializable_}.
+         */
         SERIALIZABLE_(30);
 
         /**
@@ -1636,11 +1755,19 @@ final class EntityEncryptionServiceUtils {
             return null;
         }
 
+        /**
+         * Creates a new constant with the specified id.
+         *
+         * @param id the id written into a payload's header; between {@code 1} and {@link Byte#MAX_VALUE}.
+         */
         Codec(final int id) {
             assert id > 0 && id <= Byte.MAX_VALUE;
             this.id = (byte) id;
         }
 
+        /**
+         * The id of this codec, written into a payload's header. Stored data: never renumbered, never reused.
+         */
         final byte id;
     }
 

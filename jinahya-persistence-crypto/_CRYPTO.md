@@ -1,5 +1,9 @@
 # `jinahya-persistence-crypto` — completeness assessment
 
+> **Historical.** This is an audit of an earlier state of the module, written in the old double-underscore names
+> (`__EncryptionService`, `@__EncryptedAttribute`, …). Its findings have since been filed and resolved as GitHub issues;
+> the current behavior is described in [`README.md`](README.md), and the design in [`SCHEMES.adoc`](SCHEMES.adoc).
+
 A fresh audit of what the module **covers**, not of what it does. Read against the working
 tree on branch `sketch`. Items marked **[verified]** were reproduced by executing code;
 everything else is read from source.

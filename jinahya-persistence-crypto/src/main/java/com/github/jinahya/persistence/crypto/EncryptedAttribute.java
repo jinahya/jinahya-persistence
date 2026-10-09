@@ -22,7 +22,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * An applicable {@link jakarta.persistence.AttributeOverride @AttributeOverride} is resolved, and replaces the member's
  * own {@code @Column} — note that an override which only renames a column restores the annotation default
  * {@code insertable = true}. A mapping expressed in XML is <em>not</em> visible; see
- * {@code __EncryptionService.resolveColumnRules}.
+ * {@link AbstractEntityEncryptionService#resolveColumnRules(jakarta.persistence.metamodel.ManagedType, java.util.List,
+ * jakarta.persistence.metamodel.Attribute) resolveColumnRules}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see EncryptedEntity
@@ -45,10 +46,13 @@ public @interface EncryptedAttribute {
      *         annotated attribute suffixed with
      *         {@value EncryptedAttributeConstants#DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX}.
      * @apiNote The named attribute has to be optional, has to be typed {@code byte[]}, has to be {@code BASIC},
-     *         and cannot be the annotated attribute itself, an identifier, a version, or itself annotated. The
-     *         annotated attribute has to be optional, {@code BASIC}, neither an identifier nor a version, not of a
-     *         primitive type, and mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)} —
-     *         see {@link EncryptedAttribute the type javadoc}. {@link AbstractEntityEncryptionService} rejects anything else.
+     *         has to be insertable, updatable and nullable, and cannot be the annotated attribute itself, an
+     *         identifier, a version, or itself annotated. The annotated attribute has to be a persistent, optional,
+     *         {@code BASIC} attribute, neither an identifier nor a version, of a non-primitive type which has a codec,
+     *         carrying no Bean Validation constraint, and mapped
+     *         {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and updatable — see
+     *         {@link EncryptedAttribute the type javadoc}. {@link AbstractEntityEncryptionService} rejects anything
+     *         else.
      */
     String encryptedAttribute() default "";
 

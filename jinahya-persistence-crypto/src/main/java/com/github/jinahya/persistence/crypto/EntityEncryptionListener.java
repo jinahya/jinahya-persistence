@@ -216,9 +216,12 @@ public class EntityEncryptionListener {
      *         {@link CDI#current() the current container}, once.
      */
     protected AbstractEntityEncryptionService getEncryptionService() {
-        var result = encryptionService;
+        if (encryptionService != null) {
+            return encryptionService;
+        }
+        var result = lookedUpEncryptionService;
         if (result == null) {
-            result = encryptionService = CDI.current().select(AbstractEntityEncryptionService.class).get();
+            result = lookedUpEncryptionService = CDI.current().select(AbstractEntityEncryptionService.class).get();
         }
         return result;
     }
@@ -275,6 +278,10 @@ public class EntityEncryptionListener {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    // injected when the provider creates listeners through a BeanManager; never assigned here
     @Inject
-    private volatile @Nullable AbstractEntityEncryptionService encryptionService;
+    private @Nullable AbstractEntityEncryptionService encryptionService;
+
+    // looked up from the current container otherwise, once
+    private volatile @Nullable AbstractEntityEncryptionService lookedUpEncryptionService;
 }

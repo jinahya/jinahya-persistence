@@ -21,7 +21,7 @@ written, and a second, `byte[]`-typed attribute of the same entity holds the cip
 
 @EncryptedEntity
 @Entity
-@EntityListeners(MyEncryptionListener.class)
+@EntityListeners(EntityEncryptionListener.class) // registered directly; see "Wiring"
 class MyEntity {
 
     // the plaintext; nulled by encrypt(), restored by decrypt().
@@ -221,14 +221,37 @@ ALE requires the plaintext to stay out of the *row*, not out of the object; null
 listener keeps it out of the row while the plaintext is mapped. Mode B
 ([#82](https://github.com/jinahya/jinahya-persistence/issues/82)) keeps the plaintext in the object.
 
+## Migrating existing plaintext rows
+
+The plaintext column doubles as the legacy column, so encryption can be introduced on a table which already holds
+plaintext, with no separate tool and no write freeze. Measured on both providers
+(`__EncryptionLifecycle_Test.observeLegacyRowMigration`):
+
+| row                                   | on read (`@PostLoad`)                    | on the next write                                          |
+|---------------------------------------|------------------------------------------|------------------------------------------------------------|
+| legacy: plaintext, no ciphertext      | left alone; the application reads it     | encrypted; the `UPDATE` stores the ciphertext and nulls the plaintext column |
+| migrated: no plaintext, ciphertext    | decrypted                                | re-encrypted                                               |
+
+A row which is never written again stays plaintext; migrate the rest with a batch, a chunk at a time:
+
+```java
+var entity = em.find(MyEntity.class, id); // a legacy row: left as plaintext
+service.encrypt(entity);                   // now dirty; @PreUpdate then sees it already encrypted
+// commit, em.clear(), next chunk
+```
+
+This relies on the plaintext column being updatable, which is why that is required
+([#73](https://github.com/jinahya/jinahya-persistence/issues/73)). Nulling the column does not erase the plaintext
+from backups, logs, replicas or indexes; scrubbing those is the application's.
+
 ## Encoding
 
 The `EntityEncryptionManager` receives, and returns, an array of bytes. Values are turned into those bytes by the
 attribute's *declared* java type — for a member inherited from a generic `@MappedSuperclass`, the type the concrete
-entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) — big-endian, and are self-contained — a value is reconstructed from its bytes without
-consulting the database. The sizes below are of the plaintext encoding, after the header and before the manager is
-called. Every encoding is
-pinned byte for byte by `EncryptionServiceUtils_Test`.
+entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) — big-endian, and self-contained:
+a value is reconstructed from its bytes without consulting the database. The sizes below are of the plaintext
+encoding, after the header and before the manager is called. Every encoding is pinned byte for byte by
+`EncryptionServiceUtils_Test`.
 
 ### Payload header
 
