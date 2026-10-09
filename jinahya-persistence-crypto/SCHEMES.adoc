@@ -57,7 +57,8 @@ Settled as format version `1`, whatever the scheme:
 * fixed-width decoders read exactly their width (#76);
 * strings are strict UTF-8 in both directions (#77);
 * `boolean_1` accepts only `0` and `1` (#78);
-* Java serialization is opt-in, `@EncryptedAttribute(serializable = true)` (#79);
+* `Serializable` is supported as JPA supports it, with no filter or limit of the module's own: deserialization
+  follows the JVM-wide `jdk.serialFilter` (#8, #10);
 * `java.sql.Timestamp` is 12 bytes, as `Instant` (#80).
 
 Still open: `util_calendar_8` stores the instant only, and decodes in the default time zone (#11). The codecs are

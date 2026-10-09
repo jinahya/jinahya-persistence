@@ -5,7 +5,6 @@ import org.jspecify.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -1521,31 +1520,20 @@ final class EntityEncryptionServiceUtils {
      * Returns an array of bytes representing the specified {@code Serializable} value.
      *
      * @param v the value to represent.
-     * @return an array of bytes representing the {@code v}.
+     * @return an array of bytes representing the {@code v}; its Java serialization.
+     * @implNote Nothing is limited here, as nothing is limited by a plain {@code Serializable} mapping: the size of the
+     *         value, and of the column holding it, is the application's concern.
      */
     static byte[] serializable_(final Serializable v) {
         assert v != null;
-        final byte[] serialized;
         try (var baos = new ByteArrayOutputStream();
              var oos = new ObjectOutputStream(baos)) {
             oos.writeObject(v);
             oos.flush();
-            serialized = baos.toByteArray();
+            return baos.toByteArray();
         } catch (final IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        // Refuse to write what this class could never read back. filterFor(Class) caps the stream the reader will
-        // accept, and until this check the writer accepted anything: an oversized value encrypted and stored
-        // cleanly, then failed every later read -- with the plaintext already cleared, leaving the row
-        // unrecoverable. Fail here, while the caller still holds the value.
-        if (serialized.length > MAX_SERIALIZABLE_STREAM_BYTES) {
-            throw new IllegalArgumentException(
-                    "serialized form is too large to be read back"
-                    + "; bytes: " + serialized.length
-                    + "; limit: " + MAX_SERIALIZABLE_STREAM_BYTES
-                    + "; type: " + v.getClass().getName());
-        }
-        return serialized;
     }
 
     /**
@@ -1554,12 +1542,13 @@ final class EntityEncryptionServiceUtils {
      * @param b            the array of bytes.
      * @param expectedType the type the deserialized value has to be an instance of.
      * @return the value represented by the {@code b}.
-     * @throws RuntimeException wrapping an {@link java.io.InvalidClassException} when the {@code b} holds anything
-     *         but an {@code expectedType}, or asks for more than the filter allows.
-     * @implNote Of the four caps this filter applies, only the stream size is also enforced when writing (see
-     *         {@link #serializable_(Serializable)}); the depth, reference-count and array-length caps remain read-side
-     *         only, so a graph which is deep or highly referential rather than merely large can still be written and
-     *         then refused on the way back.
+     * @throws ClassCastException when the {@code b} holds anything but an {@code expectedType}.
+     * @implNote No filter of this module's own is installed, so the stream is subject to the JVM-wide
+     *         {@code jdk.serialFilter} (or filter factory), exactly as a plain {@code Serializable} mapping's
+     *         deserialization is. Which classes may be deserialized, and how large a graph may be, is the
+     *         application's to configure there.
+     * @see <a href="https://docs.oracle.com/en/java/javase/21/core/serialization-filtering1.html">Serialization
+     *         Filtering</a>
      */
     static Serializable serializable_(final byte[] b, final Class<?> expectedType) {
         assert b != null;
@@ -1567,8 +1556,6 @@ final class EntityEncryptionServiceUtils {
         assert expectedType != null;
         try (var bais = new ByteArrayInputStream(b);
              var ois = new ObjectInputStream(bais)) {
-            // the bytes come back from the database; accept nothing but the attribute's own type
-            ois.setObjectInputFilter(filterFor(expectedType));
             try {
                 return (Serializable) expectedType.cast(ois.readObject());
             } catch (final ClassNotFoundException cnfe) {
@@ -1578,41 +1565,6 @@ final class EntityEncryptionServiceUtils {
             throw new RuntimeException(ioe);
         }
     }
-
-    /**
-     * Returns a filter which caps the depth, the reference count, the stream length and the array lengths the stream
-     * may ask for.
-     *
-     * @param expectedType the attribute's type; retained for diagnostics and for future tightening.
-     * @return a resource-limiting filter.
-     * @see <a href="https://docs.oracle.com/en/java/javase/21/core/serialization-filtering1.html">Serialization
-     *         Filtering</a>
-     */
-    private static ObjectInputFilter filterFor(final Class<?> expectedType) {
-        assert expectedType != null;
-        return info -> {
-            if (info.depth() > MAX_SERIALIZABLE_DEPTH
-                || info.references() > MAX_SERIALIZABLE_REFERENCES
-                || info.streamBytes() > MAX_SERIALIZABLE_STREAM_BYTES
-                || info.arrayLength() > MAX_SERIALIZABLE_ARRAY_LENGTH) {
-                return ObjectInputFilter.Status.REJECTED;
-            }
-            // NOTE: the root class is deliberately NOT pinned to expectedType. A value which serializes through a
-            // proxy - every java.time type writes a java.time.Ser - presents that proxy as the root, so pinning
-            // rejects values this module claims to support. The returned object is cast to expectedType by the
-            // caller, which enforces the type; and these bytes are the encryption manager's own decrypted output,
-            // not attacker-supplied input, so the residual risk is resource exhaustion, which the caps above cover.
-            return ObjectInputFilter.Status.UNDECIDED;
-        };
-    }
-
-    private static final long MAX_SERIALIZABLE_DEPTH = 32L;
-
-    private static final long MAX_SERIALIZABLE_REFERENCES = 10_000L;
-
-    private static final long MAX_SERIALIZABLE_STREAM_BYTES = 1L << 20;
-
-    private static final long MAX_SERIALIZABLE_ARRAY_LENGTH = 1L << 20;
 
     // -------------------------------------------------------------------------------------------------- payload frame
 
