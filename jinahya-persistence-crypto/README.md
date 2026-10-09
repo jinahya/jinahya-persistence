@@ -62,6 +62,9 @@ yourself. A mapping which breaks any of these is rejected:
   be insertable, updatable and nullable.
 * An `@Embedded` attribute may not itself be annotated; annotate the attributes inside the embeddable.
 * Neither side may be an identifier or a version attribute, and the ciphertext attribute may not itself be annotated.
+* The plaintext attribute's declared java type must have a codec (see [Encoding](#encoding)). A type which only Java
+  serialization can encode is rejected unless the attribute opts in with `@EncryptedAttribute(serializable = true)`
+  ([#79](https://github.com/jinahya/jinahya-persistence/issues/79)).
 * An entity class with encrypted attributes must be annotated with `@EncryptedEntity` (directly or by inheritance);
   a forgotten annotation is rejected, not skipped
   ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)). An entity with no encrypted attribute, and no
@@ -232,7 +235,7 @@ The checks are unconditional, not `assert`s.
 | `char[]`               | `2×length` | each `char` big endian                                      |
 | `Character[]`          | `2×length` | unboxed; use `char[]` instead                               |
 | `enum`                 | variable   | `name()`(`String`)                                          |
-| `java.io.Serializable` | variable   | java serialization; not platform-independent; to become opt-in ([#79](https://github.com/jinahya/jinahya-persistence/issues/79)) |
+| `java.io.Serializable` | variable   | java serialization; not platform-independent; **opt-in**, with `@EncryptedAttribute(serializable = true)` ([#79](https://github.com/jinahya/jinahya-persistence/issues/79)) |
 
 `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are matched before `java.util.Date`, so a `Timestamp`
 keeps its nanos rather than being truncated to milliseconds.
