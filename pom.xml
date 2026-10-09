@@ -104,7 +104,7 @@
     <!-- the randomizer roles, and the three engines behind them, extracted out of jinahya-persistence-test-utils;
          every engine is 'provided' there too, so this brings nothing of its own onto a classpath -->
     <!-- https://central.sonatype.com/artifact/io.github.jinahya/jinahya-object-randomizer/versions -->
-    <version.io.github.jinahya.object-randomizer>0.0.4</version.io.github.jinahya.object-randomizer>
+    <version.io.github.jinahya.object-randomizer>0.0.6</version.io.github.jinahya.object-randomizer>
     <!-- https://jakarta.ee/specifications/platform/11/ -->
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
     <!-- 11.0.0 manages: jakarta.persistence-api 3.2.0, jakarta.validation-api 3.1.1, -->
