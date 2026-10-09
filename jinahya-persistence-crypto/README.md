@@ -57,11 +57,12 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
 * An `@Embedded` attribute may not itself be annotated; annotate the attributes inside the embeddable.
 * Neither side may be an identifier or a version attribute, and the ciphertext attribute may not itself be annotated.
 * An entity class must be annotated with `@EncryptedEntity`; anything else passes through untouched.
+* `@EncryptedAttribute` may only be placed on a persistent attribute's member — not on a `@Transient` or unmapped
+  member, nor on the side the access type does not read (a field under property access)
+  ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)).
 
 Known gaps in this validation — each of these is currently **silent**:
 
-* an `@EncryptedAttribute` on a member the metamodel does not know (`@Transient`, unmapped) is never discovered, and
-  the value is never stored ([#70](https://github.com/jinahya/jinahya-persistence/issues/70));
 * an `@EncryptedAttribute` inside an embeddable reached through an `@ElementCollection` is ignored, and the plaintext
   is persisted ([#71](https://github.com/jinahya/jinahya-persistence/issues/71));
 * an `@EncryptedAttribute` on an entity without `@EncryptedEntity` is skipped

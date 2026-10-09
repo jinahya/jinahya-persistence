@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Member;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -30,7 +31,9 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -221,6 +224,58 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
+     * Rejects any member of the specified managed type, or of its superclasses, which is annotated with
+     * {@link EncryptedAttribute} but is not the java member of one of the specified attributes.
+     *
+     * @param rootType      the managed type the walk started from.
+     * @param embeddingPath the embedding attributes from the {@code rootType} down to the {@code managedType}.
+     * @param managedType   the managed type whose members are checked.
+     * @param attributes    the attributes of the {@code managedType}.
+     * @implNote The rest of the validation walks the metamodel, so an annotated member the metamodel does not know
+     *         is never visited: a {@code @Transient} member, an unmapped one, or one on the side which the access type
+     *         does not read (a field under property access). Such a member used to be silently ignored, and a
+     *         transient one was not even stored. Bridge and synthetic methods are skipped; {@code javac} copies a
+     *         method's annotations onto its bridge.
+     */
+    private static void rejectUnmappedAnnotatedMembers(final ManagedType<?> rootType,
+                                                       final List<Attribute<?, ?>> embeddingPath,
+                                                       final ManagedType<?> managedType,
+                                                       final Collection<Attribute<?, ?>> attributes) {
+        final var mapped = new HashSet<Member>();
+        for (final var attribute : attributes) {
+            final var member = attribute.getJavaMember();
+            if (member != null) {
+                mapped.add(member);
+            }
+        }
+        final var members = new ArrayList<Member>();
+        for (var c = managedType.getJavaType(); c != null && c != Object.class; c = c.getSuperclass()) {
+            members.addAll(Arrays.asList(c.getDeclaredFields()));
+            for (final var method : c.getDeclaredMethods()) {
+                if (!method.isBridge() && !method.isSynthetic()) {
+                    members.add(method);
+                }
+            }
+        }
+        for (final var member : members) {
+            if (!((AnnotatedElement) member).isAnnotationPresent(EncryptedAttribute.class) || mapped.contains(member)) {
+                continue;
+            }
+            final var path = new StringBuilder(rootType.getJavaType().getName());
+            for (final var embedding : embeddingPath) {
+                path.append('.').append(embedding.getName());
+            }
+            throw new RuntimeException(
+                    "an @EncryptedAttribute member is not a persistent attribute"
+                    + " (@Transient, unmapped, or not on the side the access type reads); it would never be encrypted"
+                    + "; member: " + member.getDeclaringClass().getName() + '.' + member.getName()
+                    + "; managed type: " + managedType.getJavaType().getName()
+                    + "; path: " + path
+            );
+        }
+    }
+
+    /**
      * Returns whether the specified attribute is optional.
      *
      * @param attribute the attribute.
@@ -397,6 +452,7 @@ public abstract class AbstractEntityEncryptionService {
             throw new RuntimeException("embeddable cycle through " + managedType.getJavaType().getName());
         }
         final var attributes = getAttributes(managedType);
+        rejectUnmappedAnnotatedMembers(rootType, embeddingPath, managedType, attributes.values());
         final var pairs = new ArrayList<Pair>();
         final var embeddeds = new ArrayList<Embedded>();
         final var paired = new HashSet<Attribute<?, ?>>();
