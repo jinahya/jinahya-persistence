@@ -11,6 +11,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.ManagedType;
+import jakarta.persistence.metamodel.MapAttribute;
+import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -248,16 +250,7 @@ public abstract class AbstractEntityEncryptionService {
                 mapped.add(member);
             }
         }
-        final var members = new ArrayList<Member>();
-        for (var c = managedType.getJavaType(); c != null && c != Object.class; c = c.getSuperclass()) {
-            members.addAll(Arrays.asList(c.getDeclaredFields()));
-            for (final var method : c.getDeclaredMethods()) {
-                if (!method.isBridge() && !method.isSynthetic()) {
-                    members.add(method);
-                }
-            }
-        }
-        for (final var member : members) {
+        for (final var member : declaredMembers(managedType.getJavaType())) {
             if (!((AnnotatedElement) member).isAnnotationPresent(EncryptedAttribute.class) || mapped.contains(member)) {
                 continue;
             }
@@ -273,6 +266,56 @@ public abstract class AbstractEntityEncryptionService {
                     + "; path: " + path
             );
         }
+    }
+
+    /**
+     * Returns the declared members of the specified class, and of its superclasses, which this module reads
+     * annotations from: every field, and every method which is neither a bridge nor synthetic.
+     *
+     * @param type the class whose members are returned.
+     * @return the members of the {@code type} and of its superclasses.
+     */
+    private static List<Member> declaredMembers(final Class<?> type) {
+        final var members = new ArrayList<Member>();
+        for (var c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+            members.addAll(Arrays.asList(c.getDeclaredFields()));
+            for (final var method : c.getDeclaredMethods()) {
+                if (!method.isBridge() && !method.isSynthetic()) {
+                    members.add(method);
+                }
+            }
+        }
+        return members;
+    }
+
+    /**
+     * Returns a member annotated with {@link EncryptedAttribute} anywhere in the specified managed type, or in an
+     * embeddable it embeds, at any depth.
+     *
+     * @param managedType the managed type to search.
+     * @param visited     the managed types already searched, for stopping at a cycle.
+     * @return an annotated member; {@code null} when there is none.
+     */
+    private @Nullable Member findEncryptedMember(final ManagedType<?> managedType,
+                                                 final Set<ManagedType<?>> visited) {
+        if (!visited.add(managedType)) {
+            return null;
+        }
+        for (final var member : declaredMembers(managedType.getJavaType())) {
+            if (((AnnotatedElement) member).isAnnotationPresent(EncryptedAttribute.class)) {
+                return member;
+            }
+        }
+        for (final var attribute : getAttributes(managedType).values()) {
+            if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED) {
+                final var found = findEncryptedMember(
+                        entityManagerFactory.getMetamodel().managedType(attribute.getJavaType()), visited);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -478,6 +521,28 @@ public abstract class AbstractEntityEncryptionService {
                 );
                 embeddeds.add(new Embedded(decryptedAttribute, childMapping));
                 continue;
+            }
+            if (persistentAttributeType == Attribute.PersistentAttributeType.ELEMENT_COLLECTION
+                && decryptedAttribute instanceof PluralAttribute<?, ?, ?> plural) {
+                // an embeddable reached through a collection is never walked, so anything encrypted inside it would
+                // be persisted in the clear to the collection table; that is an error, not something to skip past
+                final var reached = new ArrayList<ManagedType<?>>();
+                if (plural.getElementType() instanceof ManagedType<?> element) {
+                    reached.add(element);
+                }
+                if (plural instanceof MapAttribute<?, ?, ?> map && map.getKeyType() instanceof ManagedType<?> key) {
+                    reached.add(key);
+                }
+                for (final var embeddable : reached) {
+                    final var encrypted = findEncryptedMember(embeddable, new HashSet<>());
+                    if (encrypted != null) {
+                        throw reject(rootType, embeddingPath, decryptedAttribute, null,
+                                     "an embeddable reached through an @ElementCollection cannot hold an encrypted"
+                                     + " attribute; it would be persisted in the clear"
+                                     + "; encrypted member: " + encrypted.getDeclaringClass().getName() + '.'
+                                     + encrypted.getName());
+                    }
+                }
             }
             if (annotation == null) {
                 continue;
