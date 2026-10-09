@@ -277,7 +277,7 @@ version, which a reader of this version rejects.
 | `Byte[]`               | `length`   | unboxed; use `byte[]` instead                               |
 | `char[]`               | `2×length` | each `char` big endian                                      |
 | `Character[]`          | `2×length` | unboxed; use `char[]` instead                               |
-| `enum`                 | variable   | `name()`(`String`)                                          |
+| `enum`                 | variable   | `name()`(`String`), never the ordinal: reordering constants is safe, renaming one is a breaking change ([#13](https://github.com/jinahya/jinahya-persistence/issues/13)) |
 | `java.io.Serializable` | variable   | java serialization, as a plain `Serializable` mapping; not platform-independent; deserialized under the JVM-wide `jdk.serialFilter` ([#8](https://github.com/jinahya/jinahya-persistence/issues/8)) |
 
 `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are matched before `java.util.Date`, so a `Timestamp`

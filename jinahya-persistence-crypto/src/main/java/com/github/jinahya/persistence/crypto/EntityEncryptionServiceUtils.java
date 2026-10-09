@@ -1498,6 +1498,11 @@ final class EntityEncryptionServiceUtils {
 
     /**
      * Returns an array of bytes representing the specified {@code Enum<?>} value.
+     * <p>
+     * The constant is stored by its {@link Enum#name() name}, as {@code @Enumerated(EnumType.STRING)} stores it, never by
+     * its ordinal: reordering, or inserting, constants is common, and would silently map every stored row to another
+     * constant. Renaming a constant, by contrast, is a breaking change: the stored name no longer resolves, and the read
+     * fails loudly, naming the attribute.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
