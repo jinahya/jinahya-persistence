@@ -127,11 +127,29 @@ annotation-safe attribute unsafe — an application using such overrides has to 
 
 ## Wiring
 
-`EntityEncryptionListener` is an abstract entity listener whose callbacks only log. A subclass supplies an
-`AbstractEntityEncryptionService` and calls `encrypt(Object)` / `decrypt(Object)` from the callbacks it needs.
+Register `EntityEncryptionListener` itself, the way Spring Data JPA's `AuditingEntityListener` is registered; no
+subclass is needed:
 
-**Encrypt from `@PrePersist` and `@PreUpdate`, never from `@PostPersist` or `@PostUpdate`** — the row is already
-written by the time the post-callbacks run, so encrypting there stores the plaintext. Decrypt from `@PostLoad`.
+```java
+@EncryptedEntity
+@EntityListeners(EntityEncryptionListener.class)
+@Entity
+class MyEntity { ... }
+```
+
+It encrypts on `@PrePersist` and `@PreUpdate`, before the statement is built, and decrypts on `@PostLoad`
+([#5](https://github.com/jinahya/jinahya-persistence/issues/5)). Its `AbstractEntityEncryptionService` comes from
+CDI: injected when the persistence provider creates listeners through a `BeanManager`, looked up from `CDI.current()`
+otherwise. Provide the service as a CDI bean (a subclass of `AbstractEntityEncryptionService`, with an
+`EntityEncryptionManager`).
+
+**Never encrypt from `@PostPersist` or `@PostUpdate`** — the row is already written by the time the post-callbacks
+run, so encrypting there stores nothing.
+
+**A subclass has to re-declare every callback it wants.** Neither Hibernate ORM nor EclipseLink invokes a callback
+annotation inherited from a listener's superclass (measured on both). A subclass which only overrides
+`getEncryptionService()` — to supply the service without CDI, say — encrypts nothing unless it also re-declares
+`@PrePersist`, `@PreUpdate` and `@PostLoad` methods which call `super`.
 
 That is necessary but not sufficient. `__EncryptionLifecycle_Test` measures what the providers actually do, and two
 things do not follow from the callbacks alone.

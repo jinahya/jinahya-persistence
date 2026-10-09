@@ -33,24 +33,22 @@ public class _LifecycleListenerEntity extends EntityEncryptionListener {
         return SERVICE;
     }
 
+    // re-declared, calling super: providers ignore a callback inherited from a listener's superclass (#5)
     @PrePersist
     @Override
     protected void onPrePersist(final Object entityInstance) {
         super.onPrePersist(entityInstance);
-        encrypt(entityInstance);
     }
 
     @PreUpdate
     @Override
     protected void onPreUpdate(final Object entityInstance) {
         super.onPreUpdate(entityInstance);
-        encrypt(entityInstance);
     }
 
     @PostLoad
     @Override
     protected void onPostLoad(final Object entityInstance) {
         super.onPostLoad(entityInstance);
-        decrypt(entityInstance);
     }
 }
