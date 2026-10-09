@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 /**
  * Verifies that {@link AbstractEntityEncryptionService} moves every supported java type between the decrypted attribute and its
@@ -422,6 +423,42 @@ class __Entity__EncryptionService_Test {
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("has to be updatable");
             assertThat(entity.name).as("nothing was touched").isEqualTo("frozen");
+        }
+    }
+
+    @DisplayName("validateMappings() (#74)")
+    @Nested
+    class ValidateMappingsTest {
+
+        @DisplayName("reports every invalid entity of the persistence unit at once, and none of the valid ones")
+        @Test
+        void __reportsEveryInvalidEntity() {
+            final var thrown = catchThrowable(() -> service.validateMappings());
+
+            assertThat(thrown).isInstanceOf(RuntimeException.class);
+            final var message = thrown.getMessage();
+            // this test unit holds deliberately invalid entities, each covered by its own rejection test
+            assertThat(message).contains(
+                    "crypto._GraphEntity",              // an invalid embeddable
+                    "crypto._OverriddenEntity",         // an override restoring insertable = true
+                    "crypto._LifecycleEntity",          // a plaintext column left insertable
+                    "crypto._TransientSecretEntity",    // #70
+                    "crypto._CollectionSecretEntity",   // #71
+                    "crypto._UnmarkedSecretEntity",     // #72
+                    "crypto._FrozenPlainEntity"         // #73
+            );
+            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(7);
+            assertThat(message).doesNotContain(
+                    "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
+        }
+
+        @DisplayName("the valid mappings are usable afterwards")
+        @Test
+        void __validMappingsStillUsable() {
+            catchThrowable(() -> service.validateMappings());
+            final var entity = populated();
+            assertThatCode(() -> service.encrypt(entity)).doesNotThrowAnyException();
+            assertThat(entity.nameEnc__).isNotNull();
         }
     }
 

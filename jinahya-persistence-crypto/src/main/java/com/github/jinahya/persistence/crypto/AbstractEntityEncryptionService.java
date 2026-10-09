@@ -171,10 +171,49 @@ public abstract class AbstractEntityEncryptionService {
      * Observes the CDI container {@link Startup} event.
      *
      * @param startup the observed event.
-     * @implSpec The implementation of this class only logs.
+     * @implSpec The implementation of this class {@link #validateMappings() validates every mapping}, so that an
+     *         invalid one fails the deployment rather than its first use. A subclass which overrides this method, and
+     *         does not call {@code super}, opts out of that.
      */
     protected void onStartup(@Observes final Startup startup) {
         logger.log(System.Logger.Level.DEBUG, "onStartup({0})", startup);
+        validateMappings();
+    }
+
+    /**
+     * Validates, up front, the mapping of every entity of this service's persistence unit which is annotated with
+     * {@link EncryptedEntity @EncryptedEntity}, or has an {@link EncryptedAttribute encrypted attribute}.
+     * <p>
+     * Without it, a mapping is validated on its first {@link #encrypt(Object) encrypt} or {@link #decrypt(Object)
+     * decrypt}, so an entity on a rare code path fails only when that path runs, in production. Valid mappings are
+     * cached, exactly as on first use.
+     *
+     * @throws RuntimeException when any mapping is invalid; its message lists every invalid entity, and each failure
+     *                          is attached as {@link Throwable#getSuppressed() suppressed}.
+     */
+    public void validateMappings() {
+        final var failures = new ArrayList<RuntimeException>();
+        for (final var entityType : entityManagerFactory.getMetamodel().getEntities()) {
+            final var type = entityType.getJavaType();
+            if (type == null) {
+                continue; // a dynamic entity has no java class to read annotations from
+            }
+            try {
+                checkEncryptedEntity(type, getMapping(getManagedType(type)));
+            } catch (final RuntimeException re) {
+                failures.add(re);
+            }
+        }
+        if (failures.isEmpty()) {
+            return;
+        }
+        final var message = new StringBuilder("invalid encryption mapping(s): ").append(failures.size());
+        for (final var failure : failures) {
+            message.append(System.lineSeparator()).append("  - ").append(failure.getMessage());
+        }
+        final var exception = new RuntimeException(message.toString());
+        failures.forEach(exception::addSuppressed);
+        throw exception;
     }
 
     /**
@@ -878,10 +917,24 @@ public abstract class AbstractEntityEncryptionService {
      */
     private boolean isEncryptedEntity(final Object object) {
         final var type = resolveClass(object);
+        return type.isAnnotationPresent(EncryptedEntity.class)
+               || checkEncryptedEntity(type, getMapping(getManagedType(type)));
+    }
+
+    /**
+     * Checks that the specified entity class is annotated with {@link EncryptedEntity @EncryptedEntity} when its
+     * validated mapping has an encrypted attribute.
+     *
+     * @param type    the entity class.
+     * @param mapping the validated mapping of the {@code type}.
+     * @return whether the {@code type} is annotated, directly or by inheritance.
+     * @throws RuntimeException when the {@code type} is not annotated, yet has encrypted attributes.
+     */
+    private static boolean checkEncryptedEntity(final Class<?> type, final Mapping mapping) {
         if (type.isAnnotationPresent(EncryptedEntity.class)) {
             return true;
         }
-        if (hasPairs(getMapping(getManagedType(type)))) {
+        if (hasPairs(mapping)) {
             throw new RuntimeException(
                     "an entity with encrypted attributes is not annotated with @EncryptedEntity"
                     + "; it would never be encrypted; entity: " + type.getName());
