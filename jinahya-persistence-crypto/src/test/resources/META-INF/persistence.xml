@@ -40,6 +40,7 @@
     <class>com.github.jinahya.persistence.crypto._MappedSecretBase</class>
     <class>com.github.jinahya.persistence.crypto._InheritedOverrideEntity</class>
     <class>com.github.jinahya.persistence.crypto._UnguardedEmbeddable</class>
+    <class>com.github.jinahya.persistence.crypto._TransientSecretEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>

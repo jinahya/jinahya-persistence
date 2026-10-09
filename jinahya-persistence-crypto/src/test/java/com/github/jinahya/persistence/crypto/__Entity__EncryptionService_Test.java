@@ -335,6 +335,23 @@ class __Entity__EncryptionService_Test {
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("non-insertable");
         }
+
+        @DisplayName("an annotated member the metamodel does not know is rejected, not silently ignored (#70)")
+        @Test
+        void __transientMemberRejected() {
+            final var entity = new _TransientSecretEntity();
+            entity.name = "never-stored";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("not a persistent attribute")
+                    .hasMessageContaining("_TransientSecretEntity.name");
+            assertThatThrownBy(() -> service.decrypt(entity))
+                    .as("the read path is guarded by the same validation")
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("not a persistent attribute");
+            assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
+        }
     }
 
     @DisplayName("decrypt()")
