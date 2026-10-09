@@ -46,7 +46,11 @@ annotated attribute's name suffixed with `Enc__`. Name the counterpart explicitl
 ## Constraints
 
 Every annotated attribute of a managed type is validated once, in full, **before any instance is touched**, so an
-inconsistent mapping cannot leave an instance half-encrypted. A mapping which breaks any of these is rejected:
+inconsistent mapping cannot leave an instance half-encrypted. Under CDI, the service validates **every** entity of
+its persistence unit at startup (`AbstractEntityEncryptionService.validateMappings()`, called from `onStartup`), so an
+invalid mapping fails the deployment rather than its first use; all failures are reported at once
+([#74](https://github.com/jinahya/jinahya-persistence/issues/74)). Outside a container, call `validateMappings()`
+yourself. A mapping which breaks any of these is rejected:
 
 * Only `@Basic` mappings are supported; `@Embedded` attributes are descended into. An annotated attribute which is
   neither is an error, not something skipped.
@@ -68,11 +72,6 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
 * An embeddable reached through an `@ElementCollection` — as the element, or as a map key — may not hold an
   `@EncryptedAttribute` at any depth: collections are not walked, so it would be persisted in the clear
   ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)).
-
-Known gaps in this validation — each of these is currently **silent**:
-
-* validation is lazy: a mapping is checked on its first encrypt/decrypt, not at startup
-  ([#74](https://github.com/jinahya/jinahya-persistence/issues/74)).
 
 ### How the column rules are established
 
