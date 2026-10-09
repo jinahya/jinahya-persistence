@@ -366,6 +366,51 @@ class __Entity__EncryptionService_Test {
             assertThat(entity.secrets.getFirst().getNote()).as("nothing was touched").isEqualTo("TOP-SECRET");
             assertThat(entity.secrets.getFirst().getNoteEnc__()).isNull();
         }
+
+        @DisplayName("an entity with encrypted attributes but no @EncryptedEntity is rejected, not skipped (#72)")
+        @Test
+        void __unmarkedEntityRejected() {
+            final var entity = new _UnmarkedSecretEntity();
+            entity.name = "would-be-dropped";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("not annotated with @EncryptedEntity")
+                    .hasMessageContaining("_UnmarkedSecretEntity");
+            assertThatThrownBy(() -> service.decrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("not annotated with @EncryptedEntity");
+            assertThat(entity.name).as("nothing was touched").isEqualTo("would-be-dropped");
+            assertThat(entity.nameEnc__).isNull();
+        }
+
+        @DisplayName("an entity with no encrypted attribute, and no @EncryptedEntity, passes through untouched (#72)")
+        @Test
+        void __plainEntityPassesThrough() {
+            // a manager which must never be reached: not even for the encryption identifier
+            final var untouchable = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new EntityEncryptionManager() {
+                @Override
+                public String getEncryptionIdentifier(final Object entityInstance) {
+                    throw new AssertionError("must not be called for a plain entity");
+                }
+
+                @Override
+                public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+                    throw new AssertionError("must not be called for a plain entity");
+                }
+
+                @Override
+                public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
+                    throw new AssertionError("must not be called for a plain entity");
+                }
+            });
+            final var entity = new _PlainEntity();
+            entity.name = "plain";
+
+            assertThatCode(() -> untouchable.encrypt(entity)).doesNotThrowAnyException();
+            assertThatCode(() -> untouchable.decrypt(entity)).doesNotThrowAnyException();
+            assertThat(entity.name).isEqualTo("plain");
+        }
     }
 
     @DisplayName("decrypt()")
