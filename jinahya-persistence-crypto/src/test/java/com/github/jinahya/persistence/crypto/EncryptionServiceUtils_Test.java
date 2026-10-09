@@ -1294,17 +1294,6 @@ class EncryptionServiceUtils_Test {
             assertThatThrownBy(() -> serializable_(encoded, BigDecimal.class))
                     .isInstanceOf(ClassCastException.class);
         }
-
-        @DisplayName("serializable_ refuses to WRITE what it could never read back")
-        @Test
-        void __encodeOversized() {
-            // a value larger than the reader's stream cap used to encrypt and store happily, and then fail
-            // every subsequent read -- with the plaintext already cleared, so the row was unrecoverable
-            final var oversized = new byte[(1 << 20) + 1024];
-            assertThatThrownBy(() -> serializable_((java.io.Serializable) oversized))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("too large");
-        }
     }
 
     // --------------------------------------------------------------------------------------------------- payload frame

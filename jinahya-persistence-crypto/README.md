@@ -71,9 +71,7 @@ yourself. A mapping which breaks any of these is rejected:
   Validate the value before persisting; the transient-plaintext mode
   ([#82](https://github.com/jinahya/jinahya-persistence/issues/82)) will support it
   ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
-* The plaintext attribute's declared java type must have a codec (see [Encoding](#encoding)). A type which only Java
-  serialization can encode is rejected unless the attribute opts in with `@EncryptedAttribute(serializable = true)`
-  ([#79](https://github.com/jinahya/jinahya-persistence/issues/79)).
+* The plaintext attribute's declared java type must have a codec (see [Encoding](#encoding)).
 * An entity class with encrypted attributes must be annotated with `@EncryptedEntity` (directly or by inheritance);
   a forgotten annotation is rejected, not skipped
   ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)). An entity with no encrypted attribute, and no
@@ -114,6 +112,24 @@ provider metadata without this module depending on either provider.
 `UNKNOWN` is rejected, never assumed safe: a fact that cannot be established is treated exactly like a fact that is
 known to be wrong. What the default implementation cannot see is an `orm.xml` mapping that makes an
 annotation-safe attribute unsafe — an application using such overrides has to supply a resolver.
+
+## The application's responsibility
+
+This module moves values between the plaintext and the ciphertext; it imposes no policy of its own.
+
+* **The cipher suite.** `EntityEncryptionManager` decides the algorithm and the keys. An *authenticated* mode (AES-GCM,
+  for example) is recommended: tampering with the stored ciphertext is then detected by the manager, before any byte
+  is decoded.
+* **Sizes and lengths.** Nothing is limited: the size of a value, of its ciphertext, and of the column holding it are
+  the application's concern, as they are for a plain mapping.
+* **Deserialization.** A `Serializable` attribute is deserialized without a filter of this module's own, so the
+  JVM-wide `jdk.serialFilter` applies, exactly as for a plain `Serializable` mapping. Configure class allow-lists and
+  graph limits there ([#8](https://github.com/jinahya/jinahya-persistence/issues/8),
+  [#10](https://github.com/jinahya/jinahya-persistence/issues/10)):
+
+  ```
+  -Djdk.serialFilter=maxdepth=32;maxrefs=10000;maxbytes=1048576;java.base/*;com.example.model.*;!*
+  ```
 
 ## Not supported
 
@@ -262,7 +278,7 @@ version, which a reader of this version rejects.
 | `char[]`               | `2×length` | each `char` big endian                                      |
 | `Character[]`          | `2×length` | unboxed; use `char[]` instead                               |
 | `enum`                 | variable   | `name()`(`String`)                                          |
-| `java.io.Serializable` | variable   | java serialization; not platform-independent; **opt-in**, with `@EncryptedAttribute(serializable = true)` ([#79](https://github.com/jinahya/jinahya-persistence/issues/79)) |
+| `java.io.Serializable` | variable   | java serialization, as a plain `Serializable` mapping; not platform-independent; deserialized under the JVM-wide `jdk.serialFilter` ([#8](https://github.com/jinahya/jinahya-persistence/issues/8)) |
 
 `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are matched before `java.util.Date`, so a `Timestamp`
 keeps its nanos rather than being truncated to milliseconds.

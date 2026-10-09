@@ -52,16 +52,4 @@ public @interface EncryptedAttribute {
      */
     String encryptedAttribute() default "";
 
-    /**
-     * Whether the annotated attribute may be encoded with Java serialization.
-     * <p>
-     * Java serialization is the codec of last resort: a declared type which no other codec handles, but which
-     * implements {@link java.io.Serializable}, is encoded with it. That codec is the one which only Java can read,
-     * whose format depends on the class's internals (its {@code serialVersionUID} and fields), and whose decoding is
-     * the largest attack surface. So it is used only when asked for.
-     *
-     * @return {@code true} to allow Java serialization for the annotated attribute; {@code false}, the default, to
-     *         reject a declared type which no other codec handles.
-     */
-    boolean serializable() default false;
 }

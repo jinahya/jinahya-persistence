@@ -660,12 +660,6 @@ public abstract class AbstractEntityEncryptionService {
                              + constraint.annotationType().getName()
                              + "; validate the value before persisting, or use the transient-plaintext mode (#82)");
             }
-            if (codec == EntityEncryptionServiceUtils.Codec.SERIALIZABLE_ && !annotation.serializable()) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "only Java serialization can encode the declared java type "
-                             + JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute).getName()
-                             + "; opt in with @EncryptedAttribute(serializable = true), or use a supported type");
-            }
             if (!isOptional(decryptedAttribute)) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,
                              "a decrypted attribute has to be optional");
