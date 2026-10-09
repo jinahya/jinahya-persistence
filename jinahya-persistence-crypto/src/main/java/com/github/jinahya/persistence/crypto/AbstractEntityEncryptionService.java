@@ -14,12 +14,14 @@ import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.MapAttribute;
 import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
+import jakarta.validation.Constraint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
@@ -358,6 +360,47 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
+     * Returns a Bean Validation constraint declared on the specified attribute: on its java member, or on the field or
+     * getter of the same property, directly or inside a repeatable container such as {@code @Size.List}.
+     *
+     * @param attribute the attribute.
+     * @return a constraint annotation; {@code null} when there is none.
+     */
+    private static @Nullable Annotation findConstraint(final Attribute<?, ?> attribute) {
+        final var name = attribute.getName();
+        final var capitalized = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        for (final var member : declaredMembers(attribute.getDeclaringType().getJavaType())) {
+            final var matches = member instanceof java.lang.reflect.Field
+                                ? member.getName().equals(name)
+                                : member.getName().equals("get" + capitalized) || member.getName().equals("is" + capitalized);
+            if (!matches) {
+                continue;
+            }
+            for (final var annotation : ((AnnotatedElement) member).getAnnotations()) {
+                if (annotation.annotationType().isAnnotationPresent(Constraint.class)) {
+                    return annotation;
+                }
+                // a repeatable container, e.g. @Size.List, holds its constraints in value()
+                try {
+                    final var value = annotation.annotationType().getMethod("value");
+                    if (value.getReturnType().isArray()
+                        && value.getReturnType().getComponentType().isAnnotationPresent(Constraint.class)) {
+                        final var contained = (Annotation[]) value.invoke(annotation);
+                        if (contained.length > 0) {
+                            return contained[0];
+                        }
+                    }
+                } catch (final NoSuchMethodException nsme) {
+                    // not a container
+                } catch (final ReflectiveOperationException roe) {
+                    throw new RuntimeException("failed to read " + annotation, roe);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns whether the specified attribute is optional.
      *
      * @param attribute the attribute.
@@ -606,6 +649,16 @@ public abstract class AbstractEntityEncryptionService {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,
                              "no codec for the declared java type "
                              + JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute).getName());
+            }
+            // Jakarta Persistence validates after @PrePersist/@PreUpdate, by which time encrypting has nulled the
+            // plaintext: a constraint on it is evaluated against null, failing every write or passing vacuously
+            final var constraint = findConstraint(decryptedAttribute);
+            if (constraint != null) {
+                throw reject(rootType, embeddingPath, decryptedAttribute, null,
+                             "a Bean Validation constraint on an encrypted attribute is evaluated against null"
+                             + " (validation runs after encrypting has cleared the plaintext); found @"
+                             + constraint.annotationType().getName()
+                             + "; validate the value before persisting, or use the transient-plaintext mode (#82)");
             }
             if (codec == EntityEncryptionServiceUtils.Codec.SERIALIZABLE_ && !annotation.serializable()) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,

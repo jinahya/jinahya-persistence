@@ -47,6 +47,7 @@
     <class>com.github.jinahya.persistence.crypto._FrozenPlainEntity</class>
     <class>com.github.jinahya.persistence.crypto._UnoptedSerializableEntity</class>
     <class>com.github.jinahya.persistence.crypto._DirectListenerEntity</class>
+    <class>com.github.jinahya.persistence.crypto._ConstrainedSecretEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>

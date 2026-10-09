@@ -65,6 +65,12 @@ yourself. A mapping which breaks any of these is rejected:
   be insertable, updatable and nullable.
 * An `@Embedded` attribute may not itself be annotated; annotate the attributes inside the embeddable.
 * Neither side may be an identifier or a version attribute, and the ciphertext attribute may not itself be annotated.
+* The plaintext attribute may not carry a Bean Validation constraint (`@NotNull`, `@Size`, `@Pattern`, …, on its
+  field or getter). Jakarta Persistence validates *after* `@PrePersist`/`@PreUpdate`, by which time encrypting has
+  cleared the plaintext, so such a constraint is evaluated against `null`: it fails every write, or passes vacuously.
+  Validate the value before persisting; the transient-plaintext mode
+  ([#82](https://github.com/jinahya/jinahya-persistence/issues/82)) will support it
+  ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
 * The plaintext attribute's declared java type must have a codec (see [Encoding](#encoding)). A type which only Java
   serialization can encode is rejected unless the attribute opts in with `@EncryptedAttribute(serializable = true)`
   ([#79](https://github.com/jinahya/jinahya-persistence/issues/79)).

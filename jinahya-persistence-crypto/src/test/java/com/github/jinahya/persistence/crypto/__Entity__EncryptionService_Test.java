@@ -478,6 +478,20 @@ class __Entity__EncryptionService_Test {
             assertThat(entity.opaqueEnc__).as("nothing was touched").isNull();
         }
 
+        @DisplayName("a Bean Validation constraint on an encrypted attribute is rejected, not evaluated against null (#9)")
+        @Test
+        void __constraintRejected() {
+            final var entity = new _ConstrainedSecretEntity();
+            entity.name = "far too long for @Size(max = 4)";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Bean Validation constraint")
+                    .hasMessageContaining("jakarta.validation.constraints.Size")
+                    .hasMessageContaining("decrypted attribute: name");
+            assertThat(entity.nameEnc__).as("nothing was touched").isNull();
+        }
+
         @DisplayName("a plaintext column which is not updatable is rejected (#73)")
         @Test
         void __nonUpdatablePlaintextRejected() {
@@ -557,9 +571,10 @@ class __Entity__EncryptionService_Test {
                     "crypto._CollectionSecretEntity",   // #71
                     "crypto._UnmarkedSecretEntity",     // #72
                     "crypto._FrozenPlainEntity",        // #73
-                    "crypto._UnoptedSerializableEntity" // #79
+                    "crypto._UnoptedSerializableEntity", // #79
+                    "crypto._ConstrainedSecretEntity"   // #9
             );
-            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(8);
+            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(9);
             assertThat(message).doesNotContain(
                     "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
         }
