@@ -56,7 +56,10 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
   be insertable, updatable and nullable.
 * An `@Embedded` attribute may not itself be annotated; annotate the attributes inside the embeddable.
 * Neither side may be an identifier or a version attribute, and the ciphertext attribute may not itself be annotated.
-* An entity class must be annotated with `@EncryptedEntity`; anything else passes through untouched.
+* An entity class with encrypted attributes must be annotated with `@EncryptedEntity` (directly or by inheritance);
+  a forgotten annotation is rejected, not skipped
+  ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)). An entity with no encrypted attribute, and no
+  annotation, passes through untouched — the service enforces this itself, not only the listener.
 * `@EncryptedAttribute` may only be placed on a persistent attribute's member — not on a `@Transient` or unmapped
   member, nor on the side the access type does not read (a field under property access)
   ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)).
@@ -66,8 +69,6 @@ inconsistent mapping cannot leave an instance half-encrypted. A mapping which br
 
 Known gaps in this validation — each of these is currently **silent**:
 
-* an `@EncryptedAttribute` on an entity without `@EncryptedEntity` is skipped
-  ([#72](https://github.com/jinahya/jinahya-persistence/issues/72));
 * the plaintext column is not required to be `updatable`, which the lazy migration of legacy rows depends on
   ([#73](https://github.com/jinahya/jinahya-persistence/issues/73));
 * validation is lazy: a mapping is checked on its first encrypt/decrypt, not at startup

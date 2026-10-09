@@ -213,18 +213,16 @@ public abstract class EntityEncryptionListener {
     /**
      * Encrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
-     * @param entityInstance the entity instance to encrypt; instances of a class which is not annotated with
-     *                       {@link EncryptedEntity @__EncryptedEntity} are silently skipped.
+     * @param entityInstance the entity instance to encrypt; an instance of a class which is not annotated with
+     *                       {@link EncryptedEntity @EncryptedEntity}, and has no encrypted attribute, passes through
+     *                       untouched.
+     * @throws RuntimeException when the {@code entityInstance}'s class has encrypted attributes but is not annotated
+     *                          with {@link EncryptedEntity @EncryptedEntity}.
      * @see AbstractEntityEncryptionService#encrypt(Object)
      */
     protected void encrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "encrypt({0})", describe(entityInstance));
-        final var annotation = entityInstance.getClass().getAnnotation(EncryptedEntity.class);
-        if (annotation == null) {
-            logger.log(System.Logger.Level.TRACE, "skipping encrypting {0}, not annotated with {1}",
-                       describe(entityInstance), EncryptedEntity.class);
-            return;
-        }
+        // the service decides whether the instance is to be transformed, and rejects a forgotten @EncryptedEntity
         final var encryptionService = getEncryptionService();
         assert encryptionService != null;
         encryptionService.encrypt(entityInstance);
@@ -234,18 +232,16 @@ public abstract class EntityEncryptionListener {
     /**
      * Decrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
-     * @param entityInstance the entity instance to decrypt; instances of a class which is not annotated with
-     *                       {@link EncryptedEntity @__EncryptedEntity} are silently skipped.
+     * @param entityInstance the entity instance to decrypt; an instance of a class which is not annotated with
+     *                       {@link EncryptedEntity @EncryptedEntity}, and has no encrypted attribute, passes through
+     *                       untouched.
+     * @throws RuntimeException when the {@code entityInstance}'s class has encrypted attributes but is not annotated
+     *                          with {@link EncryptedEntity @EncryptedEntity}.
      * @see AbstractEntityEncryptionService#decrypt(Object)
      */
     protected void decrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "decrypt({0})", describe(entityInstance));
-        final var annotation = entityInstance.getClass().getAnnotation(EncryptedEntity.class);
-        if (annotation == null) {
-            logger.log(System.Logger.Level.TRACE, "skipping decrypting {0}, not annotated with {1}",
-                       describe(entityInstance), EncryptedEntity.class);
-            return;
-        }
+        // the service decides whether the instance is to be transformed, and rejects a forgotten @EncryptedEntity
         final var encryptionService = getEncryptionService();
         assert encryptionService != null;
         encryptionService.decrypt(entityInstance);
