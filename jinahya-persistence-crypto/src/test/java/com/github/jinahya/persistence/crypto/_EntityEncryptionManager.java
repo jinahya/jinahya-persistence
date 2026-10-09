@@ -17,7 +17,7 @@ import java.security.SecureRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
 @ApplicationScoped
-public class _Entity_EncryptionManager implements EntityEncryptionManager {
+public class _EntityEncryptionManager implements EntityEncryptionManager {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -51,7 +51,7 @@ public class _Entity_EncryptionManager implements EntityEncryptionManager {
     static final int TAG_BYTES = TAG_SIZE >>> 3; // 16 bytes
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected _Entity_EncryptionManager() {
+    protected _EntityEncryptionManager() {
         super();
     }
 

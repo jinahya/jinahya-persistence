@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-class __Entity__EncryptionService_Test {
+class __EntityEncryptionService_Test {
 
     private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
 
@@ -49,7 +49,7 @@ class __Entity__EncryptionService_Test {
 
     @BeforeEach
     void createService() {
-        service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager());
+        service = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager());
     }
 
     private static _SecretEntity populated() {
@@ -79,8 +79,8 @@ class __Entity__EncryptionService_Test {
         @DisplayName("encrypt/decrypt accept a getReference() proxy")
         @Test
         void __proxy() {
-            final var manager = new _Entity_EncryptionManager();
-            final var svc = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _EntityEncryptionManager();
+            final var svc = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
 
             final Long id;
             try (var em = ENTITY_MANAGER_FACTORY.createEntityManager()) {
@@ -116,8 +116,8 @@ class __Entity__EncryptionService_Test {
             // the ciphertext is well formed and decrypts cleanly; it is the DECODED bytes that the
             // codec cannot turn back into a value -- Enum.valueOf throws IllegalArgumentException,
             // which the guard around the decode ladder did not catch
-            final var manager = new _Entity_EncryptionManager();
-            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _EntityEncryptionManager();
+            final var service = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
             final var entity = populated();
             final var identifier = manager.getEncryptionIdentifier(entity);
 
@@ -135,8 +135,8 @@ class __Entity__EncryptionService_Test {
         @DisplayName("a payload of an unknown format version is rejected, naming the attribute (#75)")
         @Test
         void __unknownFormatVersion() {
-            final var manager = new _Entity_EncryptionManager();
-            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _EntityEncryptionManager();
+            final var service = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
             final var entity = populated();
             final var framed = EntityEncryptionServiceUtils.frame(
                     EntityEncryptionServiceUtils.Codec.INT_4, EntityEncryptionServiceUtils.int_4(37));
@@ -152,8 +152,8 @@ class __Entity__EncryptionService_Test {
         @DisplayName("a payload written by another codec is rejected rather than misread, e.g. after Long -> Integer (#75)")
         @Test
         void __codecMismatch() {
-            final var manager = new _Entity_EncryptionManager();
-            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _EntityEncryptionManager();
+            final var service = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
             final var entity = populated();
             // what a row holds when `age` was declared Long when it was written, and is Integer now
             entity.age = null;
@@ -294,7 +294,7 @@ class __Entity__EncryptionService_Test {
             // deliberately an external-package subclass: an in-package one cannot exercise the ColumnRules
             // constructor's accessibility, which is exactly what an application would hit first
             final var relaxed = new com.github.jinahya.persistence.cryptoext._ExternalResolverService(
-                    ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager(), java.util.Set.of("leak"));
+                    ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager(), java.util.Set.of("leak"));
             final var entity = new _GraphEntity();
             entity.valid = new _SecretEmbeddable("keep-me");
             entity.second = new _SecretEmbeddable("also-keep-me");
@@ -362,7 +362,7 @@ class __Entity__EncryptionService_Test {
         @DisplayName("a fact which cannot be established is rejected, not assumed safe")
         @Test
         void __unknownIsRejected() {
-            final var unsure = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager()) {
+            final var unsure = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager()) {
                 @Override
                 protected ColumnRules resolveColumnRules(final jakarta.persistence.metamodel.ManagedType<?> rootType,
                                                          final java.util.List<jakarta.persistence.metamodel.Attribute<?, ?>> embeddingPath,
@@ -460,7 +460,7 @@ class __Entity__EncryptionService_Test {
         @Test
         void __plainEntityPassesThrough() {
             // a manager which must never be reached: not even for the encryption identifier
-            final var untouchable = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new EntityEncryptionManager() {
+            final var untouchable = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new EntityEncryptionManager() {
                 @Override
                 public String getEncryptionIdentifier(final Object entityInstance) {
                     throw new AssertionError("must not be called for a plain entity");
@@ -573,8 +573,8 @@ class __Entity__EncryptionService_Test {
         @DisplayName("decrypt(): one unreadable ciphertext, and no other attribute, nor the embeddable, is touched")
         @Test
         void __decrypt() {
-            final var manager = new _Entity_EncryptionManager();
-            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _EntityEncryptionManager();
+            final var service = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
             final var entity = populated();
             service.encrypt(entity);
             final var nameEnc = entity.nameEnc__.clone();
@@ -641,9 +641,9 @@ class __Entity__EncryptionService_Test {
         void __truncated() {
             final var entity = new _SecretEntity();
             entity.ageEnc__ = new byte[
-                    _Entity_EncryptionManager.IV_BYTES + _Entity_EncryptionManager.KEY_BYTES + _Entity_EncryptionManager.AAD_BYTES];
+                    _EntityEncryptionManager.IV_BYTES + _EntityEncryptionManager.KEY_BYTES + _EntityEncryptionManager.AAD_BYTES];
             // a well-formed header with an empty payload; Integer needs four bytes after it
-            final var manager = new _Entity_EncryptionManager();
+            final var manager = new _EntityEncryptionManager();
             entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptionServiceUtils.frame(
                     EntityEncryptionServiceUtils.Codec.INT_4, new byte[0]));
 
@@ -661,7 +661,7 @@ class __Entity__EncryptionService_Test {
         void __overLong() {
             final var entity = new _SecretEntity();
             // a correct header, but eight bytes where Integer reads four
-            final var manager = new _Entity_EncryptionManager();
+            final var manager = new _EntityEncryptionManager();
             entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptionServiceUtils.frame(
                     EntityEncryptionServiceUtils.Codec.INT_4, EntityEncryptionServiceUtils.long_8(37L)));
 

@@ -2,9 +2,6 @@ package com.github.jinahya.persistence.crypto;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.event.Shutdown;
-import jakarta.enterprise.event.Startup;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
@@ -73,21 +70,6 @@ public class EntityEncryptionListener {
         logger.log(System.Logger.Level.TRACE, "onPostConstruct()");
     }
 
-    // https://stackoverflow.com/a/72628439/330457
-
-    /**
-     * Observes the CDI container {@link Startup} event.
-     *
-     * @param startup the observed event.
-     * @implSpec The implementation of this class only logs.
-     * @deprecated never called on the instance the persistence provider uses; an entity listener is not a CDI bean,
-     *         so its observer methods are not registered.
-     */
-    @Deprecated(forRemoval = true)
-    protected void onStartup(@Observes final Startup startup) {
-        logger.log(System.Logger.Level.TRACE, "onStartup({0})", startup);
-    }
-
     /**
      * Called before this listener is destroyed.
      *
@@ -96,21 +78,6 @@ public class EntityEncryptionListener {
     @PreDestroy
     protected void onPreDestroy() {
         logger.log(System.Logger.Level.TRACE, "onPreDestroy()");
-    }
-
-    // https://stackoverflow.com/a/72628439/330457
-
-    /**
-     * Observes the CDI container {@link Shutdown} event.
-     *
-     * @param shutdown the observed event.
-     * @implSpec The implementation of this class only logs.
-     * @deprecated never called on the instance the persistence provider uses; an entity listener is not a CDI bean,
-     *         so its observer methods are not registered.
-     */
-    @Deprecated(forRemoval = true)
-    protected void onShutdown(@Observes final Shutdown shutdown) {
-        logger.log(System.Logger.Level.TRACE, "onShutdown({0})", shutdown);
     }
 
     // --------------------------------------------------------------------------------------------------------- PERSIST

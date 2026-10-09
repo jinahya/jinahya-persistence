@@ -151,7 +151,7 @@ class __DirectListener_Test {
     @BeforeAll
     static void setUp() {
         ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
-        SERVICE = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager());
+        SERVICE = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager());
         final var cdi = new StubCDI();
         CDI.setCDIProvider(() -> cdi);
     }
