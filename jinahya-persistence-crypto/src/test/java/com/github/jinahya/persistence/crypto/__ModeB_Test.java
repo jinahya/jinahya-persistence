@@ -34,7 +34,7 @@ class __ModeB_Test {
     static void setUp() {
         ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
         _LifecycleListenerEntity.SERVICE =
-                new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager());
+                new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager());
     }
 
     @AfterAll

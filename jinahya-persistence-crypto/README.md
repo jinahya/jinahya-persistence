@@ -326,9 +326,3 @@ keeps its nanos rather than being truncated to milliseconds.
 `java.util.Date`, `java.util.Calendar`, `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are supported but
 [deprecated by Jakarta Persistence 3.2](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations);
 prefer the `java.time` types.
-
-## Deprecated for removal
-
-* `EntityEncryptionServiceQualifier` — nothing in this module selects by it.
-* `EntityEncryptionListener.onStartup(Startup)` / `onShutdown(Shutdown)` — an entity listener is not a CDI bean, so these
-  observers never fire on the instance the persistence provider uses.
