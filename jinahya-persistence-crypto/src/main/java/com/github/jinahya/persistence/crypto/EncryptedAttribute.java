@@ -10,10 +10,20 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * An annotation for marking an entity attribute whose value is stored encrypted.
  * <p>
- * The annotated attribute holds the plaintext, and is never written to the database with a value in it; the ciphertext
- * goes to a second, {@code byte[]}-typed attribute of the same entity, named by {@link #encryptedAttribute()}.
+ * The annotated member holds the plaintext, which never reaches the database; the ciphertext goes to a second,
+ * {@code byte[]}-typed attribute of the same entity, named by {@link #encryptedAttribute()}. Where the annotation sits
+ * decides the mode:
+ * <dl>
+ *   <dt>on a {@link jakarta.persistence.Transient @Transient} field — Mode B, the steady state</dt>
+ *   <dd>The plaintext has no column, and nothing mapped is ever nulled: the instance keeps its value, and reading it
+ *       does not write it. The entity needs a setter which also sets the ciphertext attribute to {@code null}, so that
+ *       the provider, which dirty-checks mapped attributes only, sees a change; it is proven at startup.</dd>
+ *   <dt>on a persistent attribute — Mode A, for encrypting a column which already holds data</dt>
+ *   <dd>The plaintext stays mapped to the existing column, which a legacy row still holds its plaintext in; encrypting
+ *       nulls it, so that it is migrated as it is written.</dd>
+ * </dl>
  * <p>
- * The annotated attribute has to be mapped {@code @Column(insertable = false)}.
+ * In Mode A, the annotated attribute has to be mapped {@code @Column(insertable = false)}.
  * {@link jakarta.persistence.PrePersist @PrePersist} runs when {@code persist()} is called, not when the {@code INSERT}
  * is built, and Jakarta Persistence has no callback in between; a provider which builds a single statement at commit
  * would otherwise carry a value assigned in that window in the clear. {@link AbstractEntityEncryptionService} rejects a mapping

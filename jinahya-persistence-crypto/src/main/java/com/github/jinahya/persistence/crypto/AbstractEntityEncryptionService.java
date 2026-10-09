@@ -82,14 +82,16 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
  * An abstract service which encrypts and decrypts the {@link EncryptedAttribute annotated attributes} of an entity
  * instance, in place.
  * <p>
- * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each {@code BASIC}
- * attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}:
+ * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each plaintext annotated
+ * with {@link EncryptedAttribute @EncryptedAttribute} — a {@code BASIC} attribute (Mode A), or a
+ * {@link jakarta.persistence.Transient @Transient} field (Mode B):
  * <ol>
  *   <li>converts the plaintext value to bytes, by its declared java type, prefixed with a header naming the format
  *       version and the codec;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionManager encryptionManager}, along with the
  *       {@link EntityEncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
- *   <li>stores the ciphertext in the paired {@code byte[]} attribute, and clears the plaintext one.</li>
+ *   <li>stores the ciphertext in the paired {@code byte[]} attribute; in Mode A, it also clears the plaintext, which
+ *       is mapped. In Mode B nothing mapped is ever cleared, and an unchanged plaintext is not re-encrypted.</li>
  * </ol>
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
  * attributes of an embeddable are covered as well.

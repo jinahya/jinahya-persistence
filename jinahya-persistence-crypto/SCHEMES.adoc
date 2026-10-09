@@ -166,10 +166,10 @@ connection fail. It cannot be fixed inside JPA callbacks (1.3).
 
 [source,java]
 ----
-@Transient
-String name;                                // plaintext: never mapped
+@EncryptedAttribute                         // the same annotation, in the same place
+@Transient                                  // what makes it Mode B: the plaintext is never mapped
+String name;
 
-@EncryptedAttribute(plaintext = "name")     // NEW: the annotation moves to the mapped side
 @Column
 byte[] name_enc__;
 
@@ -189,17 +189,21 @@ void setName(String name) { this.name = name; this.name_enc__ = null; }  // make
 
 *Trade-offs.*
 
-* *Edits are not detected* (1.3). Options:
-** a setter that invalidates the ciphertext (shown above); a direct field write bypasses it;
-** detection only: remember what was decrypted, and fail loudly if the plaintext changed but the ciphertext did not.
-* *Discovery.* Transient fields are not in the metamodel. With the reversed annotation, discovery and validation stay
-  metamodel-based; only the plaintext field is found by reflection.
+* *Edits are not detected* (1.3). *Implemented (#82):* a setter that invalidates the ciphertext (shown above),
+  proven at startup on a throwaway instance; and a safety net: when the instance is flushed for another reason, the
+  plaintext is compared with the ciphertext, so a direct field write is kept. A direct write with nothing else changed
+  is still lost: no callback runs at all. *Measured:* `merge()` does not copy a transient field from a detached
+  instance; set the value on the instance it returns.
+* *Discovery.* Transient fields are not in the metamodel. *Implemented (#82):* the annotation stays on the plaintext;
+  a `@Transient` (or `transient`) field is found by reflection, and paired by name with the metamodel's `byte[]`
+  attribute. A reversed annotation, on the ciphertext side, was considered and not adopted: it would have meant more
+  churn for every entity switching from A.
 * *Legacy rows are invisible.* The old `name` column is unmapped, so a row with no ciphertext reads as `name = null`
   (the chicken-and-egg problem, 2.3).
 * *The leftover `name` column* must be nullable (unmapped inserts do not write it), and any `UNIQUE` constraint on it
   dropped (SQL Server allows only one NULL). Cleansing it is an operations concern.
-* *Re-encrypting on every update* (a new IV each time) unless encryption runs only when the plaintext differs from
-  what was decrypted.
+* *Re-encrypting on every update* (a new IV each time). *Implemented (#82):* a ciphertext still present means
+  unchanged, the setter having nulled it otherwise; the safety net compares before re-encrypting.
 
 === 2.3 A to B: the two modes are phases
 
@@ -296,10 +300,10 @@ class User {
 
     @Id Long id;
 
+    @EncryptedAttribute
     @Transient
     String name;
 
-    @EncryptedAttribute(plaintext = "name")
     @Column(table = "USER_ENC", name = "name")
     byte[] nameEnc;
 
@@ -485,17 +489,14 @@ Same as within_table Mode B (2.2), with the bundle as the only mapped attribute:
 == 7. Open questions / next steps
 
 * Support within_table A and B (and per_table on top of B) in the module, or only some of them?
-* Edit detection for the transient modes: invalidating setter, detection only, or both?
-* Re-encryption policy: encrypt only when the plaintext differs from what was decrypted?
-* A pre-switch check: count rows that have plaintext and no ciphertext.
+* *Done (#82):* within_table A and B are both supported, the mode decided by `@Transient` on the plaintext;
+  edit detection is an invalidating setter, proven at startup, plus a safety net; an unchanged plaintext is not
+  re-encrypted; `countUnmigrated(Class)` is the pre-switch check.
 * *[unverified]* How Hibernate 7.4 and EclipseLink 5.0 join a missing secondary row, and whether they insert it when
   all of its columns are NULL.
-* Prototype lifecycle test on both providers (transient plaintext, with and without `@SecondaryTable`):
-** reading does not write;
-** the object is not emptied;
-** an edit through the setter persists, and a direct field write is lost;
-** behavior when the secondary row is missing;
-** the A to B switch on existing data.
+* *Done (#82), within_table:* reading does not write; the object is not emptied; an edit through the setter
+  persists, and a direct field write is lost unless something else is flushed; rows cross between A and B both ways.
+  Still to measure for per_table: the behavior when the secondary row is missing.
 * *Done:* the format items (1.4), as format version 1 (#75–#80).
 * single_column:
 ** sealed bundle or per-attribute entries?
@@ -537,17 +538,14 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 
 === 8.4 Enhancements, in order
 
-. *Mode B support:*
-** the reversed annotation (`@EncryptedAttribute(plaintext = "name")` on the `byte[]` side);
-** discovery of the transient plaintext field;
-** decrypt and encrypt rules that null nothing mapped.
-. *Edit detection:* an invalidating setter, plus detection of plaintext changes that would otherwise be lost, so that
-  they fail loudly.
-. *Re-encryption policy:* encrypt only when the plaintext differs from what was decrypted.
-. *A pre-switch check:* count the rows that still have plaintext and no ciphertext.
+. *Mode B support:* *done* (#82). The annotation stays on the plaintext, now `@Transient`; the field is found by
+  reflection; nothing mapped is ever nulled.
+. *Edit detection:* *done* (#82): an invalidating setter, proven at startup, and a safety net comparing the plaintext
+  with the ciphertext when the instance is flushed anyway.
+. *Re-encryption policy:* *done* (#82): an unchanged plaintext is never re-encrypted.
+. *A pre-switch check:* *done* (#82): `countUnmigrated(Class)`.
 . *Format items* (1.4): *done*, as format version 1 (#75–#80); `Serializable` stays as JPA supports it (#8).
 . *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
   secondary-table behavior on both providers.
 
-Start with step 1, together with a prototype lifecycle test on both providers confirming that Mode B behaves as these
-notes claim.
+Steps 1 to 5 are done; `__ModeB_Test` measures Mode B on both providers.
