@@ -156,8 +156,8 @@ public class _SecretEntity {
 
     // ------------------------------------------------ a declared type broader than the value it holds at run time
     // Jakarta Persistence 3.2 §2.6 admits any Serializable as a basic type; the value here is an ordinary String,
-    // so the declared type and the runtime type deliberately disagree.
-    @EncryptedAttribute
+    // so the declared type and the runtime type deliberately disagree. Java serialization is opt-in (#79).
+    @EncryptedAttribute(serializable = true)
     @Basic(optional = true)
     @Column(name = "opaque", nullable = true, insertable = false)
     public java.io.Serializable opaque;

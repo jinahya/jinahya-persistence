@@ -599,6 +599,20 @@ public abstract class AbstractEntityEncryptionService {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,
                              "an identifier, or a version, attribute cannot be encrypted");
             }
+            // the declared java member decides the codec, in both directions; know it is one before any value moves
+            final var codec = EntityEncryptionServiceUtils.codecOf(
+                    JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute));
+            if (codec == null) {
+                throw reject(rootType, embeddingPath, decryptedAttribute, null,
+                             "no codec for the declared java type "
+                             + JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute).getName());
+            }
+            if (codec == EntityEncryptionServiceUtils.Codec.SERIALIZABLE_ && !annotation.serializable()) {
+                throw reject(rootType, embeddingPath, decryptedAttribute, null,
+                             "only Java serialization can encode the declared java type "
+                             + JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute).getName()
+                             + "; opt in with @EncryptedAttribute(serializable = true), or use a supported type");
+            }
             if (!isOptional(decryptedAttribute)) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,
                              "a decrypted attribute has to be optional");

@@ -464,6 +464,20 @@ class __Entity__EncryptionService_Test {
             assertThat(entity.name).isEqualTo("plain");
         }
 
+        @DisplayName("an attribute only Java serialization can encode is rejected unless it opts in (#79)")
+        @Test
+        void __serializableNotOptedInRejected() {
+            final var entity = new _UnoptedSerializableEntity();
+            entity.opaque = "opaque";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("only Java serialization")
+                    .hasMessageContaining("serializable = true")
+                    .hasMessageContaining("decrypted attribute: opaque");
+            assertThat(entity.opaqueEnc__).as("nothing was touched").isNull();
+        }
+
         @DisplayName("a plaintext column which is not updatable is rejected (#73)")
         @Test
         void __nonUpdatablePlaintextRejected() {
@@ -496,9 +510,10 @@ class __Entity__EncryptionService_Test {
                     "crypto._TransientSecretEntity",    // #70
                     "crypto._CollectionSecretEntity",   // #71
                     "crypto._UnmarkedSecretEntity",     // #72
-                    "crypto._FrozenPlainEntity"         // #73
+                    "crypto._FrozenPlainEntity",        // #73
+                    "crypto._UnoptedSerializableEntity" // #79
             );
-            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(7);
+            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(8);
             assertThat(message).doesNotContain(
                     "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
         }
