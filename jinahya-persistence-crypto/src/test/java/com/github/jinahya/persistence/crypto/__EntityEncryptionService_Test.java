@@ -593,6 +593,31 @@ class __EntityEncryptionService_Test {
         }
     }
 
+    @DisplayName("the encryption identifier the manager returns is checked (#18)")
+    @Nested
+    class EncryptionIdentifierTest {
+
+        @DisplayName("a blank, or null, identifier is rejected before anything is encrypted")
+        @Test
+        void __blankIdentifierRejected() {
+            for (final var identifier : new String[]{"", "  ", null}) {
+                final var manager = new _EntityEncryptionManager() {
+                    @Override
+                    public String getEncryptionIdentifier(final Object entityInstance) {
+                        return identifier;
+                    }
+                };
+                final var service = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+                final var entity = populated();
+
+                assertThatThrownBy(() -> service.encrypt(entity))
+                        .isInstanceOf(RuntimeException.class)
+                        .hasMessageContaining("encryption identifier");
+                assertThat(entity.nameEnc__).as("nothing was encrypted").isNull();
+            }
+        }
+    }
+
     @DisplayName("validateMappings() (#74)")
     @Nested
     class ValidateMappingsTest {

@@ -15,9 +15,6 @@ import jakarta.persistence.metamodel.MapAttribute;
 import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
 import jakarta.validation.Constraint;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
@@ -150,6 +147,8 @@ public abstract class AbstractEntityEncryptionService {
      *
      * @param entityManagerFactory    an entity manager factory; must not be {@code null}.
      * @param entityEncryptionManager the encryption manager; must not be {@code null}.
+     * @implNote The service caches the metadata of the {@code entityManagerFactory}, and never evicts it: it is meant to
+     *         live exactly as long as that factory, an application-scoped bean, and not to outlive it.
      */
     protected AbstractEntityEncryptionService(final EntityManagerFactory entityManagerFactory,
                                               final EntityEncryptionManager entityEncryptionManager) {
@@ -1162,7 +1161,7 @@ public abstract class AbstractEntityEncryptionService {
      *                          cannot be turned into bytes.
      * @see #encrypt(Object)
      */
-    protected void encrypt(final @NotBlank String encryptionIdentifier, final @Valid @NotNull Object object) {
+    protected void encrypt(final String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(getManagedType(resolveClass(object)));
@@ -1393,6 +1392,23 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
+     * Returns the encryption identifier of the specified entity instance, from the manager, checked.
+     *
+     * @param object the entity instance.
+     * @return the non-blank encryption identifier of the {@code object}.
+     * @throws RuntimeException when the manager returns {@code null}, or a blank identifier.
+     */
+    private String encryptionIdentifierOf(final Object object) {
+        final var identifier = entityEncryptionManager.getEncryptionIdentifier(object);
+        if (identifier == null || identifier.isBlank()) {
+            throw new RuntimeException(
+                    "encryptionManager returned a " + (identifier == null ? "null" : "blank") + " encryption identifier"
+                    + "; entity: " + object.getClass().getName());
+        }
+        return identifier;
+    }
+
+    /**
      * Returns whether the specified entity instance is to be transformed: whether its class is annotated with
      * {@link EncryptedEntity @EncryptedEntity}, directly or by inheritance.
      *
@@ -1453,12 +1469,12 @@ public abstract class AbstractEntityEncryptionService {
      *                          attributes but is not annotated with {@link EncryptedEntity @EncryptedEntity}.
      * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
      */
-    public void encrypt(final @Valid @NotNull Object object) {
+    public void encrypt(final Object object) {
         Objects.requireNonNull(object, "object is null");
         if (!isEncryptedEntity(object)) {
             return;
         }
-        final var encryptionIdentifier = entityEncryptionManager.getEncryptionIdentifier(object);
+        final var encryptionIdentifier = encryptionIdentifierOf(object);
         encrypt(encryptionIdentifier, object);
     }
 
@@ -1471,7 +1487,7 @@ public abstract class AbstractEntityEncryptionService {
      *                          cannot be reconstructed from bytes.
      * @see #decrypt(Object)
      */
-    protected void decrypt(final @NotBlank String encryptionIdentifier, final @Valid @NotNull Object object) {
+    protected void decrypt(final String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(getManagedType(resolveClass(object)));
@@ -1649,12 +1665,12 @@ public abstract class AbstractEntityEncryptionService {
      *                          attributes but is not annotated with {@link EncryptedEntity @EncryptedEntity}.
      * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
      */
-    public void decrypt(final @Valid @NotNull Object object) {
+    public void decrypt(final Object object) {
         Objects.requireNonNull(object, "object is null");
         if (!isEncryptedEntity(object)) {
             return;
         }
-        final var encryptionIdentifier = entityEncryptionManager.getEncryptionIdentifier(object);
+        final var encryptionIdentifier = encryptionIdentifierOf(object);
         decrypt(encryptionIdentifier, object);
     }
 
@@ -1704,6 +1720,8 @@ public abstract class AbstractEntityEncryptionService {
     // ----------------------------------------------------------------------------------------- entityEncryptionManager
 
     // -----------------------------------------------------------------------------------------------------------------
+    // The caches below are never evicted: they hold the metadata of this service's entity manager factory, and are
+    // meant to live exactly as long as it does. A service is not to outlive, or be shared across, factories.
     private final Map<Class<?>, ManagedType<?>> managedTypes = new ConcurrentHashMap<>();
 
     private final Map<ManagedType<?>, Map<String, Attribute<?, ?>>> managedTypesAndAttributes =
