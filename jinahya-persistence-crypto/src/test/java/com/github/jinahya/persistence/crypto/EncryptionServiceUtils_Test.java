@@ -136,12 +136,13 @@ class EncryptionServiceUtils_Test {
             assertThat(boolean_1(boolean_1(v))).isEqualTo(v);
         }
 
-        @DisplayName("boolean_1(byte[]) decodes any byte other than 1 as false")
+        @DisplayName("boolean_1(byte[]) rejects any byte other than 0 and 1, rather than decoding it as false (#78)")
         @ValueSource(bytes = {Byte.MIN_VALUE, -1, 2, Byte.MAX_VALUE})
         @ParameterizedTest
-        void __decodeOtherThanOne(final byte b) {
-            // pins the current, lenient, behavior; a malformed payload is NOT rejected the way other codecs reject it
-            assertThat(boolean_1(new byte[]{b})).isFalse();
+        void __decodeOtherThanZeroOrOne(final byte b) {
+            assertThatThrownBy(() -> boolean_1(new byte[]{b}))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("not a boolean");
         }
 
         @DisplayName("boolean_1(byte[]) fails on an empty array")

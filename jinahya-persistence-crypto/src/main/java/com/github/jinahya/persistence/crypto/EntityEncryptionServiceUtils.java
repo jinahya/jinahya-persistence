@@ -90,12 +90,18 @@ final class EntityEncryptionServiceUtils {
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @throws IllegalArgumentException when the byte is neither {@code 0} nor {@code 1}.
      */
     private static boolean boolean_1(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
         assert i + Byte.BYTES <= b.length;
-        return b[i] == 1;
+        return switch (b[i]) {
+            case 0 -> false;
+            case 1 -> true;
+            // anything else is not a value this codec wrote; reading it as false would hide the corruption
+            default -> throw new IllegalArgumentException("not a boolean; byte: " + (b[i] & 0xFF) + "; expected 0 or 1");
+        };
     }
 
     /**

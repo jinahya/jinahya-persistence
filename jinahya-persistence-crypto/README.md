@@ -203,7 +203,7 @@ The checks are unconditional, not `assert`s.
 
 | attribute              | bytes      | encoding                                                    |
 |------------------------|------------|-------------------------------------------------------------|
-| `Boolean`              | `1`        | `0` for `false`, `1` for `true`; any other byte decodes as `false` ([#78](https://github.com/jinahya/jinahya-persistence/issues/78)) |
+| `Boolean`              | `1`        | `0` for `false`, `1` for `true`; any other byte is rejected ([#78](https://github.com/jinahya/jinahya-persistence/issues/78)) |
 | `Byte`                 | `1`        | the value                                                   |
 | `Short`                | `2`        | big endian                                                  |
 | `Character`            | `2`        | big endian                                                  |
