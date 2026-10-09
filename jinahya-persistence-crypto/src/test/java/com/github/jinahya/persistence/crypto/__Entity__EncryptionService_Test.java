@@ -522,5 +522,21 @@ class __Entity__EncryptionService_Test {
                     .hasMessageContaining("age")
                     .hasMessageContaining("decrypted bytes: " + EntityEncryptionServiceUtils.HEADER_BYTES);
         }
+
+        @DisplayName("an over-long payload is rejected, not read as its first bytes (#76)")
+        @Test
+        void __overLong() {
+            final var entity = new _SecretEntity();
+            // a correct header, but eight bytes where Integer reads four
+            final var manager = new _Entity_EncryptionManager();
+            entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptionServiceUtils.frame(
+                    EntityEncryptionServiceUtils.Codec.INT_4, EntityEncryptionServiceUtils.long_8(37L)));
+
+            assertThatThrownBy(() -> service.decrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("reads exactly 4")
+                    .hasMessageContaining("age");
+            assertThat(entity.age).as("nothing was misread").isNull();
+        }
     }
 }
