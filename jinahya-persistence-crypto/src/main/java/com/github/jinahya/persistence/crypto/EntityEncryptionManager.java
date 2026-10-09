@@ -28,10 +28,27 @@ import jakarta.validation.constraints.NotNull;
 public interface EntityEncryptionManager {
 
     /**
-     * Returns an identifier for the specified entity instance.
+     * Returns an identifier for the specified entity instance; the identifier the encryption keys are selected by.
+     * <p>
+     * <strong>The identifier is never stored.</strong> It is derived again, independently, on every encrypt and on every
+     * decrypt, for as long as the row exists. So it has to be derivable <em>identically for the whole lifetime of the
+     * row</em>, from state which is:
+     * <ol>
+     *   <li><em>present on both paths</em> — on the decrypt path the instance comes from the database with its
+     *       encrypted attributes still encrypted, so the identifier cannot depend on any of them; and</li>
+     *   <li><em>immutable for the life of the row</em> — anything which changes yields another identifier at the next
+     *       read: the {@link jakarta.persistence.Version version}, a tenant's <em>current</em> key id, a rotation
+     *       counter, a key version read from configuration. Rows written before the change then become undecryptable,
+     *       or, worse, decrypt with the wrong key into a plausible wrong value.</li>
+     * </ol>
+     * A safe derivation reads an unencrypted, never-updated attribute, such as a tenant or owner column. Beware the
+     * entity identifier: with {@link jakarta.persistence.GenerationType#IDENTITY IDENTITY} generation it is assigned
+     * by the {@code INSERT}, so it is still {@code null} when the instance is encrypted on
+     * {@link jakarta.persistence.PrePersist @PrePersist}. Key rotation belongs in the ciphertext the manager returns
+     * (a key version in its own frame), never in this identifier.
      *
      * @param entityInstance the entity instance.
-     * @return an identifier for the {@code entityInstance}.
+     * @return an identifier for the {@code entityInstance}, the same for the whole lifetime of its row.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */
     @NotBlank
