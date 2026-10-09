@@ -27,27 +27,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         ElementType.TYPE
 })
 public @interface EncryptedEntity {
-
-    /**
-     * The default name of the attribute holding the encryption identifier. The value is
-     * {@value #DEFAULT_ENCRYPTION_IDENTIFIER}.
-     *
-     * @deprecated only the default of {@link #encryptionIdentifierAttribute()}, which is never read.
-     */
-    @Deprecated(forRemoval = true)
-    String DEFAULT_ENCRYPTION_IDENTIFIER = "encryptionIdentifier__";
-
-    /**
-     * The name of the attribute which holds the identifier the encryption keys are selected by.
-     *
-     * @return the name of the attribute holding the encryption identifier; an empty string, the default, for
-     *         {@value #DEFAULT_ENCRYPTION_IDENTIFIER}.
-     * @apiNote This element is not honored yet: the identifier comes only from
-     *         {@link EntityEncryptionManager#getEncryptionIdentifier(Object)}.
-     * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
-     * @deprecated never read; the identifier comes only from
-     *         {@link EntityEncryptionManager#getEncryptionIdentifier(Object)}.
-     */
-    @Deprecated(forRemoval = true)
-    String encryptionIdentifierAttribute() default "";
 }
