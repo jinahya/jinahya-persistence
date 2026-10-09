@@ -491,6 +491,42 @@ class __Entity__EncryptionService_Test {
         }
     }
 
+    @DisplayName("an attribute declared as a type variable of a generic mapped superclass (#67)")
+    @Nested
+    class GenericSuperclassTest {
+
+        @DisplayName("is encoded by the type each entity binds it to, not by its erasure")
+        @Test
+        void __twoBindingsOfOneSuperclass() {
+            final var string = new _GenericStringEntity();
+            string.secret = "generic secret";
+            final var integer = new _GenericIntegerEntity();
+            integer.secret = 37;
+
+            service.encrypt(string);
+            service.encrypt(integer);
+            assertThat(string.secretEnc__).isNotNull();
+            assertThat(integer.secretEnc__).isNotNull();
+
+            service.decrypt(string);
+            service.decrypt(integer);
+            assertThat(string.secret).isEqualTo("generic secret");
+            assertThat(integer.secret).as("an Integer, decoded by int_4").isEqualTo(37);
+        }
+
+        @DisplayName("is resolved through more than one level of binding")
+        @Test
+        void __multiLevelBinding() {
+            final var deep = new _GenericDeepEntity();
+            deep.secret = LocalDate.of(2026, 10, 9);
+
+            service.encrypt(deep);
+            assertThat(deep.secret).isNull();
+            service.decrypt(deep);
+            assertThat(deep.secret).isEqualTo(LocalDate.of(2026, 10, 9));
+        }
+    }
+
     @DisplayName("a failure part-way leaves the instance as it was (#83)")
     @Nested
     class AllOrNothingTest {

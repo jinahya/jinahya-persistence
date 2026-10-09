@@ -401,6 +401,70 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
+     * Returns the declared java type of the specified attribute's member, resolved against the specified concrete
+     * class.
+     *
+     * @param concrete  the class whose instances hold the attribute: the entity, or embeddable, class being validated.
+     * @param attribute the attribute.
+     * @return the resolved type; the raw type of a parameterized one; the erasure of a type variable which cannot be
+     *         resolved.
+     * @implNote The declared member, not {@link Attribute#getJavaType()}, decides the codec: providers disagree on the
+     *         latter. A member declared as a type variable of a generic superclass, though, is resolved here by
+     *         walking the generic superclasses from the {@code concrete} class, binding each level's type arguments.
+     */
+    private static Class<?> resolveJavaType(final Class<?> concrete, final Attribute<?, ?> attribute) {
+        final var member = attribute.getJavaMember();
+        final java.lang.reflect.Type type;
+        if (member instanceof java.lang.reflect.Field field) {
+            type = field.getGenericType();
+        } else if (member instanceof java.lang.reflect.Method method) {
+            type = method.getGenericReturnType();
+        } else {
+            return JinahyaAttributeUtils.getJavaMemberType(attribute);
+        }
+        if (type instanceof Class<?> c) {
+            return c;
+        }
+        // bind every type variable of every generic superclass, from the concrete class up
+        final var bindings = new java.util.HashMap<java.lang.reflect.TypeVariable<?>, java.lang.reflect.Type>();
+        for (var c = concrete; c != null && c != Object.class; c = c.getSuperclass()) {
+            if (c.getGenericSuperclass() instanceof java.lang.reflect.ParameterizedType parameterized
+                && parameterized.getRawType() instanceof Class<?> raw) {
+                final var variables = raw.getTypeParameters();
+                final var arguments = parameterized.getActualTypeArguments();
+                for (int i = 0; i < variables.length; i++) {
+                    // an argument may itself be a variable of the subclass, bound one level down
+                    bindings.put(variables[i], bindings.getOrDefault(arguments[i], arguments[i]));
+                }
+            }
+        }
+        var resolved = type;
+        while (resolved instanceof java.lang.reflect.TypeVariable<?> variable && bindings.containsKey(variable)) {
+            resolved = bindings.get(variable);
+        }
+        return erase(resolved);
+    }
+
+    private static Class<?> erase(final java.lang.reflect.Type type) {
+        if (type instanceof Class<?> c) {
+            return c;
+        }
+        if (type instanceof java.lang.reflect.ParameterizedType parameterized) {
+            return erase(parameterized.getRawType());
+        }
+        if (type instanceof java.lang.reflect.GenericArrayType array) {
+            return erase(array.getGenericComponentType()).arrayType();
+        }
+        if (type instanceof java.lang.reflect.TypeVariable<?> variable) {
+            return erase(variable.getBounds()[0]);
+        }
+        if (type instanceof java.lang.reflect.WildcardType wildcard) {
+            return erase(wildcard.getUpperBounds()[0]);
+        }
+        return Object.class;
+    }
+
+    /**
      * Returns whether the specified attribute is optional.
      *
      * @param attribute the attribute.
@@ -642,13 +706,14 @@ public abstract class AbstractEntityEncryptionService {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,
                              "an identifier, or a version, attribute cannot be encrypted");
             }
-            // the declared java member decides the codec, in both directions; know it is one before any value moves
-            final var codec = EntityEncryptionServiceUtils.codecOf(
-                    JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute));
+            // the declared java member decides the codec, in both directions; know it is one before any value moves.
+            // A member inherited from a generic superclass is declared as a type variable: resolve it against the
+            // concrete class, or Base<String> would be encoded as its erasure, Object (#67)
+            final var javaType = resolveJavaType(managedType.getJavaType(), decryptedAttribute);
+            final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
             if (codec == null) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "no codec for the declared java type "
-                             + JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute).getName());
+                             "no codec for the declared java type " + javaType.getName());
             }
             // Jakarta Persistence validates after @PrePersist/@PreUpdate, by which time encrypting has nulled the
             // plaintext: a constraint on it is evaluated against null, failing every write or passing vacuously
@@ -743,7 +808,7 @@ public abstract class AbstractEntityEncryptionService {
                 throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                              "an encrypted attribute is paired more than once");
             }
-            pairs.add(new Pair(decryptedAttribute, encryptedAttribute));
+            pairs.add(new Pair(decryptedAttribute, encryptedAttribute, javaType));
         }
         visiting.remove(managedType);
         return new Mapping(List.copyOf(pairs), List.copyOf(embeddeds));
@@ -797,8 +862,9 @@ public abstract class AbstractEntityEncryptionService {
      *
      * @param decrypted the attribute holding the plaintext.
      * @param encrypted the attribute holding the ciphertext.
+     * @param javaType  the declared java type of the decrypted attribute, resolved against the concrete class.
      */
-    private record Pair(Attribute<?, ?> decrypted, Attribute<?, ?> encrypted) {
+    private record Pair(Attribute<?, ?> decrypted, Attribute<?, ?> encrypted, Class<?> javaType) {
 
     }
 
@@ -892,7 +958,7 @@ public abstract class AbstractEntityEncryptionService {
                 continue;
             }
             final byte[] decryptedBytes;
-            final var javaType = JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute);
+            final var javaType = pair.javaType();
             // The DECLARED type decides the encoding, exactly as it decides the decoding below. Dispatching on
             // the runtime class here instead let the two ladders pick different codecs for one attribute -- a
             // java.util.Date holding a java.sql.Timestamp was written as epoch seconds and read back as epoch
@@ -1133,7 +1199,7 @@ public abstract class AbstractEntityEncryptionService {
             final Object decryptedValue;
             // the java member, for the same reason as in encrypt(...): the two ladders must agree on the type,
             // and only the declared member means the same thing on every provider
-            final var javaType = JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute);
+            final var javaType = pair.javaType();
             final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
             if (codec == null) {
                 throw new RuntimeException("unsupported java type: " + javaType);

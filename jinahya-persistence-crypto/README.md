@@ -224,7 +224,8 @@ listener keeps it out of the row while the plaintext is mapped. Mode B
 ## Encoding
 
 The `EntityEncryptionManager` receives, and returns, an array of bytes. Values are turned into those bytes by the
-attribute's *declared* java type, big-endian, and are self-contained — a value is reconstructed from its bytes without
+attribute's *declared* java type — for a member inherited from a generic `@MappedSuperclass`, the type the concrete
+entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) — big-endian, and are self-contained — a value is reconstructed from its bytes without
 consulting the database. The sizes below are of the plaintext encoding, after the header and before the manager is
 called. Every encoding is
 pinned byte for byte by `EncryptionServiceUtils_Test`.
