@@ -329,9 +329,6 @@ prefer the `java.time` types.
 
 ## Deprecated for removal
 
-* `@__EncryptionIdentifier`, `EncryptedEntity.encryptionIdentifierAttribute()` and
-  `EncryptedEntity.DEFAULT_ENCRYPTION_IDENTIFIER` — never read; the identifier comes only from
-  `EntityEncryptionManager.getEncryptionIdentifier(Object)`.
 * `EntityEncryptionServiceQualifier` — nothing in this module selects by it.
 * `EntityEncryptionListener.onStartup(Startup)` / `onShutdown(Shutdown)` — an entity listener is not a CDI bean, so these
   observers never fire on the instance the persistence provider uses.
