@@ -894,7 +894,11 @@ public abstract class AbstractEntityEncryptionService {
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-            final var encrypted = entityEncryptionManager.encrypt(encryptionIdentifier, decryptedBytes);
+            // the header names the format version and the codec, so that a reader can tell what wrote the bytes
+            final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+            assert codec != null : "the ladder above handled a type codecOf does not know: " + javaType;
+            final var encrypted = entityEncryptionManager.encrypt(
+                    encryptionIdentifier, EntityEncryptionServiceUtils.frame(codec, decryptedBytes));
             if (encrypted == null) {
                 throw new RuntimeException(
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
@@ -1019,8 +1023,8 @@ public abstract class AbstractEntityEncryptionService {
                 JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
                 continue;
             }
-            final var decryptedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
-            if (decryptedBytes == null) {
+            final var framedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
+            if (framedBytes == null) {
                 throw new RuntimeException(
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
             }
@@ -1028,7 +1032,13 @@ public abstract class AbstractEntityEncryptionService {
             // the java member, for the same reason as in encrypt(...): the two ladders must agree on the type,
             // and only the declared member means the same thing on every provider
             final var javaType = JinahyaAttributeUtils.getJavaMemberType(decryptedAttribute);
+            final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+            if (codec == null) {
+                throw new RuntimeException("unsupported java type: " + javaType);
+            }
             try {
+                // checks the format version, and that the codec which wrote the bytes is the one which reads them
+                final var decryptedBytes = EntityEncryptionServiceUtils.unframe(codec, framedBytes);
                 if (javaType == boolean.class || javaType == Boolean.class) {
                     decryptedValue = boolean_1(decryptedBytes);
                 } else if (javaType == byte.class || javaType == Byte.class) {
@@ -1107,14 +1117,16 @@ public abstract class AbstractEntityEncryptionService {
                 //   AssertionError       the same, when assertions are enabled -- __EncryptionServiceUtils
                 //                        validates its lengths with assert, so a short payload reads the same
                 //                        way whether or not -ea is on
-                //   IllegalArgumentException  chars_2l on an odd-length payload, and Enum.valueOf on a name
-                //                        which is not a constant of the attribute's enum
+                //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
+                //                        which is not a constant of the attribute's enum, and a payload header
+                //                        naming another format version or another codec
                 // Without the last one, those two surfaced bare, with no clue which attribute they came from.
                 throw new RuntimeException(
                         "cannot reconstruct the value from the decrypted bytes" +
+                        (e.getMessage() == null ? "" : " (" + e.getMessage() + ")") +
                         "; decrypted attribute: " + decryptedAttribute.getName() +
                         "; java type: " + javaType.getName() +
-                        "; decrypted bytes: " + decryptedBytes.length,
+                        "; decrypted bytes: " + framedBytes.length,
                         e
                 );
             }

@@ -122,12 +122,49 @@ class __Entity__EncryptionService_Test {
             final var identifier = manager.getEncryptionIdentifier(entity);
 
             entity.grade = null;
-            entity.gradeEnc__ = manager.encrypt(identifier, "NOPE".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            // a well-formed header, so the bytes reach the enum codec, which cannot find the constant
+            entity.gradeEnc__ = manager.encrypt(identifier, EntityEncryptionServiceUtils.frame(
+                    EntityEncryptionServiceUtils.Codec.ENUM_, "NOPE".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .as("the failure has to say which attribute and which java type")
                     .hasMessageContaining("grade")
                     .hasMessageContaining("Grade");
+        }
+
+        @DisplayName("a payload of an unknown format version is rejected, naming the attribute (#75)")
+        @Test
+        void __unknownFormatVersion() {
+            final var manager = new _Entity_EncryptionManager();
+            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var entity = populated();
+            final var framed = EntityEncryptionServiceUtils.frame(
+                    EntityEncryptionServiceUtils.Codec.INT_4, EntityEncryptionServiceUtils.int_4(37));
+            framed[0] = (byte) (EntityEncryptionServiceUtils.FORMAT_VERSION + 1);
+            entity.age = null;
+            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), framed);
+
+            assertThatThrownBy(() -> service.decrypt(entity))
+                    .hasMessageContaining("unknown payload format version")
+                    .hasMessageContaining("age");
+        }
+
+        @DisplayName("a payload written by another codec is rejected rather than misread, e.g. after Long -> Integer (#75)")
+        @Test
+        void __codecMismatch() {
+            final var manager = new _Entity_EncryptionManager();
+            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var entity = populated();
+            // what a row holds when `age` was declared Long when it was written, and is Integer now
+            entity.age = null;
+            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), EntityEncryptionServiceUtils.frame(
+                    EntityEncryptionServiceUtils.Codec.LONG_8, EntityEncryptionServiceUtils.long_8(37L)));
+
+            assertThatThrownBy(() -> service.decrypt(entity))
+                    .hasMessageContaining("encoded by LONG_8")
+                    .hasMessageContaining("decoded by INT_4")
+                    .hasMessageContaining("age");
+            assertThat(entity.age).as("nothing was misread").isNull();
         }
     }
 
@@ -472,9 +509,10 @@ class __Entity__EncryptionService_Test {
             final var entity = new _SecretEntity();
             entity.ageEnc__ = new byte[
                     _Entity_EncryptionManager.IV_BYTES + _Entity_EncryptionManager.KEY_BYTES + _Entity_EncryptionManager.AAD_BYTES];
-            // an empty, but well-formed, payload decrypts to zero bytes; Integer needs four
+            // a well-formed header with an empty payload; Integer needs four bytes after it
             final var manager = new _Entity_EncryptionManager();
-            entity.ageEnc__ = manager.encrypt("irrelevant", new byte[0]);
+            entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptionServiceUtils.frame(
+                    EntityEncryptionServiceUtils.Codec.INT_4, new byte[0]));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .isInstanceOf(RuntimeException.class)
@@ -482,7 +520,7 @@ class __Entity__EncryptionService_Test {
                     // and unknown enum constants, which are not "too short" but are equally unreadable
                     .hasMessageContaining("cannot reconstruct the value")
                     .hasMessageContaining("age")
-                    .hasMessageContaining("decrypted bytes: 0");
+                    .hasMessageContaining("decrypted bytes: " + EntityEncryptionServiceUtils.HEADER_BYTES);
         }
     }
 }
