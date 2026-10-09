@@ -175,13 +175,28 @@ listener keeps it out of the row while the plaintext is mapped. Mode B
 
 The `EntityEncryptionManager` receives, and returns, an array of bytes. Values are turned into those bytes by the
 attribute's *declared* java type, big-endian, and are self-contained — a value is reconstructed from its bytes without
-consulting the database. The sizes below are of the plaintext encoding, before the manager is called. Every encoding is
+consulting the database. The sizes below are of the plaintext encoding, after the header and before the manager is
+called. Every encoding is
 pinned byte for byte by `EncryptionServiceUtils_Test`.
 
-> **The format is not final.** Before a release that stores data, it is revised as one change: a format version byte
-> ([#75](https://github.com/jinahya/jinahya-persistence/issues/75)), exact-length checks in the fixed-width decoders
-> ([#76](https://github.com/jinahya/jinahya-persistence/issues/76) — today an over-long payload is read silently, so
-> changing an attribute from `Long` to `Integer` misreads existing rows), and the per-codec items marked below.
+### Payload header
+
+Every encoded value is prefixed with a two-byte header before it reaches the manager
+([#75](https://github.com/jinahya/jinahya-persistence/issues/75)):
+
+| byte | content                                                                                   |
+|------|-------------------------------------------------------------------------------------------|
+| `0`  | the format version, currently `1`; any other version is rejected                          |
+| `1`  | the id of the codec which encoded the value (`EntityEncryptionServiceUtils.Codec`); stored data, never renumbered |
+
+A reader checks both, so a payload written by another codec — an attribute whose declared type changed after the row
+was written, say `Long` to `Integer` — is rejected, naming the attribute, rather than misread. Ciphertext written before
+the header existed is not readable; the module is pre-1.0, and offers no migration for it
+([#19](https://github.com/jinahya/jinahya-persistence/issues/19)).
+
+> **The format is not final.** Before a release that stores data, the rest of the revision lands: exact-length checks in
+> the fixed-width decoders ([#76](https://github.com/jinahya/jinahya-persistence/issues/76)), and the per-codec items
+> marked below.
 
 | attribute              | bytes      | encoding                                                    |
 |------------------------|------------|-------------------------------------------------------------|

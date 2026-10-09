@@ -1,5 +1,7 @@
 package com.github.jinahya.persistence.crypto;
 
+import org.jspecify.annotations.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -1552,6 +1554,199 @@ final class EntityEncryptionServiceUtils {
     private static final long MAX_SERIALIZABLE_STREAM_BYTES = 1L << 20;
 
     private static final long MAX_SERIALIZABLE_ARRAY_LENGTH = 1L << 20;
+
+    // -------------------------------------------------------------------------------------------------- payload frame
+
+    /**
+     * The codecs of this class, each with the id written into a payload's header.
+     * <p>
+     * An id is stored data: never renumber one, and never reuse a retired one.
+     */
+    enum Codec {
+
+        BOOLEAN_1(1),
+        BYTE_1(2),
+        SHORT_2(3),
+        INT_4(4),
+        LONG_8(5),
+        CHAR_2(6),
+        FLOAT_4(7),
+        DOUBLE_8(8),
+        STRING_(9),
+        UUID_16(10),
+        BIG_INTEGER_(11),
+        BIG_DECIMAL_(12),
+        LOCAL_DATE_8(13),
+        LOCAL_TIME_8(14),
+        LOCAL_DATE_TIME_16(15),
+        OFFSET_TIME_12(16),
+        OFFSET_DATE_TIME_20(17),
+        INSTANT_12(18),
+        YEAR_4(19),
+        SQL_TIMESTAMP_16(20),
+        SQL_DATE_8(21),
+        SQL_TIME_8(22),
+        UTIL_CALENDAR_8(23),
+        UTIL_DATE_8(24),
+        BYTES_L(25),
+        BOXED_BYTES_L(26),
+        CHARS_2L(27),
+        CHARACTERS_2L(28),
+        ENUM_(29),
+        SERIALIZABLE_(30);
+
+        /**
+         * Returns the codec with the specified id.
+         *
+         * @param id the id.
+         * @return the codec with the {@code id}; {@code null} when there is none.
+         */
+        static @Nullable Codec of(final byte id) {
+            for (final var codec : values()) {
+                if (codec.id == id) {
+                    return codec;
+                }
+            }
+            return null;
+        }
+
+        Codec(final int id) {
+            assert id > 0 && id <= Byte.MAX_VALUE;
+            this.id = (byte) id;
+        }
+
+        final byte id;
+    }
+
+    /**
+     * Returns the codec which encodes, and decodes, a value of the specified declared java type.
+     *
+     * @param javaType the declared java type of an attribute.
+     * @return the codec for the {@code javaType}; {@code null} when the type is not supported.
+     * @implNote The order of the checks is the order of the codec ladders in {@link AbstractEntityEncryptionService}:
+     *         {@code java.sql} types before {@link java.util.Date}, and {@link Serializable} last.
+     */
+    static @Nullable Codec codecOf(final Class<?> javaType) {
+        if (javaType == boolean.class || javaType == Boolean.class) {
+            return Codec.BOOLEAN_1;
+        } else if (javaType == byte.class || javaType == Byte.class) {
+            return Codec.BYTE_1;
+        } else if (javaType == short.class || javaType == Short.class) {
+            return Codec.SHORT_2;
+        } else if (javaType == int.class || javaType == Integer.class) {
+            return Codec.INT_4;
+        } else if (javaType == long.class || javaType == Long.class) {
+            return Codec.LONG_8;
+        } else if (javaType == char.class || javaType == Character.class) {
+            return Codec.CHAR_2;
+        } else if (javaType == float.class || javaType == Float.class) {
+            return Codec.FLOAT_4;
+        } else if (javaType == double.class || javaType == Double.class) {
+            return Codec.DOUBLE_8;
+        } else if (javaType == String.class) {
+            return Codec.STRING_;
+        } else if (javaType == UUID.class) {
+            return Codec.UUID_16;
+        } else if (javaType == BigInteger.class) {
+            return Codec.BIG_INTEGER_;
+        } else if (javaType == BigDecimal.class) {
+            return Codec.BIG_DECIMAL_;
+        } else if (javaType == LocalDate.class) {
+            return Codec.LOCAL_DATE_8;
+        } else if (javaType == LocalTime.class) {
+            return Codec.LOCAL_TIME_8;
+        } else if (javaType == LocalDateTime.class) {
+            return Codec.LOCAL_DATE_TIME_16;
+        } else if (javaType == OffsetTime.class) {
+            return Codec.OFFSET_TIME_12;
+        } else if (javaType == OffsetDateTime.class) {
+            return Codec.OFFSET_DATE_TIME_20;
+        } else if (javaType == Instant.class) {
+            return Codec.INSTANT_12;
+        } else if (javaType == Year.class) {
+            return Codec.YEAR_4;
+        } else if (javaType == java.sql.Timestamp.class) {
+            return Codec.SQL_TIMESTAMP_16;
+        } else if (javaType == java.sql.Date.class) {
+            return Codec.SQL_DATE_8;
+        } else if (javaType == java.sql.Time.class) {
+            return Codec.SQL_TIME_8;
+        } else if (Calendar.class.isAssignableFrom(javaType)) {
+            return Codec.UTIL_CALENDAR_8;
+        } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+            return Codec.UTIL_DATE_8;
+        } else if (javaType == byte[].class) {
+            return Codec.BYTES_L;
+        } else if (javaType == Byte[].class) {
+            return Codec.BOXED_BYTES_L;
+        } else if (javaType == char[].class) {
+            return Codec.CHARS_2L;
+        } else if (javaType == Character[].class) {
+            return Codec.CHARACTERS_2L;
+        } else if (javaType.isEnum()) {
+            return Codec.ENUM_;
+        } else if (Serializable.class.isAssignableFrom(javaType)) {
+            return Codec.SERIALIZABLE_;
+        }
+        return null;
+    }
+
+    /**
+     * The version of the payload format this class writes, and the only one it reads. The value is
+     * {@value #FORMAT_VERSION}.
+     */
+    static final byte FORMAT_VERSION = 1;
+
+    /**
+     * The length of a payload's header: the {@link #FORMAT_VERSION format version}, then the {@link Codec#id codec
+     * id}. The value is {@value #HEADER_BYTES}.
+     */
+    static final int HEADER_BYTES = 2;
+
+    /**
+     * Returns the specified encoded value prefixed with a header: the {@link #FORMAT_VERSION format version}, and the
+     * id of the codec which encoded it.
+     *
+     * @param codec   the codec which encoded the {@code encoded}.
+     * @param encoded the encoded value.
+     * @return a new array: the header followed by the {@code encoded}.
+     */
+    static byte[] frame(final Codec codec, final byte[] encoded) {
+        final var framed = new byte[HEADER_BYTES + encoded.length];
+        framed[0] = FORMAT_VERSION;
+        framed[1] = codec.id;
+        System.arraycopy(encoded, 0, framed, HEADER_BYTES, encoded.length);
+        return framed;
+    }
+
+    /**
+     * Returns the encoded value of the specified framed payload, after checking its header against the specified
+     * expected codec.
+     *
+     * @param expected the codec the reader decodes with; the one of the attribute's declared type.
+     * @param framed   the framed payload.
+     * @return a new array holding the encoded value.
+     * @throws IllegalArgumentException when the {@code framed} is shorter than a header, was written in another
+     *                                  format version, or was encoded by a codec other than the {@code expected}.
+     */
+    static byte[] unframe(final Codec expected, final byte[] framed) {
+        if (framed.length < HEADER_BYTES) {
+            throw new IllegalArgumentException(
+                    "no payload header; bytes: " + framed.length + "; expected at least " + HEADER_BYTES);
+        }
+        if (framed[0] != FORMAT_VERSION) {
+            throw new IllegalArgumentException(
+                    "unknown payload format version: " + (framed[0] & 0xFF) + "; supported: " + FORMAT_VERSION);
+        }
+        if (framed[1] != expected.id) {
+            final var actual = Codec.of(framed[1]);
+            // the declared type of the attribute changed after the row was written, or the bytes belong elsewhere
+            throw new IllegalArgumentException(
+                    "the payload was encoded by " + (actual == null ? "an unknown codec (" + (framed[1] & 0xFF) + ")" : actual)
+                    + ", but the attribute is decoded by " + expected);
+        }
+        return Arrays.copyOfRange(framed, HEADER_BYTES, framed.length);
+    }
 
     // -----------------------------------------------------------------------------------------------------------------
     private EntityEncryptionServiceUtils() {

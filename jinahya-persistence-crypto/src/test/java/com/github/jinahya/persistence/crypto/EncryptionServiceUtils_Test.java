@@ -1160,4 +1160,86 @@ class EncryptionServiceUtils_Test {
                     .hasMessageContaining("too large");
         }
     }
+
+    // --------------------------------------------------------------------------------------------------- payload frame
+    @DisplayName("payload frame (#75)")
+    @Nested
+    class Frame_Test {
+
+        @DisplayName("codec ids are stored data: pinned, and unique")
+        @Test
+        void __codecIdsPinned() {
+            final var codecs = EntityEncryptionServiceUtils.Codec.values();
+            for (int i = 0; i < codecs.length; i++) {
+                // appending a codec is fine; renumbering or reusing an id is a format break
+                assertThat(codecs[i].id).as("id of %s", codecs[i]).isEqualTo((byte) (i + 1));
+                assertThat(EntityEncryptionServiceUtils.Codec.of(codecs[i].id)).isSameAs(codecs[i]);
+            }
+            assertThat(EntityEncryptionServiceUtils.Codec.of((byte) 0)).isNull();
+            assertThat(EntityEncryptionServiceUtils.Codec.of(Byte.MAX_VALUE)).isNull();
+        }
+
+        @DisplayName("codecOf(Class) follows the ladders: java.sql before java.util.Date, Serializable last")
+        @Test
+        void __codecOf() {
+            assertThat(EntityEncryptionServiceUtils.codecOf(Integer.class))
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.INT_4);
+            assertThat(EntityEncryptionServiceUtils.codecOf(int.class))
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.INT_4);
+            assertThat(EntityEncryptionServiceUtils.codecOf(java.sql.Timestamp.class))
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.SQL_TIMESTAMP_16);
+            assertThat(EntityEncryptionServiceUtils.codecOf(java.util.Date.class))
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.UTIL_DATE_8);
+            assertThat(EntityEncryptionServiceUtils.codecOf(java.util.GregorianCalendar.class))
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.UTIL_CALENDAR_8);
+            assertThat(EntityEncryptionServiceUtils.codecOf(java.time.DayOfWeek.class))
+                    .as("an enum is an enum before it is Serializable")
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.ENUM_);
+            assertThat(EntityEncryptionServiceUtils.codecOf(java.util.ArrayList.class))
+                    .isSameAs(EntityEncryptionServiceUtils.Codec.SERIALIZABLE_);
+            assertThat(EntityEncryptionServiceUtils.codecOf(Object.class)).as("unsupported").isNull();
+        }
+
+        @DisplayName("frame(Codec, byte[]) prefixes the format version and the codec id")
+        @Test
+        void __frame() {
+            final var framed = EntityEncryptionServiceUtils.frame(EntityEncryptionServiceUtils.Codec.INT_4,
+                                                                  new byte[]{1, 2, 3, 4});
+            assertThat(framed).containsExactly(
+                    EntityEncryptionServiceUtils.FORMAT_VERSION, EntityEncryptionServiceUtils.Codec.INT_4.id,
+                    1, 2, 3, 4);
+        }
+
+        @DisplayName("unframe(Codec, byte[]) reads back what frame wrote, empty included")
+        @Test
+        void __roundTrip() {
+            final var codec = EntityEncryptionServiceUtils.Codec.STRING_;
+            assertThat(EntityEncryptionServiceUtils.unframe(codec, EntityEncryptionServiceUtils.frame(codec, new byte[0])))
+                    .isEmpty();
+            final var encoded = randomBytes(1, 128);
+            assertThat(EntityEncryptionServiceUtils.unframe(codec, EntityEncryptionServiceUtils.frame(codec, encoded)))
+                    .isEqualTo(encoded);
+        }
+
+        @DisplayName("unframe(Codec, byte[]) rejects a missing header, another version, and another codec")
+        @Test
+        void __unframeRejects() {
+            final var codec = EntityEncryptionServiceUtils.Codec.INT_4;
+            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(codec, new byte[1]))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("no payload header");
+            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(codec, new byte[]{0, codec.id}))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("unknown payload format version");
+            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(
+                    codec, EntityEncryptionServiceUtils.frame(EntityEncryptionServiceUtils.Codec.LONG_8, new byte[8])))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("encoded by LONG_8")
+                    .hasMessageContaining("decoded by INT_4");
+            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(
+                    codec, new byte[]{EntityEncryptionServiceUtils.FORMAT_VERSION, Byte.MAX_VALUE}))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("unknown codec");
+        }
+    }
 }
