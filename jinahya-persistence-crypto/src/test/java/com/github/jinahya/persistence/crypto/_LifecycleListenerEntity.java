@@ -5,17 +5,17 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
 /**
- * An entity listener which takes its {@link __EncryptionService} from a static holder rather than from CDI, so that the
+ * An entity listener which takes its {@link AbstractEntityEncryptionService} from a static holder rather than from CDI, so that the
  * life cycle can be observed without a container.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public class _LifecycleListener extends __EncryptionListener {
+public class _LifecycleListenerEntity extends EntityEncryptionListener {
 
     /**
      * The service every instance of this listener delegates to.
      */
-    static volatile __EncryptionService SERVICE;
+    static volatile AbstractEntityEncryptionService SERVICE;
 
     /**
      * Creates a new instance.
@@ -24,12 +24,12 @@ public class _LifecycleListener extends __EncryptionListener {
      *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#entity-listeners">3.6.1.
      *         Entity Listeners</a> (Jakarta Persistence 3.2 Specification Document)
      */
-    public _LifecycleListener() {
+    public _LifecycleListenerEntity() {
         super();
     }
 
     @Override
-    protected __EncryptionService getEncryptionService() {
+    protected AbstractEntityEncryptionService getEncryptionService() {
         return SERVICE;
     }
 

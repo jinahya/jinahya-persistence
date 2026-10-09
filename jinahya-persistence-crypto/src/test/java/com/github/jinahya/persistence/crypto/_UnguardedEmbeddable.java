@@ -5,7 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 /**
- * An embeddable whose plaintext column is insertable, and which {@link __EncryptionService} therefore has to reject.
+ * An embeddable whose plaintext column is insertable, and which {@link AbstractEntityEncryptionService} therefore has to reject.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -17,7 +17,7 @@ public class _UnguardedEmbeddable {
     }
 
     // no insertable = false, so this pair is invalid
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "leak", nullable = true)
     public String leak;

@@ -9,12 +9,12 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManagerFactory;
 
 @_EncryptionServiceQualifier
-public class _EncryptionService extends __EncryptionService {
+public class EntityEncryptionService extends AbstractEntityEncryptionService {
 
     @Inject
-    protected _EncryptionService(final EntityManagerFactory entityManagerFactory,
-                                 final __EncryptionManager encryptionManager) {
-        super(entityManagerFactory, encryptionManager);
+    protected EntityEncryptionService(final EntityManagerFactory entityManagerFactory,
+                                      final EntityEncryptionManager entityEncryptionManager) {
+        super(entityManagerFactory, entityEncryptionManager);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

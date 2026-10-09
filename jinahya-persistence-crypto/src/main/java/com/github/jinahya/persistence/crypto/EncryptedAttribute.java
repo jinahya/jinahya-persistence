@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * The annotated attribute has to be mapped {@code @Column(insertable = false)}.
  * {@link jakarta.persistence.PrePersist @PrePersist} runs when {@code persist()} is called, not when the {@code INSERT}
  * is built, and Jakarta Persistence has no callback in between; a provider which builds a single statement at commit
- * would otherwise carry a value assigned in that window in the clear. {@link __EncryptionService} rejects a mapping
+ * would otherwise carry a value assigned in that window in the clear. {@link AbstractEntityEncryptionService} rejects a mapping
  * without it.
  * <p>
  * An applicable {@link jakarta.persistence.AttributeOverride @AttributeOverride} is resolved, and replaces the member's
@@ -25,8 +25,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * {@code __EncryptionService.resolveColumnRules}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __EncryptedEntity
- * @see __EncryptionService
+ * @see EncryptedEntity
+ * @see AbstractEntityEncryptionService
  */
 @Documented
 @Retention(value = RUNTIME)
@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         ElementType.FIELD,
         ElementType.METHOD
 })
-public @interface __EncryptedAttribute {
+public @interface EncryptedAttribute {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -43,12 +43,12 @@ public @interface __EncryptedAttribute {
      *
      * @return the name of the attribute holding the encrypted bytes; an empty string, the default, for the name of the
      *         annotated attribute suffixed with
-     *         {@value __EncryptedAttributeConstants#DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX}.
+     *         {@value EncryptedAttributeConstants#DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX}.
      * @apiNote The named attribute has to be optional, has to be typed {@code byte[]}, has to be {@code BASIC},
      *         and cannot be the annotated attribute itself, an identifier, a version, or itself annotated. The
      *         annotated attribute has to be optional, {@code BASIC}, neither an identifier nor a version, not of a
      *         primitive type, and mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)} —
-     *         see {@link __EncryptedAttribute the type javadoc}. {@link __EncryptionService} rejects anything else.
+     *         see {@link EncryptedAttribute the type javadoc}. {@link AbstractEntityEncryptionService} rejects anything else.
      */
     String encryptedAttribute() default "";
 }

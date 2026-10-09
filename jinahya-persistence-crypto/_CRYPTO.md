@@ -4,7 +4,7 @@ A fresh audit of what the module **covers**, not of what it does. Read against t
 tree on branch `sketch`. Items marked **[verified]** were reproduced by executing code;
 everything else is read from source.
 
-The module's own `README.md` is accurate and already states most of the limits below. This
+The module's own `../README.md` is accurate and already states most of the limits below. This
 document is a second opinion on *completeness* — where the coverage envelope ends, and
 which of those edges are loud and which are silent.
 
@@ -44,7 +44,7 @@ embeddable reached through a plain `@Embedded`, where `note` is nulled and `note
 populated. The failure mode is the worst available one: the developer wrote the
 annotation, so they believe the value is encrypted.
 
-This is listed in `README.md` under **Not supported**, so it is known — but nothing in the
+This is listed in `../README.md` under **Not supported**, so it is known — but nothing in the
 build pins it, and the module rejects a dozen far less dangerous mistakes loudly. A
 validation-time rejection of *any* `ELEMENT_COLLECTION` whose element type carries
 `@__EncryptedAttribute` would close it with the machinery already present.
@@ -98,13 +98,13 @@ list into deployment-time errors using code that already exists.
 
 ## 4. The listener is a scaffold, not a policy
 
-`__EncryptionListener`'s seven callbacks all only log; a subclass must override and call
+`EntityEncryptionListener`'s seven callbacks all only log; a subclass must override and call
 `encrypt`/`decrypt`. No ready-made subclass ships, so **every downstream re-derives the
-wiring**, and the correct wiring is not obvious — `README.md` has to spend three
+wiring**, and the correct wiring is not obvious — `../README.md` has to spend three
 subsections explaining that you encrypt from `@PrePersist`/`@PreUpdate` and never from the
 post-callbacks, that reading an entity dirties it, and that a flush empties your own
 instance. That knowledge currently lives only in prose and in
-`_LifecycleListener` (a test class).
+`_LifecycleListenerEntity` (a test class).
 
 Note also that the two entry points are gated differently:
 
@@ -139,9 +139,11 @@ compact codec. Correct, but opaque and bulkier than the neighbouring encodings.
 
 | Element | State |
 | --- | --- |
-| `__SecureAttributeConveter` (`OfBytes`, `OfString`) | all four conversion methods throw `UnsupportedOperationException` |
-| `@__EncryptionIdentifier` | declared, never read |
-| `__EncryptedEntity.encryptionIdentifierAttribute()` | declared, never read; the identifier comes only from `__EncryptionManager.getEncryptionIdentifier(Object)` |
+| `__SecureAttributeConverter` (`OfBytes`, `OfString`) | all four conversion methods throw `UnsupportedOperationException`; deprecated for removal |
+| `@__EncryptionIdentifier` | declared, never read; deprecated for removal |
+| `EncryptedEntity.encryptionIdentifierAttribute()` (and `DEFAULT_ENCRYPTION_IDENTIFIER`) | declared, never read; the identifier comes only from `__EncryptionManager.getEncryptionIdentifier(Object)`; deprecated for removal |
+| `EntityEncryptionServiceQualifier` | nothing selects by it; deprecated for removal |
+| `__EncryptionListener.onStartup` / `onShutdown` | `@Observes` on an entity listener, which is not a CDI bean, so never fires; deprecated for removal |
 
 `@__EncryptedEmbedded` was in this list and was **removed** in this session: descent is
 unconditional, so the annotation could only ever have subtracted coverage.
@@ -151,14 +153,14 @@ capability. Today the identifier is re-derived from the entity instance on both 
 because `encrypt()` nulls the plaintext, it can only key off state that both survives the
 round trip and never changes for the life of the row —
 [#61](https://github.com/jinahya/jinahya-persistence/issues/61). Downstream must otherwise
-self-frame the scheme inside the ciphertext, as the reference `_EncryptionManager` does
+self-frame the scheme inside the ciphertext, as the reference `_Entity_EncryptionManager` does
 with its `iv || key || aad || ciphertext` layout.
 
 ### The identifier stays a `String` — shape it downstream
 
 Decided; no code change. A typed `__EncryptionManager<T>` was weighed and rejected. The
 genericity itself is tractable — a wildcard field plus one capture point keeps `<T>` out of
-`__EncryptionService`'s public API and out of `__EncryptionListener` entirely — but two
+`AbstractEntityEncryptionService`'s public API and out of `EntityEncryptionListener` entirely — but two
 things argue against it. CDI resolution is the visible cost: a raw injection point like the
 one at `_EncryptionService:14-16` does **not** satisfy a `__EncryptionManager<KeyRef>` bean
 (CDI 4.1 §2.4.2.1), so every downstream raw `@Inject` would fail at deploy time. The
@@ -204,7 +206,7 @@ record KeyRef(String scope, String subject) {
 | Not in the `KeyRef` | Why |
 | --- | --- |
 | key version / epoch | belongs in the ciphertext frame; putting it here is exactly the #61 failure |
-| algorithm, mode, IV, tag | same — the frame carries them, as `_EncryptionManager` shows |
+| algorithm, mode, IV, tag | same — the frame carries them, as `_Entity_EncryptionManager` shows |
 | anything mutable (status, plan, region) | changes under the row and orphans the ciphertext |
 | the row's own encrypted values | `null` on the decrypt path |
 | **the entity id** | see below |
@@ -243,7 +245,7 @@ anyway — one key per row is a KMS problem, not a design.
 ## 8. Structural limits the design cannot remove
 
 These are properties of doing application-level encryption through JPA callbacks, not
-defects, and `README.md` documents each. Listed here because they bound completeness more
+defects, and `../README.md` documents each. Listed here because they bound completeness more
 than any missing feature does.
 
 - **Reading an entity writes it.** `@PostLoad` runs after the loaded-state snapshot, so a

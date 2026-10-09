@@ -17,7 +17,7 @@ import jakarta.persistence.MappedSuperclass;
 public class _MappedSecretBase {
 
     // insertable defaults to true here; only a class-level override on the entity can make this safe
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "inherited", nullable = true)
     public String inherited;

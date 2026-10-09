@@ -19,19 +19,19 @@ import java.lang.invoke.MethodHandles;
  * An abstract entity listener which encrypts an entity instance before it is written, and decrypts it after it is
  * read.
  * <p>
- * A subclass supplies an {@link __EncryptionService}, and is registered with
- * {@link jakarta.persistence.EntityListeners @EntityListeners} on an {@link __EncryptedEntity @__EncryptedEntity}
+ * A subclass supplies an {@link AbstractEntityEncryptionService}, and is registered with
+ * {@link jakarta.persistence.EntityListeners @EntityListeners} on an {@link EncryptedEntity @__EncryptedEntity}
  * class. The life cycle callbacks here only log; override the ones an entity needs, and call {@link #encrypt(Object)}
  * or {@link #decrypt(Object)} from them.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __EncryptionService
- * @see __EncryptedEntity
+ * @see AbstractEntityEncryptionService
+ * @see EncryptedEntity
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __EncryptionListener {
+public abstract class EntityEncryptionListener {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -40,7 +40,7 @@ public abstract class __EncryptionListener {
     /**
      * Creates a new instance.
      */
-    protected __EncryptionListener() {
+    protected EntityEncryptionListener() {
         super();
     }
 
@@ -63,7 +63,10 @@ public abstract class __EncryptionListener {
      *
      * @param startup the observed event.
      * @implSpec The implementation of this class only logs.
+     * @deprecated never called on the instance the persistence provider uses; an entity listener is not a CDI bean,
+     *         so its observer methods are not registered.
      */
+    @Deprecated(forRemoval = true)
     protected void onStartup(@Observes final Startup startup) {
         logger.log(System.Logger.Level.TRACE, "onStartup({0})", startup);
     }
@@ -85,7 +88,10 @@ public abstract class __EncryptionListener {
      *
      * @param shutdown the observed event.
      * @implSpec The implementation of this class only logs.
+     * @deprecated never called on the instance the persistence provider uses; an entity listener is not a CDI bean,
+     *         so its observer methods are not registered.
      */
+    @Deprecated(forRemoval = true)
     protected void onShutdown(@Observes final Shutdown shutdown) {
         logger.log(System.Logger.Level.TRACE, "onShutdown({0})", shutdown);
     }
@@ -189,7 +195,7 @@ public abstract class __EncryptionListener {
      *
      * @return the encryption service; never {@code null}.
      */
-    protected abstract __EncryptionService getEncryptionService();
+    protected abstract AbstractEntityEncryptionService getEncryptionService();
 
     /**
      * Returns a description of the specified entity instance which cannot carry an attribute value.
@@ -208,15 +214,15 @@ public abstract class __EncryptionListener {
      * Encrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
      * @param entityInstance the entity instance to encrypt; instances of a class which is not annotated with
-     *                       {@link __EncryptedEntity @__EncryptedEntity} are silently skipped.
-     * @see __EncryptionService#encrypt(Object)
+     *                       {@link EncryptedEntity @__EncryptedEntity} are silently skipped.
+     * @see AbstractEntityEncryptionService#encrypt(Object)
      */
     protected void encrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "encrypt({0})", describe(entityInstance));
-        final var annotation = entityInstance.getClass().getAnnotation(__EncryptedEntity.class);
+        final var annotation = entityInstance.getClass().getAnnotation(EncryptedEntity.class);
         if (annotation == null) {
             logger.log(System.Logger.Level.TRACE, "skipping encrypting {0}, not annotated with {1}",
-                       describe(entityInstance), __EncryptedEntity.class);
+                       describe(entityInstance), EncryptedEntity.class);
             return;
         }
         final var encryptionService = getEncryptionService();
@@ -229,15 +235,15 @@ public abstract class __EncryptionListener {
      * Decrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
      * @param entityInstance the entity instance to decrypt; instances of a class which is not annotated with
-     *                       {@link __EncryptedEntity @__EncryptedEntity} are silently skipped.
-     * @see __EncryptionService#decrypt(Object)
+     *                       {@link EncryptedEntity @__EncryptedEntity} are silently skipped.
+     * @see AbstractEntityEncryptionService#decrypt(Object)
      */
     protected void decrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "decrypt({0})", describe(entityInstance));
-        final var annotation = entityInstance.getClass().getAnnotation(__EncryptedEntity.class);
+        final var annotation = entityInstance.getClass().getAnnotation(EncryptedEntity.class);
         if (annotation == null) {
             logger.log(System.Logger.Level.TRACE, "skipping decrypting {0}, not annotated with {1}",
-                       describe(entityInstance), __EncryptedEntity.class);
+                       describe(entityInstance), EncryptedEntity.class);
             return;
         }
         final var encryptionService = getEncryptionService();

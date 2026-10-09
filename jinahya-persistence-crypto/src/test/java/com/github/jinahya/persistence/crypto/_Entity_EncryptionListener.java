@@ -16,7 +16,7 @@ import jakarta.persistence.PreUpdate;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
-public class _EncryptionListener extends __EncryptionListener {
+public class _Entity_EncryptionListener extends EntityEncryptionListener {
 
     /**
      * .
@@ -26,20 +26,20 @@ public class _EncryptionListener extends __EncryptionListener {
      *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#entity-listeners">3.6.1.
      *         Entity Listeners</a> (Jakarta Persistence 3.2 Specification Document)
      */
-    public _EncryptionListener() {
+    public _Entity_EncryptionListener() {
         super();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    protected __EncryptionService getEncryptionService() {
-        __EncryptionService result = encryptionService;
+    protected AbstractEntityEncryptionService getEncryptionService() {
+        AbstractEntityEncryptionService result = encryptionService;
         if (result == null) {
             final var qualifier = Arrays.stream(getClass().getAnnotations())
-                    .filter(a -> a instanceof __EncryptionServiceQualifier)
+                    .filter(a -> a instanceof EntityEncryptionServiceQualifier)
                     .findFirst()
                     .orElse(null);
             final var qualifiers = qualifier == null ? new Annotation[0] : new Annotation[]{qualifier};
-            result = encryptionService = CDI.current().select(__EncryptionService.class, qualifiers).get();
+            result = encryptionService = CDI.current().select(AbstractEntityEncryptionService.class, qualifiers).get();
         }
         return result;
     }
@@ -117,5 +117,5 @@ public class _EncryptionListener extends __EncryptionListener {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private volatile __EncryptionService encryptionService;
+    private volatile AbstractEntityEncryptionService encryptionService;
 }

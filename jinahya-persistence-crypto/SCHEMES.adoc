@@ -1,0 +1,552 @@
+= Encryption schemes
+:toc: macro
+:toclevels: 2
+
+toc::[]
+
+Working notes on *where the ciphertext lives* and *how it is moved*, and on what each choice costs. Not a spec.
+
+Key management and the cryptography itself are out of scope: they live behind `EntityEncryptionManager`. These notes
+are about the ALE *mechanism* only.
+
+Claims marked *[unverified]* come from reading code or from provider knowledge, not from a test in this module.
+
+[cols="1,3"]
+|===
+| Scheme | Where the ciphertext lives
+
+| <<within-table,within_table>> | a sibling column in the entity's own table (`USER.name_enc__`)
+| <<single-table,single_table>> | one shared table for every entity (`ENCRYPTED_ATTRIBUTE`)
+| <<per-table,per_table>> | one side table per entity (`USER_ENC`, via `@SecondaryTable`)
+| <<single-column,single_column>> | one column per entity holding *all* of the row's encrypted values (`USER.encrypted__`)
+|===
+
+== 1. Common ground
+
+=== 1.1 Goal: at rest only
+
+* The *row* must never hold the plaintext. That is the whole point.
+* Plaintext in the running application is accepted. `String` lingers on the heap, and the keys live in the same JVM.
+  In-memory secrecy is not something this module can provide.
+* So "nulling `name`" is a requirement *for the row*. Nulling it *in the entity* is only a side effect of how a JPA
+  listener has to work (see 1.3).
+
+=== 1.2 Constraint: portable Java/JPA
+
+* One code path for Hibernate and EclipseLink (`CLAUDE.md`).
+* The hook is a JPA entity listener (`EntityEncryptionListener`) calling `AbstractEntityEncryptionService`.
+* The encoding is decided by the attribute's *Java* type (`EntityEncryptionServiceUtils`).
+
+=== 1.3 What JPA callbacks can and cannot do
+
+* `@PostLoad` runs *after* the provider has taken its loaded-state snapshot, and no callback runs between reading the
+  row and taking the snapshot. Any value a callback writes into a *mapped* attribute looks like a user edit.
+* `@PrePersist` runs at `persist()`, not when the `INSERT` is built.
+* A callback must not use the `EntityManager` or run queries (spec). A listener therefore cannot write to *another*
+  table by itself.
+* `@Transient` fields are not dirty-checked. If only a transient field changes, the provider issues no `UPDATE` and
+  runs no `@PreUpdate`.
+
+These four facts decide most of the trade-offs below.
+
+=== 1.4 Independent of the scheme: the payload format
+
+To fix before the format is released:
+
+* A format version byte, plus an optional type tag, in every payload.
+* Fixed-width decoders that reject a payload of the *wrong* length, not just a short one. Today a `Long` changed to
+  `Integer` reads the first 4 bytes of an 8-byte payload silently.
+* `Serializable` opt-in rather than the catch-all.
+* A short format spec. The codecs are now pinned byte for byte by `EncryptionServiceUtils_Test`.
+
+Known codec quirks pinned by those tests:
+
+* `string_` loses unpaired surrogates (`?`).
+* `sql_timestamp_16` has 4 trailing zero bytes.
+* `util_calendar_8` comes back in the default time zone.
+* `boolean_1` decodes any byte other than 1 as `false`.
+
+[[within-table]]
+== 2. within_table
+
+The ciphertext is a sibling column in the entity's own table. There are two modes.
+
+=== 2.1 Mode A: mapped plaintext (the current design)
+
+[source,java]
+----
+@EncryptedEntity
+@EntityListeners(MyEncryptionListener.class)
+class User {
+
+    @EncryptedAttribute
+    @Column(insertable = false)  // the existing column stays; made nullable and non-insertable
+    String name;
+
+    @Column
+    byte[] name_enc__;           // added; no accessors
+}
+----
+
+----
+USER(id, name, ..., name_enc__)
+----
+
+*Mechanism.*
+
+* `@PrePersist` / `@PreUpdate` encrypt: `name_enc__ = E(name)`, then `name = null`.
+* `@PostLoad` decrypts: `name = D(name_enc__)`, then `name_enc__ = null`.
+* At runtime the pair is a two-slot state machine:
++
+|===
+| In memory | `encrypt` | `decrypt`
+
+| `name=x`, `enc=null` | `enc=E(x)`, `name=null` | skipped ("may be defined later")
+| `name=null`, `enc=b` | skipped ("already encrypted") | `name=D(b)`, `enc=null`
+| both set | `name` wins: re-encrypted | `enc` wins: decrypted
+| both null | no-op | no-op
+|===
+
+*Gains.*
+
+* *Migration is built in.* The `name` column doubles as the legacy column:
++
+|===
+| Row | `name` column | `name_enc__`
+
+| legacy | plaintext | NULL
+| migrated | NULL | ciphertext
+|===
++
+`decrypt` skips a legacy row, so the application still reads its plaintext. A legacy row migrates the next time it is
+written. A batch covers the untouched rows:
++
+[source,java]
+----
+var e = em.find(User.class, id);  // @PostLoad: legacy row, left as plaintext
+service.encrypt(e);               // now dirty; @PreUpdate then sees "already encrypted"
+// commit per chunk, em.clear()
+----
++
+No separate tool, no write freeze, no ordering problem. Every write already produces ciphertext, so the set of
+plaintext rows only ever shrinks. *This is why the sibling column was chosen.*
+* Portable JPA, and a single table.
+* Per-entity key selection (`getEncryptionIdentifier(entity)`).
+
+*Trade-offs.*
+
+* *Reading writes.* Measured on both providers (`__EncryptionLifecycle_Test`):
++
+----
+1. provider reads the row          name = NULL, name_enc__ = b
+2. provider takes its snapshot     {name: NULL, name_enc__: b}
+3. @PostLoad -> decrypt            name = "jane", name_enc__ = null
+4. flush: entity != snapshot       dirty -> UPDATE, @Version++, a new IV
+----
++
+This makes optimistic locking unusable, puts every read into replication, CDC and audit, and makes a read-only
+connection fail. It cannot be fixed inside JPA callbacks (1.3).
+** Not nulling `name_enc__` on decrypt does not help: `name` still changes.
+** `@Column(updatable = false)` on `name` stops the dirtiness on some providers *[unverified]*, but real user edits
+   are then lost too.
+* *The object is emptied.* Right after `persist()`, not only after a flush, `name` reads `null`. Decrypting again in
+  `@PostPersist` / `@PostUpdate` dirties the entity again.
+* *Schema clutter.* An always-NULL `name` column stays forever, and `name_enc__` is appended at the end. Only MySQL and
+  MariaDB support `ADD COLUMN ... AFTER`.
+* *Insert window.* `insertable = false` is required (and enforced). On EclipseLink an assignment made after
+  `persist()` is dropped.
+* *Silent failures.*
+** JPQL on `name` silently sees NULL.
+** Clearing a value in the encrypted state is impossible through `name`.
+** Raw ciphertext written into `name_enc__` is accepted as is.
+* *Lazy migration relies on `name` staying updatable*, which validation does not require *[untested]*.
+
+=== 2.2 Mode B: transient plaintext (steady state)
+
+[source,java]
+----
+@Transient
+String name;                                // plaintext: never mapped
+
+@EncryptedAttribute(plaintext = "name")     // NEW: the annotation moves to the mapped side
+@Column
+byte[] name_enc__;
+
+void setName(String name) { this.name = name; this.name_enc__ = null; }  // makes edits visible
+----
+
+*Mechanism.*
+
+* `@PostLoad` sets `name = D(name_enc__)` and leaves `name_enc__` alone. Only an untracked field changes.
+* `@PrePersist` / `@PreUpdate` set `name_enc__ = E(name)` and leave `name` alone.
+
+*Gains.*
+
+* Reading does not write, and the object is not emptied.
+* No plaintext column, so there is no insert window.
+* JPQL on `u.name` is *rejected* instead of silently matching nothing.
+
+*Trade-offs.*
+
+* *Edits are not detected* (1.3). Options:
+** a setter that invalidates the ciphertext (shown above); a direct field write bypasses it;
+** detection only: remember what was decrypted, and fail loudly if the plaintext changed but the ciphertext did not.
+* *Discovery.* Transient fields are not in the metamodel. With the reversed annotation, discovery and validation stay
+  metamodel-based; only the plaintext field is found by reflection.
+* *Legacy rows are invisible.* The old `name` column is unmapped, so a row with no ciphertext reads as `name = null`
+  (the chicken-and-egg problem, 2.3).
+* *The leftover `name` column* must be nullable (unmapped inserts do not write it), and any `UNIQUE` constraint on it
+  dropped (SQL Server allows only one NULL). Cleansing it is an operations concern.
+* *Re-encrypting on every update* (a new IV each time) unless encryption runs only when the plaintext differs from
+  what was decrypted.
+
+=== 2.3 A to B: the two modes are phases
+
+----
+Phase A (transition)                       Phase B (steady state)
+@Column(insertable=false) String name      @Transient String name
+byte[] name_enc__                          @EncryptedAttribute(plaintext="name") byte[] name_enc__
+legacy rows readable, migrate lazily       reading does not write, object not emptied
++ batch for untouched rows
+dirty on read (accepted, temporary)
+----
+
+* Phase A guarantees that every row ends up with ciphertext, and stays that way, because every write in Phase A
+  already produces ciphertext.
+* Switching to Phase B changes *annotations only*: no data moves and no schema change.
+* *Precondition:* no row has plaintext without ciphertext. The module should offer a check, e.g. a count.
+* This removes the chicken-and-egg problem: B never needs to read the old column.
+
+[[single-table]]
+== 3. single_table
+
+One shared table holds the ciphertext of every encrypted attribute of every entity. This is the shape Envers uses.
+
+[source,sql]
+----
+CREATE TABLE ENCRYPTED_ATTRIBUTE (
+    entity_name VARCHAR   NOT NULL,
+    entity_id   VARCHAR   NOT NULL,   -- every id type, stringified
+    attribute   VARCHAR   NOT NULL,
+    ciphertext  VARBINARY NOT NULL,
+    PRIMARY KEY (entity_name, entity_id, attribute)
+);
+----
+
+[source,java]
+----
+@Transient
+String name;  // the plaintext; the entity table holds no trace of the secret
+----
+
+*Mechanism.* There is no portable mapping for it:
+
+* the rows belong to many entities, so no single JPA association can own them, and a discriminator on a collection
+  table is not portable JPA;
+* a listener must not write to another table (1.3).
+
+The module would therefore have to write and read `ENCRYPTED_ATTRIBUTE` itself, through provider-native hooks, the
+way Envers does (Hibernate event listeners and before-completion processes; EclipseLink session events).
+
+*Gains.*
+
+* Entity tables are untouched: no new columns, nothing appended, and the old column can be dropped later.
+* One uniform table: easy to automate, to grant, to back up separately and to audit.
+* Crypto-shredding by deleting rows. A natural place for a `key_id` per row.
+* No dirty on read and no emptied object: the plaintext is transient, and the ciphertext is not part of the entity's
+  state.
+
+*Trade-offs.*
+
+* *Not portable JPA.* One integration per provider, which breaks the constraint in 1.2.
+* *Edits are not detected* (transient plaintext), as in 2.2, and the module must also track changes itself to know
+  which rows to write.
+* *Extra reads.* Every load needs a lookup in the shared table; a list of N entities costs N+1 queries unless batched.
+* *No referential integrity.* Stringified ids cannot carry a foreign key, so bulk JPQL `DELETE` (which skips callbacks)
+  leaves orphans, and id types must be stringified consistently.
+* *No canonical encoding for a non-single primary key.* `entity_id` is one column for every entity, but a composite key
+  (`@IdClass`, `@EmbeddedId`) has no fixed string form. Each such entity needs its own encoder/decoder, the job Spring
+  Data REST's `BackendIdConverter` exists for. That means deciding component order, a delimiter and its escaping, and
+  the textual form of each component type (dates, decimals, UUIDs). The encoding also becomes stored data: refactoring
+  the key class (reordering or renaming components, changing a type) orphans the existing rows. Even single keys need a
+  fixed text form per type (`Long`, `UUID`, `String` with its case and padding).
+  There is not even a generic fallback: Jakarta Persistence 3.2 no longer requires a primary key class to be
+  `Serializable` (earlier versions did), and it allows a record as the key class, so Java-serializing the key object
+  into `entity_id` cannot be relied on. That form would be opaque and Java-only anyway.
+* *Hot spot.* All entities share one table and its indexes.
+* *Migration has the chicken-and-egg problem* (as in 2.2 without Phase A): a separate tool reads the old column
+  natively, and a write freeze or delta passes are needed.
+
+*Variant (portable, but no longer single).* One key/value collection table *per entity*, via `@ElementCollection`
+(`USER_ENCRYPTED(user_id, attribute, ciphertext)`). That is portable JPA, but it is per-table again, with the
+collection's cost of a delete-and-reinsert on change *[unverified per provider]*.
+
+[[per-table]]
+== 4. per_table
+
+One side table per entity, joined one-to-one by primary key. This is standard JPA (`@SecondaryTable`).
+
+[source,java]
+----
+@EncryptedEntity
+@Entity
+@SecondaryTable(name = "USER_ENC", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+class User {
+
+    @Id Long id;
+
+    @Transient
+    String name;
+
+    @EncryptedAttribute(plaintext = "name")
+    @Column(table = "USER_ENC", name = "name")
+    byte[] nameEnc;
+
+    void setName(String name) { this.name = name; this.nameEnc = null; }
+}
+----
+
+[source,sql]
+----
+CREATE TABLE USER_ENC (
+    id   BIGINT PRIMARY KEY REFERENCES "USER"(id) ON DELETE CASCADE,
+    name VARBINARY(...) NULL
+    -- , one column per encrypted attribute, in any order you like
+);
+----
+
+*Mechanism.* Same as within_table Mode B (2.2); only the column's `table` differs. The provider writes both tables in
+one transaction and loads them in one `SELECT` with a join.
+
+*Gains.*
+
+* Portable JPA, with no custom writes and no N+1.
+* No dirty on read, and the object is not emptied (transient plaintext).
+* A clean schema: the entity table eventually loses its plaintext column, and the side table is ordered by design.
+* Separate grants, tablespace and backup policy for secrets. Crypto-shredding by row; room for `key_id`.
+* The PK/FK and cascade come from the database, so there are no orphans and integrity is enforced.
+* JPQL on `u.name` is rejected rather than silently wrong.
+
+*Trade-offs.*
+
+* Everything in 2.2: edit detection, discovery by reflection, the leftover column, the re-encryption policy.
+* *Missing secondary rows.* *[unverified]* A provider may inner-join the secondary table, so a `USER` without a
+  `USER_ENC` row could vanish from queries. Backfill one row per entity before switching. A provider may also skip
+  inserting the row when all of its columns are NULL.
+* *Migration.* Done directly, it has the chicken-and-egg problem (2.2, 3). Done via within_table, it does not:
+. run within_table Phase A until every row has ciphertext in `USER.name_enc__`;
+. copy the ciphertext with plain SQL; no crypto is needed:
++
+[source,sql]
+----
+INSERT INTO USER_ENC (id, name) SELECT id, name_enc__ FROM "USER";
+----
+. deploy the per_table mapping;
+. the leftover `name` and `name_enc__` columns in `USER` are left for cleansing.
+* One more table per encrypted entity.
+
+[[single-column]]
+== 5. single_column
+
+One column per entity holds *all* of that row's encrypted values: a bundle. However many attributes are encrypted,
+the table gains exactly one column.
+
+[source,java]
+----
+@EncryptedEntity
+@Entity
+class User {
+
+    @Id Long id;
+
+    @EncryptedAttribute @Transient
+    String name;                       // plaintext members of the bundle
+
+    @EncryptedAttribute @Transient
+    LocalDate bornOn;
+
+    @EncryptedBundle                   // NEW: marks the one mapped attribute holding the bundle
+    @Column(name = "encrypted__")
+    byte[] encrypted__;
+
+    void setName(String name) { this.name = name; this.encrypted__ = null; }  // makes edits visible
+}
+----
+
+----
+USER(id, ..., encrypted__)   -- VARBINARY / BLOB, or VARCHAR / TEXT (Base64), or JSON
+----
+
+=== 5.1 Two shapes of the bundle
+
+[cols="1,3,3"]
+|===
+| | Sealed bundle | Per-attribute entries
+
+| Content
+| `E( {name: ..., bornOn: ...} )`: the whole map serialized, then encrypted once
+| `{"name": "<E(name)>", "bornOn": "<E(bornOn)>"}`: each value encrypted separately
+
+| Column type
+| VARBINARY / BLOB (or Base64 in TEXT)
+| TEXT, or a JSON type (see the caveat below)
+
+| Leaks
+| nothing but the total size
+| which attributes are present, and the size of each
+
+| Cost of a change
+| decrypt, change, re-encrypt the whole bundle
+| re-encrypt only the changed entry; the column is still rewritten
+
+| IVs / key ids
+| one per row
+| one per attribute
+|===
+
+*Caveat on a native JSON type.* Mapping a `String` to a native JSON column is not portable. PostgreSQL `jsonb`, for
+example, needs a cast or a driver setting, and the providers' JSON mappings are their own *[unverified]*. A JSON
+*document* stored in TEXT or VARBINARY stays portable.
+
+=== 5.2 Mechanism
+
+Same as within_table Mode B (2.2), with the bundle as the only mapped attribute:
+
+* `@PostLoad` decrypts the bundle into the transient fields and leaves `encrypted__` alone. Only untracked fields
+  change, so reading does not write.
+* `@PrePersist` / `@PreUpdate` build the bundle from the transient fields into `encrypted__`, and leave the plaintext
+  alone, so the object is not emptied.
+
+=== 5.3 Gains
+
+* *Schema: exactly one column per entity.* Encrypting another attribute later needs *no DDL*. Only one column is ever
+  appended, so column-order clutter is minimal.
+* No dirty on read, and the object is not emptied (transient plaintext).
+* Portable JPA: a single basic attribute, in the entity's own table. No join, no N+1, nothing to keep consistent.
+* A natural home for a per-row header: format version, key id, type tags.
+* Sealed shape: fewer leaks, since even whether a single attribute is set is hidden.
+* Embeddables fit: entries keyed by path (`secret.note`), all in the root entity's bundle.
+
+=== 5.4 Trade-offs
+
+* *Edits are not detected* (transient plaintext), as in 2.2. The setter invalidates the bundle.
+* *A new format to own.* The bundle is a serialized map of typed values. It needs a spec (JSON with Base64 codecs, or
+  a binary tag/length/value layout), and decoding still follows the declared Java type.
+* *Attribute names are part of the stored data* (the entry keys). Renaming a field breaks reading unless there is an
+  alias. A removed attribute leaves stale entries, which must be ignored or pruned.
+* *Write amplification.* Any change to any encrypted attribute rewrites the whole column; the sealed shape also
+  re-encrypts everything.
+* *Larger blast radius.* One corrupt bundle loses every secret of that row.
+* *LOB handling.* A large bundle needs BLOB/TEXT, and LOB fetching and streaming differ per database and provider
+  *[unverified]*.
+* *All or nothing at the database level.* There are no per-attribute grants, no per-attribute NULLing, and no
+  per-attribute index (a blind index would still be its own column).
+* *Discovery.* The members are transient, so they are found by reflection, or listed on the bundle annotation:
+  `@EncryptedBundle(attributes = {"name", "bornOn"})`.
+* *Migration.* The legacy plaintext columns are unmapped once the members are transient (the chicken-and-egg problem
+  again). The phase trick from 2.3 still works:
+. Phase A: keep the legacy columns mapped (`insertable = false`), and have encryption move their values into the
+  bundle and NULL them. Rows migrate as they are written, plus a batch. Dirty on read is accepted for this phase.
+. Phase B: make the members `@Transient`; annotations change only.
+. The leftover columns are left for cleansing.
+
+== 6. Comparison
+
+|===
+| | within_table A (now) | within_table B | single_table | per_table | single_column
+
+| Reading writes | *yes* | no | no | no | no
+| Object emptied | *yes* | no | no | no | no
+| Edits detected | provider | *you* (setter) | *you* (+ change tracking) | *you* (setter) | *you* (setter)
+| Portable JPA | yes | yes | *no* | yes | yes
+| Extra queries | no | no | *yes* (N+1) | no (one join) | no
+| Referential integrity | n/a | n/a | *none* | FK + cascade | n/a
+| Composite primary key | n/a (same row) | n/a (same row) | *needs a per-entity id encoder* | native (one `@PrimaryKeyJoinColumn` per component) | n/a (same row)
+| Entity table | NULL `name` stays, `_enc__` appended | leftover `name`, `_enc__` appended | untouched | leftover `name` until cleansed | leftover columns until cleansed, *one* column appended
+| Side table | none | none | one, shared | one per entity, ordered | none
+| New encrypted attribute | DDL | DDL | none | DDL | *none*
+| Write granularity | per attribute | per attribute | per attribute | per attribute | *whole bundle*
+| Legacy rows / migration | *built in* | via Phase A | separate tool + freeze/deltas | via Phase A + SQL copy | via its own Phase A
+| JPQL on the attribute | silently NULL | rejected | rejected | rejected | rejected
+| Per-entity key | yes | yes | yes | yes | yes
+|===
+
+*Reading the table.*
+
+* within_table A is the best *way in*: migration with zero risk, at the cost of dirty on read.
+* within_table B is the cheapest *place to end up*: annotations change, data and schema do not.
+* per_table is the cleanest place to end up, reached from A with one SQL copy.
+* single_column is the most schema-frugal portable scheme: one column, no DDL for new attributes. It pays with a
+  bundle format to own, whole-bundle writes, and a larger blast radius.
+* single_table is the only scheme that leaves entity tables completely untouched, but it gives up portable JPA, which
+  is the module's founding constraint.
+
+== 7. Open questions / next steps
+
+* Support within_table A and B (and per_table on top of B) in the module, or only some of them?
+* Edit detection for the transient modes: invalidating setter, detection only, or both?
+* Re-encryption policy: encrypt only when the plaintext differs from what was decrypted?
+* A pre-switch check: count rows that have plaintext and no ciphertext.
+* *[unverified]* How Hibernate 7.4 and EclipseLink 5.0 join a missing secondary row, and whether they insert it when
+  all of its columns are NULL.
+* Prototype lifecycle test on both providers (transient plaintext, with and without `@SecondaryTable`):
+** reading does not write;
+** the object is not emptied;
+** an edit through the setter persists, and a direct field write is lost;
+** behavior when the secondary row is missing;
+** the A to B switch on existing data.
+* Format items (1.4), whatever the scheme.
+* single_column:
+** sealed bundle or per-attribute entries?
+** bundle encoding: JSON with Base64 codecs, or binary tag/length/value?
+** a policy for renamed and removed attributes (aliases, pruning).
+
+== 8. Recommendation
+
+*within_table, used as the two-phase A -> B lifecycle.* Mode B is the steady state; Mode A is the way in.
+
+=== 8.1 Why
+
+|===
+| Concern | within_table A -> B
+
+| Dirty on read | fixed in B
+| Object emptied | fixed in B
+| Zero-risk migration (the reason for the sibling column) | kept: A *is* the migration, and the switch to B changes annotations only
+| Portable Java/JPA | yes, both providers
+| Composite primary keys | not an issue (same row)
+| Per-entity key, manager SPI, codecs | unchanged
+| New machinery | the smallest: the module already *is* Mode A; B adds transient discovery and edit detection
+|===
+
+=== 8.2 Why not the others
+
+* *single_table.* Not portable JPA, and it needs a per-entity id encoder for composite keys. Out.
+* *per_table.* The mechanism is identical to Mode B; only `@Column(table = ...)` differs, and its migration path goes
+  through within_table A anyway. Treat it as an *option on top of B* for teams who want the separation, not as a
+  separate scheme. Choosing within_table keeps it open.
+* *single_column.* Attractive: one column, no DDL for new attributes, and a path to cross-language bundles. But it adds
+  the most new design: a bundle format, alias and pruning rules, whole-bundle writes, and a larger blast radius. A
+  candidate for a later, separate mode, not the core.
+
+=== 8.3 What is accepted
+
+*Schema clutter.* The leftover `name` column stays until it is cleansed, an `_enc__` column is appended per encrypted
+attribute, and each new encrypted attribute needs DDL. per_table on top of B is the escape hatch if this matters.
+
+=== 8.4 Enhancements, in order
+
+. *Mode B support:*
+** the reversed annotation (`@EncryptedAttribute(plaintext = "name")` on the `byte[]` side);
+** discovery of the transient plaintext field;
+** decrypt and encrypt rules that null nothing mapped.
+. *Edit detection:* an invalidating setter, plus detection of plaintext changes that would otherwise be lost, so that
+  they fail loudly.
+. *Re-encryption policy:* encrypt only when the plaintext differs from what was decrypted.
+. *A pre-switch check:* count the rows that still have plaintext and no ciphertext.
+. *Format items* (1.4): version byte, strict lengths, `Serializable` opt-in, a spec.
+. *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
+  secondary-table behavior on both providers.
+
+Start with step 1, together with a prototype lifecycle test on both providers confirming that Mode B behaves as these
+notes claim.

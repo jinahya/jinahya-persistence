@@ -41,46 +41,46 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.Bytes_l;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.Characters_2l;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.big_decimal_;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.big_integer_;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.boolean_1;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.byte_1;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.char_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.chars_2l;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.double_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.enum_;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.float_4;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.instant_12;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.int_4;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.local_date_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.local_date_time_16;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.local_time_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.long_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.offset_date_time_20;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.offset_time_12;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.serializable_;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.short_2;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.sql_date_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.sql_timestamp_16;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.string_;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.util_calendar_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.util_date_8;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.uuid_16;
-import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.year_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.Bytes_l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.Characters_2l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.big_decimal_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.big_integer_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.boolean_1;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.byte_1;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.char_2;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.chars_2l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.double_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.enum_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.float_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.instant_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.int_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_date_time_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_time_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.long_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_date_time_20;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.serializable_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.short_2;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_time_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.string_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_calendar_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.uuid_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.year_4;
 
 /**
- * An abstract service which encrypts and decrypts the {@link __EncryptedAttribute annotated attributes} of an entity
+ * An abstract service which encrypts and decrypts the {@link EncryptedAttribute annotated attributes} of an entity
  * instance, in place.
  * <p>
  * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each {@code BASIC}
- * attribute annotated with {@link __EncryptedAttribute @__EncryptedAttribute}:
+ * attribute annotated with {@link EncryptedAttribute @__EncryptedAttribute}:
  * <ol>
  *   <li>converts the plaintext value to bytes, by its java type;</li>
- *   <li>hands those bytes to the {@link __EncryptionManager encryptionManager}, along with the
- *       {@link __EncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
+ *   <li>hands those bytes to the {@link EntityEncryptionManager encryptionManager}, along with the
+ *       {@link EntityEncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
  *   <li>stores the ciphertext in the paired {@code byte[]} attribute, and clears the plaintext one.</li>
  * </ol>
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
@@ -92,15 +92,15 @@ import static com.github.jinahya.persistence.crypto.__EncryptionServiceUtils.yea
  * {@link Serializable}. Any other type is rejected with a {@link RuntimeException}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __EncryptionManager
- * @see __EncryptionListener
+ * @see EntityEncryptionManager
+ * @see EntityEncryptionListener
  * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486">2.6. Basic
  *         Types</a> (Jakarta Persistence 3.2 Specification Document)
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __EncryptionService {
+public abstract class AbstractEntityEncryptionService {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -134,14 +134,15 @@ public abstract class __EncryptionService {
     /**
      * Creates a new instance.
      *
-     * @param entityManagerFactory an entity manager factory; must not be {@code null}.
-     * @param encryptionManager    the encryption manager; must not be {@code null}.
+     * @param entityManagerFactory    an entity manager factory; must not be {@code null}.
+     * @param entityEncryptionManager the encryption manager; must not be {@code null}.
      */
-    protected __EncryptionService(final EntityManagerFactory entityManagerFactory,
-                                  final __EncryptionManager encryptionManager) {
+    protected AbstractEntityEncryptionService(final EntityManagerFactory entityManagerFactory,
+                                              final EntityEncryptionManager entityEncryptionManager) {
         super();
         this.entityManagerFactory = Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
-        this.encryptionManager = Objects.requireNonNull(encryptionManager, "encryptionManager is null");
+        this.entityEncryptionManager =
+                Objects.requireNonNull(entityEncryptionManager, "entityEncryptionManager is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -156,7 +157,7 @@ public abstract class __EncryptionService {
     @PostConstruct
     protected void onPostConstruct() {
         logger.log(System.Logger.Level.DEBUG, "onPostConstruct()");
-        logger.log(System.Logger.Level.DEBUG, "encryptionManager: {0}", encryptionManager.getClass().getName());
+        logger.log(System.Logger.Level.DEBUG, "encryptionManager: {0}", entityEncryptionManager.getClass().getName());
     }
 
     // https://stackoverflow.com/a/72628439/330457
@@ -237,7 +238,7 @@ public abstract class __EncryptionService {
     }
 
     /**
-     * Validates every {@link __EncryptedAttribute annotated attribute} of the specified managed type, and returns the
+     * Validates every {@link EncryptedAttribute annotated attribute} of the specified managed type, and returns the
      * pairs, and the embedded attributes, to walk.
      *
      * @param managedType the managed type to validate.
@@ -402,7 +403,7 @@ public abstract class __EncryptionService {
         for (final var decryptedAttribute : attributes.values()) {
             final var persistentAttributeType = decryptedAttribute.getPersistentAttributeType();
             final var annotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, __EncryptedAttribute.class);
+                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, EncryptedAttribute.class);
             if (persistentAttributeType == Attribute.PersistentAttributeType.EMBEDDED) {
                 if (annotation != null) {
                     throw reject(rootType, embeddingPath, decryptedAttribute, null,
@@ -460,7 +461,7 @@ public abstract class __EncryptionService {
                              + "; encrypting nulls it (from " + rules.source() + ")");
             }
             final var name = annotation.encryptedAttribute().isBlank()
-                    ? __EncryptedAttributeUtils.getDefaultEncryptedAttributeName(decryptedAttribute)
+                    ? EncryptedAttributeUtils.getDefaultEncryptedAttributeName(decryptedAttribute)
                     : annotation.encryptedAttribute();
             final var encryptedAttribute = attributes.get(name);
             if (encryptedAttribute == null) {
@@ -487,7 +488,7 @@ public abstract class __EncryptionService {
                 throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                              "an encrypted attribute has to be optional");
             }
-            if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, __EncryptedAttribute.class) != null) {
+            if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, EncryptedAttribute.class) != null) {
                 throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                              "an encrypted attribute cannot itself be annotated with @__EncryptedAttribute");
             }
@@ -724,7 +725,7 @@ public abstract class __EncryptionService {
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-            final var encrypted = encryptionManager.encrypt(encryptionIdentifier, decryptedBytes);
+            final var encrypted = entityEncryptionManager.encrypt(encryptionIdentifier, decryptedBytes);
             if (encrypted == null) {
                 throw new RuntimeException(
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
@@ -736,16 +737,16 @@ public abstract class __EncryptionService {
 
     /**
      * Encrypts the annotated attributes of the specified object, with the identifier the
-     * {@link __EncryptionManager encryptionManager} derives from it.
+     * {@link EntityEncryptionManager encryptionManager} derives from it.
      *
      * @param object the entity instance to encrypt, in place.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
-     * @see __EncryptionManager#getEncryptionIdentifier(Object)
+     * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
      */
     public void encrypt(final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
-        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
+        final var encryptionIdentifier = entityEncryptionManager.getEncryptionIdentifier(object);
         encrypt(encryptionIdentifier, object);
     }
 
@@ -794,7 +795,7 @@ public abstract class __EncryptionService {
                 JinahyaAttributeUtils.setAttributeValue(object, decryptedAttribute, null);
                 continue;
             }
-            final var decryptedBytes = encryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
+            final var decryptedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, encryptedBytes.clone());
             if (decryptedBytes == null) {
                 throw new RuntimeException(
                         "encryptionManager returned null; decrypted attribute: " + decryptedAttribute.getName());
@@ -900,16 +901,16 @@ public abstract class __EncryptionService {
 
     /**
      * Decrypts the annotated attributes of the specified object, with the identifier the
-     * {@link __EncryptionManager encryptionManager} derives from it.
+     * {@link EntityEncryptionManager encryptionManager} derives from it.
      *
      * @param object the entity instance to decrypt, in place.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be reconstructed from bytes.
-     * @see __EncryptionManager#getEncryptionIdentifier(Object)
+     * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
      */
     public void decrypt(final @Valid @NotNull Object object) {
         Objects.requireNonNull(object, "object is null");
-        final var encryptionIdentifier = encryptionManager.getEncryptionIdentifier(object);
+        final var encryptionIdentifier = entityEncryptionManager.getEncryptionIdentifier(object);
         decrypt(encryptionIdentifier, object);
     }
 
@@ -964,7 +965,7 @@ public abstract class __EncryptionService {
 
     // -------------------------------------------------------------------------------------------- entityManagerFactory
 
-    // ----------------------------------------------------------------------------------------------- encryptionManager
+    // ----------------------------------------------------------------------------------------- entityEncryptionManager
 
     // -----------------------------------------------------------------------------------------------------------------
     private final Map<Class<?>, ManagedType<?>> managedTypes = new ConcurrentHashMap<>();
@@ -977,5 +978,5 @@ public abstract class __EncryptionService {
     // -----------------------------------------------------------------------------------------------------------------
     private final EntityManagerFactory entityManagerFactory;
 
-    private final __EncryptionManager encryptionManager;
+    private final EntityEncryptionManager entityEncryptionManager;
 }

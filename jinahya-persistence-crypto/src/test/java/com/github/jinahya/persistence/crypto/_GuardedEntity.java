@@ -21,9 +21,9 @@ import jakarta.persistence.Version;
  */
 @Access(AccessType.FIELD)
 @Entity
-@EntityListeners(_LifecycleListener.class)
+@EntityListeners(_LifecycleListenerEntity.class)
 @Table(name = "guarded_entity")
-@__EncryptedEntity
+@EncryptedEntity
 public class _GuardedEntity {
 
     static final String TABLE_NAME = "guarded_entity";
@@ -37,7 +37,7 @@ public class _GuardedEntity {
     @Column(name = "version")
     public long version;
 
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "name", nullable = true, insertable = false, updatable = true)
     public String name;

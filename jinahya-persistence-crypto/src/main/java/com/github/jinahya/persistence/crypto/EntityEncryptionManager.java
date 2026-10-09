@@ -9,16 +9,16 @@ import jakarta.validation.constraints.NotNull;
  * <p>
  * An implementation decides which key an entity instance is encrypted with — that is what the encryption identifier
  * selects — and performs the encryption and decryption themselves; everything else, including finding the attributes
- * and turning their values into bytes, is done by {@link __EncryptionService}.
+ * and turning their values into bytes, is done by {@link AbstractEntityEncryptionService}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __EncryptionService
- * @see __EncryptedEntity
+ * @see AbstractEntityEncryptionService
+ * @see EncryptedEntity
  */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 })
-public interface __EncryptionManager {
+public interface EntityEncryptionManager {
 
     /**
      * Returns an identifier for the specified entity instance.
@@ -29,6 +29,7 @@ public interface __EncryptionManager {
     @NotBlank
     String getEncryptionIdentifier(@Valid @NotNull Object entityInstance);
 
+    // -----------------------------------------------------------------------------------------------------------------
     /**
      * Encrypts the specified decrypted bytes with the specified identifier provided via
      * {@link #getEncryptionIdentifier(Object)}.

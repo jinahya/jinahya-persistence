@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Verifies that {@link __EncryptionService} moves every supported java type between the decrypted attribute and its
+ * Verifies that {@link AbstractEntityEncryptionService} moves every supported java type between the decrypted attribute and its
  * paired encrypted attribute, and back, against a real metamodel.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-class __EncryptionService_Test {
+class __Entity__EncryptionService_Test {
 
     private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
 
@@ -44,11 +44,11 @@ class __EncryptionService_Test {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __EncryptionService service;
+    private AbstractEntityEncryptionService service;
 
     @BeforeEach
     void createService() {
-        service = new _EncryptionService(ENTITY_MANAGER_FACTORY, new _EncryptionManager());
+        service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager());
     }
 
     private static _SecretEntity populated() {
@@ -78,8 +78,8 @@ class __EncryptionService_Test {
         @DisplayName("encrypt/decrypt accept a getReference() proxy")
         @Test
         void __proxy() {
-            final var manager = new _EncryptionManager();
-            final var svc = new _EncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _Entity_EncryptionManager();
+            final var svc = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
 
             final Long id;
             try (var em = ENTITY_MANAGER_FACTORY.createEntityManager()) {
@@ -115,8 +115,8 @@ class __EncryptionService_Test {
             // the ciphertext is well formed and decrypts cleanly; it is the DECODED bytes that the
             // codec cannot turn back into a value -- Enum.valueOf throws IllegalArgumentException,
             // which the guard around the decode ladder did not catch
-            final var manager = new _EncryptionManager();
-            final var service = new _EncryptionService(ENTITY_MANAGER_FACTORY, manager);
+            final var manager = new _Entity_EncryptionManager();
+            final var service = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, manager);
             final var entity = populated();
             final var identifier = manager.getEncryptionIdentifier(entity);
 
@@ -242,7 +242,7 @@ class __EncryptionService_Test {
             // deliberately an external-package subclass: an in-package one cannot exercise the ColumnRules
             // constructor's accessibility, which is exactly what an application would hit first
             final var relaxed = new com.github.jinahya.persistence.cryptoext._ExternalResolverService(
-                    ENTITY_MANAGER_FACTORY, new _EncryptionManager(), java.util.Set.of("leak"));
+                    ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager(), java.util.Set.of("leak"));
             final var entity = new _GraphEntity();
             entity.valid = new _SecretEmbeddable("keep-me");
             entity.second = new _SecretEmbeddable("also-keep-me");
@@ -310,7 +310,7 @@ class __EncryptionService_Test {
         @DisplayName("a fact which cannot be established is rejected, not assumed safe")
         @Test
         void __unknownIsRejected() {
-            final var unsure = new _EncryptionService(ENTITY_MANAGER_FACTORY, new _EncryptionManager()) {
+            final var unsure = new EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _Entity_EncryptionManager()) {
                 @Override
                 protected ColumnRules resolveColumnRules(final jakarta.persistence.metamodel.ManagedType<?> rootType,
                                                          final java.util.List<jakarta.persistence.metamodel.Attribute<?, ?>> embeddingPath,
@@ -346,9 +346,9 @@ class __EncryptionService_Test {
         void __truncated() {
             final var entity = new _SecretEntity();
             entity.ageEnc__ = new byte[
-                    _EncryptionManager.IV_BYTES + _EncryptionManager.KEY_BYTES + _EncryptionManager.AAD_BYTES];
+                    _Entity_EncryptionManager.IV_BYTES + _Entity_EncryptionManager.KEY_BYTES + _Entity_EncryptionManager.AAD_BYTES];
             // an empty, but well-formed, payload decrypts to zero bytes; Integer needs four
-            final var manager = new _EncryptionManager();
+            final var manager = new _Entity_EncryptionManager();
             entity.ageEnc__ = manager.encrypt("irrelevant", new byte[0]);
 
             assertThatThrownBy(() -> service.decrypt(entity))

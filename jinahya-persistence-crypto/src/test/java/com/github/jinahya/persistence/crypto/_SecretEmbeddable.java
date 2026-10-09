@@ -5,8 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 /**
- * An embeddable which holds an {@link __EncryptedAttribute encrypted attribute} of its own, for verifying that
- * {@link __EncryptionService} descends into {@code EMBEDDED} attributes.
+ * An embeddable which holds an {@link EncryptedAttribute encrypted attribute} of its own, for verifying that
+ * {@link AbstractEntityEncryptionService} descends into {@code EMBEDDED} attributes.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -31,7 +31,7 @@ public class _SecretEmbeddable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "note", nullable = true, insertable = false)
     private String note;

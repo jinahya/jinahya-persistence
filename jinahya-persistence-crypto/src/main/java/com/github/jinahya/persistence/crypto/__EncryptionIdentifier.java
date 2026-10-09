@@ -13,10 +13,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote This annotation is not honored yet: the identifier comes only from
- *         {@link __EncryptionManager#getEncryptionIdentifier(Object)}.
- * @see __EncryptedEntity#encryptionIdentifierAttribute()
- * @see __EncryptionManager#getEncryptionIdentifier(Object)
+ *         {@link EntityEncryptionManager#getEncryptionIdentifier(Object)}.
+ * @see EncryptedEntity#encryptionIdentifierAttribute()
+ * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
+ * @deprecated never read; the identifier comes only from {@link EntityEncryptionManager#getEncryptionIdentifier(Object)}.
  */
+@Deprecated(forRemoval = true)
 @Documented
 @Retention(value = RUNTIME)
 @Target({

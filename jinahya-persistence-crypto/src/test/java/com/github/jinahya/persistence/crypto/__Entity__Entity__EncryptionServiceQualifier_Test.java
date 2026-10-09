@@ -10,14 +10,14 @@ import java.lang.annotation.Target;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link __EncryptionServiceQualifier}.
+ * Tests for {@link EntityEncryptionServiceQualifier}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __EncryptionServiceQualifier_Test {
+class __Entity__Entity__EncryptionServiceQualifier_Test {
 
     /**
      * A holder which uses the qualifier at each of the places an injection point can appear. This class existing at all
@@ -26,14 +26,14 @@ class __EncryptionServiceQualifier_Test {
     @SuppressWarnings({"unused"})
     static class InjectionPoints {
 
-        @__EncryptionServiceQualifier
-        private __EncryptionService field;
+        @EntityEncryptionServiceQualifier
+        private AbstractEntityEncryptionService field;
 
-        InjectionPoints(@__EncryptionServiceQualifier final __EncryptionService parameter) {
+        InjectionPoints(@EntityEncryptionServiceQualifier final AbstractEntityEncryptionService parameter) {
         }
 
-        @__EncryptionServiceQualifier
-        __EncryptionService producer() {
+        @EntityEncryptionServiceQualifier
+        AbstractEntityEncryptionService producer() {
             return null;
         }
     }
@@ -41,13 +41,13 @@ class __EncryptionServiceQualifier_Test {
     @DisplayName("it is a CDI qualifier")
     @Test
     void __isAQualifier() {
-        assertThat(__EncryptionServiceQualifier.class.getAnnotation(Qualifier.class)).isNotNull();
+        assertThat(EntityEncryptionServiceQualifier.class.getAnnotation(Qualifier.class)).isNotNull();
     }
 
     @DisplayName("it is applicable where an injection point can appear")
     @Test
     void __targetsInjectionPoints() {
-        assertThat(__EncryptionServiceQualifier.class.getAnnotation(Target.class).value())
+        assertThat(EntityEncryptionServiceQualifier.class.getAnnotation(Target.class).value())
                 .contains(ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER);
     }
 

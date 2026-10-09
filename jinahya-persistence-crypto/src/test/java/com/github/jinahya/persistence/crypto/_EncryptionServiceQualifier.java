@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 // Meta-annotating with another qualifier does NOT make an annotation a CDI qualifier; it has to
 // carry @Qualifier itself.
 @Qualifier
-@__EncryptionServiceQualifier
+@EntityEncryptionServiceQualifier
 @Retention(
         RetentionPolicy.RUNTIME
 )

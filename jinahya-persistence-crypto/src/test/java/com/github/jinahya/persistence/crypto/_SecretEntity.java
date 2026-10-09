@@ -20,8 +20,8 @@ import java.util.Calendar;
 import java.util.UUID;
 
 /**
- * An entity holding one {@link __EncryptedAttribute encrypted attribute} of each java type whose encoding
- * {@link __EncryptionService} dispatches on, for verifying the encrypt/decrypt round trip against a real metamodel.
+ * An entity holding one {@link EncryptedAttribute encrypted attribute} of each java type whose encoding
+ * {@link AbstractEntityEncryptionService} dispatches on, for verifying the encrypt/decrypt round trip against a real metamodel.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -50,7 +50,7 @@ public class _SecretEntity {
     private Long id;
 
     // ---------------------------------------------------------------------------------------------------------- String
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "name", nullable = true, insertable = false)
     public String name;
@@ -60,7 +60,7 @@ public class _SecretEntity {
     public byte[] nameEnc__;
 
     // --------------------------------------------------------------------------------------------------------- Integer
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "age", nullable = true, insertable = false)
     public Integer age;
@@ -70,7 +70,7 @@ public class _SecretEntity {
     public byte[] ageEnc__;
 
     // ------------------------------------------------------------------------------------------------------------ UUID
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "reference", nullable = true, insertable = false)
     public UUID reference;
@@ -80,7 +80,7 @@ public class _SecretEntity {
     public byte[] referenceEnc__;
 
     // ------------------------------------------------------------------------------------------------------- LocalDate
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "born_on", nullable = true, insertable = false)
     public LocalDate bornOn;
@@ -91,7 +91,7 @@ public class _SecretEntity {
 
     // ------------------------------------------------------------------------------------------- java.sql.Timestamp
     // the branch which used to fall through to java.util.Date, losing the nanos
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "seen_at", nullable = true, insertable = false)
     public java.sql.Timestamp seenAt;
@@ -101,7 +101,7 @@ public class _SecretEntity {
     public byte[] seenAtEnc__;
 
     // ------------------------------------------------------------------------------------------------- java.util.Date
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = true)
     @Column(name = "joined_at", nullable = true, insertable = false)
@@ -112,7 +112,7 @@ public class _SecretEntity {
     public byte[] joinedAtEnc__;
 
     // -------------------------------------------------------------------------------------------------------- Calendar
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = true)
     @Column(name = "checked_at", nullable = true, insertable = false)
@@ -123,7 +123,7 @@ public class _SecretEntity {
     public byte[] checkedAtEnc__;
 
     // ------------------------------------------------------------------------------------------------------------ enum
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Enumerated(EnumType.STRING)
     @Basic(optional = true)
     @Column(name = "grade", nullable = true, insertable = false)
@@ -134,7 +134,7 @@ public class _SecretEntity {
     public byte[] gradeEnc__;
 
     // ---------------------------------------------------------------------------------------------------------- byte[]
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "photo", nullable = true, length = 2048, insertable = false)
     public byte[] photo;
@@ -144,7 +144,7 @@ public class _SecretEntity {
     public byte[] photoEnc__;
 
     // ---------------------------------------------------------- a pair named explicitly, rather than by the default
-    @__EncryptedAttribute(encryptedAttribute = "secretNumberCipher")
+    @EncryptedAttribute(encryptedAttribute = "secretNumberCipher")
     @Basic(optional = true)
     @Column(name = "secret_number", nullable = true, insertable = false)
     public Long secretNumber;
@@ -156,7 +156,7 @@ public class _SecretEntity {
     // ------------------------------------------------ a declared type broader than the value it holds at run time
     // Jakarta Persistence 3.2 §2.6 admits any Serializable as a basic type; the value here is an ordinary String,
     // so the declared type and the runtime type deliberately disagree.
-    @__EncryptedAttribute
+    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "opaque", nullable = true, insertable = false)
     public java.io.Serializable opaque;

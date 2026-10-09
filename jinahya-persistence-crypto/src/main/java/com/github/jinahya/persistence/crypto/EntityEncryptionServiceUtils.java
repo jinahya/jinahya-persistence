@@ -32,13 +32,13 @@ import java.util.UUID;
  * be reconstructed from its bytes without consulting the database.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __EncryptionService
+ * @see AbstractEntityEncryptionService
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101"  // Class names should comply with a naming convention
 })
-final class __EncryptionServiceUtils {
+final class EntityEncryptionServiceUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -1554,7 +1554,7 @@ final class __EncryptionServiceUtils {
     private static final long MAX_SERIALIZABLE_ARRAY_LENGTH = 1L << 20;
 
     // -----------------------------------------------------------------------------------------------------------------
-    private __EncryptionServiceUtils() {
+    private EntityEncryptionServiceUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

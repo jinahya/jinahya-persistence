@@ -1,7 +1,7 @@
 package com.github.jinahya.persistence.cryptoext;
 
-import com.github.jinahya.persistence.crypto.__EncryptionManager;
-import com.github.jinahya.persistence.crypto.__EncryptionService;
+import com.github.jinahya.persistence.crypto.EntityEncryptionManager;
+import com.github.jinahya.persistence.crypto.AbstractEntityEncryptionService;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.ManagedType;
@@ -20,10 +20,10 @@ import java.util.Set;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public class _ExternalResolverService extends __EncryptionService {
+public class _ExternalResolverService extends AbstractEntityEncryptionService {
 
     public _ExternalResolverService(final EntityManagerFactory entityManagerFactory,
-                                    final __EncryptionManager encryptionManager,
+                                    final EntityEncryptionManager encryptionManager,
                                     final Set<String> nonInsertableAttributeNames) {
         super(entityManagerFactory, encryptionManager);
         this.nonInsertableAttributeNames = Set.copyOf(nonInsertableAttributeNames);

@@ -10,15 +10,15 @@ class _EncryptionManagerTest {
 
     @Test
     void __0() {
-        final var manager = new _EncryptionManager();
+        final var manager = new _Entity_EncryptionManager();
         final var plain = new byte[0];
         final var encrypted = manager.encrypt("irrelevant", plain);
         assertThat(encrypted)
                 .hasSize(
-                        _EncryptionManager.IV_BYTES
-                        + _EncryptionManager.KEY_BYTES
-                        + _EncryptionManager.AAD_BYTES
-                        + _EncryptionManager.TAG_BYTES
+                        _Entity_EncryptionManager.IV_BYTES
+                        + _Entity_EncryptionManager.KEY_BYTES
+                        + _Entity_EncryptionManager.AAD_BYTES
+                        + _Entity_EncryptionManager.TAG_BYTES
                 );
         final var decrypted = manager.decrypt("irrelevant", encrypted);
         assertThat(decrypted).isEqualTo(plain);
@@ -26,7 +26,7 @@ class _EncryptionManagerTest {
 
     @Test
     void __() {
-        final var manager = new _EncryptionManager();
+        final var manager = new _Entity_EncryptionManager();
         final var plain = new byte[ThreadLocalRandom.current().nextInt(1048576)];
         final var encrypted = manager.encrypt("irrelevant", plain);
         final var decrypted = manager.decrypt("irrelevant", encrypted);
