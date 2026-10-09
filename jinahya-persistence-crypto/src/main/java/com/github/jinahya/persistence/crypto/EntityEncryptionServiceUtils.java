@@ -11,6 +11,10 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -426,10 +430,25 @@ final class EntityEncryptionServiceUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @throws IllegalArgumentException when the {@code v} is not encodable as UTF-8; it holds an unpaired surrogate.
      */
     static byte[] string_(final String v) {
         assert v != null;
-        return v.getBytes(StandardCharsets.UTF_8);
+        try {
+            // String.getBytes(UTF_8) would replace an unpaired surrogate with '?', storing something else, silently
+            final var buffer = StandardCharsets.UTF_8.newEncoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .encode(CharBuffer.wrap(v));
+            final var b = new byte[buffer.remaining()];
+            buffer.get(b);
+            return b;
+        } catch (final CharacterCodingException cce) {
+            // never put the value in the message
+            throw new IllegalArgumentException(
+                    "the string is not encodable as UTF-8 (an unpaired surrogate?), so it would not be read back as is",
+                    cce);
+        }
     }
 
     /**
@@ -437,10 +456,20 @@ final class EntityEncryptionServiceUtils {
      *
      * @param v the array of bytes.
      * @return the value represented by the {@code v}.
+     * @throws IllegalArgumentException when the {@code v} is not well-formed UTF-8.
      */
     static String string_(final byte[] v) {
         assert v != null;
-        return new String(v, StandardCharsets.UTF_8);
+        try {
+            // new String(v, UTF_8) would replace a malformed sequence with U+FFFD, silently
+            return StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(v))
+                    .toString();
+        } catch (final CharacterCodingException cce) {
+            throw new IllegalArgumentException("the bytes are not well-formed UTF-8", cce);
+        }
     }
 
     // ------------------------------------------------------------------------------------------------------------ UUID

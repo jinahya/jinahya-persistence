@@ -826,73 +826,85 @@ public abstract class AbstractEntityEncryptionService {
                         "; value type: " + decryptedValue.getClass().getName()
                 );
             }
-            if (javaType == Boolean.class) {
-                decryptedBytes = boolean_1((Boolean) decryptedValue);
-            } else if (javaType == Byte.class) {
-                decryptedBytes = byte_1((Byte) decryptedValue);
-            } else if (javaType == Short.class) {
-                decryptedBytes = short_2((Short) decryptedValue);
-            } else if (javaType == Integer.class) {
-                decryptedBytes = int_4((Integer) decryptedValue);
-            } else if (javaType == Long.class) {
-                decryptedBytes = long_8((Long) decryptedValue);
-            } else if (javaType == Character.class) {
-                decryptedBytes = char_2((Character) decryptedValue);
-            } else if (javaType == Float.class) {
-                decryptedBytes = float_4((Float) decryptedValue);
-            } else if (javaType == Double.class) {
-                decryptedBytes = double_8((Double) decryptedValue);
-            } else if (javaType == String.class) {
-                decryptedBytes = string_((String) decryptedValue);
-            } else if (javaType == UUID.class) {
-                decryptedBytes = uuid_16((UUID) decryptedValue);
-            } else if (javaType == BigInteger.class) {
-                decryptedBytes = big_integer_((BigInteger) decryptedValue);
-            } else if (javaType == BigDecimal.class) {
-                decryptedBytes = big_decimal_((BigDecimal) decryptedValue);
-            } else if (javaType == LocalDate.class) {
-                decryptedBytes = local_date_8((LocalDate) decryptedValue);
-            } else if (javaType == LocalTime.class) {
-                decryptedBytes = local_time_8((LocalTime) decryptedValue);
-            } else if (javaType == LocalDateTime.class) {
-                decryptedBytes = local_date_time_16((LocalDateTime) decryptedValue);
-            } else if (javaType == OffsetTime.class) {
-                decryptedBytes = offset_time_12((OffsetTime) decryptedValue);
-            } else if (javaType == OffsetDateTime.class) {
-                decryptedBytes = offset_date_time_20((OffsetDateTime) decryptedValue);
-            } else if (javaType == Instant.class) {
-                decryptedBytes = instant_12((Instant) decryptedValue);
-            } else if (javaType == Year.class) {
-                decryptedBytes = year_4((Year) decryptedValue);
-            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                decryptedBytes = sql_timestamp_16((java.sql.Timestamp) decryptedValue);
-            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
-                decryptedBytes = sql_date_8((java.sql.Date) decryptedValue);
-            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
-                decryptedBytes = sql_time_8((java.sql.Time) decryptedValue);
-            } else if (Calendar.class.isAssignableFrom(javaType)) {
-                decryptedBytes = util_calendar_8((Calendar) decryptedValue);
-            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                // one branch feeds both of decrypt's generic Date branches -- the exact `== java.util.Date` one
-                // and the reflective (long) constructor one -- because both read long_8 millis
-                decryptedBytes = util_date_8((java.util.Date) decryptedValue);
-            } else if (javaType == byte[].class) {
-                decryptedBytes =
-                        ((byte[]) decryptedValue).clone(); // the manager must not be handed the instance's own array
-            } else if (javaType == Byte[].class) {
-                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                decryptedBytes = Bytes_l((Byte[]) decryptedValue);
-            } else if (javaType == char[].class) {
-                decryptedBytes = chars_2l((char[]) decryptedValue);
-            } else if (javaType == Character[].class) {
-                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                decryptedBytes = Characters_2l((Character[]) decryptedValue);
-            } else if (javaType.isEnum()) {
-                decryptedBytes = enum_((Enum<?>) decryptedValue);
-            } else if (Serializable.class.isAssignableFrom(javaType)) {
-                decryptedBytes = serializable_((Serializable) decryptedValue);
-            } else {
-                throw new RuntimeException("unsupported java type: " + javaType);
+            try {
+                if (javaType == Boolean.class) {
+                    decryptedBytes = boolean_1((Boolean) decryptedValue);
+                } else if (javaType == Byte.class) {
+                    decryptedBytes = byte_1((Byte) decryptedValue);
+                } else if (javaType == Short.class) {
+                    decryptedBytes = short_2((Short) decryptedValue);
+                } else if (javaType == Integer.class) {
+                    decryptedBytes = int_4((Integer) decryptedValue);
+                } else if (javaType == Long.class) {
+                    decryptedBytes = long_8((Long) decryptedValue);
+                } else if (javaType == Character.class) {
+                    decryptedBytes = char_2((Character) decryptedValue);
+                } else if (javaType == Float.class) {
+                    decryptedBytes = float_4((Float) decryptedValue);
+                } else if (javaType == Double.class) {
+                    decryptedBytes = double_8((Double) decryptedValue);
+                } else if (javaType == String.class) {
+                    decryptedBytes = string_((String) decryptedValue);
+                } else if (javaType == UUID.class) {
+                    decryptedBytes = uuid_16((UUID) decryptedValue);
+                } else if (javaType == BigInteger.class) {
+                    decryptedBytes = big_integer_((BigInteger) decryptedValue);
+                } else if (javaType == BigDecimal.class) {
+                    decryptedBytes = big_decimal_((BigDecimal) decryptedValue);
+                } else if (javaType == LocalDate.class) {
+                    decryptedBytes = local_date_8((LocalDate) decryptedValue);
+                } else if (javaType == LocalTime.class) {
+                    decryptedBytes = local_time_8((LocalTime) decryptedValue);
+                } else if (javaType == LocalDateTime.class) {
+                    decryptedBytes = local_date_time_16((LocalDateTime) decryptedValue);
+                } else if (javaType == OffsetTime.class) {
+                    decryptedBytes = offset_time_12((OffsetTime) decryptedValue);
+                } else if (javaType == OffsetDateTime.class) {
+                    decryptedBytes = offset_date_time_20((OffsetDateTime) decryptedValue);
+                } else if (javaType == Instant.class) {
+                    decryptedBytes = instant_12((Instant) decryptedValue);
+                } else if (javaType == Year.class) {
+                    decryptedBytes = year_4((Year) decryptedValue);
+                } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
+                    decryptedBytes = sql_timestamp_16((java.sql.Timestamp) decryptedValue);
+                } else if (javaType == java.sql.Date.class) {      // before java.util.Date
+                    decryptedBytes = sql_date_8((java.sql.Date) decryptedValue);
+                } else if (javaType == java.sql.Time.class) {      // before java.util.Date
+                    decryptedBytes = sql_time_8((java.sql.Time) decryptedValue);
+                } else if (Calendar.class.isAssignableFrom(javaType)) {
+                    decryptedBytes = util_calendar_8((Calendar) decryptedValue);
+                } else if (java.util.Date.class.isAssignableFrom(javaType)) {
+                    // one branch feeds both of decrypt's generic Date branches -- the exact `== java.util.Date` one
+                    // and the reflective (long) constructor one -- because both read long_8 millis
+                    decryptedBytes = util_date_8((java.util.Date) decryptedValue);
+                } else if (javaType == byte[].class) {
+                    decryptedBytes =
+                            ((byte[]) decryptedValue).clone(); // the manager must not be handed the instance's own array
+                } else if (javaType == Byte[].class) {
+                    logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
+                    decryptedBytes = Bytes_l((Byte[]) decryptedValue);
+                } else if (javaType == char[].class) {
+                    decryptedBytes = chars_2l((char[]) decryptedValue);
+                } else if (javaType == Character[].class) {
+                    logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
+                    decryptedBytes = Characters_2l((Character[]) decryptedValue);
+                } else if (javaType.isEnum()) {
+                    decryptedBytes = enum_((Enum<?>) decryptedValue);
+                } else if (Serializable.class.isAssignableFrom(javaType)) {
+                    decryptedBytes = serializable_((Serializable) decryptedValue);
+                } else {
+                    throw new RuntimeException("unsupported java type: " + javaType);
+                }
+            } catch (final IllegalArgumentException iae) {
+                // a value the codec refuses to encode, because it could not be read back as it is: a string with an
+                // unpaired surrogate, an oversized serializable, ... -- reported here while the caller still holds it.
+                // The message never carries the value.
+                throw new RuntimeException(
+                        "cannot encode the value (" + iae.getMessage() + ")" +
+                        "; decrypted attribute: " + decryptedAttribute.getName() +
+                        "; java type: " + javaType.getName(),
+                        iae
+                );
             }
             // the header names the format version and the codec, so that a reader can tell what wrote the bytes
             final var codec = EntityEncryptionServiceUtils.codecOf(javaType);

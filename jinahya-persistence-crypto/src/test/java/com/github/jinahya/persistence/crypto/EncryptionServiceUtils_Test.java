@@ -406,12 +406,25 @@ class EncryptionServiceUtils_Test {
             assertThat(string_(string_(v))).isEqualTo(v);
         }
 
-        @DisplayName("string_ does NOT round-trip an unpaired surrogate; it comes back as '?'")
+        @DisplayName("string_(String) rejects an unpaired surrogate, rather than storing '?' (#77)")
         @ValueSource(strings = {"\uD800", "\uDC00", "a\uD800b"})
         @ParameterizedTest
-        void __unpairedSurrogateIsLost(final String v) {
-            // pins the current behavior: UTF-8 cannot represent a lone surrogate, and getBytes replaces it silently
-            assertThat(string_(string_(v))).isNotEqualTo(v).contains("?");
+        void __unpairedSurrogateRejected(final String v) {
+            // UTF-8 cannot represent a lone surrogate; String.getBytes used to replace it with '?' silently
+            assertThatThrownBy(() -> string_(v))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("unpaired surrogate")
+                    .hasMessageNotContaining(v);
+        }
+
+        @DisplayName("string_(byte[]) rejects malformed UTF-8, rather than decoding U+FFFD (#77)")
+        @Test
+        void __malformedRejected() {
+            assertThatThrownBy(() -> string_(new byte[]{(byte) 0xC3}))       // a truncated sequence
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("not well-formed UTF-8");
+            assertThatThrownBy(() -> string_(new byte[]{'a', (byte) 0xFF}))  // never valid in UTF-8
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

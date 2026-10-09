@@ -212,7 +212,7 @@ The checks are unconditional, not `assert`s.
 | `Long`                 | `8`        | big endian                                                  |
 | `Double`               | `8`        | the raw `64`-bit long                                       |
 | `UUID`                 | `16`       | `getMostSignificantBits()` + `getLeastSignificantBits()`    |
-| `String`               | variable   | the `utf-8` encoded bytes; an unpaired surrogate becomes `?` ([#77](https://github.com/jinahya/jinahya-persistence/issues/77)) |
+| `String`               | variable   | the `utf-8` encoded bytes, strictly: an unpaired surrogate is rejected on encrypt, malformed `utf-8` on decrypt ([#77](https://github.com/jinahya/jinahya-persistence/issues/77)) |
 | `BigInteger`           | variable   | `toByteArray()`                                             |
 | `BigDecimal`           | variable   | `scale()`(`4`) + `unscaledValue()`(`BigInteger`)            |
 | `LocalDate`            | `8`        | `toEpochDay()`(`Long`)                                      |
