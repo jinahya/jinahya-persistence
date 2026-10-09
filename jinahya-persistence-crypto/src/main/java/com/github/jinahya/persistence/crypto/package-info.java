@@ -21,6 +21,10 @@
  *       it is written and decrypted after it is read. Registered directly, with
  *       {@link jakarta.persistence.EntityListeners @EntityListeners}; it takes the service from CDI.</dd>
  * </dl>
+ * An annotated {@link jakarta.persistence.Transient @Transient} field is Mode B, the steady state: the plaintext has no
+ * column, and nothing mapped is ever nulled. An annotated persistent attribute is Mode A, for encrypting a column which
+ * already holds data: the plaintext stays mapped to it, and is nulled as each row is written, migrating it.
+ * <p>
  * The mapping is validated before any instance is touched, and at startup under CDI; each encrypt and decrypt is
  * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.
  * <p>

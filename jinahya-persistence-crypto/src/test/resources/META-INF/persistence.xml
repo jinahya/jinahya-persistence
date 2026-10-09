@@ -52,6 +52,11 @@
     <class>com.github.jinahya.persistence.crypto._GenericStringEntity</class>
     <class>com.github.jinahya.persistence.crypto._GenericIntegerEntity</class>
     <class>com.github.jinahya.persistence.crypto._GenericDeepEntity</class>
+    <class>com.github.jinahya.persistence.crypto._GuardedModeBEntity</class>
+    <class>com.github.jinahya.persistence.crypto._ModeBNoteEntity</class>
+    <class>com.github.jinahya.persistence.crypto._ModeBPlainSetterEntity</class>
+    <class>com.github.jinahya.persistence.crypto._ModeBConstrainedEntity</class>
+    <class>com.github.jinahya.persistence.crypto._MisplacedAnnotationEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>

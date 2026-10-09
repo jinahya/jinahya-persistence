@@ -7,83 +7,192 @@ Application-level encryption (ALE) for Jakarta Persistence entities: selected at
 application, so the database only ever stores their ciphertext. The cryptography and the keys are not this module's
 concern; they live behind `EntityEncryptionManager`, which an application implements (with a KMS, Vault, Tink, …).
 
-An entity carries the value twice: the annotated attribute holds the plaintext and is nulled before the row is
-written, and a second, `byte[]`-typed attribute of the same entity holds the ciphertext.
+Each encrypted value has two attributes in the entity: the annotated one holds the plaintext, and a second,
+`byte[]`-typed one — a column of the same table — holds the ciphertext.
 
-> **Mode A, the transition mode.** This is the *within-table, mapped-plaintext* scheme. It is the right way *in* —
-> legacy rows stay readable and migrate as they are written — but it has inherent costs: reading an entity writes it,
-> and the application's object is emptied (see [Wiring](#wiring)). A transient-plaintext steady state (Mode B), which
-> downstream applications switch to by changing annotations only, is planned in
-> [#82](https://github.com/jinahya/jinahya-persistence/issues/82). The schemes considered, and why this one was
-> chosen, are in [`SCHEMES.adoc`](SCHEMES.adoc).
+## Choose your path
+
+Start from one question: **does the column you are encrypting already hold data?**
+
+```
+plain entity, column holds data  ──►  Mode A  ──►  Mode B
+plain entity, no data yet        ──────────────►  Mode B
+```
+
+| mode | the plaintext attribute is | use it when | in one line |
+|------|-----------------------------|-------------|-------------|
+| **[B](#mode-b-the-steady-state)** | `@Transient` | there is no plaintext data to migrate | behaves like an ordinary field |
+| **[A](#mode-a-encrypting-existing-data)** | mapped, to the old column | the column already holds plaintext | migrates rows as they are written, at a cost |
+
+**A is how you get in; B is where you stay.** Both use the same annotation and the same listener; the module tells them
+apart by whether the plaintext is `@Transient` ([#82](https://github.com/jinahya/jinahya-persistence/issues/82)). The design behind this, and the schemes considered, are in
+[`SCHEMES.adoc`](SCHEMES.adoc).
+
+## Mode B: the steady state
 
 ```java
-
 @EncryptedEntity
-@Entity
 @EntityListeners(EntityEncryptionListener.class) // registered directly; see "Wiring"
-class MyEntity {
+@Entity
+class User {
 
-    // the plaintext; nulled by encrypt(), restored by decrypt().
-    // insertable = false is required - see "Declare the plaintext column insertable = false" below
-    @EncryptedAttribute // defaults to the attribute below, by name
-    @Nullable
-    @Basic(optional = true)
-    @Column(name = "social_security_number", nullable = true, insertable = false)
-    private String socialSecurityNumber;
+    @EncryptedAttribute // pairs with nameEnc__, by name
+    @Transient          // no column: the plaintext lives only in the object
+    private String name;
 
-    // the ciphertext; the attribute name, not the column name, is what the annotation refers to
-    @Nullable
-    @Basic(optional = true)
-    @Column(name = "social_security_number_enc", nullable = true)
-    private byte[] socialSecurityNumberEnc__;
+    @Column(name = "name_enc")
+    private byte[] nameEnc__;  // the ciphertext; no accessors needed
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+        this.nameEnc__ = null; // required: see below
+    }
 }
 ```
 
-`@EncryptedAttribute` pairs the two by attribute name: an empty `encryptedAttribute()`, the default, means the
-annotated attribute's name suffixed with `Enc__`. Name the counterpart explicitly to use anything else.
+It behaves like an ordinary field: `getName()` always returns the value, reading an entity does not write it, the
+version does not move, a value can be cleared, and Bean Validation constraints on `name` see the real value.
+
+**The setter has to null the ciphertext.** The persistence provider dirty-checks mapped attributes only; it never
+sees a change to a `@Transient` field. Nulling `nameEnc__` is what makes the change visible, so that `@PreUpdate`
+runs and re-encrypts. Write this setter by hand — a generated one (Lombok's `@Setter`, an IDE's) is not enough. The
+module proves it at startup: it calls the setter on a throwaway instance, and rejects the mapping if the setter is
+missing or does not null the ciphertext.
+
+**Change the value through the setter, never the field.** A direct write to `name` is kept only if the instance is
+flushed for another reason anyway (another attribute changed); otherwise it is lost. An unchanged value is never
+re-encrypted.
+
+**`merge()` does not copy a transient field.** Merging a detached instance whose plaintext changed keeps the managed
+instance's old value — Jakarta Persistence merges persistent state only. Set the value on the instance `merge()`
+returns:
+
+```java
+em.merge(detached).setName(detached.getName());
+```
+
+## Mode A: encrypting existing data
+
+```java
+@EncryptedEntity
+@EntityListeners(EntityEncryptionListener.class)
+@Entity
+class User {
+
+    @EncryptedAttribute
+    @Column(name = "name", insertable = false) // the existing column, kept; nullable and updatable
+    private String name;
+
+    @Column(name = "name_enc")
+    private byte[] nameEnc__;                  // added
+}
+```
+
+The existing column doubles as the legacy column, so encryption can be introduced on a table which already holds
+plaintext, with no separate tool and no write freeze. Measured on both providers
+(`__EncryptionLifecycle_Test.observeLegacyRowMigration`):
+
+| row                                   | on read (`@PostLoad`)                    | on the next write                                          |
+|---------------------------------------|------------------------------------------|------------------------------------------------------------|
+| legacy: plaintext, no ciphertext      | left alone; the application reads it     | encrypted; the `UPDATE` stores the ciphertext and nulls the plaintext column |
+| migrated: no plaintext, ciphertext    | decrypted                                | re-encrypted                                               |
+
+A row which is never written again stays plaintext; migrate the rest with a batch, a chunk at a time:
+
+```java
+var entity = em.find(User.class, id); // a legacy row: left as plaintext
+service.encrypt(entity);              // now dirty; @PreUpdate then sees it already encrypted
+// commit, em.clear(), next chunk
+```
+
+This relies on the plaintext column being updatable, which is why that is required ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)). Nulling the column
+does not erase the plaintext from backups, logs, replicas or indexes; scrubbing those is the application's.
+
+### What Mode A costs
+
+The plaintext is a *mapped* attribute, and a JPA listener can only keep its value out of the row by nulling the field.
+These follow, and cannot be fixed inside the standard callbacks; Mode B has none of them.
+
+* **Reading an entity writes it.** `@PostLoad` runs after the provider has taken its loaded-state snapshot, so moving
+  the value between the two mapped attributes leaves the instance dirty from the moment it is read. Measured on both
+  providers: a transaction which only reads still issues an `UPDATE`, increments `@Version`, and — encryption being
+  randomized — rewrites the ciphertext with a fresh IV. Optimistic locking is unusable, every read shows up in
+  replication, CDC and audit, and a read-only connection fails.
+* **The instance is emptied by `persist()` and by every flush.** Right after `em.persist(entity)` returns, and after
+  every flush, the application's own object reads back `null` for every encrypted attribute.
+* **A value cannot be cleared through the plaintext.** With the plaintext `null` and the ciphertext present, encrypting
+  reads that as "already encrypted"; clear the ciphertext attribute as well.
+* **No Bean Validation constraint** may sit on the plaintext: Jakarta Persistence validates after encrypting has nulled
+  it ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
+* **The insert window.** `@PrePersist` fires when `persist()` is called, not when the `INSERT` is built. The plaintext
+  column has to be `insertable = false` (enforced), which guarantees *INSERT confidentiality only*:
+
+  | after `persist()`, the application sets the plaintext again | Hibernate 7.4                            | EclipseLink 5.0                     |
+  |-------------------------------------------------------------|------------------------------------------|-------------------------------------|
+  | plain `@Column`                                              | not written (an `UPDATE` re-encrypts it) | **written, and left, in the clear** |
+  | `@Column(insertable = false)`                                | not written                              | not written                         |
+
+  On EclipseLink the late assignment is *dropped* rather than stored. **Do not modify an encrypted attribute between
+  `persist()` and the flush.**
+
+## Switching from A to B
+
+Per entity, when its team is ready — nothing forces it:
+
+1. Let rows migrate as they are written, and run the batch above for the rest.
+2. Check that none is left: `service.countUnmigrated(User.class)` counts the rows still holding plaintext and no
+   ciphertext. Run it while the entity is still in Mode A.
+3. When it returns `0`: replace `@Column(insertable = false)` on the plaintext with `@Transient`, and add the
+   invalidating setter. Nothing else changes; no data moves, and the ciphertext column is already full.
+4. The old plaintext column is left over: it has to stay nullable (unmapped, it is never written) and lose any `UNIQUE`
+   constraint. Drop it whenever convenient.
+
+Mixing the two during a rolling deploy works, and so does rolling back: a row written in either mode reads in the
+other (measured on both providers, `__ModeB_Test`). Mode B cannot see a row which still holds plaintext only — which
+is why step 2 comes first.
+
+## Wiring
+
+Register `EntityEncryptionListener` itself, the way Spring Data JPA's `AuditingEntityListener` is registered; no
+subclass is needed. It encrypts on `@PrePersist` and `@PreUpdate`, before the statement is built, and decrypts on
+`@PostLoad` ([#5](https://github.com/jinahya/jinahya-persistence/issues/5)). Its `AbstractEntityEncryptionService` comes from CDI: injected when the persistence provider
+creates listeners through a `BeanManager`, looked up from `CDI.current()` otherwise. Provide the service as a CDI bean
+(a subclass of `AbstractEntityEncryptionService`, with an `EntityEncryptionManager`).
+
+**Never encrypt from `@PostPersist` or `@PostUpdate`** — the row is already written by the time the post-callbacks
+run.
+
+**A subclass has to re-declare every callback it wants.** Neither Hibernate ORM nor EclipseLink invokes a callback
+annotation inherited from a listener's superclass (measured on both). A subclass which only overrides
+`getEncryptionService()` — to supply the service without CDI, say — encrypts nothing unless it also re-declares
+`@PrePersist`, `@PreUpdate` and `@PostLoad` methods which call `super`.
 
 ## Constraints
 
-Every annotated attribute of a managed type is validated once, in full, **before any instance is touched**, so an
-inconsistent mapping cannot leave an instance half-encrypted. Each encrypt and decrypt is then **all-or-nothing** per
-instance: every value is computed before any is assigned, so a value which fails part-way (an unencodable string, an
-unreadable ciphertext, a failing manager) leaves the instance as it was
-([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). Under CDI, the service validates **every** entity of
-its persistence unit at startup (`AbstractEntityEncryptionService.validateMappings()`, called from `onStartup`), so an
-invalid mapping fails the deployment rather than its first use; all failures are reported at once
-([#74](https://github.com/jinahya/jinahya-persistence/issues/74)). Outside a container, call `validateMappings()`
-yourself. A mapping which breaks any of these is rejected:
+Every mapping is validated in full **before any instance is touched**; under CDI, every entity of the persistence unit
+is validated at startup (`AbstractEntityEncryptionService.validateMappings()`, called from `onStartup`), and all
+failures are reported at once ([#74](https://github.com/jinahya/jinahya-persistence/issues/74)). Outside a container, call `validateMappings()` yourself. Each encrypt and
+decrypt is **all-or-nothing** per instance: every value is computed before any is assigned ([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). A mapping which
+breaks any of these is rejected:
 
-* Only `@Basic` mappings are supported; `@Embedded` attributes are descended into. An annotated attribute which is
-  neither is an error, not something skipped.
-* Source (decrypted, plain) attributes must be `optional`, must not be of a primitive type, and their column must be
-  **non-insertable**, nullable and **updatable**: a legacy row (plaintext, no ciphertext) is migrated by the `UPDATE`
-  which stores its ciphertext, and only that `UPDATE` nulls the plaintext column
-  ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)).
-* Target (encrypted) attributes must be `optional`, `@Basic`, typed `byte[]`, paired only once, and their column must
-  be insertable, updatable and nullable.
-* An `@Embedded` attribute may not itself be annotated; annotate the attributes inside the embeddable.
-* Neither side may be an identifier or a version attribute, and the ciphertext attribute may not itself be annotated.
-* The plaintext attribute may not carry a Bean Validation constraint (`@NotNull`, `@Size`, `@Pattern`, …, on its
-  field or getter). Jakarta Persistence validates *after* `@PrePersist`/`@PreUpdate`, by which time encrypting has
-  cleared the plaintext, so such a constraint is evaluated against `null`: it fails every write, or passes vacuously.
-  Validate the value before persisting; the transient-plaintext mode
-  ([#82](https://github.com/jinahya/jinahya-persistence/issues/82)) will support it
-  ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
-* The plaintext attribute's declared java type must have a codec (see [Encoding](#encoding)).
-* An entity class with encrypted attributes must be annotated with `@EncryptedEntity` (directly or by inheritance);
-  a forgotten annotation is rejected, not skipped
-  ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)). An entity with no encrypted attribute, and no
-  annotation, passes through untouched — the service enforces this itself, not only the listener.
-* `@EncryptedAttribute` may only be placed on a persistent attribute's member — not on a `@Transient` or unmapped
-  member, nor on the side the access type does not read (a field under property access)
-  ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)).
-* An embeddable reached through an `@ElementCollection` — as the element, or as a map key — may not hold an
-  `@EncryptedAttribute` at any depth: collections are not walked, so it would be persisted in the clear
-  ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)).
+| rule | A | B |
+|------|:-:|:-:|
+| the entity class is annotated `@EncryptedEntity`, directly or by inheritance; a forgotten annotation is rejected, not skipped; an entity with no encrypted attribute passes through untouched ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)) | ✓ | ✓ |
+| `@EncryptedAttribute` sits on a persistent attribute (A) or on a `@Transient` field (B); anywhere else — unmapped, a getter the access type does not read — is rejected ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)) | ✓ | ✓ |
+| the plaintext is `@Basic`, optional, not of a primitive type, neither an identifier nor a version | ✓ | ✓ |
+| the plaintext's declared java type has a codec (see [Encoding](#encoding)); for a member of a generic `@MappedSuperclass`, the type the entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) | ✓ | ✓ |
+| the plaintext column is **non-insertable**, nullable and **updatable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)) | ✓ | — (no column) |
+| no Bean Validation constraint on the plaintext ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)) | ✓ | — (allowed) |
+| a setter which also nulls the ciphertext, proven at startup | — | ✓ |
+| the ciphertext attribute exists, is `@Basic`, optional, typed `byte[]`, not an identifier or a version, not itself annotated, paired only once, and its column is insertable, updatable and nullable | ✓ | ✓ |
+| an `@Embedded` attribute is not itself annotated; annotate the attributes inside the embeddable, which are descended into | ✓ | ✓ |
+| an embeddable reached through an `@ElementCollection` — element or map key — holds no `@EncryptedAttribute` at any depth: collections are not walked ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)) | ✓ | ✓ |
 
-### How the column rules are established
+### How the column rules are established (Mode A)
 
 Jakarta Persistence exposes no portable accessor for effective per-column metadata: neither the metamodel,
 `PersistenceUnitUtil`, `SchemaManager` nor `EntityManagerFactory.getProperties()` reports whether a column is
@@ -137,112 +246,15 @@ This module moves values between the plaintext and the ciphertext; it imposes no
 
 ## Not supported
 
-* **Bulk JPQL `UPDATE`/`DELETE`** bypass entity callbacks entirely and leave managed state unsynchronized. Do not
-  assign an encrypted attribute in bulk DML; predicates and orderings against a plaintext column match what is
-  *stored*, which is `NULL`.
+* **Querying an encrypted attribute.** The database holds only ciphertext: predicates and orderings against a Mode A
+  plaintext column match what is *stored*, which is `NULL`; a Mode B plaintext is not mapped at all, so JPQL naming it
+  is rejected.
+* **Bulk JPQL `UPDATE`/`DELETE`** bypass entity callbacks entirely and leave managed state unsynchronized.
 * **Scalar projections** do not load entities, so nothing decrypts them.
 * **Collections and associations.** Only `@Basic` and `@Embedded` are walked; an encrypted embeddable inside an
-  `@ElementCollection` is not covered, and is rejected
-  ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)); cascaded entities need their own listener
-  registration.
+  `@ElementCollection` is rejected ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)); cascaded entities need their own listener registration.
 * **The shared (second-level) cache.** The test persistence units set `shared-cache-mode` to `NONE`; nothing here is
   proven against a cache hit.
-* **Setting an already-encrypted attribute to `null`.** With the plaintext `null` and the ciphertext present,
-  `encrypt()` reads that as "already encrypted" and leaves it alone, so an erasure cannot be expressed that way.
-  Clear the ciphertext attribute as well.
-
-## Wiring
-
-Register `EntityEncryptionListener` itself, the way Spring Data JPA's `AuditingEntityListener` is registered; no
-subclass is needed:
-
-```java
-@EncryptedEntity
-@EntityListeners(EntityEncryptionListener.class)
-@Entity
-class MyEntity { ... }
-```
-
-It encrypts on `@PrePersist` and `@PreUpdate`, before the statement is built, and decrypts on `@PostLoad`
-([#5](https://github.com/jinahya/jinahya-persistence/issues/5)). Its `AbstractEntityEncryptionService` comes from
-CDI: injected when the persistence provider creates listeners through a `BeanManager`, looked up from `CDI.current()`
-otherwise. Provide the service as a CDI bean (a subclass of `AbstractEntityEncryptionService`, with an
-`EntityEncryptionManager`).
-
-**Never encrypt from `@PostPersist` or `@PostUpdate`** — the row is already written by the time the post-callbacks
-run, so encrypting there stores nothing.
-
-**A subclass has to re-declare every callback it wants.** Neither Hibernate ORM nor EclipseLink invokes a callback
-annotation inherited from a listener's superclass (measured on both). A subclass which only overrides
-`getEncryptionService()` — to supply the service without CDI, say — encrypts nothing unless it also re-declares
-`@PrePersist`, `@PreUpdate` and `@PostLoad` methods which call `super`.
-
-That is necessary but not sufficient. `__EncryptionLifecycle_Test` measures what the providers actually do, and two
-things do not follow from the callbacks alone.
-
-### Declare the plaintext column `insertable = false` (enforced)
-
-`@PrePersist` fires when `persist()` is called, **not** when the `INSERT` is built, and Jakarta Persistence has no
-callback in between. Anything assigned to an encrypted attribute after `persist()` is therefore unencrypted when the
-statement is built:
-
-| after `persist()`, the application sets the plaintext again | Hibernate 7.4                            | EclipseLink 5.0                     |
-|-------------------------------------------------------------|------------------------------------------|-------------------------------------|
-| plain `@Column`                                              | not written (an `UPDATE` re-encrypts it) | **written, and left, in the clear** |
-| `@Column(insertable = false)`                                | not written                              | not written                         |
-
-Declaring the plaintext column `insertable = false` closes it on every provider, and the mapping is now rejected
-without it. That guarantees **INSERT confidentiality only.** On EclipseLink the late assignment is then *dropped*
-rather than stored — only one `INSERT` is issued, so no `@PreUpdate` runs to re-encrypt it, and the row keeps the
-ciphertext of the earlier value. **Do not modify an encrypted attribute between `persist()` and the flush.**
-
-### Reading an entity writes it
-
-`@PostLoad` runs after the provider has taken its loaded-state snapshot, so moving the value between the two *mapped*
-attributes leaves the instance dirty from the moment it is read. Measured on both providers: a transaction which only
-reads still issues an `UPDATE`, increments `@Version`, and — encryption being randomized — rewrites the ciphertext
-with a fresh IV.
-
-Consequences: optimistic locking is unusable, every read shows up in replication, CDC and audit, and a read-only
-connection fails. There is no fix inside the standard callbacks while the plaintext is a *mapped* attribute. The
-providers' own pre-statement hooks (`org.hibernate.event.spi.PreLoadEventListener`, EclipseLink
-`DescriptorEventListener.postBuild`) operate on the row before the snapshot and do not have this problem, but they are
-not portable. The portable fix is to stop mapping the plaintext: Mode B
-([#82](https://github.com/jinahya/jinahya-persistence/issues/82)).
-
-### The instance is emptied by `persist()` and by every flush
-
-Encrypting nulls the plaintext attribute, and `@PrePersist` encrypts when `persist()` is called. So right after
-`em.persist(entity)` returns — and after every flush — the application's own object reads back `null` for every
-encrypted attribute. Decrypting again from `@PostPersist`/`@PostUpdate` restores it, at the cost of dirtying the
-instance once more.
-
-ALE requires the plaintext to stay out of the *row*, not out of the object; nulling the field is only how a JPA
-listener keeps it out of the row while the plaintext is mapped. Mode B
-([#82](https://github.com/jinahya/jinahya-persistence/issues/82)) keeps the plaintext in the object.
-
-## Migrating existing plaintext rows
-
-The plaintext column doubles as the legacy column, so encryption can be introduced on a table which already holds
-plaintext, with no separate tool and no write freeze. Measured on both providers
-(`__EncryptionLifecycle_Test.observeLegacyRowMigration`):
-
-| row                                   | on read (`@PostLoad`)                    | on the next write                                          |
-|---------------------------------------|------------------------------------------|------------------------------------------------------------|
-| legacy: plaintext, no ciphertext      | left alone; the application reads it     | encrypted; the `UPDATE` stores the ciphertext and nulls the plaintext column |
-| migrated: no plaintext, ciphertext    | decrypted                                | re-encrypted                                               |
-
-A row which is never written again stays plaintext; migrate the rest with a batch, a chunk at a time:
-
-```java
-var entity = em.find(MyEntity.class, id); // a legacy row: left as plaintext
-service.encrypt(entity);                   // now dirty; @PreUpdate then sees it already encrypted
-// commit, em.clear(), next chunk
-```
-
-This relies on the plaintext column being updatable, which is why that is required
-([#73](https://github.com/jinahya/jinahya-persistence/issues/73)). Nulling the column does not erase the plaintext
-from backups, logs, replicas or indexes; scrubbing those is the application's.
 
 ## Encoding
 
