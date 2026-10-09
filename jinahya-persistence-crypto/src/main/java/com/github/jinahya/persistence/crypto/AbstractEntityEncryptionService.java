@@ -69,7 +69,7 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.short_2;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_date_8;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_12;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.string_;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_calendar_8;
 import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_date_8;
@@ -880,7 +880,7 @@ public abstract class AbstractEntityEncryptionService {
                 } else if (javaType == Year.class) {
                     decryptedBytes = year_4((Year) decryptedValue);
                 } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                    decryptedBytes = sql_timestamp_16((java.sql.Timestamp) decryptedValue);
+                    decryptedBytes = sql_timestamp_12((java.sql.Timestamp) decryptedValue);
                 } else if (javaType == java.sql.Date.class) {      // before java.util.Date
                     decryptedBytes = sql_date_8((java.sql.Date) decryptedValue);
                 } else if (javaType == java.sql.Time.class) {      // before java.util.Date
@@ -1104,7 +1104,7 @@ public abstract class AbstractEntityEncryptionService {
                 } else if (javaType == Year.class) {
                     decryptedValue = year_4(decryptedBytes);
                 } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                    decryptedValue = sql_timestamp_16(decryptedBytes);
+                    decryptedValue = sql_timestamp_12(decryptedBytes);
                 } else if (javaType == java.sql.Date.class) {      // before java.util.Date
                     decryptedValue = sql_date_8(decryptedBytes);
                 } else if (javaType == java.sql.Time.class) {      // before java.util.Date

@@ -201,8 +201,8 @@ Every fixed-width decoder reads a payload of **exactly** its width, and rejects 
 ([#76](https://github.com/jinahya/jinahya-persistence/issues/76)); a variable-width one rejects what it cannot read.
 The checks are unconditional, not `assert`s.
 
-> **The format is not final.** Before a release that stores data, the rest of the revision lands: the per-codec items
-> marked below.
+The codecs and the header are format version `1`. A change to any of them from now on is a format change: a new
+version, which a reader of this version rejects.
 
 | attribute              | bytes      | encoding                                                    |
 |------------------------|------------|-------------------------------------------------------------|
@@ -229,7 +229,7 @@ The checks are unconditional, not `assert`s.
 | `java.util.Calendar`   | `8`        | `getTime().getTime()`(`Long`); the time zone is not stored ([#11](https://github.com/jinahya/jinahya-persistence/issues/11)) |
 | `java.sql.Date`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Time`        | `8`        | `getTime()`(`Long`)                                         |
-| `java.sql.Timestamp`   | `16`       | `toInstant()`(`Instant`, `12`) + `4` zero bytes ([#80](https://github.com/jinahya/jinahya-persistence/issues/80)) |
+| `java.sql.Timestamp`   | `12`       | `toInstant()`(`Instant`) ([#80](https://github.com/jinahya/jinahya-persistence/issues/80)) |
 | `byte[]`               | `length`   | as is                                                       |
 | `Byte[]`               | `length`   | unboxed; use `byte[]` instead                               |
 | `char[]`               | `2×length` | each `char` big endian                                      |

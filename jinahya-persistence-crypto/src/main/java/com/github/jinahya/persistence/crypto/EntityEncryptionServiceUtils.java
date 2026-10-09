@@ -1288,10 +1288,10 @@ final class EntityEncryptionServiceUtils {
      *         of the {@code java.time} API.
      */
     @Deprecated
-    private static byte[] sql_timestamp_16(final byte[] b, final int i, final java.sql.Timestamp v) {
+    private static byte[] sql_timestamp_12(final byte[] b, final int i, final java.sql.Timestamp v) {
         assert b != null;
         assert i >= 0;
-        assert i + 16 <= b.length;
+        assert i + Long.BYTES + Integer.BYTES <= b.length;
         assert v != null;
         return instant_12(b, i, v.toInstant());
     }
@@ -1308,10 +1308,10 @@ final class EntityEncryptionServiceUtils {
      *         of the {@code java.time} API.
      */
     @Deprecated
-    private static java.sql.Timestamp sql_timestamp_16(final byte[] b, final int i) {
+    private static java.sql.Timestamp sql_timestamp_12(final byte[] b, final int i) {
         assert b != null;
         assert i >= 0;
-        assert i + 16 <= b.length;
+        assert i + Long.BYTES + Integer.BYTES <= b.length;
         return Timestamp.from(instant_12(b, i));
     }
 
@@ -1326,8 +1326,8 @@ final class EntityEncryptionServiceUtils {
      *         of the {@code java.time} API.
      */
     @Deprecated
-    static byte[] sql_timestamp_16(final java.sql.Timestamp v) {
-        return sql_timestamp_16(new byte[16], 0, v);
+    static byte[] sql_timestamp_12(final java.sql.Timestamp v) {
+        return sql_timestamp_12(new byte[Long.BYTES + Integer.BYTES], 0, v);
     }
 
     /**
@@ -1341,8 +1341,8 @@ final class EntityEncryptionServiceUtils {
      *         of the {@code java.time} API.
      */
     @Deprecated
-    static java.sql.Timestamp sql_timestamp_16(final byte[] b) {
-        return sql_timestamp_16(exactly(b, 16), 0);
+    static java.sql.Timestamp sql_timestamp_12(final byte[] b) {
+        return sql_timestamp_12(exactly(b, Long.BYTES + Integer.BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------------------------- byte[]
@@ -1642,7 +1642,7 @@ final class EntityEncryptionServiceUtils {
         OFFSET_DATE_TIME_20(17),
         INSTANT_12(18),
         YEAR_4(19),
-        SQL_TIMESTAMP_16(20),
+        SQL_TIMESTAMP_12(20),
         SQL_DATE_8(21),
         SQL_TIME_8(22),
         UTIL_CALENDAR_8(23),
@@ -1725,7 +1725,7 @@ final class EntityEncryptionServiceUtils {
         } else if (javaType == Year.class) {
             return Codec.YEAR_4;
         } else if (javaType == java.sql.Timestamp.class) {
-            return Codec.SQL_TIMESTAMP_16;
+            return Codec.SQL_TIMESTAMP_12;
         } else if (javaType == java.sql.Date.class) {
             return Codec.SQL_DATE_8;
         } else if (javaType == java.sql.Time.class) {
