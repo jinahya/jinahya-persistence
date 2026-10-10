@@ -235,7 +235,9 @@ class ___MappedTemporalInterval_PersistenceTest {
         @DisplayName("the containment this package is stored for runs in SQL, absent bounds included")
         @Test
         void _containment_inSql() {
-            // EclipseLink 5.0.1 gets a LocalTime *parameter* wrong: the bound value reaches the database as a
+            // EclipseLink 5.0.1 and 5.0.2 get a LocalTime *parameter* wrong (fixed by
+            // https://github.com/eclipse-ee4j/eclipselink/pull/2908, first in 5.0.3-RC1, where this test passes; drop
+            // this assumption once the build is on 5.0.3): the bound value reaches the database as a
             // minimum-date timestamp, so a TIME column compares above it and the predicate matches every row. The
             // column itself is mapped correctly here (INFORMATION_SCHEMA reports TIME), which is what separates this
             // from https://github.com/eclipse-ee4j/eclipselink/issues/1544 -- that one was the column's DDL, on
