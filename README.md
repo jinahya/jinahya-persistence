@@ -40,9 +40,9 @@ platform out from under the implementations.
 
 | Spec | Version from the EE 11 BOM | Implementation | In this build | Latest released | Status |
 | --- | --- | --- | --- | --- | --- |
-| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | Hibernate ORM (`hibernate-core`) | 7.4.9.Final | 7.4.9.Final | current — latest stable series for JPA 3.2 / EE 11 |
-| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | EclipseLink (`org.eclipse.persistence.jpa`) | 5.0.1 | 5.0.1 | current — 5.0 is certified for JPA 3.2 / EE 11 |
-| Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Hibernate Validator | 9.1.3.Final | 9.1.3.Final | current |
+| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | Hibernate ORM (`hibernate-core`) | 7.4.12.Final | 7.4.12.Final | current — latest stable series for JPA 3.2 / EE 11 |
+| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | EclipseLink (`org.eclipse.persistence.jpa`) | 5.0.2 | 5.0.2 | current — 5.0 is certified for JPA 3.2 / EE 11 |
+| Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Hibernate Validator | 9.1.4.Final | 9.1.4.Final | current |
 | Jakarta Expression Language 6.0 | `jakarta.el-api` 6.0.1 | Expressly (required by Hibernate Validator) | 6.0.0 | 6.0.0 | current |
 | Jakarta CDI 4.1 | `jakarta.enterprise.cdi-api` 4.1.0 | Weld, via `weld-junit5` | weld-junit5 5.0.3.Final → weld-se-core 6.0.3.Final | weld-junit5 5.0.3.Final (Weld 6.0.4.Final) | current — `weld-junit5` 5.0.3 pins Weld 6.0.3 |
 
