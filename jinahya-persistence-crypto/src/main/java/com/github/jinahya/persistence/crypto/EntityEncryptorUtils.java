@@ -37,13 +37,13 @@ import java.util.UUID;
  * be reconstructed from its bytes without consulting the database.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see AbstractEntityEncryptionService
+ * @see EntityEncryptor
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101"  // Class names should comply with a naming convention
 })
-final class EntityEncryptionServiceUtils {
+final class EntityEncryptorUtils {
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -1776,7 +1776,7 @@ final class EntityEncryptionServiceUtils {
      *
      * @param javaType the declared java type of an attribute.
      * @return the codec for the {@code javaType}; {@code null} when the type is not supported.
-     * @implNote The order of the checks is the order of the codec ladders in {@link AbstractEntityEncryptionService}:
+     * @implNote The order of the checks is the order of the codec ladders in {@link EntityEncryptor}:
      *         {@code java.sql} types before {@link java.util.Date}, and {@link Serializable} last.
      */
     static @Nullable Codec codecOf(final Class<?> javaType) {
@@ -1902,7 +1902,7 @@ final class EntityEncryptionServiceUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private EntityEncryptionServiceUtils() {
+    private EntityEncryptorUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

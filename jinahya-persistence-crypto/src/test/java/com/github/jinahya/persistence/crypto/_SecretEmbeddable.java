@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable;
 
 /**
  * An embeddable which holds an {@link EncryptedAttribute encrypted attribute} of its own, for verifying that
- * {@link AbstractEntityEncryptionService} descends into {@code EMBEDDED} attributes.
+ * {@link EntityEncryptor} descends into {@code EMBEDDED} attributes.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

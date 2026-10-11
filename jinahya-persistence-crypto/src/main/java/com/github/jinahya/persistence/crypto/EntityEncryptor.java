@@ -1,11 +1,6 @@
 package com.github.jinahya.persistence.crypto;
 
 import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.event.Shutdown;
-import jakarta.enterprise.event.Startup;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManagerFactory;
@@ -45,48 +40,50 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.Bytes_l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.Characters_2l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.big_decimal_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.big_integer_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.boolean_1;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.byte_1;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.char_2;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.chars_2l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.double_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.enum_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.float_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.instant_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.int_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_date_time_16;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.long_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_date_time_20;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_time_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.serializable_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.short_2;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.string_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_calendar_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.uuid_16;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.year_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.Bytes_l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.Characters_2l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.big_decimal_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.big_integer_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.boolean_1;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.byte_1;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.char_2;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.chars_2l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.double_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.enum_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.float_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.instant_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.int_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_date_time_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_time_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.long_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_date_time_20;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.serializable_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.short_2;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_time_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_timestamp_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.string_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.util_calendar_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.util_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.uuid_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.year_4;
 
 /**
- * An abstract service which encrypts and decrypts the {@link EncryptedAttribute annotated attributes} of an entity
- * instance, in place.
+ * Encrypts and decrypts the {@link EncryptedAttribute encrypted attributes} of entity instances, in place, through an
+ * {@link EntityEncryptionService}: the mechanism behind {@link EntityEncryptionListener}, internal to this package.
  * <p>
- * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each {@code byte[]}
- * attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}, and the plaintext it names — a {@code BASIC}
- * attribute (Mode A), or a {@link jakarta.persistence.Transient @Transient} field (Mode B):
+ * It decides nothing about keys, cryptography or the container: the persistence unit, the identifier and the bytes all
+ * come from the {@link EntityEncryptionService}. It reads the entity's {@link ManagedType managedType} from the
+ * metamodel, and for each {@code byte[]} attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}, and
+ * the plaintext it names — a {@code BASIC} attribute (Mode A), or a {@link jakarta.persistence.Transient @Transient}
+ * field (Mode B):
  * <ol>
  *   <li>converts the plaintext value to bytes, by its declared java type, prefixed with a header naming the format
  *       version and the codec;</li>
- *   <li>hands those bytes to the {@link EntityEncryptionManager encryptionManager}, along with the
- *       {@link EntityEncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
+ *   <li>hands those bytes to the {@link EntityEncryptionService encryption service}, along with the
+ *       {@link EntityEncryptionService#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
  *   <li>stores the ciphertext in the annotated attribute; in Mode A, it also clears the plaintext, which
  *       is mapped. In Mode B nothing mapped is ever cleared, and an unchanged plaintext is not re-encrypted.</li>
  * </ol>
@@ -94,8 +91,8 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
  * attributes of an embeddable are covered as well.
  * <p>
  * The mapping of a type is validated in full before any instance of it is touched, and every mapping of the
- * persistence unit at {@link #onStartup(Startup) startup}, or by {@link #validateMappings()}. Each encrypt and decrypt
- * is all-or-nothing per instance: every value is computed before any is assigned.
+ * persistence unit by {@link #validateMappings()}. Each encrypt and decrypt is all-or-nothing per instance: every value
+ * is computed before any is assigned.
  * <p>
  * The java types handled are those Jakarta Persistence calls basic types: the primitives and their wrappers,
  * {@link String}, {@link BigInteger}, {@link BigDecimal}, the {@code java.time} types, {@link java.util.Date},
@@ -103,7 +100,7 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
  * {@link Serializable}. A mapping of any other type is rejected when it is validated.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see EntityEncryptionManager
+ * @see EntityEncryptionService
  * @see EntityEncryptionListener
  * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486">2.6. Basic
  *         Types</a> (Jakarta Persistence 3.2 Specification Document)
@@ -111,7 +108,7 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class AbstractEntityEncryptionService {
+class EntityEncryptor {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -127,7 +124,7 @@ public abstract class AbstractEntityEncryptionService {
      * @implNote The cache belongs to this instance. A cache shared across the JVM would hand one persistence
      *         unit's metadata to another which happens to manage a class of the same name.
      */
-    protected Map<String, Attribute<?, ?>> getAttributes(final ManagedType<?> managedType) {
+    private Map<String, Attribute<?, ?>> getAttributes(final ManagedType<?> managedType) {
         Objects.requireNonNull(managedType, "managedType is null");
         return managedTypesAndAttributes.computeIfAbsent(
                 managedType,
@@ -145,51 +142,36 @@ public abstract class AbstractEntityEncryptionService {
     /**
      * Creates a new instance.
      *
-     * @param entityManagerFactory    an entity manager factory; must not be {@code null}.
-     * @param entityEncryptionManager the encryption manager; must not be {@code null}.
-     * @implNote The service caches the metadata of the {@code entityManagerFactory}, and never evicts it: it is meant to
-     *         live exactly as long as that factory, an application-scoped bean, and not to outlive it.
+     * @param encryptionService the encryption service everything comes from; must not be {@code null}.
+     * @implNote The entity manager factory is not resolved here, but on first use: the listener creating this
+     *         instance may itself be created while the factory is still being built. The metadata of that factory is
+     *         then cached, and never evicted: an instance is meant to live exactly as long as its factory.
      */
-    protected AbstractEntityEncryptionService(final EntityManagerFactory entityManagerFactory,
-                                              final EntityEncryptionManager entityEncryptionManager) {
+    EntityEncryptor(final EntityEncryptionService encryptionService) {
         super();
-        this.entityManagerFactory = Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
-        this.entityEncryptionManager =
-                Objects.requireNonNull(entityEncryptionManager, "entityEncryptionManager is null");
+        this.encryptionService = Objects.requireNonNull(encryptionService, "encryptionService is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
-     * Called after this instance has been constructed and its injection points have been satisfied.
+     * Returns the entity manager factory of the {@link EntityEncryptionService encryption service}.
      *
-     * @implSpec The implementation of this class only logs.
+     * @return the entity manager factory.
+     * @throws RuntimeException when the encryption service returns {@code null}.
      */
-    @PostConstruct
-    protected void onPostConstruct() {
-        logger.log(System.Logger.Level.DEBUG, "onPostConstruct()");
-        logger.log(System.Logger.Level.DEBUG, "encryptionManager: {0}", entityEncryptionManager.getClass().getName());
-    }
-
-    // https://stackoverflow.com/a/72628439/330457
-
-    /**
-     * Observes the CDI container {@link Startup} event.
-     *
-     * @param startup the observed event.
-     * @implSpec The implementation of this class {@link #validateMappings() validates every mapping}, so that an
-     *         invalid one fails the deployment rather than its first use. A subclass which overrides this method, and
-     *         does not call {@code super}, opts out of that.
-     */
-    protected void onStartup(@Observes final Startup startup) {
-        logger.log(System.Logger.Level.DEBUG, "onStartup({0})", startup);
-        validateMappings();
+    private EntityManagerFactory entityManagerFactory() {
+        final var entityManagerFactory = encryptionService.getEntityManagerFactory();
+        if (entityManagerFactory == null) {
+            throw new RuntimeException(
+                    "encryption service returned a null entity manager factory; service: "
+                    + encryptionService.getClass().getName());
+        }
+        return entityManagerFactory;
     }
 
     /**
-     * Validates, up front, the mapping of every entity of this service's persistence unit.
+     * Validates, up front, the mapping of every entity of the encryption service's persistence unit.
      * <p>
      * Without it, a mapping is validated on its first {@link #encrypt(Object) encrypt} or {@link #decrypt(Object)
      * decrypt}, so an entity on a rare code path fails only when that path runs, in production. Valid mappings are
@@ -198,9 +180,9 @@ public abstract class AbstractEntityEncryptionService {
      * @throws RuntimeException when any mapping is invalid; its message lists every invalid entity, and each failure
      *                          is attached as {@link Throwable#getSuppressed() suppressed}.
      */
-    public void validateMappings() {
+    void validateMappings() {
         final var failures = new ArrayList<RuntimeException>();
-        for (final var entityType : entityManagerFactory.getMetamodel().getEntities()) {
+        for (final var entityType : entityManagerFactory().getMetamodel().getEntities()) {
             final var type = entityType.getJavaType();
             if (type == null) {
                 continue; // a dynamic entity has no java class to read annotations from
@@ -221,28 +203,6 @@ public abstract class AbstractEntityEncryptionService {
         final var exception = new RuntimeException(message.toString());
         failures.forEach(exception::addSuppressed);
         throw exception;
-    }
-
-    /**
-     * Called before this instance is destroyed.
-     *
-     * @implSpec The implementation of this class only logs.
-     */
-    @PreDestroy
-    protected void onPreDestroy() {
-        logger.log(System.Logger.Level.DEBUG, "onPreDestroy()");
-    }
-
-    // https://stackoverflow.com/a/72628439/330457
-
-    /**
-     * Observes the CDI container {@link Shutdown} event.
-     *
-     * @param shutdown the observed event.
-     * @implSpec The implementation of this class only logs.
-     */
-    protected void onShutdown(@Observes final Shutdown shutdown) {
-        logger.log(System.Logger.Level.DEBUG, "onShutdown({0})", shutdown);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -374,7 +334,7 @@ public abstract class AbstractEntityEncryptionService {
         for (final var attribute : getAttributes(managedType).values()) {
             if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED) {
                 final var found = findEncryptedMember(
-                        entityManagerFactory.getMetamodel().managedType(attribute.getJavaType()), visited);
+                        entityManagerFactory().getMetamodel().managedType(attribute.getJavaType()), visited);
                 if (found != null) {
                     return found;
                 }
@@ -516,7 +476,7 @@ public abstract class AbstractEntityEncryptionService {
     /**
      * Whether a mapping fact holds, does not hold, or could not be established.
      */
-    protected enum MappingFlag {
+    enum MappingFlag {
 
         /**
          * The fact holds.
@@ -542,7 +502,7 @@ public abstract class AbstractEntityEncryptionService {
      * @param nullable   whether the column accepts {@code null}.
      * @param source     where the facts came from, for diagnostics; never a value.
      */
-    protected record ColumnRules(MappingFlag insertable, MappingFlag updatable, MappingFlag nullable, String source) {
+    record ColumnRules(MappingFlag insertable, MappingFlag updatable, MappingFlag nullable, String source) {
 
         /**
          * Creates a new instance.
@@ -551,12 +511,8 @@ public abstract class AbstractEntityEncryptionService {
          * @param updatable  whether the provider may write the column in an {@code UPDATE}.
          * @param nullable   whether the column accepts {@code null}.
          * @param source     where the facts came from, for diagnostics; never a value.
-         * @implNote The canonical constructor is {@code public} on purpose. A subclass in another package
-         *         inherits visibility of this nested type, but not access to a {@code protected} constructor of it, so
-         *         the hook would otherwise be impossible to implement outside this package — which is the whole point
-         *         of it.
          */
-        public ColumnRules {
+        ColumnRules {
             Objects.requireNonNull(insertable, "insertable is null");
             Objects.requireNonNull(updatable, "updatable is null");
             Objects.requireNonNull(nullable, "nullable is null");
@@ -577,17 +533,17 @@ public abstract class AbstractEntityEncryptionService {
      *         {@link Column @Column}, honouring the annotation defaults when neither is present. It never returns
      *         {@link MappingFlag#UNKNOWN UNKNOWN}.
      * @implNote The result is cached against the {@code (rootType, embeddingPath)} it was resolved for, so an
-     *         implementation has to be thread-safe, and has to return the same facts for the lifetime of this service:
+     *         implementation has to be thread-safe, and has to return the same facts for the lifetime of this instance:
      *         two threads may both miss the cache and call this method, and a later change of mind is never
      *         reconsidered. An implementation is trusted — returning {@link MappingFlag#NO NO} for a column which is in
      *         fact insertable authorizes a mapping which writes the plaintext.
      *         <p>
-     *         Jakarta Persistence exposes no portable accessor for effective per-column metadata, so an application
-     *         which maps in {@code orm.xml} has to override this method and state the facts its configuration
-     *         establishes, delegating everything else to {@code super}. A subclass which cannot establish a fact
-     *         returns {@link MappingFlag#UNKNOWN UNKNOWN}, and the mapping is rejected rather than assumed safe.
+     *         Jakarta Persistence exposes no portable accessor for effective per-column metadata, so the facts of a
+     *         mapping expressed in {@code orm.xml} are not visible here. Overridable within this package only: a way
+     *         for an application to state such facts is not offered at present. A subclass which cannot establish a
+     *         fact returns {@link MappingFlag#UNKNOWN UNKNOWN}, and the mapping is rejected rather than assumed safe.
      */
-    protected ColumnRules resolveColumnRules(final ManagedType<?> rootType,
+    ColumnRules resolveColumnRules(final ManagedType<?> rootType,
                                              final List<Attribute<?, ?>> embeddingPath,
                                              final Attribute<?, ?> attribute) {
         Objects.requireNonNull(rootType, "rootType is null");
@@ -696,7 +652,7 @@ public abstract class AbstractEntityEncryptionService {
                 final var childMapping = resolve(
                         rootType,
                         List.copyOf(childPath),
-                        entityManagerFactory.getMetamodel().managedType(attribute.getJavaType()),
+                        entityManagerFactory().getMetamodel().managedType(attribute.getJavaType()),
                         visiting
                 );
                 embeddeds.add(new Embedded(attribute, childMapping));
@@ -815,7 +771,7 @@ public abstract class AbstractEntityEncryptionService {
         // A member inherited from a generic superclass is declared as a type variable: resolve it against the
         // concrete class, or Base<String> would be encoded as its erasure, Object (#67)
         final var javaType = resolveJavaType(managedType.getJavaType(), decryptedAttribute);
-        final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+        final var codec = EntityEncryptorUtils.codecOf(javaType);
         if (codec == null) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "no codec for the declared java type " + javaType.getName());
@@ -905,7 +861,7 @@ public abstract class AbstractEntityEncryptionService {
             throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
                          "a decrypted attribute cannot be of a primitive type; it has no value when cleared");
         }
-        if (EntityEncryptionServiceUtils.codecOf(javaType) == null) {
+        if (EntityEncryptorUtils.codecOf(javaType) == null) {
             throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
                          "no codec for the declared java type " + javaType.getName());
         }
@@ -1190,7 +1146,7 @@ public abstract class AbstractEntityEncryptionService {
      *                          cannot be turned into bytes.
      * @see #encrypt(Object)
      */
-    protected void encrypt(final String encryptionIdentifier, final Object object) {
+    private void encrypt(final String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(getManagedType(resolveClass(object)));
@@ -1236,7 +1192,7 @@ public abstract class AbstractEntityEncryptionService {
                     // the invalidating setter nulls the ciphertext on a change; a ciphertext still present means the
                     // plaintext is unchanged -- unless it was written directly, which this compares for, so that the
                     // write is kept rather than lost, and an unchanged value is never re-encrypted with a new IV
-                    final var current = entityEncryptionManager.decrypt(encryptionIdentifier, ciphertext.clone());
+                    final var current = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
                     if (current != null && Arrays.equals(current, framed)) {
                         continue;
                     }
@@ -1363,15 +1319,15 @@ public abstract class AbstractEntityEncryptionService {
             );
         }
         // the header names the format version and the codec, so that a reader can tell what wrote the bytes
-        final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+        final var codec = EntityEncryptorUtils.codecOf(javaType);
         assert codec != null : "the ladder above handled a type codecOf does not know: " + javaType;
-        return EntityEncryptionServiceUtils.frame(codec, decryptedBytes);
+        return EntityEncryptorUtils.frame(codec, decryptedBytes);
     }
 
     private byte[] encryptFramed(final String encryptionIdentifier, final Pair pair, final byte[] framed) {
-        final var encrypted = entityEncryptionManager.encrypt(encryptionIdentifier, framed);
+        final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
         if (encrypted == null) {
-            throw new RuntimeException("encryptionManager returned null; decrypted attribute: " + pair.name());
+            throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
         }
         return encrypted;
     }
@@ -1389,7 +1345,7 @@ public abstract class AbstractEntityEncryptionService {
      * @throws IllegalArgumentException when the {@code entityClass} is not an entity of this service's persistence
      *                                  unit.
      */
-    public long countUnmigrated(final Class<?> entityClass) {
+    long countUnmigrated(final Class<?> entityClass) {
         Objects.requireNonNull(entityClass, "entityClass is null");
         if (!(getManagedType(entityClass) instanceof jakarta.persistence.metamodel.EntityType<?> entityType)) {
             throw new IllegalArgumentException("not an entity: " + entityClass);
@@ -1399,7 +1355,7 @@ public abstract class AbstractEntityEncryptionService {
         if (conditions.isEmpty()) {
             return 0L;
         }
-        try (var entityManager = entityManagerFactory.createEntityManager()) {
+        try (var entityManager = entityManagerFactory().createEntityManager()) {
             return entityManager.createQuery(
                     "SELECT COUNT(e) FROM " + entityType.getName() + " e WHERE " + String.join(" OR ", conditions),
                     Long.class).getSingleResult();
@@ -1428,10 +1384,10 @@ public abstract class AbstractEntityEncryptionService {
      * @throws RuntimeException when the manager returns {@code null}, or a blank identifier.
      */
     private String encryptionIdentifierOf(final Object object) {
-        final var identifier = entityEncryptionManager.getEncryptionIdentifier(object);
+        final var identifier = encryptionService.getEncryptionIdentifier(object);
         if (identifier == null || identifier.isBlank()) {
             throw new RuntimeException(
-                    "encryptionManager returned a " + (identifier == null ? "null" : "blank") + " encryption identifier"
+                    "encryption service returned a " + (identifier == null ? "null" : "blank") + " encryption identifier"
                     + "; entity: " + object.getClass().getName());
         }
         return identifier;
@@ -1463,15 +1419,15 @@ public abstract class AbstractEntityEncryptionService {
 
     /**
      * Encrypts the annotated attributes of the specified object, with the identifier the
-     * {@link EntityEncryptionManager encryptionManager} derives from it.
+     * {@link EntityEncryptionService encryption service} derives from it.
      *
      * @param object the entity instance to encrypt, in place; an instance of a class which has no encrypted attribute
      *               passes through untouched.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
-     * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
+     * @see EntityEncryptionService#getEncryptionIdentifier(Object)
      */
-    public void encrypt(final Object object) {
+    void encrypt(final Object object) {
         Objects.requireNonNull(object, "object is null");
         if (!hasEncryptedAttributes(object)) {
             return;
@@ -1489,7 +1445,7 @@ public abstract class AbstractEntityEncryptionService {
      *                          cannot be reconstructed from bytes.
      * @see #decrypt(Object)
      */
-    protected void decrypt(final String encryptionIdentifier, final Object object) {
+    private void decrypt(final String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(getManagedType(resolveClass(object)));
@@ -1533,9 +1489,9 @@ public abstract class AbstractEntityEncryptionService {
                 }
                 continue;
             }
-            final var framedBytes = entityEncryptionManager.decrypt(encryptionIdentifier, ciphertext.clone());
+            final var framedBytes = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
             if (framedBytes == null) {
-                throw new RuntimeException("encryptionManager returned null; decrypted attribute: " + pair.name());
+                throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
             }
             assignments.add(pair.setPlaintext(object, decode(pair, framedBytes)));
             if (!pair.isTransient()) {
@@ -1556,13 +1512,13 @@ public abstract class AbstractEntityEncryptionService {
         final Object decryptedValue;
         // the declared java type, for the same reason as in encode(...): the two ladders must agree on the type
         final var javaType = pair.javaType();
-        final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+        final var codec = EntityEncryptorUtils.codecOf(javaType);
         if (codec == null) {
             throw new RuntimeException("unsupported java type: " + javaType);
         }
         try {
             // checks the format version, and that the codec which wrote the bytes is the one which reads them
-            final var decryptedBytes = EntityEncryptionServiceUtils.unframe(codec, framedBytes);
+            final var decryptedBytes = EntityEncryptorUtils.unframe(codec, framedBytes);
             if (javaType == boolean.class || javaType == Boolean.class) {
                 decryptedValue = boolean_1(decryptedBytes);
             } else if (javaType == byte.class || javaType == Byte.class) {
@@ -1638,7 +1594,7 @@ public abstract class AbstractEntityEncryptionService {
         } catch (final IndexOutOfBoundsException | IllegalArgumentException | AssertionError e) {
             // Everything the decode ladder can raise for bytes it cannot turn back into a value:
             //   IndexOutOfBounds     a payload shorter than the fixed-width codec expects
-            //   AssertionError       an assert in EntityEncryptionServiceUtils, when assertions are enabled;
+            //   AssertionError       an assert in EntityEncryptorUtils, when assertions are enabled;
             //                        the payload lengths themselves are checked unconditionally
             //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
             //                        which is not a constant of the attribute's enum, and a payload header
@@ -1658,15 +1614,15 @@ public abstract class AbstractEntityEncryptionService {
 
     /**
      * Decrypts the annotated attributes of the specified object, with the identifier the
-     * {@link EntityEncryptionManager encryptionManager} derives from it.
+     * {@link EntityEncryptionService encryption service} derives from it.
      *
      * @param object the entity instance to decrypt, in place; an instance of a class which has no encrypted attribute
      *               passes through untouched.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be reconstructed from bytes.
-     * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
+     * @see EntityEncryptionService#getEncryptionIdentifier(Object)
      */
-    public void decrypt(final Object object) {
+    void decrypt(final Object object) {
         Objects.requireNonNull(object, "object is null");
         if (!hasEncryptedAttributes(object)) {
             return;
@@ -1687,12 +1643,11 @@ public abstract class AbstractEntityEncryptionService {
      *         provider-generated subclass, which the metamodel has never heard of, so asking it directly failed with
      *         {@code Not a managed type: ..._SecretEntity$HibernateProxy}. Jakarta Persistence 3.2 added
      *         {@link jakarta.persistence.PersistenceUnitUtil#getClass(Object)} for exactly this. It is defined for
-     *         <em>entity</em> instances, so an embeddable &mdash; which a subclass may pass to the {@code protected}
-     *         entry points &mdash; falls back to its own class.
+     *         <em>entity</em> instances, so anything else falls back to its own class.
      */
     private Class<?> resolveClass(final Object object) {
         try {
-            return entityManagerFactory.getPersistenceUnitUtil().getClass(object);
+            return entityManagerFactory().getPersistenceUnitUtil().getClass(object);
         } catch (final RuntimeException re) {
             logger.log(System.Logger.Level.TRACE,
                        () -> "not an entity instance; using its own class: " + object.getClass().getName());
@@ -1709,20 +1664,16 @@ public abstract class AbstractEntityEncryptionService {
      * @implNote The lookup is cached per class, so that a listener consulting the metamodel on every lifecycle
      *         callback does not go back to the {@link jakarta.persistence.metamodel.Metamodel Metamodel} for each one.
      */
-    protected ManagedType<?> getManagedType(final Class<?> entityClass) {
+    private ManagedType<?> getManagedType(final Class<?> entityClass) {
         return managedTypes.computeIfAbsent(
                 Objects.requireNonNull(entityClass, "entityClass is null"),
-                k -> entityManagerFactory.getMetamodel().managedType(k)
+                k -> entityManagerFactory().getMetamodel().managedType(k)
         );
     }
 
-    // -------------------------------------------------------------------------------------------- entityManagerFactory
-
-    // ----------------------------------------------------------------------------------------- entityEncryptionManager
-
     // -----------------------------------------------------------------------------------------------------------------
-    // The caches below are never evicted: they hold the metadata of this service's entity manager factory, and are
-    // meant to live exactly as long as it does. A service is not to outlive, or be shared across, factories.
+    // The caches below are never evicted: they hold the metadata of the encryption service's entity manager factory,
+    // and are meant to live exactly as long as it does.
     private final Map<Class<?>, ManagedType<?>> managedTypes = new ConcurrentHashMap<>();
 
     private final Map<ManagedType<?>, Map<String, Attribute<?, ?>>> managedTypesAndAttributes =
@@ -1731,7 +1682,5 @@ public abstract class AbstractEntityEncryptionService {
     private final Map<MappingKey, Mapping> mappings = new ConcurrentHashMap<>();
 
     // -----------------------------------------------------------------------------------------------------------------
-    private final EntityManagerFactory entityManagerFactory;
-
-    private final EntityEncryptionManager entityEncryptionManager;
+    private final EntityEncryptionService encryptionService;
 }

@@ -1,0 +1,175 @@
+= Wiring
+:toc: macro
+:toclevels: 2
+
+toc::[]
+
+Working notes on *how the module is wired into an application*: what the application supplies, what the module
+exposes, and how the pieces find each other at run time. Not a spec. The encryption scheme itself — where the
+ciphertext lives, Mode A and Mode B — is in link:SCHEMES.adoc[`SCHEMES.adoc`].
+
+Claims marked *[unverified]* come from reading code or from provider knowledge, not from a test in this module.
+
+== 1. Goal
+
+Once an application registers the listener and provides one bean, encryption works. Nothing else is constructed,
+subclassed or configured, and the module exposes as little as possible.
+
+[source,java]
+----
+@EntityListeners(EntityEncryptionListener.class)
+@Entity
+class User {
+
+    @Transient
+    private String name;
+
+    @EncryptedAttribute("name")
+    @Column(name = "name_enc")
+    private byte[] nameEnc;
+}
+
+@ApplicationScoped // or a Spring @Component
+class KmsEncryptionService implements EntityEncryptionService { ... }
+----
+
+== 2. Where it came from
+
+Before this design, the application supplied two things:
+
+* an `EntityEncryptionManager`: the identifier per instance, and bytes in and out;
+* a subclass of `AbstractEntityEncryptionService`, whose only purpose was to pass an `EntityManagerFactory` and the
+  manager to a `protected` constructor and to become the CDI bean the listener injected.
+
+So the application had to know the mechanism existed, and had to build it, although everything it does — finding
+the pairs, encoding, the per-mode walk — is mechanism an application should not need to see. The mechanism also
+declared CDI observer methods (`@Observes Startup`, `@Observes Shutdown`) whose parameter types are CDI types, which a
+container without the CDI API on the class path is expected to fail on when it introspects the class
+*[unverified]*.
+
+== 3. Architecture
+
+[source]
+----
+ application                     │  this module
+─────────────────────────────────┼──────────────────────────────────────────────────────────
+ @EntityListeners(               │  EntityEncryptionListener               (public)
+   EntityEncryptionListener)     │    @Inject EntityEncryptionService
+                                 │    @PrePersist/@PreUpdate → encrypt
+ @EncryptedAttribute("name")     │    @PostLoad              → decrypt
+ byte[] nameEnc;                 │            │
+                                 │            ▼
+ EntityEncryptionService impl ◄──┼──  EntityEncryptor                       (package-private)
+   getEntityManagerFactory()     │    one per listener instance, created on the first callback
+   getEncryptionIdentifier(e)    │    ├─ mapping: metamodel → validated pairs, cached per type
+   encrypt / decrypt (bytes)     │    ├─ codec:   value ⇄ framed bytes (EntityEncryptorUtils)
+                                 │    └─ walk:    per-mode decision, all-or-nothing writes
+----
+
+The public surface is three types: `@EncryptedAttribute`, `EntityEncryptionListener` and `EntityEncryptionService`.
+
+=== 3.1 `EntityEncryptionService`: the application's single SPI
+
+[source,java]
+----
+public interface EntityEncryptionService {
+
+    // which persistence unit: the metamodel the encryptor maps against
+    EntityManagerFactory getEntityManagerFactory();
+
+    // which key context, per instance; never stored, derived again on every call
+    String getEncryptionIdentifier(Object entityInstance);
+
+    // the cryptography, bytes in and out
+    byte[] encrypt(String encryptionIdentifier, byte[] decryptedBytes);
+
+    byte[] decrypt(String encryptionIdentifier, byte[] encryptedBytes);
+}
+----
+
+* *Everything the encryptor needs comes from here.* The encryptor is pure mechanism: one input, no container types.
+* *Qualification is the application's.* The implementation injects whichever `EntityManagerFactory`, key client or
+  other dependency it needs, with its own qualifiers (`@Orders`, `@Qualifier("orders")`, …). The module's injection
+  point never has to name one.
+* *Resolve the factory lazily.* The persistence provider creates listeners while it is still building the factory, so
+  an implementation holds a `Provider<EntityManagerFactory>` (`jakarta.inject`) or an `ObjectFactory` (Spring) and
+  resolves it inside `getEntityManagerFactory()`. The listener calls it on its first callback, never at construction.
+  `__DirectListener_Test` wires it exactly this way.
+* *What it gives up.* The type is no longer purely cryptographic: it is "how this persistence unit's entities are
+  encrypted". The identifier and the cryptography stay entirely the application's.
+* *The name is provisional.* "-service" sits on the type the application writes; to be discussed.
+
+=== 3.2 `EntityEncryptionListener`: the only run-time entry point
+
+* Public; its only job is to be registered with `@EntityListeners`.
+* One injection point, `@Inject EntityEncryptionService`, of the module's own type. Which bean is injected follows the
+  platform's ordinary rules: the only one, or `@Primary` (Spring), or the `@Default` one (CDI).
+* Its three callbacks, `@PrePersist`, `@PreUpdate` and `@PostLoad`, hand the instance to its encryptor, created from
+  the service on the first callback.
+* A listener which was not injected fails on its first callback with an `IllegalStateException`.
+* Nothing public to override. The callbacks and `getEncryptionService()` are package-private: the tests'
+  `_LifecycleListenerEntity` overrides the latter to hand in a service without a container.
+
+=== 3.3 `EntityEncryptor`: internal
+
+* Package-private, so not visible, let alone extensible, outside the package; built from the service alone.
+* No CDI types and no lifecycle methods; `AbstractEntityEncryptionService` and its `protected` hooks are gone.
+* Its internals are unchanged: mapping validation against `getEntityManagerFactory().getMetamodel()`, cached per type;
+  the codecs and the payload header (format version `1`); the per-mode walk; all-or-nothing writes.
+* The identifier only ever comes from the service: the overloads taking an identifier are `private`.
+
+=== 3.4 Dependencies
+
+The main sources depend on Jakarta Persistence, `jakarta.inject` (`@Inject`) and, for one rejection rule, Jakarta
+Validation. Not on the CDI API, which is test-scoped.
+
+== 4. Supported platforms
+
+Any platform which injects entity listeners.
+
+[cols="2,1,1"]
+|===
+| Platform | Hibernate ORM | EclipseLink
+
+| Jakarta EE container | yes *[unverified]* | yes *[unverified]*
+| CDI in Java SE, the `BeanManager` passed as `jakarta.persistence.bean.manager` | yes (`__DirectListener_Test`) | yes (`__DirectListener_Test`)
+| Spring Boot | yes, through Hibernate's `SpringBeanContainer` *[unverified]* | *no*: EclipseLink has no Spring bean container
+|===
+
+* Spring treats `jakarta.inject.Inject` like `@Autowired` only when `jakarta.inject-api` is on the class path, which
+  Spring Boot does not add by default *[unverified]*.
+* EclipseLink on Spring is not supported: its listeners are created with `new`, and nothing is injected.
+
+== 5. What changes for an application
+
+* Implement `EntityEncryptionService` instead of `EntityEncryptionManager`, adding `getEntityManagerFactory()`.
+* Delete the subclass of `AbstractEntityEncryptionService`.
+* A listener subclass overriding `getEncryptionService()` is deleted; such a platform is no longer supported.
+* Calls to `validateMappings()`, `countUnmigrated(Class)` and `encrypt(Object)` on the service are gone; see §6.
+
+== 6. Parked
+
+Existing features whose public home went away with the public mechanism. Each is decided separately; until then:
+
+[cols="1,3"]
+|===
+| Feature | State
+
+| Startup validation (#74)
+| `validateMappings()` exists, package-private. A mapping is validated on the first callback for its type, so a
+  mistake on a rarely used entity surfaces only when it is used.
+
+| `countUnmigrated(Class)` (#82)
+| Exists, package-private. The README gives the equivalent JPQL count for the switch from A to B.
+
+| The Mode A batch migration
+| Not offered. The README recipe called `service.encrypt(entity)` to make a legacy row dirty; rows now migrate only as
+  they are written.
+
+| The `orm.xml` column-rules hook (#73)
+| `resolveColumnRules(...)` exists, overridable within the package only. A Mode A plaintext mapped only in `orm.xml`
+  is rejected.
+
+| More than one persistence unit
+| One service names one factory, and the listener has one injection point.
+|===

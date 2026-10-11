@@ -5,17 +5,17 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
 /**
- * An entity listener which takes its {@link AbstractEntityEncryptionService} from a static holder rather than from CDI, so that the
- * life cycle can be observed without a container.
+ * An entity listener which takes its {@link EntityEncryptionService} from a static holder rather than from a container,
+ * so that the life cycle can be observed without one.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 public class _LifecycleListenerEntity extends EntityEncryptionListener {
 
     /**
-     * The service every instance of this listener delegates to.
+     * The service every instance of this listener works through.
      */
-    static volatile AbstractEntityEncryptionService SERVICE;
+    static volatile EntityEncryptionService SERVICE;
 
     /**
      * Creates a new instance.
@@ -29,26 +29,26 @@ public class _LifecycleListenerEntity extends EntityEncryptionListener {
     }
 
     @Override
-    protected AbstractEntityEncryptionService getEncryptionService() {
+    EntityEncryptionService getEncryptionService() {
         return SERVICE;
     }
 
     // re-declared, calling super: providers ignore a callback inherited from a listener's superclass (#5)
     @PrePersist
     @Override
-    protected void onPrePersist(final Object entityInstance) {
+    void onPrePersist(final Object entityInstance) {
         super.onPrePersist(entityInstance);
     }
 
     @PreUpdate
     @Override
-    protected void onPreUpdate(final Object entityInstance) {
+    void onPreUpdate(final Object entityInstance) {
         super.onPreUpdate(entityInstance);
     }
 
     @PostLoad
     @Override
-    protected void onPostLoad(final Object entityInstance) {
+    void onPostLoad(final Object entityInstance) {
         super.onPostLoad(entityInstance);
     }
 }

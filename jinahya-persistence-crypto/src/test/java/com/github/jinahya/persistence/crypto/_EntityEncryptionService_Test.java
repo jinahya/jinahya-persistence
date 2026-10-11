@@ -6,19 +6,19 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class _EncryptionManagerTest {
+class _EntityEncryptionService_Test {
 
     @Test
     void __0() {
-        final var manager = new _EntityEncryptionManager();
+        final var manager = new _EntityEncryptionService();
         final var plain = new byte[0];
         final var encrypted = manager.encrypt("irrelevant", plain);
         assertThat(encrypted)
                 .hasSize(
-                        _EntityEncryptionManager.IV_BYTES
-                        + _EntityEncryptionManager.KEY_BYTES
-                        + _EntityEncryptionManager.AAD_BYTES
-                        + _EntityEncryptionManager.TAG_BYTES
+                        _EntityEncryptionService.IV_BYTES
+                        + _EntityEncryptionService.KEY_BYTES
+                        + _EntityEncryptionService.AAD_BYTES
+                        + _EntityEncryptionService.TAG_BYTES
                 );
         final var decrypted = manager.decrypt("irrelevant", encrypted);
         assertThat(decrypted).isEqualTo(plain);
@@ -26,7 +26,7 @@ class _EncryptionManagerTest {
 
     @Test
     void __() {
-        final var manager = new _EntityEncryptionManager();
+        final var manager = new _EntityEncryptionService();
         final var plain = new byte[ThreadLocalRandom.current().nextInt(1048576)];
         final var encrypted = manager.encrypt("irrelevant", plain);
         final var decrypted = manager.decrypt("irrelevant", encrypted);

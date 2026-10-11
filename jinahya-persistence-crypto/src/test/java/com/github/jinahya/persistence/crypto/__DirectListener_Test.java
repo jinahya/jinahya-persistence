@@ -2,6 +2,8 @@ package com.github.jinahya.persistence.crypto;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -31,16 +33,48 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class __DirectListener_Test {
 
     /**
-     * Produces the service. Application-scoped, so that the listener is injected a client proxy while the factory the
-     * service needs is still being built; the service itself is created on the first callback.
+     * Produces the entity manager factory, as an application would.
      */
-    static class ServiceProducer {
+    static class FactoryProducer {
 
         @Produces
-        @ApplicationScoped
-        AbstractEntityEncryptionService produceService() {
-            return new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager());
+        EntityManagerFactory produceEntityManagerFactory() {
+            return ENTITY_MANAGER_FACTORY;
         }
+    }
+
+    /**
+     * The encryption service, as an application would write it: a bean which resolves its entity manager factory
+     * lazily, through a {@link Provider}, because the listener it is injected into is created while that factory is
+     * still being built.
+     */
+    @ApplicationScoped
+    static class Service implements EntityEncryptionService {
+
+        @Override
+        public EntityManagerFactory getEntityManagerFactory() {
+            return entityManagerFactory.get();
+        }
+
+        @Override
+        public String getEncryptionIdentifier(final Object entityInstance) {
+            return cryptography.getEncryptionIdentifier(entityInstance);
+        }
+
+        @Override
+        public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+            return cryptography.encrypt(encryptionIdentifier, decryptedBytes);
+        }
+
+        @Override
+        public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
+            return cryptography.decrypt(encryptionIdentifier, encryptedBytes);
+        }
+
+        @Inject
+        Provider<EntityManagerFactory> entityManagerFactory;
+
+        private final EntityEncryptionService cryptography = new _EntityEncryptionService();
     }
 
     private static WeldContainer CONTAINER;
@@ -51,7 +85,7 @@ class __DirectListener_Test {
     static void setUp() {
         CONTAINER = new Weld()
                 .disableDiscovery()
-                .addBeanClasses(ServiceProducer.class)
+                .addBeanClasses(FactoryProducer.class, Service.class)
                 .initialize();
         ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory(
                 "__cryptoPU", Map.of("jakarta.persistence.bean.manager", CONTAINER.getBeanManager()));

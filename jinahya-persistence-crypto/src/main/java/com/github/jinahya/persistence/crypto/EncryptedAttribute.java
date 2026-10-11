@@ -34,17 +34,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * In Mode A, the plaintext has to be mapped {@code @Column(insertable = false)}.
  * {@link jakarta.persistence.PrePersist @PrePersist} runs when {@code persist()} is called, not when the {@code INSERT}
  * is built, and Jakarta Persistence has no callback in between; a provider which builds a single statement at commit
- * would otherwise carry a value assigned in that window in the clear. {@link AbstractEntityEncryptionService} rejects a mapping
- * without it.
+ * would otherwise carry a value assigned in that window in the clear. A mapping without it is rejected.
  * <p>
  * An applicable {@link jakarta.persistence.AttributeOverride @AttributeOverride} is resolved, and replaces the member's
  * own {@code @Column} — note that an override which only renames a column restores the annotation default
- * {@code insertable = true}. A mapping expressed in XML is <em>not</em> visible; see
- * {@link AbstractEntityEncryptionService#resolveColumnRules(jakarta.persistence.metamodel.ManagedType, java.util.List,
- * jakarta.persistence.metamodel.Attribute) resolveColumnRules}.
+ * {@code insertable = true}. A mapping expressed in XML is <em>not</em> visible, so a Mode A plaintext mapped there
+ * cannot be shown to be safe, and is rejected.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see AbstractEntityEncryptionService
+ * @see EntityEncryptionListener
  */
 @Documented
 @Retention(value = RUNTIME)
@@ -68,7 +66,7 @@ public @interface EncryptedAttribute {
      *         {@code BASIC} attribute, neither an identifier nor a version, carrying no Bean Validation constraint,
      *         and mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and
      *         updatable (Mode A) — see {@link EncryptedAttribute the type javadoc}.
-     *         {@link AbstractEntityEncryptionService} rejects anything else.
+     *         Anything else is rejected, on the first callback for the entity's class.
      */
     String value();
 }

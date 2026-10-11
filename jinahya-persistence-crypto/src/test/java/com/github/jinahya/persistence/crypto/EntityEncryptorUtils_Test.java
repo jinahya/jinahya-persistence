@@ -32,43 +32,43 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.Bytes_l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.Characters_2l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.big_decimal_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.big_integer_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.boolean_1;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.byte_1;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.char_2;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.chars_2l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.double_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.enum_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.float_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.instant_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.int_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_date_time_16;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.local_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.long_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_date_time_20;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.offset_time_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.serializable_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.short_2;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.sql_timestamp_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.string_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_calendar_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.util_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.uuid_16;
-import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils.year_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.Bytes_l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.Characters_2l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.big_decimal_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.big_integer_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.boolean_1;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.byte_1;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.char_2;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.chars_2l;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.double_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.enum_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.float_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.instant_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.int_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_date_time_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_time_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.long_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_date_time_20;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_time_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.serializable_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.short_2;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_time_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_timestamp_12;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.string_;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.util_calendar_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.util_date_8;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.uuid_16;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.year_4;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Tests for the encode/decode pairs of {@link EntityEncryptionServiceUtils}.
+ * Tests for the encode/decode pairs of {@link EntityEncryptorUtils}.
  * <p>
- * The nested classes follow the order of the pairs in {@link EntityEncryptionServiceUtils}. Each one pins the
+ * The nested classes follow the order of the pairs in {@link EntityEncryptorUtils}. Each one pins the
  * <em>stored format</em> &mdash; against {@link ByteBuffer}, which is big-endian, as an independent reference &mdash;
  * because a change in an encoding makes every existing row decode differently, and nothing else would notice.
  *
@@ -77,7 +77,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Slf4j
-class EncryptionServiceUtils_Test {
+class EntityEncryptorUtils_Test {
 
     private static byte[] randomBytes(final int minLengthInclusive, final int maxLengthInclusive) {
         assert minLengthInclusive >= 0;
@@ -1304,75 +1304,75 @@ class EncryptionServiceUtils_Test {
         @DisplayName("codec ids are stored data: pinned, and unique")
         @Test
         void __codecIdsPinned() {
-            final var codecs = EntityEncryptionServiceUtils.Codec.values();
+            final var codecs = EntityEncryptorUtils.Codec.values();
             for (int i = 0; i < codecs.length; i++) {
                 // appending a codec is fine; renumbering or reusing an id is a format break
                 assertThat(codecs[i].id).as("id of %s", codecs[i]).isEqualTo((byte) (i + 1));
-                assertThat(EntityEncryptionServiceUtils.Codec.of(codecs[i].id)).isSameAs(codecs[i]);
+                assertThat(EntityEncryptorUtils.Codec.of(codecs[i].id)).isSameAs(codecs[i]);
             }
-            assertThat(EntityEncryptionServiceUtils.Codec.of((byte) 0)).isNull();
-            assertThat(EntityEncryptionServiceUtils.Codec.of(Byte.MAX_VALUE)).isNull();
+            assertThat(EntityEncryptorUtils.Codec.of((byte) 0)).isNull();
+            assertThat(EntityEncryptorUtils.Codec.of(Byte.MAX_VALUE)).isNull();
         }
 
         @DisplayName("codecOf(Class) follows the ladders: java.sql before java.util.Date, Serializable last")
         @Test
         void __codecOf() {
-            assertThat(EntityEncryptionServiceUtils.codecOf(Integer.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.INT_4);
-            assertThat(EntityEncryptionServiceUtils.codecOf(int.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.INT_4);
-            assertThat(EntityEncryptionServiceUtils.codecOf(java.sql.Timestamp.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.SQL_TIMESTAMP_12);
-            assertThat(EntityEncryptionServiceUtils.codecOf(java.util.Date.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.UTIL_DATE_8);
-            assertThat(EntityEncryptionServiceUtils.codecOf(java.util.GregorianCalendar.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.UTIL_CALENDAR_8);
-            assertThat(EntityEncryptionServiceUtils.codecOf(java.time.DayOfWeek.class))
+            assertThat(EntityEncryptorUtils.codecOf(Integer.class))
+                    .isSameAs(EntityEncryptorUtils.Codec.INT_4);
+            assertThat(EntityEncryptorUtils.codecOf(int.class))
+                    .isSameAs(EntityEncryptorUtils.Codec.INT_4);
+            assertThat(EntityEncryptorUtils.codecOf(java.sql.Timestamp.class))
+                    .isSameAs(EntityEncryptorUtils.Codec.SQL_TIMESTAMP_12);
+            assertThat(EntityEncryptorUtils.codecOf(java.util.Date.class))
+                    .isSameAs(EntityEncryptorUtils.Codec.UTIL_DATE_8);
+            assertThat(EntityEncryptorUtils.codecOf(java.util.GregorianCalendar.class))
+                    .isSameAs(EntityEncryptorUtils.Codec.UTIL_CALENDAR_8);
+            assertThat(EntityEncryptorUtils.codecOf(java.time.DayOfWeek.class))
                     .as("an enum is an enum before it is Serializable")
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.ENUM_);
-            assertThat(EntityEncryptionServiceUtils.codecOf(java.util.ArrayList.class))
-                    .isSameAs(EntityEncryptionServiceUtils.Codec.SERIALIZABLE_);
-            assertThat(EntityEncryptionServiceUtils.codecOf(Object.class)).as("unsupported").isNull();
+                    .isSameAs(EntityEncryptorUtils.Codec.ENUM_);
+            assertThat(EntityEncryptorUtils.codecOf(java.util.ArrayList.class))
+                    .isSameAs(EntityEncryptorUtils.Codec.SERIALIZABLE_);
+            assertThat(EntityEncryptorUtils.codecOf(Object.class)).as("unsupported").isNull();
         }
 
         @DisplayName("frame(Codec, byte[]) prefixes the format version and the codec id")
         @Test
         void __frame() {
-            final var framed = EntityEncryptionServiceUtils.frame(EntityEncryptionServiceUtils.Codec.INT_4,
+            final var framed = EntityEncryptorUtils.frame(EntityEncryptorUtils.Codec.INT_4,
                                                                   new byte[]{1, 2, 3, 4});
             assertThat(framed).containsExactly(
-                    EntityEncryptionServiceUtils.FORMAT_VERSION, EntityEncryptionServiceUtils.Codec.INT_4.id,
+                    EntityEncryptorUtils.FORMAT_VERSION, EntityEncryptorUtils.Codec.INT_4.id,
                     1, 2, 3, 4);
         }
 
         @DisplayName("unframe(Codec, byte[]) reads back what frame wrote, empty included")
         @Test
         void __roundTrip() {
-            final var codec = EntityEncryptionServiceUtils.Codec.STRING_;
-            assertThat(EntityEncryptionServiceUtils.unframe(codec, EntityEncryptionServiceUtils.frame(codec, new byte[0])))
+            final var codec = EntityEncryptorUtils.Codec.STRING_;
+            assertThat(EntityEncryptorUtils.unframe(codec, EntityEncryptorUtils.frame(codec, new byte[0])))
                     .isEmpty();
             final var encoded = randomBytes(1, 128);
-            assertThat(EntityEncryptionServiceUtils.unframe(codec, EntityEncryptionServiceUtils.frame(codec, encoded)))
+            assertThat(EntityEncryptorUtils.unframe(codec, EntityEncryptorUtils.frame(codec, encoded)))
                     .isEqualTo(encoded);
         }
 
         @DisplayName("unframe(Codec, byte[]) rejects a missing header, another version, and another codec")
         @Test
         void __unframeRejects() {
-            final var codec = EntityEncryptionServiceUtils.Codec.INT_4;
-            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(codec, new byte[1]))
+            final var codec = EntityEncryptorUtils.Codec.INT_4;
+            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(codec, new byte[1]))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("no payload header");
-            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(codec, new byte[]{0, codec.id}))
+            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(codec, new byte[]{0, codec.id}))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("unknown payload format version");
-            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(
-                    codec, EntityEncryptionServiceUtils.frame(EntityEncryptionServiceUtils.Codec.LONG_8, new byte[8])))
+            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(
+                    codec, EntityEncryptorUtils.frame(EntityEncryptorUtils.Codec.LONG_8, new byte[8])))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("encoded by LONG_8")
                     .hasMessageContaining("decoded by INT_4");
-            assertThatThrownBy(() -> EntityEncryptionServiceUtils.unframe(
-                    codec, new byte[]{EntityEncryptionServiceUtils.FORMAT_VERSION, Byte.MAX_VALUE}))
+            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(
+                    codec, new byte[]{EntityEncryptorUtils.FORMAT_VERSION, Byte.MAX_VALUE}))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("unknown codec");
         }

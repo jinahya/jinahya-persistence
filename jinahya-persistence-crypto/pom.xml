@@ -27,15 +27,12 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    <!-- jakarta.enterprise.*; only __DirectListener_Test, which runs the listener in a CDI container. The main
+         sources depend on jakarta.inject alone, so that the module runs under any container which injects listeners -->
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.cdi-api</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.validation</groupId>
@@ -68,7 +65,7 @@
       <artifactId>lombok</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- used directly by __SecureAttributeConveter (@Inject) and __EncryptionServiceQualifier (@Qualifier); it used to arrive transitively through the CDI API -->
+    <!-- jakarta.inject.Inject on EntityEncryptionListener, its only injection point; understood by CDI and by Spring -->
     <dependency>
       <groupId>jakarta.inject</groupId>
       <artifactId>jakarta.inject-api</artifactId>

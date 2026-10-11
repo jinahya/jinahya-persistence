@@ -6,7 +6,7 @@ toc::[]
 
 Working notes on *where the ciphertext lives* and *how it is moved*, and on what each choice costs. Not a spec.
 
-Key management and the cryptography itself are out of scope: they live behind `EntityEncryptionManager`. These notes
+Key management and the cryptography itself are out of scope: they live behind `EntityEncryptionService`. These notes
 are about the ALE *mechanism* only.
 
 Claims marked *[unverified]* come from reading code or from provider knowledge, not from a test in this module.
@@ -34,8 +34,8 @@ Claims marked *[unverified]* come from reading code or from provider knowledge, 
 === 1.2 Constraint: portable Java/JPA
 
 * One code path for Hibernate and EclipseLink (`CLAUDE.md`).
-* The hook is a JPA entity listener (`EntityEncryptionListener`) calling `AbstractEntityEncryptionService`.
-* The encoding is decided by the attribute's *Java* type (`EntityEncryptionServiceUtils`).
+* The hook is a JPA entity listener (`EntityEncryptionListener`) calling the internal `EntityEncryptor`.
+* The encoding is decided by the attribute's *Java* type (`EntityEncryptorUtils`).
 
 === 1.3 What JPA callbacks can and cannot do
 
@@ -189,7 +189,7 @@ void setName(String name) { this.name = name; this.name_enc__ = null; }  // make
 *Trade-offs.*
 
 * *Edits are not detected* (1.3). *Implemented (#82):* a setter that invalidates the ciphertext (shown above),
-  proven at startup on a throwaway instance; and a safety net: when the instance is flushed for another reason, the
+  proven on validation, on a throwaway instance; and a safety net: when the instance is flushed for another reason, the
   plaintext is compared with the ciphertext, so a direct field write is kept. A direct write with nothing else changed
   is still lost: no callback runs at all. *Measured:* `merge()` does not copy a transient field from a detached
   instance; set the value on the instance it returns.
@@ -489,8 +489,9 @@ Same as within_table Mode B (2.2), with the bundle as the only mapped attribute:
 
 * Support within_table A and B (and per_table on top of B) in the module, or only some of them?
 * *Done (#82):* within_table A and B are both supported, the mode decided by `@Transient` on the plaintext;
-  edit detection is an invalidating setter, proven at startup, plus a safety net; an unchanged plaintext is not
-  re-encrypted; `countUnmigrated(Class)` is the pre-switch check.
+  edit detection is an invalidating setter, proven when the mapping is validated, plus a safety net; an unchanged
+  plaintext is not re-encrypted; the pre-switch check is a count of rows with plaintext and no ciphertext, which the
+  README gives as a JPQL query since the encryption mechanism became internal (`WIRING.adoc`).
 * *[unverified]* How Hibernate 7.4 and EclipseLink 5.0 join a missing secondary row, and whether they insert it when
   all of its columns are NULL.
 * *Done (#82), within_table:* reading does not write; the object is not emptied; an edit through the setter
@@ -539,10 +540,11 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 
 . *Mode B support:* *done* (#82). The plaintext is `@Transient`, found by reflection by the name which the
   annotation on the ciphertext gives; nothing mapped is ever nulled.
-. *Edit detection:* *done* (#82): an invalidating setter, proven at startup, and a safety net comparing the plaintext
+. *Edit detection:* *done* (#82): an invalidating setter, proven on validation, and a safety net comparing the plaintext
   with the ciphertext when the instance is flushed anyway.
 . *Re-encryption policy:* *done* (#82): an unchanged plaintext is never re-encrypted.
-. *A pre-switch check:* *done* (#82): `countUnmigrated(Class)`.
+. *A pre-switch check:* *done* (#82), as `countUnmigrated(Class)`; parked when the mechanism became internal, and given
+  in the README as a JPQL query (`WIRING.adoc`).
 . *Format items* (1.4): *done*, as format version 1 (#75–#80); `Serializable` stays as JPA supports it (#8).
 . *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
   secondary-table behavior on both providers.

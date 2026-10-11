@@ -33,8 +33,7 @@ class __ModeB_Test {
     @BeforeAll
     static void setUp() {
         ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
-        _LifecycleListenerEntity.SERVICE =
-                new _EntityEncryptionService(ENTITY_MANAGER_FACTORY, new _EntityEncryptionManager());
+        _LifecycleListenerEntity.SERVICE = new _EntityEncryptionService(ENTITY_MANAGER_FACTORY);
     }
 
     @AfterAll
@@ -281,7 +280,7 @@ class __ModeB_Test {
     @DisplayName("countUnmigrated(Class) counts the rows still holding plaintext, and none once migrated")
     @Test
     void __countUnmigrated() {
-        final var service = _LifecycleListenerEntity.SERVICE;
+        final var service = new EntityEncryptor(_LifecycleListenerEntity.SERVICE);
         final var before = service.countUnmigrated(_GuardedEntity.class);
         final var plaintext = "legacy-" + System.nanoTime();
         apply(em -> em.createNativeQuery(

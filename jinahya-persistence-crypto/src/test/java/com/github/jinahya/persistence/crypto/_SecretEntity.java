@@ -21,7 +21,7 @@ import java.util.UUID;
 
 /**
  * An entity holding one {@link EncryptedAttribute encrypted attribute} of each java type whose encoding
- * {@link AbstractEntityEncryptionService} dispatches on, for verifying the encrypt/decrypt round trip against a real metamodel.
+ * {@link EntityEncryptor} dispatches on, for verifying the encrypt/decrypt round trip against a real metamodel.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
