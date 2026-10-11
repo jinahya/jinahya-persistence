@@ -74,7 +74,6 @@ The ciphertext is a sibling column in the entity's own table. There are two mode
 
 [source,java]
 ----
-@EncryptedEntity
 @EntityListeners(EntityEncryptionListener.class)
 class User {
 
@@ -295,7 +294,6 @@ One side table per entity, joined one-to-one by primary key. This is standard JP
 
 [source,java]
 ----
-@EncryptedEntity
 @Entity
 @SecondaryTable(name = "USER_ENC", pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
 class User {
@@ -360,7 +358,6 @@ the table gains exactly one column.
 
 [source,java]
 ----
-@EncryptedEntity
 @Entity
 class User {
 

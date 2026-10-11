@@ -42,7 +42,6 @@
     <class>com.github.jinahya.persistence.crypto._UnguardedEmbeddable</class>
     <class>com.github.jinahya.persistence.crypto._TransientSecretEntity</class>
     <class>com.github.jinahya.persistence.crypto._CollectionSecretEntity</class>
-    <class>com.github.jinahya.persistence.crypto._UnmarkedSecretEntity</class>
     <class>com.github.jinahya.persistence.crypto._PlainEntity</class>
     <class>com.github.jinahya.persistence.crypto._FrozenPlainEntity</class>
     <class>com.github.jinahya.persistence.crypto._DirectListenerEntity</class>

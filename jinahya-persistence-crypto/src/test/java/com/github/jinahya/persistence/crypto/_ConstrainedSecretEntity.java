@@ -17,7 +17,6 @@ import jakarta.validation.constraints.Size;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EncryptedEntity
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "constrained_secret_entity")

@@ -19,7 +19,6 @@ import jakarta.persistence.Version;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EncryptedEntity
 @EntityListeners(_LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity

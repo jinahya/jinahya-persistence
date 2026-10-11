@@ -17,9 +17,9 @@ import java.lang.invoke.MethodHandles;
 /**
  * An entity listener which encrypts an entity instance before it is written, and decrypts it after it is read.
  * <p>
- * Register this class itself on an {@link EncryptedEntity @EncryptedEntity} class; nothing else is required.
+ * Register this class itself on an entity class which has {@link EncryptedAttribute encrypted attributes}; nothing
+ * else is required.
  * <pre>{@code
- * @EncryptedEntity
  * @EntityListeners(EntityEncryptionListener.class)
  * @Entity
  * class User { ... }
@@ -38,7 +38,7 @@ import java.lang.invoke.MethodHandles;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see AbstractEntityEncryptionService
- * @see EncryptedEntity
+ * @see EncryptedAttribute
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
@@ -210,16 +210,13 @@ public class EntityEncryptionListener {
     /**
      * Encrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
-     * @param entityInstance the entity instance to encrypt; an instance of a class which is not annotated with
-     *                       {@link EncryptedEntity @EncryptedEntity}, and has no encrypted attribute, passes through
-     *                       untouched.
-     * @throws RuntimeException when the {@code entityInstance}'s class has encrypted attributes but is not annotated
-     *                          with {@link EncryptedEntity @EncryptedEntity}.
+     * @param entityInstance the entity instance to encrypt; an instance of a class which has no encrypted attribute
+     *                       passes through untouched.
      * @see AbstractEntityEncryptionService#encrypt(Object)
      */
     protected void encrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "encrypt({0})", describe(entityInstance));
-        // the service decides whether the instance is to be transformed, and rejects a forgotten @EncryptedEntity
+        // the service decides whether the instance is to be transformed
         final var encryptionService = getEncryptionService();
         assert encryptionService != null;
         encryptionService.encrypt(entityInstance);
@@ -229,16 +226,13 @@ public class EntityEncryptionListener {
     /**
      * Decrypts the specified entity instance, through {@link #getEncryptionService() the encryption service}.
      *
-     * @param entityInstance the entity instance to decrypt; an instance of a class which is not annotated with
-     *                       {@link EncryptedEntity @EncryptedEntity}, and has no encrypted attribute, passes through
-     *                       untouched.
-     * @throws RuntimeException when the {@code entityInstance}'s class has encrypted attributes but is not annotated
-     *                          with {@link EncryptedEntity @EncryptedEntity}.
+     * @param entityInstance the entity instance to decrypt; an instance of a class which has no encrypted attribute
+     *                       passes through untouched.
      * @see AbstractEntityEncryptionService#decrypt(Object)
      */
     protected void decrypt(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "decrypt({0})", describe(entityInstance));
-        // the service decides whether the instance is to be transformed, and rejects a forgotten @EncryptedEntity
+        // the service decides whether the instance is to be transformed
         final var encryptionService = getEncryptionService();
         assert encryptionService != null;
         encryptionService.decrypt(entityInstance);

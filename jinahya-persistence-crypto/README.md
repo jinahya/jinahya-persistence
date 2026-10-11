@@ -32,7 +32,6 @@ apart by whether the plaintext is `@Transient` ([#82](https://github.com/jinahya
 ## Mode B: the steady state
 
 ```java
-@EncryptedEntity
 @EntityListeners(EntityEncryptionListener.class) // registered directly; see "Wiring"
 @Entity
 class User {
@@ -79,7 +78,6 @@ em.merge(detached).setName(detached.getName());
 ## Mode A: encrypting existing data
 
 ```java
-@EncryptedEntity
 @EntityListeners(EntityEncryptionListener.class)
 @Entity
 class User {
@@ -186,12 +184,12 @@ annotation inherited from a listener's superclass (measured on both). A subclass
 Every mapping is validated in full **before any instance is touched**; under CDI, every entity of the persistence unit
 is validated at startup (`AbstractEntityEncryptionService.validateMappings()`, called from `onStartup`), and all
 failures are reported at once ([#74](https://github.com/jinahya/jinahya-persistence/issues/74)). Outside a container, call `validateMappings()` yourself. Each encrypt and
-decrypt is **all-or-nothing** per instance: every value is computed before any is assigned ([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). A mapping which
-breaks any of these is rejected:
+decrypt is **all-or-nothing** per instance: every value is computed before any is assigned ([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). An entity is encrypted
+when it has an `@EncryptedAttribute`, directly or in an embeddable; one with none passes through untouched. A mapping
+which breaks any of these is rejected:
 
 | rule | A | B |
 |------|:-:|:-:|
-| the entity class is annotated `@EncryptedEntity`, directly or by inheritance; a forgotten annotation is rejected, not skipped; an entity with no encrypted attribute passes through untouched ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)) | ✓ | ✓ |
 | `@EncryptedAttribute` sits on the persistent attribute holding the ciphertext; anywhere else — unmapped, transient, a getter the access type does not read — is rejected ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)) | ✓ | ✓ |
 | the plaintext it names exists: a persistent attribute (A) or a `@Transient` field (B) of the same entity or embeddable; it is not itself annotated, and is named only once | ✓ | ✓ |
 | the plaintext is `@Basic`, optional, not of a primitive type, neither an identifier nor a version | ✓ | ✓ |

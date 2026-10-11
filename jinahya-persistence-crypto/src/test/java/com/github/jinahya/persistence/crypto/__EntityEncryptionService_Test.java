@@ -464,24 +464,7 @@ class __EntityEncryptionService_Test {
             assertThat(entity.secrets.getFirst().getNoteEnc__()).isNull();
         }
 
-        @DisplayName("an entity with encrypted attributes but no @EncryptedEntity is rejected, not skipped (#72)")
-        @Test
-        void __unmarkedEntityRejected() {
-            final var entity = new _UnmarkedSecretEntity();
-            entity.name = "would-be-dropped";
-
-            assertThatThrownBy(() -> service.encrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("not annotated with @EncryptedEntity")
-                    .hasMessageContaining("_UnmarkedSecretEntity");
-            assertThatThrownBy(() -> service.decrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("not annotated with @EncryptedEntity");
-            assertThat(entity.name).as("nothing was touched").isEqualTo("would-be-dropped");
-            assertThat(entity.nameEnc__).isNull();
-        }
-
-        @DisplayName("an entity with no encrypted attribute, and no @EncryptedEntity, passes through untouched (#72)")
+        @DisplayName("an entity with no encrypted attribute passes through untouched (#72)")
         @Test
         void __plainEntityPassesThrough() {
             // a manager which must never be reached: not even for the encryption identifier
@@ -663,13 +646,12 @@ class __EntityEncryptionService_Test {
                     "crypto._MisplacedAnnotationEntity", // #70
                     "crypto._ModeBPlainSetterEntity",   // #82: a setter which does not null the ciphertext
                     "crypto._CollectionSecretEntity",   // #71
-                    "crypto._UnmarkedSecretEntity",     // #72
                     "crypto._FrozenPlainEntity",        // #73
                     "crypto._ConstrainedSecretEntity",  // #9
                     "crypto._PlaintextAnnotatedEntity", // the annotation on the plaintext
                     "crypto._MisnamedPlaintextEntity"   // a plaintext which does not exist
             );
-            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(12);
+            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(11);
             assertThat(message).doesNotContain(
                     "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
         }

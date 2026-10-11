@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.crypto;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see AbstractEntityEncryptionService
- * @see EncryptedEntity
  */
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention

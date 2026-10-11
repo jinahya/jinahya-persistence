@@ -21,7 +21,6 @@ import java.util.List;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EncryptedEntity
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "collection_secret_entity")

@@ -17,7 +17,6 @@ import jakarta.persistence.Table;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EncryptedEntity
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "two_path_entity")

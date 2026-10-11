@@ -23,7 +23,6 @@ import jakarta.persistence.Version;
 @Entity
 @EntityListeners(_LifecycleListenerEntity.class)
 @Table(name = "guarded_entity")
-@EncryptedEntity
 public class _GuardedEntity {
 
     static final String TABLE_NAME = "guarded_entity";

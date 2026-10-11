@@ -44,7 +44,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * jakarta.persistence.metamodel.Attribute) resolveColumnRules}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see EncryptedEntity
  * @see AbstractEntityEncryptionService
  */
 @Documented

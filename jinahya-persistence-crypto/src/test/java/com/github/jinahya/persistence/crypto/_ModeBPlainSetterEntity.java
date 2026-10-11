@@ -17,7 +17,6 @@ import jakarta.persistence.Transient;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EncryptedEntity
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "mode_b_plain_setter_entity")

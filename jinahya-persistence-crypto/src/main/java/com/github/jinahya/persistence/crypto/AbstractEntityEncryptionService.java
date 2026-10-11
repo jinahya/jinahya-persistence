@@ -189,8 +189,7 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * Validates, up front, the mapping of every entity of this service's persistence unit which is annotated with
-     * {@link EncryptedEntity @EncryptedEntity}, or has an {@link EncryptedAttribute encrypted attribute}.
+     * Validates, up front, the mapping of every entity of this service's persistence unit.
      * <p>
      * Without it, a mapping is validated on its first {@link #encrypt(Object) encrypt} or {@link #decrypt(Object)
      * decrypt}, so an entity on a rare code path fails only when that path runs, in production. Valid mappings are
@@ -207,7 +206,7 @@ public abstract class AbstractEntityEncryptionService {
                 continue; // a dynamic entity has no java class to read annotations from
             }
             try {
-                checkEncryptedEntity(type, getMapping(getManagedType(type)));
+                getMapping(getManagedType(type));
             } catch (final RuntimeException re) {
                 failures.add(re);
             }
@@ -1439,41 +1438,15 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * Returns whether the specified entity instance is to be transformed: whether its class is annotated with
-     * {@link EncryptedEntity @EncryptedEntity}, directly or by inheritance.
+     * Returns whether the specified entity instance is to be transformed: whether its validated mapping has an
+     * {@link EncryptedAttribute encrypted attribute}, directly or inside an embeddable.
      *
      * @param object the entity instance.
      * @return {@code true} when the {@code object} is to be transformed; {@code false} when it passes through.
-     * @throws RuntimeException when the {@code object}'s class is not annotated, yet has encrypted attributes.
-     * @implNote The gate lives here, not only in the callers, so that a direct caller of the public entry points gets
-     *         the same guarantee. A class which is not annotated is validated all the same: an encrypted attribute on
-     *         it is a forgotten annotation, which used to be skipped in silence, writing the plaintext.
+     * @throws RuntimeException when the mapping of the {@code object}'s class is invalid.
      */
-    private boolean isEncryptedEntity(final Object object) {
-        final var type = resolveClass(object);
-        return type.isAnnotationPresent(EncryptedEntity.class)
-               || checkEncryptedEntity(type, getMapping(getManagedType(type)));
-    }
-
-    /**
-     * Checks that the specified entity class is annotated with {@link EncryptedEntity @EncryptedEntity} when its
-     * validated mapping has an encrypted attribute.
-     *
-     * @param type    the entity class.
-     * @param mapping the validated mapping of the {@code type}.
-     * @return whether the {@code type} is annotated, directly or by inheritance.
-     * @throws RuntimeException when the {@code type} is not annotated, yet has encrypted attributes.
-     */
-    private static boolean checkEncryptedEntity(final Class<?> type, final Mapping mapping) {
-        if (type.isAnnotationPresent(EncryptedEntity.class)) {
-            return true;
-        }
-        if (hasPairs(mapping)) {
-            throw new RuntimeException(
-                    "an entity with encrypted attributes is not annotated with @EncryptedEntity"
-                    + "; it would never be encrypted; entity: " + type.getName());
-        }
-        return false;
+    private boolean hasEncryptedAttributes(final Object object) {
+        return hasPairs(getMapping(getManagedType(resolveClass(object))));
     }
 
     private static boolean hasPairs(final Mapping mapping) {
@@ -1492,16 +1465,15 @@ public abstract class AbstractEntityEncryptionService {
      * Encrypts the annotated attributes of the specified object, with the identifier the
      * {@link EntityEncryptionManager encryptionManager} derives from it.
      *
-     * @param object the entity instance to encrypt, in place; an instance of a class which is not annotated with
-     *               {@link EncryptedEntity @EncryptedEntity}, and has no encrypted attribute, passes through untouched.
-     * @throws RuntimeException when an attribute pair is inconsistent, when an attribute has a java type which
-     *                          cannot be turned into bytes, or when the {@code object}'s class has encrypted
-     *                          attributes but is not annotated with {@link EncryptedEntity @EncryptedEntity}.
+     * @param object the entity instance to encrypt, in place; an instance of a class which has no encrypted attribute
+     *               passes through untouched.
+     * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
+     *                          cannot be turned into bytes.
      * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
      */
     public void encrypt(final Object object) {
         Objects.requireNonNull(object, "object is null");
-        if (!isEncryptedEntity(object)) {
+        if (!hasEncryptedAttributes(object)) {
             return;
         }
         final var encryptionIdentifier = encryptionIdentifierOf(object);
@@ -1688,16 +1660,15 @@ public abstract class AbstractEntityEncryptionService {
      * Decrypts the annotated attributes of the specified object, with the identifier the
      * {@link EntityEncryptionManager encryptionManager} derives from it.
      *
-     * @param object the entity instance to decrypt, in place; an instance of a class which is not annotated with
-     *               {@link EncryptedEntity @EncryptedEntity}, and has no encrypted attribute, passes through untouched.
-     * @throws RuntimeException when an attribute pair is inconsistent, when an attribute has a java type which
-     *                          cannot be reconstructed from bytes, or when the {@code object}'s class has encrypted
-     *                          attributes but is not annotated with {@link EncryptedEntity @EncryptedEntity}.
+     * @param object the entity instance to decrypt, in place; an instance of a class which has no encrypted attribute
+     *               passes through untouched.
+     * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
+     *                          cannot be reconstructed from bytes.
      * @see EntityEncryptionManager#getEncryptionIdentifier(Object)
      */
     public void decrypt(final Object object) {
         Objects.requireNonNull(object, "object is null");
-        if (!isEncryptedEntity(object)) {
+        if (!hasEncryptedAttributes(object)) {
             return;
         }
         final var encryptionIdentifier = encryptionIdentifierOf(object);

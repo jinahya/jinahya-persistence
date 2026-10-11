@@ -19,7 +19,6 @@ import jakarta.persistence.Table;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EncryptedEntity
 @Access(AccessType.FIELD)
 @Entity
 @AttributeOverride(name = "inherited", column = @Column(name = "inherited", nullable = true, insertable = false))

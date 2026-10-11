@@ -2,10 +2,9 @@
  * Application-level encryption of entity attributes: selected attributes are encrypted inside the application, so that
  * the database only ever stores their ciphertext.
  * <p>
- * An entity opts in by being annotated with {@link EncryptedEntity @EncryptedEntity}, and each attribute which is to
- * be stored encrypted with {@link EncryptedAttribute @EncryptedAttribute}. The annotated attribute holds the plaintext
- * and is never written with a value in it; the ciphertext lives in a second, {@code byte[]}-typed attribute of the same
- * entity, named by the annotation or derived from the first attribute's name.
+ * Each encrypted value has two attributes in the same entity: a {@code byte[]}-typed one, annotated with
+ * {@link EncryptedAttribute @EncryptedAttribute}, holds the ciphertext; the annotation names the other one, which holds
+ * the plaintext and is never written with a value in it. An entity with no annotated attribute passes through untouched.
  *
  * <h2>The pieces</h2>
  * <dl>
@@ -21,9 +20,9 @@
  *       it is written and decrypted after it is read. Registered directly, with
  *       {@link jakarta.persistence.EntityListeners @EntityListeners}; it takes the service from CDI.</dd>
  * </dl>
- * An annotated {@link jakarta.persistence.Transient @Transient} field is Mode B, the steady state: the plaintext has no
- * column, and nothing mapped is ever nulled. An annotated persistent attribute is Mode A, for encrypting a column which
- * already holds data: the plaintext stays mapped to it, and is nulled as each row is written, migrating it.
+ * A {@link jakarta.persistence.Transient @Transient} plaintext is Mode B, the steady state: it has no column, and
+ * nothing mapped is ever nulled. A persistent plaintext is Mode A, for encrypting a column which already holds data:
+ * the plaintext stays mapped to it, and is nulled as each row is written, migrating it.
  * <p>
  * The mapping is validated before any instance is touched, and at startup under CDI; each encrypt and decrypt is
  * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.
