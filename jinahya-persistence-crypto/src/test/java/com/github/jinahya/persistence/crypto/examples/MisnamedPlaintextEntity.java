@@ -12,8 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * An entity whose {@link EncryptedAttribute} names a plaintext which does not exist, for verifying that it is
- * rejected rather than skipped.
+ * An entity whose {@link EncryptedAttribute} names a plaintext which does not exist, for verifying that it is rejected
+ * rather than skipped.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

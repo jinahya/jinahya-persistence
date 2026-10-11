@@ -1339,7 +1339,7 @@ class EntityEncryptorUtils_Test {
         @Test
         void __frame() {
             final var framed = EntityEncryptorUtils.frame(EntityEncryptorUtils.Codec.INT_4,
-                                                                  new byte[]{1, 2, 3, 4});
+                                                          new byte[]{1, 2, 3, 4});
             assertThat(framed).containsExactly(
                     EntityEncryptorUtils.FORMAT_VERSION, EntityEncryptorUtils.Codec.INT_4.id,
                     1, 2, 3, 4);

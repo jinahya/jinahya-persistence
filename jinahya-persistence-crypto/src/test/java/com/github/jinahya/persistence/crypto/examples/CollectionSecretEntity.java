@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.CollectionTable;
@@ -16,8 +17,8 @@ import java.util.List;
 
 /**
  * An entity reaching an embeddable which holds an {@link EncryptedAttribute encrypted attribute} through an
- * {@link ElementCollection}, which this module does not walk; for verifying that such a mapping is rejected rather
- * than persisted in the clear.
+ * {@link ElementCollection}, which this module does not walk; for verifying that such a mapping is rejected rather than
+ * persisted in the clear.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

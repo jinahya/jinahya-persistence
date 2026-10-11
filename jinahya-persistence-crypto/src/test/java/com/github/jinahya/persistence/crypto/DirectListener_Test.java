@@ -119,7 +119,8 @@ class DirectListener_Test {
         }
     }
 
-    @DisplayName("registered directly, with no subclass, the listener encrypts before writing and decrypts after reading")
+    @DisplayName(
+            "registered directly, with no subclass, the listener encrypts before writing and decrypts after reading")
     @Test
     void __safeByDefault() {
         final long id = apply(em -> {

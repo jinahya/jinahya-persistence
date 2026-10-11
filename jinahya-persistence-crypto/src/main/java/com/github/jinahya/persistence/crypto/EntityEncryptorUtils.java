@@ -58,8 +58,8 @@ final class EntityEncryptorUtils {
      * @param length the width of the codec, in bytes.
      * @return the {@code b}.
      * @throws IllegalArgumentException when the {@code b} is shorter, or longer, than the {@code length}.
-     * @implNote Checked unconditionally, not with {@code assert}: a payload which is too long would otherwise be read
-     *         silently, as its first {@code length} bytes.
+     * @implNote Checked unconditionally, not with {@code assert}: a payload which is too long would otherwise
+     *         be read silently, as its first {@code length} bytes.
      */
     private static byte[] exactly(final byte[] b, final int length) {
         if (b.length != length) {
@@ -103,7 +103,8 @@ final class EntityEncryptorUtils {
             case 0 -> false;
             case 1 -> true;
             // anything else is not a value this codec wrote; reading it as false would hide the corruption
-            default -> throw new IllegalArgumentException("not a boolean; byte: " + (b[i] & 0xFF) + "; expected 0 or 1");
+            default ->
+                    throw new IllegalArgumentException("not a boolean; byte: " + (b[i] & 0xFF) + "; expected 0 or 1");
         };
     }
 
@@ -1119,9 +1120,9 @@ final class EntityEncryptorUtils {
     /**
      * Returns an array of bytes representing the specified {@code Calendar} value.
      * <p>
-     * Only the instant is stored; the calendar's time zone, locale-dependent settings and calendar system are not.
-     * That is the same value a plain, unencrypted {@code Calendar} mapping persists: a {@code TIMESTAMP} column holds
-     * no zone either, and a provider reads it back as a {@code Calendar} in the default time zone. Storing the epoch
+     * Only the instant is stored; the calendar's time zone, locale-dependent settings and calendar system are not. That
+     * is the same value a plain, unencrypted {@code Calendar} mapping persists: a {@code TIMESTAMP} column holds no
+     * zone either, and a provider reads it back as a {@code Calendar} in the default time zone. Storing the epoch
      * millis also keeps the instant independent of the JVM's, or the JDBC driver's, time zone.
      *
      * @param v the value to represent.
@@ -1503,10 +1504,10 @@ final class EntityEncryptorUtils {
     /**
      * Returns an array of bytes representing the specified {@code Enum<?>} value.
      * <p>
-     * The constant is stored by its {@link Enum#name() name}, as {@code @Enumerated(EnumType.STRING)} stores it, never by
-     * its ordinal: reordering, or inserting, constants is common, and would silently map every stored row to another
-     * constant. Renaming a constant, by contrast, is a breaking change: the stored name no longer resolves, and the read
-     * fails loudly, naming the attribute.
+     * The constant is stored by its {@link Enum#name() name}, as {@code @Enumerated(EnumType.STRING)} stores it, never
+     * by its ordinal: reordering, or inserting, constants is common, and would silently map every stored row to another
+     * constant. Renaming a constant, by contrast, is a breaking change: the stored name no longer resolves, and the
+     * read fails loudly, naming the attribute.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
@@ -1540,8 +1541,8 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}; its Java serialization.
-     * @implNote Nothing is limited here, as nothing is limited by a plain {@code Serializable} mapping: the size of the
-     *         value, and of the column holding it, is the application's concern.
+     * @implNote Nothing is limited here, as nothing is limited by a plain {@code Serializable} mapping: the
+     *         size of the value, and of the column holding it, is the application's concern.
      */
     static byte[] serializable_(final Serializable v) {
         assert v != null;
@@ -1564,8 +1565,8 @@ final class EntityEncryptorUtils {
      * @throws ClassCastException when the {@code b} holds anything but an {@code expectedType}.
      * @implNote No filter of this module's own is installed, so the stream is subject to the JVM-wide
      *         {@code jdk.serialFilter} (or filter factory), exactly as a plain {@code Serializable} mapping's
-     *         deserialization is. Which classes may be deserialized, and how large a graph may be, is the
-     *         application's to configure there.
+     *         deserialization is. Which classes may be deserialized, and how large a graph may be, is the application's
+     *         to configure there.
      * @see <a href="https://docs.oracle.com/en/java/javase/21/core/serialization-filtering1.html">Serialization
      *         Filtering</a>
      */
@@ -1855,8 +1856,8 @@ final class EntityEncryptorUtils {
     static final byte FORMAT_VERSION = 1;
 
     /**
-     * The length of a payload's header: the {@link #FORMAT_VERSION format version}, then the {@link Codec#id codec
-     * id}. The value is {@value #HEADER_BYTES}.
+     * The length of a payload's header: the {@link #FORMAT_VERSION format version}, then the {@link Codec#id codec id}.
+     * The value is {@value #HEADER_BYTES}.
      */
     static final int HEADER_BYTES = 2;
 
@@ -1883,8 +1884,8 @@ final class EntityEncryptorUtils {
      * @param expected the codec the reader decodes with; the one of the attribute's declared type.
      * @param framed   the framed payload.
      * @return a new array holding the encoded value.
-     * @throws IllegalArgumentException when the {@code framed} is shorter than a header, was written in another
-     *                                  format version, or was encoded by a codec other than the {@code expected}.
+     * @throws IllegalArgumentException when the {@code framed} is shorter than a header, was written in another format
+     *                                  version, or was encoded by a codec other than the {@code expected}.
      */
     static byte[] unframe(final Codec expected, final byte[] framed) {
         if (framed.length < HEADER_BYTES) {
@@ -1899,7 +1900,8 @@ final class EntityEncryptorUtils {
             final var actual = Codec.of(framed[1]);
             // the declared type of the attribute changed after the row was written, or the bytes belong elsewhere
             throw new IllegalArgumentException(
-                    "the payload was encoded by " + (actual == null ? "an unknown codec (" + (framed[1] & 0xFF) + ")" : actual)
+                    "the payload was encoded by " +
+                    (actual == null ? "an unknown codec (" + (framed[1] & 0xFF) + ")" : actual)
                     + ", but the attribute is decoded by " + expected);
         }
         return Arrays.copyOfRange(framed, HEADER_BYTES, framed.length);

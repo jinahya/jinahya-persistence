@@ -58,7 +58,7 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
      * @param javaType       the declared java type of the plaintext, resolved against the concrete class.
      */
     record Pair(@Nullable Attribute<?, ?> decrypted, java.lang.reflect.@Nullable Field plaintextField,
-                        Attribute<?, ?> encrypted, Class<?> javaType) {
+                Attribute<?, ?> encrypted, Class<?> javaType) {
 
         Pair {
             assert (decrypted == null) != (plaintextField == null);

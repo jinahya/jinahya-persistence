@@ -93,7 +93,8 @@
   <persistence-unit name="__cryptoItPU">
     <description>Persistence Unit for exercising this module against a physical database: no DDL generated, no
       classes listed, SQL logged. The URL below is a placeholder on H2 in memory — point it at the real
-      database to use this unit.</description>
+      database to use this unit.
+    </description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>

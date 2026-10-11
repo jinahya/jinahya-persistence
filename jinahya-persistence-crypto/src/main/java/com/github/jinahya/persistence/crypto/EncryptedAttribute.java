@@ -58,15 +58,15 @@ public @interface EncryptedAttribute {
      * The name of the attribute, or of the transient field, of the same entity which holds the plaintext.
      *
      * @return the name of the plaintext; never blank.
-     * @apiNote The annotated attribute has to be optional, has to be typed {@code byte[]}, has to be {@code BASIC},
-     *         has to be insertable, updatable and nullable, and cannot be an identifier or a version. The named
-     *         plaintext cannot be the annotated attribute itself, cannot itself be annotated, has to be of a
+     * @apiNote The annotated attribute has to be optional, has to be typed {@code byte[]}, has to be
+     *         {@code BASIC}, has to be insertable, updatable and nullable, and cannot be an identifier or a version.
+     *         The named plaintext cannot be the annotated attribute itself, cannot itself be annotated, has to be of a
      *         non-primitive type which has a codec, and is either a {@link jakarta.persistence.Transient @Transient}
      *         field with a setter which also nulls the annotated attribute (Mode B), or a persistent, optional,
-     *         {@code BASIC} attribute, neither an identifier nor a version, carrying no Bean Validation constraint,
-     *         and mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and
-     *         updatable (Mode A) — see {@link EncryptedAttribute the type javadoc}.
-     *         Anything else is rejected, on the first callback for the entity's class.
+     *         {@code BASIC} attribute, neither an identifier nor a version, carrying no Bean Validation constraint, and
+     *         mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and
+     *         updatable (Mode A) — see {@link EncryptedAttribute the type javadoc}. Anything else is rejected, on the
+     *         first callback for the entity's class.
      */
     String value();
 }

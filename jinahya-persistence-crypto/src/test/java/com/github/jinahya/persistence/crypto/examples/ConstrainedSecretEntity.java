@@ -13,8 +13,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 
 /**
- * An entity with a Bean Validation constraint on an encrypted attribute, for verifying that such a mapping is
- * rejected: validation runs after encrypting has cleared the plaintext.
+ * An entity with a Bean Validation constraint on an encrypted attribute, for verifying that such a mapping is rejected:
+ * validation runs after encrypting has cleared the plaintext.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

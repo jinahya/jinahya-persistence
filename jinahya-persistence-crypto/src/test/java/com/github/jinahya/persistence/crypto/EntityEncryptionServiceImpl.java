@@ -16,7 +16,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class EntityEncryptionServiceImpl implements EntityEncryptionService {
 
-
     // -----------------------------------------------------------------------------------------------------------------
     private static final String ALGORITHM = "AES";
 

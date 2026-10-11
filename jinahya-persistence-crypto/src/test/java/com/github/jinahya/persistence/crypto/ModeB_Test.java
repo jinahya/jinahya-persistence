@@ -65,19 +65,25 @@ class ModeB_Test {
         }
     }
 
-    /** {@code version, name, name_enc} of the row, read natively. */
+    /**
+     * {@code version, name, name_enc} of the row, read natively.
+     */
     private static Object[] row(final long id) {
         return apply(em -> (Object[]) em.createNativeQuery(
                         "SELECT version, name, name_enc FROM " + GuardedEntity.TABLE_NAME + " WHERE id = " + id)
                 .getSingleResult());
     }
 
-    /** The plaintext of the row, as Mode B reads it. */
+    /**
+     * The plaintext of the row, as Mode B reads it.
+     */
     private static String readB(final long id) {
         return apply(em -> em.find(GuardedModeBEntity.class, id).name);
     }
 
-    /** The plaintext of the row, as Mode A reads it. */
+    /**
+     * The plaintext of the row, as Mode A reads it.
+     */
     private static String readA(final long id) {
         return apply(em -> em.find(GuardedEntity.class, id).name);
     }

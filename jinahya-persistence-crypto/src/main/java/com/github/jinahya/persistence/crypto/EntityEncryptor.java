@@ -120,9 +120,9 @@ class EntityEncryptor {
      *
      * @return the entity manager factory.
      * @throws RuntimeException when the encryption service returns {@code null}.
-     * @implNote The service promises the same factory on every call, so it is asked once: what resolving it costs —
-     *         a container lookup through a {@code Provider}, say — is the application's, and unknown here. Two threads
-     *         may both ask on first use; they get the same factory.
+     * @implNote The service promises the same factory on every call, so it is asked once: what resolving it
+     *         costs — a container lookup through a {@code Provider}, say — is the application's, and unknown here. Two
+     *         threads may both ask on first use; they get the same factory.
      */
     private EntityManagerFactory entityManagerFactory() {
         var result = entityManagerFactory;
@@ -416,8 +416,8 @@ class EntityEncryptor {
      *                      empty when the {@code attribute} belongs to the {@code rootType} itself.
      * @param attribute     the attribute whose rules are returned.
      * @return the rules of the {@code attribute}.
-     * @implNote Jakarta Persistence exposes no portable accessor for effective per-column metadata, so a mapping
-     *         expressed in {@code orm.xml} is not visible here.
+     * @implNote Jakarta Persistence exposes no portable accessor for effective per-column metadata, so a
+     *         mapping expressed in {@code orm.xml} is not visible here.
      */
     private static ColumnRules resolveColumnRules(final ManagedType<?> rootType,
                                                   final List<Attribute<?, ?>> embeddingPath,
@@ -490,13 +490,13 @@ class EntityEncryptor {
      * @param visiting      the managed types on the current path, for detecting a cycle.
      * @return the validated mapping of the {@code managedType}.
      * @throws RuntimeException when any annotated attribute of the {@code managedType} is mapped inconsistently.
-     * @implNote Runs once per entity class, and descends through the whole reachable embeddable graph to completion
-     *         before any instance is touched, so that an inconsistent mapping cannot leave an instance half-encrypted.
-     *         An embeddable is validated anew for each path it is reached by: an override on one path can make it
-     *         safe, or unsafe, where it is not on another.
+     * @implNote Runs once per entity class, and descends through the whole reachable embeddable graph to
+     *         completion before any instance is touched, so that an inconsistent mapping cannot leave an instance
+     *         half-encrypted. An embeddable is validated anew for each path it is reached by: an override on one path
+     *         can make it safe, or unsafe, where it is not on another.
      */
     private EncryptionMapping validate(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
-                             final ManagedType<?> managedType, final Set<ManagedType<?>> visiting) {
+                                       final ManagedType<?> managedType, final Set<ManagedType<?>> visiting) {
         if (!visiting.add(managedType)) {
             throw new RuntimeException("embeddable cycle through " + managedType.getJavaType().getName());
         }

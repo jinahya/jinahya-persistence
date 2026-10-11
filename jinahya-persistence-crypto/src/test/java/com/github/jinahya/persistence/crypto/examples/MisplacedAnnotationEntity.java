@@ -12,8 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * An entity under field access whose {@link EncryptedAttribute} sits on a getter, which the provider does not read,
- * for verifying that it is rejected rather than silently ignored (#70).
+ * An entity under field access whose {@link EncryptedAttribute} sits on a getter, which the provider does not read, for
+ * verifying that it is rejected rather than silently ignored (#70).
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

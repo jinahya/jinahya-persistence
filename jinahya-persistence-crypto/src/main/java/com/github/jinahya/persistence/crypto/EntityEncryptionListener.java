@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 /**
  * An entity listener which encrypts an entity instance before it is written, and decrypts it after it is read.
  * <p>
- * Register this class itself on an entity class which has {@link EncryptedAttribute encrypted attributes}, and
- * provide an {@link EntityEncryptionService} as a bean; nothing else is required.
+ * Register this class itself on an entity class which has {@link EncryptedAttribute encrypted attributes}, and provide
+ * an {@link EntityEncryptionService} as a bean; nothing else is required.
  * <pre>{@code
  * @EntityListeners(EntityEncryptionListener.class)
  * @Entity
