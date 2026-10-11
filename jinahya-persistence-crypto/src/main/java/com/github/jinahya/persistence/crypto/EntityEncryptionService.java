@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.crypto;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -109,11 +110,12 @@ public interface EntityEncryptionService {
      * @param decryptedBytes       the decrypted bytes to encrypt; never {@code null}. The encoding of the value, framed
      *                             with a header, so never empty either; an array of the listener's own, which this
      *                             method may keep.
-     * @return an encryption result to be decrypted via {@link #decrypt(String, byte[])} method; never {@code null}.
+     * @return an encryption result to be decrypted via {@link #decrypt(String, byte[])} method; never {@code null},
+     *         and never empty: an empty array stands for a stale ciphertext, so the listener rejects one.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */
     @Nonnull
-    @NotNull
+    @NotEmpty
     byte[] encrypt(@Nullable @org.jspecify.annotations.Nullable String encryptionIdentifier,
                    @Nonnull @NotNull byte[] decryptedBytes);
 

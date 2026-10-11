@@ -2,7 +2,6 @@ package com.github.jinahya.persistence.crypto;
 
 import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
 import jakarta.persistence.metamodel.Attribute;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +56,7 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
      * @param encrypted      the attribute holding the ciphertext.
      * @param javaType       the declared java type of the plaintext, resolved against the concrete class.
      */
-    record Pair(@Nullable Attribute<?, ?> decrypted, java.lang.reflect.@Nullable Field plaintextField,
+    record Pair(@org.jspecify.annotations.Nullable Attribute<?, ?> decrypted, java.lang.reflect.@org.jspecify.annotations.Nullable Field plaintextField,
                 Attribute<?, ?> encrypted, Class<?> javaType) {
 
         Pair {
@@ -78,7 +77,7 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
             return plaintextField != null ? plaintextField.getName() : Objects.requireNonNull(decrypted).getName();
         }
 
-        @Nullable Object getPlaintext(final Object target) {
+        @org.jspecify.annotations.Nullable Object getPlaintext(final Object target) {
             if (plaintextField != null) {
                 try {
                     return plaintextField.get(target);
@@ -89,7 +88,7 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
             return JinahyaAttributeUtils.getAttributeValue(target, Objects.requireNonNull(decrypted));
         }
 
-        Runnable setPlaintext(final Object target, final @Nullable Object value) {
+        Runnable setPlaintext(final Object target, final @org.jspecify.annotations.Nullable Object value) {
             final var field = plaintextField;
             if (field != null) {
                 return () -> {
@@ -104,11 +103,11 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
             return () -> JinahyaAttributeUtils.setAttributeValue(target, attribute, value);
         }
 
-        byte @Nullable [] getCiphertext(final Object target) {
+        byte @org.jspecify.annotations.Nullable [] getCiphertext(final Object target) {
             return (byte[]) JinahyaAttributeUtils.getAttributeValue(target, encrypted);
         }
 
-        Runnable setCiphertext(final Object target, final byte @Nullable [] value) {
+        Runnable setCiphertext(final Object target, final byte @org.jspecify.annotations.Nullable [] value) {
             return () -> JinahyaAttributeUtils.setAttributeValue(target, encrypted, value);
         }
     }

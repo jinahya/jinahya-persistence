@@ -10,14 +10,12 @@ import com.github.jinahya.persistence.crypto.examples.GraphEntity;
 import com.github.jinahya.persistence.crypto.examples.InheritedOverrideEntity;
 import com.github.jinahya.persistence.crypto.examples.MisnamedPlaintextEntity;
 import com.github.jinahya.persistence.crypto.examples.MisplacedAnnotationEntity;
-import com.github.jinahya.persistence.crypto.examples.ModeBPlainSetterEntity;
 import com.github.jinahya.persistence.crypto.examples.OverriddenEntity;
 import com.github.jinahya.persistence.crypto.examples.PlainEntity;
 import com.github.jinahya.persistence.crypto.examples.PlaintextAnnotatedEntity;
 import com.github.jinahya.persistence.crypto.examples.RescuedEntity;
 import com.github.jinahya.persistence.crypto.examples.SecretEmbeddable;
 import com.github.jinahya.persistence.crypto.examples.SecretEntity;
-import com.github.jinahya.persistence.crypto.examples.TransientSecretEntity;
 import com.github.jinahya.persistence.crypto.examples.TwoPathEntity;
 import com.github.jinahya.persistence.crypto.examples.UnguardedEmbeddable;
 import jakarta.persistence.EntityManagerFactory;
@@ -415,30 +413,6 @@ class EntityEncryptor_Test {
             assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
         }
 
-        @DisplayName("a transient plaintext (Mode B) without a setter is rejected (#82)")
-        @Test
-        void __transientWithoutSetterRejected() {
-            final var entity = new TransientSecretEntity();
-            entity.name = "never-stored";
-
-            assertThatThrownBy(() -> service.encrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("needs a setter")
-                    .hasMessageContaining("setName(String)");
-        }
-
-        @DisplayName("a transient plaintext (Mode B) whose setter does not null the ciphertext is rejected (#82)")
-        @Test
-        void __plainSetterRejected() {
-            final var entity = new ModeBPlainSetterEntity();
-            entity.name = "lost-on-edit";
-
-            assertThatThrownBy(() -> service.encrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("does not null the ciphertext")
-                    .hasMessageContaining("nameEnc__");
-        }
-
         @DisplayName(
                 "an encrypted embeddable reached through an @ElementCollection is rejected, not persisted in the clear (#71)")
         @Test
@@ -642,6 +616,28 @@ class EntityEncryptor_Test {
 
             assertThat(given).as("the stored ciphertext is not handed over").noneMatch(a -> a == stored);
             assertThat(returned).as("the decrypted value is not the service's array").noneMatch(a -> a == entity.photo);
+        }
+    }
+
+    @DisplayName("an empty encryption result")
+    @Nested
+    class EmptyEncryptionResultTest {
+
+        @DisplayName("is rejected: an empty array stands for a stale ciphertext, and is never stored")
+        @Test
+        void __rejected() {
+            final var encryptor = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
+                @Override
+                public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+                    return new byte[0];
+                }
+            });
+            final var entity = populated();
+
+            assertThatThrownBy(() -> encryptor.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("returned no bytes");
+            assertThat(entity.nameEnc__).as("nothing was assigned").isNull();
         }
     }
 

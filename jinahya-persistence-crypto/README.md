@@ -36,7 +36,7 @@ class User {
 
     public String getName() { return name; }
 
-    public void setName(String name) { this.name = name; this.nameEnc = null; }
+    public void setName(String name) { this.name = name; this.nameEnc = new byte[0]; } // stale: see Mode B
 }
 
 @ApplicationScoped // or a Spring @Component
@@ -116,7 +116,7 @@ class User {
 
     public void setName(final String name) {
         this.name = name;
-        this.nameEnc = null; // required: see below
+        this.nameEnc = new byte[0]; // required: makes the ciphertext stale, see below
     }
 }
 ```
@@ -124,11 +124,14 @@ class User {
 It behaves like an ordinary field: `getName()` always returns the value, reading an entity does not write it, the
 version does not move, a value can be cleared, and Bean Validation constraints on `name` see the real value.
 
-**The setter has to null the ciphertext.** The persistence provider dirty-checks mapped attributes only; it never
-sees a change to a `@Transient` field. Nulling `nameEnc` is what makes the change visible, so that `@PreUpdate`
-runs and re-encrypts. Write this setter by hand — a generated one (Lombok's `@Setter`, an IDE's) is not enough. The
-module proves it when it validates the mapping: it calls the setter on a throwaway instance, and rejects the mapping if
-the setter is missing or does not null the ciphertext.
+**The setter has to make the ciphertext stale.** The persistence provider dirty-checks mapped attributes only, and
+calls `@PreUpdate` only for an entity it finds changed; it never sees a change to a `@Transient` field. Setting
+`nameEnc` to an empty array is what makes the change visible: an empty array differs from whatever was loaded, a
+ciphertext or `null`, so the provider calls `@PreUpdate`, and the listener re-encrypts from `name`, replacing the empty
+array before the `UPDATE` is built. An empty array is never stored: the module treats it as stale, and rejects an
+empty result from `EntityEncryptionService.encrypt`. `null` would not do: on an entity which had no value, `null` is no
+change, and the value set would be lost. Write this setter by hand — a generated one (Lombok's `@Setter`, an IDE's) is
+not enough; the module does not check it.
 
 **Change the value through the setter, never the field.** A direct write to `name` is kept only if the instance is
 flushed for another reason anyway (another attribute changed); otherwise it is lost. An unchanged value is never
@@ -213,7 +216,7 @@ Per entity, when its team is ready — nothing forces it:
      .getSingleResult();
    ```
 3. When it returns `0`: replace `@Column(insertable = false)` on the plaintext with `@Transient`, and add the
-   invalidating setter. Nothing else changes; no data moves, and the ciphertext column is already full.
+   setter which makes the ciphertext stale. Nothing else changes; no data moves, and the ciphertext column is already full.
 4. The old plaintext column is left over: it has to stay nullable (unmapped, it is never written) and lose any `UNIQUE`
    constraint. Drop it whenever convenient.
 
@@ -293,7 +296,6 @@ which breaks any of these is rejected:
 | the plaintext's declared java type has a codec (see [Encoding](#encoding)); for a member of a generic `@MappedSuperclass`, the type the entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) | ✓ | ✓ |
 | the plaintext column is **non-insertable**, nullable and **updatable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)) | ✓ | — (no column) |
 | no Bean Validation constraint on the plaintext ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)) | ✓ | — (allowed) |
-| a setter which also nulls the ciphertext, proven when the mapping is validated | — | ✓ |
 | the ciphertext attribute is `@Basic`, optional, typed `byte[]`, not an identifier or a version, and its column is insertable, updatable and nullable | ✓ | ✓ |
 | an `@Embedded` attribute is not itself annotated; annotate the ciphertext attributes inside the embeddable, which are descended into | ✓ | ✓ |
 | an embeddable reached through an `@ElementCollection` — element or map key — holds no `@EncryptedAttribute` at any depth: collections are not walked ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)) | ✓ | ✓ |
@@ -325,6 +327,11 @@ This module moves values between the plaintext and the ciphertext; it imposes no
 * **The cipher suite.** `EntityEncryptionService` decides the algorithm and the keys. An *authenticated* mode (AES-GCM,
   for example) is recommended: tampering with the stored ciphertext is then detected by the service, before any byte
   is decoded.
+* **Secondary tables.** The ciphertext attribute may be mapped to a column of a `@SecondaryTable`
+  (`@Column(table = "user_secret", …)`): attributes are found in the metamodel, never in tables, so it is an ordinary
+  attribute of the same entity, in either mode. The secondary rows are the schema's and the persistence provider's
+  matter: EclipseLink does not find an entity whose secondary row is missing, so rows which exist before the mapping
+  does need theirs inserted first; Hibernate ORM finds them.
 * **Sizes and lengths.** Nothing is limited: the size of a value, of its ciphertext, and of the column holding it are
   the application's concern, as they are for a plain mapping.
 * **Deserialization.** A `Serializable` attribute is deserialized without a filter of this module's own, so the
@@ -345,6 +352,11 @@ This module moves values between the plaintext and the ciphertext; it imposes no
 * **Scalar projections** do not load entities, so nothing decrypts them.
 * **Collections and associations.** Only `@Basic` and `@Embedded` are walked; an encrypted embeddable inside an
   `@ElementCollection` is rejected ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)); cascaded entities need their own listener registration.
+* **Change-tracking class enhancement is not verified** — EclipseLink weaving with change tracking, and Hibernate
+  ORM bytecode enhancement with dirty tracking. The listener writes entity fields by reflection, which such
+  enhancement may not see; tracked this way, the provider could leave out of a write what the listener put into the
+  entity. Hibernate ORM's `@DynamicInsert` and `@DynamicUpdate`, without enhancement, are verified
+  (`HibernateDynamic_Test`).
 * **The shared (second-level) cache.** The test persistence units set `shared-cache-mode` to `NONE`; nothing here is
   proven against a cache hit.
 

@@ -1,7 +1,6 @@
 package com.github.jinahya.persistence.crypto;
 
 import com.github.jinahya.persistence.crypto.EncryptionMapping.Pair;
-import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1751,7 +1750,7 @@ final class EntityEncryptorUtils {
          * @param id the id.
          * @return the codec with the {@code id}; {@code null} when there is none.
          */
-        static @Nullable Codec of(final byte id) {
+        static @org.jspecify.annotations.Nullable Codec of(final byte id) {
             for (final var codec : values()) {
                 if (codec.id == id) {
                     return codec;
@@ -1784,7 +1783,7 @@ final class EntityEncryptorUtils {
      * @implNote The order of the checks is the order of the codec ladders in {@link EntityEncryptor}:
      *         {@code java.sql} types before {@link java.util.Date}, and {@link Serializable} last.
      */
-    static @Nullable Codec codecOf(final Class<?> javaType) {
+    static @org.jspecify.annotations.Nullable Codec codecOf(final Class<?> javaType) {
         if (javaType == boolean.class || javaType == Boolean.class) {
             return Codec.BOOLEAN_1;
         } else if (javaType == byte.class || javaType == Byte.class) {

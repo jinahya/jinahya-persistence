@@ -172,7 +172,7 @@ String name;
 @Column
 byte[] name_enc__;
 
-void setName(String name) { this.name = name; this.name_enc__ = null; }  // makes edits visible
+void setName(String name) { this.name = name; this.name_enc__ = new byte[0]; }  // stale: makes edits visible
 ----
 
 *Mechanism.*
@@ -188,8 +188,9 @@ void setName(String name) { this.name = name; this.name_enc__ = null; }  // make
 
 *Trade-offs.*
 
-* *Edits are not detected* (1.3). *Implemented (#82):* a setter that invalidates the ciphertext (shown above),
-  proven on validation, on a throwaway instance; and a safety net: when the instance is flushed for another reason, the
+* *Edits are not detected* (1.3). *Implemented (#82):* a setter that makes the ciphertext stale (an empty array,
+  which differs from anything loaded, `null` included; a `null` would be no change on an entity which had no value);
+  and a safety net: when the instance is flushed for another reason, the
   plaintext is compared with the ciphertext, so a direct field write is kept. A direct write with nothing else changed
   is still lost: no callback runs at all. *Measured:* `merge()` does not copy a transient field from a detached
   instance; set the value on the instance it returns.
@@ -307,7 +308,7 @@ class User {
     @Column(table = "USER_ENC", name = "name")
     byte[] nameEnc;
 
-    void setName(String name) { this.name = name; this.nameEnc = null; }
+    void setName(String name) { this.name = name; this.nameEnc = new byte[0]; }
 }
 ----
 
@@ -489,7 +490,7 @@ Same as within_table Mode B (2.2), with the bundle as the only mapped attribute:
 
 * Support within_table A and B (and per_table on top of B) in the module, or only some of them?
 * *Done (#82):* within_table A and B are both supported, the mode decided by `@Transient` on the plaintext;
-  edit detection is an invalidating setter, proven when the mapping is validated, plus a safety net; an unchanged
+  edit detection is a setter which makes the ciphertext stale (an empty array), plus a safety net; an unchanged
   plaintext is not re-encrypted; the pre-switch check is a count of rows with plaintext and no ciphertext, which the
   README gives as a JPQL query since the encryption mechanism became internal (`WIRING.adoc`).
 * *[unverified]* How Hibernate 7.4 and EclipseLink 5.0 join a missing secondary row, and whether they insert it when
@@ -540,7 +541,7 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 
 . *Mode B support:* *done* (#82). The plaintext is `@Transient`, found by reflection by the name which the
   annotation on the ciphertext gives; nothing mapped is ever nulled.
-. *Edit detection:* *done* (#82): an invalidating setter, proven on validation, and a safety net comparing the plaintext
+. *Edit detection:* *done* (#82): a setter which makes the ciphertext stale, and a safety net comparing the plaintext
   with the ciphertext when the instance is flushed anyway.
 . *Re-encryption policy:* *done* (#82): an unchanged plaintext is never re-encrypted.
 . *A pre-switch check:* *done* (#82) as `countUnmigrated(Class)`, then removed: counting the rows still holding

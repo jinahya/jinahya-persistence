@@ -161,6 +161,19 @@ class ModeB_Test {
         assertThat(row(id)[2]).as("the ciphertext is gone too").isNull();
     }
 
+    @DisplayName("B: a value set on an entity which had none is stored, and the empty marker never reaches the row")
+    @Test
+    void __noValueThenValue() {
+        final var id = persistB(null);
+        assertThat(row(id)[2]).as("no value, no ciphertext; the stale marker was not stored").isNull();
+        apply(em -> {
+            em.find(GuardedModeBEntity.class, id).setName("later");
+            return null;
+        });
+        assertThat(readB(id)).isEqualTo("later");
+        assertThat((byte[]) row(id)[2]).as("a real ciphertext").isNotNull().isNotEmpty();
+    }
+
     @DisplayName("A -> B: a row written in Mode A reads in Mode B")
     @Test
     void __aToB() {

@@ -4,7 +4,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.invoke.MethodHandles;
 
@@ -140,8 +139,8 @@ public class EntityEncryptionListener {
     // -----------------------------------------------------------------------------------------------------------------
     // injected when the persistence provider creates listeners through a bean container; never assigned here
     @Inject
-    private @Nullable EntityEncryptionService encryptionService;
+    private @org.jspecify.annotations.Nullable EntityEncryptionService encryptionService;
 
     // created from the encryption service on the first callback
-    private volatile @Nullable EntityEncryptor encryptor;
+    private volatile @org.jspecify.annotations.Nullable EntityEncryptor encryptor;
 }

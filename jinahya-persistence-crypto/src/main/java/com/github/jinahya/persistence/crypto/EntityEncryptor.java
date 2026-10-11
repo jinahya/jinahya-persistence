@@ -13,7 +13,6 @@ import jakarta.persistence.metamodel.MapAttribute;
 import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
 import jakarta.validation.Constraint;
-import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -150,7 +149,7 @@ class EntityEncryptor {
      */
     private RuntimeException reject(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                                     final Attribute<?, ?> decryptedAttribute,
-                                    final @Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
+                                    final @org.jspecify.annotations.Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
         return reject(rootType, embeddingPath, decryptedAttribute.getName(),
                       decryptedAttribute.getDeclaringType().getJavaType(), encryptedAttribute, reason);
     }
@@ -168,7 +167,7 @@ class EntityEncryptor {
      */
     private static RuntimeException reject(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                                            final String decryptedName, final Class<?> declaringType,
-                                           final @Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
+                                           final @org.jspecify.annotations.Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
         final var path = new StringBuilder(rootType.getJavaType().getName());
         for (final var embedding : embeddingPath) {
             path.append('.').append(embedding.getName());
@@ -254,7 +253,7 @@ class EntityEncryptor {
      * @param visited     the managed types already searched, for stopping at a cycle.
      * @return an annotated member; {@code null} when there is none.
      */
-    private @Nullable Member findEncryptedMember(final ManagedType<?> managedType,
+    private @org.jspecify.annotations.Nullable Member findEncryptedMember(final ManagedType<?> managedType,
                                                  final Set<ManagedType<?>> visited) {
         if (!visited.add(managedType)) {
             return null;
@@ -283,7 +282,7 @@ class EntityEncryptor {
      * @param attribute the attribute.
      * @return a constraint annotation; {@code null} when there is none.
      */
-    private static @Nullable Annotation findConstraint(final Attribute<?, ?> attribute) {
+    private static @org.jspecify.annotations.Nullable Annotation findConstraint(final Attribute<?, ?> attribute) {
         final var name = attribute.getName();
         final var capitalized = Character.toUpperCase(name.charAt(0)) + name.substring(1);
         for (final var member : declaredMembers(attribute.getDeclaringType().getJavaType())) {
@@ -445,7 +444,7 @@ class EntityEncryptor {
      * Returns the {@link AttributeOverride @AttributeOverride} which applies to the specified attribute, the outermost
      * one winning.
      */
-    private static @Nullable AttributeOverride findAttributeOverride(final ManagedType<?> rootType,
+    private static @org.jspecify.annotations.Nullable AttributeOverride findAttributeOverride(final ManagedType<?> rootType,
                                                                      final List<Attribute<?, ?>> embeddingPath,
                                                                      final Attribute<?, ?> attribute) {
         final var names = new ArrayList<String>();
@@ -595,7 +594,7 @@ class EntityEncryptor {
      * @param name the name of the field.
      * @return the field; {@code null} when there is none.
      */
-    private static java.lang.reflect.@Nullable Field findField(final Class<?> type, final String name) {
+    private static java.lang.reflect.@org.jspecify.annotations.Nullable Field findField(final Class<?> type, final String name) {
         for (var c = type; c != null && c != Object.class; c = c.getSuperclass()) {
             for (final var field : c.getDeclaredFields()) {
                 if (field.getName().equals(name)) {
@@ -705,8 +704,8 @@ class EntityEncryptor {
      * @return the validated pair.
      * @implNote A transient field is not in the metamodel, so it is found by reflection. It has no column, so
      *         no column rule applies to it; and since nothing ever nulls it, a Bean Validation constraint on it sees
-     *         the real value, and is allowed. What it needs instead is a setter which also nulls the ciphertext, the
-     *         provider dirty-checking only mapped attributes: {@link #checkInvalidatingSetter} proves one.
+     *         the real value, and is allowed. A change to it is invisible to the provider, which dirty-checks mapped
+     *         attributes only; the application's setter makes the ciphertext stale, an empty array, to show one.
      */
     private static Pair checkTransientPlaintext(final ManagedType<?> rootType,
                                                 final List<Attribute<?, ?>> embeddingPath,
@@ -728,72 +727,8 @@ class EntityEncryptor {
             throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
                          "no codec for the declared java type " + javaType.getName());
         }
-        checkInvalidatingSetter(rootType, embeddingPath, concrete, field, javaType, encryptedAttribute);
         field.setAccessible(true);
         return new Pair(null, field, encryptedAttribute, javaType);
-    }
-
-    /**
-     * Checks that the specified transient plaintext has a setter which also nulls the ciphertext, by calling it on a
-     * throwaway instance.
-     *
-     * @param rootType           the managed type the walk started from.
-     * @param embeddingPath      the embedding attributes from the {@code rootType}.
-     * @param concrete           the entity, or embeddable, class.
-     * @param field              the transient plaintext field.
-     * @param javaType           the resolved type of the {@code field}.
-     * @param encryptedAttribute the attribute holding the ciphertext.
-     * @implNote Without such a setter, changing only the plaintext of a loaded instance changes nothing the
-     *         provider dirty-checks: no {@code @PreUpdate} runs, and the edit is lost. The check sets the ciphertext of
-     *         a new instance (Jakarta Persistence requires a no-arg constructor) to a dummy value, calls the setter
-     *         with {@code null}, and expects the ciphertext to be {@code null}. An abstract class is not instantiated;
-     *         its concrete subclasses are checked on their own.
-     */
-    private static void checkInvalidatingSetter(final ManagedType<?> rootType,
-                                                final List<Attribute<?, ?>> embeddingPath, final Class<?> concrete,
-                                                final java.lang.reflect.Field field, final Class<?> javaType,
-                                                final Attribute<?, ?> encryptedAttribute) {
-        final var name = "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
-        java.lang.reflect.Method setter = null;
-        search:
-        for (var c = concrete; c != null && c != Object.class; c = c.getSuperclass()) {
-            for (final var method : c.getDeclaredMethods()) {
-                if (method.getName().equals(name) && method.getParameterCount() == 1 && !method.isBridge()
-                    && !java.lang.reflect.Modifier.isStatic(method.getModifiers())
-                    && method.getParameterTypes()[0].isAssignableFrom(javaType)) {
-                    setter = method;
-                    break search;
-                }
-            }
-        }
-        final var expectation = name + "(" + javaType.getSimpleName() + "), which sets the field and also sets "
-                                + encryptedAttribute.getName() + " to null, so that the provider sees the change";
-        if (setter == null) {
-            throw reject(rootType, embeddingPath, field.getName(), field.getDeclaringClass(), encryptedAttribute,
-                         "a transient plaintext needs a setter, " + expectation);
-        }
-        if (java.lang.reflect.Modifier.isAbstract(concrete.getModifiers())) {
-            return;
-        }
-        try {
-            final var constructor = concrete.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            final var instance = constructor.newInstance();
-            JinahyaAttributeUtils.setAttributeValue(instance, encryptedAttribute, new byte[]{0});
-            setter.setAccessible(true);
-            setter.invoke(instance, (Object) null);
-            if (JinahyaAttributeUtils.getAttributeValue(instance, encryptedAttribute) != null) {
-                throw reject(rootType, embeddingPath, field.getName(), field.getDeclaringClass(), encryptedAttribute,
-                             "the setter of a transient plaintext does not null the ciphertext; it has to be "
-                             + expectation + " (a generated setter is not enough)");
-            }
-        } catch (final ReflectiveOperationException roe) {
-            final var cause = roe instanceof java.lang.reflect.InvocationTargetException ite && ite.getCause() != null
-                    ? ite.getCause() : roe;
-            throw reject(rootType, embeddingPath, field.getName(), field.getDeclaringClass(), encryptedAttribute,
-                         "cannot verify the setter of a transient plaintext, which is called once with null on a"
-                         + " new instance (" + cause + "); it has to be " + expectation);
-        }
     }
 
     /**
@@ -875,7 +810,7 @@ class EntityEncryptor {
      *                          cannot be turned into bytes.
      * @see #encrypt(Object)
      */
-    private void encrypt(final @Nullable String encryptionIdentifier, final Object object) {
+    private void encrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(resolveClass(object));
@@ -897,7 +832,7 @@ class EntityEncryptor {
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void encrypt(final @Nullable String encryptionIdentifier, final Object object,
+    private void encrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object,
                          final EncryptionMapping mapping, final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
@@ -908,6 +843,9 @@ class EntityEncryptor {
         for (final var pair : mapping.pairs()) {
             final var plaintext = pair.getPlaintext(object);
             final var ciphertext = pair.getCiphertext(object);
+            // an empty ciphertext is stale: an application's setter put it there to show the provider a change. It is
+            // never a stored value -- an empty encryption result is rejected -- and is always replaced here
+            final var stale = ciphertext != null && ciphertext.length == 0;
             if (pair.isTransient()) {
                 // Mode B: the plaintext is never mapped, so nothing mapped is ever nulled
                 if (plaintext == null) {
@@ -917,8 +855,8 @@ class EntityEncryptor {
                     continue;
                 }
                 final var framed = encode(pair, plaintext);
-                if (ciphertext != null) {
-                    // the invalidating setter nulls the ciphertext on a change; a ciphertext still present means the
+                if (ciphertext != null && !stale) {
+                    // the setter makes the ciphertext stale on a change; a stored ciphertext still present means the
                     // plaintext is unchanged -- unless it was written directly, which this compares for, so that the
                     // write is kept rather than lost, and an unchanged value is never re-encrypted with a new IV
                     final var returned = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
@@ -937,7 +875,7 @@ class EntityEncryptor {
             }
             // Mode A: the plaintext is mapped, so it is nulled to keep it out of the row
             if (plaintext == null) {
-                if (ciphertext != null) {
+                if (ciphertext != null && !stale) {
                     // already encrypted
                     continue;
                 }
@@ -950,10 +888,14 @@ class EntityEncryptor {
         }
     }
 
-    private byte[] encryptFramed(final @Nullable String encryptionIdentifier, final Pair pair, final byte[] framed) {
+    private byte[] encryptFramed(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Pair pair, final byte[] framed) {
         final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
         if (encrypted == null) {
             throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
+        }
+        if (encrypted.length == 0) {
+            // an empty ciphertext stands for a stale one; it must never be stored
+            throw new RuntimeException("encryption service returned no bytes; decrypted attribute: " + pair.name());
         }
         // a copy: the entity must not share an array the service may keep, or reuse
         return encrypted.clone();
@@ -1000,7 +942,7 @@ class EntityEncryptor {
      *                          cannot be reconstructed from bytes.
      * @see #decrypt(Object)
      */
-    private void decrypt(final @Nullable String encryptionIdentifier, final Object object) {
+    private void decrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(resolveClass(object));
@@ -1022,7 +964,7 @@ class EntityEncryptor {
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void decrypt(final @Nullable String encryptionIdentifier, final Object object,
+    private void decrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object,
                          final EncryptionMapping mapping, final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
@@ -1104,7 +1046,7 @@ class EntityEncryptor {
     private final EntityEncryptionService encryptionService;
 
     // the encryption service's entity manager factory, asked for on first use
-    private volatile @Nullable EntityManagerFactory entityManagerFactory;
+    private volatile @org.jspecify.annotations.Nullable EntityManagerFactory entityManagerFactory;
 
     // -----------------------------------------------------------------------------------------------------------------
     // the validated mapping of each entity class; never evicted: it describes the encryption service's entity manager

@@ -100,4 +100,26 @@
       </testResource>
     </testResources>
   </build>
+
+  <profiles>
+    <!-- the Hibernate ORM specific examples, and their tests, compile against Hibernate ORM's own annotations, which
+         are on the test class path under jakarta-ee-11-hibernate-orm only -->
+    <profile>
+      <id>jakarta-ee-11-eclipselink</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <testExcludes>
+                <testExclude>**/examples/hibernate/**</testExclude>
+                <testExclude>**/Hibernate*_Test.java</testExclude>
+              </testExcludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

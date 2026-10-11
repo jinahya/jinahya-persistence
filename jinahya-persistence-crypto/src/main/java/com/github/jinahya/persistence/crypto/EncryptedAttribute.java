@@ -24,8 +24,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <dl>
  *   <dt>a {@link jakarta.persistence.Transient @Transient} field — Mode B, the steady state</dt>
  *   <dd>The plaintext has no column, and nothing mapped is ever nulled: the instance keeps its value, and reading it
- *       does not write it. The entity needs a setter which also sets the ciphertext attribute to {@code null}, so that
- *       the provider, which dirty-checks mapped attributes only, sees a change; it is proven at startup.</dd>
+ *       does not write it. The entity needs a setter which also sets the ciphertext attribute to an empty array, so
+ *       that the provider, which dirty-checks mapped attributes only, sees a change; the value is then
+ *       re-encrypted.</dd>
  *   <dt>a persistent attribute — Mode A, for encrypting a column which already holds data</dt>
  *   <dd>The plaintext stays mapped to the existing column, which a legacy row still holds its plaintext in; encrypting
  *       nulls it, so that it is migrated as it is written.</dd>
@@ -62,7 +63,7 @@ public @interface EncryptedAttribute {
      *         {@code BASIC}, has to be insertable, updatable and nullable, and cannot be an identifier or a version.
      *         The named plaintext cannot be the annotated attribute itself, cannot itself be annotated, has to be of a
      *         non-primitive type which has a codec, and is either a {@link jakarta.persistence.Transient @Transient}
-     *         field with a setter which also nulls the annotated attribute (Mode B), or a persistent, optional,
+     *         field with a setter which also sets the annotated attribute to an empty array (Mode B), or a persistent, optional,
      *         {@code BASIC} attribute, neither an identifier nor a version, carrying no Bean Validation constraint, and
      *         mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and
      *         updatable (Mode A) — see {@link EncryptedAttribute the type javadoc}. Anything else is rejected, on the

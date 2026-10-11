@@ -44,6 +44,6 @@ public class ModeBNoteEntity {
 
     public void setName(final String name) {
         this.name = name;
-        this.nameEnc__ = null;
+        this.nameEnc__ = new byte[0]; // stale: shows the provider a change, so that the value is re-encrypted
     }
 }
