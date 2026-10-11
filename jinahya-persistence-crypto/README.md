@@ -7,12 +7,76 @@ Application-level encryption (ALE) for Jakarta Persistence entities: selected at
 application, so the database only ever stores their ciphertext. The cryptography and the keys are not this module's
 concern; they live behind `EntityEncryptionService`, which an application implements (with a KMS, Vault, Tink, …).
 
-An application does two things: it registers `EntityEncryptionListener` on its entities, and it provides one
-`EntityEncryptionService` as a bean. Everything else is internal to the module.
+## How it works
 
-Each encrypted value has two attributes in the same entity: a `byte[]`-typed one — a column of the same table — holds
-the ciphertext, and is the one annotated `@EncryptedAttribute`; the annotation names the other one, which holds the
-plaintext: `@EncryptedAttribute("name")`. The name is required.
+### The pieces
+
+| type | what it is | who writes it |
+|------|------------|---------------|
+| `@EncryptedAttribute` | marks the `byte[]` attribute holding a ciphertext, and names the attribute holding its plaintext | the application, on its entities |
+| `EntityEncryptionListener` | the entity listener which does the work | the module; the application only registers it |
+| `EntityEncryptionService` | which persistence unit, which key, and the cryptography itself | the application, as one bean |
+
+That is the whole public surface. The mechanism in between — finding the encrypted attributes, turning values into
+bytes, deciding what to write — is internal.
+
+### A complete example
+
+```java
+@EntityListeners(EntityEncryptionListener.class)
+@Entity
+class User {
+
+    @Transient                  // the plaintext: lives only in the object
+    private String name;
+
+    @EncryptedAttribute("name") // the ciphertext of name: the column which is stored
+    @Column(name = "name_enc")
+    private byte[] nameEnc;
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; this.nameEnc = null; }
+}
+
+@ApplicationScoped // or a Spring @Component
+class KmsEncryptionService implements EntityEncryptionService {
+    // getEntityManagerFactory(), getEncryptionIdentifier(entity), encrypt(id, bytes), decrypt(id, bytes)
+}
+```
+
+Each encrypted value has two attributes in the same entity: the `byte[]` one, annotated, which holds the ciphertext
+and is a column of the same table, and the one it names, which holds the plaintext. The name is required. Whether
+the plaintext is `@Transient`, as here, or still mapped to a column is the choice between the two modes below.
+
+### What happens
+
+```
+em.persist(user) / flush ──► @PrePersist, @PreUpdate ──► encrypt   user.name ──► user.nameEnc
+em.find(User.class, id)  ──► @PostLoad               ──► decrypt   user.nameEnc ──► user.name
+```
+
+For each encrypted attribute of the instance, and of its embeddables:
+
+1. **encrypt** — the plaintext is encoded to bytes by its declared java type, behind a two-byte header naming the
+   format and the codec ([Encoding](#encoding)); the service encrypts those bytes; the result is stored in the
+   ciphertext attribute.
+2. **decrypt** — the service decrypts the ciphertext; the header is checked, and the bytes decoded back to a value of
+   the declared type; the value is set on the plaintext.
+
+Each instance is changed **all or nothing**: every value is computed before any attribute is assigned. The mapping of
+an entity class is validated in full on its first callback, before any instance is touched ([Constraints](#constraints)).
+
+Two rules about what reaches the service:
+
+* **`null` is `null`.** An absent value never reaches the service: a `null` plaintext is stored as a `null`
+  ciphertext, and a `null` ciphertext read as a `null` plaintext, without a call. So the bytes the service is given,
+  and the bytes it returns, are never `null`; every array crossing in either direction is a copy.
+* **The encryption identifier is opaque.** The service derives it from the instance, and gets it back, unchanged, on
+  every `encrypt` and `decrypt` of that instance — `null` included. What it means is entirely the service's; it has to
+  be the same for the whole lifetime of the row ([The application's responsibility](#the-applications-responsibility)).
+
+How the listener gets the service is under [Wiring](#wiring).
 
 ## Choose your path
 
@@ -217,9 +281,7 @@ run.
 ## Constraints
 
 The mapping of an entity class is validated in full **before any instance of it is touched**, on the first callback
-for that class, and every failure of it is reported at once. Validating every entity at startup
-([#74](https://github.com/jinahya/jinahya-persistence/issues/74)) is not offered at present (see
-[`WIRING.adoc`](WIRING.adoc), "Parked"). Each encrypt and decrypt is **all-or-nothing** per instance: every value is computed before any is assigned ([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). An entity is encrypted
+for that class, and every failure of it is reported at once; there is no separate validation at startup. Each encrypt and decrypt is **all-or-nothing** per instance: every value is computed before any is assigned ([#83](https://github.com/jinahya/jinahya-persistence/issues/83)). An entity is encrypted
 when it has an `@EncryptedAttribute`, directly or in an embeddable; one with none passes through untouched. A mapping
 which breaks any of these is rejected:
 
@@ -245,12 +307,11 @@ searching the root class by the whole dotted path, then each embedding attribute
 — and otherwise reads the attribute's own `@Column`, honouring the annotation defaults when neither is present. Note
 that an override carries its own `@Column`, with its own defaults, so **an override which only renames a column
 restores `insertable = true`** even when the embeddable's own member declares otherwise. The same embeddable can
-therefore be safe on one embedding path and unsafe on another, and mappings are validated and cached per path, not
-per type.
+therefore be safe on one embedding path and unsafe on another, and an embeddable is validated for each path it is
+reached by, not once per type.
 
 **A mapping in `orm.xml` is not visible.** A Mode A plaintext mapped only there reads as the annotation defaults,
-which are insertable, and is rejected; a way to state its facts is not offered at present (see
-[`WIRING.adoc`](WIRING.adoc), "Parked"). An `orm.xml` mapping which makes an annotation-safe attribute unsafe cannot be
+which are insertable, and is rejected. An `orm.xml` mapping which makes an annotation-safe attribute unsafe cannot be
 seen either. Mode B is unaffected: its plaintext has no column.
 
 ## The application's responsibility

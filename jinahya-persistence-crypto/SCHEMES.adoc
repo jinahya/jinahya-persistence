@@ -543,8 +543,8 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 . *Edit detection:* *done* (#82): an invalidating setter, proven on validation, and a safety net comparing the plaintext
   with the ciphertext when the instance is flushed anyway.
 . *Re-encryption policy:* *done* (#82): an unchanged plaintext is never re-encrypted.
-. *A pre-switch check:* *done* (#82), as `countUnmigrated(Class)`; parked when the mechanism became internal, and given
-  in the README as a JPQL query (`WIRING.adoc`).
+. *A pre-switch check:* *done* (#82) as `countUnmigrated(Class)`, then removed: counting the rows still holding
+  plaintext is an operational step of the application, which the README gives as a JPQL query.
 . *Format items* (1.4): *done*, as format version 1 (#75–#80); `Serializable` stays as JPA supports it (#8).
 . *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
   secondary-table behavior on both providers.

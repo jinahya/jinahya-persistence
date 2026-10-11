@@ -37,7 +37,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 /**
  * Verifies that {@link EntityEncryptor} moves every supported java type between the decrypted attribute and its
@@ -308,33 +307,6 @@ class EntityEncryptor_Test {
             assertThat(rejected.overridden.getNote()).as("and nothing was touched").isEqualTo("leak-me");
         }
 
-        @DisplayName("column facts stated by an override of the annotation reading are honoured")
-        @Test
-        void __statedFactsAreHonoured() {
-            // the facts an XML mapping would establish, which the annotations cannot show
-            final var relaxed = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY)) {
-                @Override
-                ColumnRules resolveColumnRules(final jakarta.persistence.metamodel.ManagedType<?> rootType,
-                                               final java.util.List<jakarta.persistence.metamodel.Attribute<?, ?>> embeddingPath,
-                                               final jakarta.persistence.metamodel.Attribute<?, ?> attribute) {
-                    if (attribute.getName().equals("leak")) {
-                        return new ColumnRules(MappingFlag.NO, MappingFlag.YES, MappingFlag.YES, "stated");
-                    }
-                    return super.resolveColumnRules(rootType, embeddingPath, attribute);
-                }
-            };
-            final var entity = new GraphEntity();
-            entity.valid = new SecretEmbeddable("keep-me");
-            entity.second = new SecretEmbeddable("also-keep-me");
-            entity.invalid = new UnguardedEmbeddable();
-            entity.invalid.leak = "now-encrypted";
-
-            relaxed.encrypt(entity);
-
-            assertThat(entity.invalid.leak).as("the asserted mapping is accepted and encrypted").isNull();
-            assertThat(entity.invalid.leakEnc__).isNotNull().isNotEmpty();
-        }
-
         @DisplayName("a class-level override of an inherited attribute is honoured")
         @Test
         void __inheritedAttributeClassLevelOverride() {
@@ -385,23 +357,6 @@ class EntityEncryptor_Test {
             service.decrypt(entity);
             assertThat(entity.first.getNote()).as("and each decrypts back to its own value").isEqualTo("one");
             assertThat(entity.second.getNote()).isEqualTo("two");
-        }
-
-        @DisplayName("a fact which cannot be established is rejected, not assumed safe")
-        @Test
-        void __unknownIsRejected() {
-            final var unsure = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY)) {
-                @Override
-                ColumnRules resolveColumnRules(final jakarta.persistence.metamodel.ManagedType<?> rootType,
-                                               final java.util.List<jakarta.persistence.metamodel.Attribute<?, ?>> embeddingPath,
-                                               final jakarta.persistence.metamodel.Attribute<?, ?> attribute) {
-                    return new ColumnRules(MappingFlag.UNKNOWN, MappingFlag.UNKNOWN, MappingFlag.UNKNOWN, "unsure");
-                }
-            };
-
-            assertThatThrownBy(() -> unsure.encrypt(populated()))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("cannot establish");
         }
 
         @DisplayName("a null embeddable does not hide an invalid mapping")
@@ -719,46 +674,6 @@ class EntityEncryptor_Test {
                 assertThat(entity.name).as("round trip with identifier %s", identifier).isEqualTo("Jane Roe");
                 assertThat(seen).as("identifiers passed to the service").isNotEmpty().containsOnly(identifier);
             }
-        }
-    }
-
-    @DisplayName("validateMappings() (#74)")
-    @Nested
-    class ValidateMappingsTest {
-
-        @DisplayName("reports every invalid entity of the persistence unit at once, and none of the valid ones")
-        @Test
-        void __reportsEveryInvalidEntity() {
-            final var thrown = catchThrowable(() -> service.validateMappings());
-
-            assertThat(thrown).isInstanceOf(RuntimeException.class);
-            final var message = thrown.getMessage();
-            // this test unit holds deliberately invalid entities, each covered by its own rejection test
-            assertThat(message).contains(
-                    "examples.GraphEntity",              // an invalid embeddable
-                    "examples.OverriddenEntity",         // an override restoring insertable = true
-                    "examples.LifecycleEntity",          // a plaintext column left insertable
-                    "examples.TransientSecretEntity",    // #82: Mode B without a setter
-                    "examples.MisplacedAnnotationEntity", // #70
-                    "examples.ModeBPlainSetterEntity",   // #82: a setter which does not null the ciphertext
-                    "examples.CollectionSecretEntity",   // #71
-                    "examples.FrozenPlainEntity",        // #73
-                    "examples.ConstrainedSecretEntity",  // #9
-                    "examples.PlaintextAnnotatedEntity", // the annotation on the plaintext
-                    "examples.MisnamedPlaintextEntity"   // a plaintext which does not exist
-            );
-            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(11);
-            assertThat(message).doesNotContain(
-                    "examples.SecretEntity;", "examples.SecretEntity.", "examples.GuardedEntity", "examples.PlainEntity");
-        }
-
-        @DisplayName("the valid mappings are usable afterwards")
-        @Test
-        void __validMappingsStillUsable() {
-            catchThrowable(() -> service.validateMappings());
-            final var entity = populated();
-            assertThatCode(() -> service.encrypt(entity)).doesNotThrowAnyException();
-            assertThat(entity.nameEnc__).isNotNull();
         }
     }
 

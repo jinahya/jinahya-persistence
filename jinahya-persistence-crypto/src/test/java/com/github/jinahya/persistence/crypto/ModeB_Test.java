@@ -280,25 +280,4 @@ class ModeB_Test {
         });
         assertThat(readB(id)).as("set on the managed instance merge() returns").isEqualTo("after-merge");
     }
-
-    @DisplayName("countUnmigrated(Class) counts the rows still holding plaintext, and none once migrated")
-    @Test
-    void __countUnmigrated() {
-        final var service = new EntityEncryptor(LifecycleListenerEntity.SERVICE);
-        final var before = service.countUnmigrated(GuardedEntity.class);
-        final var plaintext = "legacy-" + System.nanoTime();
-        apply(em -> em.createNativeQuery(
-                        "INSERT INTO " + GuardedEntity.TABLE_NAME + " (version, name, name_enc)"
-                        + " VALUES (0, '" + plaintext + "', NULL)")
-                .executeUpdate());
-        assertThat(service.countUnmigrated(GuardedEntity.class)).isEqualTo(before + 1);
-        final long id = apply(em -> ((Number) em.createNativeQuery(
-                        "SELECT id FROM " + GuardedEntity.TABLE_NAME + " WHERE name = '" + plaintext + "'")
-                .getSingleResult()).longValue());
-        apply(em -> {
-            service.encrypt(em.find(GuardedEntity.class, id)); // the batch, for this row
-            return null;
-        });
-        assertThat(service.countUnmigrated(GuardedEntity.class)).isEqualTo(before);
-    }
 }

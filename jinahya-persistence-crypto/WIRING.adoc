@@ -61,7 +61,7 @@ container without the CDI API on the class path is expected to fail on when it i
                                  │            ▼
  EntityEncryptionService impl ◄──┼──  EntityEncryptor                       (package-private)
    getEntityManagerFactory()     │    one per listener instance, created on the first callback
-   getEncryptionIdentifier(e)    │    ├─ mapping: metamodel → validated pairs, cached per type
+   getEncryptionIdentifier(e)    │    ├─ mapping: metamodel → validated pairs, cached per class
    encrypt / decrypt (bytes)     │    ├─ codec:   value ⇄ framed bytes (EntityEncryptorUtils)
                                  │    └─ walk:    per-mode decision, all-or-nothing writes
 ----
@@ -114,7 +114,7 @@ public interface EntityEncryptionService {
 
 * Package-private, so not visible, let alone extensible, outside the package; built from the service alone.
 * No CDI types and no lifecycle methods; `AbstractEntityEncryptionService` and its `protected` hooks are gone.
-* Its internals are unchanged: mapping validation against `getEntityManagerFactory().getMetamodel()`, cached per type;
+* Its internals are unchanged: mapping validation against `getEntityManagerFactory().getMetamodel()`, cached per entity class;
   the codecs and the payload header (format version `1`); the per-mode walk; all-or-nothing writes.
 * The identifier only ever comes from the service: the overloads taking an identifier are `private`.
 
@@ -146,29 +146,26 @@ Any platform which injects entity listeners.
 * Delete the subclass of `AbstractEntityEncryptionService`.
 * A listener subclass overriding `getEncryptionService()` is deleted; such a platform is no longer supported.
 * Calls to `validateMappings()`, `countUnmigrated(Class)` and `encrypt(Object)` on the service are gone; see §6.
+  Counting unmigrated rows is the application's own query: the README gives it.
 
 == 6. Parked
 
-Existing features whose public home went away with the public mechanism. Each is decided separately; until then:
+Existing features whose public home went away with the public mechanism, and what became of each.
 
 [cols="1,3"]
 |===
 | Feature | State
 
 | Startup validation (#74)
-| `validateMappings()` exists, package-private. A mapping is validated on the first callback for its type, so a
-  mistake on a rarely used entity surfaces only when it is used.
-
-| `countUnmigrated(Class)` (#82)
-| Exists, package-private. The README gives the equivalent JPQL count for the switch from A to B.
+| Removed. A mapping is validated on the first callback for its class, so a mistake on a rarely used entity surfaces
+  only when it is used.
 
 | The Mode A batch migration
 | Not offered. The README recipe called `service.encrypt(entity)` to make a legacy row dirty; rows now migrate only as
   they are written.
 
 | The `orm.xml` column-rules hook (#73)
-| `resolveColumnRules(...)` exists, overridable within the package only. A Mode A plaintext mapped only in `orm.xml`
-  is rejected.
+| Removed. Column facts are read from annotations only; a Mode A plaintext mapped only in `orm.xml` is rejected.
 
 | More than one persistence unit
 | One service names one factory, and the listener has one injection point.

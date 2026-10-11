@@ -90,9 +90,8 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.year_4;
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
  * attributes of an embeddable are covered as well.
  * <p>
- * The mapping of a type is validated in full before any instance of it is touched, and every mapping of the
- * persistence unit by {@link #validateMappings()}. Each encrypt and decrypt is all-or-nothing per instance: every value
- * is computed before any is assigned.
+ * The mapping of an entity class is validated in full before any instance of it is touched. Each encrypt and decrypt
+ * is all-or-nothing per instance: every value is computed before any is assigned.
  * <p>
  * The java types handled are those Jakarta Persistence calls basic types: the primitives and their wrappers,
  * {@link String}, {@link BigInteger}, {@link BigDecimal}, the {@code java.time} types, {@link java.util.Date},
@@ -115,22 +114,14 @@ class EntityEncryptor {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns an unmodifiable map of attribute names and attributes of the specified managed type, caching it against
-     * the {@code managedType}.
+     * Returns the attributes of the specified managed type, by name.
      *
      * @param managedType the managed type whose attributes are returned.
      * @return an unmodifiable map of attribute names and attributes of the {@code managedType}.
-     * @apiNote this method is thread-safe.
-     * @implNote The cache belongs to this instance. A cache shared across the JVM would hand one persistence
-     *         unit's metadata to another which happens to manage a class of the same name.
      */
-    private Map<String, Attribute<?, ?>> getAttributes(final ManagedType<?> managedType) {
-        Objects.requireNonNull(managedType, "managedType is null");
-        return managedTypesAndAttributes.computeIfAbsent(
-                managedType,
-                k -> k.getAttributes().stream()
-                        .collect(Collectors.toUnmodifiableMap(Attribute::getName, Function.identity()))
-        );
+    private static Map<String, Attribute<?, ?>> getAttributes(final ManagedType<?> managedType) {
+        return managedType.getAttributes().stream()
+                .collect(Collectors.toUnmodifiableMap(Attribute::getName, Function.identity()));
     }
 
     // -------------------------------------------------------------------------------------------------------- BUILDERS
@@ -155,54 +146,27 @@ class EntityEncryptor {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns the entity manager factory of the {@link EntityEncryptionService encryption service}.
+     * Returns the entity manager factory of the {@link EntityEncryptionService encryption service}, asking for it on
+     * the first call only.
      *
      * @return the entity manager factory.
      * @throws RuntimeException when the encryption service returns {@code null}.
+     * @implNote The service promises the same factory on every call, so it is asked once: what resolving it costs —
+     *         a container lookup through a {@code Provider}, say — is the application's, and unknown here. Two threads
+     *         may both ask on first use; they get the same factory.
      */
     private EntityManagerFactory entityManagerFactory() {
-        final var entityManagerFactory = encryptionService.getEntityManagerFactory();
-        if (entityManagerFactory == null) {
-            throw new RuntimeException(
-                    "encryption service returned a null entity manager factory; service: "
-                    + encryptionService.getClass().getName());
-        }
-        return entityManagerFactory;
-    }
-
-    /**
-     * Validates, up front, the mapping of every entity of the encryption service's persistence unit.
-     * <p>
-     * Without it, a mapping is validated on its first {@link #encrypt(Object) encrypt} or {@link #decrypt(Object)
-     * decrypt}, so an entity on a rare code path fails only when that path runs, in production. Valid mappings are
-     * cached, exactly as on first use.
-     *
-     * @throws RuntimeException when any mapping is invalid; its message lists every invalid entity, and each failure
-     *                          is attached as {@link Throwable#getSuppressed() suppressed}.
-     */
-    void validateMappings() {
-        final var failures = new ArrayList<RuntimeException>();
-        for (final var entityType : entityManagerFactory().getMetamodel().getEntities()) {
-            final var type = entityType.getJavaType();
-            if (type == null) {
-                continue; // a dynamic entity has no java class to read annotations from
+        var result = entityManagerFactory;
+        if (result == null) {
+            result = encryptionService.getEntityManagerFactory();
+            if (result == null) {
+                throw new RuntimeException(
+                        "encryption service returned a null entity manager factory; service: "
+                        + encryptionService.getClass().getName());
             }
-            try {
-                getMapping(getManagedType(type));
-            } catch (final RuntimeException re) {
-                failures.add(re);
-            }
+            entityManagerFactory = result;
         }
-        if (failures.isEmpty()) {
-            return;
-        }
-        final var message = new StringBuilder("invalid encryption mapping(s): ").append(failures.size());
-        for (final var failure : failures) {
-            message.append(System.lineSeparator()).append("  - ").append(failure.getMessage());
-        }
-        final var exception = new RuntimeException(message.toString());
-        failures.forEach(exception::addSuppressed);
-        throw exception;
+        return result;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -257,11 +221,11 @@ class EntityEncryptor {
      * @param embeddingPath the embedding attributes from the {@code rootType} down to the {@code managedType}.
      * @param managedType   the managed type whose members are checked.
      * @param attributes    the attributes of the {@code managedType}.
-     * @implNote The rest of the validation walks the metamodel, so an annotated member the metamodel does not know
-     *         is never visited: a {@code @Transient} member, an unmapped one, or one on the side which the access type
-     *         does not read (a field under property access). Such a member would be silently ignored, and the plaintext
-     *         it names would never be encrypted. Bridge and synthetic methods are skipped; {@code javac} copies a
-     *         method's annotations onto its bridge.
+     * @implNote The rest of the validation walks the metamodel, so an annotated member the metamodel does not
+     *         know is never visited: a {@code @Transient} member, an unmapped one, or one on the side which the access
+     *         type does not read (a field under property access). Such a member would be silently ignored, and the
+     *         plaintext it names would never be encrypted. Bridge and synthetic methods are skipped; {@code javac}
+     *         copies a method's annotations onto its bridge.
      */
     private static void rejectUnmappedAnnotatedMembers(final ManagedType<?> rootType,
                                                        final List<Attribute<?, ?>> embeddingPath,
@@ -294,8 +258,8 @@ class EntityEncryptor {
     }
 
     /**
-     * Returns the declared members of the specified class, and of its superclasses, which this module reads
-     * annotations from: every field, and every method which is neither a bridge nor synthetic.
+     * Returns the declared members of the specified class, and of its superclasses, which this module reads annotations
+     * from: every field, and every method which is neither a bridge nor synthetic.
      *
      * @param type the class whose members are returned.
      * @return the members of the {@code type} and of its superclasses.
@@ -355,8 +319,8 @@ class EntityEncryptor {
         final var capitalized = Character.toUpperCase(name.charAt(0)) + name.substring(1);
         for (final var member : declaredMembers(attribute.getDeclaringType().getJavaType())) {
             final var matches = member instanceof java.lang.reflect.Field
-                                ? member.getName().equals(name)
-                                : member.getName().equals("get" + capitalized) || member.getName().equals("is" + capitalized);
+                    ? member.getName().equals(name)
+                    : member.getName().equals("get" + capitalized) || member.getName().equals("is" + capitalized);
             if (!matches) {
                 continue;
             }
@@ -392,8 +356,8 @@ class EntityEncryptor {
      * @param attribute the attribute.
      * @return the resolved type; the raw type of a parameterized one; the erasure of a type variable which cannot be
      *         resolved.
-     * @implNote The declared member, not {@link Attribute#getJavaType()}, decides the codec: providers disagree on the
-     *         latter. A member declared as a type variable of a generic superclass, though, is resolved here by
+     * @implNote The declared member, not {@link Attribute#getJavaType()}, decides the codec: providers disagree
+     *         on the latter. A member declared as a type variable of a generic superclass, though, is resolved here by
      *         walking the generic superclasses from the {@code concrete} class, binding each level's type arguments.
      */
     private static Class<?> resolveJavaType(final Class<?> concrete, final Attribute<?, ?> attribute) {
@@ -474,27 +438,6 @@ class EntityEncryptor {
     }
 
     /**
-     * Whether a mapping fact holds, does not hold, or could not be established.
-     */
-    enum MappingFlag {
-
-        /**
-         * The fact holds.
-         */
-        YES,
-
-        /**
-         * The fact does not hold.
-         */
-        NO,
-
-        /**
-         * The fact could not be established from the metadata available.
-         */
-        UNKNOWN
-    }
-
-    /**
      * The column rules of one attribute.
      *
      * @param insertable whether the provider may write the column in an {@code INSERT}.
@@ -502,53 +445,26 @@ class EntityEncryptor {
      * @param nullable   whether the column accepts {@code null}.
      * @param source     where the facts came from, for diagnostics; never a value.
      */
-    record ColumnRules(MappingFlag insertable, MappingFlag updatable, MappingFlag nullable, String source) {
+    private record ColumnRules(boolean insertable, boolean updatable, boolean nullable, String source) {
 
-        /**
-         * Creates a new instance.
-         *
-         * @param insertable whether the provider may write the column in an {@code INSERT}.
-         * @param updatable  whether the provider may write the column in an {@code UPDATE}.
-         * @param nullable   whether the column accepts {@code null}.
-         * @param source     where the facts came from, for diagnostics; never a value.
-         */
-        ColumnRules {
-            Objects.requireNonNull(insertable, "insertable is null");
-            Objects.requireNonNull(updatable, "updatable is null");
-            Objects.requireNonNull(nullable, "nullable is null");
-            Objects.requireNonNull(source, "source is null");
-        }
     }
 
     /**
-     * Returns the column rules of the specified attribute.
+     * Returns the column rules of the specified attribute, as its annotations describe them: the applicable
+     * {@link AttributeOverride @AttributeOverride}, if any, and otherwise the attribute's own {@link Column @Column},
+     * honouring the annotation defaults when neither is present.
      *
      * @param rootType      the managed type the walk started from.
      * @param embeddingPath the embedding attributes from the {@code rootType} down to the {@code attribute}'s owner;
      *                      empty when the {@code attribute} belongs to the {@code rootType} itself.
      * @param attribute     the attribute whose rules are returned.
      * @return the rules of the {@code attribute}.
-     * @implSpec The implementation of this class describes the <em>annotation</em> mapping: the applicable
-     *         {@link AttributeOverride @AttributeOverride}, if any, and otherwise the attribute's own
-     *         {@link Column @Column}, honouring the annotation defaults when neither is present. It never returns
-     *         {@link MappingFlag#UNKNOWN UNKNOWN}.
-     * @implNote The result is cached against the {@code (rootType, embeddingPath)} it was resolved for, so an
-     *         implementation has to be thread-safe, and has to return the same facts for the lifetime of this instance:
-     *         two threads may both miss the cache and call this method, and a later change of mind is never
-     *         reconsidered. An implementation is trusted — returning {@link MappingFlag#NO NO} for a column which is in
-     *         fact insertable authorizes a mapping which writes the plaintext.
-     *         <p>
-     *         Jakarta Persistence exposes no portable accessor for effective per-column metadata, so the facts of a
-     *         mapping expressed in {@code orm.xml} are not visible here. Overridable within this package only: a way
-     *         for an application to state such facts is not offered at present. A subclass which cannot establish a
-     *         fact returns {@link MappingFlag#UNKNOWN UNKNOWN}, and the mapping is rejected rather than assumed safe.
+     * @implNote Jakarta Persistence exposes no portable accessor for effective per-column metadata, so a mapping
+     *         expressed in {@code orm.xml} is not visible here.
      */
-    ColumnRules resolveColumnRules(final ManagedType<?> rootType,
-                                             final List<Attribute<?, ?>> embeddingPath,
-                                             final Attribute<?, ?> attribute) {
-        Objects.requireNonNull(rootType, "rootType is null");
-        Objects.requireNonNull(embeddingPath, "embeddingPath is null");
-        Objects.requireNonNull(attribute, "attribute is null");
+    private static ColumnRules resolveColumnRules(final ManagedType<?> rootType,
+                                                  final List<Attribute<?, ?>> embeddingPath,
+                                                  final Attribute<?, ?> attribute) {
         final var override = findAttributeOverride(rootType, embeddingPath, attribute);
         if (override != null) {
             // an override supplies its own @Column, with its own defaults; it replaces the member's, never merges
@@ -556,17 +472,12 @@ class EntityEncryptor {
         }
         final var column = JinahyaAttributeUtils.getJavaMemberAnnotation(attribute, Column.class);
         return column == null
-                ? new ColumnRules(MappingFlag.YES, MappingFlag.YES, MappingFlag.YES, "@Column defaults")
+                ? new ColumnRules(true, true, true, "@Column defaults")
                 : rulesOf(column, "@Column");
     }
 
     private static ColumnRules rulesOf(final Column column, final String source) {
-        return new ColumnRules(
-                column.insertable() ? MappingFlag.YES : MappingFlag.NO,
-                column.updatable() ? MappingFlag.YES : MappingFlag.NO,
-                column.nullable() ? MappingFlag.YES : MappingFlag.NO,
-                source
-        );
+        return new ColumnRules(column.insertable(), column.updatable(), column.nullable(), source);
     }
 
     private static AttributeOverride[] overridesOn(final AnnotatedElement element) {
@@ -622,9 +533,10 @@ class EntityEncryptor {
      * @param visiting      the managed types on the current path, for detecting a cycle.
      * @return the validated mapping of the {@code managedType}.
      * @throws RuntimeException when any annotated attribute of the {@code managedType} is mapped inconsistently.
-     * @implNote The validation runs once per {@code (rootType, embeddingPath)}, and descends through the whole
-     *         reachable embeddable graph to completion before any instance is touched, so that an inconsistent
-     *         mapping cannot leave an instance half-encrypted.
+     * @implNote Runs once per entity class, and descends through the whole reachable embeddable graph to completion
+     *         before any instance is touched, so that an inconsistent mapping cannot leave an instance half-encrypted.
+     *         An embeddable is validated anew for each path it is reached by: an override on one path can make it
+     *         safe, or unsafe, where it is not on another.
      */
     private Mapping validate(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                              final ManagedType<?> managedType, final Set<ManagedType<?>> visiting) {
@@ -649,7 +561,7 @@ class EntityEncryptor {
                 // and keep the child mapping: it was resolved with this path's overrides in scope
                 final var childPath = new ArrayList<>(embeddingPath);
                 childPath.add(attribute);
-                final var childMapping = resolve(
+                final var childMapping = validate(
                         rootType,
                         List.copyOf(childPath),
                         entityManagerFactory().getMetamodel().managedType(attribute.getJavaType()),
@@ -793,27 +705,21 @@ class EntityEncryptor {
         // the plaintext column must not be writable: @PrePersist runs at persist(), not when the INSERT is built,
         // so a provider which builds one statement at commit would otherwise carry a late assignment in the clear
         final var rules = resolveColumnRules(rootType, embeddingPath, decryptedAttribute);
-        if (rules.insertable() != MappingFlag.NO) {
+        if (rules.insertable()) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         (rules.insertable() == MappingFlag.UNKNOWN
-                                 ? "cannot establish that a decrypted attribute's column is not insertable"
-                                 : "a decrypted attribute's column has to be non-insertable")
+                         "a decrypted attribute's column has to be non-insertable"
                          + "; otherwise an INSERT can carry the plaintext (from " + rules.source() + ")");
         }
-        if (rules.nullable() != MappingFlag.YES) {
+        if (!rules.nullable()) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         (rules.nullable() == MappingFlag.UNKNOWN
-                                 ? "cannot establish that a decrypted attribute's column is nullable"
-                                 : "a decrypted attribute's column has to be nullable")
+                         "a decrypted attribute's column has to be nullable"
                          + "; encrypting nulls it (from " + rules.source() + ")");
         }
         // a legacy row (plaintext in this column, no ciphertext) is migrated by the UPDATE which stores its
         // ciphertext, and only that UPDATE nulls this column; a non-updatable one keeps the legacy plaintext forever
-        if (rules.updatable() != MappingFlag.YES) {
+        if (!rules.updatable()) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         (rules.updatable() == MappingFlag.UNKNOWN
-                                 ? "cannot establish that a decrypted attribute's column is updatable"
-                                 : "a decrypted attribute's column has to be updatable")
+                         "a decrypted attribute's column has to be updatable"
                          + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
         }
         return new Pair(decryptedAttribute, null, encryptedAttribute, javaType);
@@ -840,9 +746,9 @@ class EntityEncryptor {
      * @param field              the transient field holding the plaintext.
      * @param encryptedAttribute the attribute holding the ciphertext, already validated.
      * @return the validated pair.
-     * @implNote A transient field is not in the metamodel, so it is found by reflection. It has no column, so no
-     *         column rule applies to it; and since nothing ever nulls it, a Bean Validation constraint on it sees the
-     *         real value, and is allowed. What it needs instead is a setter which also nulls the ciphertext, the
+     * @implNote A transient field is not in the metamodel, so it is found by reflection. It has no column, so
+     *         no column rule applies to it; and since nothing ever nulls it, a Bean Validation constraint on it sees
+     *         the real value, and is allowed. What it needs instead is a setter which also nulls the ciphertext, the
      *         provider dirty-checking only mapped attributes: {@link #checkInvalidatingSetter} proves one.
      */
     private static Pair checkTransientPlaintext(final ManagedType<?> rootType,
@@ -880,10 +786,10 @@ class EntityEncryptor {
      * @param field              the transient plaintext field.
      * @param javaType           the resolved type of the {@code field}.
      * @param encryptedAttribute the attribute holding the ciphertext.
-     * @implNote Without such a setter, changing only the plaintext of a loaded instance changes nothing the provider
-     *         dirty-checks: no {@code @PreUpdate} runs, and the edit is lost. The check sets the ciphertext of a new
-     *         instance (Jakarta Persistence requires a no-arg constructor) to a dummy value, calls the setter with
-     *         {@code null}, and expects the ciphertext to be {@code null}. An abstract class is not instantiated;
+     * @implNote Without such a setter, changing only the plaintext of a loaded instance changes nothing the
+     *         provider dirty-checks: no {@code @PreUpdate} runs, and the edit is lost. The check sets the ciphertext of
+     *         a new instance (Jakarta Persistence requires a no-arg constructor) to a dummy value, calls the setter
+     *         with {@code null}, and expects the ciphertext to be {@code null}. An abstract class is not instantiated;
      *         its concrete subclasses are checked on their own.
      */
     private static void checkInvalidatingSetter(final ManagedType<?> rootType,
@@ -973,66 +879,32 @@ class EntityEncryptor {
                          "an encrypted attribute has to be optional");
         }
         final var encryptedRules = resolveColumnRules(rootType, embeddingPath, encryptedAttribute);
-        if (encryptedRules.insertable() != MappingFlag.YES || encryptedRules.updatable() != MappingFlag.YES) {
-            final var unknown = encryptedRules.insertable() == MappingFlag.UNKNOWN
-                                || encryptedRules.updatable() == MappingFlag.UNKNOWN;
+        if (!encryptedRules.insertable() || !encryptedRules.updatable()) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
-                         (unknown
-                                 ? "cannot establish that an encrypted attribute's column is insertable and updatable"
-                                 : "an encrypted attribute's column has to be insertable and updatable")
+                         "an encrypted attribute's column has to be insertable and updatable"
                          + "; otherwise the ciphertext cannot be stored (from " + encryptedRules.source() + ")");
         }
-        if (encryptedRules.nullable() != MappingFlag.YES) {
+        if (!encryptedRules.nullable()) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
-                         (encryptedRules.nullable() == MappingFlag.UNKNOWN
-                                 ? "cannot establish that an encrypted attribute's column is nullable"
-                                 : "an encrypted attribute's column has to be nullable")
+                         "an encrypted attribute's column has to be nullable"
                          + "; decrypting nulls it (from " + encryptedRules.source() + ")");
         }
         return encryptedAttribute;
     }
 
     /**
-     * Returns the validated mapping of the specified managed type, caching it against the {@code managedType}.
+     * Returns the validated mapping of the specified entity class: its pairs, and the mapping of every embeddable it
+     * reaches, each built for its own embedding path. Validated in full on first use, then cached.
      *
-     * @param managedType the managed type whose mapping is returned.
-     * @return the validated mapping of the {@code managedType}.
+     * @param entityClass the entity class.
+     * @return the validated mapping of the {@code entityClass}.
+     * @throws RuntimeException when the mapping is invalid; it is not cached, so every later use fails the same way.
      */
-    private Mapping getMapping(final ManagedType<?> managedType) {
-        return resolve(managedType, List.of(), managedType, new HashSet<>());
-    }
-
-    /**
-     * Returns the validated mapping of the specified managed type, validating it, and everything its embedded
-     * attributes reach, when it is not already cached.
-     *
-     * @param managedType the managed type whose mapping is returned.
-     * @param visiting    the managed types on the current path, for detecting a cycle.
-     * @return the validated mapping of the {@code managedType}.
-     * @implNote The cache is not populated with {@code computeIfAbsent}: validation recurses, and a nested
-     *         {@code computeIfAbsent} on the same map is not permitted.
-     */
-    private Mapping resolve(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
-                            final ManagedType<?> managedType, final Set<ManagedType<?>> visiting) {
-        final var key = new MappingKey(rootType, embeddingPath);
-        final var cached = mappings.get(key);
-        if (cached != null) {
-            return cached;
-        }
-        final var validated = validate(rootType, embeddingPath, managedType, visiting);
-        final var previous = mappings.putIfAbsent(key, validated);
-        return previous != null ? previous : validated;
-    }
-
-    /**
-     * The key a validated mapping is cached under. The same embeddable reached through two different paths can carry
-     * two different sets of overrides, so the managed type alone is not enough.
-     *
-     * @param rootType      the managed type the walk started from.
-     * @param embeddingPath the embedding attributes from the {@code rootType}.
-     */
-    private record MappingKey(ManagedType<?> rootType, List<Attribute<?, ?>> embeddingPath) {
-
+    private Mapping getMapping(final Class<?> entityClass) {
+        return mappings.computeIfAbsent(entityClass, k -> {
+            final var managedType = entityManagerFactory().getMetamodel().managedType(k);
+            return validate(managedType, List.of(), managedType, new HashSet<>());
+        });
     }
 
     /**
@@ -1078,40 +950,27 @@ class EntityEncryptor {
             return JinahyaAttributeUtils.getAttributeValue(target, Objects.requireNonNull(decrypted));
         }
 
-        Assignment setPlaintext(final Object target, final @Nullable Object value) {
+        Runnable setPlaintext(final Object target, final @Nullable Object value) {
             final var field = plaintextField;
             if (field != null) {
-                return new Assignment(() -> {
+                return () -> {
                     try {
                         field.set(target, value);
                     } catch (final IllegalAccessException iae) {
                         throw new RuntimeException("failed to write " + field, iae);
                     }
-                });
+                };
             }
             final var attribute = Objects.requireNonNull(decrypted);
-            return new Assignment(() -> JinahyaAttributeUtils.setAttributeValue(target, attribute, value));
+            return () -> JinahyaAttributeUtils.setAttributeValue(target, attribute, value);
         }
 
         byte @Nullable [] getCiphertext(final Object target) {
             return (byte[]) JinahyaAttributeUtils.getAttributeValue(target, encrypted);
         }
 
-        Assignment setCiphertext(final Object target, final byte @Nullable [] value) {
-            return new Assignment(() -> JinahyaAttributeUtils.setAttributeValue(target, encrypted, value));
-        }
-    }
-
-    /**
-     * An assignment to an attribute, or a field, of an entity, or embeddable, instance, deferred until every
-     * assignment of a transform has been computed.
-     *
-     * @param action the assignment.
-     */
-    private record Assignment(Runnable action) {
-
-        void apply() {
-            action.run();
+        Runnable setCiphertext(final Object target, final byte @Nullable [] value) {
+            return () -> JinahyaAttributeUtils.setAttributeValue(target, encrypted, value);
         }
     }
 
@@ -1149,11 +1008,11 @@ class EntityEncryptor {
     private void encrypt(final @Nullable String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
-        final var mapping = getMapping(getManagedType(resolveClass(object)));
+        final var mapping = getMapping(resolveClass(object));
         // computes every ciphertext before assigning any, so that a failure part-way leaves the instance as it was
-        final var assignments = new ArrayList<Assignment>();
+        final var assignments = new ArrayList<Runnable>();
         encrypt(encryptionIdentifier, object, mapping, assignments);
-        assignments.forEach(Assignment::apply);
+        assignments.forEach(Runnable::run);
     }
 
     /**
@@ -1169,7 +1028,7 @@ class EntityEncryptor {
      *         computed.
      */
     private void encrypt(final @Nullable String encryptionIdentifier, final Object object, final Mapping mapping,
-                         final List<Assignment> assignments) {
+                         final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
@@ -1340,50 +1199,6 @@ class EntityEncryptor {
     }
 
     /**
-     * Returns the number of rows of the specified entity which still hold a plaintext, and no ciphertext, in a Mode A
-     * attribute: the rows which are not migrated yet.
-     * <p>
-     * An entity is ready to be switched to Mode B, its plaintext made {@link jakarta.persistence.Transient
-     * @Transient}, when this returns {@code 0}. Run it while the entity is still in Mode A: a Mode B plaintext has no
-     * mapping left to count by.
-     *
-     * @param entityClass the entity class.
-     * @return the number of rows not migrated yet; {@code 0} when every row has its ciphertext.
-     * @throws IllegalArgumentException when the {@code entityClass} is not an entity of this service's persistence
-     *                                  unit.
-     */
-    long countUnmigrated(final Class<?> entityClass) {
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        if (!(getManagedType(entityClass) instanceof jakarta.persistence.metamodel.EntityType<?> entityType)) {
-            throw new IllegalArgumentException("not an entity: " + entityClass);
-        }
-        final var conditions = new ArrayList<String>();
-        collectUnmigratedConditions(getMapping(entityType), "e", conditions);
-        if (conditions.isEmpty()) {
-            return 0L;
-        }
-        try (var entityManager = entityManagerFactory().createEntityManager()) {
-            return entityManager.createQuery(
-                    "SELECT COUNT(e) FROM " + entityType.getName() + " e WHERE " + String.join(" OR ", conditions),
-                    Long.class).getSingleResult();
-        }
-    }
-
-    private static void collectUnmigratedConditions(final Mapping mapping, final String path,
-                                                    final List<String> conditions) {
-        for (final var pair : mapping.pairs()) {
-            final var decrypted = pair.decrypted();
-            if (decrypted != null) { // Mode A only
-                conditions.add("(" + path + "." + decrypted.getName() + " IS NOT NULL AND "
-                               + path + "." + pair.encrypted().getName() + " IS NULL)");
-            }
-        }
-        for (final var embedded : mapping.embeddeds()) {
-            collectUnmigratedConditions(embedded.mapping(), path + "." + embedded.attribute().getName(), conditions);
-        }
-    }
-
-    /**
      * Returns whether the specified entity instance is to be transformed: whether its validated mapping has an
      * {@link EncryptedAttribute encrypted attribute}, directly or inside an embeddable.
      *
@@ -1392,7 +1207,7 @@ class EntityEncryptor {
      * @throws RuntimeException when the mapping of the {@code object}'s class is invalid.
      */
     private boolean hasEncryptedAttributes(final Object object) {
-        return hasPairs(getMapping(getManagedType(resolveClass(object))));
+        return hasPairs(getMapping(resolveClass(object)));
     }
 
     private static boolean hasPairs(final Mapping mapping) {
@@ -1439,11 +1254,11 @@ class EntityEncryptor {
     private void decrypt(final @Nullable String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
-        final var mapping = getMapping(getManagedType(resolveClass(object)));
+        final var mapping = getMapping(resolveClass(object));
         // decodes every value before assigning any, so that a failure part-way leaves the instance as it was
-        final var assignments = new ArrayList<Assignment>();
+        final var assignments = new ArrayList<Runnable>();
         decrypt(encryptionIdentifier, object, mapping, assignments);
-        assignments.forEach(Assignment::apply);
+        assignments.forEach(Runnable::run);
     }
 
     /**
@@ -1459,7 +1274,7 @@ class EntityEncryptor {
      *         computed.
      */
     private void decrypt(final @Nullable String encryptionIdentifier, final Object object, final Mapping mapping,
-                         final List<Assignment> assignments) {
+                         final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
@@ -1625,9 +1440,8 @@ class EntityEncryptor {
         decrypt(encryptionIdentifier, object);
     }
 
-    // ----------------------------------------------------------------------------------------------------- entityTypes
+    // -----------------------------------------------------------------------------------------------------------------
 
-    // ---------------------------------------------------------------------------------------------------- managedTypes
     /**
      * Returns the class the metamodel knows the specified object by.
      *
@@ -1649,32 +1463,14 @@ class EntityEncryptor {
         }
     }
 
-    /**
-     * Returns the metamodel {@link ManagedType} of the specified class.
-     *
-     * @param entityClass the class whose managed type is looked up.
-     * @return the managed type of the {@code entityClass}.
-     * @throws IllegalArgumentException when the {@code entityClass} is not a managed type of the persistence unit.
-     * @implNote The lookup is cached per class, so that a listener consulting the metamodel on every lifecycle
-     *         callback does not go back to the {@link jakarta.persistence.metamodel.Metamodel Metamodel} for each one.
-     */
-    private ManagedType<?> getManagedType(final Class<?> entityClass) {
-        return managedTypes.computeIfAbsent(
-                Objects.requireNonNull(entityClass, "entityClass is null"),
-                k -> entityManagerFactory().getMetamodel().managedType(k)
-        );
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    // The caches below are never evicted: they hold the metadata of the encryption service's entity manager factory,
-    // and are meant to live exactly as long as it does.
-    private final Map<Class<?>, ManagedType<?>> managedTypes = new ConcurrentHashMap<>();
-
-    private final Map<ManagedType<?>, Map<String, Attribute<?, ?>>> managedTypesAndAttributes =
-            new ConcurrentHashMap<>();
-
-    private final Map<MappingKey, Mapping> mappings = new ConcurrentHashMap<>();
-
     // -----------------------------------------------------------------------------------------------------------------
     private final EntityEncryptionService encryptionService;
+
+    // the encryption service's entity manager factory, asked for on first use
+    private volatile @Nullable EntityManagerFactory entityManagerFactory;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // the validated mapping of each entity class; never evicted: it describes the encryption service's entity manager
+    // factory, and lives exactly as long as it does
+    private final Map<Class<?>, Mapping> mappings = new ConcurrentHashMap<>();
 }
