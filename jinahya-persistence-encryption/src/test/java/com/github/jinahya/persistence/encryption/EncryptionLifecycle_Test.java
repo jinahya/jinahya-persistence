@@ -1,6 +1,7 @@
 package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.GuardedEntity;
+import com.github.jinahya.persistence.encryption.examples.NotedModeAEntity;
 import com.github.jinahya.persistence.encryption.examples.LifecycleEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -230,5 +231,59 @@ class EncryptionLifecycle_Test {
 
         final var reread = apply(em -> em.find(GuardedEntity.class, id).name);
         assertThat(reread).as("and reads back as the same value").isEqualTo(plaintext);
+    }
+
+    // ------------------------------------------------------------------------------------------- migration by writing
+
+    private static long insertLegacy(final String table, final String columns, final String values,
+                                     final String where) {
+        apply(em -> em.createNativeQuery("INSERT INTO " + table + " (" + columns + ") VALUES (" + values + ")")
+                .executeUpdate());
+        return apply(em -> ((Number) em.createNativeQuery("SELECT id FROM " + table + " WHERE " + where)
+                .getSingleResult()).longValue());
+    }
+
+    private static Object[] nameColumns(final String table, final long id) {
+        return apply(em -> (Object[]) em.createNativeQuery(
+                "SELECT name, name_enc FROM " + table + " WHERE id = " + id).getSingleResult());
+    }
+
+    @DisplayName("a legacy row whose value the application edits is migrated by that write")
+    @Test
+    void migrateLegacyRowByEditingItsValue() {
+        final var plaintext = "legacy-edit-" + System.nanoTime();
+        final long id = insertLegacy(GuardedEntity.TABLE_NAME, "version, name, name_enc",
+                                     "0, '" + plaintext + "', NULL", "name = '" + plaintext + "'");
+
+        apply(em -> {
+            em.find(GuardedEntity.class, id).name = plaintext + "-edited";
+            return null;
+        });
+
+        final var row = nameColumns(GuardedEntity.TABLE_NAME, id);
+        assertThat(row[0]).as("the plaintext column is nulled").isNull();
+        assertThat((byte[]) row[1]).as("the ciphertext is stored").isNotNull().isNotEmpty();
+        // read inside the transaction: Mode A empties the instance on every flush, the commit included
+        final String read = apply(em -> em.find(GuardedEntity.class, id).name);
+        assertThat(read).isEqualTo(plaintext + "-edited");
+    }
+
+    @DisplayName("a legacy row is migrated by a write which only changes another column")
+    @Test
+    void migrateLegacyRowByAnUnrelatedWrite() {
+        final var marker = "legacy-unrelated-" + System.nanoTime();
+        final long id = insertLegacy(NotedModeAEntity.TABLE_NAME, "note, name",
+                                     "'" + marker + "', 'legacy-value'", "note = '" + marker + "'");
+
+        apply(em -> {
+            em.find(NotedModeAEntity.class, id).note = marker + "-written";
+            return null;
+        });
+
+        final var row = nameColumns(NotedModeAEntity.TABLE_NAME, id);
+        assertThat(row[0]).as("the plaintext column is nulled").isNull();
+        assertThat((byte[]) row[1]).as("the ciphertext is stored").isNotNull().isNotEmpty();
+        final String read = apply(em -> em.find(NotedModeAEntity.class, id).name);
+        assertThat(read).isEqualTo("legacy-value");
     }
 }

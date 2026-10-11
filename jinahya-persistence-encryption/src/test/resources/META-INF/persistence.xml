@@ -35,6 +35,7 @@
     <class>com.github.jinahya.persistence.encryption.examples.SecretEmbeddable</class>
     <class>com.github.jinahya.persistence.encryption.examples.LifecycleEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.GuardedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.NotedModeAEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.GraphEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.OverriddenEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.RescuedEntity</class>
