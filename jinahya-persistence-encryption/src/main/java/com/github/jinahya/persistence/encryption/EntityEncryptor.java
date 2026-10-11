@@ -45,15 +45,14 @@ import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.enc
  * It decides nothing about keys, cryptography or the container: the persistence unit, the identifier and the bytes all
  * come from the {@link EntityEncryptionService}. It reads the entity's {@link ManagedType managedType} from the
  * metamodel, and for each {@code byte[]} attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}, and
- * the plaintext it names — a {@code BASIC} attribute (Mode A), or a {@link jakarta.persistence.Transient @Transient}
- * field (Mode B):
+ * the {@code BASIC} attribute holding the plaintext it names:
  * <ol>
  *   <li>converts the plaintext value to bytes, by its declared java type, prefixed with a header naming the format
  *       version and the codec;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionService encryption service}, along with the
  *       {@link EntityEncryptionService#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
- *   <li>stores the ciphertext in the annotated attribute; in Mode A, it also clears the plaintext, which
- *       is mapped. In Mode B nothing mapped is ever cleared, and an unchanged plaintext is not re-encrypted.</li>
+ *   <li>stores the ciphertext in the annotated attribute, and clears the plaintext, so that its column is never
+ *       written with a value.</li>
  * </ol>
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
  * attributes of an embeddable are covered as well.
@@ -160,7 +159,7 @@ class EntityEncryptor {
      *
      * @param rootType           the managed type the walk started from.
      * @param embeddingPath      the embedding attributes from the {@code rootType}.
-     * @param decryptedName      the name of the attribute, or of the transient field, holding the plaintext.
+     * @param decryptedName      the name of the attribute holding the plaintext.
      * @param declaringType      the class declaring the plaintext.
      * @param encryptedAttribute the attribute holding the ciphertext; may be {@code null}.
      * @param reason             why the mapping was rejected.
@@ -554,7 +553,7 @@ class EntityEncryptor {
             if (annotation == null) {
                 continue;
             }
-            // the annotated attribute holds the ciphertext; the plaintext is the attribute, or field, it names
+            // the annotated attribute holds the ciphertext; the plaintext is the attribute it names
             final var plaintextName = annotation.value();
             final var encryptedAttribute = checkEncryptedAttribute(rootType, embeddingPath, attribute, plaintextName);
             if (!paired.add(plaintextName)) {
@@ -562,24 +561,14 @@ class EntityEncryptor {
                              encryptedAttribute, "a plaintext is named by more than one encrypted attribute");
             }
             final var decryptedAttribute = attributes.get(plaintextName);
-            if (decryptedAttribute != null) {
-                pairs.add(checkMappedPlaintext(rootType, embeddingPath, managedType, decryptedAttribute,
-                                               encryptedAttribute));
-                continue;
-            }
-            final var field = findField(managedType.getJavaType(), plaintextName);
-            if (field == null) {
+            if (decryptedAttribute == null) {
                 throw reject(rootType, embeddingPath, plaintextName, declaringClassOf(encryptedAttribute),
                              encryptedAttribute,
-                             "no plaintext named '" + plaintextName + "': neither a persistent attribute (Mode A) nor"
-                             + " a transient field (Mode B)");
+                             "no plaintext named '" + plaintextName + "': it has to be a persistent attribute of the"
+                             + " same entity, or embeddable");
             }
-            if (!isTransientField(field)) {
-                throw reject(rootType, embeddingPath, plaintextName, field.getDeclaringClass(), encryptedAttribute,
-                             "a plaintext field is neither a persistent attribute (Mode A) nor transient (Mode B)"
-                             + "; unmapped, or on the side the access type does not read");
-            }
-            pairs.add(checkTransientPlaintext(rootType, embeddingPath, managedType, field, encryptedAttribute));
+            pairs.add(checkMappedPlaintext(rootType, embeddingPath, managedType, decryptedAttribute,
+                                           encryptedAttribute));
         }
         visiting.remove(managedType);
         return new EncryptionMapping(List.copyOf(pairs), List.copyOf(embeddeds));
@@ -590,27 +579,7 @@ class EntityEncryptor {
     }
 
     /**
-     * Returns the field of the specified name declared by the specified class, or by the nearest of its superclasses
-     * which declares one.
-     *
-     * @param type the class to search from.
-     * @param name the name of the field.
-     * @return the field; {@code null} when there is none.
-     */
-    private static java.lang.reflect.@org.jspecify.annotations.Nullable Field findField(final Class<?> type,
-                                                                                        final String name) {
-        for (var c = type; c != null && c != Object.class; c = c.getSuperclass()) {
-            for (final var field : c.getDeclaredFields()) {
-                if (field.getName().equals(name)) {
-                    return field;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Validates a persistent plaintext attribute (Mode A), and returns its pair.
+     * Validates a persistent plaintext attribute, and returns its pair.
      *
      * @param rootType           the managed type the walk started from.
      * @param embeddingPath      the embedding attributes from the {@code rootType}.
@@ -656,7 +625,7 @@ class EntityEncryptor {
                          "a Bean Validation constraint on an encrypted attribute is evaluated against null"
                          + " (validation runs after encrypting has cleared the plaintext); found @"
                          + constraint.annotationType().getName()
-                         + "; validate the value before persisting, or use the transient-plaintext mode (#82)");
+                         + "; validate the value before persisting");
         }
         if (!isOptional(decryptedAttribute)) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
@@ -682,57 +651,7 @@ class EntityEncryptor {
                          "a decrypted attribute's column has to be updatable"
                          + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
         }
-        return new Pair(decryptedAttribute, null, encryptedAttribute, javaType);
-    }
-
-    /**
-     * Returns whether the specified field is transient to Jakarta Persistence: annotated with
-     * {@link jakarta.persistence.Transient @Transient}, or declared {@code transient}.
-     *
-     * @param field the field.
-     * @return {@code true} when the {@code field} is not persistent.
-     */
-    private static boolean isTransientField(final java.lang.reflect.Field field) {
-        return field.isAnnotationPresent(jakarta.persistence.Transient.class)
-               || java.lang.reflect.Modifier.isTransient(field.getModifiers());
-    }
-
-    /**
-     * Validates a transient plaintext field (Mode B), and returns its pair.
-     *
-     * @param rootType           the managed type the walk started from.
-     * @param embeddingPath      the embedding attributes from the {@code rootType}.
-     * @param managedType        the managed type whose java class, or a superclass of it, declares the field.
-     * @param field              the transient field holding the plaintext.
-     * @param encryptedAttribute the attribute holding the ciphertext, already validated.
-     * @return the validated pair.
-     * @implNote A transient field is not in the metamodel, so it is found by reflection. It has no column, so
-     *         no column rule applies to it; and since nothing ever nulls it, a Bean Validation constraint on it sees
-     *         the real value, and is allowed. A change to it is invisible to the provider, which dirty-checks mapped
-     *         attributes only; the application's setter makes the ciphertext stale, an empty array, to show one.
-     */
-    private static Pair checkTransientPlaintext(final ManagedType<?> rootType,
-                                                final List<Attribute<?, ?>> embeddingPath,
-                                                final ManagedType<?> managedType,
-                                                final java.lang.reflect.Field field,
-                                                final Attribute<?, ?> encryptedAttribute) {
-        final var concrete = managedType.getJavaType();
-        final var declaring = field.getDeclaringClass();
-        if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-            throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
-                         "a transient plaintext cannot be a static field");
-        }
-        final var javaType = resolveType(concrete, field.getGenericType());
-        if (javaType.isPrimitive()) {
-            throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
-                         "a decrypted attribute cannot be of a primitive type; it has no value when cleared");
-        }
-        if (EntityEncryptorUtils.codecOf(javaType) == null) {
-            throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
-                         "no codec for the declared java type " + javaType.getName());
-        }
-        field.setAccessible(true);
-        return new Pair(null, field, encryptedAttribute, javaType);
+        return new Pair(decryptedAttribute, encryptedAttribute, javaType);
     }
 
     /**
@@ -847,39 +766,9 @@ class EntityEncryptor {
         for (final var pair : mapping.pairs()) {
             final var plaintext = pair.getPlaintext(object);
             final var ciphertext = pair.getCiphertext(object);
-            // an empty ciphertext is stale: an application's setter put it there to show the provider a change. It is
-            // never a stored value -- an empty encryption result is rejected -- and is always replaced here
-            final var stale = ciphertext != null && ciphertext.length == 0;
-            if (pair.isTransient()) {
-                // Mode B: the plaintext is never mapped, so nothing mapped is ever nulled
-                if (plaintext == null) {
-                    if (ciphertext != null) {
-                        assignments.add(pair.setCiphertext(object, null)); // cleared
-                    }
-                    continue;
-                }
-                final var framed = encode(pair, plaintext);
-                if (ciphertext != null && !stale) {
-                    // the setter makes the ciphertext stale on a change; a stored ciphertext still present means the
-                    // plaintext is unchanged -- unless it was written directly, which this compares for, so that the
-                    // write is kept rather than lost, and an unchanged value is never re-encrypted with a new IV
-                    final var returned = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
-                    if (returned == null) {
-                        throw new RuntimeException(
-                                "encryption service returned null; decrypted attribute: " + pair.name());
-                    }
-                    // a copy: compared against an array the service no longer holds
-                    final var current = returned.clone();
-                    if (Arrays.equals(current, framed)) {
-                        continue;
-                    }
-                }
-                assignments.add(pair.setCiphertext(object, encryptFramed(encryptionIdentifier, pair, framed)));
-                continue;
-            }
-            // Mode A: the plaintext is mapped, so it is nulled to keep it out of the row
+            // the plaintext is mapped, so it is nulled to keep it out of the row
             if (plaintext == null) {
-                if (ciphertext != null && !stale) {
+                if (ciphertext != null) {
                     // already encrypted
                     continue;
                 }
@@ -897,10 +786,6 @@ class EntityEncryptor {
         final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
         if (encrypted == null) {
             throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
-        }
-        if (encrypted.length == 0) {
-            // an empty ciphertext stands for a stale one; it must never be stored
-            throw new RuntimeException("encryption service returned no bytes; decrypted attribute: " + pair.name());
         }
         // a copy: the entity must not share an array the service may keep, or reuse
         return encrypted.clone();
@@ -980,12 +865,7 @@ class EntityEncryptor {
         for (final var pair : mapping.pairs()) {
             final var ciphertext = pair.getCiphertext(object);
             if (ciphertext == null) {
-                if (pair.isTransient()) {
-                    // Mode B: no ciphertext is no value
-                    assignments.add(pair.setPlaintext(object, null));
-                    continue;
-                }
-                // Mode A: a legacy row keeps its plaintext; it is migrated when it is next written
+                // a legacy row keeps its plaintext; it is migrated when it is next written
                 if (pair.getPlaintext(object) == null) {
                     assignments.add(pair.setPlaintext(object, null));
                 }
@@ -998,9 +878,7 @@ class EntityEncryptor {
             // a copy: the header is checked, and the payload decoded, from an array the service no longer holds
             final var framedBytes = returned.clone();
             assignments.add(pair.setPlaintext(object, decode(pair, framedBytes)));
-            if (!pair.isTransient()) {
-                assignments.add(pair.setCiphertext(object, null)); // Mode A only; Mode B leaves it, unchanged
-            }
+            assignments.add(pair.setCiphertext(object, null));
         }
     }
 

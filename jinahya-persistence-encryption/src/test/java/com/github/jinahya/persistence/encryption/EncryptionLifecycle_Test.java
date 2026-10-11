@@ -1,7 +1,7 @@
 package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.GuardedEntity;
-import com.github.jinahya.persistence.encryption.examples.NotedModeAEntity;
+import com.github.jinahya.persistence.encryption.examples.NotedEntity;
 import com.github.jinahya.persistence.encryption.examples.LifecycleEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -263,7 +263,7 @@ class EncryptionLifecycle_Test {
         final var row = nameColumns(GuardedEntity.TABLE_NAME, id);
         assertThat(row[0]).as("the plaintext column is nulled").isNull();
         assertThat((byte[]) row[1]).as("the ciphertext is stored").isNotNull().isNotEmpty();
-        // read inside the transaction: Mode A empties the instance on every flush, the commit included
+        // read inside the transaction: the listener empties the instance on every flush, the commit included
         final String read = apply(em -> em.find(GuardedEntity.class, id).name);
         assertThat(read).isEqualTo(plaintext + "-edited");
     }
@@ -272,18 +272,18 @@ class EncryptionLifecycle_Test {
     @Test
     void migrateLegacyRowByAnUnrelatedWrite() {
         final var marker = "legacy-unrelated-" + System.nanoTime();
-        final long id = insertLegacy(NotedModeAEntity.TABLE_NAME, "note, name",
+        final long id = insertLegacy(NotedEntity.TABLE_NAME, "note, name",
                                      "'" + marker + "', 'legacy-value'", "note = '" + marker + "'");
 
         apply(em -> {
-            em.find(NotedModeAEntity.class, id).note = marker + "-written";
+            em.find(NotedEntity.class, id).note = marker + "-written";
             return null;
         });
 
-        final var row = nameColumns(NotedModeAEntity.TABLE_NAME, id);
+        final var row = nameColumns(NotedEntity.TABLE_NAME, id);
         assertThat(row[0]).as("the plaintext column is nulled").isNull();
         assertThat((byte[]) row[1]).as("the ciphertext is stored").isNotNull().isNotEmpty();
-        final String read = apply(em -> em.find(NotedModeAEntity.class, id).name);
+        final String read = apply(em -> em.find(NotedEntity.class, id).name);
         assertThat(read).isEqualTo("legacy-value");
     }
 }

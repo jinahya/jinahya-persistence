@@ -21,9 +21,8 @@
  *       hands them to the service, and moves the result between the two attributes, so that an instance is encrypted
  *       before it is written and decrypted after it is read. Embedded attributes are descended into.</dd>
  * </dl>
- * A {@link jakarta.persistence.Transient @Transient} plaintext is Mode B, the steady state: it has no column, and
- * nothing mapped is ever nulled. A persistent plaintext is Mode A, for encrypting a column which already holds data:
- * the plaintext stays mapped to it, and is nulled as each row is written, migrating it.
+ * The plaintext stays mapped to its own column, which is never written with a value; a row written before encryption was
+ * introduced keeps its plaintext there until it is next written, which migrates it.
  * <p>
  * The mapping of an entity class is validated before any instance of it is touched; each encrypt and decrypt is
  * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.

@@ -1,7 +1,6 @@
 package com.github.jinahya.persistence.encryption;
 
-import com.github.jinahya.persistence.encryption.examples.hibernate.DynamicModeAEntity;
-import com.github.jinahya.persistence.encryption.examples.hibernate.DynamicModeBEntity;
+import com.github.jinahya.persistence.encryption.examples.hibernate.DynamicEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -67,105 +66,24 @@ class HibernateDynamic_Test {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("Mode B")
+    @DisplayName("@DynamicInsert / @DynamicUpdate")
     @Nested
-    class ModeBTest {
-
-        private static long persist(final String name) {
-            return apply(em -> {
-                final var entity = new DynamicModeBEntity();
-                entity.note = "note";
-                entity.setName(name);
-                em.persist(entity);
-                return entity;
-            }).id;
-        }
-
-        private static byte[] ciphertext(final long id) {
-            return (byte[]) column(DynamicModeBEntity.TABLE_NAME, "name_enc", id);
-        }
-
-        private static String read(final long id) {
-            return apply(em -> em.find(DynamicModeBEntity.class, id).name);
-        }
-
-        @DisplayName("a value persisted is stored, and reads back")
-        @Test
-        void __persist() {
-            final var id = persist("first");
-            assertThat(ciphertext(id)).isNotNull().isNotEmpty();
-            assertThat(read(id)).isEqualTo("first");
-        }
-
-        @DisplayName("persisted with no value, then given one: stored, and the empty marker never reaches the row")
-        @Test
-        void __noValueThenValue() {
-            final var id = persist(null);
-            assertThat(ciphertext(id)).isNull();
-            apply(em -> {
-                em.find(DynamicModeBEntity.class, id).setName("later");
-                return null;
-            });
-            assertThat(ciphertext(id)).isNotNull().isNotEmpty();
-            assertThat(read(id)).isEqualTo("later");
-        }
-
-        @DisplayName("a changed value is stored")
-        @Test
-        void __change() {
-            final var id = persist("before");
-            apply(em -> {
-                em.find(DynamicModeBEntity.class, id).setName("after");
-                return null;
-            });
-            assertThat(read(id)).isEqualTo("after");
-        }
-
-        @DisplayName("a cleared value is stored as null")
-        @Test
-        void __clear() {
-            final var id = persist("clear-me");
-            apply(em -> {
-                em.find(DynamicModeBEntity.class, id).setName(null);
-                return null;
-            });
-            assertThat(ciphertext(id)).isNull();
-            assertThat(read(id)).isNull();
-        }
-
-        @DisplayName("an unrelated change leaves the ciphertext as it was")
-        @Test
-        void __unrelatedChange() {
-            final var id = persist("kept");
-            final var before = ciphertext(id);
-            apply(em -> {
-                em.find(DynamicModeBEntity.class, id).note = "changed";
-                return null;
-            });
-            assertThat(ciphertext(id)).isEqualTo(before);
-            assertThat(read(id)).isEqualTo("kept");
-        }
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @DisplayName("Mode A")
-    @Nested
-    class ModeATest {
+    class DynamicTest {
 
         @DisplayName("a value persisted is stored as ciphertext only, and reads back")
         @Test
         void __persist() {
             final long id = apply(em -> {
-                final var entity = new DynamicModeAEntity();
+                final var entity = new DynamicEntity();
                 entity.note = "note";
                 entity.name = "first";
                 em.persist(entity);
                 return entity;
             }).id;
-            assertThat(column(DynamicModeAEntity.TABLE_NAME, "name", id)).isNull();
-            assertThat((byte[]) column(DynamicModeAEntity.TABLE_NAME, "name_enc", id)).isNotNull().isNotEmpty();
-            // read inside the transaction: Mode A empties the instance on every flush, the commit included
-            final String read = apply(em -> em.find(DynamicModeAEntity.class, id).name);
+            assertThat(column(DynamicEntity.TABLE_NAME, "name", id)).isNull();
+            assertThat((byte[]) column(DynamicEntity.TABLE_NAME, "name_enc", id)).isNotNull().isNotEmpty();
+            // read inside the transaction: the listener empties the instance on every flush, the commit included
+            final String read = apply(em -> em.find(DynamicEntity.class, id).name);
             assertThat(read).isEqualTo("first");
         }
 
@@ -173,22 +91,22 @@ class HibernateDynamic_Test {
         @Test
         void __legacyRowMigrated() {
             final var marker = "legacy-" + System.nanoTime();
-            apply(em -> em.createNativeQuery("INSERT INTO " + DynamicModeAEntity.TABLE_NAME
+            apply(em -> em.createNativeQuery("INSERT INTO " + DynamicEntity.TABLE_NAME
                                              + " (note, name) VALUES ('" + marker + "', 'legacy-value')")
                     .executeUpdate());
             final long id = apply(em -> ((Number) em.createNativeQuery(
-                            "SELECT id FROM " + DynamicModeAEntity.TABLE_NAME + " WHERE note = '" + marker + "'")
+                            "SELECT id FROM " + DynamicEntity.TABLE_NAME + " WHERE note = '" + marker + "'")
                     .getSingleResult()).longValue());
 
             apply(em -> {
-                em.find(DynamicModeAEntity.class, id).note = marker + "-written";
+                em.find(DynamicEntity.class, id).note = marker + "-written";
                 return null;
             });
 
-            assertThat(column(DynamicModeAEntity.TABLE_NAME, "name", id)).as("the plaintext column").isNull();
-            assertThat((byte[]) column(DynamicModeAEntity.TABLE_NAME, "name_enc", id)).as("the ciphertext")
+            assertThat(column(DynamicEntity.TABLE_NAME, "name", id)).as("the plaintext column").isNull();
+            assertThat((byte[]) column(DynamicEntity.TABLE_NAME, "name_enc", id)).as("the ciphertext")
                     .isNotNull().isNotEmpty();
-            final String read = apply(em -> em.find(DynamicModeAEntity.class, id).name);
+            final String read = apply(em -> em.find(DynamicEntity.class, id).name);
             assertThat(read).isEqualTo("legacy-value");
         }
     }

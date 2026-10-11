@@ -6,7 +6,8 @@ toc::[]
 
 Working notes on *how the module is wired into an application*: what the application supplies, what the module
 exposes, and how the pieces find each other at run time. Not a spec. The encryption scheme itself — where the
-ciphertext lives, Mode A and Mode B — is in link:SCHEMES.adoc[`SCHEMES.adoc`].
+ciphertext lives — is in link:SCHEMES.adoc[`SCHEMES.adoc`], working notes which also record the transient-plaintext
+mode since removed.
 
 Claims marked *[unverified]* come from reading code or from provider knowledge, not from a test in this module.
 
@@ -21,7 +22,7 @@ subclassed or configured, and the module exposes as little as possible.
 @Entity
 class User {
 
-    @Transient
+    @Column(name = "name", insertable = false)
     private String name;
 
     @EncryptedAttribute("name")
@@ -160,12 +161,12 @@ Existing features whose public home went away with the public mechanism, and wha
 | Removed. A mapping is validated on the first callback for its class, so a mistake on a rarely used entity surfaces
   only when it is used.
 
-| The Mode A batch migration
+| The batch migration of legacy rows
 | Not offered. The README recipe called `service.encrypt(entity)` to make a legacy row dirty; rows now migrate only as
   they are written.
 
 | The `orm.xml` column-rules hook (#73)
-| Removed. Column facts are read from annotations only; a Mode A plaintext mapped only in `orm.xml` is rejected.
+| Removed. Column facts are read from annotations only; a plaintext mapped only in `orm.xml` is rejected.
 
 | More than one persistence unit
 | One service names one factory, and the listener has one injection point.

@@ -4,7 +4,6 @@ import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
 import jakarta.persistence.metamodel.Attribute;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The validated encryption mapping of a managed type: what {@link EntityEncryptor} builds for an entity class on first
@@ -46,62 +45,27 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
     }
 
     /**
-     * A validated pair of a plaintext and the attribute which holds its ciphertext.
-     * <p>
-     * The plaintext is either a persistent attribute (Mode A, {@code decrypted}), or a transient field (Mode B,
-     * {@code plaintextField}); exactly one of the two is set.
+     * A validated pair of the attribute which holds a plaintext and the attribute which holds its ciphertext.
      *
-     * @param decrypted      the attribute holding the plaintext, in Mode A; {@code null} in Mode B.
-     * @param plaintextField the transient field holding the plaintext, in Mode B; {@code null} in Mode A.
-     * @param encrypted      the attribute holding the ciphertext.
-     * @param javaType       the declared java type of the plaintext, resolved against the concrete class.
+     * @param decrypted the attribute holding the plaintext.
+     * @param encrypted the attribute holding the ciphertext.
+     * @param javaType  the declared java type of the plaintext, resolved against the concrete class.
      */
-    record Pair(@org.jspecify.annotations.Nullable Attribute<?, ?> decrypted,
-                java.lang.reflect.@org.jspecify.annotations.Nullable Field plaintextField,
-                Attribute<?, ?> encrypted, Class<?> javaType) {
-
-        Pair {
-            assert (decrypted == null) != (plaintextField == null);
-        }
+    record Pair(Attribute<?, ?> decrypted, Attribute<?, ?> encrypted, Class<?> javaType) {
 
         /**
-         * Returns whether the plaintext is a transient field: Mode B.
-         */
-        boolean isTransient() {
-            return plaintextField != null;
-        }
-
-        /**
-         * Returns the name of the plaintext attribute, or field.
+         * Returns the name of the plaintext attribute.
          */
         String name() {
-            return plaintextField != null ? plaintextField.getName() : Objects.requireNonNull(decrypted).getName();
+            return decrypted.getName();
         }
 
         @org.jspecify.annotations.Nullable Object getPlaintext(final Object target) {
-            if (plaintextField != null) {
-                try {
-                    return plaintextField.get(target);
-                } catch (final IllegalAccessException iae) {
-                    throw new RuntimeException("failed to read " + plaintextField, iae);
-                }
-            }
-            return JinahyaAttributeUtils.getAttributeValue(target, Objects.requireNonNull(decrypted));
+            return JinahyaAttributeUtils.getAttributeValue(target, decrypted);
         }
 
         Runnable setPlaintext(final Object target, final @org.jspecify.annotations.Nullable Object value) {
-            final var field = plaintextField;
-            if (field != null) {
-                return () -> {
-                    try {
-                        field.set(target, value);
-                    } catch (final IllegalAccessException iae) {
-                        throw new RuntimeException("failed to write " + field, iae);
-                    }
-                };
-            }
-            final var attribute = Objects.requireNonNull(decrypted);
-            return () -> JinahyaAttributeUtils.setAttributeValue(target, attribute, value);
+            return () -> JinahyaAttributeUtils.setAttributeValue(target, decrypted, value);
         }
 
         byte @org.jspecify.annotations.Nullable [] getCiphertext(final Object target) {

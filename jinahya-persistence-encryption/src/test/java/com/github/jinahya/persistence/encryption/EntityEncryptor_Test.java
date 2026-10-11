@@ -619,28 +619,6 @@ class EntityEncryptor_Test {
         }
     }
 
-    @DisplayName("an empty encryption result")
-    @Nested
-    class EmptyEncryptionResultTest {
-
-        @DisplayName("is rejected: an empty array stands for a stale ciphertext, and is never stored")
-        @Test
-        void __rejected() {
-            final var encryptor = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
-                @Override
-                public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
-                    return new byte[0];
-                }
-            });
-            final var entity = populated();
-
-            assertThatThrownBy(() -> encryptor.encrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("returned no bytes");
-            assertThat(entity.nameEnc__).as("nothing was assigned").isNull();
-        }
-    }
-
     @DisplayName("the encryption identifier is opaque")
     @Nested
     class EncryptionIdentifierTest {

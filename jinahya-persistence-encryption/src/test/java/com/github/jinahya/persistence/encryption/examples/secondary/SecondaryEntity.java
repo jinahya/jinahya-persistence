@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.encryption.examples;
+package com.github.jinahya.persistence.encryption.examples.secondary;
 
 import com.github.jinahya.persistence.encryption.EncryptedAttribute;
 import com.github.jinahya.persistence.encryption.LifecycleListenerEntity;
@@ -11,39 +11,46 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
 
 /**
- * A Mode A entity with an ordinary column besides its encrypted pair, so that a legacy row can be written without its
- * plaintext being touched.
+ * An entity whose ciphertext lives in a secondary table: the plaintext stays mapped to its column of the primary
+ * table, which a legacy row still holds its value in, and the ciphertext attribute is mapped to a column of
+ * {@value #SECONDARY_TABLE_NAME}, joined one-to-one by primary key.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @EntityListeners(LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = NotedModeAEntity.TABLE_NAME)
-public class NotedModeAEntity {
+@Table(name = SecondaryEntity.TABLE_NAME)
+@SecondaryTable(name = SecondaryEntity.SECONDARY_TABLE_NAME,
+                pkJoinColumns = @PrimaryKeyJoinColumn(name = "id"))
+public class SecondaryEntity {
 
-    public static final String TABLE_NAME = "noted_mode_a_entity";
+    public static final String TABLE_NAME = "secondary_entity";
+
+    public static final String SECONDARY_TABLE_NAME = "secondary_secret";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public Long id;
 
-    // an ordinary column, for a write which does not touch the secret
+    // an ordinary column of the primary table, for writing a row without touching the secret
     @Basic(optional = true)
     @Column(name = "note", nullable = true)
     public String note;
 
-    // the existing plaintext column
+    // the existing plaintext column, in the primary table
     @Basic(optional = true)
     @Column(name = "name", nullable = true, insertable = false)
     public String name;
 
     @EncryptedAttribute("name")
     @Basic(optional = true)
-    @Column(name = "name_enc", nullable = true, length = 2048)
+    @Column(table = SECONDARY_TABLE_NAME, name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc;
 }
