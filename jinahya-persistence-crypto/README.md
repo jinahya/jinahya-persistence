@@ -92,7 +92,8 @@ plain entity, no data yet        ───────────────�
 | **[B](#mode-b-the-steady-state)** | `@Transient` | there is no plaintext data to migrate | behaves like an ordinary field |
 | **[A](#mode-a-encrypting-existing-data)** | mapped, to the old column | the column already holds plaintext | migrates rows as they are written, at a cost |
 
-**A is how you get in; B is where you stay.** Both use the same annotation and the same listener; the module tells them
+**Both are supported for as long as you need them.** A exists to encrypt a column which already holds data, at the
+costs listed under it; B has none of them, and switching from A to B is optional. Both use the same annotation and the same listener; the module tells them
 apart by whether the plaintext is `@Transient` ([#82](https://github.com/jinahya/jinahya-persistence/issues/82)). The design behind this, and the schemes considered, are in
 [`SCHEMES.adoc`](SCHEMES.adoc).
 
@@ -176,6 +177,35 @@ the encryption mechanism directly, which is now internal (see [`WIRING.adoc`](WI
 Migrating on write relies on the plaintext column being updatable, which is why that is required ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)). Nulling the column
 does not erase the plaintext from backups, logs, replicas or indexes; scrubbing those is the application's.
 
+### The rules (Mode A)
+
+What the listener does with the two attributes of each pair; a stale ciphertext — an empty array — counts as none.
+
+**Encrypt** (`@PrePersist`, `@PreUpdate`)
+
+| plaintext | ciphertext | result |
+|---|---|---|
+| present | anything | ciphertext = encrypt(plaintext); plaintext = `null` |
+| `null` | stored | kept: already encrypted |
+| `null` | `null`, or stale | ciphertext = `null` |
+
+**Decrypt** (`@PostLoad`)
+
+| plaintext | ciphertext | result |
+|---|---|---|
+| anything | stored | plaintext = decrypt(ciphertext); ciphertext = `null` |
+| `null` | `null` | nothing: no value |
+| present | `null` | left alone: a legacy row, migrated on its next write |
+
+The second encrypt row is what a second flush of the same instance sees: the first encryption nulled the plaintext,
+and the value is safe in the ciphertext. Reading it as "cleared" would erase the value.
+
+**Why not mark the ciphertext instead?** The ambiguity is not in the bytes: after a flush, the ciphertext attribute holds
+the ciphertext either way. It is in the plaintext, which is `null` both when the module nulled it at the flush and when
+the application set `null` afterwards — and setting `null` on a field already `null` leaves no trace to mark. Only a
+plaintext kept in memory makes that change visible, which is Mode B. The ciphertext's format stays entirely the
+`EntityEncryptionService`'s.
+
 ### What Mode A costs
 
 The plaintext is a *mapped* attribute, and a JPA listener can only keep its value out of the row by nulling the field.
@@ -188,8 +218,10 @@ These follow, and cannot be fixed inside the standard callbacks; Mode B has none
   replication, CDC and audit, and a read-only connection fails.
 * **The instance is emptied by `persist()` and by every flush.** Right after `em.persist(entity)` returns, and after
   every flush, the application's own object reads back `null` for every encrypted attribute.
-* **A value cannot be cleared through the plaintext.** With the plaintext `null` and the ciphertext present, encrypting
-  reads that as "already encrypted"; clear the ciphertext attribute as well.
+* **An instance already encrypted cannot be cleared through its plaintext alone.** After `persist()`, or a flush, in the
+  same persistence context, the instance holds a `null` plaintext and the ciphertext, which encrypting reads as
+  "already encrypted"; to clear the value there, clear the ciphertext attribute as well. An instance freshly loaded
+  holds the plaintext and no ciphertext, so setting the plaintext to `null` clears it.
 * **No Bean Validation constraint** may sit on the plaintext: Jakarta Persistence validates after encrypting has nulled
   it ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
 * **The insert window.** `@PrePersist` fires when `persist()` is called, not when the `INSERT` is built. The plaintext
