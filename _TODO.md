@@ -10,7 +10,7 @@ GitHub issue it is **removed from this file**. The backlog itself lives in
 
 | Label | Meaning |
 | --- | --- |
-| `jinahya-persistence-crypto` / `-more` / `-utils` / `-test-utils` / `-more-test-utils` | the module |
+| `jinahya-persistence-encryption` / `-more` / `-utils` / `-test-utils` / `-more-test-utils` | the module |
 | `cross-cutting` | build, CI, POM, `module-info`; spans modules |
 | `bug` / `enhancement` / `documentation` / `test-coverage` | what kind of work it is |
 | `severity: high` | data loss, silent corruption, or a broken build |

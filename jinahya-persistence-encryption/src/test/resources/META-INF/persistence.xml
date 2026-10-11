@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  jinahya-persistence-encryption
+  %%
+  Copyright (C) 2024 - 2025 Jinahya, Inc.
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+
+<!-- https://jakarta.ee/xml/ns/persistence/ -->
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="${persistence.version}">
+  <persistence-unit name="__encryptionPU">
+    <description>Persistence Unit for exercising this module against an in-memory DB</description>
+    <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+    <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+    <provider>${persistence-unit.provider}</provider>
+    <class>com.github.jinahya.persistence.encryption.examples.SecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.secondary.SecondaryModeAEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.secondary.SecondaryModeBEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.SecretEmbeddable</class>
+    <class>com.github.jinahya.persistence.encryption.examples.LifecycleEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GuardedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GraphEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.OverriddenEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.RescuedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.TwoPathEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.MappedSecretBase</class>
+    <class>com.github.jinahya.persistence.encryption.examples.InheritedOverrideEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.UnguardedEmbeddable</class>
+    <class>com.github.jinahya.persistence.encryption.examples.CollectionSecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.PlainEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.FrozenPlainEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.DirectListenerEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.ConstrainedSecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GenericSecretBase</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GenericSecretMiddle</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GenericStringEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GenericIntegerEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GenericDeepEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.GuardedModeBEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.ModeBNoteEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.ModeBConstrainedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.MisplacedAnnotationEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.PlaintextAnnotatedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.MisnamedPlaintextEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>CALLBACK</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!-- eclipselink -->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+      <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <!--      <property name="eclipselink.weaving" value="static"/>-->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <!-- hibernate -->
+      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+      <property name="hibernate.format_sql" value="true"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.highlight_sql" value="true"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.use_sql_comment" value="true"/>
+      <!--      <property name="hibernate.cache.use_second_level_cache" value="false"/>-->
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionHibernatePU">
+    <description>Persistence Unit for the Hibernate ORM specific examples (examples.hibernate); used, and compiled,
+      under the jakarta-ee-11-hibernate-orm profile only
+    </description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.examples.hibernate.DynamicModeAEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.hibernate.DynamicModeBEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>CALLBACK</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!-- eclipselink -->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+      <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <!--      <property name="eclipselink.weaving" value="static"/>-->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <!-- hibernate -->
+      <!--      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>-->
+      <property name="hibernate.format_sql" value="true"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.highlight_sql" value="true"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.use_sql_comment" value="true"/>
+      <!--      <property name="hibernate.cache.use_second_level_cache" value="false"/>-->
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionItPU">
+    <description>Persistence Unit for exercising this module against a physical database: no DDL generated, no
+      classes listed, SQL logged. The URL below is a placeholder on H2 in memory — point it at the real
+      database to use this unit.
+    </description>
+    <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
+    <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
+    <provider>${persistence-unit.provider}</provider>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>CALLBACK</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!--      <property name="jakarta.persistence.schema-generation.database.action" value="none"/>-->
+      <!-- eclipselink -->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+      <!--      <property name="eclipselink.logging.level" value="FINE"/>-->
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <!--      <property name="eclipselink.weaving" value="static"/>-->
+      <!-- https://wiki.eclipse.org/EclipseLink/Examples/JPA/DDL -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <!-- https://eclipse.dev/eclipselink/documentation/4.0/jpa/extensions/jpa-extensions.html#ddl-generation -->
+      <property name="eclipselink.ddl-generation" value="none"/>
+      <!-- hibernate -->
+      <property name="hibernate.format_sql" value="true"/>
+      <!-- https://docs.jboss.org/hibernate/orm/7.1/javadocs/constant-values.html#org.hibernate.tool.schema.Action.ACTION_NONE -->
+      <property name="hibernate.hbm2ddl.auto" value="none"/>
+      <property name="hibernate.highlight_sql" value="true"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.use_sql_comment" value="true"/>
+      <!-- jinahya.persistence -->
+      <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
+      <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
+      <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
+    </properties>
+  </persistence-unit>
+</persistence>

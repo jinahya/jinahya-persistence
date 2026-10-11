@@ -47,7 +47,7 @@
   </developers>
 
   <modules>
-    <module>jinahya-persistence-crypto</module>
+    <module>jinahya-persistence-encryption</module>
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
     <module>jinahya-persistence-test-utils</module>
