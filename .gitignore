@@ -110,3 +110,20 @@ buildNumber.properties
 *.iml
 .idea
 !.idea/codeStyles
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Annotation processor output written OUTSIDE target/ by IntelliJ IDEA's own (non-Maven) build.
+#
+# The JPA static metamodel generator (Hibernate's, or EclipseLink's) runs as an annotation processor. Maven writes its
+# output under target/generated-sources/annotations and target/generated-test-sources/test-annotations, which target/
+# above already ignores. IntelliJ IDEA, when it compiles by itself rather than delegating to Maven, resolves the
+# imported relative output paths (../generated-sources/annotations, ../generated-test-sources/test-annotations) against
+# the wrong base, and leaves these directories at the root of a module instead. They hold nothing but regenerated code
+# (the metamodel classes, Hibernate's entity/index) and are safe to delete.
+#
+# To stop them being created at all: Settings | Build, Execution, Deployment | Build Tools | Maven | Runner |
+# "Delegate IDE build/run actions to Maven".
+/generated-sources/
+/generated-test-sources/
+/*/generated-sources/
+/*/generated-test-sources/
