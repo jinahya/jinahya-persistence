@@ -8,7 +8,9 @@ application, so the database only ever stores their ciphertext. The cryptography
 concern; they live behind `EntityEncryptionManager`, which an application implements (with a KMS, Vault, Tink, …).
 
 Each encrypted value has two attributes in the entity: the annotated one holds the plaintext, and a second,
-`byte[]`-typed one — a column of the same table — holds the ciphertext.
+`byte[]`-typed one — a column of the same table — holds the ciphertext. Name the ciphertext attribute explicitly with
+`@EncryptedAttribute("...")`, as the examples below do. Left empty, it defaults to the plaintext
+attribute's name suffixed with `Enc__` (`name` → `nameEnc__`).
 
 ## Choose your path
 
@@ -16,7 +18,7 @@ Start from one question: **does the column you are encrypting already hold data?
 
 ```
 plain entity, column holds data  ──►  Mode A  ──►  Mode B
-plain entity, no data yet        ──────────────►  Mode B
+plain entity, no data yet        ───────────────►  Mode B
 ```
 
 | mode | the plaintext attribute is | use it when | in one line |
@@ -36,12 +38,12 @@ apart by whether the plaintext is `@Transient` ([#82](https://github.com/jinahya
 @Entity
 class User {
 
-    @EncryptedAttribute // pairs with nameEnc__, by name
-    @Transient          // no column: the plaintext lives only in the object
+    @EncryptedAttribute("nameEnc")
+    @Transient // no column: the plaintext lives only in the object
     private String name;
 
     @Column(name = "name_enc")
-    private byte[] nameEnc__;  // the ciphertext; no accessors needed
+    private byte[] nameEnc; // the ciphertext; no accessors needed
 
     public String getName() {
         return name;
@@ -49,7 +51,7 @@ class User {
 
     public void setName(final String name) {
         this.name = name;
-        this.nameEnc__ = null; // required: see below
+        this.nameEnc = null; // required: see below
     }
 }
 ```
@@ -58,7 +60,7 @@ It behaves like an ordinary field: `getName()` always returns the value, reading
 version does not move, a value can be cleared, and Bean Validation constraints on `name` see the real value.
 
 **The setter has to null the ciphertext.** The persistence provider dirty-checks mapped attributes only; it never
-sees a change to a `@Transient` field. Nulling `nameEnc__` is what makes the change visible, so that `@PreUpdate`
+sees a change to a `@Transient` field. Nulling `nameEnc` is what makes the change visible, so that `@PreUpdate`
 runs and re-encrypts. Write this setter by hand — a generated one (Lombok's `@Setter`, an IDE's) is not enough. The
 module proves it at startup: it calls the setter on a throwaway instance, and rejects the mapping if the setter is
 missing or does not null the ciphertext.
@@ -83,12 +85,12 @@ em.merge(detached).setName(detached.getName());
 @Entity
 class User {
 
-    @EncryptedAttribute
+    @EncryptedAttribute("nameEnc")
     @Column(name = "name", insertable = false) // the existing column, kept; nullable and updatable
     private String name;
 
     @Column(name = "name_enc")
-    private byte[] nameEnc__;                  // added
+    private byte[] nameEnc;                    // added
 }
 ```
 
@@ -159,9 +161,18 @@ is why step 2 comes first.
 
 Register `EntityEncryptionListener` itself, the way Spring Data JPA's `AuditingEntityListener` is registered; no
 subclass is needed. It encrypts on `@PrePersist` and `@PreUpdate`, before the statement is built, and decrypts on
-`@PostLoad` ([#5](https://github.com/jinahya/jinahya-persistence/issues/5)). Its `AbstractEntityEncryptionService` comes from CDI: injected when the persistence provider
-creates listeners through a `BeanManager`, looked up from `CDI.current()` otherwise. Provide the service as a CDI bean
-(a subclass of `AbstractEntityEncryptionService`, with an `EntityEncryptionManager`).
+`@PostLoad` ([#5](https://github.com/jinahya/jinahya-persistence/issues/5)). Its `AbstractEntityEncryptionService` is injected by CDI, which the persistence provider
+does only when it creates listeners through a `BeanManager`. Provide the service as a CDI bean (a subclass of
+`AbstractEntityEncryptionService`, with an `EntityEncryptionManager`). A Jakarta EE container passes the `BeanManager`
+itself; in Java SE, pass it yourself:
+
+```java
+var factory = Persistence.createEntityManagerFactory(
+        "unit", Map.of("jakarta.persistence.bean.manager", container.getBeanManager()));
+```
+
+A listener created without one has no service, and its first callback fails with an `IllegalStateException`; it is
+not looked up from `CDI.current()`. Without CDI, subclass the listener and override `getEncryptionService()`.
 
 **Never encrypt from `@PostPersist` or `@PostUpdate`** — the row is already written by the time the post-callbacks
 run.

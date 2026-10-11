@@ -797,7 +797,7 @@ public abstract class AbstractEntityEncryptionService {
             final var encryptedAttribute = checkEncryptedAttribute(
                     rootType, embeddingPath, decryptedAttribute.getName(),
                     decryptedAttribute.getDeclaringType().getJavaType(), decryptedAttribute,
-                    annotation.encryptedAttribute(), attributes, paired);
+                    annotation.value(), attributes, paired);
             pairs.add(new Pair(decryptedAttribute, null, encryptedAttribute, javaType));
         }
         validateTransientPlaintexts(rootType, embeddingPath, managedType, attributes, paired, pairs);
@@ -860,7 +860,7 @@ public abstract class AbstractEntityEncryptionService {
                              "no codec for the declared java type " + javaType.getName());
             }
             final var encryptedAttribute = checkEncryptedAttribute(
-                    rootType, embeddingPath, field.getName(), declaring, null, annotation.encryptedAttribute(),
+                    rootType, embeddingPath, field.getName(), declaring, null, annotation.value(),
                     attributes, paired);
             checkInvalidatingSetter(rootType, embeddingPath, concrete, field, javaType, encryptedAttribute);
             field.setAccessible(true);
@@ -939,7 +939,7 @@ public abstract class AbstractEntityEncryptionService {
      * @param decryptedName      the name of the plaintext attribute, or transient field.
      * @param declaringType      the class declaring the plaintext.
      * @param decryptedAttribute the plaintext attribute; {@code null} for a transient plaintext.
-     * @param named              the name given by {@link EncryptedAttribute#encryptedAttribute()}; may be blank.
+     * @param named              the name given by {@link EncryptedAttribute#value()}; may be blank.
      * @param attributes         the attributes of the managed type, by name.
      * @param paired             the attributes already paired, to which the result is added.
      * @return the attribute holding the ciphertext.

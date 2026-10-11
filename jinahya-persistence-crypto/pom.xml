@@ -74,6 +74,13 @@
       <artifactId>jakarta.inject-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- org.jboss.weld.environment.se.*; __DirectListener_Test starts a Weld SE container and hands its BeanManager to
+         the persistence provider, so that the listener is injected -->
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- __EncryptionLifecycle_Test logs through it directly -->
     <dependency>
       <groupId>org.slf4j</groupId>

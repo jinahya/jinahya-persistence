@@ -2,7 +2,6 @@ package com.github.jinahya.persistence.crypto;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostPersist;
@@ -27,9 +26,10 @@ import java.lang.invoke.MethodHandles;
  * }</pre>
  * It encrypts on {@link PrePersist @PrePersist} and {@link PreUpdate @PreUpdate}, before the statement is built, and
  * decrypts on {@link PostLoad @PostLoad}; the other callbacks only log, and a post-callback never encrypts, by which
- * time the row is already written. The {@link AbstractEntityEncryptionService encryption service} comes from CDI:
- * injected when the persistence provider creates listeners through a {@code BeanManager}, looked up from
- * {@link CDI#current() the current container} otherwise.
+ * time the row is already written. The {@link AbstractEntityEncryptionService encryption service} is injected by CDI,
+ * which happens when the persistence provider creates listeners through a {@code BeanManager}: a Jakarta EE container
+ * passes one; in Java SE, pass it as the {@code jakarta.persistence.bean.manager} property of the
+ * {@code EntityManagerFactory}. A listener created without one has no service, and fails on its first callback.
  * <p>
  * <strong>A subclass has to re-declare every callback it wants.</strong> Neither Hibernate ORM nor EclipseLink invokes a
  * callback annotation inherited from a listener's superclass, so a subclass which only overrides
@@ -179,16 +179,17 @@ public class EntityEncryptionListener {
      * Returns the encryption service which this listener delegates to.
      *
      * @return the encryption service; never {@code null}.
-     * @implSpec The implementation of this class returns the injected service, and otherwise looks one up from
-     *         {@link CDI#current() the current container}, once.
+     * @throws IllegalStateException when no service has been injected.
+     * @implSpec The implementation of this class returns the injected service.
      */
     protected AbstractEntityEncryptionService getEncryptionService() {
-        if (encryptionService != null) {
-            return encryptionService;
-        }
-        var result = lookedUpEncryptionService;
+        final var result = encryptionService;
         if (result == null) {
-            result = lookedUpEncryptionService = CDI.current().select(AbstractEntityEncryptionService.class).get();
+            throw new IllegalStateException(
+                    "no encryption service injected into " + getClass().getName()
+                    + "; the persistence provider creates listeners through CDI only when it is given a BeanManager"
+                    + " — pass one as the jakarta.persistence.bean.manager property, or override"
+                    + " getEncryptionService()");
         }
         return result;
     }
@@ -248,7 +249,4 @@ public class EntityEncryptionListener {
     // injected when the provider creates listeners through a BeanManager; never assigned here
     @Inject
     private @Nullable AbstractEntityEncryptionService encryptionService;
-
-    // looked up from the current container otherwise, once
-    private volatile @Nullable AbstractEntityEncryptionService lookedUpEncryptionService;
 }

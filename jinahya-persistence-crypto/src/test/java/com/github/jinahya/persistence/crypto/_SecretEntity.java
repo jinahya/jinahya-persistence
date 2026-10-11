@@ -145,7 +145,7 @@ public class _SecretEntity {
     public byte[] photoEnc__;
 
     // ---------------------------------------------------------- a pair named explicitly, rather than by the default
-    @EncryptedAttribute(encryptedAttribute = "secretNumberCipher")
+    @EncryptedAttribute("secretNumberCipher")
     @Basic(optional = true)
     @Column(name = "secret_number", nullable = true, insertable = false)
     public Long secretNumber;

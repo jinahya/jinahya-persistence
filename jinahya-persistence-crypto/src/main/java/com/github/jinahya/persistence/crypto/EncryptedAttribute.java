@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * An annotation for marking an entity attribute whose value is stored encrypted.
  * <p>
  * The annotated member holds the plaintext, which never reaches the database; the ciphertext goes to a second,
- * {@code byte[]}-typed attribute of the same entity, named by {@link #encryptedAttribute()}. Where the annotation sits
+ * {@code byte[]}-typed attribute of the same entity, named by {@link #value()}. Where the annotation sits
  * decides the mode:
  * <dl>
  *   <dt>on a {@link jakarta.persistence.Transient @Transient} field — Mode B, the steady state</dt>
@@ -64,6 +64,5 @@ public @interface EncryptedAttribute {
      *         {@link EncryptedAttribute the type javadoc}. {@link AbstractEntityEncryptionService} rejects anything
      *         else.
      */
-    String encryptedAttribute() default "";
-
+    String value() default "";
 }

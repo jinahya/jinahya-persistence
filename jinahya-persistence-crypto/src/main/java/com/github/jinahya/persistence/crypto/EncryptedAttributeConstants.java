@@ -14,7 +14,7 @@ final class EncryptedAttributeConstants {
      * The postfix appended to a decrypted attribute's name to derive the name of the attribute holding the encrypted
      * bytes. The value is {@value #DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX}.
      *
-     * @see EncryptedAttribute#encryptedAttribute()
+     * @see EncryptedAttribute#value()
      */
     public static final String DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX = "Enc__";
 
