@@ -351,8 +351,10 @@
       <scope>test</scope>
     </dependency>
     <!-- declared once for the whole reactor: every module is annotated with it, at the same scope.
-         provided, not compile: JSpecify's annotations are CLASS-retention, so no consumer needs them
-         at runtime and no published pom should drag them in -->
+         provided, not compile: these are libraries, and a library's published pom should not decide the
+         nullness tooling of its consumers. A consumer which wants the annotations (RUNTIME-retention, so
+         visible to reflection and to checkers reading our class files) declares jspecify itself, at
+         compile scope; without it, the annotations are simply absent at run time, which is harmless -->
     <dependency>
       <groupId>org.jspecify</groupId>
       <artifactId>jspecify</artifactId>
