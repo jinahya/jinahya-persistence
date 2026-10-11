@@ -1,5 +1,8 @@
 package com.github.jinahya.persistence.crypto;
 
+import com.github.jinahya.persistence.crypto.EncryptionMapping.ColumnRules;
+import com.github.jinahya.persistence.crypto.EncryptionMapping.Embedded;
+import com.github.jinahya.persistence.crypto.EncryptionMapping.Pair;
 import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -19,13 +22,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -40,35 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.Bytes_l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.Characters_2l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.big_decimal_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.big_integer_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.boolean_1;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.byte_1;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.char_2;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.chars_2l;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.double_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.enum_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.float_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.instant_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.int_4;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_date_time_16;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.local_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.long_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_date_time_20;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.offset_time_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.serializable_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.short_2;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_time_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.sql_timestamp_12;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.string_;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.util_calendar_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.util_date_8;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.uuid_16;
-import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.year_4;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.decode;
+import static com.github.jinahya.persistence.crypto.EntityEncryptorUtils.encode;
 
 /**
  * Encrypts and decrypts the {@link EncryptedAttribute encrypted attributes} of entity instances, in place, through an
@@ -438,18 +407,6 @@ class EntityEncryptor {
     }
 
     /**
-     * The column rules of one attribute.
-     *
-     * @param insertable whether the provider may write the column in an {@code INSERT}.
-     * @param updatable  whether the provider may write the column in an {@code UPDATE}.
-     * @param nullable   whether the column accepts {@code null}.
-     * @param source     where the facts came from, for diagnostics; never a value.
-     */
-    private record ColumnRules(boolean insertable, boolean updatable, boolean nullable, String source) {
-
-    }
-
-    /**
      * Returns the column rules of the specified attribute, as its annotations describe them: the applicable
      * {@link AttributeOverride @AttributeOverride}, if any, and otherwise the attribute's own {@link Column @Column},
      * honouring the annotation defaults when neither is present.
@@ -538,7 +495,7 @@ class EntityEncryptor {
      *         An embeddable is validated anew for each path it is reached by: an override on one path can make it
      *         safe, or unsafe, where it is not on another.
      */
-    private Mapping validate(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
+    private EncryptionMapping validate(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                              final ManagedType<?> managedType, final Set<ManagedType<?>> visiting) {
         if (!visiting.add(managedType)) {
             throw new RuntimeException("embeddable cycle through " + managedType.getJavaType().getName());
@@ -623,7 +580,7 @@ class EntityEncryptor {
             pairs.add(checkTransientPlaintext(rootType, embeddingPath, managedType, field, encryptedAttribute));
         }
         visiting.remove(managedType);
-        return new Mapping(List.copyOf(pairs), List.copyOf(embeddeds));
+        return new EncryptionMapping(List.copyOf(pairs), List.copyOf(embeddeds));
     }
 
     private static Class<?> declaringClassOf(final Attribute<?, ?> attribute) {
@@ -900,98 +857,11 @@ class EntityEncryptor {
      * @return the validated mapping of the {@code entityClass}.
      * @throws RuntimeException when the mapping is invalid; it is not cached, so every later use fails the same way.
      */
-    private Mapping getMapping(final Class<?> entityClass) {
+    private EncryptionMapping getMapping(final Class<?> entityClass) {
         return mappings.computeIfAbsent(entityClass, k -> {
             final var managedType = entityManagerFactory().getMetamodel().managedType(k);
             return validate(managedType, List.of(), managedType, new HashSet<>());
         });
-    }
-
-    /**
-     * A validated pair of a plaintext and the attribute which holds its ciphertext.
-     * <p>
-     * The plaintext is either a persistent attribute (Mode A, {@code decrypted}), or a transient field (Mode B,
-     * {@code plaintextField}); exactly one of the two is set.
-     *
-     * @param decrypted      the attribute holding the plaintext, in Mode A; {@code null} in Mode B.
-     * @param plaintextField the transient field holding the plaintext, in Mode B; {@code null} in Mode A.
-     * @param encrypted      the attribute holding the ciphertext.
-     * @param javaType       the declared java type of the plaintext, resolved against the concrete class.
-     */
-    private record Pair(@Nullable Attribute<?, ?> decrypted, java.lang.reflect.@Nullable Field plaintextField,
-                        Attribute<?, ?> encrypted, Class<?> javaType) {
-
-        Pair {
-            assert (decrypted == null) != (plaintextField == null);
-        }
-
-        /**
-         * Returns whether the plaintext is a transient field: Mode B.
-         */
-        boolean isTransient() {
-            return plaintextField != null;
-        }
-
-        /**
-         * Returns the name of the plaintext attribute, or field.
-         */
-        String name() {
-            return plaintextField != null ? plaintextField.getName() : Objects.requireNonNull(decrypted).getName();
-        }
-
-        @Nullable Object getPlaintext(final Object target) {
-            if (plaintextField != null) {
-                try {
-                    return plaintextField.get(target);
-                } catch (final IllegalAccessException iae) {
-                    throw new RuntimeException("failed to read " + plaintextField, iae);
-                }
-            }
-            return JinahyaAttributeUtils.getAttributeValue(target, Objects.requireNonNull(decrypted));
-        }
-
-        Runnable setPlaintext(final Object target, final @Nullable Object value) {
-            final var field = plaintextField;
-            if (field != null) {
-                return () -> {
-                    try {
-                        field.set(target, value);
-                    } catch (final IllegalAccessException iae) {
-                        throw new RuntimeException("failed to write " + field, iae);
-                    }
-                };
-            }
-            final var attribute = Objects.requireNonNull(decrypted);
-            return () -> JinahyaAttributeUtils.setAttributeValue(target, attribute, value);
-        }
-
-        byte @Nullable [] getCiphertext(final Object target) {
-            return (byte[]) JinahyaAttributeUtils.getAttributeValue(target, encrypted);
-        }
-
-        Runnable setCiphertext(final Object target, final byte @Nullable [] value) {
-            return () -> JinahyaAttributeUtils.setAttributeValue(target, encrypted, value);
-        }
-    }
-
-    /**
-     * The validated mapping of a managed type.
-     *
-     * @param pairs     the encrypted pairs to transform.
-     * @param embeddeds the embedded attributes to descend into.
-     */
-    private record Mapping(List<Pair> pairs, List<Embedded> embeddeds) {
-
-    }
-
-    /**
-     * An embedded attribute, with the mapping validated for the path it was reached by.
-     *
-     * @param attribute the embedded attribute.
-     * @param mapping   the validated mapping of the embeddable, in this attribute's override scope.
-     */
-    private record Embedded(Attribute<?, ?> attribute, Mapping mapping) {
-
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -1027,8 +897,8 @@ class EntityEncryptor {
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void encrypt(final @Nullable String encryptionIdentifier, final Object object, final Mapping mapping,
-                         final List<Runnable> assignments) {
+    private void encrypt(final @Nullable String encryptionIdentifier, final Object object,
+                         final EncryptionMapping mapping, final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
@@ -1080,115 +950,6 @@ class EntityEncryptor {
         }
     }
 
-    /**
-     * Returns the specified plaintext value of the specified pair, encoded by its declared java type and framed with
-     * the payload header.
-     *
-     * @param pair           the pair.
-     * @param decryptedValue the plaintext value.
-     * @return the framed encoding of the {@code decryptedValue}.
-     */
-    private static byte[] encode(final Pair pair, final Object decryptedValue) {
-        final byte[] decryptedBytes;
-        final var javaType = pair.javaType();
-        // The DECLARED type decides the encoding, exactly as it decides the decoding below. Dispatching on
-        // the runtime class here instead let the two ladders pick different codecs for one attribute -- a
-        // java.util.Date holding a java.sql.Timestamp was written as epoch seconds and read back as epoch
-        // millis, silently. Keep this chain in the same order as the one in decode(...).
-        if (!javaType.isInstance(decryptedValue)) {
-            throw new RuntimeException(
-                    "the value is not an instance of the attribute's declared java type" +
-                    "; decrypted attribute: " + pair.name() +
-                    "; java type: " + javaType.getName() +
-                    "; value type: " + decryptedValue.getClass().getName()
-            );
-        }
-        try {
-            if (javaType == Boolean.class) {
-                decryptedBytes = boolean_1((Boolean) decryptedValue);
-            } else if (javaType == Byte.class) {
-                decryptedBytes = byte_1((Byte) decryptedValue);
-            } else if (javaType == Short.class) {
-                decryptedBytes = short_2((Short) decryptedValue);
-            } else if (javaType == Integer.class) {
-                decryptedBytes = int_4((Integer) decryptedValue);
-            } else if (javaType == Long.class) {
-                decryptedBytes = long_8((Long) decryptedValue);
-            } else if (javaType == Character.class) {
-                decryptedBytes = char_2((Character) decryptedValue);
-            } else if (javaType == Float.class) {
-                decryptedBytes = float_4((Float) decryptedValue);
-            } else if (javaType == Double.class) {
-                decryptedBytes = double_8((Double) decryptedValue);
-            } else if (javaType == String.class) {
-                decryptedBytes = string_((String) decryptedValue);
-            } else if (javaType == UUID.class) {
-                decryptedBytes = uuid_16((UUID) decryptedValue);
-            } else if (javaType == BigInteger.class) {
-                decryptedBytes = big_integer_((BigInteger) decryptedValue);
-            } else if (javaType == BigDecimal.class) {
-                decryptedBytes = big_decimal_((BigDecimal) decryptedValue);
-            } else if (javaType == LocalDate.class) {
-                decryptedBytes = local_date_8((LocalDate) decryptedValue);
-            } else if (javaType == LocalTime.class) {
-                decryptedBytes = local_time_8((LocalTime) decryptedValue);
-            } else if (javaType == LocalDateTime.class) {
-                decryptedBytes = local_date_time_16((LocalDateTime) decryptedValue);
-            } else if (javaType == OffsetTime.class) {
-                decryptedBytes = offset_time_12((OffsetTime) decryptedValue);
-            } else if (javaType == OffsetDateTime.class) {
-                decryptedBytes = offset_date_time_20((OffsetDateTime) decryptedValue);
-            } else if (javaType == Instant.class) {
-                decryptedBytes = instant_12((Instant) decryptedValue);
-            } else if (javaType == Year.class) {
-                decryptedBytes = year_4((Year) decryptedValue);
-            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                decryptedBytes = sql_timestamp_12((java.sql.Timestamp) decryptedValue);
-            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
-                decryptedBytes = sql_date_8((java.sql.Date) decryptedValue);
-            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
-                decryptedBytes = sql_time_8((java.sql.Time) decryptedValue);
-            } else if (Calendar.class.isAssignableFrom(javaType)) {
-                decryptedBytes = util_calendar_8((Calendar) decryptedValue);
-            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                // one branch feeds both of decrypt's generic Date branches -- the exact `== java.util.Date` one
-                // and the reflective (long) constructor one -- because both read long_8 millis
-                decryptedBytes = util_date_8((java.util.Date) decryptedValue);
-            } else if (javaType == byte[].class) {
-                decryptedBytes =
-                        ((byte[]) decryptedValue).clone(); // the service must not be handed the instance's own array
-            } else if (javaType == Byte[].class) {
-                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                decryptedBytes = Bytes_l((Byte[]) decryptedValue);
-            } else if (javaType == char[].class) {
-                decryptedBytes = chars_2l((char[]) decryptedValue);
-            } else if (javaType == Character[].class) {
-                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                decryptedBytes = Characters_2l((Character[]) decryptedValue);
-            } else if (javaType.isEnum()) {
-                decryptedBytes = enum_((Enum<?>) decryptedValue);
-            } else if (Serializable.class.isAssignableFrom(javaType)) {
-                decryptedBytes = serializable_((Serializable) decryptedValue);
-            } else {
-                throw new RuntimeException("unsupported java type: " + javaType);
-            }
-        } catch (final IllegalArgumentException iae) {
-            // a value the codec refuses to encode, because it could not be read back as it is: a string with an
-            // unpaired surrogate, an oversized serializable, ... -- reported here while the caller still holds it.
-            // The message never carries the value.
-            throw new RuntimeException(
-                    "cannot encode the value (" + iae.getMessage() + ")" +
-                    "; decrypted attribute: " + pair.name() +
-                    "; java type: " + javaType.getName(),
-                    iae
-            );
-        }
-        // the header names the format version and the codec, so that a reader can tell what wrote the bytes
-        final var codec = EntityEncryptorUtils.codecOf(javaType);
-        assert codec != null : "the ladder above handled a type codecOf does not know: " + javaType;
-        return EntityEncryptorUtils.frame(codec, decryptedBytes);
-    }
-
     private byte[] encryptFramed(final @Nullable String encryptionIdentifier, final Pair pair, final byte[] framed) {
         final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
         if (encrypted == null) {
@@ -1207,19 +968,7 @@ class EntityEncryptor {
      * @throws RuntimeException when the mapping of the {@code object}'s class is invalid.
      */
     private boolean hasEncryptedAttributes(final Object object) {
-        return hasPairs(getMapping(resolveClass(object)));
-    }
-
-    private static boolean hasPairs(final Mapping mapping) {
-        if (!mapping.pairs().isEmpty()) {
-            return true;
-        }
-        for (final var embedded : mapping.embeddeds()) {
-            if (hasPairs(embedded.mapping())) {
-                return true;
-            }
-        }
-        return false;
+        return getMapping(resolveClass(object)).hasPairs();
     }
 
     /**
@@ -1273,8 +1022,8 @@ class EntityEncryptor {
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void decrypt(final @Nullable String encryptionIdentifier, final Object object, final Mapping mapping,
-                         final List<Runnable> assignments) {
+    private void decrypt(final @Nullable String encryptionIdentifier, final Object object,
+                         final EncryptionMapping mapping, final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
@@ -1306,118 +1055,6 @@ class EntityEncryptor {
                 assignments.add(pair.setCiphertext(object, null)); // Mode A only; Mode B leaves it, unchanged
             }
         }
-    }
-
-    /**
-     * Returns the plaintext value of the specified pair, decoded from the specified framed bytes.
-     *
-     * @param pair        the pair.
-     * @param framedBytes the decrypted, framed, bytes.
-     * @return the decoded value.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static Object decode(final Pair pair, final byte[] framedBytes) {
-        final Object decryptedValue;
-        // the declared java type, for the same reason as in encode(...): the two ladders must agree on the type
-        final var javaType = pair.javaType();
-        final var codec = EntityEncryptorUtils.codecOf(javaType);
-        if (codec == null) {
-            throw new RuntimeException("unsupported java type: " + javaType);
-        }
-        try {
-            // checks the format version, and that the codec which wrote the bytes is the one which reads them
-            final var decryptedBytes = EntityEncryptorUtils.unframe(codec, framedBytes);
-            if (javaType == boolean.class || javaType == Boolean.class) {
-                decryptedValue = boolean_1(decryptedBytes);
-            } else if (javaType == byte.class || javaType == Byte.class) {
-                decryptedValue = byte_1(decryptedBytes);
-            } else if (javaType == short.class || javaType == Short.class) {
-                decryptedValue = short_2(decryptedBytes);
-            } else if (javaType == int.class || javaType == Integer.class) {
-                decryptedValue = int_4(decryptedBytes);
-            } else if (javaType == long.class || javaType == Long.class) {
-                decryptedValue = long_8(decryptedBytes);
-            } else if (javaType == char.class || javaType == Character.class) {
-                decryptedValue = char_2(decryptedBytes);
-            } else if (javaType == float.class || javaType == Float.class) {
-                decryptedValue = float_4(decryptedBytes);
-            } else if (javaType == double.class || javaType == Double.class) {
-                decryptedValue = double_8(decryptedBytes);
-            } else if (javaType == String.class) {
-                decryptedValue = string_(decryptedBytes);
-            } else if (javaType == UUID.class) {
-                decryptedValue = uuid_16(decryptedBytes);
-            } else if (javaType == BigInteger.class) {
-                decryptedValue = big_integer_(decryptedBytes);
-            } else if (javaType == BigDecimal.class) {
-                decryptedValue = big_decimal_(decryptedBytes);
-            } else if (javaType == LocalDate.class) {
-                decryptedValue = local_date_8(decryptedBytes);
-            } else if (javaType == LocalTime.class) {
-                decryptedValue = local_time_8(decryptedBytes);
-            } else if (javaType == LocalDateTime.class) {
-                decryptedValue = local_date_time_16(decryptedBytes);
-            } else if (javaType == OffsetTime.class) {
-                decryptedValue = offset_time_12(decryptedBytes);
-            } else if (javaType == OffsetDateTime.class) {
-                decryptedValue = offset_date_time_20(decryptedBytes);
-            } else if (javaType == Instant.class) {
-                decryptedValue = instant_12(decryptedBytes);
-            } else if (javaType == Year.class) {
-                decryptedValue = year_4(decryptedBytes);
-            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                decryptedValue = sql_timestamp_12(decryptedBytes);
-            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
-                decryptedValue = sql_date_8(decryptedBytes);
-            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
-                decryptedValue = sql_time_8(decryptedBytes);
-            } else if (Calendar.class.isAssignableFrom(javaType)) {
-                decryptedValue = util_calendar_8(decryptedBytes);
-            } else if (javaType == java.util.Date.class) {
-                decryptedValue = util_date_8(decryptedBytes);
-            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                final var time = long_8(decryptedBytes);
-                try {
-                    decryptedValue = javaType.getConstructor(long.class).newInstance(time);
-                } catch (final ReflectiveOperationException roe) {
-                    throw new RuntimeException("failed to construct " + javaType + " with " + time, roe);
-                }
-            } else if (javaType == byte[].class) {
-                decryptedValue = decryptedBytes;
-            } else if (javaType == Byte[].class) {
-                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                decryptedValue = Bytes_l(decryptedBytes);
-            } else if (javaType == char[].class) {
-                decryptedValue = chars_2l(decryptedBytes);
-            } else if (javaType == Character[].class) {
-                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                decryptedValue = Characters_2l(decryptedBytes);
-            } else if (javaType.isEnum()) {
-                decryptedValue = enum_(decryptedBytes, (Class) javaType);
-            } else if (Serializable.class.isAssignableFrom(javaType)) {
-                decryptedValue = javaType.cast(serializable_(decryptedBytes, javaType));
-            } else {
-                throw new RuntimeException("unsupported java type: " + javaType);
-            }
-        } catch (final IndexOutOfBoundsException | IllegalArgumentException | AssertionError e) {
-            // Everything the decode ladder can raise for bytes it cannot turn back into a value:
-            //   IndexOutOfBounds     a payload shorter than the fixed-width codec expects
-            //   AssertionError       an assert in EntityEncryptorUtils, when assertions are enabled;
-            //                        the payload lengths themselves are checked unconditionally
-            //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
-            //                        which is not a constant of the attribute's enum, and a payload header
-            //                        naming another format version or another codec
-            // Without the last one, those two surfaced bare, with no clue which attribute they came from.
-            throw new RuntimeException(
-                    "cannot reconstruct the value from the decrypted bytes" +
-                    (e.getMessage() == null ? "" : " (" + e.getMessage() + ")") +
-                    "; decrypted attribute: " + pair.name() +
-                    "; java type: " + javaType.getName() +
-                    "; decrypted bytes: " + framedBytes.length,
-                    e
-            );
-        }
-        return decryptedValue;
     }
 
     /**
@@ -1472,5 +1109,5 @@ class EntityEncryptor {
     // -----------------------------------------------------------------------------------------------------------------
     // the validated mapping of each entity class; never evicted: it describes the encryption service's entity manager
     // factory, and lives exactly as long as it does
-    private final Map<Class<?>, Mapping> mappings = new ConcurrentHashMap<>();
+    private final Map<Class<?>, EncryptionMapping> mappings = new ConcurrentHashMap<>();
 }

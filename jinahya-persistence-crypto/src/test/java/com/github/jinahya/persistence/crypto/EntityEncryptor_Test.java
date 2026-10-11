@@ -22,6 +22,8 @@ import com.github.jinahya.persistence.crypto.examples.TwoPathEntity;
 import com.github.jinahya.persistence.crypto.examples.UnguardedEmbeddable;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,37 +41,16 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Verifies that {@link EntityEncryptor} moves every supported java type between the decrypted attribute and its
- * paired encrypted attribute, and back, against a real metamodel.
+ * Verifies that {@link EntityEncryptor} moves every supported java type between the decrypted attribute and its paired
+ * encrypted attribute, and back, against a real metamodel.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 class EntityEncryptor_Test {
-
-    private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
-
-    @BeforeAll
-    static void openEntityManagerFactory() {
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
-    }
-
-    @AfterAll
-    static void closeEntityManagerFactory() {
-        if (ENTITY_MANAGER_FACTORY != null) {
-            ENTITY_MANAGER_FACTORY.close();
-        }
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private EntityEncryptor service;
-
-    @BeforeEach
-    void createService() {
-        service = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY));
-    }
 
     private static SecretEntity populated() {
         final var entity = new SecretEntity();
@@ -88,6 +69,28 @@ class EntityEncryptor_Test {
         entity.secret = new SecretEmbeddable("nested");
         entity.opaque = "opaque-default";
         return entity;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @BeforeAll
+    static void openEntityManagerFactory() {
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
+    }
+
+    @AfterAll
+    static void closeEntityManagerFactory() {
+        if (ENTITY_MANAGER_FACTORY != null) {
+            ENTITY_MANAGER_FACTORY.close();
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @BeforeEach
+    void createService() {
+        service = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -168,7 +171,8 @@ class EntityEncryptor_Test {
                     .hasMessageContaining("age");
         }
 
-        @DisplayName("a payload written by another codec is rejected rather than misread, e.g. after Long -> Integer (#75)")
+        @DisplayName(
+                "a payload written by another codec is rejected rather than misread, e.g. after Long -> Integer (#75)")
         @Test
         void __codecMismatch() {
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
@@ -235,7 +239,8 @@ class EntityEncryptor_Test {
             assertThat(entity.name).isEqualTo("Jane Roe");
         }
 
-        @DisplayName("a value which would not be read back as is, is rejected against its attribute, without the value (#77)")
+        @DisplayName(
+                "a value which would not be read back as is, is rejected against its attribute, without the value (#77)")
         @Test
         void __unencodableValueRejected() {
             final var entity = new SecretEntity();
@@ -371,7 +376,8 @@ class EntityEncryptor_Test {
                     .hasMessageContaining("non-insertable");
         }
 
-        @DisplayName("an annotated member which is neither persistent nor a transient field is rejected, not silently ignored (#70)")
+        @DisplayName(
+                "an annotated member which is neither persistent nor a transient field is rejected, not silently ignored (#70)")
         @Test
         void __misplacedAnnotationRejected() {
             final var entity = new MisplacedAnnotationEntity();
@@ -433,7 +439,8 @@ class EntityEncryptor_Test {
                     .hasMessageContaining("nameEnc__");
         }
 
-        @DisplayName("an encrypted embeddable reached through an @ElementCollection is rejected, not persisted in the clear (#71)")
+        @DisplayName(
+                "an encrypted embeddable reached through an @ElementCollection is rejected, not persisted in the clear (#71)")
         @Test
         void __elementCollectionRejected() {
             final var entity = new CollectionSecretEntity();
@@ -480,7 +487,8 @@ class EntityEncryptor_Test {
             assertThat(entity.name).isEqualTo("plain");
         }
 
-        @DisplayName("a Bean Validation constraint on an encrypted attribute is rejected, not evaluated against null (#9)")
+        @DisplayName(
+                "a Bean Validation constraint on an encrypted attribute is rejected, not evaluated against null (#9)")
         @Test
         void __constraintRejected() {
             final var entity = new ConstrainedSecretEntity();
@@ -686,7 +694,8 @@ class EntityEncryptor_Test {
         void __truncated() {
             final var entity = new SecretEntity();
             entity.ageEnc__ = new byte[
-                    EntityEncryptionServiceImpl.IV_BYTES + EntityEncryptionServiceImpl.KEY_BYTES + EntityEncryptionServiceImpl.AAD_BYTES];
+                    EntityEncryptionServiceImpl.IV_BYTES + EntityEncryptionServiceImpl.KEY_BYTES +
+                    EntityEncryptionServiceImpl.AAD_BYTES];
             // a well-formed header with an empty payload; Integer needs four bytes after it
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
             entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptorUtils.frame(
@@ -717,4 +726,7 @@ class EntityEncryptor_Test {
             assertThat(entity.age).as("nothing was misread").isNull();
         }
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    private EntityEncryptor service;
 }
