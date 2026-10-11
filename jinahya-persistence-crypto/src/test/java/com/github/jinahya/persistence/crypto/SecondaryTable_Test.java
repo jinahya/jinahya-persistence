@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Verifies, on both providers, an entity whose ciphertext lives in a {@link jakarta.persistence.SecondaryTable}. The
- * module finds attributes in the metamodel, never in tables, so a ciphertext column of a secondary table is an
- * ordinary attribute of the same entity. Whether every row has its secondary row is the schema's, and the persistence
+ * module finds attributes in the metamodel, never in tables, so a ciphertext column of a secondary table is an ordinary
+ * attribute of the same entity. Whether every row has its secondary row is the schema's, and the persistence
  * provider's, matter, not the module's; it is not tested here.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;

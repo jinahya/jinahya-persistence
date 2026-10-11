@@ -177,7 +177,7 @@ class HibernateDynamic_Test {
                                              + " (note, name) VALUES ('" + marker + "', 'legacy-value')")
                     .executeUpdate());
             final long id = apply(em -> ((Number) em.createNativeQuery(
-                    "SELECT id FROM " + DynamicModeAEntity.TABLE_NAME + " WHERE note = '" + marker + "'")
+                            "SELECT id FROM " + DynamicModeAEntity.TABLE_NAME + " WHERE note = '" + marker + "'")
                     .getSingleResult()).longValue());
 
             apply(em -> {

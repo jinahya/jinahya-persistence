@@ -63,11 +63,11 @@ public @interface EncryptedAttribute {
      *         {@code BASIC}, has to be insertable, updatable and nullable, and cannot be an identifier or a version.
      *         The named plaintext cannot be the annotated attribute itself, cannot itself be annotated, has to be of a
      *         non-primitive type which has a codec, and is either a {@link jakarta.persistence.Transient @Transient}
-     *         field with a setter which also sets the annotated attribute to an empty array (Mode B), or a persistent, optional,
-     *         {@code BASIC} attribute, neither an identifier nor a version, carrying no Bean Validation constraint, and
-     *         mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and
-     *         updatable (Mode A) — see {@link EncryptedAttribute the type javadoc}. Anything else is rejected, on the
-     *         first callback for the entity's class.
+     *         field with a setter which also sets the annotated attribute to an empty array (Mode B), or a persistent,
+     *         optional, {@code BASIC} attribute, neither an identifier nor a version, carrying no Bean Validation
+     *         constraint, and mapped {@link jakarta.persistence.Column#insertable() @Column(insertable = false)},
+     *         nullable and updatable (Mode A) — see {@link EncryptedAttribute the type javadoc}. Anything else is
+     *         rejected, on the first callback for the entity's class.
      */
     String value();
 }

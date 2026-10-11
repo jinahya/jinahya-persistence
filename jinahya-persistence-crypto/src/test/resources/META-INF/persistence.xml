@@ -92,7 +92,8 @@
   </persistence-unit>
   <persistence-unit name="__cryptoHibernatePU">
     <description>Persistence Unit for the Hibernate ORM specific examples (examples.hibernate); used, and compiled,
-      under the jakarta-ee-11-hibernate-orm profile only</description>
+      under the jakarta-ee-11-hibernate-orm profile only
+    </description>
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>com.github.jinahya.persistence.crypto.examples.hibernate.DynamicModeAEntity</class>
     <class>com.github.jinahya.persistence.crypto.examples.hibernate.DynamicModeBEntity</class>

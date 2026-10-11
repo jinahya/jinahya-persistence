@@ -149,7 +149,8 @@ class EntityEncryptor {
      */
     private RuntimeException reject(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                                     final Attribute<?, ?> decryptedAttribute,
-                                    final @org.jspecify.annotations.Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
+                                    final @org.jspecify.annotations.Nullable Attribute<?, ?> encryptedAttribute,
+                                    final String reason) {
         return reject(rootType, embeddingPath, decryptedAttribute.getName(),
                       decryptedAttribute.getDeclaringType().getJavaType(), encryptedAttribute, reason);
     }
@@ -167,7 +168,8 @@ class EntityEncryptor {
      */
     private static RuntimeException reject(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
                                            final String decryptedName, final Class<?> declaringType,
-                                           final @org.jspecify.annotations.Nullable Attribute<?, ?> encryptedAttribute, final String reason) {
+                                           final @org.jspecify.annotations.Nullable Attribute<?, ?> encryptedAttribute,
+                                           final String reason) {
         final var path = new StringBuilder(rootType.getJavaType().getName());
         for (final var embedding : embeddingPath) {
             path.append('.').append(embedding.getName());
@@ -254,7 +256,7 @@ class EntityEncryptor {
      * @return an annotated member; {@code null} when there is none.
      */
     private @org.jspecify.annotations.Nullable Member findEncryptedMember(final ManagedType<?> managedType,
-                                                 final Set<ManagedType<?>> visited) {
+                                                                          final Set<ManagedType<?>> visited) {
         if (!visited.add(managedType)) {
             return null;
         }
@@ -444,9 +446,10 @@ class EntityEncryptor {
      * Returns the {@link AttributeOverride @AttributeOverride} which applies to the specified attribute, the outermost
      * one winning.
      */
-    private static @org.jspecify.annotations.Nullable AttributeOverride findAttributeOverride(final ManagedType<?> rootType,
-                                                                     final List<Attribute<?, ?>> embeddingPath,
-                                                                     final Attribute<?, ?> attribute) {
+    private static @org.jspecify.annotations.Nullable AttributeOverride findAttributeOverride(
+            final ManagedType<?> rootType,
+            final List<Attribute<?, ?>> embeddingPath,
+            final Attribute<?, ?> attribute) {
         final var names = new ArrayList<String>();
         for (final var embedding : embeddingPath) {
             names.add(embedding.getName());
@@ -594,7 +597,8 @@ class EntityEncryptor {
      * @param name the name of the field.
      * @return the field; {@code null} when there is none.
      */
-    private static java.lang.reflect.@org.jspecify.annotations.Nullable Field findField(final Class<?> type, final String name) {
+    private static java.lang.reflect.@org.jspecify.annotations.Nullable Field findField(final Class<?> type,
+                                                                                        final String name) {
         for (var c = type; c != null && c != Object.class; c = c.getSuperclass()) {
             for (final var field : c.getDeclaredFields()) {
                 if (field.getName().equals(name)) {
@@ -888,7 +892,8 @@ class EntityEncryptor {
         }
     }
 
-    private byte[] encryptFramed(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Pair pair, final byte[] framed) {
+    private byte[] encryptFramed(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Pair pair,
+                                 final byte[] framed) {
         final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
         if (encrypted == null) {
             throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());

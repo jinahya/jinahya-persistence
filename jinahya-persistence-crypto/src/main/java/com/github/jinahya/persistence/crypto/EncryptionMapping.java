@@ -56,7 +56,8 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
      * @param encrypted      the attribute holding the ciphertext.
      * @param javaType       the declared java type of the plaintext, resolved against the concrete class.
      */
-    record Pair(@org.jspecify.annotations.Nullable Attribute<?, ?> decrypted, java.lang.reflect.@org.jspecify.annotations.Nullable Field plaintextField,
+    record Pair(@org.jspecify.annotations.Nullable Attribute<?, ?> decrypted,
+                java.lang.reflect.@org.jspecify.annotations.Nullable Field plaintextField,
                 Attribute<?, ?> encrypted, Class<?> javaType) {
 
         Pair {
