@@ -51,105 +51,105 @@ public class _SecretEntity {
     private Long id;
 
     // ---------------------------------------------------------------------------------------------------------- String
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "name", nullable = true, insertable = false)
     public String name;
 
+    @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;
 
     // --------------------------------------------------------------------------------------------------------- Integer
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "age", nullable = true, insertable = false)
     public Integer age;
 
+    @EncryptedAttribute("age")
     @Basic(optional = true)
     @Column(name = "age_enc", nullable = true, length = 2048)
     public byte[] ageEnc__;
 
     // ------------------------------------------------------------------------------------------------------------ UUID
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "reference", nullable = true, insertable = false)
     public UUID reference;
 
+    @EncryptedAttribute("reference")
     @Basic(optional = true)
     @Column(name = "reference_enc", nullable = true, length = 2048)
     public byte[] referenceEnc__;
 
     // ------------------------------------------------------------------------------------------------------- LocalDate
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "born_on", nullable = true, insertable = false)
     public LocalDate bornOn;
 
+    @EncryptedAttribute("bornOn")
     @Basic(optional = true)
     @Column(name = "born_on_enc", nullable = true, length = 2048)
     public byte[] bornOnEnc__;
 
     // ------------------------------------------------------------------------------------------- java.sql.Timestamp
     // the branch which used to fall through to java.util.Date, losing the nanos
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "seen_at", nullable = true, insertable = false)
     public java.sql.Timestamp seenAt;
 
+    @EncryptedAttribute("seenAt")
     @Basic(optional = true)
     @Column(name = "seen_at_enc", nullable = true, length = 2048)
     public byte[] seenAtEnc__;
 
     // ------------------------------------------------------------------------------------------------- java.util.Date
-    @EncryptedAttribute
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = true)
     @Column(name = "joined_at", nullable = true, insertable = false)
     public java.util.Date joinedAt;
 
+    @EncryptedAttribute("joinedAt")
     @Basic(optional = true)
     @Column(name = "joined_at_enc", nullable = true, length = 2048)
     public byte[] joinedAtEnc__;
 
     // -------------------------------------------------------------------------------------------------------- Calendar
-    @EncryptedAttribute
     @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = true)
     @Column(name = "checked_at", nullable = true, insertable = false)
     public Calendar checkedAt;
 
+    @EncryptedAttribute("checkedAt")
     @Basic(optional = true)
     @Column(name = "checked_at_enc", nullable = true, length = 2048)
     public byte[] checkedAtEnc__;
 
     // ------------------------------------------------------------------------------------------------------------ enum
-    @EncryptedAttribute
     @Enumerated(EnumType.STRING)
     @Basic(optional = true)
     @Column(name = "grade", nullable = true, insertable = false)
     public Grade grade;
 
+    @EncryptedAttribute("grade")
     @Basic(optional = true)
     @Column(name = "grade_enc", nullable = true, length = 2048)
     public byte[] gradeEnc__;
 
     // ---------------------------------------------------------------------------------------------------------- byte[]
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "photo", nullable = true, length = 2048, insertable = false)
     public byte[] photo;
 
+    @EncryptedAttribute("photo")
     @Basic(optional = true)
     @Column(name = "photo_enc", nullable = true, length = 2048)
     public byte[] photoEnc__;
 
-    // ---------------------------------------------------------- a pair named explicitly, rather than by the default
-    @EncryptedAttribute("secretNumberCipher")
+    // -------------------------------------------------------- a ciphertext whose name does not follow the plaintext
     @Basic(optional = true)
     @Column(name = "secret_number", nullable = true, insertable = false)
     public Long secretNumber;
 
+    @EncryptedAttribute("secretNumber")
     @Basic(optional = true)
     @Column(name = "secret_number_cipher", nullable = true, length = 2048)
     public byte[] secretNumberCipher;
@@ -157,11 +157,11 @@ public class _SecretEntity {
     // ------------------------------------------------ a declared type broader than the value it holds at run time
     // Jakarta Persistence 3.2 §2.6 admits any Serializable as a basic type; the value here is an ordinary String,
     // so the declared type and the runtime type deliberately disagree.
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "opaque", nullable = true, insertable = false)
     public java.io.Serializable opaque;
 
+    @EncryptedAttribute("opaque")
     @Basic(optional = true)
     @Column(name = "opaque_enc", nullable = true, length = 2048)
     public byte[] opaqueEnc__;

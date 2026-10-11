@@ -396,8 +396,33 @@ class __EntityEncryptionService_Test {
 
             assertThatThrownBy(() -> service.encrypt(entity))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("neither a persistent attribute")
-                    .hasMessageContaining("_MisplacedAnnotationEntity.getName");
+                    .hasMessageContaining("is not a persistent attribute")
+                    .hasMessageContaining("_MisplacedAnnotationEntity.getNameEnc__");
+            assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
+        }
+
+        @DisplayName("an annotation left on the plaintext, naming the ciphertext, is rejected with a hint")
+        @Test
+        void __plaintextAnnotatedRejected() {
+            final var entity = new _PlaintextAnnotatedEntity();
+            entity.name = "never-encrypted";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("has to be typed byte[]")
+                    .hasMessageContaining("holding the ciphertext, and names the plaintext");
+            assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
+        }
+
+        @DisplayName("an annotation naming a plaintext which does not exist is rejected")
+        @Test
+        void __misnamedPlaintextRejected() {
+            final var entity = new _MisnamedPlaintextEntity();
+            entity.name = "never-encrypted";
+
+            assertThatThrownBy(() -> service.encrypt(entity))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("no plaintext named 'nmae'");
             assertThat(entity.nameEnc__).as("and nothing was touched").isNull();
         }
 
@@ -640,9 +665,11 @@ class __EntityEncryptionService_Test {
                     "crypto._CollectionSecretEntity",   // #71
                     "crypto._UnmarkedSecretEntity",     // #72
                     "crypto._FrozenPlainEntity",        // #73
-                    "crypto._ConstrainedSecretEntity"   // #9
+                    "crypto._ConstrainedSecretEntity",  // #9
+                    "crypto._PlaintextAnnotatedEntity", // the annotation on the plaintext
+                    "crypto._MisnamedPlaintextEntity"   // a plaintext which does not exist
             );
-            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(10);
+            assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(12);
             assertThat(message).doesNotContain(
                     "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
         }

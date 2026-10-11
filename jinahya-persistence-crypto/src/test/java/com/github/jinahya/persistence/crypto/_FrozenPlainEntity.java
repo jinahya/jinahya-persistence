@@ -27,11 +27,11 @@ public class _FrozenPlainEntity {
     public Long id;
 
     // looks like the safer mapping, but a legacy row would keep its plaintext forever
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "name", nullable = true, insertable = false, updatable = false)
     public String name;
 
+    @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;

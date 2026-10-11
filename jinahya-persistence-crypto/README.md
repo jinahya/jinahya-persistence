@@ -7,10 +7,9 @@ Application-level encryption (ALE) for Jakarta Persistence entities: selected at
 application, so the database only ever stores their ciphertext. The cryptography and the keys are not this module's
 concern; they live behind `EntityEncryptionManager`, which an application implements (with a KMS, Vault, Tink, …).
 
-Each encrypted value has two attributes in the entity: the annotated one holds the plaintext, and a second,
-`byte[]`-typed one — a column of the same table — holds the ciphertext. Name the ciphertext attribute explicitly with
-`@EncryptedAttribute("...")`, as the examples below do. Left empty, it defaults to the plaintext
-attribute's name suffixed with `Enc__` (`name` → `nameEnc__`).
+Each encrypted value has two attributes in the same entity: a `byte[]`-typed one — a column of the same table — holds
+the ciphertext, and is the one annotated `@EncryptedAttribute`; the annotation names the other one, which holds the
+plaintext: `@EncryptedAttribute("name")`. The name is required.
 
 ## Choose your path
 
@@ -38,12 +37,12 @@ apart by whether the plaintext is `@Transient` ([#82](https://github.com/jinahya
 @Entity
 class User {
 
-    @EncryptedAttribute("nameEnc")
     @Transient // no column: the plaintext lives only in the object
     private String name;
 
+    @EncryptedAttribute("name") // the ciphertext of name
     @Column(name = "name_enc")
-    private byte[] nameEnc; // the ciphertext; no accessors needed
+    private byte[] nameEnc;     // no accessors needed
 
     public String getName() {
         return name;
@@ -85,12 +84,12 @@ em.merge(detached).setName(detached.getName());
 @Entity
 class User {
 
-    @EncryptedAttribute("nameEnc")
     @Column(name = "name", insertable = false) // the existing column, kept; nullable and updatable
     private String name;
 
+    @EncryptedAttribute("name")                // added
     @Column(name = "name_enc")
-    private byte[] nameEnc;                    // added
+    private byte[] nameEnc;
 }
 ```
 
@@ -193,14 +192,15 @@ breaks any of these is rejected:
 | rule | A | B |
 |------|:-:|:-:|
 | the entity class is annotated `@EncryptedEntity`, directly or by inheritance; a forgotten annotation is rejected, not skipped; an entity with no encrypted attribute passes through untouched ([#72](https://github.com/jinahya/jinahya-persistence/issues/72)) | ✓ | ✓ |
-| `@EncryptedAttribute` sits on a persistent attribute (A) or on a `@Transient` field (B); anywhere else — unmapped, a getter the access type does not read — is rejected ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)) | ✓ | ✓ |
+| `@EncryptedAttribute` sits on the persistent attribute holding the ciphertext; anywhere else — unmapped, transient, a getter the access type does not read — is rejected ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)) | ✓ | ✓ |
+| the plaintext it names exists: a persistent attribute (A) or a `@Transient` field (B) of the same entity or embeddable; it is not itself annotated, and is named only once | ✓ | ✓ |
 | the plaintext is `@Basic`, optional, not of a primitive type, neither an identifier nor a version | ✓ | ✓ |
 | the plaintext's declared java type has a codec (see [Encoding](#encoding)); for a member of a generic `@MappedSuperclass`, the type the entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) | ✓ | ✓ |
 | the plaintext column is **non-insertable**, nullable and **updatable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)) | ✓ | — (no column) |
 | no Bean Validation constraint on the plaintext ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)) | ✓ | — (allowed) |
 | a setter which also nulls the ciphertext, proven at startup | — | ✓ |
-| the ciphertext attribute exists, is `@Basic`, optional, typed `byte[]`, not an identifier or a version, not itself annotated, paired only once, and its column is insertable, updatable and nullable | ✓ | ✓ |
-| an `@Embedded` attribute is not itself annotated; annotate the attributes inside the embeddable, which are descended into | ✓ | ✓ |
+| the ciphertext attribute is `@Basic`, optional, typed `byte[]`, not an identifier or a version, and its column is insertable, updatable and nullable | ✓ | ✓ |
+| an `@Embedded` attribute is not itself annotated; annotate the ciphertext attributes inside the embeddable, which are descended into | ✓ | ✓ |
 | an embeddable reached through an `@ElementCollection` — element or map key — holds no `@EncryptedAttribute` at any depth: collections are not walked ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)) | ✓ | ✓ |
 
 ### How the column rules are established (Mode A)

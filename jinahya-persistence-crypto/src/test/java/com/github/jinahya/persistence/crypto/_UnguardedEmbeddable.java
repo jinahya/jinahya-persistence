@@ -17,11 +17,11 @@ public class _UnguardedEmbeddable {
     }
 
     // no insertable = false, so this pair is invalid
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "leak", nullable = true)
     public String leak;
 
+    @EncryptedAttribute("leak")
     @Basic(optional = true)
     @Column(name = "leak_enc", nullable = true, length = 2048)
     public byte[] leakEnc__;

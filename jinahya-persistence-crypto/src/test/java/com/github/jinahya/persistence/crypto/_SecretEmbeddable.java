@@ -31,11 +31,11 @@ public class _SecretEmbeddable {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "note", nullable = true, insertable = false)
     private String note;
 
+    @EncryptedAttribute("note")
     @Basic(optional = true)
     @Column(name = "note_enc", nullable = true, length = 2048)
     private byte[] noteEnc__;

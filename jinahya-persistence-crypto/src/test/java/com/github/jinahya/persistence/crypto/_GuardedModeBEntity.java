@@ -36,10 +36,10 @@ public class _GuardedModeBEntity {
     public long version;
 
     // the plaintext: no column; the `name` column of the table is left over
-    @EncryptedAttribute
     @Transient
     public String name;
 
+    @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;

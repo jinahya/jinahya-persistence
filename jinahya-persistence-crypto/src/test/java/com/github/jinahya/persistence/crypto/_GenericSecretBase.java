@@ -17,11 +17,11 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class _GenericSecretBase<T> {
 
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "secret", nullable = true, insertable = false)
     public T secret;
 
+    @EncryptedAttribute("secret")
     @Basic(optional = true)
     @Column(name = "secret_enc", nullable = true, length = 2048)
     public byte[] secretEnc__;

@@ -78,12 +78,12 @@ The ciphertext is a sibling column in the entity's own table. There are two mode
 @EntityListeners(EntityEncryptionListener.class)
 class User {
 
-    @EncryptedAttribute
     @Column(insertable = false)  // the existing column stays; made nullable and non-insertable
     String name;
 
+    @EncryptedAttribute("name")  // added, with its column; no accessors
     @Column
-    byte[] name_enc__;           // added; no accessors
+    byte[] name_enc__;
 }
 ----
 
@@ -166,10 +166,10 @@ connection fail. It cannot be fixed inside JPA callbacks (1.3).
 
 [source,java]
 ----
-@EncryptedAttribute                         // the same annotation, in the same place
 @Transient                                  // what makes it Mode B: the plaintext is never mapped
 String name;
 
+@EncryptedAttribute("name")                 // the same annotation, in the same place
 @Column
 byte[] name_enc__;
 
@@ -194,10 +194,11 @@ void setName(String name) { this.name = name; this.name_enc__ = null; }  // make
   plaintext is compared with the ciphertext, so a direct field write is kept. A direct write with nothing else changed
   is still lost: no callback runs at all. *Measured:* `merge()` does not copy a transient field from a detached
   instance; set the value on the instance it returns.
-* *Discovery.* Transient fields are not in the metamodel. *Implemented (#82):* the annotation stays on the plaintext;
-  a `@Transient` (or `transient`) field is found by reflection, and paired by name with the metamodel's `byte[]`
-  attribute. A reversed annotation, on the ciphertext side, was considered and not adopted: it would have meant more
-  churn for every entity switching from A.
+* *Discovery.* Transient fields are not in the metamodel. *Implemented (#82):* the annotation sits on the ciphertext,
+  the `byte[]` attribute which the metamodel always knows, in both modes, and names the plaintext; a `@Transient` (or
+  `transient`) plaintext is then found by reflection, by that name. The annotation first sat on the plaintext, which
+  needed a reflective scan for annotated transient fields; it moved to the ciphertext once the ciphertext was settled
+  to live in the same entity, so switching from A to B no longer touches it at all.
 * *Legacy rows are invisible.* The old `name` column is unmapped, so a row with no ciphertext reads as `name = null`
   (the chicken-and-egg problem, 2.3).
 * *The leftover `name` column* must be nullable (unmapped inserts do not write it), and any `UNIQUE` constraint on it
@@ -210,7 +211,8 @@ void setName(String name) { this.name = name; this.name_enc__ = null; }  // make
 ----
 Phase A (transition)                       Phase B (steady state)
 @Column(insertable=false) String name      @Transient String name
-byte[] name_enc__                          @EncryptedAttribute(plaintext="name") byte[] name_enc__
+@EncryptedAttribute("name")                @EncryptedAttribute("name")
+byte[] name_enc__                          byte[] name_enc__
 legacy rows readable, migrate lazily       reading does not write, object not emptied
 + batch for untouched rows
 dirty on read (accepted, temporary)
@@ -300,10 +302,10 @@ class User {
 
     @Id Long id;
 
-    @EncryptedAttribute
     @Transient
     String name;
 
+    @EncryptedAttribute("name")
     @Column(table = "USER_ENC", name = "name")
     byte[] nameEnc;
 
@@ -538,8 +540,8 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 
 === 8.4 Enhancements, in order
 
-. *Mode B support:* *done* (#82). The annotation stays on the plaintext, now `@Transient`; the field is found by
-  reflection; nothing mapped is ever nulled.
+. *Mode B support:* *done* (#82). The plaintext is `@Transient`, found by reflection by the name which the
+  annotation on the ciphertext gives; nothing mapped is ever nulled.
 . *Edit detection:* *done* (#82): an invalidating setter, proven at startup, and a safety net comparing the plaintext
   with the ciphertext when the instance is flushed anyway.
 . *Re-encryption policy:* *done* (#82): an unchanged plaintext is never re-encrypted.

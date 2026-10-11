@@ -38,11 +38,11 @@ public class _LifecycleEntity {
     @Column(name = "version")
     public long version;
 
-    @EncryptedAttribute
     @Basic(optional = true)
     @Column(name = "name", nullable = true)
     public String name;
 
+    @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;

@@ -35,8 +35,8 @@ public class _MisplacedAnnotationEntity {
     public byte[] nameEnc__;
 
     // field access: the provider reads the field, never this getter
-    @EncryptedAttribute
-    public String getName() {
-        return name;
+    @EncryptedAttribute("name")
+    public byte[] getNameEnc__() {
+        return nameEnc__;
     }
 }

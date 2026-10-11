@@ -57,6 +57,8 @@
     <class>com.github.jinahya.persistence.crypto._ModeBPlainSetterEntity</class>
     <class>com.github.jinahya.persistence.crypto._ModeBConstrainedEntity</class>
     <class>com.github.jinahya.persistence.crypto._MisplacedAnnotationEntity</class>
+    <class>com.github.jinahya.persistence.crypto._PlaintextAnnotatedEntity</class>
+    <class>com.github.jinahya.persistence.crypto._MisnamedPlaintextEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>

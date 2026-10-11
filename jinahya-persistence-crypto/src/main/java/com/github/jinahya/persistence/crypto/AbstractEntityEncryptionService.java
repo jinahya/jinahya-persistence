@@ -79,15 +79,15 @@ import static com.github.jinahya.persistence.crypto.EntityEncryptionServiceUtils
  * An abstract service which encrypts and decrypts the {@link EncryptedAttribute annotated attributes} of an entity
  * instance, in place.
  * <p>
- * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each plaintext annotated
- * with {@link EncryptedAttribute @EncryptedAttribute} — a {@code BASIC} attribute (Mode A), or a
- * {@link jakarta.persistence.Transient @Transient} field (Mode B):
+ * The service reads the entity's {@link ManagedType managedType} from the metamodel, and for each {@code byte[]}
+ * attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}, and the plaintext it names — a {@code BASIC}
+ * attribute (Mode A), or a {@link jakarta.persistence.Transient @Transient} field (Mode B):
  * <ol>
  *   <li>converts the plaintext value to bytes, by its declared java type, prefixed with a header naming the format
  *       version and the codec;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionManager encryptionManager}, along with the
  *       {@link EntityEncryptionManager#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
- *   <li>stores the ciphertext in the paired {@code byte[]} attribute; in Mode A, it also clears the plaintext, which
+ *   <li>stores the ciphertext in the annotated attribute; in Mode A, it also clears the plaintext, which
  *       is mapped. In Mode B nothing mapped is ever cleared, and an unchanged plaintext is not re-encrypted.</li>
  * </ol>
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
@@ -300,8 +300,8 @@ public abstract class AbstractEntityEncryptionService {
      * @param attributes    the attributes of the {@code managedType}.
      * @implNote The rest of the validation walks the metamodel, so an annotated member the metamodel does not know
      *         is never visited: a {@code @Transient} member, an unmapped one, or one on the side which the access type
-     *         does not read (a field under property access). Such a member used to be silently ignored, and a
-     *         transient one was not even stored. Bridge and synthetic methods are skipped; {@code javac} copies a
+     *         does not read (a field under property access). Such a member would be silently ignored, and the plaintext
+     *         it names would never be encrypted. Bridge and synthetic methods are skipped; {@code javac} copies a
      *         method's annotations onto its bridge.
      */
     private static void rejectUnmappedAnnotatedMembers(final ManagedType<?> rootType,
@@ -319,17 +319,14 @@ public abstract class AbstractEntityEncryptionService {
             if (!((AnnotatedElement) member).isAnnotationPresent(EncryptedAttribute.class) || mapped.contains(member)) {
                 continue;
             }
-            if (member instanceof java.lang.reflect.Field field && isTransientField(field)) {
-                continue; // a transient plaintext: Mode B, validated by validateTransientPlaintexts(...)
-            }
             final var path = new StringBuilder(rootType.getJavaType().getName());
             for (final var embedding : embeddingPath) {
                 path.append('.').append(embedding.getName());
             }
             throw new RuntimeException(
-                    "an @EncryptedAttribute member is neither a persistent attribute (Mode A) nor a transient field"
-                    + " (Mode B): unmapped, a transient getter, or on the side the access type does not read; it would"
-                    + " never be encrypted"
+                    "an @EncryptedAttribute member is not a persistent attribute: the annotation sits on the persistent"
+                    + " byte[] attribute holding the ciphertext, and names the plaintext; this one is unmapped,"
+                    + " transient, or on the side the access type does not read"
                     + "; member: " + member.getDeclaringClass().getName() + '.' + member.getName()
                     + "; managed type: " + managedType.getJavaType().getName()
                     + "; path: " + path
@@ -661,8 +658,8 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * Validates every {@link EncryptedAttribute annotated attribute} of the specified managed type, and returns the
-     * pairs, and the embedded attributes, to walk.
+     * Validates every {@link EncryptedAttribute annotated attribute} of the specified managed type — each holding the
+     * ciphertext of the plaintext it names — and returns the pairs, and the embedded attributes, to walk.
      *
      * @param rootType      the managed type the walk started from.
      * @param embeddingPath the embedding attributes from the {@code rootType} down to the {@code managedType}.
@@ -683,32 +680,31 @@ public abstract class AbstractEntityEncryptionService {
         rejectUnmappedAnnotatedMembers(rootType, embeddingPath, managedType, attributes.values());
         final var pairs = new ArrayList<Pair>();
         final var embeddeds = new ArrayList<Embedded>();
-        final var paired = new HashSet<Attribute<?, ?>>();
-        for (final var decryptedAttribute : attributes.values()) {
-            final var persistentAttributeType = decryptedAttribute.getPersistentAttributeType();
-            final var annotation =
-                    JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, EncryptedAttribute.class);
+        final var paired = new HashSet<String>(); // the names of the plaintexts already paired
+        for (final var attribute : attributes.values()) {
+            final var persistentAttributeType = attribute.getPersistentAttributeType();
+            final var annotation = JinahyaAttributeUtils.getJavaMemberAnnotation(attribute, EncryptedAttribute.class);
             if (persistentAttributeType == Attribute.PersistentAttributeType.EMBEDDED) {
                 if (annotation != null) {
-                    throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                                 "an @Embedded attribute cannot itself be encrypted"
-                                 + "; annotate the attributes inside the embeddable");
+                    throw reject(rootType, embeddingPath, annotation.value(), declaringClassOf(attribute), attribute,
+                                 "an @Embedded attribute cannot itself be annotated"
+                                 + "; annotate the attributes holding the ciphertexts inside the embeddable");
                 }
                 // descend now, so that an invalid embeddable cannot surface only once a sibling has been transformed,
                 // and keep the child mapping: it was resolved with this path's overrides in scope
                 final var childPath = new ArrayList<>(embeddingPath);
-                childPath.add(decryptedAttribute);
+                childPath.add(attribute);
                 final var childMapping = resolve(
                         rootType,
                         List.copyOf(childPath),
-                        entityManagerFactory.getMetamodel().managedType(decryptedAttribute.getJavaType()),
+                        entityManagerFactory.getMetamodel().managedType(attribute.getJavaType()),
                         visiting
                 );
-                embeddeds.add(new Embedded(decryptedAttribute, childMapping));
+                embeddeds.add(new Embedded(attribute, childMapping));
                 continue;
             }
             if (persistentAttributeType == Attribute.PersistentAttributeType.ELEMENT_COLLECTION
-                && decryptedAttribute instanceof PluralAttribute<?, ?, ?> plural) {
+                && attribute instanceof PluralAttribute<?, ?, ?> plural) {
                 // an embeddable reached through a collection is never walked, so anything encrypted inside it would
                 // be persisted in the clear to the collection table; that is an error, not something to skip past
                 final var reached = new ArrayList<ManagedType<?>>();
@@ -721,9 +717,9 @@ public abstract class AbstractEntityEncryptionService {
                 for (final var embeddable : reached) {
                     final var encrypted = findEncryptedMember(embeddable, new HashSet<>());
                     if (encrypted != null) {
-                        throw reject(rootType, embeddingPath, decryptedAttribute, null,
+                        throw reject(rootType, embeddingPath, attribute.getName(), declaringClassOf(attribute), null,
                                      "an embeddable reached through an @ElementCollection cannot hold an encrypted"
-                                     + " attribute; it would be persisted in the clear"
+                                     + " attribute; its plaintext would be persisted in the clear"
                                      + "; encrypted member: " + encrypted.getDeclaringClass().getName() + '.'
                                      + encrypted.getName());
                     }
@@ -732,77 +728,140 @@ public abstract class AbstractEntityEncryptionService {
             if (annotation == null) {
                 continue;
             }
-            // an annotated attribute which cannot be handled is an error, never something to skip past
-            if (persistentAttributeType != Attribute.PersistentAttributeType.BASIC) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "only a BASIC attribute can be encrypted; found " + persistentAttributeType);
+            // the annotated attribute holds the ciphertext; the plaintext is the attribute, or field, it names
+            final var plaintextName = annotation.value();
+            final var encryptedAttribute = checkEncryptedAttribute(rootType, embeddingPath, attribute, plaintextName);
+            if (!paired.add(plaintextName)) {
+                throw reject(rootType, embeddingPath, plaintextName, declaringClassOf(encryptedAttribute),
+                             encryptedAttribute, "a plaintext is named by more than one encrypted attribute");
             }
-            if (decryptedAttribute.getJavaType().isPrimitive()) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "a decrypted attribute cannot be of a primitive type; encrypting nulls it");
+            final var decryptedAttribute = attributes.get(plaintextName);
+            if (decryptedAttribute != null) {
+                pairs.add(checkMappedPlaintext(rootType, embeddingPath, managedType, decryptedAttribute,
+                                               encryptedAttribute));
+                continue;
             }
-            if (isIdOrVersion(decryptedAttribute)) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "an identifier, or a version, attribute cannot be encrypted");
+            final var field = findField(managedType.getJavaType(), plaintextName);
+            if (field == null) {
+                throw reject(rootType, embeddingPath, plaintextName, declaringClassOf(encryptedAttribute),
+                             encryptedAttribute,
+                             "no plaintext named '" + plaintextName + "': neither a persistent attribute (Mode A) nor"
+                             + " a transient field (Mode B)");
             }
-            // the declared java member decides the codec, in both directions; know it is one before any value moves.
-            // A member inherited from a generic superclass is declared as a type variable: resolve it against the
-            // concrete class, or Base<String> would be encoded as its erasure, Object (#67)
-            final var javaType = resolveJavaType(managedType.getJavaType(), decryptedAttribute);
-            final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
-            if (codec == null) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "no codec for the declared java type " + javaType.getName());
+            if (!isTransientField(field)) {
+                throw reject(rootType, embeddingPath, plaintextName, field.getDeclaringClass(), encryptedAttribute,
+                             "a plaintext field is neither a persistent attribute (Mode A) nor transient (Mode B)"
+                             + "; unmapped, or on the side the access type does not read");
             }
-            // Jakarta Persistence validates after @PrePersist/@PreUpdate, by which time encrypting has nulled the
-            // plaintext: a constraint on it is evaluated against null, failing every write or passing vacuously
-            final var constraint = findConstraint(decryptedAttribute);
-            if (constraint != null) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "a Bean Validation constraint on an encrypted attribute is evaluated against null"
-                             + " (validation runs after encrypting has cleared the plaintext); found @"
-                             + constraint.annotationType().getName()
-                             + "; validate the value before persisting, or use the transient-plaintext mode (#82)");
-            }
-            if (!isOptional(decryptedAttribute)) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             "a decrypted attribute has to be optional");
-            }
-            // the plaintext column must not be writable: @PrePersist runs at persist(), not when the INSERT is built,
-            // so a provider which builds one statement at commit would otherwise carry a late assignment in the clear
-            final var rules = resolveColumnRules(rootType, embeddingPath, decryptedAttribute);
-            if (rules.insertable() != MappingFlag.NO) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             (rules.insertable() == MappingFlag.UNKNOWN
-                                     ? "cannot establish that a decrypted attribute's column is not insertable"
-                                     : "a decrypted attribute's column has to be non-insertable")
-                             + "; otherwise an INSERT can carry the plaintext (from " + rules.source() + ")");
-            }
-            if (rules.nullable() != MappingFlag.YES) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             (rules.nullable() == MappingFlag.UNKNOWN
-                                     ? "cannot establish that a decrypted attribute's column is nullable"
-                                     : "a decrypted attribute's column has to be nullable")
-                             + "; encrypting nulls it (from " + rules.source() + ")");
-            }
-            // a legacy row (plaintext in this column, no ciphertext) is migrated by the UPDATE which stores its
-            // ciphertext, and only that UPDATE nulls this column; a non-updatable one keeps the legacy plaintext forever
-            if (rules.updatable() != MappingFlag.YES) {
-                throw reject(rootType, embeddingPath, decryptedAttribute, null,
-                             (rules.updatable() == MappingFlag.UNKNOWN
-                                     ? "cannot establish that a decrypted attribute's column is updatable"
-                                     : "a decrypted attribute's column has to be updatable")
-                             + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
-            }
-            final var encryptedAttribute = checkEncryptedAttribute(
-                    rootType, embeddingPath, decryptedAttribute.getName(),
-                    decryptedAttribute.getDeclaringType().getJavaType(), decryptedAttribute,
-                    annotation.value(), attributes, paired);
-            pairs.add(new Pair(decryptedAttribute, null, encryptedAttribute, javaType));
+            pairs.add(checkTransientPlaintext(rootType, embeddingPath, managedType, field, encryptedAttribute));
         }
-        validateTransientPlaintexts(rootType, embeddingPath, managedType, attributes, paired, pairs);
         visiting.remove(managedType);
         return new Mapping(List.copyOf(pairs), List.copyOf(embeddeds));
+    }
+
+    private static Class<?> declaringClassOf(final Attribute<?, ?> attribute) {
+        return attribute.getDeclaringType().getJavaType();
+    }
+
+    /**
+     * Returns the field of the specified name declared by the specified class, or by the nearest of its superclasses
+     * which declares one.
+     *
+     * @param type the class to search from.
+     * @param name the name of the field.
+     * @return the field; {@code null} when there is none.
+     */
+    private static java.lang.reflect.@Nullable Field findField(final Class<?> type, final String name) {
+        for (var c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+            for (final var field : c.getDeclaredFields()) {
+                if (field.getName().equals(name)) {
+                    return field;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Validates a persistent plaintext attribute (Mode A), and returns its pair.
+     *
+     * @param rootType           the managed type the walk started from.
+     * @param embeddingPath      the embedding attributes from the {@code rootType}.
+     * @param managedType        the managed type declaring, or inheriting, both attributes.
+     * @param decryptedAttribute the attribute holding the plaintext.
+     * @param encryptedAttribute the attribute holding the ciphertext, already validated.
+     * @return the validated pair.
+     */
+    private Pair checkMappedPlaintext(final ManagedType<?> rootType, final List<Attribute<?, ?>> embeddingPath,
+                                      final ManagedType<?> managedType, final Attribute<?, ?> decryptedAttribute,
+                                      final Attribute<?, ?> encryptedAttribute) {
+        if (JinahyaAttributeUtils.getJavaMemberAnnotation(decryptedAttribute, EncryptedAttribute.class) != null) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "a decrypted attribute cannot itself be annotated with @EncryptedAttribute");
+        }
+        final var persistentAttributeType = decryptedAttribute.getPersistentAttributeType();
+        if (persistentAttributeType != Attribute.PersistentAttributeType.BASIC) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "only a BASIC attribute can be encrypted; found " + persistentAttributeType);
+        }
+        if (decryptedAttribute.getJavaType().isPrimitive()) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "a decrypted attribute cannot be of a primitive type; encrypting nulls it");
+        }
+        if (isIdOrVersion(decryptedAttribute)) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "an identifier, or a version, attribute cannot be encrypted");
+        }
+        // the declared java member decides the codec, in both directions; know it is one before any value moves.
+        // A member inherited from a generic superclass is declared as a type variable: resolve it against the
+        // concrete class, or Base<String> would be encoded as its erasure, Object (#67)
+        final var javaType = resolveJavaType(managedType.getJavaType(), decryptedAttribute);
+        final var codec = EntityEncryptionServiceUtils.codecOf(javaType);
+        if (codec == null) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "no codec for the declared java type " + javaType.getName());
+        }
+        // Jakarta Persistence validates after @PrePersist/@PreUpdate, by which time encrypting has nulled the
+        // plaintext: a constraint on it is evaluated against null, failing every write or passing vacuously
+        final var constraint = findConstraint(decryptedAttribute);
+        if (constraint != null) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "a Bean Validation constraint on an encrypted attribute is evaluated against null"
+                         + " (validation runs after encrypting has cleared the plaintext); found @"
+                         + constraint.annotationType().getName()
+                         + "; validate the value before persisting, or use the transient-plaintext mode (#82)");
+        }
+        if (!isOptional(decryptedAttribute)) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         "a decrypted attribute has to be optional");
+        }
+        // the plaintext column must not be writable: @PrePersist runs at persist(), not when the INSERT is built,
+        // so a provider which builds one statement at commit would otherwise carry a late assignment in the clear
+        final var rules = resolveColumnRules(rootType, embeddingPath, decryptedAttribute);
+        if (rules.insertable() != MappingFlag.NO) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         (rules.insertable() == MappingFlag.UNKNOWN
+                                 ? "cannot establish that a decrypted attribute's column is not insertable"
+                                 : "a decrypted attribute's column has to be non-insertable")
+                         + "; otherwise an INSERT can carry the plaintext (from " + rules.source() + ")");
+        }
+        if (rules.nullable() != MappingFlag.YES) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         (rules.nullable() == MappingFlag.UNKNOWN
+                                 ? "cannot establish that a decrypted attribute's column is nullable"
+                                 : "a decrypted attribute's column has to be nullable")
+                         + "; encrypting nulls it (from " + rules.source() + ")");
+        }
+        // a legacy row (plaintext in this column, no ciphertext) is migrated by the UPDATE which stores its
+        // ciphertext, and only that UPDATE nulls this column; a non-updatable one keeps the legacy plaintext forever
+        if (rules.updatable() != MappingFlag.YES) {
+            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
+                         (rules.updatable() == MappingFlag.UNKNOWN
+                                 ? "cannot establish that a decrypted attribute's column is updatable"
+                                 : "a decrypted attribute's column has to be updatable")
+                         + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
+        }
+        return new Pair(decryptedAttribute, null, encryptedAttribute, javaType);
     }
 
     /**
@@ -818,54 +877,42 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * Validates every transient plaintext field (Mode B) of the specified managed type, and adds its pair.
+     * Validates a transient plaintext field (Mode B), and returns its pair.
      *
-     * @param rootType      the managed type the walk started from.
-     * @param embeddingPath the embedding attributes from the {@code rootType}.
-     * @param managedType   the managed type whose java class, and superclasses, are searched.
-     * @param attributes    the attributes of the {@code managedType}, by name.
-     * @param paired        the attributes already paired.
-     * @param pairs         the list to which each validated pair is added.
+     * @param rootType           the managed type the walk started from.
+     * @param embeddingPath      the embedding attributes from the {@code rootType}.
+     * @param managedType        the managed type whose java class, or a superclass of it, declares the field.
+     * @param field              the transient field holding the plaintext.
+     * @param encryptedAttribute the attribute holding the ciphertext, already validated.
+     * @return the validated pair.
      * @implNote A transient field is not in the metamodel, so it is found by reflection. It has no column, so no
      *         column rule applies to it; and since nothing ever nulls it, a Bean Validation constraint on it sees the
      *         real value, and is allowed. What it needs instead is a setter which also nulls the ciphertext, the
      *         provider dirty-checking only mapped attributes: {@link #checkInvalidatingSetter} proves one.
      */
-    private void validateTransientPlaintexts(final ManagedType<?> rootType,
-                                             final List<Attribute<?, ?>> embeddingPath,
-                                             final ManagedType<?> managedType,
-                                             final Map<String, Attribute<?, ?>> attributes,
-                                             final Set<Attribute<?, ?>> paired, final List<Pair> pairs) {
+    private static Pair checkTransientPlaintext(final ManagedType<?> rootType,
+                                                final List<Attribute<?, ?>> embeddingPath,
+                                                final ManagedType<?> managedType,
+                                                final java.lang.reflect.Field field,
+                                                final Attribute<?, ?> encryptedAttribute) {
         final var concrete = managedType.getJavaType();
-        for (final var member : declaredMembers(concrete)) {
-            if (!(member instanceof java.lang.reflect.Field field) || !isTransientField(field)) {
-                continue;
-            }
-            final var annotation = field.getAnnotation(EncryptedAttribute.class);
-            if (annotation == null) {
-                continue;
-            }
-            final var declaring = field.getDeclaringClass();
-            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-                throw reject(rootType, embeddingPath, field.getName(), declaring, null,
-                             "a transient plaintext cannot be a static field");
-            }
-            final var javaType = resolveType(concrete, field.getGenericType());
-            if (javaType.isPrimitive()) {
-                throw reject(rootType, embeddingPath, field.getName(), declaring, null,
-                             "a decrypted attribute cannot be of a primitive type; it has no value when cleared");
-            }
-            if (EntityEncryptionServiceUtils.codecOf(javaType) == null) {
-                throw reject(rootType, embeddingPath, field.getName(), declaring, null,
-                             "no codec for the declared java type " + javaType.getName());
-            }
-            final var encryptedAttribute = checkEncryptedAttribute(
-                    rootType, embeddingPath, field.getName(), declaring, null, annotation.value(),
-                    attributes, paired);
-            checkInvalidatingSetter(rootType, embeddingPath, concrete, field, javaType, encryptedAttribute);
-            field.setAccessible(true);
-            pairs.add(new Pair(null, field, encryptedAttribute, javaType));
+        final var declaring = field.getDeclaringClass();
+        if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+            throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
+                         "a transient plaintext cannot be a static field");
         }
+        final var javaType = resolveType(concrete, field.getGenericType());
+        if (javaType.isPrimitive()) {
+            throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
+                         "a decrypted attribute cannot be of a primitive type; it has no value when cleared");
+        }
+        if (EntityEncryptionServiceUtils.codecOf(javaType) == null) {
+            throw reject(rootType, embeddingPath, field.getName(), declaring, encryptedAttribute,
+                         "no codec for the declared java type " + javaType.getName());
+        }
+        checkInvalidatingSetter(rootType, embeddingPath, concrete, field, javaType, encryptedAttribute);
+        field.setAccessible(true);
+        return new Pair(null, field, encryptedAttribute, javaType);
     }
 
     /**
@@ -932,36 +979,26 @@ public abstract class AbstractEntityEncryptionService {
     }
 
     /**
-     * Validates the attribute holding the ciphertext of a plaintext, and returns it.
+     * Validates an attribute annotated with {@link EncryptedAttribute}, which holds the ciphertext, and returns it.
      *
      * @param rootType           the managed type the walk started from.
      * @param embeddingPath      the embedding attributes from the {@code rootType}.
-     * @param decryptedName      the name of the plaintext attribute, or transient field.
-     * @param declaringType      the class declaring the plaintext.
-     * @param decryptedAttribute the plaintext attribute; {@code null} for a transient plaintext.
-     * @param named              the name given by {@link EncryptedAttribute#value()}; may be blank.
-     * @param attributes         the attributes of the managed type, by name.
-     * @param paired             the attributes already paired, to which the result is added.
-     * @return the attribute holding the ciphertext.
+     * @param encryptedAttribute the annotated attribute.
+     * @param decryptedName      the name of the plaintext, as given by {@link EncryptedAttribute#value()}.
+     * @return the {@code encryptedAttribute}.
      */
     private Attribute<?, ?> checkEncryptedAttribute(final ManagedType<?> rootType,
                                                     final List<Attribute<?, ?>> embeddingPath,
-                                                    final String decryptedName, final Class<?> declaringType,
-                                                    final @Nullable Attribute<?, ?> decryptedAttribute,
-                                                    final String named,
-                                                    final Map<String, Attribute<?, ?>> attributes,
-                                                    final Set<Attribute<?, ?>> paired) {
-        final var name = named.isBlank()
-                ? decryptedName + EncryptedAttributeConstants.DEFAULT_ENCRYPTED_ATTRIBUTE_POSTFIX
-                : named;
-        final var encryptedAttribute = attributes.get(name);
-        if (encryptedAttribute == null) {
-            throw reject(rootType, embeddingPath, decryptedName, declaringType, null,
-                         "no encrypted attribute named '" + name + "'");
-        }
-        if (decryptedAttribute != null && encryptedAttribute == decryptedAttribute) {
+                                                    final Attribute<?, ?> encryptedAttribute,
+                                                    final String decryptedName) {
+        final var declaringType = declaringClassOf(encryptedAttribute);
+        if (decryptedName.isBlank()) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
-                         "an encrypted attribute cannot be the decrypted attribute itself");
+                         "@EncryptedAttribute has to name the attribute, or field, holding the plaintext");
+        }
+        if (decryptedName.equals(encryptedAttribute.getName())) {
+            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
+                         "an encrypted attribute cannot name itself as its plaintext");
         }
         if (encryptedAttribute.getPersistentAttributeType() != Attribute.PersistentAttributeType.BASIC) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
@@ -969,7 +1006,8 @@ public abstract class AbstractEntityEncryptionService {
         }
         if (encryptedAttribute.getJavaType() != byte[].class) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
-                         "an encrypted attribute has to be typed byte[]");
+                         "an encrypted attribute has to be typed byte[]; @EncryptedAttribute sits on the attribute"
+                         + " holding the ciphertext, and names the plaintext");
         }
         if (isIdOrVersion(encryptedAttribute)) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
@@ -978,10 +1016,6 @@ public abstract class AbstractEntityEncryptionService {
         if (!isOptional(encryptedAttribute)) {
             throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
                          "an encrypted attribute has to be optional");
-        }
-        if (JinahyaAttributeUtils.getJavaMemberAnnotation(encryptedAttribute, EncryptedAttribute.class) != null) {
-            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
-                         "an encrypted attribute cannot itself be annotated with @EncryptedAttribute");
         }
         final var encryptedRules = resolveColumnRules(rootType, embeddingPath, encryptedAttribute);
         if (encryptedRules.insertable() != MappingFlag.YES || encryptedRules.updatable() != MappingFlag.YES) {
@@ -999,10 +1033,6 @@ public abstract class AbstractEntityEncryptionService {
                                  ? "cannot establish that an encrypted attribute's column is nullable"
                                  : "an encrypted attribute's column has to be nullable")
                          + "; decrypting nulls it (from " + encryptedRules.source() + ")");
-        }
-        if (!paired.add(encryptedAttribute)) {
-            throw reject(rootType, embeddingPath, decryptedName, declaringType, encryptedAttribute,
-                         "an encrypted attribute is paired more than once");
         }
         return encryptedAttribute;
     }
