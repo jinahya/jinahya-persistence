@@ -1,5 +1,9 @@
 package com.github.jinahya.persistence.crypto;
 
+import com.github.jinahya.persistence.crypto.examples._GuardedEntity;
+import com.github.jinahya.persistence.crypto.examples._GuardedModeBEntity;
+import com.github.jinahya.persistence.crypto.examples._ModeBConstrainedEntity;
+import com.github.jinahya.persistence.crypto.examples._ModeBNoteEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;

@@ -1,35 +1,33 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.Size;
 
 /**
- * A Mode B entity with a Bean Validation constraint on its plaintext, for verifying that the constraint sees the real
- * value: in Mode B nothing nulls the plaintext (#82).
+ * An entity whose {@link EncryptedAttribute annotated} member is {@link Transient @Transient}, for verifying that a
+ * member the metamodel does not know is rejected rather than silently ignored.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EntityListeners(_LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "mode_b_constrained_entity")
-public class _ModeBConstrainedEntity {
+@Table(name = "transient_secret_entity")
+public class _TransientSecretEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Size(max = 4)
+    // not in the metamodel, so never visited by the walk; the value would never be stored
     @Transient
     public String name;
 
@@ -37,9 +35,4 @@ public class _ModeBConstrainedEntity {
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;
-
-    public void setName(final String name) {
-        this.name = name;
-        this.nameEnc__ = null;
-    }
 }

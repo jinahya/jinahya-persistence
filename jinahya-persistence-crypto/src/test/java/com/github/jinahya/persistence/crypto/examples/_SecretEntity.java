@@ -1,5 +1,6 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 /**
  * An entity holding one {@link EncryptedAttribute encrypted attribute} of each java type whose encoding
- * {@link EntityEncryptor} dispatches on, for verifying the encrypt/decrypt round trip against a real metamodel.
+ * {@code EntityEncryptor} dispatches on, for verifying the encrypt/decrypt round trip against a real metamodel.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

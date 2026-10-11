@@ -1,5 +1,6 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -11,25 +12,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * An entity whose {@link EncryptedAttribute} sits on the plaintext and names the ciphertext — the placement before the
- * annotation moved to the ciphertext — for verifying that it is rejected with a hint, rather than misread.
+ * An entity whose {@link EncryptedAttribute} names a plaintext which does not exist, for verifying that it is
+ * rejected rather than skipped.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "plaintext_annotated_entity")
-public class _PlaintextAnnotatedEntity {
+@Table(name = "misnamed_plaintext_entity")
+public class _MisnamedPlaintextEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @EncryptedAttribute("nameEnc__")
     @Basic(optional = true)
     @Column(name = "name", nullable = true, insertable = false)
     public String name;
 
+    @EncryptedAttribute("nmae")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;

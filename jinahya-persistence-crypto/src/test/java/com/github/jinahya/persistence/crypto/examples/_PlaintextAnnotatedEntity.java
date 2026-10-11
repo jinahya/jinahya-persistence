@@ -1,5 +1,6 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -9,28 +10,27 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 /**
- * An entity whose {@link EncryptedAttribute annotated} member is {@link Transient @Transient}, for verifying that a
- * member the metamodel does not know is rejected rather than silently ignored.
+ * An entity whose {@link EncryptedAttribute} sits on the plaintext and names the ciphertext — the placement before the
+ * annotation moved to the ciphertext — for verifying that it is rejected with a hint, rather than misread.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "transient_secret_entity")
-public class _TransientSecretEntity {
+@Table(name = "plaintext_annotated_entity")
+public class _PlaintextAnnotatedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    // not in the metamodel, so never visited by the walk; the value would never be stored
-    @Transient
+    @EncryptedAttribute("nameEnc__")
+    @Basic(optional = true)
+    @Column(name = "name", nullable = true, insertable = false)
     public String name;
 
-    @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;

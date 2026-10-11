@@ -1,5 +1,6 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -11,27 +12,31 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * An entity whose plaintext column is not updatable, for verifying that such a mapping is rejected: the update which
- * migrates a legacy row is the only thing which nulls that column.
+ * An entity under field access whose {@link EncryptedAttribute} sits on a getter, which the provider does not read,
+ * for verifying that it is rejected rather than silently ignored (#70).
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "frozen_plain_entity")
-public class _FrozenPlainEntity {
+@Table(name = "misplaced_annotation_entity")
+public class _MisplacedAnnotationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    // looks like the safer mapping, but a legacy row would keep its plaintext forever
     @Basic(optional = true)
-    @Column(name = "name", nullable = true, insertable = false, updatable = false)
+    @Column(name = "name", nullable = true, insertable = false)
     public String name;
 
-    @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;
+
+    // field access: the provider reads the field, never this getter
+    @EncryptedAttribute("name")
+    public byte[] getNameEnc__() {
+        return nameEnc__;
+    }
 }

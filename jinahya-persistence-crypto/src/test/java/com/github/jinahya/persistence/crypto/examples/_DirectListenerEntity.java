@@ -1,5 +1,7 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
+import com.github.jinahya.persistence.crypto.EntityEncryptionListener;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -24,7 +26,7 @@ import jakarta.persistence.Version;
 @Table(name = _DirectListenerEntity.TABLE_NAME)
 public class _DirectListenerEntity {
 
-    static final String TABLE_NAME = "direct_listener_entity";
+    public static final String TABLE_NAME = "direct_listener_entity";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,39 +1,47 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
+import com.github.jinahya.persistence.crypto._LifecycleListenerEntity;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Size;
 
 /**
- * An entity with a Bean Validation constraint on an encrypted attribute, for verifying that such a mapping is
- * rejected: validation runs after encrypting has cleared the plaintext.
+ * A Mode B entity with a Bean Validation constraint on its plaintext, for verifying that the constraint sees the real
+ * value: in Mode B nothing nulls the plaintext (#82).
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
+@EntityListeners(_LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "constrained_secret_entity")
-public class _ConstrainedSecretEntity {
+@Table(name = "mode_b_constrained_entity")
+public class _ModeBConstrainedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    // would pass vacuously against the cleared plaintext, letting a too-long value through unchecked
     @Size(max = 4)
-    @Basic(optional = true)
-    @Column(name = "name", nullable = true, insertable = false)
+    @Transient
     public String name;
 
     @EncryptedAttribute("name")
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;
+
+    public void setName(final String name) {
+        this.name = name;
+        this.nameEnc__ = null;
+    }
 }

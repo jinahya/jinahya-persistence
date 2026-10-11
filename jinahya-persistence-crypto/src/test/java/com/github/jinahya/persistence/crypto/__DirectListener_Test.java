@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.crypto;
 
+import com.github.jinahya.persistence.crypto.examples._DirectListenerEntity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;

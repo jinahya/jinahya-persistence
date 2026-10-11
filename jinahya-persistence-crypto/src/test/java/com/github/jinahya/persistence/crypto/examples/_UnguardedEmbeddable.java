@@ -1,11 +1,12 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 /**
- * An embeddable whose plaintext column is insertable, and which {@link EntityEncryptor} therefore has to reject.
+ * An embeddable whose plaintext column is insertable, and which {@code EntityEncryptor} therefore has to reject.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

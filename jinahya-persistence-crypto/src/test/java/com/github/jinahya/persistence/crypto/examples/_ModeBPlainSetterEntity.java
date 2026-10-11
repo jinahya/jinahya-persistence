@@ -1,11 +1,11 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,16 +13,15 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
- * A Mode B entity with another mapped attribute, for verifying the safety net: a direct write to the plaintext is kept
- * when another change makes the provider flush the instance (#82).
+ * A Mode B entity whose setter does not null the ciphertext, as a generated one would not, for verifying that it is
+ * rejected (#82).
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@EntityListeners(_LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "mode_b_note_entity")
-public class _ModeBNoteEntity {
+@Table(name = "mode_b_plain_setter_entity")
+public class _ModeBPlainSetterEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,12 +35,8 @@ public class _ModeBNoteEntity {
     @Column(name = "name_enc", nullable = true, length = 2048)
     public byte[] nameEnc__;
 
-    @Basic(optional = true)
-    @Column(name = "note", nullable = true)
-    public String note;
-
+    // what Lombok's @Setter, or an IDE, would generate: the change stays invisible to the provider
     public void setName(final String name) {
         this.name = name;
-        this.nameEnc__ = null;
     }
 }

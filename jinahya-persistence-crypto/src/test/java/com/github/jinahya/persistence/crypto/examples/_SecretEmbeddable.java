@@ -1,12 +1,13 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 /**
  * An embeddable which holds an {@link EncryptedAttribute encrypted attribute} of its own, for verifying that
- * {@link EntityEncryptor} descends into {@code EMBEDDED} attributes.
+ * {@code EntityEncryptor} descends into {@code EMBEDDED} attributes.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

@@ -1,5 +1,7 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
+import com.github.jinahya.persistence.crypto.EncryptedAttribute;
+import com.github.jinahya.persistence.crypto._LifecycleListenerEntity;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -25,7 +27,7 @@ import jakarta.persistence.Version;
 @Table(name = "guarded_entity")
 public class _GuardedEntity {
 
-    static final String TABLE_NAME = "guarded_entity";
+    public static final String TABLE_NAME = "guarded_entity";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

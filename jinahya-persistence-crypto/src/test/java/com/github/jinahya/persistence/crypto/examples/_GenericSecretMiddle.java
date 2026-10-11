@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.crypto;
+package com.github.jinahya.persistence.crypto.examples;
 
 import jakarta.persistence.MappedSuperclass;
 

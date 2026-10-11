@@ -1,5 +1,27 @@
 package com.github.jinahya.persistence.crypto;
 
+import com.github.jinahya.persistence.crypto.examples._CollectionSecretEntity;
+import com.github.jinahya.persistence.crypto.examples._ConstrainedSecretEntity;
+import com.github.jinahya.persistence.crypto.examples._FrozenPlainEntity;
+import com.github.jinahya.persistence.crypto.examples._GenericDeepEntity;
+import com.github.jinahya.persistence.crypto.examples._GenericIntegerEntity;
+import com.github.jinahya.persistence.crypto.examples._GenericStringEntity;
+import com.github.jinahya.persistence.crypto.examples._GraphEntity;
+import com.github.jinahya.persistence.crypto.examples._GuardedEntity;
+import com.github.jinahya.persistence.crypto.examples._InheritedOverrideEntity;
+import com.github.jinahya.persistence.crypto.examples._LifecycleEntity;
+import com.github.jinahya.persistence.crypto.examples._MisnamedPlaintextEntity;
+import com.github.jinahya.persistence.crypto.examples._MisplacedAnnotationEntity;
+import com.github.jinahya.persistence.crypto.examples._ModeBPlainSetterEntity;
+import com.github.jinahya.persistence.crypto.examples._OverriddenEntity;
+import com.github.jinahya.persistence.crypto.examples._PlainEntity;
+import com.github.jinahya.persistence.crypto.examples._PlaintextAnnotatedEntity;
+import com.github.jinahya.persistence.crypto.examples._RescuedEntity;
+import com.github.jinahya.persistence.crypto.examples._SecretEmbeddable;
+import com.github.jinahya.persistence.crypto.examples._SecretEntity;
+import com.github.jinahya.persistence.crypto.examples._TransientSecretEntity;
+import com.github.jinahya.persistence.crypto.examples._TwoPathEntity;
+import com.github.jinahya.persistence.crypto.examples._UnguardedEmbeddable;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterAll;
@@ -652,21 +674,21 @@ class __EntityEncryptor_Test {
             final var message = thrown.getMessage();
             // this test unit holds deliberately invalid entities, each covered by its own rejection test
             assertThat(message).contains(
-                    "crypto._GraphEntity",              // an invalid embeddable
-                    "crypto._OverriddenEntity",         // an override restoring insertable = true
-                    "crypto._LifecycleEntity",          // a plaintext column left insertable
-                    "crypto._TransientSecretEntity",    // #82: Mode B without a setter
-                    "crypto._MisplacedAnnotationEntity", // #70
-                    "crypto._ModeBPlainSetterEntity",   // #82: a setter which does not null the ciphertext
-                    "crypto._CollectionSecretEntity",   // #71
-                    "crypto._FrozenPlainEntity",        // #73
-                    "crypto._ConstrainedSecretEntity",  // #9
-                    "crypto._PlaintextAnnotatedEntity", // the annotation on the plaintext
-                    "crypto._MisnamedPlaintextEntity"   // a plaintext which does not exist
+                    "examples._GraphEntity",              // an invalid embeddable
+                    "examples._OverriddenEntity",         // an override restoring insertable = true
+                    "examples._LifecycleEntity",          // a plaintext column left insertable
+                    "examples._TransientSecretEntity",    // #82: Mode B without a setter
+                    "examples._MisplacedAnnotationEntity", // #70
+                    "examples._ModeBPlainSetterEntity",   // #82: a setter which does not null the ciphertext
+                    "examples._CollectionSecretEntity",   // #71
+                    "examples._FrozenPlainEntity",        // #73
+                    "examples._ConstrainedSecretEntity",  // #9
+                    "examples._PlaintextAnnotatedEntity", // the annotation on the plaintext
+                    "examples._MisnamedPlaintextEntity"   // a plaintext which does not exist
             );
             assertThat(thrown.getSuppressed()).as("one suppressed failure per invalid entity").hasSizeGreaterThanOrEqualTo(11);
             assertThat(message).doesNotContain(
-                    "crypto._SecretEntity;", "crypto._SecretEntity.", "crypto._GuardedEntity", "crypto._PlainEntity");
+                    "examples._SecretEntity;", "examples._SecretEntity.", "examples._GuardedEntity", "examples._PlainEntity");
         }
 
         @DisplayName("the valid mappings are usable afterwards")
