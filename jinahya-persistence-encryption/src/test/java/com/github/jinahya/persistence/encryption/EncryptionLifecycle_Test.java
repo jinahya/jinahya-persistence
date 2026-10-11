@@ -188,15 +188,13 @@ class EncryptionLifecycle_Test {
             log.info("[flush] after flush(): name={}, name_enc={}",
                      entity.name == null ? "NULL" : "'" + entity.name + "'",
                      entity.nameEnc__ == null ? "null" : entity.nameEnc__.length + " bytes");
-            // holds on both providers: the instance is left encrypted, so the application cannot read it any more
-            assertThat(entity.name)
-                    .as("the application's own instance is emptied by the flush")
-                    .isNull();
+            assertThat(entity.name).as("the application's own instance keeps its value through the flush")
+                    .isEqualTo("flush-me");
             return null;
         });
     }
 
-    @DisplayName("a legacy row is left alone by a read, and migrated, plaintext column nulled, by a write (#73)")
+    @DisplayName("a legacy row is left alone by a read (#73)")
     @Test
     void observeLegacyRowMigration() {
         final var plaintext = "legacy-" + System.nanoTime();
@@ -217,20 +215,7 @@ class EncryptionLifecycle_Test {
         assertThat(afterRead[1]).as("a read does not migrate it").isEqualTo(plaintext);
         assertThat(afterRead[2]).isNull();
 
-        // a batch pass: encrypt the managed instance; @PreUpdate then sees "already encrypted"
-        apply(em -> {
-            new EntityEncryptor(LifecycleListenerEntity.SERVICE).encrypt(em.find(GuardedEntity.class, id));
-            return null;
-        });
-        final var afterMigration = row(id);
-        log.info("[legacy] row after migrate: {}", describe(afterMigration));
-        assertThat(afterMigration[1])
-                .as("the UPDATE which stores the ciphertext nulls the plaintext column; this needs it updatable")
-                .isNull();
-        assertThat(afterMigration[2]).as("the row now holds the ciphertext").isNotNull();
-
-        final var reread = apply(em -> em.find(GuardedEntity.class, id).name);
-        assertThat(reread).as("and reads back as the same value").isEqualTo(plaintext);
+        // a write migrates it: see migrateLegacyRowByEditingItsValue and migrateLegacyRowByAnUnrelatedWrite
     }
 
     // ------------------------------------------------------------------------------------------- migration by writing
@@ -285,5 +270,66 @@ class EncryptionLifecycle_Test {
         assertThat((byte[]) row[1]).as("the ciphertext is stored").isNotNull().isNotEmpty();
         final String read = apply(em -> em.find(NotedEntity.class, id).name);
         assertThat(read).isEqualTo("legacy-value");
+    }
+
+    // ----------------------------------------------------------------------------------------- the instance is kept
+
+    @DisplayName("the instance keeps its value through persist(), flushes, an update and the commit; the row never has it")
+    @Test
+    void instanceKeepsItsValue() {
+        final var kept = apply(em -> {
+            final var entity = new NotedEntity();
+            entity.name = "kept";
+            em.persist(entity);
+            assertThat(entity.name).as("after persist()").isEqualTo("kept");
+            em.flush();
+            assertThat(entity.name).as("after the INSERT").isEqualTo("kept");
+            entity.note = "changed";
+            em.flush();
+            assertThat(entity.name).as("after an UPDATE").isEqualTo("kept");
+            return entity;
+        });
+        assertThat(kept.name).as("after the commit").isEqualTo("kept");
+        final var row = nameColumns(NotedEntity.TABLE_NAME, kept.id);
+        assertThat(row[0]).as("the plaintext column").isNull();
+        assertThat((byte[]) row[1]).as("the ciphertext").isNotNull().isNotEmpty();
+    }
+
+    @DisplayName("an updated value is stored, and kept by the instance")
+    @Test
+    void updateKeepsTheNewValue() {
+        final long id = apply(em -> {
+            final var entity = new NotedEntity();
+            entity.name = "before";
+            em.persist(entity);
+            return entity;
+        }).id;
+        final var updated = apply(em -> {
+            final var entity = em.find(NotedEntity.class, id);
+            entity.name = "after";
+            return entity;
+        });
+        assertThat(updated.name).as("after the commit").isEqualTo("after");
+        assertThat(nameColumns(NotedEntity.TABLE_NAME, id)[0]).as("the plaintext column").isNull();
+        final String read = apply(em -> em.find(NotedEntity.class, id).name);
+        assertThat(read).isEqualTo("after");
+    }
+
+    @DisplayName("setting the plaintext to null clears the value, in the row and in the instance")
+    @Test
+    void nullPlaintextClears() {
+        final long id = apply(em -> {
+            final var entity = new NotedEntity();
+            entity.name = "clear-me";
+            em.persist(entity);
+            em.flush();
+            entity.name = null; // on an instance already written: no ciphertext juggling needed
+            return entity;
+        }).id;
+        final var row = nameColumns(NotedEntity.TABLE_NAME, id);
+        assertThat(row[0]).isNull();
+        assertThat(row[1]).as("the ciphertext is gone too").isNull();
+        final String read = apply(em -> em.find(NotedEntity.class, id).name);
+        assertThat(read).isNull();
     }
 }

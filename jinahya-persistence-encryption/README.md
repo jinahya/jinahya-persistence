@@ -50,6 +50,7 @@ column, and its rows are migrated as they are written ([Existing data](#existing
 
 ```
 em.persist(user) / flush ──► @PrePersist, @PreUpdate ──► encrypt   user.name ──► user.nameEnc
+                             @PostUpdate             ──► decrypt   user.nameEnc ──► user.name   (restored)
 em.find(User.class, id)  ──► @PostLoad               ──► decrypt   user.nameEnc ──► user.name
 ```
 
@@ -94,51 +95,33 @@ does not erase the plaintext from backups, logs, replicas or indexes; scrubbing 
 
 ### The rules
 
-What the listener does with the two attributes of each pair.
+**The plaintext attribute is the truth**: the application reads and writes it like any other attribute, and never sees
+it cleared. The listener only keeps it out of the row, and keeps the ciphertext in step.
 
-**Encrypt** (`@PrePersist`, `@PreUpdate`)
-
-| plaintext | ciphertext | result |
+| callback | plaintext | ciphertext |
 |---|---|---|
-| present | anything | ciphertext = encrypt(plaintext); plaintext = `null` |
-| `null` | stored | kept: already encrypted |
-| `null` | `null` | ciphertext = `null` |
+| `@PrePersist` | kept: the `INSERT` never carries the column, which is non-insertable | encrypt(plaintext), or `null` when there is no plaintext |
+| `@PreUpdate` | cleared: the `UPDATE` carries the column, which is updatable, so it goes out as `NULL` | encrypt(plaintext), or `null` when there is no plaintext |
+| `@PostUpdate` | restored: decrypt(ciphertext) | unchanged |
+| `@PostLoad` | decrypt(ciphertext); left alone when there is no ciphertext — a legacy row, migrated on its next write | unchanged |
 
-**Decrypt** (`@PostLoad`)
-
-| plaintext | ciphertext | result |
-|---|---|---|
-| anything | stored | plaintext = decrypt(ciphertext); ciphertext = `null` |
-| `null` | `null` | nothing: no value |
-| present | `null` | left alone: a legacy row, migrated on its next write |
-
-The second encrypt row is what a second flush of the same instance sees: the first encryption nulled the plaintext,
-and the value is safe in the ciphertext. Reading it as "cleared" would erase the value.
-
-**Why not mark the ciphertext instead?** The ambiguity is not in the bytes: after a flush, the ciphertext attribute holds
-the ciphertext either way. It is in the plaintext, which is `null` both when the module nulled it at the flush and when
-the application set `null` afterwards — and setting `null` on a field already `null` leaves no trace to mark. The
-ciphertext's format stays entirely the `EntityEncryptionService`'s.
+So setting the plaintext to `null` clears the value, and nothing else needs touching.
 
 ### What it costs
 
-The plaintext is a *mapped* attribute, and a JPA listener can only keep its value out of the row by nulling the field.
-These follow, and cannot be fixed inside the standard callbacks: they are the price of using standard Jakarta
+The plaintext is a *mapped* attribute, and a JPA listener can only keep its value out of the row by changing the
+field. These follow, and cannot be fixed inside the standard callbacks: they are the price of using standard Jakarta
 Persistence APIs only.
 
-* **Reading an entity writes it.** `@PostLoad` runs after the provider has taken its loaded-state snapshot, so moving
-  the value between the two mapped attributes leaves the instance dirty from the moment it is read. Measured on both
-  providers: a transaction which only reads still issues an `UPDATE`, increments `@Version`, and — encryption being
-  randomized — rewrites the ciphertext with a fresh IV. Optimistic locking is unusable, every read shows up in
-  replication, CDC and audit, and a read-only connection fails.
-* **The instance is emptied by `persist()` and by every flush.** Right after `em.persist(entity)` returns, and after
-  every flush, the application's own object reads back `null` for every encrypted attribute.
-* **An instance already encrypted cannot be cleared through its plaintext alone.** After `persist()`, or a flush, in the
-  same persistence context, the instance holds a `null` plaintext and the ciphertext, which encrypting reads as
-  "already encrypted"; to clear the value there, clear the ciphertext attribute as well. An instance freshly loaded
-  holds the plaintext and no ciphertext, so setting the plaintext to `null` clears it.
-* **No Bean Validation constraint** may sit on the plaintext: Jakarta Persistence validates after encrypting has nulled
-  it ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
+* **Reading an entity writes it.** `@PostLoad` runs after the provider has taken its loaded-state snapshot, so setting
+  the decrypted value leaves the instance dirty from the moment it is read. Measured on both providers: a transaction
+  which only reads still issues an `UPDATE`, increments `@Version`, and — encryption being randomized — rewrites the
+  ciphertext with a fresh IV. Optimistic locking is unusable, every read shows up in replication, CDC and audit, and a
+  read-only connection fails.
+* **Writing keeps writing.** `@PostUpdate` restores the plaintext the `UPDATE` went out without, so the instance differs
+  from the provider's snapshot again: every further flush in the same persistence context issues another `UPDATE`.
+* **No Bean Validation constraint** may sit on the plaintext: Jakarta Persistence validates an update after
+  `@PreUpdate` has cleared it ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
 * **The insert window.** `@PrePersist` fires when `persist()` is called, not when the `INSERT` is built. The plaintext
   column has to be `insertable = false` (enforced), which guarantees *INSERT confidentiality only*:
 
@@ -153,8 +136,8 @@ Persistence APIs only.
 ## Wiring
 
 Register `EntityEncryptionListener` itself, the way Spring Data JPA's `AuditingEntityListener` is registered; no
-subclass is needed. It encrypts on `@PrePersist` and `@PreUpdate`, before the statement is built, and decrypts on
-`@PostLoad` ([#5](https://github.com/jinahya/jinahya-persistence/issues/5)).
+subclass is needed. It encrypts on `@PrePersist` and `@PreUpdate`, before the statement is built, decrypts on
+`@PostLoad` ([#5](https://github.com/jinahya/jinahya-persistence/issues/5)), and restores the plaintext on `@PostUpdate`.
 
 Then provide one `EntityEncryptionService` as a bean. It is the only type an application implements:
 

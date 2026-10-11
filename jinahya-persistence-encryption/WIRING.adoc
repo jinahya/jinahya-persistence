@@ -57,7 +57,7 @@ container without the CDI API on the class path is expected to fail on when it i
  @EntityListeners(               │  EntityEncryptionListener               (public)
    EntityEncryptionListener)     │    @Inject EntityEncryptionService
                                  │    @PrePersist/@PreUpdate → encrypt
- @EncryptedAttribute("name")     │    @PostLoad              → decrypt
+ @EncryptedAttribute("name")     │    @PostUpdate/@PostLoad  → decrypt
  byte[] nameEnc;                 │            │
                                  │            ▼
  EntityEncryptionService impl ◄──┼──  EntityEncryptor                       (package-private)
@@ -105,7 +105,7 @@ public interface EntityEncryptionService {
 * Public; its only job is to be registered with `@EntityListeners`.
 * One injection point, `@Inject EntityEncryptionService`, of the module's own type. Which bean is injected follows the
   platform's ordinary rules: the only one, or `@Primary` (Spring), or the `@Default` one (CDI).
-* Its three callbacks, `@PrePersist`, `@PreUpdate` and `@PostLoad`, hand the instance to its encryptor, created from
+* Its four callbacks, `@PrePersist`, `@PreUpdate`, `@PostUpdate` and `@PostLoad`, hand the instance to its encryptor, created from
   the service on the first callback.
 * A listener which was not injected fails on its first callback with an `IllegalStateException`.
 * Nothing public to override. The callbacks and `getEncryptionService()` are package-private: the tests'

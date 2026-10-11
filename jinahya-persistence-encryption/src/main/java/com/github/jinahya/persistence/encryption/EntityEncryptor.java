@@ -51,8 +51,9 @@ import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.enc
  *       version and the codec;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionService encryption service}, along with the
  *       {@link EntityEncryptionService#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
- *   <li>stores the ciphertext in the annotated attribute, and clears the plaintext, so that its column is never
- *       written with a value.</li>
+ *   <li>stores the ciphertext in the annotated attribute; before an {@code UPDATE}, also clears the plaintext, so
+ *       that its column is never written with a value, and restores it once the {@code UPDATE} is done. The
+ *       plaintext column is non-insertable, so an {@code INSERT} needs no clearing.</li>
  * </ol>
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
  * attributes of an embeddable are covered as well.
@@ -617,8 +618,8 @@ class EntityEncryptor {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "no codec for the declared java type " + javaType.getName());
         }
-        // Jakarta Persistence validates after @PrePersist/@PreUpdate, by which time encrypting has nulled the
-        // plaintext: a constraint on it is evaluated against null, failing every write or passing vacuously
+        // Jakarta Persistence validates an update after @PreUpdate, by which time encrypting has cleared the
+        // plaintext: a constraint on it is evaluated against null, failing every update or passing vacuously
         final var constraint = findConstraint(decryptedAttribute);
         if (constraint != null) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
@@ -729,17 +730,19 @@ class EntityEncryptor {
      *
      * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
+     * @param clearPlaintext       whether to clear each plaintext once encrypted.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
-     * @see #encrypt(Object)
+     * @see #encrypt(Object, boolean)
      */
-    private void encrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object) {
+    private void encrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object,
+                         final boolean clearPlaintext) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(resolveClass(object));
         // computes every ciphertext before assigning any, so that a failure part-way leaves the instance as it was
         final var assignments = new ArrayList<Runnable>();
-        encrypt(encryptionIdentifier, object, mapping, assignments);
+        encrypt(encryptionIdentifier, object, mapping, clearPlaintext, assignments);
         assignments.forEach(Runnable::run);
     }
 
@@ -749,6 +752,7 @@ class EntityEncryptor {
      * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
      * @param mapping              the validated mapping of the {@code object}.
+     * @param clearPlaintext       whether to clear each plaintext once encrypted.
      * @param assignments          the list to which every attribute assignment is added, rather than made.
      * @implNote The mapping is passed down rather than looked up again: an embeddable reached through an
      *         {@link AttributeOverride @AttributeOverride} would otherwise be re-resolved without that override in
@@ -756,28 +760,27 @@ class EntityEncryptor {
      *         computed.
      */
     private void encrypt(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Object object,
-                         final EncryptionMapping mapping, final List<Runnable> assignments) {
+                         final EncryptionMapping mapping, final boolean clearPlaintext,
+                         final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
             if (embeddedValue != null) {
-                encrypt(encryptionIdentifier, embeddedValue, embedded.mapping(), assignments);
+                encrypt(encryptionIdentifier, embeddedValue, embedded.mapping(), clearPlaintext, assignments);
             }
         }
         for (final var pair : mapping.pairs()) {
+            // the plaintext is the truth: no plaintext is no value
             final var plaintext = pair.getPlaintext(object);
-            final var ciphertext = pair.getCiphertext(object);
-            // the plaintext is mapped, so it is nulled to keep it out of the row
             if (plaintext == null) {
-                if (ciphertext != null) {
-                    // already encrypted
-                    continue;
-                }
                 assignments.add(pair.setCiphertext(object, null));
                 continue;
             }
             assignments.add(pair.setCiphertext(
                     object, encryptFramed(encryptionIdentifier, pair, encode(pair, plaintext))));
-            assignments.add(pair.setPlaintext(object, null));
+            if (clearPlaintext) {
+                // the plaintext column is updatable: an UPDATE would carry the value, so it goes out as null
+                assignments.add(pair.setPlaintext(object, null));
+            }
         }
     }
 
@@ -807,20 +810,34 @@ class EntityEncryptor {
      * Encrypts the annotated attributes of the specified object, with the identifier the
      * {@link EntityEncryptionService encryption service} derives from it.
      *
-     * @param object the entity instance to encrypt, in place; an instance of a class which has no encrypted attribute
-     *               passes through untouched.
+     * @param object         the entity instance to encrypt, in place; an instance of a class which has no encrypted
+     *                       attribute passes through untouched.
+     * @param clearPlaintext whether to clear each plaintext once encrypted: {@code true} before an {@code UPDATE},
+     *                       which would carry the updatable plaintext column; {@code false} before an
+     *                       {@code INSERT}, which never carries it, the column being non-insertable.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
      * @see EntityEncryptionService#getEncryptionIdentifier(Object)
      */
-    void encrypt(final Object object) {
+    void encrypt(final Object object, final boolean clearPlaintext) {
         Objects.requireNonNull(object, "object is null");
         if (!hasEncryptedAttributes(object)) {
             return;
         }
         // opaque: passed on as it is, null included
         final var encryptionIdentifier = encryptionService.getEncryptionIdentifier(object);
-        encrypt(encryptionIdentifier, object);
+        encrypt(encryptionIdentifier, object, clearPlaintext);
+    }
+
+    /**
+     * Encrypts the annotated attributes of the specified object, and clears each plaintext, as before an
+     * {@code UPDATE}.
+     *
+     * @param object the entity instance to encrypt, in place.
+     * @see #encrypt(Object, boolean)
+     */
+    void encrypt(final Object object) {
+        encrypt(object, true);
     }
 
     /**
@@ -878,7 +895,6 @@ class EntityEncryptor {
             // a copy: the header is checked, and the payload decoded, from an array the service no longer holds
             final var framedBytes = returned.clone();
             assignments.add(pair.setPlaintext(object, decode(pair, framedBytes)));
-            assignments.add(pair.setCiphertext(object, null));
         }
     }
 

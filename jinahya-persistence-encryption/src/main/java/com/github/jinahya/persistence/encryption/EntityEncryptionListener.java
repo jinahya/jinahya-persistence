@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.encryption;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
@@ -18,7 +19,8 @@ import java.lang.invoke.MethodHandles;
  * class User { ... }
  * }</pre>
  * It encrypts on {@link PrePersist @PrePersist} and {@link PreUpdate @PreUpdate}, before the statement is built, and
- * decrypts on {@link PostLoad @PostLoad}. An instance of a class with no encrypted attribute passes through untouched.
+ * decrypts on {@link PostLoad @PostLoad}, and again on {@link PostUpdate @PostUpdate}, restoring the plaintext which
+ * an {@code UPDATE} had to go out without. An instance of a class with no encrypted attribute passes through untouched.
  * <p>
  * The {@link EntityEncryptionService encryption service} is injected, which happens when the persistence provider
  * creates its listeners through a bean container: a Jakarta EE container does; in Java SE, pass the CDI
@@ -51,25 +53,39 @@ public class EntityEncryptionListener {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Encrypts the specified entity instance before it is inserted.
+     * Encrypts the specified entity instance before it is inserted, keeping its plaintext: the {@code INSERT} never
+     * carries the plaintext column, which is non-insertable.
      *
      * @param entityInstance the entity instance.
      */
     @PrePersist
     void onPrePersist(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPrePersist({0})", describe(entityInstance));
-        getEncryptor().encrypt(entityInstance);
+        getEncryptor().encrypt(entityInstance, false);
     }
 
     /**
-     * Encrypts the specified entity instance before it is updated.
+     * Encrypts the specified entity instance before it is updated, clearing its plaintext: the {@code UPDATE} carries
+     * the plaintext column, which is updatable, so it has to go out as {@code null}.
      *
      * @param entityInstance the entity instance.
      */
     @PreUpdate
     void onPreUpdate(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPreUpdate({0})", describe(entityInstance));
-        getEncryptor().encrypt(entityInstance);
+        getEncryptor().encrypt(entityInstance, true);
+    }
+
+    /**
+     * Restores the plaintext of the specified entity instance after it has been updated, from the ciphertext just
+     * written, so that the application never sees it cleared.
+     *
+     * @param entityInstance the entity instance.
+     */
+    @PostUpdate
+    void onPostUpdate(final Object entityInstance) {
+        logger.log(System.Logger.Level.TRACE, "onPostUpdate({0})", describe(entityInstance));
+        getEncryptor().decrypt(entityInstance);
     }
 
     /**

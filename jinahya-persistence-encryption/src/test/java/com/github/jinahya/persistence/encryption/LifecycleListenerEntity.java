@@ -1,6 +1,7 @@
 package com.github.jinahya.persistence.encryption;
 
 import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostUpdate;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 
@@ -44,6 +45,12 @@ public class LifecycleListenerEntity extends EntityEncryptionListener {
     @Override
     void onPreUpdate(final Object entityInstance) {
         super.onPreUpdate(entityInstance);
+    }
+
+    @PostUpdate
+    @Override
+    void onPostUpdate(final Object entityInstance) {
+        super.onPostUpdate(entityInstance);
     }
 
     @PostLoad
