@@ -1140,13 +1140,13 @@ class EntityEncryptor {
     /**
      * Encrypts the annotated attributes of the specified object with the specified encryption identifier.
      *
-     * @param encryptionIdentifier the identifier the encryption keys are selected by.
+     * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
      * @see #encrypt(Object)
      */
-    private void encrypt(final String encryptionIdentifier, final Object object) {
+    private void encrypt(final @Nullable String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(getManagedType(resolveClass(object)));
@@ -1159,7 +1159,7 @@ class EntityEncryptor {
     /**
      * Encrypts the specified object against the mapping already validated for it.
      *
-     * @param encryptionIdentifier the identifier the encryption keys are selected by.
+     * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
      * @param mapping              the validated mapping of the {@code object}.
      * @param assignments          the list to which every attribute assignment is added, rather than made.
@@ -1168,7 +1168,7 @@ class EntityEncryptor {
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void encrypt(final String encryptionIdentifier, final Object object, final Mapping mapping,
+    private void encrypt(final @Nullable String encryptionIdentifier, final Object object, final Mapping mapping,
                          final List<Assignment> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
@@ -1192,8 +1192,14 @@ class EntityEncryptor {
                     // the invalidating setter nulls the ciphertext on a change; a ciphertext still present means the
                     // plaintext is unchanged -- unless it was written directly, which this compares for, so that the
                     // write is kept rather than lost, and an unchanged value is never re-encrypted with a new IV
-                    final var current = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
-                    if (current != null && Arrays.equals(current, framed)) {
+                    final var returned = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
+                    if (returned == null) {
+                        throw new RuntimeException(
+                                "encryption service returned null; decrypted attribute: " + pair.name());
+                    }
+                    // a copy: compared against an array the service no longer holds
+                    final var current = returned.clone();
+                    if (Arrays.equals(current, framed)) {
                         continue;
                     }
                 }
@@ -1291,7 +1297,7 @@ class EntityEncryptor {
                 decryptedBytes = util_date_8((java.util.Date) decryptedValue);
             } else if (javaType == byte[].class) {
                 decryptedBytes =
-                        ((byte[]) decryptedValue).clone(); // the manager must not be handed the instance's own array
+                        ((byte[]) decryptedValue).clone(); // the service must not be handed the instance's own array
             } else if (javaType == Byte[].class) {
                 logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
                 decryptedBytes = Bytes_l((Byte[]) decryptedValue);
@@ -1324,12 +1330,13 @@ class EntityEncryptor {
         return EntityEncryptorUtils.frame(codec, decryptedBytes);
     }
 
-    private byte[] encryptFramed(final String encryptionIdentifier, final Pair pair, final byte[] framed) {
+    private byte[] encryptFramed(final @Nullable String encryptionIdentifier, final Pair pair, final byte[] framed) {
         final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
         if (encrypted == null) {
             throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
         }
-        return encrypted;
+        // a copy: the entity must not share an array the service may keep, or reuse
+        return encrypted.clone();
     }
 
     /**
@@ -1377,23 +1384,6 @@ class EntityEncryptor {
     }
 
     /**
-     * Returns the encryption identifier of the specified entity instance, from the manager, checked.
-     *
-     * @param object the entity instance.
-     * @return the non-blank encryption identifier of the {@code object}.
-     * @throws RuntimeException when the manager returns {@code null}, or a blank identifier.
-     */
-    private String encryptionIdentifierOf(final Object object) {
-        final var identifier = encryptionService.getEncryptionIdentifier(object);
-        if (identifier == null || identifier.isBlank()) {
-            throw new RuntimeException(
-                    "encryption service returned a " + (identifier == null ? "null" : "blank") + " encryption identifier"
-                    + "; entity: " + object.getClass().getName());
-        }
-        return identifier;
-    }
-
-    /**
      * Returns whether the specified entity instance is to be transformed: whether its validated mapping has an
      * {@link EncryptedAttribute encrypted attribute}, directly or inside an embeddable.
      *
@@ -1432,20 +1422,21 @@ class EntityEncryptor {
         if (!hasEncryptedAttributes(object)) {
             return;
         }
-        final var encryptionIdentifier = encryptionIdentifierOf(object);
+        // opaque: passed on as it is, null included
+        final var encryptionIdentifier = encryptionService.getEncryptionIdentifier(object);
         encrypt(encryptionIdentifier, object);
     }
 
     /**
      * Decrypts the annotated attributes of the specified object with the specified encryption identifier.
      *
-     * @param encryptionIdentifier the identifier the encryption keys are selected by.
+     * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to decrypt, in place.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be reconstructed from bytes.
      * @see #decrypt(Object)
      */
-    private void decrypt(final String encryptionIdentifier, final Object object) {
+    private void decrypt(final @Nullable String encryptionIdentifier, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(getManagedType(resolveClass(object)));
@@ -1458,7 +1449,7 @@ class EntityEncryptor {
     /**
      * Decrypts the specified object against the mapping already validated for it.
      *
-     * @param encryptionIdentifier the identifier the encryption keys are selected by.
+     * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to decrypt, in place.
      * @param mapping              the validated mapping of the {@code object}.
      * @param assignments          the list to which every attribute assignment is added, rather than made.
@@ -1467,7 +1458,7 @@ class EntityEncryptor {
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void decrypt(final String encryptionIdentifier, final Object object, final Mapping mapping,
+    private void decrypt(final @Nullable String encryptionIdentifier, final Object object, final Mapping mapping,
                          final List<Assignment> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
@@ -1489,10 +1480,12 @@ class EntityEncryptor {
                 }
                 continue;
             }
-            final var framedBytes = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
-            if (framedBytes == null) {
+            final var returned = encryptionService.decrypt(encryptionIdentifier, ciphertext.clone());
+            if (returned == null) {
                 throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
             }
+            // a copy: the header is checked, and the payload decoded, from an array the service no longer holds
+            final var framedBytes = returned.clone();
             assignments.add(pair.setPlaintext(object, decode(pair, framedBytes)));
             if (!pair.isTransient()) {
                 assignments.add(pair.setCiphertext(object, null)); // Mode A only; Mode B leaves it, unchanged
@@ -1627,7 +1620,8 @@ class EntityEncryptor {
         if (!hasEncryptedAttributes(object)) {
             return;
         }
-        final var encryptionIdentifier = encryptionIdentifierOf(object);
+        // opaque: passed on as it is, null included
+        final var encryptionIdentifier = encryptionService.getEncryptionIdentifier(object);
         decrypt(encryptionIdentifier, object);
     }
 

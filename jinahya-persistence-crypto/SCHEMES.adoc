@@ -133,7 +133,7 @@ plaintext rows only ever shrinks. *This is why the sibling column was chosen.*
 
 *Trade-offs.*
 
-* *Reading writes.* Measured on both providers (`__EncryptionLifecycle_Test`):
+* *Reading writes.* Measured on both providers (`EncryptionLifecycle_Test`):
 +
 ----
 1. provider reads the row          name = NULL, name_enc__ = b
@@ -158,7 +158,7 @@ connection fail. It cannot be fixed inside JPA callbacks (1.3).
 ** Clearing a value in the encrypted state is impossible through `name`.
 ** Raw ciphertext written into `name_enc__` is accepted as is.
 * *Lazy migration relies on `name` staying updatable.* Validation now requires it (#73), and
-  `__EncryptionLifecycle_Test.observeLegacyRowMigration` measures it on both providers: a read leaves a legacy row
+  `EncryptionLifecycle_Test.observeLegacyRowMigration` measures it on both providers: a read leaves a legacy row
   alone, and the migrating `UPDATE` nulls the plaintext column.
 
 === 2.2 Mode B: transient plaintext (steady state)
@@ -549,4 +549,4 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 . *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
   secondary-table behavior on both providers.
 
-Steps 1 to 5 are done; `__ModeB_Test` measures Mode B on both providers.
+Steps 1 to 5 are done; `ModeB_Test` measures Mode B on both providers.

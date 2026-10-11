@@ -96,7 +96,7 @@ class User {
 
 The existing column doubles as the legacy column, so encryption can be introduced on a table which already holds
 plaintext, with no separate tool and no write freeze. Measured on both providers
-(`__EncryptionLifecycle_Test.observeLegacyRowMigration`):
+(`EncryptionLifecycle_Test.observeLegacyRowMigration`):
 
 | row                                   | on read (`@PostLoad`)                    | on the next write                                          |
 |---------------------------------------|------------------------------------------|------------------------------------------------------------|
@@ -154,7 +154,7 @@ Per entity, when its team is ready — nothing forces it:
    constraint. Drop it whenever convenient.
 
 Mixing the two during a rolling deploy works, and so does rolling back: a row written in either mode reads in the
-other (measured on both providers, `__ModeB_Test`). Mode B cannot see a row which still holds plaintext only — which
+other (measured on both providers, `ModeB_Test`). Mode B cannot see a row which still holds plaintext only — which
 is why step 2 comes first.
 
 ## Wiring

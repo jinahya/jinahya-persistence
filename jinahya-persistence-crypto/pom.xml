@@ -27,6 +27,12 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
+    <!-- jakarta.annotation.Nonnull on EntityEncryptionService's signatures; documentation for tools which read it -->
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!-- jakarta.enterprise.*; only __DirectListener_Test, which runs the listener in a CDI container. The main
          sources depend on jakarta.inject alone, so that the module runs under any container which injects listeners -->
     <dependency>

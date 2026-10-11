@@ -1,0 +1,234 @@
+package com.github.jinahya.persistence.crypto;
+
+import com.github.jinahya.persistence.crypto.examples.GuardedEntity;
+import com.github.jinahya.persistence.crypto.examples.LifecycleEntity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.function.Function;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+/**
+ * Observes when a provider writes the two attributes of an encrypted pair, so that the choice of life cycle callbacks
+ * can be made on measurements rather than on assumptions.
+ * <p>
+ * The observations are logged rather than asserted; providers differ here, and the point of this class is to say what
+ * each one actually does.
+ *
+ * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ */
+@SuppressWarnings({
+        "java:S101" // Class names should comply with a naming convention
+})
+class EncryptionLifecycle_Test {
+
+    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
+
+    @BeforeAll
+    static void openEntityManagerFactory() {
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__cryptoPU");
+        LifecycleListenerEntity.SERVICE = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
+    }
+
+    @AfterAll
+    static void closeEntityManagerFactory() {
+        LifecycleListenerEntity.SERVICE = null;
+        if (ENTITY_MANAGER_FACTORY != null) {
+            ENTITY_MANAGER_FACTORY.close();
+        }
+    }
+
+    private static <R> R apply(final Function<? super EntityManager, ? extends R> function) {
+        try (final var entityManager = ENTITY_MANAGER_FACTORY.createEntityManager()) {
+            final var transaction = entityManager.getTransaction();
+            transaction.begin();
+            try {
+                final var result = function.apply(entityManager);
+                transaction.commit();
+                return result;
+            } catch (final Exception e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Reads the row behind the entity, bypassing the entity and its callbacks entirely.
+     */
+    private static Object[] row(final long id) {
+        return apply(em -> (Object[]) em
+                .createNativeQuery("SELECT version, name, name_enc FROM " + GuardedEntity.TABLE_NAME
+                                   + " WHERE id = " + id)
+                .getSingleResult());
+    }
+
+    private static void installRecorder() {
+        apply(em -> em.createNativeQuery(
+                        "CREATE TRIGGER IF NOT EXISTS trg_" + GuardedEntity.TABLE_NAME
+                        + " BEFORE INSERT, UPDATE ON " + GuardedEntity.TABLE_NAME
+                        + " FOR EACH ROW CALL \"" + WriteRecorder.class.getName() + "\"")
+                .executeUpdate());
+    }
+
+    private static String describe(final Object[] row) {
+        final var name = row[1];
+        final var cipher = row[2];
+        return "version=" + row[0]
+               + ", name=" + (name == null ? "NULL" : "'" + name + "'")
+               + ", name_enc=" + (cipher == null ? "NULL" : ((byte[]) cipher).length + " bytes");
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("a plaintext column which an INSERT could carry is rejected outright")
+    @Test
+    void rejectInsertablePlaintext() {
+        // LifecycleEntity maps its plaintext column with the default insertable = true
+        assertThatThrownBy(() -> apply(em -> {
+            final var entity = new LifecycleEntity();
+            entity.name = "never-stored";
+            em.persist(entity);
+            return entity;
+        }))
+                .as("the mapping which leaks on EclipseLink must not be accepted")
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("non-insertable");
+    }
+
+    @DisplayName("nothing the application assigns after persist() reaches the database in the clear")
+    @Test
+    void observeInsert() {
+        installRecorder();
+        WriteRecorder.clear();
+        final var guarded = apply(em -> {
+            final var entity = new GuardedEntity();
+            entity.name = "before-persist";
+            em.persist(entity);
+            entity.name = "AFTER-PERSIST"; // the window between @PrePersist and the INSERT
+            return entity;
+        });
+        log.info("[insert] row after a post-persist() mutation: {}", describe(row(guarded.id)));
+        log.info("[insert] statements the database saw: {}", WriteRecorder.WRITES);
+        assertThat(WriteRecorder.anyWriteContains("AFTER-PERSIST"))
+                .as("a plaintext column declared insertable = false can never reach the database")
+                .isFalse();
+
+        // which of the two values survived is provider-dependent, and that divergence is the point of this assertion:
+        // Hibernate issues INSERT then UPDATE, so @PreUpdate re-encrypts the late assignment; EclipseLink issues one
+        // INSERT built at commit, so the late assignment is DROPPED and the row keeps the earlier value.
+        final var stored = apply(em -> {
+            final var reloaded = em.find(GuardedEntity.class, guarded.id); // @PostLoad decrypts it
+            return reloaded.name;
+        });
+        log.info("[insert] the value which survived: '{}'", stored);
+        assertThat(stored)
+                .as("an assignment made after persist() either survives or is dropped, never leaks")
+                .isIn("AFTER-PERSIST", "before-persist");
+        if ("before-persist".equals(stored)) {
+            log.info("[insert] this provider DROPPED the assignment made after persist()");
+        }
+    }
+
+    @DisplayName("whether a transaction which only reads still writes")
+    @Test
+    void observeReadOnlyTransaction() {
+        final var id = apply(em -> {
+            final var entity = new GuardedEntity();
+            entity.name = "read-me";
+            em.persist(entity);
+            return entity;
+        }).id;
+        final var before = row(id);
+        log.info("[read] row before the read-only transaction: {}", describe(before));
+
+        final var seen = apply(em -> {
+            final var entity = em.find(GuardedEntity.class, id);
+            return entity.name; // nothing is modified
+        });
+
+        final var after = row(id);
+        log.info("[read] row after the read-only transaction:  {}", describe(after));
+        log.info("[read] the application read '{}'; version {} -> {}; ciphertext {}",
+                 seen, before[0], after[0],
+                 Arrays.equals((byte[]) before[2], (byte[]) after[2]) ? "unchanged" : "REWRITTEN");
+        assertThat(seen).as("the application does read the plaintext back").isEqualTo("read-me");
+        // holds on both providers: decrypting in @PostLoad dirties the instance, so reading writes
+        assertThat(((Number) after[0]).longValue())
+                .as("a transaction which only reads still issues an UPDATE; see the README")
+                .isGreaterThan(((Number) before[0]).longValue());
+        assertThat((byte[]) after[2])
+                .as("and, encryption being randomized, it rewrites the ciphertext")
+                .isNotEqualTo((byte[]) before[2]);
+    }
+
+    @DisplayName("what the application holds after a flush inside the transaction")
+    @Test
+    void observeStateAfterFlush() {
+        apply(em -> {
+            final var entity = new GuardedEntity();
+            entity.name = "flush-me";
+            em.persist(entity);
+            em.flush();
+            log.info("[flush] after flush(): name={}, name_enc={}",
+                     entity.name == null ? "NULL" : "'" + entity.name + "'",
+                     entity.nameEnc__ == null ? "null" : entity.nameEnc__.length + " bytes");
+            // holds on both providers: the instance is left encrypted, so the application cannot read it any more
+            assertThat(entity.name)
+                    .as("the application's own instance is emptied by the flush")
+                    .isNull();
+            return null;
+        });
+    }
+
+    @DisplayName("a legacy row is left alone by a read, and migrated, plaintext column nulled, by a write (#73)")
+    @Test
+    void observeLegacyRowMigration() {
+        final var plaintext = "legacy-" + System.nanoTime();
+        // a row written before encryption was introduced: plaintext in the column, no ciphertext
+        apply(em -> em.createNativeQuery(
+                        "INSERT INTO " + GuardedEntity.TABLE_NAME + " (version, name, name_enc)"
+                        + " VALUES (0, '" + plaintext + "', NULL)")
+                .executeUpdate());
+        final long id = apply(em -> ((Number) em
+                .createNativeQuery("SELECT id FROM " + GuardedEntity.TABLE_NAME + " WHERE name = '" + plaintext + "'")
+                .getSingleResult()).longValue());
+
+        // a read: @PostLoad skips a row which has no ciphertext, so the application sees the plaintext
+        final var read = apply(em -> em.find(GuardedEntity.class, id).name);
+        assertThat(read).as("a legacy row stays readable").isEqualTo(plaintext);
+        final var afterRead = row(id);
+        log.info("[legacy] row after a read:  {}", describe(afterRead));
+        assertThat(afterRead[1]).as("a read does not migrate it").isEqualTo(plaintext);
+        assertThat(afterRead[2]).isNull();
+
+        // a batch pass: encrypt the managed instance; @PreUpdate then sees "already encrypted"
+        apply(em -> {
+            new EntityEncryptor(LifecycleListenerEntity.SERVICE).encrypt(em.find(GuardedEntity.class, id));
+            return null;
+        });
+        final var afterMigration = row(id);
+        log.info("[legacy] row after migrate: {}", describe(afterMigration));
+        assertThat(afterMigration[1])
+                .as("the UPDATE which stores the ciphertext nulls the plaintext column; this needs it updatable")
+                .isNull();
+        assertThat(afterMigration[2]).as("the row now holds the ciphertext").isNotNull();
+
+        final var reread = apply(em -> em.find(GuardedEntity.class, id).name);
+        assertThat(reread).as("and reads back as the same value").isEqualTo(plaintext);
+    }
+}

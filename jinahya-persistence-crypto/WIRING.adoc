@@ -94,7 +94,7 @@ public interface EntityEncryptionService {
 * *Resolve the factory lazily.* The persistence provider creates listeners while it is still building the factory, so
   an implementation holds a `Provider<EntityManagerFactory>` (`jakarta.inject`) or an `ObjectFactory` (Spring) and
   resolves it inside `getEntityManagerFactory()`. The listener calls it on its first callback, never at construction.
-  `__DirectListener_Test` wires it exactly this way.
+  `DirectListener_Test` wires it exactly this way.
 * *What it gives up.* The type is no longer purely cryptographic: it is "how this persistence unit's entities are
   encrypted". The identifier and the cryptography stay entirely the application's.
 * *The name is provisional.* "-service" sits on the type the application writes; to be discussed.
@@ -108,7 +108,7 @@ public interface EntityEncryptionService {
   the service on the first callback.
 * A listener which was not injected fails on its first callback with an `IllegalStateException`.
 * Nothing public to override. The callbacks and `getEncryptionService()` are package-private: the tests'
-  `_LifecycleListenerEntity` overrides the latter to hand in a service without a container.
+  `LifecycleListenerEntity` overrides the latter to hand in a service without a container.
 
 === 3.3 `EntityEncryptor`: internal
 
@@ -132,7 +132,7 @@ Any platform which injects entity listeners.
 | Platform | Hibernate ORM | EclipseLink
 
 | Jakarta EE container | yes *[unverified]* | yes *[unverified]*
-| CDI in Java SE, the `BeanManager` passed as `jakarta.persistence.bean.manager` | yes (`__DirectListener_Test`) | yes (`__DirectListener_Test`)
+| CDI in Java SE, the `BeanManager` passed as `jakarta.persistence.bean.manager` | yes (`DirectListener_Test`) | yes (`DirectListener_Test`)
 | Spring Boot | yes, through Hibernate's `SpringBeanContainer` *[unverified]* | *no*: EclipseLink has no Spring bean container
 |===
 
