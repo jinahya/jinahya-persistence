@@ -66,7 +66,7 @@ public class EntityEncryptionListener {
 
     /**
      * Encrypts the specified entity instance before it is updated, clearing its plaintext: the {@code UPDATE} carries
-     * the plaintext column, which is updatable, so it has to go out as {@code null}.
+     * the plaintext column, which is updatable, so it has to go out as {@code null}, or as zero for a primitive.
      *
      * @param entityInstance the entity instance.
      */

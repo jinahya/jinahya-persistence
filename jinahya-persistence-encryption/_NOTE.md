@@ -2,8 +2,8 @@
 
 ## `Serializable` as a plaintext type
 
-> **Decided (#99):** `Serializable` and `java.util.Calendar` are no longer supported; their codec ids, `23` and `30`,
-> are retired. What follows is the analysis behind it.
+> **Decided (#99):** `Serializable` and `java.util.Calendar` are no longer supported. What follows is the analysis
+> behind it.
 
 Jakarta Persistence 3.2 §2.6 lists "any other type that implements `Serializable`" as a basic type; without
 encryption, a provider writes its Java serialization to a binary column. Supporting it here mirrors what a plain
@@ -67,3 +67,30 @@ An idea for #92's `Calendar` half: drop the dedicated `Calendar` codec and let `
 A `jdk.serialFilter` then has to allow `java.util.Calendar`, `GregorianCalendar`, `TimeZone`, `SimpleTimeZone`,
 `sun.util.calendar.ZoneInfo` and `[B [I [J [Z`. The idea stands or falls with `Serializable` itself, so it waits on the
 security decision above.
+
+## A payload header (undecided)
+
+The payload used to start with a two-byte header (#75): a format version, then the id of the codec which wrote the
+value. It was removed: a value is now encoded and decoded by the attribute's current declared type, and nothing about
+the type is stored. Whether to bring a header back is open.
+
+What a header gives:
+
+- **a type change fails loudly.** An attribute whose declared type changed after rows were written reads "encoded by
+  `LONG_8`, decoded by `DOUBLE_8`" instead of a wrong value. Without it, a change between encodings of the same width
+  (`Long` → `Double`, `Integer` → `Float` / `Year`, `LocalDate` → `LocalTime` / `Long`) is misread silently, and the
+  next write stores the wrong value; one of different widths fails only on length, with a vaguer message;
+- **the encoding can evolve.** A version byte tells old and new payloads apart, so an encoding can change without
+  misreading what is stored;
+- **the reason is in the payload.** With encryption, the database can't help: the column is ciphertext, untyped, and
+  can't be inspected or migrated in SQL. The payload is the only place which can say what wrote it.
+
+What it costs:
+
+- two bytes per value, before encryption;
+- codec ids become stored data: never renumbered, never reused, retired ones remembered;
+- the type-to-codec mapping (`Codec`, `codecOf`) next to the encoders and decoders.
+
+Without one, the rule is documented instead (README, "No type information is stored"): changing an encrypted
+attribute's declared type, or an encoding, is a breaking change which needs the rows migrated first.
+

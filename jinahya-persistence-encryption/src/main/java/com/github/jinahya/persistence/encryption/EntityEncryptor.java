@@ -600,10 +600,6 @@ class EntityEncryptor {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "only a BASIC attribute can be encrypted; found " + persistentAttributeType);
         }
-        if (decryptedAttribute.getJavaType().isPrimitive()) {
-            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         "a decrypted attribute cannot be of a primitive type; encrypting nulls it");
-        }
         if (isIdOrVersion(decryptedAttribute)) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "an identifier, or a version, attribute cannot be encrypted");
@@ -626,7 +622,9 @@ class EntityEncryptor {
                          + constraint.annotationType().getName()
                          + "; validate the value before persisting");
         }
-        if (!isOptional(decryptedAttribute)) {
+        // a primitive can't be nulled; it is zeroed instead (see encrypt), so the rules for nulling it don't apply
+        final var primitive = javaType.isPrimitive();
+        if (!primitive && !isOptional(decryptedAttribute)) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "a decrypted attribute has to be optional");
         }
@@ -638,7 +636,7 @@ class EntityEncryptor {
                          "a decrypted attribute's column has to be non-insertable"
                          + "; otherwise an INSERT can carry the plaintext (from " + rules.source() + ")");
         }
-        if (!rules.nullable()) {
+        if (!primitive && !rules.nullable()) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "a decrypted attribute's column has to be nullable"
                          + "; encrypting nulls it (from " + rules.source() + ")");
@@ -776,8 +774,12 @@ class EntityEncryptor {
             assignments.add(pair.setCiphertext(
                     object, encryptFramed(encryptionIdentifier, pair, encode(pair, plaintext))));
             if (clearPlaintext) {
-                // the plaintext column is updatable: an UPDATE would carry the value, so it goes out as null
-                assignments.add(pair.setPlaintext(object, null));
+                // the plaintext column is updatable: an UPDATE would carry the value, so it goes out as null; a
+                // primitive, which can't be null, as its zero (0, false, '\0'); @PostUpdate restores it either way
+                final var javaType = pair.javaType();
+                assignments.add(pair.setPlaintext(
+                        object, javaType.isPrimitive() ? java.lang.reflect.Array.get(
+                                java.lang.reflect.Array.newInstance(javaType, 1), 0) : null));
             }
         }
     }

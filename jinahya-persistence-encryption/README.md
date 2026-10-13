@@ -201,9 +201,9 @@ which breaks any of these is rejected:
 |------|
 | `@EncryptedAttribute` sits on the persistent attribute holding the ciphertext; anywhere else — unmapped, transient, a getter the access type does not read — is rejected ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)) |
 | the plaintext it names is a persistent attribute of the same entity or embeddable; it is not itself annotated, and is named only once |
-| the plaintext is `@Basic`, optional, not of a primitive type, neither an identifier nor a version |
+| the plaintext is `@Basic`, neither an identifier nor a version, and optional unless it is primitive |
 | the plaintext's declared java type has a codec (see [Encoding](#encoding)); for a member of a generic `@MappedSuperclass`, the type the entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) |
-| the plaintext column is **non-insertable**, nullable and **updatable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)) |
+| the plaintext column is **non-insertable**, **updatable**, and nullable unless the plaintext is primitive ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)) |
 | no Bean Validation constraint on the plaintext ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)) |
 | the ciphertext attribute is `@Basic`, optional, typed `byte[]`, not an identifier or a version, and its column is insertable, updatable and nullable |
 | an `@Embedded` attribute is not itself annotated; annotate the ciphertext attributes inside the embeddable, which are descended into |
@@ -246,10 +246,8 @@ This module moves values between the plaintext and the ciphertext; it imposes no
 
 ## Not supported
 
-* **`java.util.Calendar` and `java.io.Serializable`**, although Jakarta Persistence admits both: neither has a clean,
-  secure encoding here. A `Calendar` keeps only its instant, so neither its class nor its time zone could be rebuilt;
-  a `Serializable` brings Java's opaque format, deserialization of stored data, and class evolution into encrypted
-  rows. A mapping of either is rejected when it is validated
+* **Some types Jakarta Persistence admits**, `java.util.Calendar` and `java.io.Serializable` among them: only types
+  with a clean, secure encoding are supported. See [Not supported types](#not-supported-types)
   ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)).
 * **Querying an encrypted attribute.** The database holds only ciphertext: predicates and orderings against the
   plaintext column match what is *stored*, which is `NULL`.
@@ -271,34 +269,34 @@ The `EntityEncryptionService` receives, and returns, an array of bytes. Values a
 attribute's *declared* java type — for a member inherited from a generic `@MappedSuperclass`, the type the concrete
 entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) — big-endian, and self-contained:
 a value is reconstructed from its bytes without consulting the database. The sizes below are of the plaintext
-encoding, after the header and before the service is called. Every encoding is pinned byte for byte by
-`EntityEncryptorUtils_Test`.
+encoding, before the service is called. Every encoding is pinned byte for byte by the `ValueCodecs_Of*_Test` classes.
 
-### Payload header
+### No type information is stored
 
-Every encoded value is prefixed with a two-byte header before it reaches the service
-([#75](https://github.com/jinahya/jinahya-persistence/issues/75)):
+The bytes carry the value only: nothing records which type, or which version of an encoding, wrote them. A value is
+always decoded by the attribute's declared type **now**. So, for an attribute which already has encrypted rows:
 
-| byte | content                                                                                   |
-|------|-------------------------------------------------------------------------------------------|
-| `0`  | the format version, currently `1`; any other version is rejected                          |
-| `1`  | the id of the codec which encoded the value (`EntityEncryptorUtils.Codec`); stored data, never renumbered |
+* **Changing its declared type is a breaking change.** If the old and new encodings differ in width (`Long` to
+  `Integer`), reading an old row fails, as the length doesn't match. If they don't (`Long` to `Double`, `Integer` to
+  `Float` or `Year`, `LocalDate` to `LocalTime` or `Long`), an old row is **misread silently**, and the next write
+  stores the wrong value for good. Migrate the rows first: decrypt them with the old type, re-encrypt them with the new.
+* **Changing an encoding is a breaking change** in the same way: no row says which encoding wrote it.
 
-A reader checks both, so a payload written by another codec — an attribute whose declared type changed after the row
-was written, say `Long` to `Integer` — is rejected, naming the attribute, rather than misread. Ciphertext written before
-the header existed is not readable; the module is pre-1.0, and offers no migration for it
-([#19](https://github.com/jinahya/jinahya-persistence/issues/19)).
+A fixed-width decoder rejects a payload shorter than its width, and reads only its width from a longer one; a
+variable-width one reads the whole payload, and rejects what it cannot read. The checks are unconditional, not
+`assert`s.
 
-Every fixed-width decoder reads a payload of **exactly** its width, and rejects anything shorter or longer
-([#76](https://github.com/jinahya/jinahya-persistence/issues/76)); a variable-width one rejects what it cannot read.
-The checks are unconditional, not `assert`s.
+### Supported types
 
-The codecs and the header are format version `1`. A change to any of them from now on is a format change: a new
-version, which a reader of this version rejects.
+The supported types are the basic types of
+[Jakarta Persistence 3.2 §2.6](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486),
+and no others, less those without a **clean, secure encoding**: a fixed, documented one which decoding can verify, and
+nothing unsafe on decode ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Each is matched exactly, by
+the attribute's declared type; a mapping of any other type is rejected when it is validated.
 
 | attribute              | bytes      | encoding                                                    |
 |------------------------|------------|-------------------------------------------------------------|
-| `Boolean`              | `1`        | `0` for `false`, `1` for `true`; any other byte is rejected ([#78](https://github.com/jinahya/jinahya-persistence/issues/78)) |
+| `Boolean`              | `1`        | written as `0b0` for `false`, `0b1` for `true`; read as `false` for `0b0`, `true` for any other byte |
 | `Byte`                 | `1`        | the value                                                   |
 | `Short`                | `2`        | big endian                                                  |
 | `Character`            | `2`        | big endian                                                  |
@@ -322,14 +320,29 @@ version, which a reader of this version rejects.
 | `java.sql.Time`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Timestamp`   | `12`       | `toInstant()`(`Instant`) ([#80](https://github.com/jinahya/jinahya-persistence/issues/80)) |
 | `byte[]`               | `length`   | as is                                                       |
-| `Byte[]`               | `length`   | unboxed; use `byte[]` instead                               |
+| `Byte[]`               | `length`   | unboxed, as `byte[]`; a `null` element is rejected; use `byte[]` instead |
 | `char[]`               | `2×length` | each `char` big endian                                      |
-| `Character[]`          | `2×length` | unboxed; use `char[]` instead                               |
+| `Character[]`          | `2×length` | unboxed, as `char[]`; a `null` element is rejected; use `char[]` instead |
 | `enum`                 | variable   | `name()`(`String`), never the ordinal: reordering constants is safe, renaming one is a breaking change ([#13](https://github.com/jinahya/jinahya-persistence/issues/13)) |
 
-`java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are matched before `java.util.Date`, so a `Timestamp`
-keeps its nanos rather than being truncated to milliseconds.
+A `java.sql.Timestamp` keeps its nanos; a `java.util.Date` holds milliseconds.
 
-`java.util.Date`, `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are supported but
+A primitive plaintext attribute (`int`, `boolean`, …) is encoded as its wrapper, but it can't be `null`: it always has
+a value to encrypt, and before an `UPDATE` it is cleared to its zero (`0`, `false`, `'\0'`) rather than to `null`, so
+its plaintext column holds that zero instead of `NULL`. Anything reading the column directly sees a zero, not the
+absence of a value; a wrapper type avoids that.
+
+`java.util.Date`, `java.sql.Date`, `java.sql.Time`, `java.sql.Timestamp`, `Byte[]` and `Character[]` are supported but
 [deprecated by Jakarta Persistence 3.2](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations);
-prefer the `java.time` types.
+prefer the `java.time` types, `byte[]` and `char[]`. Deprecation alone is no reason to refuse a type here; each of
+these has a clean encoding.
+
+### Not supported types
+
+| type | why |
+|------|-----|
+| `java.util.Calendar`, and its subclasses | Only its instant could be stored: its calendar system, time zone and settings would be lost, and decoding couldn't rebuild the declared class (`GregorianCalendar` read back as whatever the default locale's calendar is) ([#92](https://github.com/jinahya/jinahya-persistence/issues/92), [#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Deprecated by Jakarta Persistence 3.2; use `Instant` or `OffsetDateTime`. |
+| `java.io.Serializable`, as a catch-all | Java serialization is an opaque format this module can't define or verify; deserializing stored data invites gadget chains and denial of service; and a renamed class, or a changed `serialVersionUID`, makes encrypted rows unreadable, with no way to repair them in SQL ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Map the value's parts to supported types. |
+| subclasses of `java.util.Date`, other than `java.sql.Date`, `Time` and `Timestamp` | Decoding would have to construct the subclass reflectively, from a `(long)` constructor nothing guarantees ([#92](https://github.com/jinahya/jinahya-persistence/issues/92)). Declare `java.util.Date`. |
+| arrays other than `byte[]`, `Byte[]`, `char[]` and `Character[]` (`int[]`, `long[]`, `Integer[]`, …) | Not basic types of the specification: it admitted them only as `Serializable`. Providers may map them on their own (Hibernate as SQL arrays), but this module covers what the specification defines. |
+| anything else | Not a basic type of the specification, or no encoding: `ZoneOffset`, `ZonedDateTime`, collections, `Object`, a generic `T[]` which doesn't resolve to a supported array type ([#92](https://github.com/jinahya/jinahya-persistence/issues/92)). |

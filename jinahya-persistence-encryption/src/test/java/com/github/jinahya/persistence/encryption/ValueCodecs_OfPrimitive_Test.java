@@ -892,16 +892,12 @@ class ValueCodecs_OfPrimitive_Test {
             assertThat(OfPrimitive.decodeBoolean(OfPrimitive.encodeBoolean(v))).isEqualTo(v);
         }
 
-        @DisplayName("decodeBoolean rejects any byte other than 0 and 1")
+        @DisplayName("decodeBoolean reads any byte other than 0 as true")
         @ValueSource(bytes = {Byte.MIN_VALUE, -1, 2, Byte.MAX_VALUE})
         @ParameterizedTest
         void __decodeOtherThanZeroOrOne(final byte b) {
-            assertThatThrownBy(() -> OfPrimitive.decodeBoolean(new byte[]{b}))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("not a boolean");
-            assertThatThrownBy(() -> OfPrimitive.decodeBoolean(new byte[]{0, b}, 1))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("not a boolean");
+            assertThat(OfPrimitive.decodeBoolean(new byte[]{b})).isTrue();
+            assertThat(OfPrimitive.decodeBoolean(new byte[]{0, b}, 1)).isTrue();
         }
 
         @DisplayName("encodeBoolean(byte[], int, boolean) writes at the index, and returns the next one")
@@ -984,15 +980,13 @@ class ValueCodecs_OfPrimitive_Test {
             assertThat(OfPrimitive.encodeBooleans(dst)).isEqualTo(OfPrimitive.encodeBooleans(v));
         }
 
-        @DisplayName("decodeBooleans rejects any byte other than 0 and 1")
+        @DisplayName("decodeBooleans reads 0 as false, and any other byte as true")
         @Test
-        void __strict() {
-            assertThatThrownBy(() -> OfPrimitive.decodeBooleans(new byte[]{0, 1, 2}))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("not a boolean");
-            assertThatThrownBy(() -> OfPrimitive.decodeBooleans(new byte[]{0, -1}, 0, new boolean[2]))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("not a boolean");
+        void __lenient() {
+            assertThat(OfPrimitive.decodeBooleans(new byte[]{0, 1, 2, -1})).containsExactly(false, true, true, true);
+            final var dst = new boolean[2];
+            OfPrimitive.decodeBooleans(new byte[]{0, Byte.MIN_VALUE}, 0, dst);
+            assertThat(dst).containsExactly(false, true);
         }
 
         @DisplayName("the index-based methods fail when the values do not fit")

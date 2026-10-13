@@ -106,9 +106,8 @@ public interface EntityEncryptionService {
      *
      * @param encryptionIdentifier the identifier {@link #getEncryptionIdentifier(Object)} returned; may be
      *                             {@code null}.
-     * @param decryptedBytes       the decrypted bytes to encrypt; never {@code null}. The encoding of the value, framed
-     *                             with a header, so never empty either; an array of the listener's own, which this
-     *                             method may keep.
+     * @param decryptedBytes       the decrypted bytes to encrypt; never {@code null}, possibly empty. The encoding of
+     *                             the value; an array of the listener's own, which this method may keep.
      * @return an encryption result to be decrypted via {@link #decrypt(String, byte[])} method; never {@code null}.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */

@@ -1053,14 +1053,14 @@ public final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code boolean} value from the specified array, at the specified index.
+         * Decodes a {@code boolean} value from the specified array, at the specified index; {@code false} for
+         * {@code 0}, and {@code true} for any other byte.
          *
          * @param b the array from which the value is decoded.
          * @param i the index in the {@code b} from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException      when the {@code b} is {@code null}.
          * @throws IndexOutOfBoundsException when the {@code b} has no byte at the {@code i}.
-         * @throws IllegalArgumentException  when the byte is neither {@code 0} nor {@code 1}.
          */
         static boolean decodeBoolean(final byte[] b, final int i) {
             checkIndex(b, i, Byte.BYTES);
@@ -1071,17 +1071,10 @@ public final class ValueCodecs {
          * Returns the {@code boolean} value the specified byte encodes.
          *
          * @param b the byte.
-         * @return {@code false} for {@code 0}; {@code true} for {@code 1}.
-         * @throws IllegalArgumentException when the {@code b} is neither {@code 0} nor {@code 1}.
+         * @return {@code false} for {@code 0}; {@code true} for any other byte.
          */
         private static boolean toBoolean(final byte b) {
-            return switch (b) {
-                case 0 -> false;
-                case 1 -> true;
-                // anything else is not a value this codec wrote; reading it as false would hide the corruption
-                default ->
-                        throw new IllegalArgumentException("not a boolean; byte: " + (b & 0xFF) + "; expected 0 or 1");
-            };
+            return b != 0;
         }
 
         /**
@@ -1098,14 +1091,13 @@ public final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code boolean} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code boolean} value from the beginning of the specified array; {@code false} for {@code 0}, and
+         * {@code true} for any other byte. Any byte beyond the value is not read.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is empty, or its first byte is neither {@code 0} nor
-         *                                  {@code 1}.
+         * @throws IllegalArgumentException when the {@code b} is empty.
          */
         public static boolean decodeBoolean(final byte[] b) {
             return decodeBoolean(checkLength(b, Byte.BYTES), 0);
@@ -1142,7 +1134,6 @@ public final class ValueCodecs {
          * @throws NullPointerException      when the {@code b}, or the {@code dst}, is {@code null}.
          * @throws IndexOutOfBoundsException when the {@code b} does not hold {@code dst.length} values at the
          *                                   {@code i}.
-         * @throws IllegalArgumentException  when any of the bytes is neither {@code 0} nor {@code 1}.
          */
         static int decodeBooleans(final byte[] b, final int i, final boolean[] dst) {
             final var size = size(Objects.requireNonNull(dst, "dst is null").length, Byte.BYTES);
@@ -1169,12 +1160,12 @@ public final class ValueCodecs {
         }
 
         /**
-         * Decodes all the {@code boolean} values the specified array holds, one byte per value.
+         * Decodes all the {@code boolean} values the specified array holds, one byte per value; {@code false} for
+         * {@code 0}, and {@code true} for any other byte.
          *
          * @param b the array from which the values are decoded.
          * @return a new array of the decoded values.
-         * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when any of the bytes is neither {@code 0} nor {@code 1}.
+         * @throws NullPointerException when the {@code b} is {@code null}.
          */
         public static boolean[] decodeBooleans(final byte[] b) {
             final var dst = new boolean[checkMultiple(b, Byte.BYTES)];
@@ -1284,6 +1275,103 @@ public final class ValueCodecs {
         public static <E extends Enum<E>> E decodeEnum(final byte[] b, final Class<E> enumClass) {
             Objects.requireNonNull(enumClass, "enumClass is null");
             return Enum.valueOf(enumClass, decodeString(b));
+        }
+
+        // ----------------------------------------------------------------------------------------- Byte[], Character[]
+
+        /**
+         * Encodes the specified array of {@code Byte} values into a new array, one byte per value, as
+         * {@link OfPrimitive#encodeBytes(byte[])} encodes their unboxed values.
+         *
+         * @param v the values to encode.
+         * @return a new array holding the encoded {@code v}.
+         * @throws NullPointerException     when the {@code v} is {@code null}.
+         * @throws IllegalArgumentException when an element of the {@code v} is {@code null}, which has no encoding.
+         * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+         *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+         * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Byte[]} for basic attributes in favor of
+         *         {@code byte[]}.
+         */
+        @Deprecated
+        public static byte[] encodeBytesWrapped(final Byte[] v) {
+            final var p = new byte[Objects.requireNonNull(v, "v is null").length];
+            for (int i = 0; i < p.length; i++) {
+                if (v[i] == null) {
+                    throw new IllegalArgumentException(
+                            "a null element at " + i + "; a Byte[] is encoded one byte per element");
+                }
+                p[i] = v[i];
+            }
+            return OfPrimitive.encodeBytes(p);
+        }
+
+        /**
+         * Decodes all the {@code Byte} values the specified array holds, one byte per value.
+         *
+         * @param b the array from which the values are decoded.
+         * @return a new array of the decoded values.
+         * @throws NullPointerException when the {@code b} is {@code null}.
+         * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+         *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+         * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Byte[]} for basic attributes in favor of
+         *         {@code byte[]}.
+         */
+        @Deprecated
+        public static Byte[] decodeBytesWrapped(final byte[] b) {
+            final var p = OfPrimitive.decodeBytes(b);
+            final var v = new Byte[p.length];
+            for (int i = 0; i < v.length; i++) {
+                v[i] = p[i];
+            }
+            return v;
+        }
+
+        /**
+         * Encodes the specified array of {@code Character} values into a new array, two bytes per value, as
+         * {@link OfPrimitive#encodeChars(char[])} encodes their unboxed values.
+         *
+         * @param v the values to encode.
+         * @return a new array holding the encoded {@code v}.
+         * @throws NullPointerException     when the {@code v} is {@code null}.
+         * @throws IllegalArgumentException when an element of the {@code v} is {@code null}, which has no encoding.
+         * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+         *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+         * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Character[]} for basic attributes in favor
+         *         of {@code char[]}.
+         */
+        @Deprecated
+        public static byte[] encodeCharsWrapped(final Character[] v) {
+            final var p = new char[Objects.requireNonNull(v, "v is null").length];
+            for (int i = 0; i < p.length; i++) {
+                if (v[i] == null) {
+                    throw new IllegalArgumentException(
+                            "a null element at " + i + "; a Character[] is encoded one char per element");
+                }
+                p[i] = v[i];
+            }
+            return OfPrimitive.encodeChars(p);
+        }
+
+        /**
+         * Decodes all the {@code Character} values the specified array holds, two bytes per value.
+         *
+         * @param b the array from which the values are decoded.
+         * @return a new array of the decoded values.
+         * @throws NullPointerException     when the {@code b} is {@code null}.
+         * @throws IllegalArgumentException when the length of the {@code b} is odd.
+         * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
+         *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
+         * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Character[]} for basic attributes in favor
+         *         of {@code char[]}.
+         */
+        @Deprecated
+        public static Character[] decodeCharsWrapped(final byte[] b) {
+            final var p = OfPrimitive.decodeChars(b);
+            final var v = new Character[p.length];
+            for (int i = 0; i < v.length; i++) {
+                v[i] = p[i];
+            }
+            return v;
         }
 
         // -------------------------------------------------------------------------------------------------------------

@@ -23,8 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.Bytes_l;
-import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.Characters_2l;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -47,94 +45,6 @@ class EntityEncryptorUtils_Test {
         final var v = new byte[ThreadLocalRandom.current().nextInt(minLengthInclusive, maxLengthInclusive + 1)];
         ThreadLocalRandom.current().nextBytes(v);
         return v;
-    }
-
-    // ---------------------------------------------------------------------------------------------------------- Byte[]
-    @SuppressWarnings({"deprecation"})
-    @DisplayName("Bytes_l")
-    @Nested
-    class Bytes_l_Test {
-
-        @DisplayName("Bytes_l(Byte[]) encodes the unboxed bytes, without modifying its argument")
-        @Test
-        void __encode() {
-            final var p = randomBytes(1, 128);
-            final var v = new Byte[p.length];
-            for (int i = 0; i < v.length; i++) {
-                v[i] = p[i];
-            }
-            // an expected value which the call under test cannot reach
-            final var expected = v.clone();
-
-            final var b = Bytes_l(v);
-
-            assertThat(b).as("the encoded bytes").isEqualTo(p);
-            assertThat(v).as("the argument must not be modified").isEqualTo(expected);
-        }
-
-        @DisplayName("Bytes_l(byte[]) decodes the boxed bytes, without modifying its argument")
-        @Test
-        void __decode() {
-            final var b = randomBytes(1, 128);
-            final var expected = b.clone();
-
-            final var v = Bytes_l(b);
-
-            assertThat(v).hasSameSizeAs(b);
-            for (int i = 0; i < v.length; i++) {
-                assertThat(v[i]).isEqualTo(b[i]);
-            }
-            assertThat(b).as("the argument must not be modified").isEqualTo(expected);
-        }
-
-        @DisplayName("Bytes_l(byte[]) reads back what Bytes_l(Byte[]) wrote, empty included")
-        @Test
-        void __roundTrip() {
-            assertThat(Bytes_l(Bytes_l(new Byte[0]))).isEmpty();
-            final var p = randomBytes(1, 128);
-            final var v = new Byte[p.length];
-            for (int i = 0; i < v.length; i++) {
-                v[i] = p[i];
-            }
-            assertThat(Bytes_l(Bytes_l(v))).isEqualTo(v);
-        }
-    }
-
-    // ----------------------------------------------------------------------------------------------------- Character[]
-    @DisplayName("Characters_2l")
-    @Nested
-    class Characters_2l_Test {
-
-        @DisplayName(
-                "Characters_2l encodes two bytes per character, the same as chars_2l, without modifying its argument")
-        @Test
-        void __encode() {
-            final var v = new Character[]{'j', 'i', 'n', 'ä', '한', '￿', '\u0080'};
-            final var expected = v.clone();
-
-            final var b = Characters_2l(v);
-
-            assertThat(b).as("two bytes per character").hasSize(v.length << 1);
-            assertThat(b).as("the same format as char[]")
-                    .isEqualTo(ValueCodecs.OfPrimitive.encodeChars("jinä한￿\u0080".toCharArray()));
-            assertThat(v).as("the argument must not be modified").isEqualTo(expected);
-        }
-
-        @DisplayName("Characters_2l(byte[]) reads back what Characters_2l(Character[]) wrote, empty included")
-        @Test
-        void __roundTrip() {
-            assertThat(Characters_2l(Characters_2l(new Character[0]))).isEmpty();
-            final var v = new Character[]{'j', 'i', 'n', 'ä', '한', '￿', '\u0080'};
-            assertThat(Characters_2l(Characters_2l(v))).isEqualTo(v);
-        }
-
-        @DisplayName("an odd number of bytes is rejected, not silently truncated")
-        @Test
-        void __decodeOdd() {
-            assertThatThrownBy(() -> Characters_2l(new byte[]{1, 2, 3}))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("not a multiple of " + Character.BYTES);
-        }
     }
 
     // ------------------------------------------------------------------------------------------------- decode (#76)

@@ -8,7 +8,6 @@ import com.github.jinahya.persistence.encryption.ValueCodecs.OfSql;
 import com.github.jinahya.persistence.encryption.ValueCodecs.OfTime;
 import com.github.jinahya.persistence.encryption.ValueCodecs.OfUtil;
 
-import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -25,10 +24,8 @@ import java.util.UUID;
  * <p>
  * {@link #encode(Pair, Object)} and {@link #decode(Pair, byte[])} pick the codec by an attribute's current declared
  * type; nothing about the type is stored with the bytes, so a value is always read as the type it is declared now. The
- * codecs are those of {@link ValueCodecs}, but for {@code Byte[]} and {@code Character[]}, which are here. A stored
- * payload is decoded only when it is exactly as long as its codec reads, where {@link ValueCodecs} allows bytes beyond
- * it. The encodings are big-endian and self-contained, so that a value can be reconstructed from its bytes without
- * consulting the database.
+ * codecs are those of {@link ValueCodecs}. The encodings are big-endian and self-contained, so that a value can be
+ * reconstructed from its bytes without consulting the database.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see EntityEncryptor
@@ -39,108 +36,7 @@ import java.util.UUID;
 })
 final class EntityEncryptorUtils {
 
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Returns the specified payload after checking that it is exactly as long as a fixed-width codec reads.
-     *
-     * @param b      the payload.
-     * @param length the width of the codec, in bytes.
-     * @return the {@code b}.
-     * @throws IllegalArgumentException when the {@code b} is shorter, or longer, than the {@code length}.
-     * @implNote Checked unconditionally, not with {@code assert}: a payload which is too long would otherwise
-     *         be read silently, as its first {@code length} bytes.
-     */
-    private static byte[] exactly(final byte[] b, final int length) {
-        if (b.length != length) {
-            throw new IllegalArgumentException(
-                    "a payload of " + b.length + " byte(s); this codec reads exactly " + length);
-        }
-        return b;
-    }
-
-    // ---------------------------------------------------------------------------------------------------------- Byte[]
-
-    /**
-     * Returns an array of bytes representing the specified {@code Byte[]} value.
-     *
-     * @param v the value to represent.
-     * @return an array of bytes representing the {@code v}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Byte[]} for basic attributes in favor of
-     *         {@code byte[]}.
-     */
-    @Deprecated
-    static byte[] Bytes_l(final Byte[] v) {
-        final var p = new byte[v.length];
-        for (int i = 0; i < p.length; i++) {
-            if (v[i] == null) {
-                throw new IllegalArgumentException(
-                        "a null element at " + i + "; a Byte[] is encoded one byte per element");
-            }
-            p[i] = v[i];
-        }
-        return p;
-    }
-
-    /**
-     * Returns the {@code Byte[]} value represented by the specified array of bytes.
-     *
-     * @param b the array of bytes.
-     * @return the value represented by the {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@code Byte[]} for basic attributes in favor of
-     *         {@code byte[]}.
-     */
-    @Deprecated
-    static Byte[] Bytes_l(final byte[] b) {
-        final var v = new Byte[b.length];
-        for (int i = 0; i < v.length; i++) {
-            v[i] = b[i];
-        }
-        return v;
-    }
-
-    // ----------------------------------------------------------------------------------------------------- Character[]
-
-    /**
-     * Returns an array of bytes representing the specified {@code Character[]} value.
-     *
-     * @param v the value to represent.
-     * @return an array of bytes representing the {@code v}.
-     */
-    static byte[] Characters_2l(final Character[] v) {
-        final var p = new char[v.length];
-        for (int i = 0; i < p.length; i++) {
-            if (v[i] == null) {
-                throw new IllegalArgumentException(
-                        "a null element at " + i + "; a Character[] is encoded one char per element");
-            }
-            p[i] = v[i];
-        }
-        return OfPrimitive.encodeChars(p);
-    }
-
-    /**
-     * Returns the {@code Character[]} value represented by the specified array of bytes.
-     *
-     * @param b the array of bytes.
-     * @return the value represented by the {@code b}.
-     */
-    static Character[] Characters_2l(final byte[] b) {
-        final var p = OfPrimitive.decodeChars(b);
-        final var v = new Character[p.length];
-        for (int i = 0; i < v.length; i++) {
-            v[i] = p[i];
-        }
-        return v;
-    }
-
-    // ------------------------------------------------------------------------------------------------------- supports
+    // -------------------------------------------------------------------------------------------------------- supports
 
     /**
      * Tells whether the specified declared java type of an attribute is supported; whether
@@ -150,9 +46,7 @@ final class EntityEncryptorUtils {
      * @return {@code true} when the {@code javaType} is supported; {@code false} otherwise.
      */
     static boolean supports(final Class<?> javaType) {
-        return SUPPORTED.contains(javaType)
-               || java.util.Date.class.isAssignableFrom(javaType) // the java.sql types, and its other subclasses
-               || javaType.isEnum();
+        return SUPPORTED.contains(javaType) || javaType.isEnum();
     }
 
     private static final java.util.Set<Class<?>> SUPPORTED = java.util.Set.of(
@@ -161,6 +55,8 @@ final class EntityEncryptorUtils {
             String.class, UUID.class, BigInteger.class, BigDecimal.class,
             LocalDate.class, LocalTime.class, LocalDateTime.class, OffsetTime.class, OffsetDateTime.class,
             Instant.class, Year.class,
+            // exactly these: another subclass of java.util.Date couldn't be rebuilt on read (#92)
+            java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
             byte[].class, Byte[].class, char[].class, Character[].class
     );
 
@@ -174,7 +70,8 @@ final class EntityEncryptorUtils {
      * @return the encoding of the {@code decryptedValue}; never the instance's own array.
      */
     static byte[] encode(final Pair pair, final Object decryptedValue) {
-        final var javaType = pair.javaType();
+        // a primitive's value arrives boxed, so it is matched, and encoded, as its wrapper
+        final var javaType = java.lang.invoke.MethodType.methodType(pair.javaType()).wrap().returnType();
         // The DECLARED type decides the encoding, exactly as it decides the decoding below. Dispatching on
         // the runtime class here instead let the two ladders pick different codecs for one attribute -- a
         // java.util.Date holding a java.sql.Timestamp was written as epoch seconds and read back as epoch
@@ -226,27 +123,23 @@ final class EntityEncryptorUtils {
                 return OfTime.encodeInstant((Instant) decryptedValue);
             } else if (javaType == Year.class) {
                 return OfTime.encodeYear((Year) decryptedValue);
-            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
+            } else if (javaType == java.sql.Timestamp.class) { // keeps the nanos
                 return OfSql.encodeTimestamp((java.sql.Timestamp) decryptedValue);
-            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
+            } else if (javaType == java.sql.Date.class) {
                 return OfSql.encodeDate((java.sql.Date) decryptedValue);
-            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
+            } else if (javaType == java.sql.Time.class) {
                 return OfSql.encodeTime((java.sql.Time) decryptedValue);
-            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                // one branch feeds both of decrypt's generic Date branches -- the exact `== java.util.Date` one
-                // and the reflective (long) constructor one -- because both read long_8 millis
+            } else if (javaType == java.util.Date.class) {
                 return OfUtil.encodeDate((java.util.Date) decryptedValue);
             } else if (javaType == byte[].class) {
                 // a copy: the service must not be handed the instance's own array
                 return ((byte[]) decryptedValue).clone();
             } else if (javaType == Byte[].class) {
-                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                return Bytes_l((Byte[]) decryptedValue);
+                return OfLang.encodeBytesWrapped((Byte[]) decryptedValue);
             } else if (javaType == char[].class) {
                 return OfPrimitive.encodeChars((char[]) decryptedValue);
             } else if (javaType == Character[].class) {
-                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                return Characters_2l((Character[]) decryptedValue);
+                return OfLang.encodeCharsWrapped((Character[]) decryptedValue);
             } else if (javaType.isEnum()) {
                 return OfLang.encodeEnum((Enum<?>) decryptedValue);
             }
@@ -278,64 +171,59 @@ final class EntityEncryptorUtils {
         final var javaType = pair.javaType();
         try {
             if (javaType == boolean.class || javaType == Boolean.class) {
-                return OfPrimitive.decodeBoolean(exactly(decryptedBytes, Byte.BYTES), 0);
+                return OfPrimitive.decodeBoolean(decryptedBytes);
             } else if (javaType == byte.class || javaType == Byte.class) {
-                return OfPrimitive.decodeByte(exactly(decryptedBytes, Byte.BYTES), 0);
+                return OfPrimitive.decodeByte(decryptedBytes);
             } else if (javaType == short.class || javaType == Short.class) {
-                return OfPrimitive.decodeShort(exactly(decryptedBytes, Short.BYTES), 0);
+                return OfPrimitive.decodeShort(decryptedBytes);
             } else if (javaType == int.class || javaType == Integer.class) {
-                return OfPrimitive.decodeInt(exactly(decryptedBytes, Integer.BYTES), 0);
+                return OfPrimitive.decodeInt(decryptedBytes);
             } else if (javaType == long.class || javaType == Long.class) {
-                return OfPrimitive.decodeLong(exactly(decryptedBytes, Long.BYTES), 0);
+                return OfPrimitive.decodeLong(decryptedBytes);
             } else if (javaType == char.class || javaType == Character.class) {
-                return OfPrimitive.decodeChar(exactly(decryptedBytes, Character.BYTES), 0);
+                return OfPrimitive.decodeChar(decryptedBytes);
             } else if (javaType == float.class || javaType == Float.class) {
-                return OfPrimitive.decodeFloat(exactly(decryptedBytes, Float.BYTES), 0);
+                return OfPrimitive.decodeFloat(decryptedBytes);
             } else if (javaType == double.class || javaType == Double.class) {
-                return OfPrimitive.decodeDouble(exactly(decryptedBytes, Double.BYTES), 0);
+                return OfPrimitive.decodeDouble(decryptedBytes);
             } else if (javaType == String.class) {
                 return OfLang.decodeString(decryptedBytes);
             } else if (javaType == UUID.class) {
-                return OfUtil.decodeUuid(exactly(decryptedBytes, OfUtil.UUID_BYTES), 0);
+                return OfUtil.decodeUuid(decryptedBytes);
             } else if (javaType == BigInteger.class) {
                 return OfMath.decodeBigInteger(decryptedBytes);
             } else if (javaType == BigDecimal.class) {
                 return OfMath.decodeBigDecimal(decryptedBytes);
             } else if (javaType == LocalDate.class) {
-                return OfTime.decodeLocalDate(exactly(decryptedBytes, OfTime.LOCAL_DATE_BYTES), 0);
+                return OfTime.decodeLocalDate(decryptedBytes);
             } else if (javaType == LocalTime.class) {
-                return OfTime.decodeLocalTime(exactly(decryptedBytes, OfTime.LOCAL_TIME_BYTES), 0);
+                return OfTime.decodeLocalTime(decryptedBytes);
             } else if (javaType == LocalDateTime.class) {
-                return OfTime.decodeLocalDateTime(exactly(decryptedBytes, OfTime.LOCAL_DATE_TIME_BYTES), 0);
+                return OfTime.decodeLocalDateTime(decryptedBytes);
             } else if (javaType == OffsetTime.class) {
-                return OfTime.decodeOffsetTime(exactly(decryptedBytes, OfTime.OFFSET_TIME_BYTES), 0);
+                return OfTime.decodeOffsetTime(decryptedBytes);
             } else if (javaType == OffsetDateTime.class) {
-                return OfTime.decodeOffsetDateTime(exactly(decryptedBytes, OfTime.OFFSET_DATE_TIME_BYTES), 0);
+                return OfTime.decodeOffsetDateTime(decryptedBytes);
             } else if (javaType == Instant.class) {
-                return OfTime.decodeInstant(exactly(decryptedBytes, OfTime.INSTANT_BYTES), 0);
+                return OfTime.decodeInstant(decryptedBytes);
             } else if (javaType == Year.class) {
-                return OfTime.decodeYear(exactly(decryptedBytes, OfTime.YEAR_BYTES), 0);
-            } else if (javaType == java.sql.Timestamp.class) { // before java.util.Date; keeps the nanos
-                return OfSql.decodeTimestamp(exactly(decryptedBytes, OfSql.TIMESTAMP_BYTES), 0);
-            } else if (javaType == java.sql.Date.class) {      // before java.util.Date
-                return OfSql.decodeDate(exactly(decryptedBytes, OfSql.DATE_BYTES), 0);
-            } else if (javaType == java.sql.Time.class) {      // before java.util.Date
-                return OfSql.decodeTime(exactly(decryptedBytes, OfSql.TIME_BYTES), 0);
+                return OfTime.decodeYear(decryptedBytes);
+            } else if (javaType == java.sql.Timestamp.class) { // keeps the nanos
+                return OfSql.decodeTimestamp(decryptedBytes);
+            } else if (javaType == java.sql.Date.class) {
+                return OfSql.decodeDate(decryptedBytes);
+            } else if (javaType == java.sql.Time.class) {
+                return OfSql.decodeTime(decryptedBytes);
             } else if (javaType == java.util.Date.class) {
-                return OfUtil.decodeDate(exactly(decryptedBytes, OfUtil.DATE_BYTES), 0);
-            } else if (java.util.Date.class.isAssignableFrom(javaType)) {
-                final var time = OfPrimitive.decodeLong(exactly(decryptedBytes, Long.BYTES), 0);
-                return javaType.getConstructor(long.class).newInstance(time);
+                return OfUtil.decodeDate(decryptedBytes);
             } else if (javaType == byte[].class) {
                 return decryptedBytes;
             } else if (javaType == Byte[].class) {
-                logger.log(System.Logger.Level.WARNING, "Byte[] is not encouraged; use byte[]");
-                return Bytes_l(decryptedBytes);
+                return OfLang.decodeBytesWrapped(decryptedBytes);
             } else if (javaType == char[].class) {
                 return OfPrimitive.decodeChars(decryptedBytes);
             } else if (javaType == Character[].class) {
-                logger.log(System.Logger.Level.WARNING, "Character[] is not encouraged; use char[]");
-                return Characters_2l(decryptedBytes);
+                return OfLang.decodeCharsWrapped(decryptedBytes);
             } else if (javaType.isEnum()) {
                 return OfLang.decodeEnum(decryptedBytes, (Class) javaType);
             }

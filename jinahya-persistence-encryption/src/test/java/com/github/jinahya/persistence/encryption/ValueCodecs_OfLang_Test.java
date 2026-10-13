@@ -100,4 +100,66 @@ class ValueCodecs_OfLang_Test {
             assertThatThrownBy(() -> OfLang.decodeEnum(new byte[]{'A'}, null)).isInstanceOf(NullPointerException.class);
         }
     }
+
+    // --------------------------------------------------------------------------------------------- Byte[], Character[]
+
+    @SuppressWarnings("deprecation")
+    @DisplayName("Byte[], Character[]")
+    @Nested
+    class WrappedTest {
+
+        @DisplayName("encodeBytesWrapped(Byte[]) encodes as byte[] does, and decodeBytesWrapped(byte[]) reads it back")
+        @Test
+        void __bytes() {
+            final var v = new Byte[]{Byte.MIN_VALUE, -1, 0, 1, Byte.MAX_VALUE};
+            final var expected = v.clone();
+            final var b = OfLang.encodeBytesWrapped(v);
+            assertThat(b).isEqualTo(new byte[]{Byte.MIN_VALUE, -1, 0, 1, Byte.MAX_VALUE});
+            assertThat(OfLang.decodeBytesWrapped(b)).isEqualTo(v);
+            assertThat(v).as("the argument is not modified").isEqualTo(expected);
+            assertThat(OfLang.encodeBytesWrapped(new Byte[0])).isEmpty();
+            assertThat(OfLang.decodeBytesWrapped(new byte[0])).isEmpty();
+        }
+
+        @DisplayName("encodeCharsWrapped(Character[]) encodes as char[] does, and decodeCharsWrapped(byte[]) reads it"
+                     + " back")
+        @Test
+        void __chars() {
+            final var p = "jin\u00E4\uD55C\uFFFF\u0080\uD800".toCharArray();
+            final var v = new Character[p.length];
+            for (int i = 0; i < p.length; i++) {
+                v[i] = p[i];
+            }
+            final var b = OfLang.encodeCharsWrapped(v);
+            assertThat(b).isEqualTo(ValueCodecs.OfPrimitive.encodeChars(p));
+            assertThat(OfLang.decodeCharsWrapped(b)).isEqualTo(v);
+        }
+
+        @DisplayName("a null element is rejected, with its index, rather than unboxed")
+        @Test
+        void __nullElement() {
+            assertThatThrownBy(() -> OfLang.encodeBytesWrapped(new Byte[]{1, null, 3}))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("a null element at 1");
+            assertThatThrownBy(() -> OfLang.encodeCharsWrapped(new Character[]{'a', 'b', null}))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("a null element at 2");
+        }
+
+        @DisplayName("decodeCharsWrapped(byte[]) rejects an odd number of bytes")
+        @Test
+        void __odd() {
+            assertThatThrownBy(() -> OfLang.decodeCharsWrapped(new byte[]{1, 2, 3}))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("the methods fail on null")
+        @Test
+        void __null() {
+            assertThatThrownBy(() -> OfLang.encodeBytesWrapped(null)).isInstanceOf(NullPointerException.class);
+            assertThatThrownBy(() -> OfLang.decodeBytesWrapped(null)).isInstanceOf(NullPointerException.class);
+            assertThatThrownBy(() -> OfLang.encodeCharsWrapped(null)).isInstanceOf(NullPointerException.class);
+            assertThatThrownBy(() -> OfLang.decodeCharsWrapped(null)).isInstanceOf(NullPointerException.class);
+        }
+    }
 }
