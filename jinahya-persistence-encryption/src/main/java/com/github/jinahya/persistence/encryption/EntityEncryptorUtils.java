@@ -11,12 +11,7 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -68,53 +63,17 @@ final class EntityEncryptorUtils {
         return b;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Writes the specified {@code boolean} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] boolean_1(final byte[] b, final int i, final boolean v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Byte.BYTES <= b.length;
-        b[i] = (byte) (v ? 1 : 0);
-        return b;
-    }
-
-    /**
-     * Reads a {@code boolean} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     * @throws IllegalArgumentException when the byte is neither {@code 0} nor {@code 1}.
-     */
-    private static boolean boolean_1(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Byte.BYTES <= b.length;
-        return switch (b[i]) {
-            case 0 -> false;
-            case 1 -> true;
-            // anything else is not a value this codec wrote; reading it as false would hide the corruption
-            default ->
-                    throw new IllegalArgumentException("not a boolean; byte: " + (b[i] & 0xFF) + "; expected 0 or 1");
-        };
-    }
+    // ------------------------------------------------------------------- boolean, byte, short, int, long; ValueCodecs
 
     /**
      * Returns an array of bytes representing the specified {@code boolean} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeBoolean(boolean)
      */
     static byte[] boolean_1(final boolean v) {
-        return boolean_1(new byte[Byte.BYTES], 0, v);
+        return ValueCodecs.OfPrimitive.encodeBoolean(v);
     }
 
     /**
@@ -122,41 +81,11 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeBoolean(byte[], int)
      */
     static boolean boolean_1(final byte[] b) {
-        return boolean_1(exactly(b, Byte.BYTES), 0);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Writes the specified {@code byte} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] byte_1(final byte[] b, final int i, final byte v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Byte.BYTES <= b.length;
-        b[i] = v;
-        return b;
-    }
-
-    /**
-     * Reads a {@code byte} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static byte byte_1(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Byte.BYTES <= b.length;
-        return b[i];
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeBoolean(exactly(b, Byte.BYTES), 0);
     }
 
     /**
@@ -164,9 +93,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeByte(byte)
      */
     static byte[] byte_1(final byte v) {
-        return byte_1(new byte[Byte.BYTES], 0, v);
+        return ValueCodecs.OfPrimitive.encodeByte(v);
     }
 
     /**
@@ -174,12 +104,12 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeByte(byte[], int)
      */
     static byte byte_1(final byte[] b) {
-        return byte_1(exactly(b, Byte.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeByte(exactly(b, Byte.BYTES), 0);
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Writes the specified {@code short} value into the specified array of bytes, at the specified index.
@@ -188,13 +118,10 @@ final class EntityEncryptorUtils {
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see ValueCodecs.OfPrimitive#encodeShort(byte[], int, short)
      */
-    private static byte[] short_2(final byte[] b, int i, final short v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Short.BYTES <= b.length;
-        b[i] = (byte) (v >> Byte.SIZE);
-        b[++i] = (byte) (v & 0xFF);
+    private static byte[] short_2(final byte[] b, final int i, final short v) {
+        ValueCodecs.OfPrimitive.encodeShort(b, i, v);
         return b;
     }
 
@@ -204,15 +131,10 @@ final class EntityEncryptorUtils {
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeShort(byte[], int)
      */
-    private static short short_2(final byte[] b, int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Short.BYTES <= b.length;
-        return (short) (
-                (b[i] << Byte.SIZE) |
-                (b[++i] & 0xFF)
-        );
+    private static short short_2(final byte[] b, final int i) {
+        return ValueCodecs.OfPrimitive.decodeShort(b, i);
     }
 
     /**
@@ -220,9 +142,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeShort(short)
      */
     static byte[] short_2(final short v) {
-        return short_2(new byte[Short.BYTES], 0, v);
+        return ValueCodecs.OfPrimitive.encodeShort(v);
     }
 
     /**
@@ -230,12 +153,12 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeShort(byte[], int)
      */
     static short short_2(final byte[] b) {
-        return short_2(exactly(b, Short.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeShort(exactly(b, Short.BYTES), 0);
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Writes the specified {@code int} value into the specified array of bytes, at the specified index.
@@ -244,13 +167,10 @@ final class EntityEncryptorUtils {
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see ValueCodecs.OfPrimitive#encodeInt(byte[], int, int)
      */
     private static byte[] int_4(final byte[] b, final int i, final int v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Integer.BYTES <= b.length;
-        short_2(b, i, (short) (v >> Short.SIZE));
-        short_2(b, i + Short.BYTES, (short) (v & 0xFFFF));
+        ValueCodecs.OfPrimitive.encodeInt(b, i, v);
         return b;
     }
 
@@ -260,13 +180,10 @@ final class EntityEncryptorUtils {
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeInt(byte[], int)
      */
     private static int int_4(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Integer.BYTES <= b.length;
-        return (short_2(b, i) << Short.SIZE) |
-               (short_2(b, i + Short.BYTES) & 0xFFFF);
+        return ValueCodecs.OfPrimitive.decodeInt(b, i);
     }
 
     /**
@@ -274,9 +191,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeInt(int)
      */
     static byte[] int_4(final int v) {
-        return int_4(new byte[Integer.BYTES], 0, v);
+        return ValueCodecs.OfPrimitive.encodeInt(v);
     }
 
     /**
@@ -284,12 +202,12 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeInt(byte[], int)
      */
     static int int_4(final byte[] b) {
-        return int_4(exactly(b, Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeInt(exactly(b, Integer.BYTES), 0);
     }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Writes the specified {@code long} value into the specified array of bytes, at the specified index.
@@ -298,13 +216,10 @@ final class EntityEncryptorUtils {
      * @param i the index in the {@code b} at which the value is written.
      * @param v the value to write.
      * @return the specified {@code b}.
+     * @see ValueCodecs.OfPrimitive#encodeLong(byte[], int, long)
      */
     private static byte[] long_8(final byte[] b, final int i, final long v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Long.BYTES <= b.length;
-        int_4(b, i, (int) (v >> Integer.SIZE));
-        int_4(b, i + Integer.BYTES, (int) v);
+        ValueCodecs.OfPrimitive.encodeLong(b, i, v);
         return b;
     }
 
@@ -314,13 +229,10 @@ final class EntityEncryptorUtils {
      * @param b the array of bytes from which the value is read.
      * @param i the index in the {@code b} from which the value is read.
      * @return the value read from the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeLong(byte[], int)
      */
     private static long long_8(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Long.BYTES <= b.length;
-        return ((long) int_4(b, i) << Integer.SIZE) |
-               (int_4(b, i + Integer.BYTES) & 0xFFFFFFFFL);
+        return ValueCodecs.OfPrimitive.decodeLong(b, i);
     }
 
     /**
@@ -328,9 +240,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeLong(long)
      */
     static byte[] long_8(final long v) {
-        return long_8(new byte[Long.BYTES], 0, v);
+        return ValueCodecs.OfPrimitive.encodeLong(v);
     }
 
     /**
@@ -338,44 +251,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeLong(byte[], int)
      */
     static long long_8(final byte[] b) {
-        return long_8(exactly(b, Long.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeLong(exactly(b, Long.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Writes the specified {@code char} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] char_2(final byte[] b, final int i, final char v) {
-        return short_2(b, i, (short) v);
-    }
-
-    /**
-     * Reads a {@code char} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static char char_2(final byte[] b, final int i) {
-        return (char) short_2(b, i);
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code char} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeChar(char)
      */
     static byte[] char_2(final char v) {
-        return char_2(new byte[Character.BYTES], 0, v);
+        return ValueCodecs.OfPrimitive.encodeChar(v);
     }
 
     /**
@@ -383,9 +276,11 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeChar(byte[], int)
      */
     static char char_2(final byte[] b) {
-        return char_2(exactly(b, Character.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeChar(exactly(b, Character.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -395,9 +290,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeFloat(float)
      */
     static byte[] float_4(final float v) {
-        return int_4(Float.floatToRawIntBits(v));
+        return ValueCodecs.OfPrimitive.encodeFloat(v);
     }
 
     /**
@@ -405,9 +301,11 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeFloat(byte[], int)
      */
     static float float_4(final byte[] b) {
-        return Float.intBitsToFloat(int_4(b)); // int_4(byte[]) checks the length
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeFloat(exactly(b, Float.BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -417,9 +315,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeDouble(double)
      */
     static byte[] double_8(final double v) {
-        return long_8(Double.doubleToRawLongBits(v));
+        return ValueCodecs.OfPrimitive.encodeDouble(v);
     }
 
     /**
@@ -427,9 +326,11 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeDouble(byte[], int)
      */
     static double double_8(final byte[] b) {
-        return Double.longBitsToDouble(long_8(b)); // long_8(byte[]) checks the length
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfPrimitive.decodeDouble(exactly(b, Double.BYTES), 0);
     }
 
     // ------------------------------------------------------------------------------------------------ java.lang.String
@@ -440,24 +341,10 @@ final class EntityEncryptorUtils {
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
      * @throws IllegalArgumentException when the {@code v} is not encodable as UTF-8; it holds an unpaired surrogate.
+     * @see ValueCodecs.OfLang#encodeString(String)
      */
     static byte[] string_(final String v) {
-        assert v != null;
-        try {
-            // String.getBytes(UTF_8) would replace an unpaired surrogate with '?', storing something else, silently
-            final var buffer = StandardCharsets.UTF_8.newEncoder()
-                    .onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT)
-                    .encode(CharBuffer.wrap(v));
-            final var b = new byte[buffer.remaining()];
-            buffer.get(b);
-            return b;
-        } catch (final CharacterCodingException cce) {
-            // never put the value in the message
-            throw new IllegalArgumentException(
-                    "the string is not encodable as UTF-8 (an unpaired surrogate?), so it would not be read back as is",
-                    cce);
-        }
+        return ValueCodecs.OfLang.encodeString(v);
     }
 
     /**
@@ -466,66 +353,23 @@ final class EntityEncryptorUtils {
      * @param v the array of bytes.
      * @return the value represented by the {@code v}.
      * @throws IllegalArgumentException when the {@code v} is not well-formed UTF-8.
+     * @see ValueCodecs.OfLang#decodeString(byte[])
      */
     static String string_(final byte[] v) {
-        assert v != null;
-        try {
-            // new String(v, UTF_8) would replace a malformed sequence with U+FFFD, silently
-            return StandardCharsets.UTF_8.newDecoder()
-                    .onMalformedInput(CodingErrorAction.REPORT)
-                    .onUnmappableCharacter(CodingErrorAction.REPORT)
-                    .decode(ByteBuffer.wrap(v))
-                    .toString();
-        } catch (final CharacterCodingException cce) {
-            throw new IllegalArgumentException("the bytes are not well-formed UTF-8", cce);
-        }
+        return ValueCodecs.OfLang.decodeString(v);
     }
 
     // ------------------------------------------------------------------------------------------------------------ UUID
-
-    /**
-     * Writes the specified {@code UUID} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] uuid_16(final byte[] b, final int i, final UUID v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + (Long.BYTES << 1) <= b.length;
-        assert v != null;
-        long_8(b, i, v.getMostSignificantBits());
-        long_8(b, i + Long.BYTES, v.getLeastSignificantBits());
-        return b;
-    }
-
-    /**
-     * Reads a {@code UUID} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static UUID uuid_16(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + (Long.BYTES << 1) <= b.length;
-        return new UUID(
-                long_8(b, i),
-                long_8(b, i + Long.BYTES)
-        );
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code UUID} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfUtil#encodeUuid(UUID)
      */
     static byte[] uuid_16(final UUID v) {
-        return uuid_16(new byte[Long.BYTES << 1], 0, v);
+        return ValueCodecs.OfUtil.encodeUuid(v);
     }
 
     /**
@@ -533,9 +377,11 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfUtil#decodeUuid(byte[], int)
      */
     static UUID uuid_16(final byte[] b) {
-        return uuid_16(exactly(b, Long.BYTES << 1), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfUtil.decodeUuid(exactly(b, ValueCodecs.OfUtil.UUID_BYTES), 0);
     }
 
     // ------------------------------------------------------------------------------------------------------- java.math
@@ -545,10 +391,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfMath#encodeBigInteger(BigInteger)
      */
     static byte[] big_integer_(final BigInteger v) {
-        assert v != null;
-        return v.toByteArray();
+        return ValueCodecs.OfMath.encodeBigInteger(v);
     }
 
     /**
@@ -556,9 +402,10 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfMath#decodeBigInteger(byte[])
      */
     static BigInteger big_integer_(final byte[] b) {
-        return new BigInteger(b);
+        return ValueCodecs.OfMath.decodeBigInteger(b);
     }
 
     // ------------------------------------------------------------------------------------------------------- java.math
@@ -568,15 +415,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfMath#encodeBigDecimal(BigDecimal)
      */
     static byte[] big_decimal_(final BigDecimal v) {
-        assert v != null;
-        final var encodedScale = int_4(v.scale());
-        final var encodedUnscaledValue = big_integer_(v.unscaledValue());
-        final var b = new byte[encodedScale.length + encodedUnscaledValue.length];
-        System.arraycopy(encodedScale, 0, b, 0, encodedScale.length);
-        System.arraycopy(encodedUnscaledValue, 0, b, encodedScale.length, encodedUnscaledValue.length);
-        return b;
+        return ValueCodecs.OfMath.encodeBigDecimal(v);
     }
 
     /**
@@ -584,56 +426,23 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfMath#decodeBigDecimal(byte[])
      */
     static BigDecimal big_decimal_(final byte[] b) {
-        if (b.length < Integer.BYTES) {
-            throw new IllegalArgumentException(
-                    "a payload of " + b.length + " byte(s); expected at least " + Integer.BYTES + " for the scale");
-        }
-        final var scale = int_4(b, 0);
-        final var unscaledValue = big_integer_(Arrays.copyOfRange(b, Integer.BYTES, b.length));
-        return new BigDecimal(unscaledValue, scale);
+        return ValueCodecs.OfMath.decodeBigDecimal(b);
     }
 
     // ------------------------------------------------------------------------------------------------------- java.time
-
-    /**
-     * Writes the specified {@code LocalDate} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] local_date_8(final byte[] b, final int i, final LocalDate v) {
-        assert v != null;
-        assert i >= 0;
-        assert i + Long.BYTES <= b.length;
-        return long_8(b, i, v.toEpochDay());
-    }
-
-    /**
-     * Reads a {@code LocalDate} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static LocalDate local_date_8(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Long.BYTES <= b.length;
-        return LocalDate.ofEpochDay(long_8(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code LocalDate} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeLocalDate(LocalDate)
      */
     static byte[] local_date_8(final LocalDate v) {
-        return local_date_8(new byte[Long.BYTES], 0, v);
+        return ValueCodecs.OfTime.encodeLocalDate(v);
     }
 
     /**
@@ -641,44 +450,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeLocalDate(byte[])
      */
     static LocalDate local_date_8(final byte[] b) {
-        return local_date_8(exactly(b, Long.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeLocalDate(exactly(b, ValueCodecs.OfTime.LOCAL_DATE_BYTES), 0);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Writes the specified {@code LocalTime} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] local_time_8(final byte[] b, final int i, final LocalTime v) {
-        return long_8(b, i, v.toNanoOfDay());
-    }
-
-    /**
-     * Reads a {@code LocalTime} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static LocalTime local_time_8(final byte[] b, final int i) {
-        return LocalTime.ofNanoOfDay(long_8(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code LocalTime} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeLocalTime(LocalTime)
      */
     static byte[] local_time_8(final LocalTime v) {
-        return local_time_8(new byte[Long.BYTES], 0, v);
+        return ValueCodecs.OfTime.encodeLocalTime(v);
     }
 
     /**
@@ -686,56 +475,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeLocalTime(byte[])
      */
     static LocalTime local_time_8(final byte[] b) {
-        return LocalTime.ofNanoOfDay(long_8(exactly(b, Long.BYTES), 0));
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeLocalTime(exactly(b, ValueCodecs.OfTime.LOCAL_TIME_BYTES), 0);
     }
 
     // ----------------------------------------------------------------------------------------- java.time.LocalDateTime
-
-    /**
-     * Writes the specified {@code LocalDateTime} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] local_date_time_16(final byte[] b, final int i, final LocalDateTime v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + (Long.BYTES << 1) <= b.length;
-        assert v != null;
-        local_date_8(b, i, v.toLocalDate());
-        local_time_8(b, i + Long.BYTES, v.toLocalTime());
-        return b;
-    }
-
-    /**
-     * Reads a {@code LocalDateTime} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static LocalDateTime local_date_time_16(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + (Long.BYTES << 1) <= b.length;
-        return LocalDateTime.of(
-                local_date_8(b, i),
-                local_time_8(b, i + Long.BYTES)
-        );
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code LocalDateTime} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeLocalDateTime(LocalDateTime)
      */
     static byte[] local_date_time_16(final LocalDateTime v) {
-        return local_date_time_16(new byte[Long.BYTES << 1], 0, v);
+        return ValueCodecs.OfTime.encodeLocalDateTime(v);
     }
 
     /**
@@ -743,45 +500,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeLocalDateTime(byte[])
      */
     static LocalDateTime local_date_time_16(final byte[] b) {
-        return local_date_time_16(exactly(b, Long.BYTES << 1), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeLocalDateTime(exactly(b, ValueCodecs.OfTime.LOCAL_DATE_TIME_BYTES), 0);
     }
 
     // ------------------------------------------------------------------------------------------------ java.time.Offset
-
-    /**
-     * Writes the specified {@code ZoneOffset} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] offset_4(final byte[] b, final int i, final ZoneOffset v) {
-        assert v != null;
-        return int_4(b, i, v.getTotalSeconds());
-    }
-
-    /**
-     * Reads a {@code ZoneOffset} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static ZoneOffset offset_4(final byte[] b, final int i) {
-        return ZoneOffset.ofTotalSeconds(int_4(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code ZoneOffset} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeZoneOffset(ZoneOffset)
      */
     static byte[] offset_4(final ZoneOffset v) {
-        return offset_4(new byte[4], 0, v);
+        return ValueCodecs.OfTime.encodeZoneOffset(v);
     }
 
     /**
@@ -789,55 +525,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeZoneOffset(byte[])
      */
     static ZoneOffset offset_4(final byte[] b) {
-        return offset_4(exactly(b, Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeZoneOffset(exactly(b, ValueCodecs.OfTime.ZONE_OFFSET_BYTES), 0);
     }
 
     // -------------------------------------------------------------------------------------------- java.time.OffsetTime
-
-    /**
-     * Writes the specified {@code OffsetTime} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] offset_time_12(final byte[] b, final int i, final java.time.OffsetTime v) {
-        return offset_4(
-                local_time_8(
-                        b,
-                        i,
-                        v.toLocalTime()
-                ),
-                i + Long.BYTES,
-                v.getOffset()
-        );
-    }
-
-    /**
-     * Reads a {@code OffsetTime} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static java.time.OffsetTime offset_time_12(final byte[] b, final int i) {
-        return OffsetTime.of(
-                local_time_8(b, i),
-                offset_4(b, i + Long.BYTES)
-        );
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code OffsetTime} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeOffsetTime(OffsetTime)
      */
     static byte[] offset_time_12(final java.time.OffsetTime v) {
-        return offset_time_12(new byte[12], 0, v);
+        return ValueCodecs.OfTime.encodeOffsetTime(v);
     }
 
     /**
@@ -845,51 +550,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeOffsetTime(byte[])
      */
     static java.time.OffsetTime offset_time_12(final byte[] b) {
-        return offset_time_12(exactly(b, Long.BYTES + Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeOffsetTime(exactly(b, ValueCodecs.OfTime.OFFSET_TIME_BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------- java.time.OffsetDateTime
-
-    /**
-     * Writes the specified {@code OffsetDateTime} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] offset_date_time_20(final byte[] b, final int i, final OffsetDateTime v) {
-        return offset_4(
-                local_date_time_16(b, i, v.toLocalDateTime()),
-                i + 16,
-                v.getOffset()
-        );
-    }
-
-    /**
-     * Reads a {@code OffsetDateTime} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static OffsetDateTime offset_date_time_20(final byte[] b, final int i) {
-        return OffsetDateTime.of(
-                local_date_time_16(b, i),
-                offset_4(b, i + 16)
-        );
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code OffsetDateTime} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeOffsetDateTime(OffsetDateTime)
      */
     static byte[] offset_date_time_20(final OffsetDateTime v) {
-        return offset_date_time_20(new byte[20], 0, v);
+        return ValueCodecs.OfTime.encodeOffsetDateTime(v);
     }
 
     /**
@@ -897,51 +575,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeOffsetDateTime(byte[])
      */
     static OffsetDateTime offset_date_time_20(final byte[] b) {
-        return offset_date_time_20(exactly(b, (Long.BYTES << 1) + Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeOffsetDateTime(exactly(b, ValueCodecs.OfTime.OFFSET_DATE_TIME_BYTES), 0);
     }
 
     // ----------------------------------------------------------------------------------------------- java.time.Instant
-
-    /**
-     * Writes the specified {@code Instant} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] instant_12(final byte[] b, final int i, final Instant v) {
-        return int_4(
-                long_8(b, i, v.getEpochSecond()),
-                i + 8,
-                v.getNano()
-        );
-    }
-
-    /**
-     * Reads a {@code Instant} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static Instant instant_12(final byte[] b, final int i) {
-        return Instant.ofEpochSecond(
-                long_8(b, i),
-                int_4(b, i + 8)
-        );
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code Instant} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeInstant(Instant)
      */
     static byte[] instant_12(final Instant v) {
-        return instant_12(new byte[12], 0, v);
+        return ValueCodecs.OfTime.encodeInstant(v);
     }
 
     /**
@@ -949,45 +600,24 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeInstant(byte[])
      */
     static Instant instant_12(final byte[] b) {
-        return instant_12(exactly(b, Long.BYTES + Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeInstant(exactly(b, ValueCodecs.OfTime.INSTANT_BYTES), 0);
     }
 
     // -------------------------------------------------------------------------------------------------- java.time.Year
-
-    /**
-     * Writes the specified {@code Year} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] year_4(final byte[] b, final int i, final Year v) {
-        return int_4(b, i, v.getValue());
-    }
-
-    /**
-     * Reads a {@code Year} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static Year year_4(final byte[] b, final int i) {
-        return Year.of(int_4(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code Year} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfTime#encodeYear(Year)
      */
     static byte[] year_4(final Year v) {
-        assert v != null;
-        return year_4(new byte[4], 0, v);
+        return ValueCodecs.OfTime.encodeYear(v);
     }
 
     /**
@@ -995,52 +625,14 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfTime#decodeYear(byte[])
      */
     static Year year_4(final byte[] b) {
-        return year_4(exactly(b, Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfTime.decodeYear(exactly(b, ValueCodecs.OfTime.YEAR_BYTES), 0);
     }
 
     // -------------------------------------------------------------------------------------------------- java.util.Date
-
-    /**
-     * Writes the specified {@code Date} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
-     *         the {@code java.time} API.
-     */
-    @Deprecated
-    private static byte[] util_date_8(final byte[] b, final int i, final java.util.Date v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + 8 <= b.length;
-        assert v != null;
-        return long_8(b, i, v.getTime());
-    }
-
-    /**
-     * Reads a {@code Date} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
-     *         the {@code java.time} API.
-     */
-    @Deprecated
-    private static java.util.Date util_date_8(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + 8 <= b.length;
-        return new java.util.Date(long_8(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code Date} value.
@@ -1051,10 +643,11 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
      *         the {@code java.time} API.
+     * @see ValueCodecs.OfUtil#encodeDate(java.util.Date)
      */
     @Deprecated
     static byte[] util_date_8(final java.util.Date v) {
-        return util_date_8(new byte[8], 0, v);
+        return ValueCodecs.OfUtil.encodeDate(v);
     }
 
     /**
@@ -1066,10 +659,12 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.util.Date} in new applications in favor of
      *         the {@code java.time} API.
+     * @see ValueCodecs.OfUtil#decodeDate(byte[])
      */
     @Deprecated
     static java.util.Date util_date_8(final byte[] b) {
-        return util_date_8(exactly(b, Long.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfUtil.decodeDate(exactly(b, ValueCodecs.OfUtil.DATE_BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------------- java.util.Calendar
@@ -1092,7 +687,8 @@ final class EntityEncryptorUtils {
         assert i >= 0;
         assert i + 8 <= b.length;
         assert v != null;
-        return util_date_8(b, i, v.getTime());
+        ValueCodecs.OfUtil.encodeDate(b, i, v.getTime());
+        return b;
     }
 
     /**
@@ -1112,7 +708,7 @@ final class EntityEncryptorUtils {
         assert i >= 0;
         assert i + 8 <= b.length;
         final var v = Calendar.getInstance();
-        v.setTime(util_date_8(b, i));
+        v.setTime(ValueCodecs.OfUtil.decodeDate(b, i));
         return v;
     }
 
@@ -1159,39 +755,6 @@ final class EntityEncryptorUtils {
     // --------------------------------------------------------------------------------------------------- java.sql.Date
 
     /**
-     * Writes the specified {@code Date} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
-     *         the {@code java.time} API.
-     */
-    @Deprecated
-    private static byte[] sql_date_8(final byte[] b, final int i, final java.sql.Date v) {
-        return long_8(b, i, v.getTime());
-    }
-
-    /**
-     * Reads a {@code Date} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
-     *         the {@code java.time} API.
-     */
-    @Deprecated
-    private static java.sql.Date sql_date_8(final byte[] b, final int i) {
-        return new java.sql.Date(long_8(b, i));
-    }
-
-    /**
      * Returns an array of bytes representing the specified {@code Date} value.
      *
      * @param v the value to represent.
@@ -1200,10 +763,11 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
      *         the {@code java.time} API.
+     * @see ValueCodecs.OfSql#encodeDate(java.sql.Date)
      */
     @Deprecated
     static byte[] sql_date_8(final java.sql.Date v) {
-        return sql_date_8(new byte[8], 0, v);
+        return ValueCodecs.OfSql.encodeDate(v);
     }
 
     /**
@@ -1215,46 +779,15 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Date} in new applications in favor of
      *         the {@code java.time} API.
+     * @see ValueCodecs.OfSql#decodeDate(byte[])
      */
     @Deprecated
     static java.sql.Date sql_date_8(final byte[] b) {
-        return sql_date_8(exactly(b, Long.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfSql.decodeDate(exactly(b, ValueCodecs.OfSql.DATE_BYTES), 0);
     }
 
     // --------------------------------------------------------------------------------------------------- java.sql.Time
-
-    /**
-     * Writes the specified {@code Time} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
-     *         the {@code java.time} API.
-     */
-    @Deprecated
-    private static byte[] sql_time_8(final byte[] b, final int i, final java.sql.Time v) {
-        return long_8(b, i, v.getTime());
-    }
-
-    /**
-     * Reads a {@code Time} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
-     *         the {@code java.time} API.
-     */
-    @Deprecated
-    private static java.sql.Time sql_time_8(final byte[] b, final int i) {
-        return new java.sql.Time(long_8(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code Time} value.
@@ -1265,10 +798,11 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
      *         the {@code java.time} API.
+     * @see ValueCodecs.OfSql#encodeTime(java.sql.Time)
      */
     @Deprecated
     static byte[] sql_time_8(final java.sql.Time v) {
-        return sql_time_8(new byte[8], 0, v);
+        return ValueCodecs.OfSql.encodeTime(v);
     }
 
     /**
@@ -1280,53 +814,15 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Time} in new applications in favor of
      *         the {@code java.time} API.
+     * @see ValueCodecs.OfSql#decodeTime(byte[])
      */
     @Deprecated
     static java.sql.Time sql_time_8(final byte[] b) {
-        return sql_time_8(exactly(b, Long.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfSql.decodeTime(exactly(b, ValueCodecs.OfSql.TIME_BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------------- java.sql.Timestamp
-
-    /**
-     * Writes the specified {@code Timestamp} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
-     *         of the {@code java.time} API.
-     */
-    @Deprecated
-    private static byte[] sql_timestamp_12(final byte[] b, final int i, final java.sql.Timestamp v) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Long.BYTES + Integer.BYTES <= b.length;
-        assert v != null;
-        return instant_12(b, i, v.toInstant());
-    }
-
-    /**
-     * Reads a {@code Timestamp} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
-     *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
-     * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
-     *         of the {@code java.time} API.
-     */
-    @Deprecated
-    private static java.sql.Timestamp sql_timestamp_12(final byte[] b, final int i) {
-        assert b != null;
-        assert i >= 0;
-        assert i + Long.BYTES + Integer.BYTES <= b.length;
-        return Timestamp.from(instant_12(b, i));
-    }
 
     /**
      * Returns an array of bytes representing the specified {@code Timestamp} value.
@@ -1337,10 +833,11 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
      *         of the {@code java.time} API.
+     * @see ValueCodecs.OfSql#encodeTimestamp(java.sql.Timestamp)
      */
     @Deprecated
     static byte[] sql_timestamp_12(final java.sql.Timestamp v) {
-        return sql_timestamp_12(new byte[Long.BYTES + Integer.BYTES], 0, v);
+        return ValueCodecs.OfSql.encodeTimestamp(v);
     }
 
     /**
@@ -1352,10 +849,12 @@ final class EntityEncryptorUtils {
      *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
      * @deprecated Jakarta Persistence 3.2 deprecates the use of {@link java.sql.Timestamp} in new applications in favor
      *         of the {@code java.time} API.
+     * @see ValueCodecs.OfSql#decodeTimestamp(byte[])
      */
     @Deprecated
     static java.sql.Timestamp sql_timestamp_12(final byte[] b) {
-        return sql_timestamp_12(exactly(b, Long.BYTES + Integer.BYTES), 0);
+        // a stored payload; no byte may be left over
+        return ValueCodecs.OfSql.decodeTimestamp(exactly(b, ValueCodecs.OfSql.TIMESTAMP_BYTES), 0);
     }
 
     // ---------------------------------------------------------------------------------------------------------- byte[]
@@ -1403,58 +902,14 @@ final class EntityEncryptorUtils {
     // ---------------------------------------------------------------------------------------------------------- char[]
 
     /**
-     * Writes the specified {@code char[]} value into the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes to which the value is written.
-     * @param i the index in the {@code b} at which the value is written.
-     * @param v the value to write.
-     * @return the specified {@code b}.
-     */
-    private static byte[] chars_2l(final byte[] b, int i, final char[] v) {
-        assert b != null;
-        assert i >= 0;
-        assert v != null;
-        assert i + (v.length << 1) <= b.length;
-        for (int j = 0; j < v.length; j++) {
-            b[i++] = (byte) (v[j] >> Byte.SIZE);
-            b[i++] = (byte) (v[j] & 0xFF);
-        }
-        return b;
-    }
-
-    /**
-     * Reads a {@code char[]} value from the specified array of bytes, at the specified index.
-     *
-     * @param b the array of bytes from which the value is read.
-     * @param i the index in the {@code b} from which the value is read.
-     * @return the value read from the {@code b}.
-     */
-    private static char[] chars_2l(final byte[] b, int i) {
-        assert b != null;
-        assert i >= 0;
-        if (((b.length - i) & 1) != 0) {
-            // an assertion would be disabled in production, and the payload would silently lose its last byte
-            throw new IllegalArgumentException(
-                    "odd number of bytes for a char[]; b.length: " + b.length + ", i: " + i);
-        }
-        final var v = new char[(b.length - i) >> 1];
-        for (int j = 0; j < v.length; j++) {
-            v[j] = (char) (
-                    (b[i++] << Byte.SIZE)
-                    | (b[i++] & 0xFF)
-            );
-        }
-        return v;
-    }
-
-    /**
      * Returns an array of bytes representing the specified {@code char[]} value.
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfPrimitive#encodeChars(char[])
      */
     static byte[] chars_2l(final char[] v) {
-        return chars_2l(new byte[v.length << 1], 0, v);
+        return ValueCodecs.OfPrimitive.encodeChars(v);
     }
 
     /**
@@ -1462,9 +917,10 @@ final class EntityEncryptorUtils {
      *
      * @param b the array of bytes.
      * @return the value represented by the {@code b}.
+     * @see ValueCodecs.OfPrimitive#decodeChars(byte[])
      */
     static char[] chars_2l(final byte[] b) {
-        return chars_2l(b, 0);
+        return ValueCodecs.OfPrimitive.decodeChars(b);
     }
 
     // ----------------------------------------------------------------------------------------------------- Character[]
@@ -1510,11 +966,10 @@ final class EntityEncryptorUtils {
      *
      * @param v the value to represent.
      * @return an array of bytes representing the {@code v}.
+     * @see ValueCodecs.OfLang#encodeEnum(Enum)
      */
     static byte[] enum_(final Enum<?> v) {
-        assert v != null;
-        final var name = v.name();
-        return string_(name);
+        return ValueCodecs.OfLang.encodeEnum(v);
     }
 
     /**
@@ -1524,13 +979,10 @@ final class EntityEncryptorUtils {
      * @param enumClass the enum class.
      * @param <E>       enum type parameter
      * @return the enum constant represented by the {@code b}.
+     * @see ValueCodecs.OfLang#decodeEnum(byte[], Class)
      */
     static <E extends Enum<E>> E enum_(final byte[] b, final Class<E> enumClass) {
-        assert b != null;
-        assert b.length > 0;
-        assert enumClass != null;
-        final var name = string_(b);
-        return Enum.valueOf(enumClass, name);
+        return ValueCodecs.OfLang.decodeEnum(b, enumClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -2089,7 +1541,7 @@ final class EntityEncryptorUtils {
                 try {
                     decryptedValue = javaType.getConstructor(long.class).newInstance(time);
                 } catch (final ReflectiveOperationException roe) {
-                    throw new RuntimeException("failed to construct " + javaType + " with " + time, roe);
+                    throw new RuntimeException("failed to construct " + javaType, roe);
                 }
             } else if (javaType == byte[].class) {
                 decryptedValue = decryptedBytes;
@@ -2108,7 +1560,8 @@ final class EntityEncryptorUtils {
             } else {
                 throw new RuntimeException("unsupported java type: " + javaType);
             }
-        } catch (final IndexOutOfBoundsException | IllegalArgumentException | AssertionError e) {
+        } catch (final IndexOutOfBoundsException | IllegalArgumentException | DateTimeException
+                       | AssertionError e) {
             // Everything the decode ladder can raise for bytes it cannot turn back into a value:
             //   IndexOutOfBounds     a payload shorter than the fixed-width codec expects
             //   AssertionError       an assert in EntityEncryptorUtils, when assertions are enabled;
@@ -2116,6 +1569,8 @@ final class EntityEncryptorUtils {
             //   IllegalArgumentException  chars_2l on an odd-length payload, Enum.valueOf on a name
             //                        which is not a constant of the attribute's enum, and a payload header
             //                        naming another format version or another codec
+            //   DateTimeException    a java.time field out of its range: an epoch day, a nano-of-day,
+            //                        a nano-of-second, an offset, or a year
             // Without the last one, those two surfaced bare, with no clue which attribute they came from.
             throw new RuntimeException(
                     "cannot reconstruct the value from the decrypted bytes" +

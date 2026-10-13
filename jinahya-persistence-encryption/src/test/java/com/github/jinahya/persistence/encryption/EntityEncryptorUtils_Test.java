@@ -1167,7 +1167,7 @@ class EntityEncryptorUtils_Test {
         void __decodeOdd() {
             assertThatThrownBy(() -> chars_2l(new byte[]{1, 2, 3}))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("odd number of bytes");
+                    .hasMessageContaining("not a multiple of " + Character.BYTES);
         }
     }
 
@@ -1203,7 +1203,7 @@ class EntityEncryptorUtils_Test {
         void __decodeOdd() {
             assertThatThrownBy(() -> Characters_2l(new byte[]{1, 2, 3}))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("odd number of bytes");
+                    .hasMessageContaining("not a multiple of " + Character.BYTES);
         }
     }
 
