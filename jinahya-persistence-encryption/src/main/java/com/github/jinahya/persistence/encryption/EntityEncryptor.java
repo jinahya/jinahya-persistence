@@ -14,7 +14,6 @@ import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
 import jakarta.validation.Constraint;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
@@ -23,7 +22,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -61,10 +59,11 @@ import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.enc
  * The mapping of an entity class is validated in full before any instance of it is touched. Each encrypt and decrypt
  * is all-or-nothing per instance: every value is computed before any is assigned.
  * <p>
- * The java types handled are those Jakarta Persistence calls basic types: the primitives and their wrappers,
- * {@link String}, {@link BigInteger}, {@link BigDecimal}, the {@code java.time} types, {@link java.util.Date},
- * {@link Calendar}, {@link UUID}, {@code byte[]}, {@code char[]} and their boxed forms, enums, and anything
- * {@link Serializable}. A mapping of any other type is rejected when it is validated.
+ * The java types handled are those of the Jakarta Persistence basic types which have a clean, secure encoding: the
+ * primitives and their wrappers, {@link String}, {@link BigInteger}, {@link BigDecimal}, the {@code java.time} types,
+ * {@link java.util.Date} and the {@code java.sql} temporal types, {@link UUID}, {@code byte[]}, {@code char[]} and
+ * their boxed forms, and enums. {@code java.util.Calendar} and {@code java.io.Serializable} are not (#99). A mapping
+ * of any other type is rejected when it is validated.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see EntityEncryptionService
@@ -613,8 +612,7 @@ class EntityEncryptor {
         // A member inherited from a generic superclass is declared as a type variable: resolve it against the
         // concrete class, or Base<String> would be encoded as its erasure, Object (#67)
         final var javaType = resolveJavaType(managedType.getJavaType(), decryptedAttribute);
-        final var codec = EntityEncryptorUtils.codecOf(javaType);
-        if (codec == null) {
+        if (!EntityEncryptorUtils.supports(javaType)) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "no codec for the declared java type " + javaType.getName());
         }

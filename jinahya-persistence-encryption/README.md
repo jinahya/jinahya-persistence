@@ -243,17 +243,14 @@ This module moves values between the plaintext and the ciphertext; it imposes no
   does need theirs inserted first; Hibernate ORM finds them.
 * **Sizes and lengths.** Nothing is limited: the size of a value, of its ciphertext, and of the column holding it are
   the application's concern, as they are for a plain mapping.
-* **Deserialization.** A `Serializable` attribute is deserialized without a filter of this module's own, so the
-  JVM-wide `jdk.serialFilter` applies, exactly as for a plain `Serializable` mapping. Configure class allow-lists and
-  graph limits there ([#8](https://github.com/jinahya/jinahya-persistence/issues/8),
-  [#10](https://github.com/jinahya/jinahya-persistence/issues/10)):
-
-  ```
-  -Djdk.serialFilter=maxdepth=32;maxrefs=10000;maxbytes=1048576;java.base/*;com.example.model.*;!*
-  ```
 
 ## Not supported
 
+* **`java.util.Calendar` and `java.io.Serializable`**, although Jakarta Persistence admits both: neither has a clean,
+  secure encoding here. A `Calendar` keeps only its instant, so neither its class nor its time zone could be rebuilt;
+  a `Serializable` brings Java's opaque format, deserialization of stored data, and class evolution into encrypted
+  rows. A mapping of either is rejected when it is validated
+  ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)).
 * **Querying an encrypted attribute.** The database holds only ciphertext: predicates and orderings against the
   plaintext column match what is *stored*, which is `NULL`.
 * **Bulk JPQL `UPDATE`/`DELETE`** bypass entity callbacks entirely and leave managed state unsynchronized.
@@ -321,7 +318,6 @@ version, which a reader of this version rejects.
 | `Instant`              | `12`       | `getEpochSecond()`(`8`) + `getNano()`(`4`)                  |
 | `Year`                 | `4`        | `getValue()`(`Integer`)                                     |
 | `java.util.Date`       | `8`        | `getTime()`(`Long`)                                         |
-| `java.util.Calendar`   | `8`        | `getTime().getTime()`(`Long`): the instant only, read back in the default time zone — the same value a plain `Calendar` mapping persists ([#11](https://github.com/jinahya/jinahya-persistence/issues/11)) |
 | `java.sql.Date`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Time`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Timestamp`   | `12`       | `toInstant()`(`Instant`) ([#80](https://github.com/jinahya/jinahya-persistence/issues/80)) |
@@ -330,11 +326,10 @@ version, which a reader of this version rejects.
 | `char[]`               | `2×length` | each `char` big endian                                      |
 | `Character[]`          | `2×length` | unboxed; use `char[]` instead                               |
 | `enum`                 | variable   | `name()`(`String`), never the ordinal: reordering constants is safe, renaming one is a breaking change ([#13](https://github.com/jinahya/jinahya-persistence/issues/13)) |
-| `java.io.Serializable` | variable   | java serialization, as a plain `Serializable` mapping; not platform-independent; deserialized under the JVM-wide `jdk.serialFilter` ([#8](https://github.com/jinahya/jinahya-persistence/issues/8)) |
 
 `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are matched before `java.util.Date`, so a `Timestamp`
 keeps its nanos rather than being truncated to milliseconds.
 
-`java.util.Date`, `java.util.Calendar`, `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are supported but
+`java.util.Date`, `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are supported but
 [deprecated by Jakarta Persistence 3.2](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations);
 prefer the `java.time` types.

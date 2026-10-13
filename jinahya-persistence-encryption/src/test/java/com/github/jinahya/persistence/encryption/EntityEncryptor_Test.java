@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -58,14 +57,11 @@ class EntityEncryptor_Test {
         entity.bornOn = LocalDate.of(1988, 11, 3);
         entity.seenAt = java.sql.Timestamp.valueOf("2026-01-02 03:04:05.123456789");
         entity.joinedAt = new java.util.Date(1_700_000_000_000L);
-        entity.checkedAt = Calendar.getInstance();
-        entity.checkedAt.setTimeInMillis(1_700_000_000_000L);
         entity.grade = SecretEntity.Grade.HIGH;
         entity.photo = new byte[32];
         ThreadLocalRandom.current().nextBytes(entity.photo);
         entity.secretNumber = 1_234_567_890_123L;
         entity.secret = new SecretEmbeddable("nested");
-        entity.opaque = "opaque-default";
         return entity;
     }
 
@@ -159,14 +155,15 @@ class EntityEncryptor_Test {
             final var service = new EntityEncryptor(manager);
             final var entity = populated();
             final var framed = EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.INT_4, EntityEncryptorUtils.int_4(37));
+                    EntityEncryptorUtils.Codec.INT_4, ValueCodecs.OfPrimitive.encodeInt(37));
             framed[0] = (byte) (EntityEncryptorUtils.FORMAT_VERSION + 1);
             entity.age = null;
             entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), framed);
 
             assertThatThrownBy(() -> service.decrypt(entity))
-                    .hasMessageContaining("unknown payload format version")
-                    .hasMessageContaining("age");
+                    .hasMessageContaining("age")
+                    .cause()
+                    .hasMessageContaining("unknown payload format version");
         }
 
         @DisplayName(
@@ -179,12 +176,13 @@ class EntityEncryptor_Test {
             // what a row holds when `age` was declared Long when it was written, and is Integer now
             entity.age = null;
             entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.LONG_8, EntityEncryptorUtils.long_8(37L)));
+                    EntityEncryptorUtils.Codec.LONG_8, ValueCodecs.OfPrimitive.encodeLong(37L)));
 
             assertThatThrownBy(() -> service.decrypt(entity))
+                    .hasMessageContaining("age")
+                    .cause()
                     .hasMessageContaining("encoded by LONG_8")
-                    .hasMessageContaining("decoded by INT_4")
-                    .hasMessageContaining("age");
+                    .hasMessageContaining("decoded by INT_4");
             assertThat(entity.age).as("nothing was misread").isNull();
         }
     }
@@ -559,7 +557,7 @@ class EntityEncryptor_Test {
             final var noteEnc = entity.secret.getNoteEnc__().clone();
             // a payload of another codec where an Integer is expected
             entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.LONG_8, EntityEncryptorUtils.long_8(37L)));
+                    EntityEncryptorUtils.Codec.LONG_8, ValueCodecs.OfPrimitive.encodeLong(37L)));
 
             assertThatThrownBy(() -> service.decrypt(entity)).isInstanceOf(RuntimeException.class);
 
@@ -691,12 +689,13 @@ class EntityEncryptor_Test {
             // a correct header, but eight bytes where Integer reads four
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
             entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.INT_4, EntityEncryptorUtils.long_8(37L)));
+                    EntityEncryptorUtils.Codec.INT_4, ValueCodecs.OfPrimitive.encodeLong(37L)));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("reads exactly 4")
-                    .hasMessageContaining("age");
+                    .hasMessageContaining("age")
+                    .cause()
+                    .hasMessageContaining("reads exactly 4");
             assertThat(entity.age).as("nothing was misread").isNull();
         }
     }
