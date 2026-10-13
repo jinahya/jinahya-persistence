@@ -106,10 +106,21 @@ reason.
 |---|---|---|
 | `@PrePersist` | kept: the `INSERT` never carries the column, which is non-insertable | encrypt(plaintext), or `null` when there is no plaintext |
 | `@PreUpdate` | set to `null` when its column is mapped nullable and it is not primitive: the `UPDATE` carries the column, which is updatable, so it goes out as `NULL`; otherwise left as it is | encrypt(plaintext), or `null` when there is no plaintext |
-| `@PostUpdate` | restored: decrypt(ciphertext) | unchanged |
+| `@PostUpdate` | restored: decrypt(ciphertext) — required, see below | unchanged |
 | `@PostLoad` | decrypt(ciphertext); left alone when there is no ciphertext — a legacy row, migrated on its next write | unchanged |
 
 So setting the plaintext to `null` clears the value, and nothing else needs touching.
+
+**The restore on `@PostUpdate` is what makes the nulling safe.** A `null` plaintext means *no value*, and encrypts to a
+`null` ciphertext. Were a nulled plaintext left `null` after the `UPDATE`, the listener's own `null` would be taken for
+the application's: the next flush which updates the entity for any reason — a change to an unrelated column, an
+auto-flush before a query — or a `merge()` of the detached instance would erase the stored ciphertext, silently.
+
+**After a failed flush, reload the entity; do not retry with the same instance.** When a flush fails between
+`@PreUpdate` and `@PostUpdate` — an optimistic lock failure, a constraint violation — `@PostUpdate` never runs and the
+instance keeps its plaintext nulled; writing that instance again erases the ciphertext. Jakarta Persistence has no
+callback for a failed flush, and a rollback leaves the persistence context, and its instances, in an inconsistent state
+anyway (Jakarta Persistence, "Transaction Rollback"), so this is not new: retry with an instance freshly loaded, as for any attribute.
 
 ### What it costs
 
