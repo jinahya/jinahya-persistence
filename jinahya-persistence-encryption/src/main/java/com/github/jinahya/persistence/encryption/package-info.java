@@ -4,8 +4,8 @@
  * <p>
  * Each encrypted value has two attributes in the same entity: a {@code byte[]}-typed one, annotated with
  * {@link EncryptedAttribute @EncryptedAttribute}, holds the ciphertext; the annotation names the other one, which holds
- * the plaintext and is never written with a value in it. An entity with no annotated attribute passes through
- * untouched.
+ * the plaintext and, when its column is mapped nullable, is never written with a value in it. An entity with no
+ * annotated attribute passes through untouched.
  *
  * <h2>The pieces</h2>
  * <dl>
@@ -21,8 +21,11 @@
  *       hands them to the service, and moves the result between the two attributes, so that an instance is encrypted
  *       before it is written and decrypted after it is read. Embedded attributes are descended into.</dd>
  * </dl>
- * The plaintext stays mapped to its own column, which is never written with a value; a row written before encryption was
- * introduced keeps its plaintext there until it is next written, which migrates it.
+ * The plaintext stays mapped to its own column. Before an {@code UPDATE} it is set to {@code null} when, and only when,
+ * that column is mapped nullable and the plaintext is not primitive, so that the column is never written with a value;
+ * a row written before encryption was introduced keeps its plaintext there until it is next written, which migrates
+ * it. Any other plaintext is left as it is: nothing is written which the mapping does not allow, as no Bean Validation
+ * constraint is checked.
  * <p>
  * The mapping of an entity class is validated before any instance of it is touched; each encrypt and decrypt is
  * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.

@@ -19,8 +19,8 @@ import java.lang.invoke.MethodHandles;
  * class User { ... }
  * }</pre>
  * It encrypts on {@link PrePersist @PrePersist} and {@link PreUpdate @PreUpdate}, before the statement is built, and
- * decrypts on {@link PostLoad @PostLoad}, and again on {@link PostUpdate @PostUpdate}, restoring the plaintext which
- * an {@code UPDATE} had to go out without. An instance of a class with no encrypted attribute passes through untouched.
+ * decrypts on {@link PostLoad @PostLoad}, and again on {@link PostUpdate @PostUpdate}, restoring the plaintext which an
+ * {@code UPDATE} had to go out without. An instance of a class with no encrypted attribute passes through untouched.
  * <p>
  * The {@link EntityEncryptionService encryption service} is injected, which happens when the persistence provider
  * creates its listeners through a bean container: a Jakarta EE container does; in Java SE, pass the CDI
@@ -65,8 +65,9 @@ public class EntityEncryptionListener {
     }
 
     /**
-     * Encrypts the specified entity instance before it is updated, clearing its plaintext: the {@code UPDATE} carries
-     * the plaintext column, which is updatable, so it has to go out as {@code null}.
+     * Encrypts the specified entity instance before it is updated, setting each plaintext whose column is mapped
+     * nullable to {@code null}: the {@code UPDATE} carries the plaintext column, which is updatable. A primitive
+     * plaintext, or one whose column is mapped non-nullable, is left as it is.
      *
      * @param entityInstance the entity instance.
      */
@@ -78,7 +79,7 @@ public class EntityEncryptionListener {
 
     /**
      * Restores the plaintext of the specified entity instance after it has been updated, from the ciphertext just
-     * written, so that the application never sees it cleared.
+     * written, so that the application never sees one nulled.
      *
      * @param entityInstance the entity instance.
      */

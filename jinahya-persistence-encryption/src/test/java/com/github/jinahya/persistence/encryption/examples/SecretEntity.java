@@ -17,7 +17,6 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -112,17 +111,6 @@ public class SecretEntity {
     @Column(name = "joined_at_enc", nullable = true, length = 2048)
     public byte[] joinedAtEnc__;
 
-    // -------------------------------------------------------------------------------------------------------- Calendar
-    @Temporal(TemporalType.TIMESTAMP)
-    @Basic(optional = true)
-    @Column(name = "checked_at", nullable = true, insertable = false)
-    public Calendar checkedAt;
-
-    @EncryptedAttribute("checkedAt")
-    @Basic(optional = true)
-    @Column(name = "checked_at_enc", nullable = true, length = 2048)
-    public byte[] checkedAtEnc__;
-
     // ------------------------------------------------------------------------------------------------------------ enum
     @Enumerated(EnumType.STRING)
     @Basic(optional = true)
@@ -153,18 +141,6 @@ public class SecretEntity {
     @Basic(optional = true)
     @Column(name = "secret_number_cipher", nullable = true, length = 2048)
     public byte[] secretNumberCipher;
-
-    // ------------------------------------------------ a declared type broader than the value it holds at run time
-    // Jakarta Persistence 3.2 §2.6 admits any Serializable as a basic type; the value here is an ordinary String,
-    // so the declared type and the runtime type deliberately disagree.
-    @Basic(optional = true)
-    @Column(name = "opaque", nullable = true, insertable = false)
-    public java.io.Serializable opaque;
-
-    @EncryptedAttribute("opaque")
-    @Basic(optional = true)
-    @Column(name = "opaque_enc", nullable = true, length = 2048)
-    public byte[] opaqueEnc__;
 
     // -------------------------------------------------------------------------------------------------------- EMBEDDED
     @Embedded

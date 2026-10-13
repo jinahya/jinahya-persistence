@@ -43,8 +43,9 @@ class KmsEncryptionService implements EntityEncryptionService {
 
 Each encrypted value has two persistent attributes in the same entity: the `byte[]` one, annotated, which holds the
 ciphertext, and the one it names, which holds the plaintext. The name is required. The plaintext stays mapped to its
-own column, which is never written with a value: on a table which already holds plaintext, that is the existing
-column, and its rows are migrated as they are written ([Existing data](#existing-data)).
+own column, which — when it is mapped nullable and the plaintext is not primitive — is never written with a value: on
+a table which already holds plaintext, that is the existing column, and its rows are migrated as they are written
+([Existing data](#existing-data)). Any other plaintext is left as it is ([What it costs](#what-it-costs)).
 
 ### What happens
 
@@ -96,16 +97,30 @@ does not erase the plaintext from backups, logs, replicas or indexes; scrubbing 
 ### The rules
 
 **The plaintext attribute is the truth**: the application reads and writes it like any other attribute, and never sees
-it cleared. The listener only keeps it out of the row, and keeps the ciphertext in step.
+it nulled. The listener only keeps it out of the row, and keeps the ciphertext in step. It writes `null` into the
+plaintext only where the mapping says the column takes one: no Bean Validation constraint — on the field, or on a
+getter — can be found with certainty, and any value written may violate one. A primitive is never zeroed, for the same
+reason.
 
 | callback | plaintext | ciphertext |
 |---|---|---|
 | `@PrePersist` | kept: the `INSERT` never carries the column, which is non-insertable | encrypt(plaintext), or `null` when there is no plaintext |
-| `@PreUpdate` | cleared: the `UPDATE` carries the column, which is updatable, so it goes out as `NULL` | encrypt(plaintext), or `null` when there is no plaintext |
-| `@PostUpdate` | restored: decrypt(ciphertext) | unchanged |
+| `@PreUpdate` | set to `null` when its column is mapped nullable and it is not primitive: the `UPDATE` carries the column, which is updatable, so it goes out as `NULL`; otherwise left as it is | encrypt(plaintext), or `null` when there is no plaintext |
+| `@PostUpdate` | restored: decrypt(ciphertext) — required, see below | unchanged |
 | `@PostLoad` | decrypt(ciphertext); left alone when there is no ciphertext — a legacy row, migrated on its next write | unchanged |
 
 So setting the plaintext to `null` clears the value, and nothing else needs touching.
+
+**The restore on `@PostUpdate` is what makes the nulling safe.** A `null` plaintext means *no value*, and encrypts to a
+`null` ciphertext. Were a nulled plaintext left `null` after the `UPDATE`, the listener's own `null` would be taken for
+the application's: the next flush which updates the entity for any reason — a change to an unrelated column, an
+auto-flush before a query — or a `merge()` of the detached instance would erase the stored ciphertext, silently.
+
+**After a failed flush, reload the entity; do not retry with the same instance.** When a flush fails between
+`@PreUpdate` and `@PostUpdate` — an optimistic lock failure, a constraint violation — `@PostUpdate` never runs and the
+instance keeps its plaintext nulled; writing that instance again erases the ciphertext. Jakarta Persistence has no
+callback for a failed flush, and a rollback leaves the persistence context, and its instances, in an inconsistent state
+anyway (Jakarta Persistence, "Transaction Rollback"), so this is not new: retry with an instance freshly loaded, as for any attribute.
 
 ### What it costs
 
@@ -120,8 +135,15 @@ Persistence APIs only.
   read-only connection fails.
 * **Writing keeps writing.** `@PostUpdate` restores the plaintext the `UPDATE` went out without, so the instance differs
   from the provider's snapshot again: every further flush in the same persistence context issues another `UPDATE`.
-* **No Bean Validation constraint** may sit on the plaintext: Jakarta Persistence validates an update after
-  `@PreUpdate` has cleared it ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)).
+* **The mapping decides, not the database.** The plaintext is nulled before an `UPDATE` only when its `@Column` is
+  mapped `nullable` (the default) and it is not primitive; the database's own metadata is never consulted. A column
+  mapped nullable which the database declares `NOT NULL` fails the `UPDATE`. A plaintext which is **not** nulled — a
+  primitive, or `@Column(nullable = false)` — goes out with the `UPDATE` **in the clear**, unless its column is mapped
+  `updatable = false`.
+* **Bean Validation is the application's.** Jakarta Persistence validates an update after `@PreUpdate`, so a
+  constraint such as `@NotNull` on a nulled plaintext is evaluated against `null`
+  ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)). Nothing is checked here; keep constraints
+  consistent with the column mapping.
 * **The insert window.** `@PrePersist` fires when `persist()` is called, not when the `INSERT` is built. The plaintext
   column has to be `insertable = false` (enforced), which guarantees *INSERT confidentiality only*:
 
@@ -201,10 +223,9 @@ which breaks any of these is rejected:
 |------|
 | `@EncryptedAttribute` sits on the persistent attribute holding the ciphertext; anywhere else — unmapped, transient, a getter the access type does not read — is rejected ([#70](https://github.com/jinahya/jinahya-persistence/issues/70)) |
 | the plaintext it names is a persistent attribute of the same entity or embeddable; it is not itself annotated, and is named only once |
-| the plaintext is `@Basic`, optional, not of a primitive type, neither an identifier nor a version |
+| the plaintext is `@Basic`, neither an identifier nor a version, and optional when it is nulled |
 | the plaintext's declared java type has a codec (see [Encoding](#encoding)); for a member of a generic `@MappedSuperclass`, the type the entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) |
-| the plaintext column is **non-insertable**, nullable and **updatable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)) |
-| no Bean Validation constraint on the plaintext ([#9](https://github.com/jinahya/jinahya-persistence/issues/9)) |
+| the plaintext column is **non-insertable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)), and **updatable** when the plaintext is nulled — not primitive, and its column mapped nullable |
 | the ciphertext attribute is `@Basic`, optional, typed `byte[]`, not an identifier or a version, and its column is insertable, updatable and nullable |
 | an `@Embedded` attribute is not itself annotated; annotate the ciphertext attributes inside the embeddable, which are descended into |
 | an embeddable reached through an `@ElementCollection` — element or map key — holds no `@EncryptedAttribute` at any depth: collections are not walked ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)) |
@@ -243,17 +264,12 @@ This module moves values between the plaintext and the ciphertext; it imposes no
   does need theirs inserted first; Hibernate ORM finds them.
 * **Sizes and lengths.** Nothing is limited: the size of a value, of its ciphertext, and of the column holding it are
   the application's concern, as they are for a plain mapping.
-* **Deserialization.** A `Serializable` attribute is deserialized without a filter of this module's own, so the
-  JVM-wide `jdk.serialFilter` applies, exactly as for a plain `Serializable` mapping. Configure class allow-lists and
-  graph limits there ([#8](https://github.com/jinahya/jinahya-persistence/issues/8),
-  [#10](https://github.com/jinahya/jinahya-persistence/issues/10)):
-
-  ```
-  -Djdk.serialFilter=maxdepth=32;maxrefs=10000;maxbytes=1048576;java.base/*;com.example.model.*;!*
-  ```
 
 ## Not supported
 
+* **Some types Jakarta Persistence admits**, `java.util.Calendar` and `java.io.Serializable` among them: only types
+  with a clean, secure encoding are supported. See [Not supported types](#not-supported-types)
+  ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)).
 * **Querying an encrypted attribute.** The database holds only ciphertext: predicates and orderings against the
   plaintext column match what is *stored*, which is `NULL`.
 * **Bulk JPQL `UPDATE`/`DELETE`** bypass entity callbacks entirely and leave managed state unsynchronized.
@@ -274,34 +290,34 @@ The `EntityEncryptionService` receives, and returns, an array of bytes. Values a
 attribute's *declared* java type — for a member inherited from a generic `@MappedSuperclass`, the type the concrete
 entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) — big-endian, and self-contained:
 a value is reconstructed from its bytes without consulting the database. The sizes below are of the plaintext
-encoding, after the header and before the service is called. Every encoding is pinned byte for byte by
-`EntityEncryptorUtils_Test`.
+encoding, before the service is called. Every encoding is pinned byte for byte by the `ValueCodecs_Of*_Test` classes.
 
-### Payload header
+### No type information is stored
 
-Every encoded value is prefixed with a two-byte header before it reaches the service
-([#75](https://github.com/jinahya/jinahya-persistence/issues/75)):
+The bytes carry the value only: nothing records which type, or which version of an encoding, wrote them. A value is
+always decoded by the attribute's declared type **now**. So, for an attribute which already has encrypted rows:
 
-| byte | content                                                                                   |
-|------|-------------------------------------------------------------------------------------------|
-| `0`  | the format version, currently `1`; any other version is rejected                          |
-| `1`  | the id of the codec which encoded the value (`EntityEncryptorUtils.Codec`); stored data, never renumbered |
+* **Changing its declared type is a breaking change.** If the old and new encodings differ in width (`Long` to
+  `Integer`), reading an old row fails, as the length doesn't match. If they don't (`Long` to `Double`, `Integer` to
+  `Float` or `Year`, `LocalDate` to `LocalTime` or `Long`), an old row is **misread silently**, and the next write
+  stores the wrong value for good. Migrate the rows first: decrypt them with the old type, re-encrypt them with the new.
+* **Changing an encoding is a breaking change** in the same way: no row says which encoding wrote it.
 
-A reader checks both, so a payload written by another codec — an attribute whose declared type changed after the row
-was written, say `Long` to `Integer` — is rejected, naming the attribute, rather than misread. Ciphertext written before
-the header existed is not readable; the module is pre-1.0, and offers no migration for it
-([#19](https://github.com/jinahya/jinahya-persistence/issues/19)).
+A fixed-width decoder rejects a payload shorter than its width, and reads only its width from a longer one; a
+variable-width one reads the whole payload, and rejects what it cannot read. The checks are unconditional, not
+`assert`s.
 
-Every fixed-width decoder reads a payload of **exactly** its width, and rejects anything shorter or longer
-([#76](https://github.com/jinahya/jinahya-persistence/issues/76)); a variable-width one rejects what it cannot read.
-The checks are unconditional, not `assert`s.
+### Supported types
 
-The codecs and the header are format version `1`. A change to any of them from now on is a format change: a new
-version, which a reader of this version rejects.
+The supported types are the basic types of
+[Jakarta Persistence 3.2 §2.6](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a486),
+and no others, less those without a **clean, secure encoding**: a fixed, documented one which decoding can verify, and
+nothing unsafe on decode ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Each is matched exactly, by
+the attribute's declared type; a mapping of any other type is rejected when it is validated.
 
 | attribute              | bytes      | encoding                                                    |
 |------------------------|------------|-------------------------------------------------------------|
-| `Boolean`              | `1`        | `0` for `false`, `1` for `true`; any other byte is rejected ([#78](https://github.com/jinahya/jinahya-persistence/issues/78)) |
+| `Boolean`              | `1`        | written as `0b0` for `false`, `0b1` for `true`; read as `false` for `0b0`, `true` for any other byte |
 | `Byte`                 | `1`        | the value                                                   |
 | `Short`                | `2`        | big endian                                                  |
 | `Character`            | `2`        | big endian                                                  |
@@ -321,20 +337,33 @@ version, which a reader of this version rejects.
 | `Instant`              | `12`       | `getEpochSecond()`(`8`) + `getNano()`(`4`)                  |
 | `Year`                 | `4`        | `getValue()`(`Integer`)                                     |
 | `java.util.Date`       | `8`        | `getTime()`(`Long`)                                         |
-| `java.util.Calendar`   | `8`        | `getTime().getTime()`(`Long`): the instant only, read back in the default time zone — the same value a plain `Calendar` mapping persists ([#11](https://github.com/jinahya/jinahya-persistence/issues/11)) |
 | `java.sql.Date`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Time`        | `8`        | `getTime()`(`Long`)                                         |
 | `java.sql.Timestamp`   | `12`       | `toInstant()`(`Instant`) ([#80](https://github.com/jinahya/jinahya-persistence/issues/80)) |
 | `byte[]`               | `length`   | as is                                                       |
-| `Byte[]`               | `length`   | unboxed; use `byte[]` instead                               |
+| `Byte[]`               | `length`   | unboxed, as `byte[]`; a `null` element is rejected; use `byte[]` instead |
 | `char[]`               | `2×length` | each `char` big endian                                      |
-| `Character[]`          | `2×length` | unboxed; use `char[]` instead                               |
+| `Character[]`          | `2×length` | unboxed, as `char[]`; a `null` element is rejected; use `char[]` instead |
 | `enum`                 | variable   | `name()`(`String`), never the ordinal: reordering constants is safe, renaming one is a breaking change ([#13](https://github.com/jinahya/jinahya-persistence/issues/13)) |
-| `java.io.Serializable` | variable   | java serialization, as a plain `Serializable` mapping; not platform-independent; deserialized under the JVM-wide `jdk.serialFilter` ([#8](https://github.com/jinahya/jinahya-persistence/issues/8)) |
 
-`java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are matched before `java.util.Date`, so a `Timestamp`
-keeps its nanos rather than being truncated to milliseconds.
+A `java.sql.Timestamp` keeps its nanos; a `java.util.Date` holds milliseconds.
 
-`java.util.Date`, `java.util.Calendar`, `java.sql.Date`, `java.sql.Time` and `java.sql.Timestamp` are supported but
+A primitive plaintext attribute (`int`, `boolean`, …) is supported, but **strongly discouraged**. It is encoded as its
+wrapper, but it can't be `null`: it always has a value to encrypt, and before an `UPDATE` it is left as it is — never
+zeroed, as a zero may violate a constraint such as `@Min(1)` — so an updatable plaintext column receives it in the
+clear. Use a wrapper type, or map its column `updatable = false`.
+
+`java.util.Date`, `java.sql.Date`, `java.sql.Time`, `java.sql.Timestamp`, `Byte[]` and `Character[]` are supported but
 [deprecated by Jakarta Persistence 3.2](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations);
-prefer the `java.time` types.
+prefer the `java.time` types, `byte[]` and `char[]`. Deprecation alone is no reason to refuse a type here; each of
+these has a clean encoding.
+
+### Not supported types
+
+| type | why |
+|------|-----|
+| `java.util.Calendar`, and its subclasses | Only its instant could be stored: its calendar system, time zone and settings would be lost, and decoding couldn't rebuild the declared class (`GregorianCalendar` read back as whatever the default locale's calendar is) ([#92](https://github.com/jinahya/jinahya-persistence/issues/92), [#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Deprecated by Jakarta Persistence 3.2; use `Instant` or `OffsetDateTime`. |
+| `java.io.Serializable`, as a catch-all | Java serialization is an opaque format this module can't define or verify; deserializing stored data invites gadget chains and denial of service; and a renamed class, or a changed `serialVersionUID`, makes encrypted rows unreadable, with no way to repair them in SQL ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Map the value's parts to supported types. |
+| subclasses of `java.util.Date`, other than `java.sql.Date`, `Time` and `Timestamp` | Decoding would have to construct the subclass reflectively, from a `(long)` constructor nothing guarantees ([#92](https://github.com/jinahya/jinahya-persistence/issues/92)). Declare `java.util.Date`. |
+| arrays other than `byte[]`, `Byte[]`, `char[]` and `Character[]` (`int[]`, `long[]`, `Integer[]`, …) | Not basic types of the specification: it admitted them only as `Serializable`. Providers may map them on their own (Hibernate as SQL arrays), but this module covers what the specification defines. |
+| anything else | Not a basic type of the specification, or no encoding: `ZoneOffset`, `ZonedDateTime`, collections, `Object`, a generic `T[]` which doesn't resolve to a supported array type ([#92](https://github.com/jinahya/jinahya-persistence/issues/92)). |
