@@ -13,7 +13,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * The annotated attribute is a persistent, {@code byte[]}-typed attribute holding the ciphertext. {@link #value()}
  * names the persistent attribute, of the same entity — or the same embeddable — which holds the plaintext. The
  * plaintext stays mapped to its own column, which a row written before encryption was introduced still holds its value
- * in; that column is never written with a value again, and a legacy row is migrated when it is next written.
+ * in; when the column is mapped nullable, and the plaintext is not primitive, that column is never written with a value
+ * again, and a legacy row is migrated when it is next written. Otherwise the plaintext is left as it is, and an
+ * {@code UPDATE} writes it in the clear unless the column is mapped {@code updatable = false}; a primitive plaintext is
+ * supported, but strongly discouraged.
  * <pre>{@code
  * @Column(name = "name", insertable = false)
  * private String name;
@@ -52,11 +55,17 @@ public @interface EncryptedAttribute {
      * @return the name of the plaintext attribute; never blank.
      * @apiNote The annotated attribute has to be optional, has to be typed {@code byte[]}, has to be
      *         {@code BASIC}, has to be insertable, updatable and nullable, and cannot be an identifier or a version.
-     *         The named plaintext has to be a persistent, optional, {@code BASIC} attribute, neither an identifier nor
-     *         a version, of a non-primitive type which has a codec, carrying no Bean Validation constraint, and mapped
-     *         {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}, nullable and updatable; it
-     *         cannot be the annotated attribute itself, nor be annotated itself. Anything else is rejected, on the
-     *         first callback for the entity's class.
+     *         The named plaintext has to be a persistent, {@code BASIC} attribute, neither an identifier nor a
+     *         version, of a type which has a codec, and mapped
+     *         {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}; it cannot be the annotated
+     *         attribute itself, nor be annotated itself. Before an {@code UPDATE} it is set to {@code null} when, and
+     *         only when, it is not primitive and its column is mapped
+     *         {@link jakarta.persistence.Column#nullable() nullable}; it then has to be optional and updatable. One
+     *         which is not nulled goes out with the {@code UPDATE} in the clear, unless its column is mapped
+     *         {@link jakarta.persistence.Column#updatable() @Column(updatable = false)}. Anything else is rejected, on
+     *         the first callback for the entity's class. Only the mapping is read, never the database: a column
+     *         mapped nullable which the database declares {@code NOT NULL} fails the {@code UPDATE}. Bean Validation
+     *         constraints on the plaintext are the application's to keep consistent with this.
      */
     String value();
 }

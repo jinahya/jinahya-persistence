@@ -66,7 +66,7 @@ class EntityEncryptorUtils_Test {
                         }
                         throw new UnsupportedOperationException(method.getName());
                     });
-            return new EncryptionMapping.Pair(decrypted, null, javaType);
+            return new EncryptionMapping.Pair(decrypted, null, javaType, true);
         }
 
         @SuppressWarnings("deprecation")

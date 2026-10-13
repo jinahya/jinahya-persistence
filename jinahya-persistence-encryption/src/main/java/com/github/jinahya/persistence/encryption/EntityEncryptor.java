@@ -12,9 +12,7 @@ import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.MapAttribute;
 import jakarta.persistence.metamodel.PluralAttribute;
 import jakarta.persistence.metamodel.SingularAttribute;
-import jakarta.validation.Constraint;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
@@ -49,8 +47,9 @@ import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.enc
  *       version and the codec;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionService encryption service}, along with the
  *       {@link EntityEncryptionService#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
- *   <li>stores the ciphertext in the annotated attribute; before an {@code UPDATE}, also clears the plaintext, so
- *       that its column is never written with a value, and restores it once the {@code UPDATE} is done. The
+ *   <li>stores the ciphertext in the annotated attribute; before an {@code UPDATE}, also sets the plaintext to
+ *       {@code null} when its column is mapped nullable and it is not primitive, so that its column is never written
+ *       with a value, and restores it once the {@code UPDATE} is done. A primitive plaintext is never zeroed. The
  *       plaintext column is non-insertable, so an {@code INSERT} needs no clearing.</li>
  * </ol>
  * {@link #decrypt(Object)} runs the same steps in reverse. {@code EMBEDDED} attributes are descended into, so that
@@ -270,47 +269,6 @@ class EntityEncryptor {
                         entityManagerFactory().getMetamodel().managedType(attribute.getJavaType()), visited);
                 if (found != null) {
                     return found;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns a Bean Validation constraint declared on the specified attribute: on its java member, or on the field or
-     * getter of the same property, directly or inside a repeatable container such as {@code @Size.List}.
-     *
-     * @param attribute the attribute.
-     * @return a constraint annotation; {@code null} when there is none.
-     */
-    private static @org.jspecify.annotations.Nullable Annotation findConstraint(final Attribute<?, ?> attribute) {
-        final var name = attribute.getName();
-        final var capitalized = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-        for (final var member : declaredMembers(attribute.getDeclaringType().getJavaType())) {
-            final var matches = member instanceof java.lang.reflect.Field
-                    ? member.getName().equals(name)
-                    : member.getName().equals("get" + capitalized) || member.getName().equals("is" + capitalized);
-            if (!matches) {
-                continue;
-            }
-            for (final var annotation : ((AnnotatedElement) member).getAnnotations()) {
-                if (annotation.annotationType().isAnnotationPresent(Constraint.class)) {
-                    return annotation;
-                }
-                // a repeatable container, e.g. @Size.List, holds its constraints in value()
-                try {
-                    final var value = annotation.annotationType().getMethod("value");
-                    if (value.getReturnType().isArray()
-                        && value.getReturnType().getComponentType().isAnnotationPresent(Constraint.class)) {
-                        final var contained = (Annotation[]) value.invoke(annotation);
-                        if (contained.length > 0) {
-                            return contained[0];
-                        }
-                    }
-                } catch (final NoSuchMethodException nsme) {
-                    // not a container
-                } catch (final ReflectiveOperationException roe) {
-                    throw new RuntimeException("failed to read " + annotation, roe);
                 }
             }
         }
@@ -612,22 +570,6 @@ class EntityEncryptor {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
                          "no codec for the declared java type " + javaType.getName());
         }
-        // Jakarta Persistence validates an update after @PreUpdate, by which time encrypting has cleared the
-        // plaintext: a constraint on it is evaluated against null, failing every update or passing vacuously
-        final var constraint = findConstraint(decryptedAttribute);
-        if (constraint != null) {
-            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         "a Bean Validation constraint on an encrypted attribute is evaluated against null"
-                         + " (validation runs after encrypting has cleared the plaintext); found @"
-                         + constraint.annotationType().getName()
-                         + "; validate the value before persisting");
-        }
-        // a primitive can't be nulled; it is zeroed instead (see encrypt), so the rules for nulling it don't apply
-        final var primitive = javaType.isPrimitive();
-        if (!primitive && !isOptional(decryptedAttribute)) {
-            throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         "a decrypted attribute has to be optional");
-        }
         // the plaintext column must not be writable: @PrePersist runs at persist(), not when the INSERT is built,
         // so a provider which builds one statement at commit would otherwise carry a late assignment in the clear
         final var rules = resolveColumnRules(rootType, embeddingPath, decryptedAttribute);
@@ -636,19 +578,22 @@ class EntityEncryptor {
                          "a decrypted attribute's column has to be non-insertable"
                          + "; otherwise an INSERT can carry the plaintext (from " + rules.source() + ")");
         }
-        if (!primitive && !rules.nullable()) {
+        // the mapping, not the database, decides: the plaintext is nulled before an UPDATE only when its column is
+        // mapped nullable; a primitive can't be nulled. One which is not nulled goes out with the UPDATE as it is,
+        // unless its column is mapped non-updatable
+        final var nulled = !javaType.isPrimitive() && rules.nullable();
+        if (nulled && !isOptional(decryptedAttribute)) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         "a decrypted attribute's column has to be nullable"
-                         + "; encrypting nulls it (from " + rules.source() + ")");
+                         "a decrypted attribute which is nulled has to be optional");
         }
         // a legacy row (plaintext in this column, no ciphertext) is migrated by the UPDATE which stores its
         // ciphertext, and only that UPDATE nulls this column; a non-updatable one keeps the legacy plaintext forever
-        if (!rules.updatable()) {
+        if (nulled && !rules.updatable()) {
             throw reject(rootType, embeddingPath, decryptedAttribute, encryptedAttribute,
-                         "a decrypted attribute's column has to be updatable"
+                         "a nulled decrypted attribute's column has to be updatable"
                          + "; otherwise a migrated legacy row keeps its plaintext (from " + rules.source() + ")");
         }
-        return new Pair(decryptedAttribute, encryptedAttribute, javaType);
+        return new Pair(decryptedAttribute, encryptedAttribute, javaType, nulled);
     }
 
     /**
@@ -726,7 +671,7 @@ class EntityEncryptor {
      *
      * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
-     * @param clearPlaintext       whether to clear each plaintext once encrypted.
+     * @param clearPlaintext       whether to null each plaintext which is to be nulled once encrypted.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
      * @see #encrypt(Object, boolean)
@@ -748,7 +693,7 @@ class EntityEncryptor {
      * @param encryptionIdentifier the identifier the encryption keys are selected by; may be {@code null}.
      * @param object               the entity, or embeddable, instance to encrypt, in place.
      * @param mapping              the validated mapping of the {@code object}.
-     * @param clearPlaintext       whether to clear each plaintext once encrypted.
+     * @param clearPlaintext       whether to null each plaintext which is to be nulled once encrypted.
      * @param assignments          the list to which every attribute assignment is added, rather than made.
      * @implNote The mapping is passed down rather than looked up again: an embeddable reached through an
      *         {@link AttributeOverride @AttributeOverride} would otherwise be re-resolved without that override in
@@ -773,13 +718,10 @@ class EntityEncryptor {
             }
             assignments.add(pair.setCiphertext(
                     object, encryptFramed(encryptionIdentifier, pair, encode(pair, plaintext))));
-            if (clearPlaintext) {
-                // the plaintext column is updatable: an UPDATE would carry the value, so it goes out as null; a
-                // primitive, which can't be null, as its zero (0, false, '\0'); @PostUpdate restores it either way
-                final var javaType = pair.javaType();
-                assignments.add(pair.setPlaintext(
-                        object, javaType.isPrimitive() ? java.lang.reflect.Array.get(
-                                java.lang.reflect.Array.newInstance(javaType, 1), 0) : null));
+            if (clearPlaintext && pair.nulled()) {
+                // the plaintext column is mapped nullable: an UPDATE would carry the value, so it goes out as null;
+                // @PostUpdate restores it
+                assignments.add(pair.setPlaintext(object, null));
             }
         }
     }
@@ -812,9 +754,9 @@ class EntityEncryptor {
      *
      * @param object         the entity instance to encrypt, in place; an instance of a class which has no encrypted
      *                       attribute passes through untouched.
-     * @param clearPlaintext whether to clear each plaintext once encrypted: {@code true} before an {@code UPDATE},
-     *                       which would carry the updatable plaintext column; {@code false} before an
-     *                       {@code INSERT}, which never carries it, the column being non-insertable.
+     * @param clearPlaintext whether to null each plaintext which is to be nulled once encrypted: {@code true} before
+     *                       an {@code UPDATE}, which would carry the updatable plaintext column; {@code false} before
+     *                       an {@code INSERT}, which never carries it, the column being non-insertable.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
      * @see EntityEncryptionService#getEncryptionIdentifier(Object)

@@ -46,7 +46,6 @@
     <class>com.github.jinahya.persistence.encryption.examples.PlainEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.FrozenPlainEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.DirectListenerEntity</class>
-    <class>com.github.jinahya.persistence.encryption.examples.ConstrainedSecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.GenericSecretBase</class>
     <class>com.github.jinahya.persistence.encryption.examples.GenericSecretMiddle</class>
     <class>com.github.jinahya.persistence.encryption.examples.GenericStringEntity</class>

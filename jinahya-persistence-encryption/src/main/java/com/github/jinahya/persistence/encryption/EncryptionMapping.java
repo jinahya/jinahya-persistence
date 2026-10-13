@@ -50,8 +50,10 @@ record EncryptionMapping(List<Pair> pairs, List<Embedded> embeddeds) {
      * @param decrypted the attribute holding the plaintext.
      * @param encrypted the attribute holding the ciphertext.
      * @param javaType  the declared java type of the plaintext, resolved against the concrete class.
+     * @param nulled    whether the plaintext is nulled before an {@code UPDATE}: it is not primitive, and its column
+     *                  is mapped nullable.
      */
-    record Pair(Attribute<?, ?> decrypted, Attribute<?, ?> encrypted, Class<?> javaType) {
+    record Pair(Attribute<?, ?> decrypted, Attribute<?, ?> encrypted, Class<?> javaType, boolean nulled) {
 
         /**
          * Returns the name of the plaintext attribute.

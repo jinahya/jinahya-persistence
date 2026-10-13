@@ -1,7 +1,6 @@
 package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.CollectionSecretEntity;
-import com.github.jinahya.persistence.encryption.examples.ConstrainedSecretEntity;
 import com.github.jinahya.persistence.encryption.examples.FrozenPlainEntity;
 import com.github.jinahya.persistence.encryption.examples.GenericDeepEntity;
 import com.github.jinahya.persistence.encryption.examples.GenericIntegerEntity;
@@ -457,21 +456,6 @@ class EntityEncryptor_Test {
             assertThatCode(() -> untouchable.encrypt(entity)).doesNotThrowAnyException();
             assertThatCode(() -> untouchable.decrypt(entity)).doesNotThrowAnyException();
             assertThat(entity.name).isEqualTo("plain");
-        }
-
-        @DisplayName(
-                "a Bean Validation constraint on an encrypted attribute is rejected, not evaluated against null (#9)")
-        @Test
-        void __constraintRejected() {
-            final var entity = new ConstrainedSecretEntity();
-            entity.name = "far too long for @Size(max = 4)";
-
-            assertThatThrownBy(() -> service.encrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("Bean Validation constraint")
-                    .hasMessageContaining("jakarta.validation.constraints.Size")
-                    .hasMessageContaining("decrypted attribute: name");
-            assertThat(entity.nameEnc__).as("nothing was touched").isNull();
         }
 
         @DisplayName("a plaintext column which is not updatable is rejected (#73)")
