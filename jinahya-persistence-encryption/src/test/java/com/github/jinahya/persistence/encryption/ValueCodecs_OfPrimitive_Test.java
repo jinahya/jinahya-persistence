@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Tests for {@link ValueCodecs.OfPrimitive}.
  * <p>
- * Each nested class pins the encoding against {@link ByteBuffer}, which is big-endian, as an independent reference:
- * the encodings are stored data, and a change in one makes every existing value decode differently.
+ * Each nested class pins the encoding against {@link ByteBuffer}, which is big-endian, as an independent reference: the
+ * encodings are stored data, and a change in one makes every existing value decode differently.
  */
 class ValueCodecs_OfPrimitive_Test {
 

@@ -19,8 +19,8 @@ import java.lang.invoke.MethodHandles;
  * class User { ... }
  * }</pre>
  * It encrypts on {@link PrePersist @PrePersist} and {@link PreUpdate @PreUpdate}, before the statement is built, and
- * decrypts on {@link PostLoad @PostLoad}, and again on {@link PostUpdate @PostUpdate}, restoring the plaintext which
- * an {@code UPDATE} had to go out without. An instance of a class with no encrypted attribute passes through untouched.
+ * decrypts on {@link PostLoad @PostLoad}, and again on {@link PostUpdate @PostUpdate}, restoring the plaintext which an
+ * {@code UPDATE} had to go out without. An instance of a class with no encrypted attribute passes through untouched.
  * <p>
  * The {@link EntityEncryptionService encryption service} is injected, which happens when the persistence provider
  * creates its listeners through a bean container: a Jakarta EE container does; in Java SE, pass the CDI

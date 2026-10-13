@@ -55,16 +55,16 @@ public @interface EncryptedAttribute {
      * @return the name of the plaintext attribute; never blank.
      * @apiNote The annotated attribute has to be optional, has to be typed {@code byte[]}, has to be
      *         {@code BASIC}, has to be insertable, updatable and nullable, and cannot be an identifier or a version.
-     *         The named plaintext has to be a persistent, {@code BASIC} attribute, neither an identifier nor a
-     *         version, of a type which has a codec, and mapped
+     *         The named plaintext has to be a persistent, {@code BASIC} attribute, neither an identifier nor a version,
+     *         of a type which has a codec, and mapped
      *         {@link jakarta.persistence.Column#insertable() @Column(insertable = false)}; it cannot be the annotated
      *         attribute itself, nor be annotated itself. Before an {@code UPDATE} it is set to {@code null} when, and
      *         only when, it is not primitive and its column is mapped
      *         {@link jakarta.persistence.Column#nullable() nullable}; it then has to be optional and updatable. One
      *         which is not nulled goes out with the {@code UPDATE} in the clear, unless its column is mapped
      *         {@link jakarta.persistence.Column#updatable() @Column(updatable = false)}. Anything else is rejected, on
-     *         the first callback for the entity's class. Only the mapping is read, never the database: a column
-     *         mapped nullable which the database declares {@code NOT NULL} fails the {@code UPDATE}. Bean Validation
+     *         the first callback for the entity's class. Only the mapping is read, never the database: a column mapped
+     *         nullable which the database declares {@code NOT NULL} fails the {@code UPDATE}. Bean Validation
      *         constraints on the plaintext are the application's to keep consistent with this.
      */
     String value();

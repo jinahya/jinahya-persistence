@@ -161,7 +161,7 @@ final class EntityEncryptorUtils {
     /**
      * Returns the plaintext value of the specified pair, decoded from the specified bytes by its declared java type.
      *
-     * @param pair        the pair.
+     * @param pair           the pair.
      * @param decryptedBytes the decrypted bytes.
      * @return the decoded value.
      */

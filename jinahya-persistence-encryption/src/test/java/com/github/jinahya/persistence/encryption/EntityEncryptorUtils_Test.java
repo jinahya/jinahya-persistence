@@ -27,8 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Tests for {@link EntityEncryptorUtils}: the codecs which are still its own ({@code Byte[]}, {@code Character[]}),
- * the exact-length check of a stored payload (#76), and the payload frame (#75).
+ * Tests for {@link EntityEncryptorUtils}: the codecs which are still its own ({@code Byte[]}, {@code Character[]}), the
+ * exact-length check of a stored payload (#76), and the payload frame (#75).
  * <p>
  * The encodings of the other codecs are pinned by the {@code ValueCodecs_Of*_Test} classes.
  *

@@ -4,8 +4,8 @@
  * <p>
  * Each encrypted value has two attributes in the same entity: a {@code byte[]}-typed one, annotated with
  * {@link EncryptedAttribute @EncryptedAttribute}, holds the ciphertext; the annotation names the other one, which holds
- * the plaintext and, when its column is mapped nullable, is never written with a value in it. An entity with no annotated attribute passes through
- * untouched.
+ * the plaintext and, when its column is mapped nullable, is never written with a value in it. An entity with no
+ * annotated attribute passes through untouched.
  *
  * <h2>The pieces</h2>
  * <dl>

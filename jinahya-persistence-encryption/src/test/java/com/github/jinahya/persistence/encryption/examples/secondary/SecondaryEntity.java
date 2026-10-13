@@ -16,8 +16,8 @@ import jakarta.persistence.SecondaryTable;
 import jakarta.persistence.Table;
 
 /**
- * An entity whose ciphertext lives in a secondary table: the plaintext stays mapped to its column of the primary
- * table, which a legacy row still holds its value in, and the ciphertext attribute is mapped to a column of
+ * An entity whose ciphertext lives in a secondary table: the plaintext stays mapped to its column of the primary table,
+ * which a legacy row still holds its value in, and the ciphertext attribute is mapped to a column of
  * {@value #SECONDARY_TABLE_NAME}, joined one-to-one by primary key.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;

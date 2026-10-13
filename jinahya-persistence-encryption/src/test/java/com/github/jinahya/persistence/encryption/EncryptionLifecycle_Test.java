@@ -1,8 +1,8 @@
 package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.GuardedEntity;
-import com.github.jinahya.persistence.encryption.examples.NotedEntity;
 import com.github.jinahya.persistence.encryption.examples.LifecycleEntity;
+import com.github.jinahya.persistence.encryption.examples.NotedEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -274,7 +274,8 @@ class EncryptionLifecycle_Test {
 
     // ----------------------------------------------------------------------------------------- the instance is kept
 
-    @DisplayName("the instance keeps its value through persist(), flushes, an update and the commit; the row never has it")
+    @DisplayName(
+            "the instance keeps its value through persist(), flushes, an update and the commit; the row never has it")
     @Test
     void instanceKeepsItsValue() {
         final var kept = apply(em -> {

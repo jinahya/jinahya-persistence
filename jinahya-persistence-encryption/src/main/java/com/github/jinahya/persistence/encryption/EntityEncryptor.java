@@ -754,9 +754,9 @@ class EntityEncryptor {
      *
      * @param object         the entity instance to encrypt, in place; an instance of a class which has no encrypted
      *                       attribute passes through untouched.
-     * @param clearPlaintext whether to null each plaintext which is to be nulled once encrypted: {@code true} before
-     *                       an {@code UPDATE}, which would carry the updatable plaintext column; {@code false} before
-     *                       an {@code INSERT}, which never carries it, the column being non-insertable.
+     * @param clearPlaintext whether to null each plaintext which is to be nulled once encrypted: {@code true} before an
+     *                       {@code UPDATE}, which would carry the updatable plaintext column; {@code false} before an
+     *                       {@code INSERT}, which never carries it, the column being non-insertable.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
      * @see EntityEncryptionService#getEncryptionIdentifier(Object)

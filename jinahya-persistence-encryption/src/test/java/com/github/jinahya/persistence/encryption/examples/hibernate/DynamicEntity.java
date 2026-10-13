@@ -16,8 +16,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 /**
- * An entity under Hibernate ORM's {@link DynamicInsert @DynamicInsert} and {@link DynamicUpdate @DynamicUpdate},
- * which write only the non-{@code null}, and only the changed, columns.
+ * An entity under Hibernate ORM's {@link DynamicInsert @DynamicInsert} and {@link DynamicUpdate @DynamicUpdate}, which
+ * write only the non-{@code null}, and only the changed, columns.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
