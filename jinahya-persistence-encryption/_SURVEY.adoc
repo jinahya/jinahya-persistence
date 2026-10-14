@@ -488,3 +488,106 @@ in-memory values across repeated flushes. Reject unsafe plaintext mappings indep
 If the demonstrator requires provider-specific integration, choose explicitly between a shared API with provider adapters
 and a narrower portable contract. The estimate for supporting both providers should follow that evidence. The absence of
 an exact library match is not sufficient justification for accepting unintended writes or plaintext storage.
+
+== Sketches: the vendor mechanisms on the basic concepts only
+
+Only the module's basic concepts are kept here: *application-level* encryption, *per attribute (column)*, and a
+*cipher suite which is provided* (by `EntityEncryptionService`). Jakarta Persistence purity is given up, at a price;
+the paired attributes and the legacy migration are not assumed. Key selection is noted for each mechanism, as the
+service selects keys by `getEncryptionIdentifier(entity)`.
+
+These are *sketches from the APIs, not tested*.
+
+=== EclipseLink: transformation mapping
+
+One java attribute over the two columns: the legacy plaintext `NAME`, and the ciphertext `NAME_ENC`. The ciphertext has
+no java attribute of its own; it exists only in the row.
+
+[source]
+----
+@Transformation  String name   ──►  columns NAME (legacy plaintext) + NAME_ENC (ciphertext)
+
+ write (INSERT / UPDATE)                         read (SELECT)
+ ───────────────────────                         ─────────────
+ @WriteTransformer(column = "NAME_ENC")          @ReadTransformer
+   FieldTransformer.buildFieldValue(entity)        AttributeTransformer.buildAttributeValue(row, entity)
+   → service.encrypt(id(entity), bytes),           NAME_ENC present? → service.decrypt(id(row), NAME_ENC)
+     or NULL                                       NAME_ENC absent?  → NAME   (a legacy row)
+ @WriteTransformer(column = "NAME")
+   → NULL, always
+----
+
+* Two columns, as in this module: `NAME` keeps a legacy row's plaintext, read as the fallback; every write of the
+  attribute nulls it and fills `NAME_ENC`, which migrates the row.
+* The plaintext never reaches the row: the `NAME` write transformer always produces `NULL`, on `INSERT` and `UPDATE`.
+* The entity field always holds the plaintext; it is never mutated. Dirty checking compares it with its backup clone: a
+  read does not write.
+* A second java attribute for `NAME_ENC` would make two writable mappings of one column, which EclipseLink rejects
+  unless all but one are read-only.
+* Key selection: the write side sees the whole entity; the read side sees the row and a half-built object, so the
+  identifier comes from the row — the `Record` is passed as the context, and the service reads its columns.
+* Price: EclipseLink-specific annotations on the entity; the transformer is instantiated by class, so the service is
+  reached through a static holder or a session property.
+* To check: the columns of a transformation mapping are written when the attribute is detected as changed; a legacy row
+  saved after a change to another column may keep its `NAME` plaintext until `name` itself changes.
+
+=== EclipseLink: descriptor events
+
+[source]
+----
+DescriptorEventAdapter (registered per class)
+
+ aboutToInsert / aboutToUpdate (event.getRecord())     postBuild / postClone
+   row["NAME_ENC"] = encrypt(entity.name)                entity.name = decrypt(row["NAME_ENC"])
+   row["NAME"]     = removed / NULL
+----
+
+* The entity is never temporarily nulled: the events edit the outgoing row, not the object.
+* Key selection: the entity is seen on both sides.
+* Price: event timing (which events carry a row; whether the decryption runs before or after the backup clone), the
+  shared cache possibly holding the plaintext, and a per-class registration.
+
+=== Hibernate ORM: UserType (single column)
+
+[source]
+----
+@Type(EncryptedStringType.class)  String name   ──►  column NAME_ENC
+
+ nullSafeSet(stmt, "alice", …)                 nullSafeGet(rs, …)
+   stmt.setBytes(encrypt(bytes))                 decrypt(rs.getBytes()) → "alice"
+----
+
+* The entity field always holds the plaintext; Hibernate compares values through the type's `equals`, so a read does
+  not write.
+* Key selection: the type sees *the value only, not the entity*; `getEncryptionIdentifier(entity)` does not fit. This
+  is the main price of this route: one key per type or column, or a key from outside the entity.
+* Price: one type per java type, unless made generic over the codecs; Hibernate-specific `@Type` on the entity.
+
+=== Hibernate ORM: event listeners
+
+[source]
+----
+PreInsert / PreUpdateEventListener               PostLoadEventListener
+  state[NAME_ENC] = encrypt(entity.name)           entity.name = decrypt(entity.nameEnc)
+  (SQL uses state[]; the entity is untouched)       + loadedState[NAME] = entity.name   ← snapshot fix
+----
+
+* The entity is never temporarily nulled: the events edit the state the SQL is built from.
+* Key selection: the entity is seen.
+* Price: to keep reads from writing, the provider's snapshot (the `EntityEntry` loaded state) has to be fixed; that is
+  Hibernate's SPI, and the riskiest part. Listeners are registered through an `Integrator`.
+
+=== Side by side
+
+[cols="3,2,2,2,2",options="header"]
+|===
+| | EclipseLink transformation | EclipseLink descriptor events | Hibernate UserType | Hibernate events
+| entity temporarily nulled | no | no | no | no
+| reading writes | no | depends on timing | no | no, with the snapshot fix
+| key from the entity (the service SPI) | write: yes; read: the row, passed as the context | yes | *no* | yes
+| user's mapping | one attribute over two columns; vendor annotations | unchanged | vendor annotation | unchanged
+| riskiest part | service wiring, key on read | event timing, cache | key selection | snapshot fix
+|===
+
+The common price is giving up Jakarta Persistence purity: one adapter per provider, each with its own tests. What it
+buys, on all four, is the removal of the current mechanism's dominant costs: the temporary null, and reads which write.
