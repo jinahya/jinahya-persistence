@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Proxy;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -47,7 +50,7 @@ class EntityEncryptorUtils_Test {
          * Returns a pair of the specified declared type; only the name of its plaintext attribute is answered, which is
          * all {@code decode} reads of it.
          */
-        private static EncryptionMapping.Pair pair(final Class<?> javaType) {
+        static EncryptionMapping.Pair pair(final Class<?> javaType) {
             final var decrypted = (Attribute<?, ?>) Proxy.newProxyInstance(
                     Attribute.class.getClassLoader(),
                     new Class<?>[]{Attribute.class},
@@ -110,6 +113,81 @@ class EntityEncryptorUtils_Test {
         @ParameterizedTest
         void __overLong(final Class<?> javaType, final int width) {
             assertThat(EntityEncryptorUtils.decode(pair(javaType), new byte[width + 1])).isInstanceOf(javaType);
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------- encode / decode
+    @DisplayName("decode(encode(v)) is v, for every supported declared java type")
+    @Nested
+    class RoundTrip_Test {
+
+        /**
+         * One value of each supported declared java type, primitives included, and an enum.
+         */
+        @SuppressWarnings("deprecation")
+        static Stream<Arguments> values() {
+            return Stream.of(
+                    Arguments.of(boolean.class, true),
+                    Arguments.of(Boolean.class, Boolean.TRUE),
+                    Arguments.of(byte.class, (byte) -7),
+                    Arguments.of(Byte.class, (byte) 7),
+                    Arguments.of(short.class, (short) -1234),
+                    Arguments.of(Short.class, (short) 1234),
+                    Arguments.of(int.class, -37),
+                    Arguments.of(Integer.class, 37),
+                    Arguments.of(long.class, -1_234_567_890_123L),
+                    Arguments.of(Long.class, 1_234_567_890_123L),
+                    Arguments.of(char.class, 'K'),
+                    Arguments.of(Character.class, '\uD55C'),
+                    Arguments.of(float.class, -3.5f),
+                    Arguments.of(Float.class, 3.5f),
+                    Arguments.of(double.class, -2.25d),
+                    Arguments.of(Double.class, 2.25d),
+                    Arguments.of(String.class, "Jane Roe \uD55C\uAE00"),
+                    Arguments.of(UUID.class, UUID.fromString("123e4567-e89b-12d3-a456-426614174000")),
+                    Arguments.of(BigInteger.class, new BigInteger("-123456789012345678901234567890")),
+                    Arguments.of(BigDecimal.class, new BigDecimal("12345.6789")),
+                    Arguments.of(LocalDate.class, LocalDate.of(1988, 11, 3)),
+                    Arguments.of(LocalTime.class, LocalTime.of(3, 4, 5, 123_456_789)),
+                    Arguments.of(LocalDateTime.class, LocalDateTime.of(2026, 1, 2, 3, 4, 5, 123_456_789)),
+                    Arguments.of(OffsetTime.class, OffsetTime.of(10, 11, 12, 13, ZoneOffset.ofHours(9))),
+                    Arguments.of(OffsetDateTime.class,
+                                 OffsetDateTime.of(2026, 1, 2, 3, 4, 5, 6, ZoneOffset.ofHoursMinutes(-5, -30))),
+                    Arguments.of(Instant.class, Instant.ofEpochSecond(1_700_000_000L, 123_456_789)),
+                    Arguments.of(Year.class, Year.of(2026)),
+                    Arguments.of(java.util.Date.class, new java.util.Date(1_700_000_000_123L)),
+                    Arguments.of(java.sql.Date.class, java.sql.Date.valueOf("2026-01-02")),
+                    Arguments.of(java.sql.Time.class, java.sql.Time.valueOf("03:04:05")),
+                    Arguments.of(java.sql.Timestamp.class, java.sql.Timestamp.valueOf("2026-01-02 03:04:05.123456789")),
+                    Arguments.of(byte[].class, new byte[]{0, 1, -1, 127, -128}),
+                    Arguments.of(Byte[].class, new Byte[]{0, 1, -1, 127, -128}),
+                    Arguments.of(char[].class, new char[]{'a', '\uD55C', '\0'}),
+                    Arguments.of(Character[].class, new Character[]{'a', '\uD55C', '\0'}),
+                    Arguments.of(java.time.DayOfWeek.class, java.time.DayOfWeek.FRIDAY)
+            );
+        }
+
+        @DisplayName("the value is decoded back, by the declared java type alone")
+        @MethodSource("values")
+        @ParameterizedTest
+        void __roundTrip(final Class<?> javaType, final Object value) {
+            final var pair = Decode_Test.pair(javaType);
+            final var encoded = EntityEncryptorUtils.encode(pair, value);
+            assertThat(EntityEncryptorUtils.decode(pair, encoded)).isEqualTo(value);
+        }
+
+        @DisplayName("every supported type has a value above; a type added to the codecs has to be added here")
+        @Test
+        void __everySupportedTypeIsCovered() throws ReflectiveOperationException {
+            final var field = EntityEncryptorUtils.class.getDeclaredField("SUPPORTED");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            final var supported = (java.util.Set<Class<?>>) field.get(null);
+            final java.util.Set<Class<?>> covered = values()
+                    .map(a -> (Class<?>) a.get()[0])
+                    .collect(java.util.stream.Collectors.toSet());
+            assertThat(covered).containsAll(supported);
+            assertThat(covered).anyMatch(Class::isEnum);
         }
     }
 
