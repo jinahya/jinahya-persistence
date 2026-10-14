@@ -74,7 +74,7 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
     }
 
     @Override
-    public String getEncryptionIdentifier(final Object entityInstance) {
+    public String getEncryptionIdentifier(final Object entityContext) {
         return "irrelevant";
     }
 

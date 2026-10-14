@@ -397,7 +397,7 @@ class EntityEncryptor_Test {
                 }
 
                 @Override
-                public String getEncryptionIdentifier(final Object entityInstance) {
+                public String getEncryptionIdentifier(final Object entityContext) {
                     throw new AssertionError("must not be called for a plain entity");
                 }
 
@@ -572,7 +572,7 @@ class EntityEncryptor_Test {
                 final var seen = java.util.Collections.synchronizedList(new java.util.ArrayList<String>());
                 final var cryptography = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
                     @Override
-                    public String getEncryptionIdentifier(final Object entityInstance) {
+                    public String getEncryptionIdentifier(final Object entityContext) {
                         return identifier;
                     }
 
