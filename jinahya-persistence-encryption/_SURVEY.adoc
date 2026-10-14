@@ -1,0 +1,490 @@
+= Application-level encryption: library and provider survey
+:toc: macro
+:toclevels: 3
+
+Research date: 2026-10-14.
+
+toc::[]
+
+== Scope and result
+
+This survey compares this module with existing Java libraries and with EclipseLink and Hibernate extension points.
+Here, provider-neutral means independent of the Jakarta Persistence implementation; it does not necessarily mean
+independent of Spring, a key-management vendor, or a commercial service.
+
+* *Exact provider-neutral replacement:* none verified in this search. This is a search result, not a claim that none exists.
+* *Related provider-neutral library:* jEAP Crypto provides JPA encryption converters, but does not document this module's
+  paired-attribute migration mechanism.
+* *EclipseLink:* transformation mappings are a promising implementation route for a plaintext Java attribute backed by
+  ciphertext and legacy columns. Descriptor events are another route when retaining the two Java attributes.
+* *Hibernate:* Jasypt and Crypteron provide encryption integrations, with version limitations discussed below.
+  Custom types or event/interceptor integration are the routes to a purpose-built implementation.
+
+Library features below are documented features, not independently tested behavior. Proposed mappings and integration
+designs are explicitly proposals; no provider-specific prototype or compatibility test was performed for this survey.
+
+== Baseline: what this module actually does
+
+The comparison is based on link:README.md[the module README],
+link:src/main/java/com/github/jinahya/persistence/encryption/EntityEncryptionListener.java[EntityEncryptionListener], and
+link:src/main/java/com/github/jinahya/persistence/encryption/EntityEncryptionService.java[EntityEncryptionService].
+
+[source,java]
+----
+@Column(name = "name", insertable = false)
+private String name;
+
+@EncryptedAttribute("name")
+@Column(name = "name_enc")
+private byte[] nameEnc;
+----
+
+Both attributes are persistent. The plaintext is not merely a transient convenience property.
+The original plaintext column remains available for legacy rows; ciphertext occupies a separate column.
+
+* `@PrePersist` encrypts into the ciphertext attribute. The plaintext column is excluded from the insert.
+* `@PreUpdate` encrypts and nulls eligible plaintext attributes for the outgoing update.
+* `@PostUpdate` restores the application's plaintext from ciphertext.
+* `@PostLoad` decrypts ciphertext, or preserves legacy plaintext when ciphertext is absent.
+* Migration happens on subsequent writes; untouched legacy rows remain plaintext.
+* Nulling applies to nullable, nonprimitive plaintext mappings. The README explicitly describes other mappings as
+  retaining their plaintext; the strongest ciphertext-only claim therefore needs those mapping conditions.
+* The application supplies cryptography and entity-derived key selection through `EntityEncryptionService`.
+
+An exact replacement would need to address both attributes, both columns, legacy fallback, migration on write,
+entity-dependent key selection, and ORM lifecycle behavior. A single-column encryption converter alone is not equivalent.
+
+The root POM currently declares EclipseLink `5.0.2` and Hibernate ORM `7.4.12.Final`.
+Those are repository declarations, not versions verified against external release metadata in this survey.
+Some cited API documentation describes earlier versions; compilation and behavior against the project's versions remain
+to be checked before adopting an extension.
+
+== Comparison
+
+[cols="2,2,3,3",options="header"]
+|===
+| Candidate | Integration | Relationship to this module | Status
+
+| jEAP Crypto
+| Standard JPA `AttributeConverter`; Spring Boot wiring
+| Encrypts individual columns; no documented paired-attribute legacy migration
+| Real library; provider compatibility matrix not verified
+
+| springcrypto-example
+| Standard JPA converter with Spring Security crypto
+| Demonstrates single-column ALE
+| Example application, not a replacement library
+
+| EclipseLink transformation mapping
+| `@Transformation`, `@ReadTransformer`, `@WriteTransformer`
+| Could map one plaintext attribute to ciphertext plus legacy columns
+| Built-in extension point; custom encryption integration required
+
+| EclipseLink descriptor events
+| Descriptor listener and row/change-set APIs
+| Could retain the existing paired Java attributes
+| Built-in extension point; lifecycle implementation required
+
+| Jasypt Hibernate integration
+| Hibernate encrypted custom types
+| ALE with encrypted mapped values; no documented paired-column migration
+| Official documentation covers Hibernate 3, 4, and 5; a separate fork contains Hibernate 6 integration
+
+| Crypteron CipherDB
+| Annotation-driven ORM agent
+| ALE plus key management; no verified match for this module's attribute pair
+| Service-backed product; Java documentation links Hibernate 4 and 5 agents
+
+| Hibernate custom types
+| `UserType` or `CompositeUserType`
+| Single-column encryption or a custom multi-column value mapping
+| Built-in extension points; application code required
+
+| Hibernate interceptor/events
+| Persistence state arrays and lifecycle events
+| Could coordinate the existing paired attributes and outgoing state
+| Built-in extension points; dirty checking and state synchronization require care
+|===
+
+== 1. Provider-neutral libraries and approaches
+
+=== jEAP Crypto
+
+https://github.com/jeap-admin-ch/jeap-crypto[jEAP Crypto] is an Apache-2.0 library for application-side encryption.
+Its documented features include AES-256-GCM, envelope encryption, AWS KMS and HashiCorp Vault backends, a self-describing
+ciphertext container, and Spring Boot integration. The `jeap-crypto-db` module supplies JPA `AttributeConverter` helpers;
+the byte-array APIs are independent of the persistence technology.
+
+This is a relevant comparison for portable column encryption and a possible backend for `EntityEncryptionService`.
+Its overview does not document pairing a legacy plaintext attribute with a separate ciphertext attribute or automatically
+nulling the legacy column on migration. Standard JPA integration is evidence of a portable API choice, not proof that
+the library has been tested with both providers used here.
+
+The repository's detailed database-column document could not be fetched during this survey. Findings above are limited
+to its accessible project overview; provider testing and detailed converter configuration remain unverified.
+
+=== Standard Jakarta Persistence AttributeConverter
+
+The https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2.html[Jakarta Persistence 3.2 specification]
+defines conversion between an attribute value and its database representation. A typical ALE mapping is:
+
+[source,java]
+----
+@Convert(converter = NameEncryptionConverter.class)
+@Column(name = "name_enc")
+private String name;
+----
+
+The converter would implement `AttributeConverter<String, byte[]>`, encrypting on the database path and decrypting on
+the entity path. This is an architectural illustration, not a supplied converter implementation.
+
+The conversion methods receive the value being converted, not the owning entity or an arbitrary row of sibling columns.
+Consequently, a converter by itself cannot reproduce legacy-column fallback, null a separate plaintext column, or derive
+a key from another entity attribute. Those behaviors need additional mapping or lifecycle logic.
+
+For a new schema with one ciphertext column and key selection independent of sibling state, this is the simplest
+portable approach to investigate. It is not a drop-in replacement for the current model.
+
+=== Example: springcrypto-example
+
+https://github.com/joutwate/springcrypto-example[springcrypto-example] demonstrates ALE with Spring Security crypto and
+JPA `@Convert` on email and SSN attributes. It demonstrates the converter pattern, not the paired-column scheme.
+Its README also demonstrates logging secrets and values; it should be treated as historical example code, not copied
+as production cryptographic configuration. Its modern Jakarta compatibility was not checked.
+
+=== Result for the exact portable scheme
+
+No examined library documents the full combination implemented here: two persistent attributes, separate legacy and
+ciphertext columns, legacy fallback, migration on write, and entity-derived key selection behind an application SPI.
+Retaining this module is therefore a reasonable option when that exact model is required. This finding does not establish
+uniqueness, completeness of the search, or production correctness of the current implementation.
+
+== 2. EclipseLink-specific approaches
+
+=== Transformation mappings: the strongest mapping-level candidate
+
+EclipseLink's https://eclipse.dev/eclipselink/api/3.0/org/eclipse/persistence/annotations/Transformation.html[`@Transformation`]
+supports transforming database columns into a Java attribute and defining a write transformer for each output column.
+The https://eclipse.dev/eclipselink/documentation/2.4/jpa/extensions/a_transformation.htm[extension guide]
+illustrates multiple column transformers for one attribute.
+
+The Java extension points expose useful context:
+
+* https://eclipse.dev/eclipselink/api/3.0/org/eclipse/persistence/mappings/transformers/AttributeTransformer.html[`AttributeTransformer`]
+  receives the database record, object being built, and session, and returns the attribute value.
+* https://eclipse.dev/eclipselink/api/5.0/org.eclipse.persistence.core/org/eclipse/persistence/mappings/transformers/FieldTransformerAdapter.html[`FieldTransformerAdapter`]
+  can compute an output column value from the domain object, field name, and session.
+
+*Proposed design, not tested:* map the application's `name` attribute using a transformation over `NAME` and `NAME_ENC`.
+
+[cols="1,3",options="header"]
+|===
+| Operation | Proposed behavior
+| Read | If `NAME_ENC` is present, decrypt it; otherwise use legacy `NAME`.
+| Write ciphertext | Produce `encrypt(name)` for `NAME_ENC`, or null for absent plaintext.
+| Write legacy column | Produce null for `NAME`.
+|===
+
+This could preserve the two-column storage model while removing the need to temporarily null and restore the Java
+plaintext attribute. It changes the Java mapping: a separate persistent ciphertext attribute is not necessary in this
+design. It also does not automatically prove that every unrelated update will trigger migration of an unchanged legacy
+value; write selection and change detection need testing.
+
+Read-side key selection must use state actually available while the object is being constructed, potentially from the
+record. Do not assume every sibling Java attribute has already been populated.
+Transformer service injection, null handling, randomized ciphertext, change tracking, cache hits, and merge behavior
+are implementation work, not features guaranteed merely by choosing this API.
+
+=== Descriptor events: retain the paired attributes
+
+https://eclipse.dev/eclipselink/api/3.0/org/eclipse/persistence/descriptors/DescriptorEvent.html[`DescriptorEvent`]
+exposes the entity, an associated row for certain events, and change-set information when available.
+It also supplies `applyAttributeValuesIntoRow` and `updateAttributeWithObject` helpers.
+
+*Proposed design, not tested:* register a descriptor listener, encrypt into the sibling ciphertext mapping at an
+appropriate write event, arrange for the legacy column to be null in the outgoing row, and reconstruct plaintext on
+the read path. This gives provider-specific access beyond portable entity callbacks.
+
+Event timing matters: not every event has a row or change set. Updating a Java field, an outgoing row, and the tracked
+state are different operations. An implementation must keep them consistent and verify behavior with weaving enabled.
+
+No dedicated EclipseLink encryption library matching the module was verified. These are supported extension mechanisms
+from which to build one, rather than a ready-made encryption facility.
+
+== 3. Hibernate-specific libraries and approaches
+
+=== Jasypt
+
+https://jasypt.sourceforge.io/hibernate.html[Jasypt's official Hibernate integration documentation]
+describes encrypted custom types and integrations for Hibernate 3, 4, and 5. Its page identifies version `1.9.3` and
+a 2019 publication date. This is application-side encryption, but the documented type mappings do not establish support
+for this module's paired-attribute migration scheme.
+
+The separate https://github.com/phaneesh/jasypt[phaneesh/jasypt fork] contains a `jasypt-hibernate6` module.
+Its existence was verified in the repository; binary compatibility, maintenance suitability, cryptographic defaults,
+and support for the Hibernate 7 version declared by this project were not verified.
+
+Do not treat either the official Hibernate 5 integration or the fork's Hibernate 6 module as a verified dependency for
+this project's Hibernate 7 configuration.
+
+=== Crypteron CipherDB
+
+https://www.crypteron.com/docs/[Crypteron's documentation] describes an agent that encrypts `@Secure` entity properties
+on persistence and decrypts them on loading, integrated with its key-management platform.
+Although the overview mentions JPA, the Java download section explicitly links Hibernate 4 and Hibernate 5 agents.
+
+It is therefore relevant as an existing ALE product, but not verified as an EclipseLink-compatible or modern
+provider-neutral alternative. Neither support for this project's Hibernate version nor the exact paired-column migration
+contract was established. Adoption also entails the product's account/platform model rather than only an ORM utility.
+
+=== UserType: Java-side encryption at the JDBC boundary
+
+Hibernate's https://docs.hibernate.org/orm/7.1/javadocs/org/hibernate/usertype/UserType.html[`UserType`]
+is an extension point for a custom mapped value. A purpose-built encryption type can keep the Java representation in
+plaintext while handling ciphertext when reading and binding JDBC values.
+
+*Proposed design, not tested:* use a custom type for a single ciphertext column, with appropriate equality, copying,
+and cache representation. This avoids encrypting the entity field itself solely to prepare a database write.
+It does not by itself coordinate a separate legacy attribute/column or guarantee access to arbitrary sibling state.
+
+=== CompositeUserType: multiple columns for one logical value
+
+Hibernate's https://docs.hibernate.org/orm/7.1/javadocs/org/hibernate/usertype/CompositeUserType.html[`CompositeUserType`]
+supports custom values with an embeddable mapping projection, applied using `@CompositeType` or registration.
+Its persistent components need not correspond directly to fields on the application's value object.
+
+*Proposed design, not tested:* a custom encrypted value could represent plaintext in Java and expose ciphertext,
+legacy plaintext, or key metadata as mapped components. Its read construction could select ciphertext or legacy data.
+This changes the domain mapping and requires deliberate conversion and lifecycle implementation.
+
+Do not simply generate new randomized ciphertext every time Hibernate asks for a component value: stable persistence
+equality, dirty checking, repeated component access, cache serialization, and merge semantics must be designed together.
+The API is an enabling mechanism, not an encryption or migration implementation.
+
+=== Interceptor and event integration: retain the paired attributes
+
+Hibernate's https://docs.jboss.org/hibernate/orm/7.1/javadocs/org/hibernate/Interceptor.html[`Interceptor`]
+documents callbacks including `onLoad`, `onPersist`, and `onFlushDirty`, with aligned property-name and state arrays.
+An implementation can inspect entity context and modify persistence state. Hibernate also exposes insert, update,
+and load events for more specialized integration.
+
+*Proposed design, not tested:* locate both mapped properties, derive the encryption identifier from available entity
+state, populate ciphertext, suppress outgoing legacy plaintext, and restore or preserve the application's plaintext.
+This is the closer route when the existing two-attribute model must remain.
+
+The interceptor documentation explicitly says modified flush state is propagated to the persistent object as well as
+the database. An interceptor therefore does not automatically solve the current null-and-restore problem. Dirty-property
+selection, snapshots, callbacks, and enhanced tracking still need coordinated handling. Changing only a transient
+plaintext field also needs an explicit mechanism to make its persistent representation dirty.
+
+=== ColumnTransformer is SQL-side, not the requested ALE mechanism
+
+Hibernate's https://docs.hibernate.org/orm/7.1/javadocs/org/hibernate/annotations/ColumnTransformer.html[`@ColumnTransformer`]
+defines SQL read and write expressions. Its documented encryption example invokes `encrypt(?)` and `decrypt(column)`
+in SQL. That executes cryptography in the database and does not implement the application's Java encryption service.
+
+EclipseLink's Java `FieldTransformer` and Hibernate's SQL `ColumnTransformer` therefore have materially different roles,
+despite the similar names.
+
+== Assessment and next investigations
+
+For the exact portable paired-attribute contract, keep the current module as the baseline and evaluate alternatives
+against its existing lifecycle tests. jEAP Crypto is more immediately relevant as a cryptographic backend or as a
+single-column converter alternative than as a replacement for the migration mechanism.
+
+For an EclipseLink-specific experiment, start with a transformation mapping if changing the Java mapping is acceptable.
+Use descriptor events if retaining both Java attributes is mandatory.
+
+For a Hibernate-specific experiment, use a custom type for a single encrypted column, investigate `CompositeUserType`
+for a logical multi-column value, or investigate events/interceptors for the existing paired properties.
+Existing encryption libraries need explicit version validation before consideration for this repository.
+
+The following checks would determine whether any prototype actually improves on the current implementation:
+
+* Insert, plaintext-only update, unrelated-field update, and explicit null assignment.
+* Read-only load followed by flush: detect unintended updates or re-encryption.
+* Legacy fallback and migration, including clearing the original column.
+* Multiple flushes, rollback, detached merge, and optimistic locking.
+* Provider enhancement/weaving and selective insert/update behavior.
+* First-level and second-level cache behavior and the representation cached.
+* Embeddables and secondary tables required by this module.
+* Availability and stability of entity-derived key context during loading and insertion.
+* Bulk operations and scalar projections: establish their behavior separately from entity lifecycle paths.
+
+These are proposed evaluation cases, not tests executed for this survey. The module README already identifies
+enhanced change tracking and shared-cache behavior as unverified for the current implementation.
+
+== Research limits
+
+Searches covered JPA encryption libraries and listeners, separate plaintext/ciphertext mappings, EclipseLink transformation
+and descriptor APIs, Hibernate encryption libraries, and custom type/interceptor APIs.
+The substantive findings above use project-maintained repositories, vendor documentation, and the Jakarta specification.
+Search hits limited to unrelated frameworks, password hashing, configuration-property encryption, or general cryptography
+were not treated as comparable persistence libraries.
+
+No dependency was installed, no external library was executed, and no claim of current release support or security audit
+is made. Some attempted documentation URLs were unavailable; accessible versioned references are linked instead.
+Absence of a documented match in these sources does not establish absence of an implementation elsewhere.
+
+== Verdicts and engineering estimates for this module
+
+These are engineering judgments based on the source, documentation, and test assertions inspected for this survey.
+They are not a security audit, benchmark, or report of a fresh test run.
+
+=== Overall verdict
+
+*The module addresses a useful, specific migration problem, but its current callback mechanism is not a general-purpose,
+transparent ALE solution that I would recommend as a default for production entities.*
+
+Its strongest contribution is the combination of a small application-facing API, provider-neutral integration, explicit
+plaintext/ciphertext pairing, and legacy-data migration. The survey did not verify an off-the-shelf equivalent for that
+whole contract. That is a reason to continue evaluating the design, not evidence that its lifecycle trade-offs are necessary
+for every possible portable design or that the implementation is production-ready.
+
+The decisive limitation is that the current mechanism changes persistent plaintext state to control database writes,
+then changes it back for the application. That interferes with the provider's view of what has changed. Additional codec
+coverage or better cryptography cannot resolve that persistence-state problem.
+
+=== Assessment by area
+
+[cols="2,2,5",options="header"]
+|===
+| Area | Verdict | Basis and implication
+
+| Problem selection
+| Worth pursuing
+| Separate ciphertext storage and gradual migration of existing plaintext are concrete requirements that ordinary
+  single-column converters do not satisfy by themselves.
+
+| Public API and separation of responsibilities
+| Strong foundation
+| `@EncryptedAttribute`, the listener, and `EntityEncryptionService` keep the application contract small. Encoding and
+  mapping logic are separated from key management and cryptography. The service could remain useful under a different
+  persistence integration.
+
+| Mapping and value handling
+| Substantial implementation effort already invested
+| The source validates mappings, handles embeddables and inherited type bindings, and computes transformations before
+  assigning values. Tests cover mapping rejection, codecs, array isolation, and service identifier forwarding.
+  This is meaningful groundwork, but does not establish correctness of every ORM execution path.
+
+| Provider portability
+| Portable API; costly runtime semantics
+| Standard Jakarta callbacks avoid a provider dependency. The README reports tests on both providers, but also documents
+  unwanted writes and an EclipseLink insert-window limitation. Compiling against a portable API is a weaker guarantee
+  than preserving normal entity behavior.
+
+| Confidentiality contract
+| Conditional; should fail closed more consistently
+| Inserts exclude plaintext, but the update logic leaves primitive or non-nullable plaintext untouched. If its column is
+  updatable, it can be stored in cleartext. Accepting such mappings is at odds with an unconditional ciphertext-only promise.
+
+| Ordinary read/write behavior
+| Major architectural blocker
+| `observeReadOnlyTransaction` explicitly asserts that a transaction which only loads an encrypted entity advances its
+  version and rewrites ciphertext. The README also reports further writes after plaintext restoration on later flushes.
+
+| Production maturity
+| Not established for broad use
+| Enhancement/weaving and second-level caches remain unverified; rollback/retry and persist-to-flush restrictions require
+  application discipline. Existing tests provide evidence for particular behaviors, including undesirable ones.
+|===
+
+Evidence: link:README.md#what-it-costs[README: What it costs],
+link:src/main/java/com/github/jinahya/persistence/encryption/EntityEncryptor.java[EntityEncryptor],
+link:src/test/java/com/github/jinahya/persistence/encryption/EncryptionLifecycle_Test.java[EncryptionLifecycle_Test], and
+link:src/test/java/com/github/jinahya/persistence/encryption/EntityEncryptor_Test.java[EntityEncryptor_Test].
+
+=== Operational and performance estimate
+
+There is no measured throughput or latency estimate from this survey. The operation count nevertheless suggests the
+dominant costs to measure first:
+
+* Loading an encrypted entity and subsequently flushing can add an update and version advance without a business edit.
+  In a read-heavy workload, database write traffic could therefore track the number of entities loaded into flushing
+  persistence contexts, rather than the number deliberately modified. Batching may reduce round trips, not logical writes.
+* For `k` non-null encrypted attributes, an ordinary load invokes approximately `k` service decrypt operations. If it then
+  produces one update, the callback sequence adds approximately `k` encrypt operations and `k` decrypt operations for
+  restoration: roughly `3k` service operations across that load/update cycle. Additional updates repeat work.
+* Service operations are not necessarily remote KMS requests. A local cipher with cached envelope keys and a remote
+  per-value encryption service have very different latency and cost profiles.
+* Unnecessary version advances can cause optimistic-lock conflicts between transactions that would otherwise only read.
+  This does not mean Hibernate or EclipseLink stop enforcing optimistic locking; it means the module creates additional
+  writes and contention that violate normal read-only expectations.
+* Extra updates affect transaction logs, replication, CDC, and auditing. These costs may outweigh reflection or codec
+  overhead; optimize the write behavior before spending effort on micro-optimizing metadata access.
+
+The service-call estimate follows the current listener's load, pre-update, and post-update paths. It excludes retries,
+cache effects, null values, and provider-specific scheduling differences.
+
+=== Suitability by use case
+
+[cols="3,5",options="header"]
+|===
+| Use case | Judgment
+| New schema, one ciphertext column, no sibling-dependent key context
+| Start by evaluating a standard converter; the paired legacy mapping adds complexity without a migration benefit.
+| Existing schema requiring gradual migration and both providers
+| The module is relevant, but proceed only with explicit acceptance of its current write behavior and mapping restrictions,
+  or after a redesign demonstrates better semantics.
+| Read-heavy service, read-only database access, or frequent concurrent entity access
+| Do not adopt the present listener as the default: read-induced writes and version churn directly conflict with this workload.
+| Provider-specific application willing to change mappings
+| Prototype EclipseLink transformation mappings or Hibernate custom types before investing further in callback workarounds.
+| Controlled migration or research harness
+| A useful baseline, provided plaintext mappings, failure handling, and the actual SQL are checked for the intended workload.
+|===
+
+=== Rough effort estimates
+
+These are planning ranges for one engineer familiar with this repository and JPA, expressed in focused engineering days.
+They assume working build profiles, reuse of the current test fixtures, and an existing encryption-service implementation.
+Confidence is moderate for narrow validation changes and low for persistence integration redesign. The rows overlap and
+must not be summed into a delivery commitment. KMS infrastructure, external security review, and production data migration
+are excluded.
+
+[cols="3,1,4",options="header"]
+|===
+| Work item | Estimate | Reviewable outcome
+| Tighten the confidentiality contract
+| 2–4 days
+| Define and reject mappings that could write plaintext; add focused regression cases and reconcile documentation.
+  This may be a compatibility-breaking change for currently accepted mappings.
+| Establish a current two-provider behavior baseline
+| 3–6 days
+| Run existing tests and add missing assertions for read-only flush, repeated flush, merge, failed-flush recovery, late
+  assignment after persist, and observed SQL/version changes. This characterizes the design; it does not repair it.
+| EclipseLink transformation proof of concept
+| 3–7 days
+| One encrypted attribute with two database columns, legacy fallback, null clearing, and checks for migration and dirty state.
+  Retaining both existing Java attributes may require a different approach.
+| Hibernate mapping or event proof of concept
+| 5–10 days
+| Compare a custom value mapping with a paired-attribute event approach; demonstrate correct writes, reads, nulls, and
+  version behavior for one entity. No assumption of a simple drop-in listener replacement.
+| Enhancement and cache investigation for a selected design
+| 5–10 days
+| Test the selected provider configurations and establish the cache representation and change-tracking behavior.
+  Findings may require redesign beyond this estimate.
+| Harden one successful provider adapter
+| 10–20 additional days
+| Extend the prototype to required embeddables, inheritance, secondary tables, failure paths, service wiring, and documentation.
+  Supporting both providers is a separate maintenance commitment.
+| Preserve every current constraint using standard callbacks while eliminating all lifecycle side effects
+| No defensible estimate yet
+| First determine feasibility. More callback code is not evidence that snapshot and dirty-state problems can be solved.
+|===
+
+=== Recommended decision
+
+Keep the encoding, mapping knowledge, encryption-service abstraction, and existing tests as assets. Treat the current
+listener as a constrained integration whose limitations are part of its contract, rather than presenting encryption as
+transparent to normal persistence behavior.
+
+The first decision gate should be a small demonstrator that reads and flushes an encrypted entity without writing it,
+updates plaintext exactly when requested, clears legacy plaintext during migration, and maintains coherent versions and
+in-memory values across repeated flushes. Reject unsafe plaintext mappings independently of that experiment.
+
+If the demonstrator requires provider-specific integration, choose explicitly between a shared API with provider adapters
+and a narrower portable contract. The estimate for supporting both providers should follow that evidence. The absence of
+an exact library match is not sufficient justification for accepting unintended writes or plaintext storage.
