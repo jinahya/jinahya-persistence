@@ -591,3 +591,109 @@ PreInsert / PreUpdateEventListener               PostLoadEventListener
 
 The common price is giving up Jakarta Persistence purity: one adapter per provider, each with its own tests. What it
 buys, on all four, is the removal of the current mechanism's dominant costs: the temporary null, and reads which write.
+
+== Current approach: the provider integrations
+
+Of the four sketches, the two event routes were implemented: Hibernate ORM event listeners and EclipseLink descriptor
+events. Both keep the paired attributes and the entity as the context of `getEncryptionIdentifier`, so the mapping
+(`@EncryptedAttribute`) and the `EntityEncryptionService` are unchanged. `UserType` was rejected, as it has no
+entity to select a key from; the transformation mapping, as it replaces the user's two attributes with one.
+
+Each is a module of its own, replacing `EntityEncryptionListener`, which must not be registered alongside it:
+
+[cols="1,2,2",options="header"]
+|===
+| | Hibernate ORM | EclipseLink
+| module | `jinahya-persistence-encryption-hibernate` | `jinahya-persistence-encryption-eclipselink`
+| entry point | `EntityEncryptionIntegrator`, found through `ServiceLoader`; does nothing without the service property |
+  `EntityEncryptionSessionCustomizer`, named by `eclipselink.session.customizer`
+| the service | `jinahya.persistence.encryption.service` (`EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE`): an instance, its
+  class, or its class name | the same
+| the metamodel read | the session factory being integrated | the service's `getEntityManagerFactory()`, on the first
+  event
+| tests | 13, on H2 | 22, on H2: 11 with the shared cache off, 11 with it on
+|===
+
+Both work through `EntityEncryptor`, made public for this: `encrypt(Object, Snapshot)` encrypts into the entity against
+the provider's snapshot, `decrypt(Object)`, and `getPlaintextAttributeNames`, `getCiphertextAttributeNames`,
+`getNulledPlaintextPaths` and `clearPlaintexts` tell an engine what to rewrite.
+
+=== The common rules
+
+* *The entity's plaintext is never nulled.* The plaintext a nullable column must not receive is cleared only in what the
+  provider builds the row from: Hibernate ORM's state array, EclipseLink's row.
+* *A read never writes.* After a load, the provider's snapshot — Hibernate ORM's loaded state, EclipseLink's backup
+  clone — is given copies of the decrypted plaintexts.
+* *A plaintext is encrypted again only when it changed.* Against the snapshot, by its encoding, not by `equals`; or when
+  its ciphertext is missing, which is a legacy row, or a new value. An unrelated change keeps the stored ciphertext.
+* *A legacy row is migrated by any write of the entity*, the plaintext column nulled and the ciphertext stored; a read
+  alone leaves it as it is.
+* *Bean Validation sees the plaintext*, the entity never being changed under it (#9 does not arise).
+
+=== Hibernate ORM: event listeners
+
+[source]
+----
+FLUSH_ENTITY  EncryptingFlushEntityEventListener extends DefaultFlushEntityEventListener
+  invokeInterceptor(event)          after the @PreUpdate callbacks and the Interceptor, once the entity is dirty
+    encrypt(entity, loadedState)    ciphertexts which changed, into the entity
+    values[i] = copy, cleared       the state the UPDATE is built from
+    dirtyProperties += changed i    so that @DynamicUpdate writes them
+  onFlushEntity(event)              restores the plaintexts, should Hibernate copy the state back (substitute)
+
+PRE_INSERT    encrypt(entity, none); copies into the insert state, plaintexts NOT cleared
+POST_LOAD     decrypt(entity); loadedState[i] = copy of the entity's
+POST_UPDATE   loadedState[i] = copy of the entity's
+----
+
+* The hook point is the one an `Interceptor.onFlushDirty` has: after the dirty check, before the update is scheduled,
+  the dirty properties recalculable. A `PRE_UPDATE` listener was too late: under `@DynamicUpdate` the columns written
+  are already decided.
+* The insert state is never cleared: for an `IDENTITY` insert, Hibernate ORM makes the state the entity's snapshot only
+  after the post-insert events, so a cleared plaintext there made the first flush after every `INSERT` an `UPDATE`.
+  The plaintext column is non-insertable, so the row does not carry it.
+* Price: the default `FLUSH_ENTITY` listener is replaced, and the integration refuses to start over another one. The
+  second-level cache entry written by an `INSERT` holds the plaintext. Bytecode-enhanced dirty tracking is untested.
+
+=== EclipseLink: descriptor events
+
+[source]
+----
+DescriptorEventAdapter, on every entity descriptor
+  preInsert              encrypt(entity, none); fired while the unit of work calculates its changes
+  preUpdateWithChanges   encrypt(entity, backupClone); EclipseLink calculates the changes again
+  aboutToUpdate          row[plaintext field] = NULL, for every plaintext the mapping nulls
+  postClone, postRefresh decrypt(clone); backup[plaintext attributes] = copies of the clone's
+  postMerge              the same, only for a refresh merging the shared cache's own original into the clone
+----
+
+* `postBuild` and `postClone` of an object built straight into the unit of work are deferred until after its backup
+  clone is taken; hence the backup is reset, not relied on being taken later.
+* Under the shared cache, a refresh refreshes the cache's original and merges it into the clone: only `postMerge` is
+  seen in the unit of work. The same event follows a merge of a detached instance, whose plaintexts are the
+  application's; so only a merge whose source is the original in the parent identity map is decrypted.
+* An object outside a unit of work, such as the shared cache's, is never decrypted.
+* The plaintext columns of an aggregate are found through the aggregate mapping's reference descriptor, cloned by
+  EclipseLink for each mapping with its fields translated by the overrides in scope.
+* Price: the shared cache receives the plaintext of a new or changed entity when the transaction commits. Attribute
+  change tracking, which weaving may enable, is rejected on the first event: a ciphertext set by reflection would not
+  be recorded.
+
+=== Against the sketches
+
+[cols="3,2,2",options="header"]
+|===
+| | Hibernate events (implemented) | EclipseLink descriptor events (implemented)
+| entity temporarily nulled | no | no
+| reading writes | no (tested: load, flush, flush) | no (tested, the shared cache off and on, refresh included)
+| key from the entity | yes | yes
+| user's mapping | unchanged | unchanged
+| the riskiest part, as sketched | the snapshot fix: done on `POST_LOAD` and `POST_UPDATE`, never on insert | event
+  timing: deferred clone events and the refresh merge, both handled; the cache: open
+|===
+
+=== Open
+
+* The plaintext in a provider's shared or second-level cache; the rows never hold it.
+* EclipseLink attribute change tracking; Hibernate ORM bytecode enhancement.
+* Sharing a `FLUSH_ENTITY` listener with an application's own.
