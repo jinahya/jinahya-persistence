@@ -111,6 +111,14 @@ reason.
 
 So setting the plaintext to `null` clears the value, and nothing else needs touching.
 
+**`insertable = false` is unavoidable.** The objective is that the plaintext is never stored in the first place, and the
+`INSERT` is kept from it by the mapping alone: the column is not in the statement. `@PrePersist` encrypts but keeps the
+plaintext, so without it every `INSERT` would carry the plaintext in the clear; and no callback could take its place,
+as `@PrePersist` runs at `persist()`, not when the `INSERT` is built, and Jakarta Persistence has none in between ([the
+insert window](#what-it-costs)). It holds regardless of the nulling and the restoring, which concern the `UPDATE`
+only; only giving up a mapped plaintext, or standard Jakarta Persistence, would lift it. As every `INSERT` leaves the
+column out, a new row gets `NULL` there, or the column's `DEFAULT`: the column has to accept one.
+
 **The restore on `@PostUpdate` is what makes the nulling safe.** A `null` plaintext means *no value*, and encrypts to a
 `null` ciphertext. Were a nulled plaintext left `null` after the `UPDATE`, the listener's own `null` would be taken for
 the application's: the next flush which updates the entity for any reason — a change to an unrelated column, an
