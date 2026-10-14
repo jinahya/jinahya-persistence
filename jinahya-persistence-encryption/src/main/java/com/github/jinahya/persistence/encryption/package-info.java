@@ -28,7 +28,8 @@
  * constraint is checked.
  * <p>
  * The mapping of an entity class is validated before any instance of it is touched; each encrypt and decrypt is
- * all-or-nothing per instance. Every encoded value carries a header naming the format version and the codec.
+ * all-or-nothing per instance. An encoded value carries no type information: it is decoded by the attribute's declared
+ * java type.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

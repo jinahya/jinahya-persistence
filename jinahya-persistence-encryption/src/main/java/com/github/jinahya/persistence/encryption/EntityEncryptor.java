@@ -43,8 +43,8 @@ import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.enc
  * metamodel, and for each {@code byte[]} attribute annotated with {@link EncryptedAttribute @EncryptedAttribute}, and
  * the {@code BASIC} attribute holding the plaintext it names:
  * <ol>
- *   <li>converts the plaintext value to bytes, by its declared java type, prefixed with a header naming the format
- *       version and the codec;</li>
+ *   <li>converts the plaintext value to bytes, by its declared java type; no type information is stored with
+ *       them;</li>
  *   <li>hands those bytes to the {@link EntityEncryptionService encryption service}, along with the
  *       {@link EntityEncryptionService#getEncryptionIdentifier(Object) encryption identifier} of the instance;</li>
  *   <li>stores the ciphertext in the annotated attribute; before an {@code UPDATE}, also sets the plaintext to
@@ -717,7 +717,7 @@ class EntityEncryptor {
                 continue;
             }
             assignments.add(pair.setCiphertext(
-                    object, encryptFramed(encryptionIdentifier, pair, encode(pair, plaintext))));
+                    object, encryptEncoded(encryptionIdentifier, pair, encode(pair, plaintext))));
             if (clearPlaintext && pair.nulled()) {
                 // the plaintext column is mapped nullable: an UPDATE would carry the value, so it goes out as null;
                 // @PostUpdate restores it
@@ -726,9 +726,9 @@ class EntityEncryptor {
         }
     }
 
-    private byte[] encryptFramed(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Pair pair,
-                                 final byte[] framed) {
-        final var encrypted = encryptionService.encrypt(encryptionIdentifier, framed);
+    private byte[] encryptEncoded(final @org.jspecify.annotations.Nullable String encryptionIdentifier, final Pair pair,
+                                  final byte[] encoded) {
+        final var encrypted = encryptionService.encrypt(encryptionIdentifier, encoded);
         if (encrypted == null) {
             throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
         }
@@ -834,9 +834,9 @@ class EntityEncryptor {
             if (returned == null) {
                 throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
             }
-            // a copy: the header is checked, and the payload decoded, from an array the service no longer holds
-            final var framedBytes = returned.clone();
-            assignments.add(pair.setPlaintext(object, decode(pair, framedBytes)));
+            // a copy: the payload is decoded from an array the service no longer holds
+            final var decryptedBytes = returned.clone();
+            assignments.add(pair.setPlaintext(object, decode(pair, decryptedBytes)));
         }
     }
 

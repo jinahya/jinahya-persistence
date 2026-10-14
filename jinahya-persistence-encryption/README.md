@@ -57,11 +57,11 @@ em.find(User.class, id)  ──► @PostLoad               ──► decrypt   u
 
 For each encrypted attribute of the instance, and of its embeddables:
 
-1. **encrypt** — the plaintext is encoded to bytes by its declared java type, behind a two-byte header naming the
-   format and the codec ([Encoding](#encoding)); the service encrypts those bytes; the result is stored in the
-   ciphertext attribute.
-2. **decrypt** — the service decrypts the ciphertext; the header is checked, and the bytes decoded back to a value of
-   the declared type; the value is set on the plaintext.
+1. **encrypt** — the plaintext is encoded to bytes by its declared java type ([Encoding](#encoding)); the service
+   encrypts those bytes; the result is stored in the ciphertext attribute.
+2. **decrypt** — the service decrypts the ciphertext; the bytes are decoded back to a value of the declared type — no
+   type information is stored ([No type information is stored](#no-type-information-is-stored)); the value is set on
+   the plaintext.
 
 Each instance is changed **all or nothing**: every value is computed before any attribute is assigned. The mapping of
 an entity class is validated in full on its first callback, before any instance is touched ([Constraints](#constraints)).

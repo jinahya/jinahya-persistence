@@ -51,17 +51,20 @@ These four facts decide most of the trade-offs below.
 
 === 1.4 Independent of the scheme: the payload format
 
-Settled as format version `1`, whatever the scheme:
+Settled, whatever the scheme:
 
-* every payload starts with a header: the format version, then the id of the codec which wrote it (#75, #19);
-* fixed-width decoders read exactly their width (#76);
+* no type information is stored: a payload is the encoded value only, decoded by the attribute's declared java type;
+  the two-byte header of format version `1` (#75, #19) was removed, so changing a declared type is a breaking change,
+  migrated by decrypting with the old type and re-encrypting with the new;
+* a fixed-width decoder reads its width, and ignores any bytes beyond it (no longer exactly, as in #76);
 * strings are strict UTF-8 in both directions (#77);
-* `boolean_1` accepts only `0` and `1` (#78);
+* a `boolean` is decoded leniently: `0` is `false`, any other byte `true` (reversing #78);
 * `java.sql.Timestamp` is 12 bytes, as `Instant` (#80);
-* `java.util.Calendar` and `java.io.Serializable` are not supported: neither has a clean, secure encoding; their codec
-  ids, `23` and `30`, are retired and never reused (#99, superseding #8, #10 and #11).
+* `java.util.Calendar` and `java.io.Serializable` are not supported: neither has a clean, secure encoding (#99,
+  superseding #8, #10 and #11).
 
-The codecs are pinned byte for byte by `EncryptionServiceUtils_Test`; a change to any of them is a new format version.
+The codecs are public, as `ValueCodecs`, and pinned byte for byte by the `ValueCodecs_Of*_Test` classes; a change to
+any of them changes stored data.
 
 [[within-table]]
 == 2. within_table
@@ -496,7 +499,7 @@ Same as within_table Mode B (2.2), with the bundle as the only mapped attribute:
 * *Done (#82), within_table:* reading does not write; the object is not emptied; an edit through the setter
   persists, and a direct field write is lost unless something else is flushed; rows cross between A and B both ways.
   Still to measure for per_table: the behavior when the secondary row is missing.
-* *Done:* the format items (1.4), as format version 1 (#75–#80).
+* *Done:* the format items (1.4), as format version 1 (#75–#80); the header was later removed.
 * single_column:
 ** sealed bundle or per-attribute entries?
 ** bundle encoding: JSON with Base64 codecs, or binary tag/length/value?
@@ -544,7 +547,8 @@ attribute, and each new encrypted attribute needs DDL. per_table on top of B is 
 . *Re-encryption policy:* *done* (#82): an unchanged plaintext is never re-encrypted.
 . *A pre-switch check:* *done* (#82) as `countUnmigrated(Class)`, then removed: counting the rows still holding
   plaintext is an operational step of the application, which the README gives as a JPQL query.
-. *Format items* (1.4): *done*, as format version 1 (#75–#80); `Serializable` stays as JPA supports it (#8).
+. *Format items* (1.4): *done*, as format version 1 (#75–#80); the header was later removed, and `Serializable`
+  dropped (#99).
 . *Later, as an option:* per_table, by allowing `table = ...` on the ciphertext attribute and validating the
   secondary-table behavior on both providers.
 
