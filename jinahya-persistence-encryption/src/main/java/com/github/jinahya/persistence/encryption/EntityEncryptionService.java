@@ -63,7 +63,13 @@ public interface EntityEncryptionService {
     EntityManagerFactory getEntityManagerFactory();
 
     /**
-     * Returns an identifier for the specified entity instance; the identifier the encryption keys are selected by.
+     * Returns an identifier for the specified entity context; the identifier the encryption keys are selected by.
+     * <p>
+     * The <em>entity context</em> is what stands for one entity when its keys are selected — the context of a single
+     * entity, as the persistence context is that of a unit of work. For this module's
+     * {@link EntityEncryptionListener listener} it is always the entity instance itself; another integration may pass
+     * what it has at that moment instead, such as the entity's row. Interpreting it is this service's, as choosing
+     * the cipher suite and the keys is.
      * <p>
      * <strong>The identifier is never stored.</strong> It is derived again, independently, on every encrypt and on
      * every decrypt, for as long as the row exists. So it has to be derivable <em>identically for the whole lifetime of
@@ -87,14 +93,14 @@ public interface EntityEncryptionService {
      * meaning for it — a default key, a legacy key, … — is entirely this service's. The rule above applies to it all
      * the same: a row written with {@code null} is read with {@code null}.
      *
-     * @param entityInstance the entity instance; never {@code null}.
-     * @return an identifier for the {@code entityInstance}, the same for the whole lifetime of its row; may be
+     * @param entityContext the entity context: the entity instance, for this module's listener; never {@code null}.
+     * @return an identifier for the {@code entityContext}, the same for the whole lifetime of its row; may be
      *         {@code null}.
      * @apiNote Called concurrently on one instance; an implementation has to be thread-safe.
      */
     @org.jspecify.annotations.Nullable
     @Nullable
-    String getEncryptionIdentifier(@Nonnull @NotNull Object entityInstance);
+    String getEncryptionIdentifier(@Nonnull @NotNull Object entityContext);
 
     // -----------------------------------------------------------------------------------------------------------------
 

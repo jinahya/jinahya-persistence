@@ -58,8 +58,8 @@ class DirectListener_Test {
         }
 
         @Override
-        public String getEncryptionIdentifier(final Object entityInstance) {
-            return cryptography.getEncryptionIdentifier(entityInstance);
+        public String getEncryptionIdentifier(final Object entityContext) {
+            return cryptography.getEncryptionIdentifier(entityContext);
         }
 
         @Override

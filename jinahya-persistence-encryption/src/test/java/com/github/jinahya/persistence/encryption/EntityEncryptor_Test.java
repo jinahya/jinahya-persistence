@@ -137,52 +137,13 @@ class EntityEncryptor_Test {
             final var identifier = manager.getEncryptionIdentifier(entity);
 
             entity.grade = null;
-            // a well-formed header, so the bytes reach the enum codec, which cannot find the constant
-            entity.gradeEnc__ = manager.encrypt(identifier, EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.ENUM_, "NOPE".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+            // a name the enum codec reads, but cannot find among the constants
+            entity.gradeEnc__ = manager.encrypt(identifier, ValueCodecs.OfLang.encodeString("NOPE"));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .as("the failure has to say which attribute and which java type")
                     .hasMessageContaining("grade")
                     .hasMessageContaining("Grade");
-        }
-
-        @DisplayName("a payload of an unknown format version is rejected, naming the attribute (#75)")
-        @Test
-        void __unknownFormatVersion() {
-            final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
-            final var service = new EntityEncryptor(manager);
-            final var entity = populated();
-            final var framed = EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.INT_4, ValueCodecs.OfPrimitive.encodeInt(37));
-            framed[0] = (byte) (EntityEncryptorUtils.FORMAT_VERSION + 1);
-            entity.age = null;
-            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), framed);
-
-            assertThatThrownBy(() -> service.decrypt(entity))
-                    .hasMessageContaining("age")
-                    .cause()
-                    .hasMessageContaining("unknown payload format version");
-        }
-
-        @DisplayName(
-                "a payload written by another codec is rejected rather than misread, e.g. after Long -> Integer (#75)")
-        @Test
-        void __codecMismatch() {
-            final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
-            final var service = new EntityEncryptor(manager);
-            final var entity = populated();
-            // what a row holds when `age` was declared Long when it was written, and is Integer now
-            entity.age = null;
-            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.LONG_8, ValueCodecs.OfPrimitive.encodeLong(37L)));
-
-            assertThatThrownBy(() -> service.decrypt(entity))
-                    .hasMessageContaining("age")
-                    .cause()
-                    .hasMessageContaining("encoded by LONG_8")
-                    .hasMessageContaining("decoded by INT_4");
-            assertThat(entity.age).as("nothing was misread").isNull();
         }
     }
 
@@ -436,7 +397,7 @@ class EntityEncryptor_Test {
                 }
 
                 @Override
-                public String getEncryptionIdentifier(final Object entityInstance) {
+                public String getEncryptionIdentifier(final Object entityContext) {
                     throw new AssertionError("must not be called for a plain entity");
                 }
 
@@ -539,9 +500,8 @@ class EntityEncryptor_Test {
             service.encrypt(entity);
             final var nameEnc = entity.nameEnc__.clone();
             final var noteEnc = entity.secret.getNoteEnc__().clone();
-            // a payload of another codec where an Integer is expected
-            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.LONG_8, ValueCodecs.OfPrimitive.encodeLong(37L)));
+            // three bytes where an Integer reads four
+            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), new byte[3]);
 
             assertThatThrownBy(() -> service.decrypt(entity)).isInstanceOf(RuntimeException.class);
 
@@ -612,7 +572,7 @@ class EntityEncryptor_Test {
                 final var seen = java.util.Collections.synchronizedList(new java.util.ArrayList<String>());
                 final var cryptography = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
                     @Override
-                    public String getEncryptionIdentifier(final Object entityInstance) {
+                    public String getEncryptionIdentifier(final Object entityContext) {
                         return identifier;
                     }
 
@@ -652,10 +612,9 @@ class EntityEncryptor_Test {
             entity.ageEnc__ = new byte[
                     EntityEncryptionServiceImpl.IV_BYTES + EntityEncryptionServiceImpl.KEY_BYTES +
                     EntityEncryptionServiceImpl.AAD_BYTES];
-            // a well-formed header with an empty payload; Integer needs four bytes after it
+            // an empty payload; Integer reads four bytes
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
-            entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.INT_4, new byte[0]));
+            entity.ageEnc__ = manager.encrypt("irrelevant", new byte[0]);
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .isInstanceOf(RuntimeException.class)
@@ -663,24 +622,7 @@ class EntityEncryptor_Test {
                     // and unknown enum constants, which are not "too short" but are equally unreadable
                     .hasMessageContaining("cannot reconstruct the value")
                     .hasMessageContaining("age")
-                    .hasMessageContaining("decrypted bytes: " + EntityEncryptorUtils.HEADER_BYTES);
-        }
-
-        @DisplayName("an over-long payload is rejected, not read as its first bytes (#76)")
-        @Test
-        void __overLong() {
-            final var entity = new SecretEntity();
-            // a correct header, but eight bytes where Integer reads four
-            final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
-            entity.ageEnc__ = manager.encrypt("irrelevant", EntityEncryptorUtils.frame(
-                    EntityEncryptorUtils.Codec.INT_4, ValueCodecs.OfPrimitive.encodeLong(37L)));
-
-            assertThatThrownBy(() -> service.decrypt(entity))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("age")
-                    .cause()
-                    .hasMessageContaining("reads exactly 4");
-            assertThat(entity.age).as("nothing was misread").isNull();
+                    .hasMessageContaining("decrypted bytes: 0");
         }
     }
 

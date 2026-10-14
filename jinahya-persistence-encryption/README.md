@@ -57,11 +57,11 @@ em.find(User.class, id)  ──► @PostLoad               ──► decrypt   u
 
 For each encrypted attribute of the instance, and of its embeddables:
 
-1. **encrypt** — the plaintext is encoded to bytes by its declared java type, behind a two-byte header naming the
-   format and the codec ([Encoding](#encoding)); the service encrypts those bytes; the result is stored in the
-   ciphertext attribute.
-2. **decrypt** — the service decrypts the ciphertext; the header is checked, and the bytes decoded back to a value of
-   the declared type; the value is set on the plaintext.
+1. **encrypt** — the plaintext is encoded to bytes by its declared java type ([Encoding](#encoding)); the service
+   encrypts those bytes; the result is stored in the ciphertext attribute.
+2. **decrypt** — the service decrypts the ciphertext; the bytes are decoded back to a value of the declared type — no
+   type information is stored ([No type information is stored](#no-type-information-is-stored)); the value is set on
+   the plaintext.
 
 Each instance is changed **all or nothing**: every value is computed before any attribute is assigned. The mapping of
 an entity class is validated in full on its first callback, before any instance is touched ([Constraints](#constraints)).
@@ -359,12 +359,15 @@ A `java.sql.Timestamp` keeps its nanos; a `java.util.Date` holds milliseconds.
 A primitive plaintext attribute (`int`, `boolean`, …) is supported, but **strongly discouraged**. It is encoded as its
 wrapper, but it can't be `null`: it always has a value to encrypt, and before an `UPDATE` it is left as it is — never
 zeroed, as a zero may violate a constraint such as `@Min(1)` — so an updatable plaintext column receives it in the
-clear. Use a wrapper type, or map its column `updatable = false`.
+clear. Use a wrapper type, or map its column `updatable = false`. And as every `INSERT` leaves the column out, a new
+row holds `NULL` there: Hibernate ORM fails to load a `NULL` into a primitive, where EclipseLink loads it as zero, so the
+column needs a `DEFAULT` (measured on both, by `AllTypes_Test`).
 
 `java.util.Date`, `java.sql.Date`, `java.sql.Time`, `java.sql.Timestamp`, `Byte[]` and `Character[]` are supported but
 [deprecated by Jakarta Persistence 3.2](https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations);
 prefer the `java.time` types, `byte[]` and `char[]`. Deprecation alone is no reason to refuse a type here; each of
-these has a clean encoding.
+these has a clean encoding. Hibernate ORM, though, rejects a `Byte[]` or `Character[]` attribute — the plaintext is
+one — unless `hibernate.type.wrapper_array_handling` is set (`ALLOW`, or `LEGACY`).
 
 ### Not supported types
 

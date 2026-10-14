@@ -63,7 +63,7 @@ container without the CDI API on the class path is expected to fail on when it i
  EntityEncryptionService impl ◄──┼──  EntityEncryptor                       (package-private)
    getEntityManagerFactory()     │    one per listener instance, created on the first callback
    getEncryptionIdentifier(e)    │    ├─ mapping: metamodel → validated pairs, cached per class
-   encrypt / decrypt (bytes)     │    ├─ codec:   value ⇄ framed bytes (EntityEncryptorUtils)
+   encrypt / decrypt (bytes)     │    ├─ codec:   value ⇄ bytes (EntityEncryptorUtils, ValueCodecs)
                                  │    └─ walk:    per-mode decision, all-or-nothing writes
 ----
 
@@ -116,7 +116,8 @@ public interface EntityEncryptionService {
 * Package-private, so not visible, let alone extensible, outside the package; built from the service alone.
 * No CDI types and no lifecycle methods; `AbstractEntityEncryptionService` and its `protected` hooks are gone.
 * Its internals are unchanged: mapping validation against `getEntityManagerFactory().getMetamodel()`, cached per entity class;
-  the codecs and the payload header (format version `1`); the per-mode walk; all-or-nothing writes.
+  the codecs (no payload header: a value is decoded by its declared java type); the per-mode walk; all-or-nothing
+  writes.
 * The identifier only ever comes from the service: the overloads taking an identifier are `private`.
 
 === 3.4 Dependencies

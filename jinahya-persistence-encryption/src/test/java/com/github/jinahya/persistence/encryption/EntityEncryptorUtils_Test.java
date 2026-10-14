@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Proxy;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,16 +21,16 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
+import java.time.ZoneOffset;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Tests for {@link EntityEncryptorUtils}: the codecs which are still its own ({@code Byte[]}, {@code Character[]}), the
- * exact-length check of a stored payload (#76), and the payload frame (#75).
+ * Tests for {@link EntityEncryptorUtils}: the types it supports, and the decoding of a stored payload by the declared
+ * java type alone, no type information being stored.
  * <p>
  * The encodings of the other codecs are pinned by the {@code ValueCodecs_Of*_Test} classes.
  *
@@ -39,16 +41,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Slf4j
 class EntityEncryptorUtils_Test {
 
-    private static byte[] randomBytes(final int minLengthInclusive, final int maxLengthInclusive) {
-        assert minLengthInclusive >= 0;
-        assert maxLengthInclusive >= minLengthInclusive;
-        final var v = new byte[ThreadLocalRandom.current().nextInt(minLengthInclusive, maxLengthInclusive + 1)];
-        ThreadLocalRandom.current().nextBytes(v);
-        return v;
-    }
-
-    // ------------------------------------------------------------------------------------------------- decode (#76)
-    @DisplayName("decode(Pair, byte[]) reads a fixed-width payload of exactly its width (#76)")
+    // ------------------------------------------------------------------------------------------------------- decode
+    @DisplayName("decode(Pair, byte[]) reads a fixed-width payload by the declared java type")
     @Nested
     class Decode_Test {
 
@@ -56,7 +50,7 @@ class EntityEncryptorUtils_Test {
          * Returns a pair of the specified declared type; only the name of its plaintext attribute is answered, which is
          * all {@code decode} reads of it.
          */
-        private static EncryptionMapping.Pair pair(final Class<?> javaType) {
+        static EncryptionMapping.Pair pair(final Class<?> javaType) {
             final var decrypted = (Attribute<?, ?>) Proxy.newProxyInstance(
                     Attribute.class.getClassLoader(),
                     new Class<?>[]{Attribute.class},
@@ -95,119 +89,139 @@ class EntityEncryptorUtils_Test {
             );
         }
 
-        @DisplayName("a payload one byte short, or one byte over, is rejected against the attribute")
+        @DisplayName("a payload one byte short is rejected against the attribute")
         @MethodSource("fixedWidths")
         @ParameterizedTest
-        void __wrongLength(final Class<?> javaType, final int width) {
-            final var codec = EntityEncryptorUtils.codecOf(javaType);
-            for (final var length : new int[]{width - 1, width + 1}) {
-                final var framed = EntityEncryptorUtils.frame(codec, new byte[length]);
-                assertThatThrownBy(() -> EntityEncryptorUtils.decode(pair(javaType), framed))
-                        .as("%s from %d byte(s)", javaType.getSimpleName(), length)
-                        .isInstanceOf(RuntimeException.class)
-                        .hasMessageContaining("decrypted attribute: secret")
-                        .cause()
-                        .hasMessageContaining("reads exactly " + width);
-            }
+        void __short(final Class<?> javaType, final int width) {
+            assertThatThrownBy(() -> EntityEncryptorUtils.decode(pair(javaType), new byte[width - 1]))
+                    .as("%s from %d byte(s)", javaType.getSimpleName(), width - 1)
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("decrypted attribute: secret")
+                    .cause()
+                    .hasMessageContaining("this codec reads " + width);
         }
 
         @DisplayName("a payload of exactly the width is decoded")
         @MethodSource("fixedWidths")
         @ParameterizedTest
         void __exactLength(final Class<?> javaType, final int width) {
-            final var framed = EntityEncryptorUtils.frame(EntityEncryptorUtils.codecOf(javaType), new byte[width]);
-            assertThat(EntityEncryptorUtils.decode(pair(javaType), framed)).isInstanceOf(javaType);
+            assertThat(EntityEncryptorUtils.decode(pair(javaType), new byte[width])).isInstanceOf(javaType);
+        }
+
+        @DisplayName("a payload one byte over is decoded from its leading bytes; the extra byte is not read")
+        @MethodSource("fixedWidths")
+        @ParameterizedTest
+        void __overLong(final Class<?> javaType, final int width) {
+            assertThat(EntityEncryptorUtils.decode(pair(javaType), new byte[width + 1])).isInstanceOf(javaType);
         }
     }
 
-    // --------------------------------------------------------------------------------------------------- payload frame
-    @DisplayName("payload frame (#75)")
+    // ---------------------------------------------------------------------------------------------- encode / decode
+    @DisplayName("decode(encode(v)) is v, for every supported declared java type")
     @Nested
-    class Frame_Test {
+    class RoundTrip_Test {
 
-        @DisplayName("codec ids are stored data: pinned, and unique")
-        @Test
-        void __codecIdsPinned() {
-            // retired ids are never reused: 23, java.util.Calendar, and 30, java.io.Serializable (#99)
-            final var retired = java.util.Set.of((byte) 23, (byte) 30);
-            byte expected = 0;
-            for (final var codec : EntityEncryptorUtils.Codec.values()) {
-                // appending a codec is fine; renumbering or reusing an id is a format break
-                do {
-                    expected++;
-                } while (retired.contains(expected));
-                assertThat(codec.id).as("id of %s", codec).isEqualTo(expected);
-                assertThat(EntityEncryptorUtils.Codec.of(codec.id)).isSameAs(codec);
-            }
-            for (final var id : retired) {
-                assertThat(EntityEncryptorUtils.Codec.of(id)).as("retired id %d", id).isNull();
-            }
-            assertThat(EntityEncryptorUtils.Codec.of((byte) 0)).isNull();
-            assertThat(EntityEncryptorUtils.Codec.of(Byte.MAX_VALUE)).isNull();
+        /**
+         * One value of each supported declared java type, primitives included, and an enum.
+         */
+        @SuppressWarnings("deprecation")
+        static Stream<Arguments> values() {
+            return Stream.of(
+                    Arguments.of(boolean.class, true),
+                    Arguments.of(Boolean.class, Boolean.TRUE),
+                    Arguments.of(byte.class, (byte) -7),
+                    Arguments.of(Byte.class, (byte) 7),
+                    Arguments.of(short.class, (short) -1234),
+                    Arguments.of(Short.class, (short) 1234),
+                    Arguments.of(int.class, -37),
+                    Arguments.of(Integer.class, 37),
+                    Arguments.of(long.class, -1_234_567_890_123L),
+                    Arguments.of(Long.class, 1_234_567_890_123L),
+                    Arguments.of(char.class, 'K'),
+                    Arguments.of(Character.class, '\uD55C'),
+                    Arguments.of(float.class, -3.5f),
+                    Arguments.of(Float.class, 3.5f),
+                    Arguments.of(double.class, -2.25d),
+                    Arguments.of(Double.class, 2.25d),
+                    Arguments.of(String.class, "Jane Roe \uD55C\uAE00"),
+                    Arguments.of(UUID.class, UUID.fromString("123e4567-e89b-12d3-a456-426614174000")),
+                    Arguments.of(BigInteger.class, new BigInteger("-123456789012345678901234567890")),
+                    Arguments.of(BigDecimal.class, new BigDecimal("12345.6789")),
+                    Arguments.of(LocalDate.class, LocalDate.of(1988, 11, 3)),
+                    Arguments.of(LocalTime.class, LocalTime.of(3, 4, 5, 123_456_789)),
+                    Arguments.of(LocalDateTime.class, LocalDateTime.of(2026, 1, 2, 3, 4, 5, 123_456_789)),
+                    Arguments.of(OffsetTime.class, OffsetTime.of(10, 11, 12, 13, ZoneOffset.ofHours(9))),
+                    Arguments.of(OffsetDateTime.class,
+                                 OffsetDateTime.of(2026, 1, 2, 3, 4, 5, 6, ZoneOffset.ofHoursMinutes(-5, -30))),
+                    Arguments.of(Instant.class, Instant.ofEpochSecond(1_700_000_000L, 123_456_789)),
+                    Arguments.of(Year.class, Year.of(2026)),
+                    Arguments.of(java.util.Date.class, new java.util.Date(1_700_000_000_123L)),
+                    Arguments.of(java.sql.Date.class, java.sql.Date.valueOf("2026-01-02")),
+                    Arguments.of(java.sql.Time.class, java.sql.Time.valueOf("03:04:05")),
+                    Arguments.of(java.sql.Timestamp.class, java.sql.Timestamp.valueOf("2026-01-02 03:04:05.123456789")),
+                    Arguments.of(byte[].class, new byte[]{0, 1, -1, 127, -128}),
+                    Arguments.of(Byte[].class, new Byte[]{0, 1, -1, 127, -128}),
+                    Arguments.of(char[].class, new char[]{'a', '\uD55C', '\0'}),
+                    Arguments.of(Character[].class, new Character[]{'a', '\uD55C', '\0'}),
+                    Arguments.of(java.time.DayOfWeek.class, java.time.DayOfWeek.FRIDAY)
+            );
         }
 
-        @DisplayName("codecOf(Class) follows the ladders: java.sql before java.util.Date")
-        @Test
-        void __codecOf() {
-            assertThat(EntityEncryptorUtils.codecOf(Integer.class))
-                    .isSameAs(EntityEncryptorUtils.Codec.INT_4);
-            assertThat(EntityEncryptorUtils.codecOf(int.class))
-                    .isSameAs(EntityEncryptorUtils.Codec.INT_4);
-            assertThat(EntityEncryptorUtils.codecOf(java.sql.Timestamp.class))
-                    .isSameAs(EntityEncryptorUtils.Codec.SQL_TIMESTAMP_12);
-            assertThat(EntityEncryptorUtils.codecOf(java.util.Date.class))
-                    .isSameAs(EntityEncryptorUtils.Codec.UTIL_DATE_8);
-            assertThat(EntityEncryptorUtils.codecOf(java.time.DayOfWeek.class))
-                    .isSameAs(EntityEncryptorUtils.Codec.ENUM_);
-            assertThat(EntityEncryptorUtils.codecOf(java.util.Calendar.class)).as("not supported (#99)").isNull();
-            assertThat(EntityEncryptorUtils.codecOf(java.util.GregorianCalendar.class)).as("not supported (#99)")
-                    .isNull();
-            assertThat(EntityEncryptorUtils.codecOf(java.util.ArrayList.class))
-                    .as("Serializable is not supported (#99)")
-                    .isNull();
-            assertThat(EntityEncryptorUtils.codecOf(Object.class)).as("unsupported").isNull();
+        @DisplayName("the value is decoded back, by the declared java type alone")
+        @MethodSource("values")
+        @ParameterizedTest
+        void __roundTrip(final Class<?> javaType, final Object value) {
+            final var pair = Decode_Test.pair(javaType);
+            final var encoded = EntityEncryptorUtils.encode(pair, value);
+            assertThat(EntityEncryptorUtils.decode(pair, encoded)).isEqualTo(value);
         }
 
-        @DisplayName("frame(Codec, byte[]) prefixes the format version and the codec id")
+        @DisplayName("every supported type has a value above; a type added to the codecs has to be added here")
         @Test
-        void __frame() {
-            final var framed = EntityEncryptorUtils.frame(EntityEncryptorUtils.Codec.INT_4,
-                                                          new byte[]{1, 2, 3, 4});
-            assertThat(framed).containsExactly(
-                    EntityEncryptorUtils.FORMAT_VERSION, EntityEncryptorUtils.Codec.INT_4.id,
-                    1, 2, 3, 4);
+        void __everySupportedTypeIsCovered() throws ReflectiveOperationException {
+            final var field = EntityEncryptorUtils.class.getDeclaredField("SUPPORTED");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            final var supported = (java.util.Set<Class<?>>) field.get(null);
+            final java.util.Set<Class<?>> covered = values()
+                    .map(a -> (Class<?>) a.get()[0])
+                    .collect(java.util.stream.Collectors.toSet());
+            assertThat(covered).containsAll(supported);
+            assertThat(covered).anyMatch(Class::isEnum);
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------------ supports
+    @DisplayName("supports(Class)")
+    @Nested
+    class Supports_Test {
+
+        @DisplayName("the supported types, a primitive and an enum included")
+        @Test
+        void __supported() {
+            assertThat(EntityEncryptorUtils.supports(Integer.class)).isTrue();
+            assertThat(EntityEncryptorUtils.supports(int.class)).isTrue();
+            assertThat(EntityEncryptorUtils.supports(String.class)).isTrue();
+            assertThat(EntityEncryptorUtils.supports(java.sql.Timestamp.class)).isTrue();
+            assertThat(EntityEncryptorUtils.supports(java.util.Date.class)).isTrue();
+            assertThat(EntityEncryptorUtils.supports(java.time.DayOfWeek.class)).isTrue();
+            assertThat(EntityEncryptorUtils.supports(byte[].class)).isTrue();
         }
 
-        @DisplayName("unframe(Codec, byte[]) reads back what frame wrote, empty included")
+        @DisplayName("the unsupported types (#92, #99)")
         @Test
-        void __roundTrip() {
-            final var codec = EntityEncryptorUtils.Codec.STRING_;
-            assertThat(EntityEncryptorUtils.unframe(codec, EntityEncryptorUtils.frame(codec, new byte[0])))
-                    .isEmpty();
-            final var encoded = randomBytes(1, 128);
-            assertThat(EntityEncryptorUtils.unframe(codec, EntityEncryptorUtils.frame(codec, encoded)))
-                    .isEqualTo(encoded);
+        void __unsupported() {
+            assertThat(EntityEncryptorUtils.supports(java.util.Calendar.class)).isFalse();
+            assertThat(EntityEncryptorUtils.supports(java.util.GregorianCalendar.class)).isFalse();
+            assertThat(EntityEncryptorUtils.supports(java.util.ArrayList.class)).as("Serializable").isFalse();
+            assertThat(EntityEncryptorUtils.supports(Object.class)).isFalse();
+            assertThat(EntityEncryptorUtils.supports(UtilDateSubclass.class))
+                    .as("another subclass of java.util.Date couldn't be rebuilt on read")
+                    .isFalse();
         }
+    }
 
-        @DisplayName("unframe(Codec, byte[]) rejects a missing header, another version, and another codec")
-        @Test
-        void __unframeRejects() {
-            final var codec = EntityEncryptorUtils.Codec.INT_4;
-            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(codec, new byte[1]))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("no payload header");
-            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(codec, new byte[]{0, codec.id}))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("unknown payload format version");
-            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(
-                    codec, EntityEncryptorUtils.frame(EntityEncryptorUtils.Codec.LONG_8, new byte[8])))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("encoded by LONG_8")
-                    .hasMessageContaining("decoded by INT_4");
-            assertThatThrownBy(() -> EntityEncryptorUtils.unframe(
-                    codec, new byte[]{EntityEncryptorUtils.FORMAT_VERSION, Byte.MAX_VALUE}))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("unknown codec");
-        }
+    @SuppressWarnings("serial")
+    private static final class UtilDateSubclass extends java.util.Date {
     }
 }
