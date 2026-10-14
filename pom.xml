@@ -48,6 +48,7 @@
 
   <modules>
     <module>jinahya-persistence-encryption</module>
+    <module>jinahya-persistence-encryption-hibernate</module>
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
     <module>jinahya-persistence-test-utils</module>
@@ -269,6 +270,13 @@
       <!--        <type>pom</type>-->
       <!--        <scope>import</scope>-->
       <!--      </dependency>-->
+      <!-- for the modules which integrate with Hibernate ORM itself; the jakarta-ee-11-hibernate-orm profile adds it to
+           every module's test class path at the same version -->
+      <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${version.org.hibernate.orm}</version>
+      </dependency>
       <dependency>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator</artifactId>

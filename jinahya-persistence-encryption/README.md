@@ -136,6 +136,8 @@ The plaintext is a *mapped* attribute, and a JPA listener can only keep its valu
 field. These follow, and cannot be fixed inside the standard callbacks: they are the price of using standard Jakarta
 Persistence APIs only.
 
+A [provider integration](#provider-integrations) removes the first three, at the price of that purity.
+
 * **Reading an entity writes it.** `@PostLoad` runs after the provider has taken its loaded-state snapshot, so setting
   the decrypted value leaves the instance dirty from the moment it is read. Measured on both providers: a transaction
   which only reads still issues an `UPDATE`, increments `@Version`, and — encryption being randomized — rewrites the
@@ -219,6 +221,33 @@ A listener created without one has no service, and its first callback fails with
 
 **Never encrypt from `@PostPersist` or `@PostUpdate`** — the row is already written by the time the post-callbacks
 run.
+
+## Provider integrations
+
+A provider integration replaces the listener with the persistence provider's own write and read paths. The mapping
+and the `EntityEncryptionService` are the same; the listener must **not** be registered as well. What changes:
+
+* **The entity's plaintext is never nulled.** It is cleared only in what the provider builds the row from.
+* **A read never writes.** The snapshot the provider checks the entity against holds the decrypted plaintext.
+* **An unrelated change keeps the ciphertext.** A plaintext is encrypted again only when its encoding changed, or when
+  its ciphertext is missing — a legacy row, migrated by any write of the entity.
+* **Bean Validation sees the plaintext**, as the entity is never changed under it.
+
+The service comes from the persistence unit property `jinahya.persistence.encryption.service`
+(`EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE`): an instance, passed in the properties of the entity manager factory,
+its class, or the name of its class. Without the property, the integration does nothing.
+
+```java
+var factory = Persistence.createEntityManagerFactory(
+        "unit", Map.of(EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE, service));
+```
+
+| provider | module | mechanism |
+|---|---|---|
+| Hibernate ORM | `jinahya-persistence-encryption-hibernate` | an `Integrator`, found through `ServiceLoader`; replaces the default `FLUSH_ENTITY` listener, and adds `PRE_INSERT`, `POST_UPDATE` and `POST_LOAD` listeners. The session factory is the entity manager factory read, so the service's `getEntityManagerFactory()` is never called. `@DynamicInsert` and `@DynamicUpdate` are supported |
+
+Under Hibernate ORM, the second-level cache entry written by an `INSERT` holds the plaintext. The plaintext column is
+non-insertable, so the row never does.
 
 ## Constraints
 
