@@ -160,13 +160,12 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
             return;
         }
         final var entity = event.getEntity();
-        final @org.jspecify.annotations.Nullable Object @org.jspecify.annotations.Nullable [] loaded =
-                entry.getLoadedState();
+        final Object[] loaded = entry.getLoadedState();
         encryptor.encrypt(entity, loaded == null ? null : name -> {
             final var index = indices.indices().get(name);
             return index == null ? null : loaded[index];
         });
-        final @org.jspecify.annotations.Nullable Object[] values = event.getPropertyValues();
+        final Object[] values = event.getPropertyValues();
         writeState(persister, entity, values, indices, true, event.getSession());
         if (loaded == null) {
             // no snapshot to check against; every column is written
