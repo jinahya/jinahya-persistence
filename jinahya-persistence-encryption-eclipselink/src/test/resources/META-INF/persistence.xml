@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="3.2">
+  <!-- this module integrates with EclipseLink only; the provider is fixed, whichever profile is active -->
+  <!-- objects built straight into the unit of work: postClone runs after the backup clone is taken -->
+  <persistence-unit name="__encryptionEclipseLinkIsolatedPU">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEmbeddable</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url"
+                value="jdbc:h2:mem:encryption-eclipselink-isolated;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <property name="eclipselink.session.customizer"
+                value="com.github.jinahya.persistence.encryption.eclipselink.EntityEncryptionSessionCustomizer"/>
+    </properties>
+  </persistence-unit>
+  <!-- objects cloned from the shared cache: postClone runs before the backup clone is taken -->
+  <persistence-unit name="__encryptionEclipseLinkSharedPU">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEmbeddable</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url"
+                value="jdbc:h2:mem:encryption-eclipselink-shared;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <property name="eclipselink.session.customizer"
+                value="com.github.jinahya.persistence.encryption.eclipselink.EntityEncryptionSessionCustomizer"/>
+    </properties>
+  </persistence-unit>
+</persistence>

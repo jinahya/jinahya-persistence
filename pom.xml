@@ -48,6 +48,7 @@
 
   <modules>
     <module>jinahya-persistence-encryption</module>
+    <module>jinahya-persistence-encryption-eclipselink</module>
     <module>jinahya-persistence-encryption-hibernate</module>
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
@@ -246,6 +247,12 @@
             <artifactId>byte-buddy</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <!-- for the modules which integrate with EclipseLink itself -->
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.core</artifactId>
+        <version>${version.org.eclipse.persistence}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>

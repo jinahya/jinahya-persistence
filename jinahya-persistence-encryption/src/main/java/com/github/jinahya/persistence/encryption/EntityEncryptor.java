@@ -975,6 +975,36 @@ public class EntityEncryptor {
     }
 
     /**
+     * Returns the paths, from the specified entity class, of the plaintexts which are nulled: not primitive, and
+     * their columns mapped nullable. A path is the names of the embedded attributes leading to the plaintext, if any,
+     * followed by the plaintext's own name.
+     *
+     * @param entityClass the entity class.
+     * @return an unmodifiable list of unmodifiable paths; empty when the {@code entityClass} has none.
+     */
+    public List<List<String>> getNulledPlaintextPaths(final Class<?> entityClass) {
+        final var paths = new ArrayList<List<String>>();
+        collectNulledPlaintextPaths(getMapping(entityClass), List.of(), paths);
+        return List.copyOf(paths);
+    }
+
+    private static void collectNulledPlaintextPaths(final EncryptionMapping mapping, final List<String> prefix,
+                                                    final List<List<String>> paths) {
+        for (final var pair : mapping.pairs()) {
+            if (pair.nulled()) {
+                final var path = new ArrayList<>(prefix);
+                path.add(pair.name());
+                paths.add(List.copyOf(path));
+            }
+        }
+        for (final var embedded : mapping.embeddeds()) {
+            final var path = new ArrayList<>(prefix);
+            path.add(embedded.attribute().getName());
+            collectNulledPlaintextPaths(embedded.mapping(), path, paths);
+        }
+    }
+
+    /**
      * Returns the value to write for the specified attribute of the specified entity class: {@code null} for a
      * plaintext which is nulled — not primitive, and its column mapped nullable — and, for an embedded attribute, the
      * specified value with each such plaintext inside it, at any depth, set to {@code null}. Any other value is

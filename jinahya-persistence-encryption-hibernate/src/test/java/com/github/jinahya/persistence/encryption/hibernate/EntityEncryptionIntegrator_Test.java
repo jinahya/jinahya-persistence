@@ -232,6 +232,26 @@ class EntityEncryptionIntegrator_Test {
             assertThat(column(SecretEntity.TABLE_NAME, "note", id)).isEqualTo("changed");
         }
 
+        @DisplayName("a detached instance merged with a changed plaintext stores it")
+        @Test
+        void __merged() {
+            final long id = persist("alice", 1);
+            final var detached = apply(em -> em.find(SecretEntity.class, id));
+            detached.name = "carol";
+            apply(em -> {
+                final var merged = em.merge(detached);
+                assertThat(merged.name).isEqualTo("carol");
+                em.flush();
+                assertThat(merged.name).isEqualTo("carol");
+                return null;
+            });
+            assertThat(column(SecretEntity.TABLE_NAME, "name", id)).isNull();
+            apply(em -> {
+                assertThat(em.find(SecretEntity.class, id).name).isEqualTo("carol");
+                return null;
+            });
+        }
+
         @DisplayName("a plaintext set to null nulls the ciphertext")
         @Test
         void __nulled() {
