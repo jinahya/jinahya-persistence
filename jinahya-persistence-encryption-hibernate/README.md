@@ -68,7 +68,7 @@ from the persistence unit properties and registers one engine, `HibernateEntityE
 | `PRE_INSERT` | the ciphertexts are computed into the entity, then copied into the state the `INSERT` is built from |
 | `FLUSH_ENTITY` | Hibernate's `DefaultFlushEntityEventListener` is **replaced** by a subclass. Once an entity is found dirty, and after any interceptor and `@PreUpdate` callback, the plaintexts which changed against the snapshot are encrypted; the `UPDATE` state gets the new ciphertexts and the cleared plaintexts, and those indices are marked dirty. `@DynamicUpdate` therefore writes the right columns |
 | `POST_UPDATE` | the snapshot, the entry's loaded state, is reset to what the entity holds, so the cleared plaintext does not make it dirty again |
-| `POST_LOAD` | the entity is decrypted, and its snapshot reset to the decrypted values, so a read is not a change |
+| `POST_LOAD` (prepended) | the entity is decrypted, and its snapshot reset to the decrypted values, so a read is not a change. It runs before Hibernate's default listener, so JPA `@PostLoad` callbacks see the plaintext decrypted |
 | `PRE_INSERT`, `PRE_UPDATE`, `PRE_UPSERT` from a `StatelessSession` | refused with an `IllegalStateException` ([below](#rules)) |
 
 The entity's own plaintext fields are never written to by the engine, so nothing has to be restored after an

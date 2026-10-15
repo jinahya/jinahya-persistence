@@ -339,6 +339,79 @@ class EntityEncryptionIntegrator_Test {
             });
         }
 
+        private long persistCallback(final String name) {
+            return apply(em -> {
+                final var entity = new CallbackSecretEntity();
+                entity.name = name;
+                em.persist(entity);
+                return entity;
+            }).id;
+        }
+
+        // https://github.com/jinahya/jinahya-persistence/issues/106
+        @DisplayName("@PostLoad sees the decrypted plaintext, and a read still writes nothing")
+        @Test
+        void __postLoad() {
+            final long id = persistCallback("original");
+            final var before = updates();
+            apply(em -> {
+                final var found = em.find(CallbackSecretEntity.class, id);
+                assertThat(found.nameSeenOnPostLoad).isEqualTo("original");
+                em.flush();
+                return null;
+            });
+            assertThat(updates()).isEqualTo(before);
+        }
+
+        // https://github.com/jinahya/jinahya-persistence/issues/106
+        @DisplayName("@PostLoad sees a legacy row's plaintext, and the read doesn't migrate it")
+        @Test
+        void __postLoadLegacy() {
+            final long id = insertLegacy(CallbackSecretEntity.TABLE_NAME, "legacy");
+            apply(em -> {
+                assertThat(em.find(CallbackSecretEntity.class, id).nameSeenOnPostLoad).isEqualTo("legacy");
+                return null;
+            });
+            assertThat(column(CallbackSecretEntity.TABLE_NAME, "name", id)).isEqualTo("legacy");
+            assertThat(column(CallbackSecretEntity.TABLE_NAME, "name_enc", id)).isNull();
+        }
+
+        // https://github.com/jinahya/jinahya-persistence/issues/106
+        @DisplayName("a plaintext @PostLoad assigns is kept, not overwritten by decryption, and stored encrypted")
+        @Test
+        void __postLoadAssigns() {
+            final long id = persistCallback("original");
+            CallbackSecretEntity.nameAssignedOnPostLoad = "assigned";
+            try {
+                apply(em -> {
+                    final var found = em.find(CallbackSecretEntity.class, id);
+                    assertThat(found.name).isEqualTo("assigned");
+                    return null;
+                });
+            } finally {
+                CallbackSecretEntity.nameAssignedOnPostLoad = null;
+            }
+            assertThat(column(CallbackSecretEntity.TABLE_NAME, "name", id)).isNull();
+            apply(em -> {
+                assertThat(em.find(CallbackSecretEntity.class, id).name).isEqualTo("assigned");
+                return null;
+            });
+        }
+
+        // https://github.com/jinahya/jinahya-persistence/issues/106
+        @DisplayName("@PostLoad sees the decrypted plaintext on refresh")
+        @Test
+        void __postLoadRefresh() {
+            final long id = persistCallback("original");
+            apply(em -> {
+                final var found = em.find(CallbackSecretEntity.class, id);
+                found.nameSeenOnPostLoad = null;
+                em.refresh(found);
+                assertThat(found.nameSeenOnPostLoad).isEqualTo("original");
+                return null;
+            });
+        }
+
         // https://github.com/jinahya/jinahya-persistence/issues/102
         @DisplayName("a plaintext an interceptor assigns in onFlushDirty is kept by the entity, and stored as ciphertext"
                      + " only")

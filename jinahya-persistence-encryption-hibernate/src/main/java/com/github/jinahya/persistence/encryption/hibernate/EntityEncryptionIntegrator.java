@@ -75,6 +75,7 @@ public class EntityEncryptionIntegrator implements Integrator {
         registry.appendListeners(EventType.PRE_UPDATE, engine);
         registry.appendListeners(EventType.PRE_UPSERT, engine);
         registry.appendListeners(EventType.POST_UPDATE, engine);
-        registry.appendListeners(EventType.POST_LOAD, engine);
+        // before Hibernate ORM's default one, which invokes the @PostLoad callbacks: they see the plaintext decrypted
+        registry.prependListeners(EventType.POST_LOAD, engine);
     }
 }
