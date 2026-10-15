@@ -165,8 +165,10 @@ class EntityEncryptionIntegrator_Test {
             final long id = persist("alice", 1);
             final var before = updates();
             final var encrypted = SERVICE.encrypted.get();
+            final var initialized = SERVICE.initialized.get();
             apply(em -> {
                 final var found = em.find(SecretEntity.class, id);
+                assertThat(SERVICE.initialized.get()).as("one init, for the load").isEqualTo(initialized + 1);
                 assertThat(found.name).isEqualTo("alice");
                 em.flush();
                 em.flush();
@@ -174,6 +176,7 @@ class EntityEncryptionIntegrator_Test {
             });
             assertThat(updates()).isEqualTo(before);
             assertThat(SERVICE.encrypted.get()).isEqualTo(encrypted);
+            assertThat(SERVICE.initialized.get()).as("no init for the flushes").isEqualTo(initialized + 1);
         }
     }
 

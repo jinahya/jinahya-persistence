@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.eclipselink;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionContext;
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import jakarta.persistence.EntityManagerFactory;
 
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An encryption service for tests: AES-GCM under a fixed key, with a random IV, so that encrypting the same value twice
- * yields different bytes; it counts its calls.
+ * yields different bytes; it counts its calls. The cipher is prepared once per context, and kept as its attachment.
  */
 class CountingEncryptionService implements EntityEncryptionService {
 
@@ -31,17 +32,23 @@ class CountingEncryptionService implements EntityEncryptionService {
     }
 
     @Override
-    public String getEncryptionIdentifier(final Object entityContext) {
-        return "test";
+    public void init(final EntityEncryptionContext context) {
+        initialized.incrementAndGet();
+        try {
+            context.setAttachment(Cipher.getInstance("AES/GCM/NoPadding"));
+        } catch (final GeneralSecurityException gse) {
+            throw new RuntimeException(gse);
+        }
     }
 
     @Override
-    public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+    public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
         encrypted.incrementAndGet();
         final var iv = new byte[IV_BYTES];
         RANDOM.nextBytes(iv);
         try {
-            final var cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            // the context's cipher, initialized again with a fresh IV for each value
+            final var cipher = (Cipher) context.getAttachment();
             cipher.init(Cipher.ENCRYPT_MODE, KEY, new GCMParameterSpec(128, iv));
             final var encrypted = cipher.doFinal(decryptedBytes);
             return ByteBuffer.allocate(IV_BYTES + encrypted.length).put(iv).put(encrypted).array();
@@ -51,10 +58,10 @@ class CountingEncryptionService implements EntityEncryptionService {
     }
 
     @Override
-    public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
+    public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
         decrypted.incrementAndGet();
         try {
-            final var cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            final var cipher = (Cipher) context.getAttachment();
             cipher.init(Cipher.DECRYPT_MODE, KEY, new GCMParameterSpec(128, encryptedBytes, 0, IV_BYTES));
             return cipher.doFinal(encryptedBytes, IV_BYTES, encryptedBytes.length - IV_BYTES);
         } catch (final GeneralSecurityException gse) {
@@ -65,6 +72,8 @@ class CountingEncryptionService implements EntityEncryptionService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     volatile EntityManagerFactory entityManagerFactory;
+
+    final AtomicInteger initialized = new AtomicInteger();
 
     final AtomicInteger encrypted = new AtomicInteger();
 

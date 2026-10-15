@@ -167,8 +167,10 @@ abstract class EntityEncryptionSessionCustomizer_Test {
             final long id = persist("alice", 1);
             final var version = version(id);
             final var encrypted = service.encrypted.get();
+            final var initialized = service.initialized.get();
             apply(em -> {
                 final var found = em.find(SecretEntity.class, id);
+                assertThat(service.initialized.get()).as("one init, for the load").isEqualTo(initialized + 1);
                 assertThat(found.name).isEqualTo("alice");
                 assertThat(found.secret.code).isEqualTo(1);
                 em.flush();
@@ -177,6 +179,7 @@ abstract class EntityEncryptionSessionCustomizer_Test {
             });
             assertThat(version(id)).isEqualTo(version);
             assertThat(service.encrypted.get()).isEqualTo(encrypted);
+            assertThat(service.initialized.get()).as("no init for the flushes").isEqualTo(initialized + 1);
         }
 
         @DisplayName("a refreshed entity, flushed, does not write")
