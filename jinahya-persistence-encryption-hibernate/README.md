@@ -61,7 +61,7 @@ the [encoding](../jinahya-persistence-encryption/README.md#encoding), the servic
 
 `EntityEncryptionIntegrator` is a Hibernate ORM `Integrator`, found through `ServiceLoader`
 (`META-INF/services/org.hibernate.integrator.spi.Integrator`). When the session factory is built, it reads the service
-from the persistence unit properties and registers one engine, `HibernateEntityEncryptor`, on four events:
+from the persistence unit properties and registers one engine, `HibernateEntityEncryptor`, on these events:
 
 | event | what happens |
 |---|---|
@@ -69,6 +69,7 @@ from the persistence unit properties and registers one engine, `HibernateEntityE
 | `FLUSH_ENTITY` | Hibernate's `DefaultFlushEntityEventListener` is **replaced** by a subclass. Once an entity is found dirty, and after any interceptor and `@PreUpdate` callback, the plaintexts which changed against the snapshot are encrypted; the `UPDATE` state gets the new ciphertexts and the cleared plaintexts, and those indices are marked dirty. `@DynamicUpdate` therefore writes the right columns |
 | `POST_UPDATE` | the snapshot, the entry's loaded state, is reset to what the entity holds, so the cleared plaintext does not make it dirty again |
 | `POST_LOAD` | the entity is decrypted, and its snapshot reset to the decrypted values, so a read is not a change |
+| `PRE_INSERT`, `PRE_UPDATE`, `PRE_UPSERT` from a `StatelessSession` | refused with an `IllegalStateException` ([below](#rules)) |
 
 The entity's own plaintext fields are never written to by the engine, so nothing has to be restored after an
 `UPDATE`. Only POJO-mapped entities are handled: a dynamic-map entity is skipped. `@DynamicInsert` and `@DynamicUpdate`
@@ -129,4 +130,9 @@ cycle between the service bean and the factory bean.
   if another listener has been registered there.
 * **The second-level cache holds the plaintext.** The cache entry written by an `INSERT` carries it, although the row
   never does. Where that matters, leave the encrypted entities uncached.
+* **No `StatelessSession`.** A stateless session never flushes and fires no load events, so its updates would write
+  the plaintext in the clear, and what it reads is never decrypted. Its `insert`, `update` and `upsert` of an
+  encrypted entity (and their `*Multiple` forms) fail with an `IllegalStateException`. Its reads can't be refused: they
+  return the entity with its plaintexts not decrypted. Use a `Session`, or an `EntityManager`, for encrypted entities
+  ([#104](https://github.com/jinahya/jinahya-persistence/issues/104)).
 * **Bytecode enhancement with dirty tracking is not verified.**

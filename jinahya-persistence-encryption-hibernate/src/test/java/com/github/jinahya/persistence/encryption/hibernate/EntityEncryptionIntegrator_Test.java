@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.type.Type;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Verifies the Hibernate ORM integration against an in-memory database: what reaches the row, what the entity keeps,
@@ -366,6 +368,69 @@ class EntityEncryptionIntegrator_Test {
                 assertThat(em.find(SecretEntity.class, id).name).isEqualTo("interceptor-value");
                 return null;
             });
+        }
+    }
+
+    // https://github.com/jinahya/jinahya-persistence/issues/104
+    @DisplayName("StatelessSession")
+    @Nested
+    class StatelessTest {
+
+        private static <R> R stateless(final Function<? super StatelessSession, ? extends R> function) {
+            try (var session = ENTITY_MANAGER_FACTORY.unwrap(SessionFactory.class).openStatelessSession()) {
+                final var tx = session.beginTransaction();
+                try {
+                    return function.apply(session);
+                } finally {
+                    tx.rollback();
+                }
+            }
+        }
+
+        @DisplayName("insert is refused, and nothing is written")
+        @Test
+        void __insert() {
+            final var count = (Number) apply(em -> em.createNativeQuery(
+                    "SELECT COUNT(*) FROM " + SecretEntity.TABLE_NAME).getSingleResult());
+            final var entity = new SecretEntity();
+            entity.name = "alice";
+            assertThatThrownBy(() -> stateless(session -> {
+                session.insert(entity);
+                return null;
+            })).isInstanceOf(IllegalStateException.class).hasMessageContaining("StatelessSession");
+            assertThat((Number) apply(em -> em.createNativeQuery(
+                    "SELECT COUNT(*) FROM " + SecretEntity.TABLE_NAME).getSingleResult()))
+                    .isEqualTo(count);
+        }
+
+        @DisplayName("update is refused, so the plaintext is never written in the clear")
+        @Test
+        void __update() {
+            final long id = persist("original", 1);
+            final var stored = (byte[]) column(SecretEntity.TABLE_NAME, "name_enc", id);
+            assertThatThrownBy(() -> stateless(session -> {
+                final var found = session.get(SecretEntity.class, id);
+                found.name = "changed";
+                session.update(found);
+                return null;
+            })).isInstanceOf(IllegalStateException.class).hasMessageContaining("StatelessSession");
+            assertThat(column(SecretEntity.TABLE_NAME, "name", id)).isNull();
+            assertThat((byte[]) column(SecretEntity.TABLE_NAME, "name_enc", id)).isEqualTo(stored);
+        }
+
+        @DisplayName("upsert is refused, so the plaintext is never written in the clear")
+        @Test
+        void __upsert() {
+            final long id = persist("original", 1);
+            final var stored = (byte[]) column(SecretEntity.TABLE_NAME, "name_enc", id);
+            assertThatThrownBy(() -> stateless(session -> {
+                final var found = session.get(SecretEntity.class, id);
+                found.name = "changed";
+                session.upsert(found);
+                return null;
+            })).isInstanceOf(IllegalStateException.class).hasMessageContaining("StatelessSession");
+            assertThat(column(SecretEntity.TABLE_NAME, "name", id)).isNull();
+            assertThat((byte[]) column(SecretEntity.TABLE_NAME, "name_enc", id)).isEqualTo(stored);
         }
     }
 
