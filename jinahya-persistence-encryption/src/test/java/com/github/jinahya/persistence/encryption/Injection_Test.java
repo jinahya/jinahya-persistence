@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Hands a CDI container's {@code BeanManager} to the persistence provider, as {@code jakarta.persistence.bean.manager},
- * and measures whether the provider then creates the converters through it, so that the service bean is injected; when
- * it does not, the {@link java.util.ServiceLoader} fallback serves.
+ * and checks that the provider then creates the converters through it, so that the service bean is injected, and the
+ * {@link java.util.ServiceLoader} one is never used. Measured on both providers.
  */
 @SuppressWarnings({"java:S101"})
 class Injection_Test {
@@ -88,6 +88,7 @@ class Injection_Test {
                              - loaded;
         log.info("service calls: {} through the injected bean, {} through the ServiceLoader one",
                  byInjection, byLoader);
-        assertThat(byInjection + byLoader).isEqualTo(2);
+        assertThat(byInjection).as("the injected bean served both calls").isEqualTo(2);
+        assertThat(byLoader).as("the ServiceLoader one served none").isZero();
     }
 }

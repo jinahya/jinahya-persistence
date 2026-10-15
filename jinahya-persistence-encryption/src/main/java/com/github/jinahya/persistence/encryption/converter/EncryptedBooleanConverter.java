@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfPrimitive;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedBooleanConverter extends EncryptedAttributeConverter
      * Creates a new instance.
      */
     public EncryptedBooleanConverter() {
-        super(Boolean.class, OfPrimitive::encodeBoolean, OfPrimitive::decodeBoolean);
+        this(null);
+    }
+
+    EncryptedBooleanConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(Boolean.class, OfPrimitive::encodeBoolean, OfPrimitive::decodeBoolean, service);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfTime;
 
 import jakarta.persistence.AttributeConverter;
@@ -22,6 +23,10 @@ public final class EncryptedOffsetDateTimeConverter extends EncryptedAttributeCo
      * Creates a new instance.
      */
     public EncryptedOffsetDateTimeConverter() {
-        super(OffsetDateTime.class, OfTime::encodeOffsetDateTime, OfTime::decodeOffsetDateTime);
+        this(null);
+    }
+
+    EncryptedOffsetDateTimeConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(OffsetDateTime.class, OfTime::encodeOffsetDateTime, OfTime::decodeOffsetDateTime, service);
     }
 }

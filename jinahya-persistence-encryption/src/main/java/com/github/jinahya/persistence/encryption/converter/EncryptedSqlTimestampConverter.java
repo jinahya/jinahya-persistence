@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfSql;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedSqlTimestampConverter extends EncryptedAttributeConv
      * Creates a new instance.
      */
     public EncryptedSqlTimestampConverter() {
-        super(java.sql.Timestamp.class, OfSql::encodeTimestamp, OfSql::decodeTimestamp);
+        this(null);
+    }
+
+    EncryptedSqlTimestampConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(java.sql.Timestamp.class, OfSql::encodeTimestamp, OfSql::decodeTimestamp, service);
     }
 }

@@ -12,7 +12,7 @@
   <artifactId>jinahya-persistence-encryption-eclipselink</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Application-level encryption of entity attributes, integrated with EclipseLink</description>
+  <description>Application-level encryption of entity attributes, EclipseLink's own way: a named converter</description>
 
   <properties>
     <!-- the Automatic-Module-Name; the name the module-info draft declares -->
@@ -27,7 +27,7 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-    <!-- the engine is EclipseLink's own descriptor events; the application brings EclipseLink -->
+    <!-- the converter is EclipseLink's own; the application brings EclipseLink -->
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
@@ -47,6 +47,22 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the test persistence unit requests CALLBACK validation; a provider has to be on the test classpath -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

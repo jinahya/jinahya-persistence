@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfTime;
 
 import jakarta.persistence.AttributeConverter;
@@ -22,6 +23,10 @@ public final class EncryptedYearConverter extends EncryptedAttributeConverter<Ye
      * Creates a new instance.
      */
     public EncryptedYearConverter() {
-        super(Year.class, OfTime::encodeYear, OfTime::decodeYear);
+        this(null);
+    }
+
+    EncryptedYearConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(Year.class, OfTime::encodeYear, OfTime::decodeYear, service);
     }
 }

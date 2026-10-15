@@ -3,81 +3,45 @@
 [![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-hibernate)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-hibernate/versions)
 [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-hibernate/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-hibernate)
 
-The [`jinahya-persistence-encryption`](../jinahya-persistence-encryption/README.md) engine on Hibernate ORM's own
-event listeners, in place of the portable entity listener.
-
-## The encryption module, in short
-
-[`jinahya-persistence-encryption`](../jinahya-persistence-encryption/README.md) is application-level encryption for
-Jakarta Persistence entities. An application pairs each secret attribute (the *plaintext*) with a `byte[]` attribute
-annotated `@EncryptedAttribute` (the *ciphertext*). The database stores the ciphertext only. Keys and cryptography stay
-in the application's one `EntityEncryptionService`.
+Hibernate ORM's own way into [`jinahya-persistence-encryption`](../jinahya-persistence-encryption/README.md): one
+annotation for every supported type, the service from a persistence unit property, and the ciphertext in the
+second-level cache. Optional: the generic module is complete on its own, and this one changes nothing about what is
+stored.
 
 ```java
 @Entity
 class User {
 
-    @Column(name = "name", insertable = false) // the plaintext: never carried by an INSERT
-    private String name;
-
-    @EncryptedAttribute("name")                // its ciphertext: the column which is stored
-    @Column(name = "name_enc")
-    private byte[] nameEnc;
+    @Encrypted
+    @Column(name = "name_enc")      // a binary column; holds the ciphertext only
+    private String name;            // holds the plaintext only
 }
 ```
 
-What it costs, whichever way it is wired:
+## What it adds
 
-* **Querying stops working.** The database holds ciphertext only, so a predicate or an ordering on an encrypted
-  attribute matches what is stored, which is `NULL`.
-* **The service is on every load and write.** Each loaded entity is decrypted attribute by attribute, and each written
-  one encrypted, after one `init(context)` per instance to select its keys.
-* **No type information is stored.** Changing an attribute's java type or encoding breaks the rows already written.
-* **The key selection is the application's.** Whatever `init(context)` selects keys by has to stay the same for the
-  whole lifetime of the row.
-
-The portable wiring, `@EntityListeners(EntityEncryptionListener.class)`, uses standard callbacks only, and so pays
-more ([What it costs](../jinahya-persistence-encryption/README.md#what-it-costs)): a read leaves the entity dirty, so
-every read issues an `UPDATE` and bumps `@Version`; every further flush writes again; and Bean Validation sees a nulled
-plaintext. This module removes those three, at the price of depending on Hibernate ORM's internals.
-
-## What this module changes
-
-| | `EntityEncryptionListener` | this module |
+| | the generic module | this module |
 |---|---|---|
-| a read | writes the entity back (`UPDATE`, `@Version` + 1, fresh IV) | never writes |
-| an unrelated change | re-encrypts every attribute | keeps the stored ciphertext; re-encrypts only a changed plaintext |
-| the entity's plaintext before an `UPDATE` | nulled, then restored on `@PostUpdate` | never touched; cleared only in the row's state |
-| a failed flush | leaves the plaintext nulled; reload before retrying | leaves the entity as it was |
-| Bean Validation | sees the nulled plaintext | sees the plaintext |
-| `EntityEncryptionService.getEntityManagerFactory()` | called on the first callback | never called |
+| the mapping | `@Convert(converter = Encrypted<Type>Converter.class)`, one converter class per type | `@Encrypted`; the codec follows the attribute's declared type, enums and primitives included |
+| the service | injected, or `META-INF/services/` | the persistence unit property `jinahya.persistence.encryption.service`: an instance, its class, or its class name; without it, `META-INF/services/` |
+| a bad service | fails on the first conversion | fails the session factory |
+| the second-level cache | holds the attribute's value | holds the ciphertext: a cache hit decrypts |
+| the column | binary, from the converter's type | binary, from the type's `VARBINARY` |
+| an in-place change of an array or a `Date` | detected | detected |
 
-Everything else is unchanged: the mapping and its [constraints](../jinahya-persistence-encryption/README.md#constraints),
-the [encoding](../jinahya-persistence-encryption/README.md#encoding), the service, and the migration of
-[existing data](../jinahya-persistence-encryption/README.md#existing-data) on write. Here a legacy row is migrated by
-**any** write of its entity, not only by a change to the plaintext.
+Everything else is the generic module's: the rows are the same bytes, so an attribute mapped one way reads what the
+other wrote (`EncryptedUserType_Test`, "mixed"), and the encoding table, the service contract and the constraints are
+those of [its README](../jinahya-persistence-encryption/README.md).
 
-## How it is implemented
+## How it works
 
-`EntityEncryptionIntegrator` is a Hibernate ORM `Integrator`, found through `ServiceLoader`
-(`META-INF/services/org.hibernate.integrator.spi.Integrator`). When the session factory is built, it reads the service
-from the persistence unit properties and registers one engine, `HibernateEntityEncryptor`, on these events:
-
-| event | what happens |
-|---|---|
-| `PRE_INSERT` | the ciphertexts are computed into the entity, then copied into the state the `INSERT` is built from |
-| `FLUSH_ENTITY` | Hibernate's `DefaultFlushEntityEventListener` is **replaced** by a subclass. Once an entity is found dirty, and after any interceptor and `@PreUpdate` callback, the plaintexts which changed against the snapshot are encrypted; the `UPDATE` state gets the new ciphertexts and the cleared plaintexts, and those indices are marked dirty. `@DynamicUpdate` therefore writes the right columns |
-| `POST_UPDATE` | the snapshot, the entry's loaded state, is reset to what the entity holds, so the cleared plaintext does not make it dirty again |
-| `POST_LOAD` (prepended) | the entity is decrypted, and its snapshot reset to the decrypted values, so a read is not a change. It runs before Hibernate's default listener, so JPA `@PostLoad` callbacks see the plaintext decrypted |
-| `PRE_INSERT`, `PRE_UPDATE`, `PRE_UPSERT` from a `StatelessSession` | refused with an `IllegalStateException` ([below](#rules)) |
-
-The entity's own plaintext fields are never written to by the engine, so nothing has to be restored after an
-`UPDATE`. Only POJO-mapped entities are handled: a dynamic-map entity is skipped. `@DynamicInsert` and `@DynamicUpdate`
-are covered by `EntityEncryptionIntegrator_Test`.
+`@Encrypted` composes Hibernate ORM's `@Type` with `EncryptedUserType`. Hibernate ORM creates one instance of that
+type per annotated attribute, handing it the attribute and the session factory's settings, from which it takes the
+declared java type and the service, and asks the generic module for the converter of that type with that service
+(`EncryptedConverters.forType`). The type then binds the ciphertext to a `VARBINARY` column, reads it back, compares
+and copies values by content, and gives the second-level cache the ciphertext as the attribute's disassembled form.
 
 ## Configuration
-
-Add the module next to Hibernate ORM, which it expects the application to bring (`provided`):
 
 ```xml
 <dependency>
@@ -87,56 +51,27 @@ Add the module next to Hibernate ORM, which it expects the application to bring 
 </dependency>
 ```
 
-Then give the persistence unit the service, under `jinahya.persistence.encryption.service`
-(`EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE`). The value is one of:
-
-* an `EntityEncryptionService` instance, passed in the properties of the entity manager factory. Use this one for a
-  service which is a container bean.
-* its `Class`, or
-* its class name. The class is loaded through the thread's context class loader and created through its public no-arg
-  constructor, so it gets no injection.
+Hibernate ORM is `provided`: the application brings it. Then, optionally, name the service:
 
 ```java
 var factory = Persistence.createEntityManagerFactory(
-        "unit", Map.of(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service));
+        "unit", Map.of("jinahya.persistence.encryption.service", service));   // or its Class, or class name
 ```
 
-```xml
-<!-- persistence.xml: by class name -->
-<property name="jinahya.persistence.encryption.service" value="com.example.KmsEncryptionService"/>
-```
+Without the property the service is loaded from `META-INF/services/`, as for the generic converters. A property
+which names no service fails the session factory.
 
-**Without the property, the integrator does nothing**: nothing is encrypted or decrypted, so an entity mapped with
-`@EncryptedAttribute` stores neither its plaintext, which is non-insertable, nor a ciphertext. It is logged at `DEBUG` only. A property which names no service fails
-the session factory, not its first write.
+## Measured
 
-Under Spring Boot, put the bean into the JPA properties, for example from a `HibernatePropertiesCustomizer`. This is not
-tested here:
+On H2, by the module's tests: every supported type, an enum and a primitive round-trip through `@Encrypted` and every
+column is binary; a read never writes; a change, a null, a merge and a bulk JPQL `UPDATE` with a parameter are stored
+as ciphertext; a `StatelessSession` stores ciphertext and reads it decrypted; `@DynamicUpdate` keeps an unchanged
+ciphertext; Bean Validation sees the plaintext; an array or a `Date` changed in place is stored; the service comes
+from the property as an instance or a class name; and with the second-level cache on, a cache hit issues no statement
+and decrypts the cached form.
 
-```java
-@Bean
-HibernatePropertiesCustomizer entityEncryption(EntityEncryptionService service) {
-    return properties -> properties.put(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service);
-}
-```
+## Not covered
 
-As `getEntityManagerFactory()` is never called, the service needs no lazy reference to the factory, and there is no
-cycle between the service bean and the factory bean.
-
-### Rules
-
-* **Do not register `EntityEncryptionListener` as well.** The two are alternatives, not layers.
-* **No other `FLUSH_ENTITY` listener.** The integrator replaces Hibernate's default one, and fails the session factory
-  if another listener has been registered there.
-* **The second-level cache holds the plaintext.** The cache entry written by an `INSERT` carries it, although the row
-  never does. Where that matters, leave the encrypted entities uncached.
-* **No `StatelessSession`.** A stateless session never flushes and fires no load events, so its updates would write
-  the plaintext in the clear, and what it reads is never decrypted. Its `insert`, `update` and `upsert` of an
-  encrypted entity (and their `*Multiple` forms) fail with an `IllegalStateException`. Its reads can't be refused: they
-  return the entity with its plaintexts not decrypted. Use a `Session`, or an `EntityManager`, for encrypted entities
-  ([#104](https://github.com/jinahya/jinahya-persistence/issues/104)).
-* **No versionless optimistic locking.** An encrypted entity with `@OptimisticLocking(type = ALL)` or `DIRTY` fails
-  on its first event with an `IllegalStateException`: the `UPDATE`'s `WHERE` would compare the decrypted plaintext
-  with a column holding `NULL`, fail every update, and carry the plaintext as a bind parameter. Use a `@Version`
-  attribute ([#105](https://github.com/jinahya/jinahya-persistence/issues/105)).
-* **Bytecode enhancement with dirty tracking is not verified.**
+* Bytecode enhancement, versionless optimistic locking (unusable with a randomized ciphertext, as on the generic
+  path), and the query cache: not measured.
+* A key selected from the entity instance: the service sees bytes only, as everywhere in this project.

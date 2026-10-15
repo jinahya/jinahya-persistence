@@ -150,8 +150,10 @@ application's.
   but a write.
 * **Versionless optimistic locking is unusable** on an encrypted attribute, for the same reason as querying: the
   `WHERE` would compare a fresh ciphertext with the stored one. Use a `@Version` attribute. Not measured here.
-* **The provider's shared cache holds the plaintext**, as it holds the attribute's value. The test persistence units
-  set `shared-cache-mode` to `NONE`; leave encrypted entities uncached where that matters.
+* **The provider's shared cache holds the attribute's value**, the plaintext, as for any converted attribute (what
+  Hibernate ORM caches depends on the type's mutability, but is never the ciphertext). The test persistence units set
+  `shared-cache-mode` to `NONE`; leave encrypted entities uncached where that matters, or use the Hibernate module,
+  whose type caches the ciphertext.
 * **Bytecode enhancement and weaving are not measured.** The converter sits where the provider binds the column, not
   in the entity, so there is no reason it would differ; it has not been run.
 * **A primitive attribute** (`int`, `boolean`, …) is converted as its wrapper, as the specification requires, and
@@ -217,12 +219,18 @@ unless `hibernate.type.wrapper_array_handling` is set (`ALLOW`, or `LEGACY`).
 `java.util.Calendar`, `java.io.Serializable` and arrays of other types have no converter: none has a clean, secure
 encoding ([#99](https://github.com/jinahya/jinahya-persistence/issues/99)). Map the value's parts to supported types.
 
-## Provider integrations
+## Provider modules
 
-None are required: the converter is standard Jakarta Persistence, and both providers are measured. What a
-provider-specific module could add on top, and under which rules, is recorded in [`VENDORS.adoc`](VENDORS.adoc). The
-earlier integrations, which replaced a listener-based mechanism, are unlinked from the build and kept in the tree for
-reference.
+None is required: the converter is standard Jakarta Persistence, and both providers are measured. Each provider has an
+optional module on top, built on this one through `EncryptedConverters.forType(type, service)`, the one hook exposed
+for them, so the bytes are the same and an attribute mapped either way reads what the other wrote:
+
+| provider | module | adds |
+|---|---|---|
+| Hibernate ORM | [`jinahya-persistence-encryption-hibernate`](../jinahya-persistence-encryption-hibernate/README.md) | `@Encrypted`, one annotation for every type; the service from a persistence unit property; the ciphertext in the second-level cache |
+| EclipseLink | [`jinahya-persistence-encryption-eclipselink`](../jinahya-persistence-encryption-eclipselink/README.md) | `@Convert("encrypted")`, one named converter for every type, nothing listed; binary DDL; the service from a persistence unit property |
+
+What they keep, what was decided against and what stays open is in [`VENDORS.adoc`](VENDORS.adoc).
 
 ## Design notes
 

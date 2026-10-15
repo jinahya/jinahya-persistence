@@ -53,10 +53,26 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
      */
     protected EncryptedAttributeConverter(final Class<X> javaType, final Function<? super X, byte[]> encoder,
                                           final Function<byte[], ? extends X> decoder) {
+        this(javaType, encoder, decoder, null);
+    }
+
+    /**
+     * Creates a new instance with the specified codec, and the specified service, which is then neither injected nor
+     * loaded.
+     *
+     * @param javaType the java type of the attribute, for diagnostics.
+     * @param encoder  the function which encodes a value into bytes.
+     * @param decoder  the function which decodes a value from bytes.
+     * @param service  the service; {@code null} to have it injected, or loaded.
+     */
+    EncryptedAttributeConverter(final Class<X> javaType, final Function<? super X, byte[]> encoder,
+                                final Function<byte[], ? extends X> decoder,
+                                final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
         super();
         this.javaType = Objects.requireNonNull(javaType, "javaType is null");
         this.encoder = Objects.requireNonNull(encoder, "encoder is null");
         this.decoder = Objects.requireNonNull(decoder, "decoder is null");
+        this.service = service;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

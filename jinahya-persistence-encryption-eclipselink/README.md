@@ -3,84 +3,44 @@
 [![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-eclipselink)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-eclipselink/versions)
 [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-eclipselink/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-eclipselink)
 
-The [`jinahya-persistence-encryption`](../jinahya-persistence-encryption/README.md) engine on EclipseLink's own
-descriptor events, in place of the portable entity listener.
-
-## The encryption module, in short
-
-[`jinahya-persistence-encryption`](../jinahya-persistence-encryption/README.md) is application-level encryption for
-Jakarta Persistence entities. An application pairs each secret attribute (the *plaintext*) with a `byte[]` attribute
-annotated `@EncryptedAttribute` (the *ciphertext*). The database stores the ciphertext only. Keys and cryptography stay
-in the application's one `EntityEncryptionService`.
+EclipseLink's own way into [`jinahya-persistence-encryption`](../jinahya-persistence-encryption/README.md): one named
+converter for every supported type, the column made binary by the converter, and the service from a persistence unit
+property. Optional: the generic module is complete on its own, and this one changes nothing about what is stored.
 
 ```java
+@org.eclipse.persistence.annotations.Converter(name = "encrypted", converterClass = EncryptedConverter.class)
 @Entity
 class User {
 
-    @Column(name = "name", insertable = false) // the plaintext: never carried by an INSERT
-    private String name;
-
-    @EncryptedAttribute("name")                // its ciphertext: the column which is stored
-    @Column(name = "name_enc")
-    private byte[] nameEnc;
+    @org.eclipse.persistence.annotations.Convert("encrypted")
+    @Column(name = "name_enc")      // a binary column; holds the ciphertext only
+    private String name;            // holds the plaintext only
 }
 ```
 
-What it costs, whichever way it is wired:
+The name is registered once, on any entity of the persistence unit, and used on each attribute to encrypt.
 
-* **Querying stops working.** The database holds ciphertext only, so a predicate or an ordering on an encrypted
-  attribute matches what is stored, which is `NULL`.
-* **The service is on every load and write.** Each loaded entity is decrypted attribute by attribute, and each written
-  one encrypted, after one `init(context)` per instance to select its keys.
-* **No type information is stored.** Changing an attribute's java type or encoding breaks the rows already written.
-* **The key selection is the application's.** Whatever `init(context)` selects keys by has to stay the same for the
-  whole lifetime of the row.
+## What it adds
 
-The portable wiring, `@EntityListeners(EntityEncryptionListener.class)`, uses standard callbacks only, and so pays
-more ([What it costs](../jinahya-persistence-encryption/README.md#what-it-costs)): a read leaves the entity dirty, so
-every read issues an `UPDATE` and bumps `@Version`; every further flush writes again; and Bean Validation sees a nulled
-plaintext. On EclipseLink the listener also needs CDI to be injected; it cannot be injected under Spring. This module
-removes all of that, at the price of depending on EclipseLink's internals.
-
-## What this module changes
-
-| | `EntityEncryptionListener` | this module |
+| | the generic module | this module |
 |---|---|---|
-| a read | writes the entity back (`UPDATE`, `@Version` + 1, fresh IV) | never writes |
-| an unrelated change | re-encrypts every attribute | keeps the stored ciphertext; re-encrypts only a changed plaintext |
-| the entity's plaintext before an `UPDATE` | nulled, then restored on `@PostUpdate` | never touched; nulled only in the row |
-| Bean Validation | sees the nulled plaintext | sees the plaintext |
-| how the service is found | injected into the listener by CDI | a persistence unit property; no container needed |
+| the mapping | `@Convert(converter = Encrypted<Type>Converter.class)`, one converter class per type, each listed in a unit with `exclude-unlisted-classes` | `@Convert("encrypted")`; the codec follows the attribute's declared type, enums and primitives included; nothing to list |
+| the column | binary only because each converter declares `byte[]` in its own `implements` clause | binary, set by the converter when the mapping is initialized, so the DDL EclipseLink generates is right |
+| the service | injected, or `META-INF/services/` | the persistence unit property `jinahya.persistence.encryption.service`: an instance, its class, or its class name; without it, `META-INF/services/` |
+| a bad service | fails on the first conversion | fails on the first use of the unit, before any write |
+| an in-place change of an array or a `Date` | not detected | not detected unless the mapping is `@Mutable`; see the rules |
 
-Everything else is unchanged: the mapping and its [constraints](../jinahya-persistence-encryption/README.md#constraints),
-the [encoding](../jinahya-persistence-encryption/README.md#encoding), the service, and the migration of
-[existing data](../jinahya-persistence-encryption/README.md#existing-data) on write. Here a legacy row is migrated by
-**any** `UPDATE` of its entity, not only by a change to the plaintext.
+Everything else is the generic module's: the rows are the same bytes, and the encoding table, the service contract
+and the constraints are those of [its README](../jinahya-persistence-encryption/README.md).
 
-## How it is implemented
+## How it works
 
-`EntityEncryptionSessionCustomizer` is an EclipseLink `SessionCustomizer`. When the session is built, it reads the
-service from the session properties and adds one `DescriptorEventListener`, `EclipseLinkEntityEncryptor`, to every
-entity descriptor (aggregate descriptors, the embeddables, are reached through their owners). The engine works on the
-unit of work:
-
-| descriptor event | what happens |
-|---|---|
-| `preInsert` | the ciphertexts are computed into the entity, while the unit of work calculates its changes; the plaintext columns are non-insertable, so the row never carries them |
-| `preUpdateWithChanges` (an internal listener) | the plaintexts which changed against the **backup clone** are encrypted into the entity; EclipseLink then calculates the changes again, so the new ciphertexts are written. Registered with `addInternalListener()`, which EclipseLink notifies after every JPA `@PreUpdate` callback of the same event, so a plaintext a callback assigns is encrypted too ([#107](https://github.com/jinahya/jinahya-persistence/issues/107)). That method is marked INTERNAL in EclipseLink; the tests pin its behaviour |
-| `aboutToUpdate` | each plaintext column the mapping nulls is set to `NULL` in the row being written. The entity keeps its value |
-| `postClone`, `postRefresh` | the working clone is decrypted, and its backup clone, if already taken, given the decrypted plaintexts, so a read is not a change |
-| `postMerge` | the same, for a refresh which merged the shared cache's object into the working clone. A merge of a detached instance, or of the clone's changes into the shared cache, is left alone |
-
-An object outside a unit of work, such as the one in the shared cache, is never decrypted: it keeps what the row holds.
-So a session event listener, `UndecryptedReadGuard`, also added by the customizer, refuses any query which would
-return such objects ([Rules](#rules)).
-Both cache modes are covered by `EntityEncryptionSessionCustomizer_Isolated_Test` (`shared-cache-mode` `NONE`) and
-`EntityEncryptionSessionCustomizer_Shared_Test` (`ALL`).
+`EncryptedConverter` is an EclipseLink `Converter`, which EclipseLink initializes with the mapping it converts and
+the session. From the mapping it takes the attribute's declared java type, from the session the service property,
+and from the generic module the converter of that type with that service (`EncryptedConverters.forType`). It sets the
+mapping's field type to `byte[]`, so the column is binary, and from then on converts through that converter.
 
 ## Configuration
-
-Add the module next to EclipseLink, which it expects the application to bring (`provided`):
 
 ```xml
 <dependency>
@@ -90,66 +50,39 @@ Add the module next to EclipseLink, which it expects the application to bring (`
 </dependency>
 ```
 
-Then set two persistence unit properties:
-
-| property | value |
-|---|---|
-| `eclipselink.session.customizer` | `com.github.jinahya.persistence.encryption.eclipselink.EntityEncryptionSessionCustomizer` |
-| `jinahya.persistence.encryption.service` (`EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE`) | an `EntityEncryptionService` instance, passed in the properties of the entity manager factory; or its `Class`; or its class name. A class is loaded through the thread's context class loader and created through its public no-arg constructor, so it gets no injection |
+EclipseLink is `provided`: the application brings it. Then, optionally, name the service:
 
 ```java
-var factory = Persistence.createEntityManagerFactory("unit", Map.of(
-        "eclipselink.session.customizer", EntityEncryptionSessionCustomizer.class.getName(),
-        EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service));
+var factory = Persistence.createEntityManagerFactory(
+        "unit", Map.of("jinahya.persistence.encryption.service", service));   // or its Class, or class name
 ```
 
-```xml
-<!-- persistence.xml -->
-<property name="eclipselink.session.customizer"
-          value="com.github.jinahya.persistence.encryption.eclipselink.EntityEncryptionSessionCustomizer"/>
-<property name="jinahya.persistence.encryption.service" value="com.example.KmsEncryptionService"/>
-```
+Without the property the service is loaded from `META-INF/services/`, as for the generic converters.
 
-Once the customizer is named, the service property is required: when it is missing, or names no service, the customizer
-throws an `IllegalArgumentException`, and the entity manager factory is not built.
+## Rules
 
-**The service's `getEntityManagerFactory()` is called on the first event**, as the engine finds the encrypted attributes
-in that factory's metamodel. Resolve it lazily: the service is handed over while the factory is still being built.
+* **Mutable values follow EclipseLink's `@Mutable`.** The converter reports itself immutable, so an array or a
+  `java.util.Date` attribute is, unless its mapping is `@Mutable`, treated as a value: an in-place change is not
+  detected, and one instance is shared between the shared cache and every persistence context. Declare `@Mutable`
+  on a `Date` attribute to get copies and in-place change detection (measured). On an array attribute, `@Mutable` also
+  makes every flush write it again, because EclipseLink compares a mutable attribute with its backup copy by `equals`,
+  identity for an array, and then by converting both sides, and a randomized ciphertext never compares equal. For an
+  array, assign a new array, and leave the entity out of the shared cache where sharing an instance matters.
+* **The shared cache holds the plaintext**, as it holds any attribute's value. Leave encrypted entities uncached where
+  that matters (`@Cacheable(false)`, or `shared-cache-mode` `NONE`).
 
-**An application with a customizer of its own** can name only one, and calls this one from it:
+## Measured
 
-```java
-public class MySessionCustomizer implements SessionCustomizer {
+On H2, by the module's tests: every supported type, an enum and a primitive round-trip through the one named
+converter, with no converter listed in the unit, and every column EclipseLink generates is binary; a read never
+writes; a change, a null, a merge and a bulk JPQL `UPDATE` with a parameter are stored as ciphertext; an unrelated
+change keeps the stored ciphertext; a read-only query is decrypted; Bean Validation sees the plaintext; an array
+changed in place is not written, one assigned anew is; a `@Mutable` `Date` changed in place is written, and a read of
+it still never writes; and the service comes from the property as an instance or a
+class name.
 
-    @Override
-    public void customize(Session session) throws Exception {
-        new EntityEncryptionSessionCustomizer().customize(session);
-        // ... the application's own customization
-    }
-}
-```
+## Not covered
 
-### Rules
-
-* **Do not register `EntityEncryptionListener` as well.** The two are alternatives, not layers.
-* **No attribute change tracking.** Weaving may enable it, and the engine fails on the first event of such an entity.
-  Disable it with `eclipselink.weaving.changetracking=false`.
-* **No reads outside the unit of work.** In a persistence unit with any encrypted entity, a query is refused, with an
-  `IllegalStateException`, when it would return objects which are never decrypted. That covers a query (or a `find`)
-  which is read-only (`eclipselink.read-only`), doesn't maintain the cache (`eclipselink.maintain-cache=false`) or
-  doesn't register its results in the unit of work, and any query in a unit of work with read-only classes, or in a
-  unit with a read-only (`@ReadOnly`) or non-registering descriptor. The rule is **unit-wide**: a read-only query of an
-  unrelated entity, or of a scalar result, is refused too, as an unencrypted entity may reach an encrypted one through
-  a relationship, and a report's result can't be told safe before it is prepared
-  ([#103](https://github.com/jinahya/jinahya-persistence/issues/103)). Direct access to the shared cache, and to its
-  objects, is not covered.
-* **No field-based optimistic locking.** An encrypted entity with `@OptimisticLocking` of `ALL_COLUMNS`,
-  `CHANGED_COLUMNS` or `SELECTED_COLUMNS` fails on its first event with an `IllegalStateException`: the `UPDATE`'s
-  `WHERE` would compare the backup clone's decrypted plaintext with a column holding `NULL`, and fail every update.
-  `SELECTED_COLUMNS` without a plaintext column would be safe, but is refused as well, for now. Use a `@Version`
-  attribute ([#105](https://github.com/jinahya/jinahya-persistence/issues/105)).
-* **The shared cache holds the plaintext.** It receives the plaintext of a new or changed entity when the transaction
-  commits, although the row never does. Where that matters, leave the encrypted entities uncached
-  (`@Cacheable(false)`, or `shared-cache-mode` `NONE`).
-* **A missing secondary row hides the entity.** EclipseLink does not find an entity whose `@SecondaryTable` row is
-  missing, so a ciphertext mapped to a new secondary table needs those rows inserted first.
+* Weaving with change tracking, and field-based optimistic locking (unusable with a randomized ciphertext, as on the
+  generic path): not measured.
+* A key selected from the entity instance: the service sees bytes only, as everywhere in this project.

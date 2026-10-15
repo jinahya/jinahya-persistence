@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedStringConverter extends EncryptedAttributeConverter<
      * Creates a new instance.
      */
     public EncryptedStringConverter() {
-        super(String.class, OfLang::encodeString, OfLang::decodeString);
+        this(null);
+    }
+
+    EncryptedStringConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(String.class, OfLang::encodeString, OfLang::decodeString, service);
     }
 }

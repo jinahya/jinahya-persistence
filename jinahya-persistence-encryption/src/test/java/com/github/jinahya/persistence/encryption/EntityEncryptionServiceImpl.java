@@ -30,7 +30,7 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
     /**
      * Encrypts the specified bytes under the fixed key; shared with the CDI bean of {@code Injection_Test}.
      */
-    static byte[] encryptBytes(final byte[] decryptedBytes) {
+    public static byte[] encryptBytes(final byte[] decryptedBytes) {
         final var iv = new byte[IV_BYTES];
         RANDOM.nextBytes(iv);
         try {
@@ -43,7 +43,7 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
         }
     }
 
-    static byte[] decryptBytes(final byte[] encryptedBytes) {
+    public static byte[] decryptBytes(final byte[] encryptedBytes) {
         try {
             final var cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, KEY, new GCMParameterSpec(TAG_BITS, encryptedBytes, 0, IV_BYTES));

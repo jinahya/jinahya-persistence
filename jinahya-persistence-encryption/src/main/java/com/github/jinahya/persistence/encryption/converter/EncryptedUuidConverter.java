@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfUtil;
 
 import jakarta.persistence.AttributeConverter;
@@ -22,6 +23,10 @@ public final class EncryptedUuidConverter extends EncryptedAttributeConverter<UU
      * Creates a new instance.
      */
     public EncryptedUuidConverter() {
-        super(UUID.class, OfUtil::encodeUuid, OfUtil::decodeUuid);
+        this(null);
+    }
+
+    EncryptedUuidConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(UUID.class, OfUtil::encodeUuid, OfUtil::decodeUuid, service);
     }
 }

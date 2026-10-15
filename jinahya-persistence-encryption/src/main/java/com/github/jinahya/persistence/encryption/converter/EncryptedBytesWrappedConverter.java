@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedBytesWrappedConverter extends EncryptedAttributeConv
      * Creates a new instance.
      */
     public EncryptedBytesWrappedConverter() {
-        super(Byte[].class, OfLang::encodeBytesWrapped, OfLang::decodeBytesWrapped);
+        this(null);
+    }
+
+    EncryptedBytesWrappedConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(Byte[].class, OfLang::encodeBytesWrapped, OfLang::decodeBytesWrapped, service);
     }
 }

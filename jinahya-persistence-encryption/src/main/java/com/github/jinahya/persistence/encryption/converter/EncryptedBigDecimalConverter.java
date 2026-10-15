@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfMath;
 
 import jakarta.persistence.AttributeConverter;
@@ -22,6 +23,10 @@ public final class EncryptedBigDecimalConverter extends EncryptedAttributeConver
      * Creates a new instance.
      */
     public EncryptedBigDecimalConverter() {
-        super(BigDecimal.class, OfMath::encodeBigDecimal, OfMath::decodeBigDecimal);
+        this(null);
+    }
+
+    EncryptedBigDecimalConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(BigDecimal.class, OfMath::encodeBigDecimal, OfMath::decodeBigDecimal, service);
     }
 }

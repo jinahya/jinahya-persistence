@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfPrimitive;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedDoubleConverter extends EncryptedAttributeConverter<
      * Creates a new instance.
      */
     public EncryptedDoubleConverter() {
-        super(Double.class, OfPrimitive::encodeDouble, OfPrimitive::decodeDouble);
+        this(null);
+    }
+
+    EncryptedDoubleConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(Double.class, OfPrimitive::encodeDouble, OfPrimitive::decodeDouble, service);
     }
 }

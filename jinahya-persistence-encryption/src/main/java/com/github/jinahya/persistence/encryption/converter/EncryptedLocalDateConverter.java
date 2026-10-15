@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfTime;
 
 import jakarta.persistence.AttributeConverter;
@@ -22,6 +23,10 @@ public final class EncryptedLocalDateConverter extends EncryptedAttributeConvert
      * Creates a new instance.
      */
     public EncryptedLocalDateConverter() {
-        super(LocalDate.class, OfTime::encodeLocalDate, OfTime::decodeLocalDate);
+        this(null);
+    }
+
+    EncryptedLocalDateConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(LocalDate.class, OfTime::encodeLocalDate, OfTime::decodeLocalDate, service);
     }
 }

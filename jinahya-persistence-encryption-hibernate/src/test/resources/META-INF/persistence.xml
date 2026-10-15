@@ -3,18 +3,16 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="3.2">
-  <!-- this module integrates with Hibernate ORM only; the provider is fixed, whichever profile is active -->
+  <!-- the provider is fixed: this module is Hibernate ORM's, whichever profile the build runs under -->
   <persistence-unit name="__encryptionHibernatePU">
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-    <class>com.github.jinahya.persistence.encryption.hibernate.SecretEntity</class>
-    <class>com.github.jinahya.persistence.encryption.hibernate.SecretEmbeddable</class>
-    <class>com.github.jinahya.persistence.encryption.hibernate.DynamicSecretEntity</class>
-    <class>com.github.jinahya.persistence.encryption.hibernate.CallbackSecretEntity</class>
-    <class>com.github.jinahya.persistence.encryption.hibernate.LockAllSecretEntity</class>
-    <class>com.github.jinahya.persistence.encryption.hibernate.LockDirtySecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.SecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.AllTypesEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.DynamicEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.MixedEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
-    <validation-mode>NONE</validation-mode>
+    <validation-mode>CALLBACK</validation-mode>
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-hibernate;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
@@ -23,6 +21,27 @@
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.generate_statistics" value="true"/>
+      <!-- a Byte[] or Character[] attribute is rejected unless this is set (AllTypesEntity) -->
+      <property name="hibernate.type.wrapper_array_handling" value="ALLOW"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionHibernateCachedPU">
+    <description>The second-level cache on, with Hibernate ORM's testing region factory</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.CachedEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-hibernate-cached;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.generate_statistics" value="true"/>
+      <property name="hibernate.cache.use_second_level_cache" value="true"/>
+      <property name="hibernate.cache.region.factory_class" value="org.hibernate.testing.cache.CachingRegionFactory"/>
     </properties>
   </persistence-unit>
 </persistence>

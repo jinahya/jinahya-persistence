@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
 
 /**
@@ -28,6 +29,11 @@ public abstract class EncryptedEnumConverter<E extends Enum<E>> extends Encrypte
      * @param enumClass the enum type.
      */
     protected EncryptedEnumConverter(final Class<E> enumClass) {
-        super(enumClass, OfLang::encodeEnum, b -> OfLang.decodeEnum(b, enumClass));
+        this(enumClass, null);
+    }
+
+    EncryptedEnumConverter(final Class<E> enumClass,
+                           final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(enumClass, OfLang::encodeEnum, b -> OfLang.decodeEnum(b, enumClass), service);
     }
 }

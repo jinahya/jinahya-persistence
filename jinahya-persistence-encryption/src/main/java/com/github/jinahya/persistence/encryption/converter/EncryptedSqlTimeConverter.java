@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfSql;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedSqlTimeConverter extends EncryptedAttributeConverter
      * Creates a new instance.
      */
     public EncryptedSqlTimeConverter() {
-        super(java.sql.Time.class, OfSql::encodeTime, OfSql::decodeTime);
+        this(null);
+    }
+
+    EncryptedSqlTimeConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(java.sql.Time.class, OfSql::encodeTime, OfSql::decodeTime, service);
     }
 }

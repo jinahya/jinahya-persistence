@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfUtil;
 
 import jakarta.persistence.AttributeConverter;
@@ -21,6 +22,10 @@ public final class EncryptedUtilDateConverter extends EncryptedAttributeConverte
      * Creates a new instance.
      */
     public EncryptedUtilDateConverter() {
-        super(java.util.Date.class, OfUtil::encodeDate, OfUtil::decodeDate);
+        this(null);
+    }
+
+    EncryptedUtilDateConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+        super(java.util.Date.class, OfUtil::encodeDate, OfUtil::decodeDate, service);
     }
 }

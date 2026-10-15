@@ -12,7 +12,7 @@
   <artifactId>jinahya-persistence-encryption-hibernate</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Application-level encryption of entity attributes, integrated with Hibernate ORM</description>
+  <description>Application-level encryption of entity attributes, Hibernate ORM's own way: @Encrypted</description>
 
   <properties>
     <!-- the Automatic-Module-Name; the name the module-info draft declares -->
@@ -27,11 +27,17 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-    <!-- the engine is Hibernate ORM's own event listeners; the application brings Hibernate ORM -->
+    <!-- the type is Hibernate ORM's own UserType; the application brings Hibernate ORM -->
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <!-- org.hibernate.testing.cache.CachingRegionFactory; a second-level cache for Cache_Test -->
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-testing</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -41,6 +47,22 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the test persistence unit requests CALLBACK validation; a provider has to be on the test classpath -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
