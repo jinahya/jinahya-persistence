@@ -9,12 +9,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 /**
- * An entity whose own {@code @PreUpdate} callback assigns its plaintext.
+ * An entity whose own callbacks read, and assign, its plaintext: {@code @PreUpdate} assigns it (#100), and
+ * {@code @PostLoad} records what it sees, and may assign it (#106).
  */
 @Access(AccessType.FIELD)
 @Entity
@@ -49,6 +51,21 @@ public class CallbackSecretEntity {
     void onPreUpdate() {
         if (nameOnPreUpdate != null) {
             name = nameOnPreUpdate;
+        }
+    }
+
+    // what @PostLoad assigns to name, when not null; static, as a loaded instance is created by the provider
+    public static volatile String nameAssignedOnPostLoad;
+
+    // what name held when @PostLoad ran
+    @Transient
+    public String nameSeenOnPostLoad;
+
+    @PostLoad
+    void onPostLoad() {
+        nameSeenOnPostLoad = name;
+        if (nameAssignedOnPostLoad != null) {
+            name = nameAssignedOnPostLoad;
         }
     }
 }
