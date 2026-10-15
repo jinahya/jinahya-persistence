@@ -61,6 +61,8 @@ public class EntityEncryptionSessionCustomizer implements SessionCustomizer {
         for (final var descriptor : session.getDescriptors().values()) {
             if (!descriptor.isAggregateDescriptor() && !descriptor.isAggregateCollectionDescriptor()) {
                 descriptor.getEventManager().addListener(engine);
+                // notified after the JPA callbacks of the same event, and only for this descriptor's own instances
+                descriptor.getEventManager().addInternalListener(engine.updateEncryptor());
             }
         }
         // propagated to every client session and unit of work acquired from this one

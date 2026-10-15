@@ -7,14 +7,18 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.Version;
 
 @Access(AccessType.FIELD)
 @Entity
+@EntityListeners(PreUpdateListener.class)
 @Table(name = SecretEntity.TABLE_NAME)
 public class SecretEntity {
 
@@ -46,4 +50,19 @@ public class SecretEntity {
 
     @Embedded
     public SecretEmbeddable secret;
+
+    // what the entity's own @PreUpdate assigns to name, when not null (#107)
+    @Transient
+    public String nameOnPreUpdate;
+
+    // what PreUpdateListener assigns to name, when not null (#107)
+    @Transient
+    public String nameOnListenerPreUpdate;
+
+    @PreUpdate
+    void assignOnPreUpdate() {
+        if (nameOnPreUpdate != null) {
+            name = nameOnPreUpdate;
+        }
+    }
 }

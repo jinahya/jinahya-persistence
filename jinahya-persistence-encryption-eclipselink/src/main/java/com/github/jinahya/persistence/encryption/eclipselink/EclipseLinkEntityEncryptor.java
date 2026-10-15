@@ -22,8 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * <ul>
  *   <li>Before an {@code INSERT} — when the unit of work calculates its changes — the ciphertexts are computed into the
  *       entity. The plaintext columns are non-insertable, so the row never carries them.</li>
- *   <li>Before an {@code UPDATE} of an entity which has changes, the ciphertexts which changed against the backup clone
- *       are computed into the entity; EclipseLink then calculates the changes again. When the row is built, each
+ *   <li>Before an {@code UPDATE} of an entity which has changes, after every JPA {@code @PreUpdate} callback, the
+ *       ciphertexts which changed against the backup clone are computed into the entity; EclipseLink then calculates
+ *       the changes again. When the row is built, each
  *       plaintext column the mapping nulls is set to {@code null} in it.</li>
  *   <li>After an entity is cloned into the unit of work, or refreshed — directly, or by a merge from the shared cache
  *       — it is decrypted, and its backup clone, if already taken, is given copies of the decrypted plaintexts, so
@@ -134,8 +135,29 @@ class EclipseLinkEntityEncryptor extends DescriptorEventAdapter {
         }
     }
 
-    @Override
-    public void preUpdateWithChanges(final DescriptorEvent event) {
+    /**
+     * Returns the listener which encrypts an entity before its {@code UPDATE}; registered as an internal listener, so
+     * that it runs after every JPA callback of the same event.
+     *
+     * @return the listener which encrypts before an {@code UPDATE}.
+     * @see EntityEncryptionSessionCustomizer#customize(org.eclipse.persistence.sessions.Session)
+     */
+    DescriptorEventAdapter updateEncryptor() {
+        return updateEncryptor;
+    }
+
+    /**
+     * Encrypts, before an {@code UPDATE} of an entity which has changes, the plaintexts which changed against the
+     * backup clone.
+     * <p>
+     * JPA {@code @PreUpdate} callbacks are notified on the same event, and after this class's ordinary listeners, so
+     * this runs as an internal listener, which EclipseLink notifies last; EclipseLink then calculates the changes again,
+     * covering both the callbacks' and the new ciphertexts.
+     *
+     * @param event the {@code preUpdateWithChanges} event.
+     * @see <a href="https://github.com/jinahya/jinahya-persistence/issues/107">#107</a>
+     */
+    private void encryptForUpdate(final DescriptorEvent event) {
         final var descriptor = event.getDescriptor();
         if (encryption(descriptor).isNone() || !(event.getSession() instanceof UnitOfWorkImpl unitOfWork)) {
             return;
@@ -145,6 +167,10 @@ class EclipseLinkEntityEncryptor extends DescriptorEventAdapter {
         encryptor.encrypt(entity, backup == null || backup == entity
                 ? null
                 : name -> mapping(descriptor, name).getAttributeValueFromObject(backup));
+        if (event.getChangeSet() != null) {
+            // the default; insisted on, as the new ciphertexts are written only when the changes are calculated again
+            event.getChangeSet().setShouldRecalculateAfterUpdateEvent(true);
+        }
     }
 
     @Override
@@ -216,4 +242,11 @@ class EclipseLinkEntityEncryptor extends DescriptorEventAdapter {
     private final EntityEncryptionEngine encryptor;
 
     private final Map<ClassDescriptor, Encryption> encryptions = new ConcurrentHashMap<>();
+
+    private final DescriptorEventAdapter updateEncryptor = new DescriptorEventAdapter() {
+        @Override
+        public void preUpdateWithChanges(final DescriptorEvent event) {
+            encryptForUpdate(event);
+        }
+    };
 }

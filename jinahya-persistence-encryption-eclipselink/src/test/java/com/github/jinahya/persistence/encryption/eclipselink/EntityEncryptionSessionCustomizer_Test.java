@@ -292,6 +292,89 @@ abstract class EntityEncryptionSessionCustomizer_Test {
         }
     }
 
+    // https://github.com/jinahya/jinahya-persistence/issues/107
+    @DisplayName("a plaintext assigned by a JPA @PreUpdate callback is stored as ciphertext only")
+    @Nested
+    class CallbackTest {
+
+        @DisplayName("the entity's own @PreUpdate")
+        @Test
+        void __entityCallback() {
+            final long id = persist("original", 1);
+            final var version = version(id);
+            apply(em -> {
+                final var found = em.find(SecretEntity.class, id);
+                found.note = "changed";
+                found.nameOnPreUpdate = "callback-value";
+                em.flush();
+                assertThat(found.name).isEqualTo("callback-value");
+                return null;
+            });
+            assertThat(version(id)).isEqualTo(version + 1);
+            assertThat(column("name", id)).isNull();
+            apply(em -> {
+                assertThat(em.find(SecretEntity.class, id).name).isEqualTo("callback-value");
+                return null;
+            });
+        }
+
+        @DisplayName("an entity listener's @PreUpdate")
+        @Test
+        void __listenerCallback() {
+            final long id = persist("original", 1);
+            apply(em -> {
+                final var found = em.find(SecretEntity.class, id);
+                found.note = "changed";
+                found.nameOnListenerPreUpdate = "listener-value";
+                em.flush();
+                return null;
+            });
+            assertThat(column("name", id)).isNull();
+            apply(em -> {
+                assertThat(em.find(SecretEntity.class, id).name).isEqualTo("listener-value");
+                return null;
+            });
+        }
+
+        @DisplayName("an empty plaintext a @PreUpdate assigns is stored as ciphertext only")
+        @Test
+        void __callbackEmpty() {
+            final long id = persist("original", 1);
+            apply(em -> {
+                final var found = em.find(SecretEntity.class, id);
+                found.note = "changed";
+                found.nameOnPreUpdate = "";
+                return null;
+            });
+            apply(em -> {
+                final var found = em.find(SecretEntity.class, id);
+                assertThat(found.name).isEmpty();
+                return null;
+            });
+            assertThat(column("name", id)).isNull();
+        }
+
+        @DisplayName("the next flush writes nothing more, and the stored ciphertext is not re-encrypted")
+        @Test
+        void __stable() {
+            final long id = persist("original", 1);
+            apply(em -> {
+                final var found = em.find(SecretEntity.class, id);
+                found.note = "changed";
+                found.nameOnPreUpdate = "callback-value";
+                em.flush();
+                found.nameOnPreUpdate = null;
+                final var version = found.version;
+                final var stored = found.nameEnc.clone();
+                em.flush();
+                assertThat(found.version).isEqualTo(version);
+                assertThat(found.nameEnc).isEqualTo(stored);
+                return null;
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     // https://github.com/jinahya/jinahya-persistence/issues/103
     @DisplayName("reads which return objects never decrypted are refused")
     @Nested

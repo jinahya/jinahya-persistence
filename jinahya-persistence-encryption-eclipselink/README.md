@@ -67,7 +67,7 @@ unit of work:
 | descriptor event | what happens |
 |---|---|
 | `preInsert` | the ciphertexts are computed into the entity, while the unit of work calculates its changes; the plaintext columns are non-insertable, so the row never carries them |
-| `preUpdateWithChanges` | the plaintexts which changed against the **backup clone** are encrypted into the entity; EclipseLink then calculates the changes again, so the new ciphertexts are written |
+| `preUpdateWithChanges` (an internal listener) | the plaintexts which changed against the **backup clone** are encrypted into the entity; EclipseLink then calculates the changes again, so the new ciphertexts are written. Registered with `addInternalListener()`, which EclipseLink notifies after every JPA `@PreUpdate` callback of the same event, so a plaintext a callback assigns is encrypted too ([#107](https://github.com/jinahya/jinahya-persistence/issues/107)). That method is marked INTERNAL in EclipseLink; the tests pin its behaviour |
 | `aboutToUpdate` | each plaintext column the mapping nulls is set to `NULL` in the row being written. The entity keeps its value |
 | `postClone`, `postRefresh` | the working clone is decrypted, and its backup clone, if already taken, given the decrypted plaintexts, so a read is not a change |
 | `postMerge` | the same, for a refresh which merged the shared cache's object into the working clone. A merge of a detached instance, or of the clone's changes into the shared cache, is left alone |
@@ -143,10 +143,6 @@ public class MySessionCustomizer implements SessionCustomizer {
   a relationship, and a report's result can't be told safe before it is prepared
   ([#103](https://github.com/jinahya/jinahya-persistence/issues/103)). Direct access to the shared cache, and to its
   objects, is not covered.
-* **Not yet for entities with callbacks of their own.** A plaintext assigned by a JPA `@PreUpdate`, the entity's own
-  or a listener's, is assigned after the engine encrypts, as EclipseLink notifies it first: the column is still
-  nulled, but the new value is never encrypted, and the update is lost
-  ([#107](https://github.com/jinahya/jinahya-persistence/issues/107)).
 * **The shared cache holds the plaintext.** It receives the plaintext of a new or changed entity when the transaction
   commits, although the row never does. Where that matters, leave the encrypted entities uncached
   (`@Cacheable(false)`, or `shared-cache-mode` `NONE`).
