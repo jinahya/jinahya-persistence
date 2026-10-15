@@ -1,6 +1,6 @@
 module com.github.jinahya.persistence.encryption {
 
-    requires transitive com.github.jinahya.persistence.utils;
+    requires transitive com.github.jinahya.persistence;
     requires transitive jakarta.annotation;
     requires transitive jakarta.inject;
     requires transitive jakarta.persistence;

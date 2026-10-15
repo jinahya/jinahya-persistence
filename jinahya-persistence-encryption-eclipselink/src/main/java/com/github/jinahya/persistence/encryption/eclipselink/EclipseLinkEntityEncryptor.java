@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.eclipselink;
 
-import com.github.jinahya.persistence.encryption.EntityEncryptor;
+import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import org.eclipse.persistence.descriptors.ClassDescriptor;
 import org.eclipse.persistence.descriptors.DescriptorEvent;
 import org.eclipse.persistence.descriptors.DescriptorEventAdapter;
@@ -57,7 +57,7 @@ class EclipseLinkEntityEncryptor extends DescriptorEventAdapter {
      *
      * @param encryptor the encryptor to encrypt and decrypt with.
      */
-    EclipseLinkEntityEncryptor(final EntityEncryptor encryptor) {
+    EclipseLinkEntityEncryptor(final EntityEncryptionEngine encryptor) {
         super();
         this.encryptor = Objects.requireNonNull(encryptor, "encryptor is null");
     }
@@ -213,7 +213,7 @@ class EclipseLinkEntityEncryptor extends DescriptorEventAdapter {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private final EntityEncryptor encryptor;
+    private final EntityEncryptionEngine encryptor;
 
     private final Map<ClassDescriptor, Encryption> encryptions = new ConcurrentHashMap<>();
 }

@@ -14,6 +14,11 @@
   <name>${project.artifactId}</name>
   <description>Application-level encryption of entity attributes, integrated with Hibernate ORM</description>
 
+  <properties>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence.encryption.hibernate</module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

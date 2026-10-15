@@ -607,14 +607,15 @@ Each is a module of its own, replacing `EntityEncryptionListener`, which must no
 | module | `jinahya-persistence-encryption-hibernate` | `jinahya-persistence-encryption-eclipselink`
 | entry point | `EntityEncryptionIntegrator`, found through `ServiceLoader`; does nothing without the service property |
   `EntityEncryptionSessionCustomizer`, named by `eclipselink.session.customizer`
-| the service | `jinahya.persistence.encryption.service` (`EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE`): an instance, its
+| the service | `jinahya.persistence.encryption.service` (`EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE`): an instance, its
   class, or its class name | the same
 | the metamodel read | the session factory being integrated | the service's `getEntityManagerFactory()`, on the first
   event
 | tests | 13, on H2 | 22, on H2: 11 with the shared cache off, 11 with it on
 |===
 
-Both work through `EntityEncryptor`, made public for this: `encrypt(Object, Snapshot)` encrypts into the entity against
+Both work through `EntityEncryptionEngine`, the module's service provider interface, which the package-private
+`EntityEncryptor` implements: `encrypt(Object, Snapshot)` encrypts into the entity against
 the provider's snapshot, `decrypt(Object)`, and `getPlaintextAttributeNames`, `getCiphertextAttributeNames`,
 `getNulledPlaintextPaths` and `clearPlaintexts` tell an engine what to rewrite.
 
@@ -710,5 +711,6 @@ the context's attachment; then it encrypts, or decrypts, every attribute of that
 * *Lazy.* The service is initialized at the first attribute which needs it: an instance whose values are all `null`,
   or, under an integration, whose ciphertexts are all unchanged, never reaches it; a read which flushes initializes it
   once, for the load.
-* *Where the context lives.* Inside `EntityEncryptor`: the listener and both integrations call it as before, so
+* *Where the context lives.* Inside `EntityEncryptor`, behind `EntityEncryptionEngine`: the listener and both
+  integrations call it as before, so
   neither integration's engine changed.

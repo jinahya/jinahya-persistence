@@ -240,12 +240,12 @@ and the `EntityEncryptionService` are the same; the listener must **not** be reg
 * **Bean Validation sees the plaintext**, as the entity is never changed under it.
 
 The service comes from the persistence unit property `jinahya.persistence.encryption.service`
-(`EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE`): an instance, passed in the properties of the entity manager factory,
+(`EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE`): an instance, passed in the properties of the entity manager factory,
 its class, or the name of its class. Without the property, the integration does nothing.
 
 ```java
 var factory = Persistence.createEntityManagerFactory(
-        "unit", Map.of(EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE, service));
+        "unit", Map.of(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service));
 ```
 
 | provider | module | mechanism |

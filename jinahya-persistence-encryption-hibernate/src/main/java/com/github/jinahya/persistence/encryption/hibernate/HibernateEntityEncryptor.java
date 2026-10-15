@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.hibernate;
 
-import com.github.jinahya.persistence.encryption.EntityEncryptor;
+import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.engine.spi.Status;
 import org.hibernate.event.spi.FlushEntityEvent;
@@ -67,7 +67,7 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
      *
      * @param encryptor the encryptor to encrypt and decrypt with.
      */
-    HibernateEntityEncryptor(final EntityEncryptor encryptor) {
+    HibernateEntityEncryptor(final EntityEncryptionEngine encryptor) {
         super();
         this.encryptor = Objects.requireNonNull(encryptor, "encryptor is null");
     }
@@ -259,7 +259,7 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private final EntityEncryptor encryptor;
+    private final EntityEncryptionEngine encryptor;
 
     // by entity name
     private final Map<String, Indices> indices = new ConcurrentHashMap<>();
