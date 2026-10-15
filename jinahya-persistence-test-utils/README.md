@@ -1,6 +1,6 @@
 # jinahya-persistence-test-utils
 
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-test-utils)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-test-utils)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-test-utils/versions)
 [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-test-utils/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-test-utils)
 
 

@@ -1,6 +1,6 @@
 # jinahya-persistence-encryption
 
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption/versions)
 [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption)
 
 Application-level encryption (ALE) for Jakarta Persistence entities: selected attributes are encrypted inside the
@@ -250,8 +250,8 @@ var factory = Persistence.createEntityManagerFactory(
 
 | provider | module | mechanism |
 |---|---|---|
-| Hibernate ORM | `jinahya-persistence-encryption-hibernate` | an `Integrator`, found through `ServiceLoader`; replaces the default `FLUSH_ENTITY` listener, and adds `PRE_INSERT`, `POST_UPDATE` and `POST_LOAD` listeners. The session factory is the entity manager factory read, so the service's `getEntityManagerFactory()` is never called. `@DynamicInsert` and `@DynamicUpdate` are supported |
-| EclipseLink | `jinahya-persistence-encryption-eclipselink` | a `SessionCustomizer`, named by `eclipselink.session.customizer` (an application with a customizer of its own calls it from that one); registers a descriptor event listener which encrypts on `preInsert` and `preUpdateWithChanges`, nulls the plaintext columns in the row on `aboutToUpdate`, and decrypts on `postClone`, `postRefresh` and a refresh's `postMerge`, resetting the backup clone. The service's `getEntityManagerFactory()` is called on the first event. Attribute change tracking (weaving) is not supported, and fails |
+| Hibernate ORM | [`jinahya-persistence-encryption-hibernate`](../jinahya-persistence-encryption-hibernate/README.md) | an `Integrator`, found through `ServiceLoader`; replaces the default `FLUSH_ENTITY` listener, and adds `PRE_INSERT`, `POST_UPDATE` and `POST_LOAD` listeners. The session factory is the entity manager factory read, so the service's `getEntityManagerFactory()` is never called. `@DynamicInsert` and `@DynamicUpdate` are supported |
+| EclipseLink | [`jinahya-persistence-encryption-eclipselink`](../jinahya-persistence-encryption-eclipselink/README.md) | a `SessionCustomizer`, named by `eclipselink.session.customizer` (an application with a customizer of its own calls it from that one); registers a descriptor event listener which encrypts on `preInsert` and `preUpdateWithChanges`, nulls the plaintext columns in the row on `aboutToUpdate`, and decrypts on `postClone`, `postRefresh` and a refresh's `postMerge`, resetting the backup clone. The service's `getEntityManagerFactory()` is called on the first event. Attribute change tracking (weaving) is not supported, and fails |
 
 Neither keeps the plaintext out of a provider's shared cache: under Hibernate ORM, the second-level cache entry
 written by an `INSERT` holds it; under EclipseLink, the shared cache receives the plaintext of a new or changed entity
