@@ -12,7 +12,7 @@ class EntityEncryptionServiceImpl_Test {
     void __0() {
         final var manager = new EntityEncryptionServiceImpl();
         final var plain = new byte[0];
-        final var encrypted = manager.encrypt("irrelevant", plain);
+        final var encrypted = manager.encrypt(new SimpleEncryptionContext(), plain);
         assertThat(encrypted)
                 .hasSize(
                         EntityEncryptionServiceImpl.IV_BYTES
@@ -20,7 +20,7 @@ class EntityEncryptionServiceImpl_Test {
                         + EntityEncryptionServiceImpl.AAD_BYTES
                         + EntityEncryptionServiceImpl.TAG_BYTES
                 );
-        final var decrypted = manager.decrypt("irrelevant", encrypted);
+        final var decrypted = manager.decrypt(new SimpleEncryptionContext(), encrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
 
@@ -28,8 +28,8 @@ class EntityEncryptionServiceImpl_Test {
     void __() {
         final var manager = new EntityEncryptionServiceImpl();
         final var plain = new byte[ThreadLocalRandom.current().nextInt(1048576)];
-        final var encrypted = manager.encrypt("irrelevant", plain);
-        final var decrypted = manager.decrypt("irrelevant", encrypted);
+        final var encrypted = manager.encrypt(new SimpleEncryptionContext(), plain);
+        final var decrypted = manager.decrypt(new SimpleEncryptionContext(), encrypted);
         assertThat(decrypted).isEqualTo(plain);
     }
 }

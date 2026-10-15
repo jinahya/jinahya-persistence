@@ -595,7 +595,7 @@ buys, on all four, is the removal of the current mechanism's dominant costs: the
 == Current approach: the provider integrations
 
 Of the four sketches, the two event routes were implemented: Hibernate ORM event listeners and EclipseLink descriptor
-events. Both keep the paired attributes and the entity as the context of `getEncryptionIdentifier`, so the mapping
+events. Both keep the paired attributes and the entity as what the keys are selected by, so the mapping
 (`@EncryptedAttribute`) and the `EntityEncryptionService` are unchanged. `UserType` was rejected, as it has no
 entity to select a key from; the transformation mapping, as it replaces the user's two attributes with one.
 
@@ -697,3 +697,18 @@ DescriptorEventAdapter, on every entity descriptor
 * The plaintext in a provider's shared or second-level cache; the rows never hold it.
 * EclipseLink attribute change tracking; Hibernate ORM bytecode enhancement.
 * Sharing a `FLUSH_ENTITY` listener with an application's own.
+
+=== The service: one context per entity
+
+Since the integrations, `EntityEncryptionService` no longer returns an identifier for the module to pass back. Each
+encryption of an instance, and each decryption of one, gets an `EntityEncryptionContext`: the service is initialized
+with it once — selecting the keys from `getEntityInstance()`, preparing its cipher suite — and keeps what it prepared as
+the context's attachment; then it encrypts, or decrypts, every attribute of that instance with that context.
+
+* *Thread safety.* A context is confined to the thread of its operation, so a `Cipher` belongs in it, never in the
+  service.
+* *Lazy.* The service is initialized at the first attribute which needs it: an instance whose values are all `null`,
+  or, under an integration, whose ciphertexts are all unchanged, never reaches it; a read which flushes initializes it
+  once, for the load.
+* *Where the context lives.* Inside `EntityEncryptor`: the listener and both integrations call it as before, so
+  neither integration's engine changed.

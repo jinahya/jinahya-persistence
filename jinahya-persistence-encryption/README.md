@@ -37,7 +37,7 @@ class User {
 
 @ApplicationScoped // or a Spring @Component
 class KmsEncryptionService implements EntityEncryptionService {
-    // getEntityManagerFactory(), getEncryptionIdentifier(entity), encrypt(id, bytes), decrypt(id, bytes)
+    // getEntityManagerFactory(), init(context), encrypt(context, bytes), decrypt(context, bytes)
 }
 ```
 
@@ -71,9 +71,12 @@ Two rules about what reaches the service:
 * **`null` is `null`.** An absent value never reaches the service: a `null` plaintext is stored as a `null`
   ciphertext, and a `null` ciphertext read as a `null` plaintext, without a call. So the bytes the service is given,
   and the bytes it returns, are never `null`; every array crossing in either direction is a copy.
-* **The encryption identifier is opaque.** The service derives it from the instance, and gets it back, unchanged, on
-  every `encrypt` and `decrypt` of that instance — `null` included. What it means is entirely the service's; it has to
-  be the same for the whole lifetime of the row ([The application's responsibility](#the-applications-responsibility)).
+* **One context per entity.** Each encryption of an instance, and each decryption of one, gets an
+  `EntityEncryptionContext` of its own: the service is `init`ialized with it once, selecting the keys from the
+  instance and preparing its cipher suite, which it keeps as the context's attachment; then every attribute of that
+  instance is encrypted, or decrypted, with that context. An instance with nothing to encrypt, or to decrypt, never
+  reaches the service. What selects the keys has to be the same for the whole lifetime of the row
+  ([The application's responsibility](#the-applications-responsibility)).
 
 How the listener gets the service is under [Wiring](#wiring).
 
@@ -186,13 +189,16 @@ class KmsEncryptionService implements EntityEncryptionService {
     }
 
     @Override
-    public String getEncryptionIdentifier(Object entityInstance) { ... }
+    public void init(EntityEncryptionContext context) {
+        // once per instance: select the key from context.getEntityInstance(), prepare a Cipher,
+        // context.setAttachment(...)
+    }
 
     @Override
-    public byte[] encrypt(String encryptionIdentifier, byte[] decryptedBytes) { ... }
+    public byte[] encrypt(EntityEncryptionContext context, byte[] decryptedBytes) { ... } // per attribute
 
     @Override
-    public byte[] decrypt(String encryptionIdentifier, byte[] encryptedBytes) { ... }
+    public byte[] decrypt(EntityEncryptionContext context, byte[] encryptedBytes) { ... } // per attribute
 }
 ```
 
@@ -289,8 +295,8 @@ seen either.
 
 This module moves values between the plaintext and the ciphertext; it imposes no policy of its own.
 
-* **The encryption identifier.** `EntityEncryptionService.getEncryptionIdentifier(Object)` is never stored; it is
-  derived again on every encrypt and decrypt, so it has to be the same for the whole lifetime of the row — from an
+* **The key selection.** What `EntityEncryptionService.init(EntityEncryptionContext)` selects the keys by is never
+  stored; it is derived again on every encrypt and decrypt, so it has to be the same for the whole lifetime of the row — from an
   unencrypted, never-updated attribute such as a tenant column; never the version, a *current* key id, or an
   `IDENTITY` id, which is still `null` at `@PrePersist` ([#61](https://github.com/jinahya/jinahya-persistence/issues/61)).
 * **The cipher suite.** `EntityEncryptionService` decides the algorithm and the keys. An *authenticated* mode (AES-GCM,

@@ -12,8 +12,12 @@
  *   <dt>{@link EncryptedAttribute}</dt>
  *   <dd>Marks the {@code byte[]} attribute holding a ciphertext, and names its plaintext.</dd>
  *   <dt>{@link EntityEncryptionService}</dt>
- *   <dd>What an application implements, and provides as a bean: the persistence unit, the encryption identifier of
- *       an instance — that is, which key the instance is encrypted with — and the encryption and decryption.</dd>
+ *   <dd>What an application implements, and provides as a bean: the persistence unit, the keys an instance is
+ *       encrypted with — selected once per instance, in its {@link EntityEncryptionContext context} — and the
+ *       encryption and decryption.</dd>
+ *   <dt>{@link EntityEncryptionContext}</dt>
+ *   <dd>The context of one instance, for one encryption, or decryption, of it: what the service prepared for that
+ *       instance travels in it from one attribute to the next.</dd>
  *   <dt>{@link EntityEncryptionListener}</dt>
  *   <dd>The entity listener an application registers, with
  *       {@link jakarta.persistence.EntityListeners @EntityListeners}. It is injected with the service, and does
