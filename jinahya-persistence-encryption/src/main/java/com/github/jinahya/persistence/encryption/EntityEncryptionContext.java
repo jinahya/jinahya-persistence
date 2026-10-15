@@ -13,10 +13,10 @@ import jakarta.validation.constraints.NotNull;
  * {@link EntityEncryptionService#encrypt(EntityEncryptionContext, byte[]) encrypt}, or to
  * {@link EntityEncryptionService#decrypt(EntityEncryptionContext, byte[]) decrypt}, once for each attribute.
  * <p>
- * A context is confined to the thread of its operation, and is never reused: what the service prepares in
- * {@code init} — a key, a {@link javax.crypto.Cipher} — it keeps here, as the {@link #getAttachment() attachment},
- * without any synchronization. The service must not keep the context, which holds the entity instance, beyond the
- * call it was handed to.
+ * A context is confined to the thread of its operation, and is never reused: what the service prepares in {@code init}
+ * — a key, a {@link javax.crypto.Cipher} — it keeps here, as the {@link #getAttachment() attachment}, without any
+ * synchronization. The service must not keep the context, which holds the entity instance, beyond the call it was
+ * handed to.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see EntityEncryptionService
@@ -48,5 +48,5 @@ public interface EntityEncryptionContext {
      *
      * @param attachment the object to attach; may be {@code null}.
      */
-    void setAttachment(@Nullable @org.jspecify.annotations.Nullable Object attachment);
+    void setAttachment(@org.jspecify.annotations.Nullable @Nullable Object attachment);
 }
