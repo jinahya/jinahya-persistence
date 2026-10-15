@@ -444,6 +444,36 @@ class EntityEncryptionIntegrator_Test {
         }
     }
 
+    // https://github.com/jinahya/jinahya-persistence/issues/105
+    @DisplayName("versionless optimistic locking is refused")
+    @Nested
+    class OptimisticLockingTest {
+
+        @DisplayName("ALL")
+        @Test
+        void __all() {
+            assertThatThrownBy(() -> apply(em -> {
+                final var entity = new LockAllSecretEntity();
+                entity.name = "alice";
+                em.persist(entity);
+                em.flush();
+                return null;
+            })).hasStackTraceContaining("versionless optimistic locking");
+        }
+
+        @DisplayName("DIRTY")
+        @Test
+        void __dirty() {
+            assertThatThrownBy(() -> apply(em -> {
+                final var entity = new LockDirtySecretEntity();
+                entity.name = "alice";
+                em.persist(entity);
+                em.flush();
+                return null;
+            })).hasStackTraceContaining("versionless optimistic locking");
+        }
+    }
+
     // https://github.com/jinahya/jinahya-persistence/issues/104
     @DisplayName("StatelessSession")
     @Nested

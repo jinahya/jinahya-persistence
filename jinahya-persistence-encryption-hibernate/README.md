@@ -135,4 +135,8 @@ cycle between the service bean and the factory bean.
   encrypted entity (and their `*Multiple` forms) fail with an `IllegalStateException`. Its reads can't be refused: they
   return the entity with its plaintexts not decrypted. Use a `Session`, or an `EntityManager`, for encrypted entities
   ([#104](https://github.com/jinahya/jinahya-persistence/issues/104)).
+* **No versionless optimistic locking.** An encrypted entity with `@OptimisticLocking(type = ALL)` or `DIRTY` fails
+  on its first event with an `IllegalStateException`: the `UPDATE`'s `WHERE` would compare the decrypted plaintext
+  with a column holding `NULL`, fail every update, and carry the plaintext as a bind parameter. Use a `@Version`
+  attribute ([#105](https://github.com/jinahya/jinahya-persistence/issues/105)).
 * **Bytecode enhancement with dirty tracking is not verified.**

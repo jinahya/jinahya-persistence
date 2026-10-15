@@ -4,6 +4,7 @@ import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import org.eclipse.persistence.descriptors.ClassDescriptor;
 import org.eclipse.persistence.descriptors.DescriptorEvent;
 import org.eclipse.persistence.descriptors.DescriptorEventAdapter;
+import org.eclipse.persistence.descriptors.FieldsLockingPolicy;
 import org.eclipse.persistence.internal.helper.DatabaseField;
 import org.eclipse.persistence.internal.sessions.AbstractRecord;
 import org.eclipse.persistence.internal.sessions.UnitOfWorkImpl;
@@ -71,13 +72,22 @@ class EclipseLinkEntityEncryptor extends DescriptorEventAdapter {
      *
      * @param descriptor the descriptor.
      * @return the encryption of the {@code descriptor}; {@link Encryption#NONE} when it has nothing encrypted.
-     * @throws IllegalStateException when the descriptor tracks attribute changes.
+     * @throws IllegalStateException when the descriptor tracks attribute changes, or uses field-based optimistic
+     *                               locking.
      */
     private Encryption encryption(final ClassDescriptor descriptor) {
         return encryptions.computeIfAbsent(descriptor, d -> {
             final var javaClass = d.getJavaClass();
             if (!encryptor.hasEncryptedAttributes(javaClass)) {
                 return Encryption.NONE;
+            }
+            if (d.getOptimisticLockingPolicy() instanceof FieldsLockingPolicy policy) {
+                // its WHERE compares the backup clone's values, which hold the decrypted plaintexts, with columns
+                // which hold NULL; https://github.com/jinahya/jinahya-persistence/issues/105
+                throw new IllegalStateException(
+                        "versionless optimistic locking (" + policy.getClass().getSimpleName() + ") is not supported for "
+                        + javaClass.getName() + ", which has encrypted attributes: it would compare a decrypted"
+                        + " plaintext with a column holding NULL, and fail every update; use a @Version attribute");
             }
             if (d.getObjectChangePolicy().isAttributeChangeTrackingPolicy()) {
                 throw new IllegalStateException(

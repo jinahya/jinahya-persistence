@@ -292,6 +292,45 @@ abstract class EntityEncryptionSessionCustomizer_Test {
         }
     }
 
+    // https://github.com/jinahya/jinahya-persistence/issues/105
+    @DisplayName("field-based optimistic locking is refused")
+    @Nested
+    class OptimisticLockingTest {
+
+        private <T> void persistAndUpdate(final T entity, final java.util.function.Consumer<T> change) {
+            final var id = apply(em -> {
+                em.persist(entity);
+                em.flush();
+                return em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
+            });
+            apply(em -> {
+                @SuppressWarnings("unchecked") final var found = (T) em.find(entity.getClass(), id);
+                change.accept(found);
+                em.flush();
+                return null;
+            });
+        }
+
+        @DisplayName("ALL_COLUMNS")
+        @Test
+        void __allColumns() {
+            final var entity = new LockAllColumnsSecretEntity();
+            entity.name = "alice";
+            assertThatThrownBy(() -> persistAndUpdate(entity, e -> e.note = "changed"))
+                    .hasStackTraceContaining("versionless optimistic locking");
+        }
+
+        @DisplayName("CHANGED_COLUMNS")
+        @Test
+        void __changedColumns() {
+            final var entity = new LockChangedColumnsSecretEntity();
+            entity.name = "alice";
+            assertThatThrownBy(() -> persistAndUpdate(entity, e -> e.name = "bob"))
+                    .hasStackTraceContaining("versionless optimistic locking");
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     // https://github.com/jinahya/jinahya-persistence/issues/107
     @DisplayName("a plaintext assigned by a JPA @PreUpdate callback is stored as ciphertext only")
     @Nested

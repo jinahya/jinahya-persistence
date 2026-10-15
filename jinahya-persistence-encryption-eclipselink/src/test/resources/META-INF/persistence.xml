@@ -9,6 +9,8 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEmbeddable</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.LockAllColumnsSecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.LockChangedColumnsSecretEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
@@ -31,6 +33,8 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.eclipselink.SecretEmbeddable</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.LockAllColumnsSecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.LockChangedColumnsSecretEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>ALL</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
