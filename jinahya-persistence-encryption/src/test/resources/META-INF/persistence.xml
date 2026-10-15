@@ -89,6 +89,28 @@
       <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
     </properties>
   </persistence-unit>
+  <persistence-unit name="__encryptionCallbacksPU">
+    <description>Persistence Unit for entities with callbacks of their own (#101); one is declared in orm.xml</description>
+    <provider>${persistence-unit.provider}</provider>
+    <!-- declares XmlCallbackSecretEntity, which is not annotated as an entity -->
+    <mapping-file>META-INF/callbacks-orm.xml</mapping-file>
+    <class>com.github.jinahya.persistence.encryption.examples.CallbackSecretEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-callbacks;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.show_sql" value="true"/>
+    </properties>
+  </persistence-unit>
   <persistence-unit name="__encryptionHibernatePU">
     <description>Persistence Unit for the Hibernate ORM specific examples (examples.hibernate); used, and compiled,
       under the jakarta-ee-11-hibernate-orm profile only

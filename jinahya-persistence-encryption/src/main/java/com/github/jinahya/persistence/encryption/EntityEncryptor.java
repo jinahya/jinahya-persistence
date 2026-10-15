@@ -1004,6 +1004,76 @@ final class EntityEncryptor implements EntityEncryptionEngine {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Rejects the class of the specified entity instance when, with the specified listener class encrypting it, any
+     * {@code @PrePersist} or {@code @PreUpdate} callback can run after the listener; validated once for each pair of
+     * classes.
+     *
+     * @param object        the entity instance about to be encrypted.
+     * @param listenerClass the class of the listener about to encrypt it.
+     * @throws IllegalStateException when the entity is encrypted and such a callback is found.
+     * @see LateWriteCallbacks
+     */
+    void validateCallbacks(final Object object, final Class<?> listenerClass) {
+        Objects.requireNonNull(object, "object is null");
+        Objects.requireNonNull(listenerClass, "listenerClass is null");
+        final var entityClass = resolveClass(object);
+        final var key = List.<Class<?>>of(entityClass, listenerClass);
+        if (validatedCallbacks.contains(key) || !getMapping(entityClass).hasPairs()) {
+            return;
+        }
+        final var found = LateWriteCallbacks.find(entityClass, listenerClass);
+        if (!found.isEmpty()) {
+            throw new IllegalStateException(
+                    entityClass.getName() + " has encrypted attributes, and callbacks which run after "
+                    + listenerClass.getName() + ", once it has encrypted them: " + found
+                    + "; a plaintext one of them assigns would be written in the clear, or leave a stale ciphertext."
+                    + " Move what they do into a listener declared before it, or use a provider integration"
+                    + " (jinahya-persistence-encryption-hibernate, -eclipselink), which encrypts after every callback");
+        }
+        validatedCallbacks.add(key);
+    }
+
+    /**
+     * Checks, after an {@code UPDATE}, that each plaintext which was nulled before it is still {@code null}: one
+     * which is not was assigned again after the instance was encrypted, and went out with the {@code UPDATE}.
+     *
+     * @param object the entity instance just updated.
+     * @throws IllegalStateException when a plaintext which was nulled has a value.
+     */
+    void checkPlaintextsCleared(final Object object) {
+        Objects.requireNonNull(object, "object is null");
+        if (!hasEncryptedAttributes(object)) {
+            return;
+        }
+        final var assigned = new ArrayList<String>();
+        collectAssignedPlaintexts(object, getMapping(resolveClass(object)), "", assigned);
+        if (!assigned.isEmpty()) {
+            throw new IllegalStateException(
+                    "plaintext " + assigned + " of " + resolveClass(object).getName() + " was assigned after it was"
+                    + " encrypted, and was written by the UPDATE in the clear; something which runs after the"
+                    + " encryption listener changed it");
+        }
+    }
+
+    private static void collectAssignedPlaintexts(final Object object, final EncryptionMapping mapping,
+                                                  final String prefix, final List<String> assigned) {
+        for (final var embedded : mapping.embeddeds()) {
+            final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
+            if (embeddedValue != null) {
+                collectAssignedPlaintexts(embeddedValue, embedded.mapping(),
+                                          prefix + embedded.attribute().getName() + '.', assigned);
+            }
+        }
+        for (final var pair : mapping.pairs()) {
+            if (pair.nulled() && pair.getPlaintext(object) != null) {
+                assigned.add(prefix + pair.name());
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Returns the class the metamodel knows the specified object by.
      *
      * @param object the entity, or embeddable, instance.
@@ -1064,4 +1134,7 @@ final class EntityEncryptor implements EntityEncryptionEngine {
     // the validated mapping of each entity class; never evicted: it describes the encryption service's entity manager
     // factory, and lives exactly as long as it does
     private final Map<Class<?>, EncryptionMapping> mappings = new ConcurrentHashMap<>();
+
+    // each (entity class, listener class) whose callbacks have been validated
+    private final Set<List<Class<?>>> validatedCallbacks = ConcurrentHashMap.newKeySet();
 }
