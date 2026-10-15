@@ -4,6 +4,7 @@ import com.github.jinahya.persistence.encryption.EncryptionMapping.ColumnRules;
 import com.github.jinahya.persistence.encryption.EncryptionMapping.Embedded;
 import com.github.jinahya.persistence.encryption.EncryptionMapping.Pair;
 import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManagerFactory;
@@ -29,7 +30,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.github.jinahya.persistence.encryption.EntityEncryptorUtils.decode;
@@ -99,8 +99,8 @@ public class EntityEncryptor {
     /**
      * Returns the encryption service the specified value of {@link #PROPERTY_ENCRYPTION_SERVICE} stands for.
      *
-     * @param value the value of the property: an {@link EntityEncryptionService}, its {@link Class}, or the name of
-     *              its class.
+     * @param value the value of the property: an {@link EntityEncryptionService}, its {@link Class}, or the name of its
+     *              class.
      * @return the encryption service; a new instance when the {@code value} is a class, or a class name.
      * @throws IllegalArgumentException when the {@code value} is {@code null}, or none of the above.
      */
@@ -160,27 +160,23 @@ public class EntityEncryptor {
      *         instance may itself be created while the factory is still being built. The metadata of that factory is
      *         then cached, and never evicted: an instance is meant to live exactly as long as its factory.
      */
-    public EntityEncryptor(final EntityEncryptionService encryptionService) {
+    public EntityEncryptor(final @Nonnull EntityEncryptionService encryptionService) {
         super();
-        Objects.requireNonNull(encryptionService, "encryptionService is null");
-        this.encryptionServiceSupplier = () -> encryptionService;
+        this.encryptionService = Objects.requireNonNull(encryptionService, "encryptionService is null");
     }
 
     /**
      * Creates a new instance for the specified entity manager factory, whose metamodel is read in place of the one of
-     * the {@link EntityEncryptionService#getEntityManagerFactory() encryption service's}.
+     * the {@link EntityEncryptionService#getEntityManagerFactory() encryption service's}, which is then never asked
+     * for.
      *
-     * @param entityManagerFactory      the entity manager factory whose entities are encrypted; must not be
-     *                                  {@code null}.
-     * @param encryptionServiceSupplier a supplier of the encryption service, asked on the first use which needs one,
-     *                                  never for an entity with no encrypted attribute; must not be {@code null}.
+     * @param entityManagerFactory the entity manager factory whose entities are encrypted; must not be {@code null}.
+     * @param encryptionService    the encryption service; must not be {@code null}.
      */
     public EntityEncryptor(final EntityManagerFactory entityManagerFactory,
-                           final Supplier<? extends EntityEncryptionService> encryptionServiceSupplier) {
-        super();
+                           final EntityEncryptionService encryptionService) {
+        this(encryptionService);
         this.entityManagerFactory = Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
-        this.encryptionServiceSupplier = Objects.requireNonNull(encryptionServiceSupplier,
-                                                                "encryptionServiceSupplier is null");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -198,32 +194,13 @@ public class EntityEncryptor {
     private EntityManagerFactory entityManagerFactory() {
         var result = entityManagerFactory;
         if (result == null) {
-            final var service = encryptionService();
-            result = service.getEntityManagerFactory();
+            result = encryptionService.getEntityManagerFactory();
             if (result == null) {
                 throw new RuntimeException(
                         "encryption service returned a null entity manager factory; service: "
-                        + service.getClass().getName());
+                        + encryptionService.getClass().getName());
             }
             entityManagerFactory = result;
-        }
-        return result;
-    }
-
-    /**
-     * Returns the encryption service, asking the supplier on the first call only.
-     *
-     * @return the encryption service.
-     * @throws RuntimeException when the supplier returns {@code null}.
-     */
-    private EntityEncryptionService encryptionService() {
-        var result = encryptionService;
-        if (result == null) {
-            result = encryptionServiceSupplier.get();
-            if (result == null) {
-                throw new RuntimeException("no encryption service supplied");
-            }
-            encryptionService = result;
         }
         return result;
     }
@@ -762,14 +739,14 @@ public class EntityEncryptor {
     /**
      * Encrypts the annotated attributes of the specified object within the specified context.
      *
-     * @param context              the context of the entity instance being encrypted, or decrypted.
-     * @param object               the entity, or embeddable, instance to encrypt, in place.
-     * @param clearPlaintext       whether to null each plaintext which is to be nulled once encrypted.
+     * @param context        the context of the entity instance being encrypted, or decrypted.
+     * @param object         the entity, or embeddable, instance to encrypt, in place.
+     * @param clearPlaintext whether to null each plaintext which is to be nulled once encrypted.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be turned into bytes.
      * @see #encrypt(Object, boolean)
      */
-    private void encrypt(final Context context, final Object object,
+    private void encrypt(final DefaultEntityEncryptionContext context, final Object object,
                          final boolean clearPlaintext) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
@@ -783,19 +760,19 @@ public class EntityEncryptor {
     /**
      * Encrypts the specified object against the mapping already validated for it.
      *
-     * @param context              the context of the entity instance being encrypted, or decrypted.
-     * @param object               the entity, or embeddable, instance to encrypt, in place.
-     * @param mapping              the validated mapping of the {@code object}.
-     * @param clearPlaintext       whether to null each plaintext which is to be nulled once encrypted.
-     * @param snapshot             the values the {@code object}'s attributes had when it was last read or written,
-     *                             by attribute; {@code null} when there is none, and every plaintext is encrypted.
-     * @param assignments          the list to which every attribute assignment is added, rather than made.
+     * @param context        the context of the entity instance being encrypted, or decrypted.
+     * @param object         the entity, or embeddable, instance to encrypt, in place.
+     * @param mapping        the validated mapping of the {@code object}.
+     * @param clearPlaintext whether to null each plaintext which is to be nulled once encrypted.
+     * @param snapshot       the values the {@code object}'s attributes had when it was last read or written, by
+     *                       attribute; {@code null} when there is none, and every plaintext is encrypted.
+     * @param assignments    the list to which every attribute assignment is added, rather than made.
      * @implNote The mapping is passed down rather than looked up again: an embeddable reached through an
      *         {@link AttributeOverride @AttributeOverride} would otherwise be re-resolved without that override in
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void encrypt(final Context context, final Object object,
+    private void encrypt(final DefaultEntityEncryptionContext context, final Object object,
                          final EncryptionMapping mapping, final boolean clearPlaintext,
                          final @org.jspecify.annotations.Nullable AttributeSnapshot snapshot,
                          final List<Runnable> assignments) {
@@ -857,9 +834,8 @@ public class EntityEncryptor {
         return previousPlaintext != null && Arrays.equals(encode(pair, plaintext), encode(pair, previousPlaintext));
     }
 
-    private byte[] encryptEncoded(final Context context, final Pair pair,
+    private byte[] encryptEncoded(final DefaultEntityEncryptionContext context, final Pair pair,
                                   final byte[] encoded) {
-        final var encryptionService = encryptionService();
         final var encrypted = encryptionService.encrypt(initialized(context), encoded);
         if (encrypted == null) {
             throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
@@ -898,7 +874,7 @@ public class EntityEncryptor {
         if (!hasEncryptedAttributes(object)) {
             return;
         }
-        encrypt(new Context(object), object, clearPlaintext);
+        encrypt(new DefaultEntityEncryptionContext(object), object, clearPlaintext);
     }
 
     /**
@@ -909,8 +885,8 @@ public class EntityEncryptor {
      * instance holds is not the snapshot's, which includes a legacy row, whose ciphertext is {@code null}. A
      * {@code null} plaintext always yields a {@code null} ciphertext.
      *
-     * @param entity   the entity instance to encrypt, in place; an instance of a class which has no encrypted
-     *                 attribute passes through untouched.
+     * @param entity   the entity instance to encrypt, in place; an instance of a class which has no encrypted attribute
+     *                 passes through untouched.
      * @param snapshot the values the instance's attributes had when it was last read or written, by the name of an
      *                 attribute of the entity class; an embedded attribute maps to an instance of its embeddable, read
      *                 the same way. {@code null} when there is none, as before an {@code INSERT}: every plaintext is
@@ -923,7 +899,7 @@ public class EntityEncryptor {
         if (!hasEncryptedAttributes(entity)) {
             return;
         }
-        final var context = new Context(entity);
+        final var context = new DefaultEntityEncryptionContext(entity);
         final var mapping = getMapping(resolveClass(entity));
         final var assignments = new ArrayList<Runnable>();
         encrypt(context, entity, mapping, false,
@@ -961,8 +937,8 @@ public class EntityEncryptor {
     }
 
     /**
-     * Returns the names of the attributes of the specified entity class itself which hold a ciphertext. Those inside
-     * an embeddable are reached through its {@link #getPlaintextAttributeNames(Class) embedded attribute}.
+     * Returns the names of the attributes of the specified entity class itself which hold a ciphertext. Those inside an
+     * embeddable are reached through its {@link #getPlaintextAttributeNames(Class) embedded attribute}.
      *
      * @param entityClass the entity class.
      * @return an unmodifiable set of attribute names; empty when the {@code entityClass} has none of its own.
@@ -974,8 +950,8 @@ public class EntityEncryptor {
     }
 
     /**
-     * Returns the paths, from the specified entity class, of the plaintexts which are nulled: not primitive, and
-     * their columns mapped nullable. A path is the names of the embedded attributes leading to the plaintext, if any,
+     * Returns the paths, from the specified entity class, of the plaintexts which are nulled: not primitive, and their
+     * columns mapped nullable. A path is the names of the embedded attributes leading to the plaintext, if any,
      * followed by the plaintext's own name.
      *
      * @param entityClass the entity class.
@@ -1011,8 +987,8 @@ public class EntityEncryptor {
      *
      * @param entityClass   the entity class.
      * @param attributeName the name of an attribute of the {@code entityClass}.
-     * @param value         the value of the attribute; for an embedded attribute, a <em>copy</em> of the
-     *                      instance's, which is modified.
+     * @param value         the value of the attribute; for an embedded attribute, a <em>copy</em> of the instance's,
+     *                      which is modified.
      * @return the value to write.
      */
     public @org.jspecify.annotations.Nullable Object clearPlaintexts(
@@ -1063,13 +1039,13 @@ public class EntityEncryptor {
     /**
      * Decrypts the annotated attributes of the specified object within the specified context.
      *
-     * @param context              the context of the entity instance being encrypted, or decrypted.
-     * @param object               the entity, or embeddable, instance to decrypt, in place.
+     * @param context the context of the entity instance being encrypted, or decrypted.
+     * @param object  the entity, or embeddable, instance to decrypt, in place.
      * @throws RuntimeException when an attribute pair is inconsistent, or when an attribute has a java type which
      *                          cannot be reconstructed from bytes.
      * @see #decrypt(Object)
      */
-    private void decrypt(final Context context, final Object object) {
+    private void decrypt(final DefaultEntityEncryptionContext context, final Object object) {
         Objects.requireNonNull(object, "object is null");
         // validates the whole reachable graph before anything is touched
         final var mapping = getMapping(resolveClass(object));
@@ -1082,16 +1058,16 @@ public class EntityEncryptor {
     /**
      * Decrypts the specified object against the mapping already validated for it.
      *
-     * @param context              the context of the entity instance being encrypted, or decrypted.
-     * @param object               the entity, or embeddable, instance to decrypt, in place.
-     * @param mapping              the validated mapping of the {@code object}.
-     * @param assignments          the list to which every attribute assignment is added, rather than made.
+     * @param context     the context of the entity instance being encrypted, or decrypted.
+     * @param object      the entity, or embeddable, instance to decrypt, in place.
+     * @param mapping     the validated mapping of the {@code object}.
+     * @param assignments the list to which every attribute assignment is added, rather than made.
      * @implNote The mapping is passed down rather than looked up again: an embeddable reached through an
      *         {@link AttributeOverride @AttributeOverride} would otherwise be re-resolved without that override in
      *         scope. Nothing is assigned here; the caller applies the {@code assignments} once all of them have been
      *         computed.
      */
-    private void decrypt(final Context context, final Object object,
+    private void decrypt(final DefaultEntityEncryptionContext context, final Object object,
                          final EncryptionMapping mapping, final List<Runnable> assignments) {
         for (final var embedded : mapping.embeddeds()) {
             final var embeddedValue = JinahyaAttributeUtils.getAttributeValue(object, embedded.attribute());
@@ -1108,7 +1084,7 @@ public class EntityEncryptor {
                 }
                 continue;
             }
-            final var returned = encryptionService().decrypt(initialized(context), ciphertext.clone());
+            final var returned = encryptionService.decrypt(initialized(context), ciphertext.clone());
             if (returned == null) {
                 throw new RuntimeException("encryption service returned null; decrypted attribute: " + pair.name());
             }
@@ -1133,7 +1109,7 @@ public class EntityEncryptor {
         if (!hasEncryptedAttributes(object)) {
             return;
         }
-        decrypt(new Context(object), object);
+        decrypt(new DefaultEntityEncryptionContext(object), object);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -1160,51 +1136,14 @@ public class EntityEncryptor {
     }
 
     /**
-     * The context of one entity instance, for one encryption, or one decryption, of it.
-     *
-     * @implNote Created for each operation, and confined to its thread; the encryption service is
-     *         {@link EntityEncryptionService#init(EntityEncryptionContext) initialized} with it on the first attribute
-     *         which needs the service, and never when none does.
-     */
-    private static final class Context implements EntityEncryptionContext {
-
-        private Context(final Object entityInstance) {
-            super();
-            this.entityInstance = Objects.requireNonNull(entityInstance, "entityInstance is null");
-        }
-
-        @Override
-        public Object getEntityInstance() {
-            return entityInstance;
-        }
-
-        @Override
-        public @org.jspecify.annotations.Nullable Object getAttachment() {
-            return attachment;
-        }
-
-        @Override
-        public void setAttachment(final @org.jspecify.annotations.Nullable Object attachment) {
-            this.attachment = attachment;
-        }
-
-        private final Object entityInstance;
-
-        private @org.jspecify.annotations.Nullable Object attachment;
-
-        // whether the encryption service has been initialized with this context
-        private boolean initialized;
-    }
-
-    /**
      * Returns the specified context, initializing the encryption service with it first, on its first use.
      *
      * @param context the context.
      * @return the {@code context}.
      */
-    private EntityEncryptionContext initialized(final Context context) {
+    private EntityEncryptionContext initialized(final DefaultEntityEncryptionContext context) {
         if (!context.initialized) {
-            encryptionService().init(context);
+            encryptionService.init(context);
             context.initialized = true;
         }
         return context;
@@ -1222,8 +1161,8 @@ public class EntityEncryptor {
         /**
          * Returns the value the specified attribute had.
          *
-         * @param attributeName the name of an attribute of the entity class; for an embedded attribute, the value is
-         *                      an instance of its embeddable.
+         * @param attributeName the name of an attribute of the entity class; for an embedded attribute, the value is an
+         *                      instance of its embeddable.
          * @return the value; may be {@code null}.
          */
         @org.jspecify.annotations.Nullable
@@ -1247,10 +1186,7 @@ public class EntityEncryptor {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    private final Supplier<? extends EntityEncryptionService> encryptionServiceSupplier;
-
-    // the encryption service, asked for on first use
-    private volatile @org.jspecify.annotations.Nullable EntityEncryptionService encryptionService;
+    private final EntityEncryptionService encryptionService;
 
     // the encryption service's entity manager factory, asked for on first use
     private volatile @org.jspecify.annotations.Nullable EntityManagerFactory entityManagerFactory;

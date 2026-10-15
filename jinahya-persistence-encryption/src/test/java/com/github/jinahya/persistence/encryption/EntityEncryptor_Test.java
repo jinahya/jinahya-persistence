@@ -137,7 +137,7 @@ class EntityEncryptor_Test {
 
             entity.grade = null;
             // a name the enum codec reads, but cannot find among the constants
-            entity.gradeEnc__ = manager.encrypt(new SimpleEncryptionContext(entity), ValueCodecs.OfLang.encodeString("NOPE"));
+            entity.gradeEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), ValueCodecs.OfLang.encodeString("NOPE"));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .as("the failure has to say which attribute and which java type")
@@ -500,7 +500,7 @@ class EntityEncryptor_Test {
             final var nameEnc = entity.nameEnc__.clone();
             final var noteEnc = entity.secret.getNoteEnc__().clone();
             // three bytes where an Integer reads four
-            entity.ageEnc__ = manager.encrypt(new SimpleEncryptionContext(entity), new byte[3]);
+            entity.ageEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), new byte[3]);
 
             assertThatThrownBy(() -> service.decrypt(entity)).isInstanceOf(RuntimeException.class);
 
@@ -567,6 +567,8 @@ class EntityEncryptor_Test {
         /**
          * A service which records what it is called with, attaching a marker of its own in init.
          */
+        private static final String NAME = "recording";
+
         private static final class Recording extends EntityEncryptionServiceImpl {
 
             Recording(final jakarta.persistence.EntityManagerFactory entityManagerFactory) {
@@ -576,8 +578,8 @@ class EntityEncryptor_Test {
             @Override
             public void init(final EntityEncryptionContext context) {
                 calls.add("init");
-                assertThat(context.getAttachment()).as("a context is new to init").isNull();
-                context.setAttachment(new Object());
+                assertThat(context.getAttachment(NAME)).as("a context is new to init").isNull();
+                assertThat(context.setAttachment(NAME, new Object())).as("nothing attached before").isNull();
                 inits.add(context);
                 super.init(context);
             }
@@ -598,7 +600,7 @@ class EntityEncryptor_Test {
                 calls.add("attribute");
                 assertThat(inits).as("initialized before any attribute").isNotEmpty();
                 assertThat(context).as("the context init was given").isSameAs(inits.getLast());
-                assertThat(context.getAttachment()).as("what init attached").isNotNull();
+                assertThat(context.getAttachment(NAME)).as("what init attached").isNotNull();
             }
 
             final java.util.List<String> calls = new java.util.ArrayList<>();
@@ -627,6 +629,46 @@ class EntityEncryptor_Test {
             assertThat(entity.name).isEqualTo("Jane Roe");
         }
 
+        @DisplayName("attachments: by name, the previous one returned, null removing, the deprecated one apart")
+        @Test
+        void __attachments() {
+            final var checked = new java.util.concurrent.atomic.AtomicBoolean();
+            final var encryptor = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
+                @Override
+                public void init(final EntityEncryptionContext context) {
+                    if (checked.getAndSet(true)) {
+                        return;
+                    }
+                    final var first = new Object();
+                    final var second = new Object();
+                    assertThat(context.getAttachment("a")).isNull();
+                    assertThat(context.setAttachment("a", first)).as("none before").isNull();
+                    assertThat(context.getAttachment("a")).isSameAs(first);
+                    assertThat(context.setAttachment("a", second)).as("the replaced one").isSameAs(first);
+                    assertThat(context.getAttachment("a")).isSameAs(second);
+                    assertThat(context.setAttachment("b", first)).isNull();
+                    assertThat(context.getAttachment("a")).as("names are apart").isSameAs(second);
+                    assertThat(context.setAttachment("a", null)).as("null removes, returning it").isSameAs(second);
+                    assertThat(context.getAttachment("a")).isNull();
+                    assertThat(context.setAttachment("a", null)).as("removing nothing").isNull();
+                    assertThat(context.getAttachment("b")).isSameAs(first);
+                    assertThatThrownBy(() -> context.getAttachment(null)).isInstanceOf(NullPointerException.class);
+                    assertThatThrownBy(() -> context.setAttachment(null, first))
+                            .isInstanceOf(NullPointerException.class);
+                    // the deprecated attachment is the one under the default name, apart from any other
+                    assertThat(context.getAttachment()).isNull();
+                    assertThat(context.setAttachment(first)).isNull();
+                    assertThat(context.getAttachment()).isSameAs(first);
+                    assertThat(context.getAttachment(EntityEncryptionContextConstants.DEFAULT_NAME)).isSameAs(first);
+                    assertThat(context.setAttachment((Object) null)).isSameAs(first);
+                    assertThat(context.getAttachment()).isNull();
+                    assertThat(context.getAttachment("b")).isSameAs(first);
+                }
+            });
+            encryptor.encrypt(populated());
+            assertThat(checked).as("init ran").isTrue();
+        }
+
         @DisplayName("never initialized when no attribute has a value")
         @Test
         void __noInitWithoutValues() {
@@ -653,7 +695,7 @@ class EntityEncryptor_Test {
                     EntityEncryptionServiceImpl.AAD_BYTES];
             // an empty payload; Integer reads four bytes
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
-            entity.ageEnc__ = manager.encrypt(new SimpleEncryptionContext(entity), new byte[0]);
+            entity.ageEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), new byte[0]);
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .isInstanceOf(RuntimeException.class)

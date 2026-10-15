@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An encryption service for tests: AES-GCM under a fixed key, with a random IV, so that encrypting the same value twice
- * yields different bytes; it counts its calls. The cipher is prepared once per context, and kept as its attachment.
+ * yields different bytes; it counts its calls. The cipher is prepared once per context, and attached to it.
  */
 class CountingEncryptionService implements EntityEncryptionService {
 
@@ -31,7 +31,7 @@ class CountingEncryptionService implements EntityEncryptionService {
     public void init(final EntityEncryptionContext context) {
         initialized.incrementAndGet();
         try {
-            context.setAttachment(Cipher.getInstance("AES/GCM/NoPadding"));
+            context.setAttachment(CIPHER, Cipher.getInstance("AES/GCM/NoPadding"));
         } catch (final GeneralSecurityException gse) {
             throw new RuntimeException(gse);
         }
@@ -44,7 +44,7 @@ class CountingEncryptionService implements EntityEncryptionService {
         RANDOM.nextBytes(iv);
         try {
             // the context's cipher, initialized again with a fresh IV for each value
-            final var cipher = (Cipher) context.getAttachment();
+            final var cipher = (Cipher) context.getAttachment(CIPHER);
             cipher.init(Cipher.ENCRYPT_MODE, KEY, new GCMParameterSpec(128, iv));
             final var encrypted = cipher.doFinal(decryptedBytes);
             return ByteBuffer.allocate(IV_BYTES + encrypted.length).put(iv).put(encrypted).array();
@@ -57,13 +57,16 @@ class CountingEncryptionService implements EntityEncryptionService {
     public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
         decrypted.incrementAndGet();
         try {
-            final var cipher = (Cipher) context.getAttachment();
+            final var cipher = (Cipher) context.getAttachment(CIPHER);
             cipher.init(Cipher.DECRYPT_MODE, KEY, new GCMParameterSpec(128, encryptedBytes, 0, IV_BYTES));
             return cipher.doFinal(encryptedBytes, IV_BYTES, encryptedBytes.length - IV_BYTES);
         } catch (final GeneralSecurityException gse) {
             throw new RuntimeException(gse);
         }
     }
+
+    // a name of this service's own choosing
+    private static final String CIPHER = CountingEncryptionService.class.getName() + ".cipher";
 
     private static final SecureRandom RANDOM = new SecureRandom();
 

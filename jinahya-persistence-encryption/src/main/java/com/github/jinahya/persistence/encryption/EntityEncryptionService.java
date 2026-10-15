@@ -20,8 +20,8 @@ import jakarta.validation.constraints.NotNull;
  * context of its own: the service is {@link #init(EntityEncryptionContext) initialized} with it once, then
  * {@link #encrypt(EntityEncryptionContext, byte[]) encrypts}, or {@link #decrypt(EntityEncryptionContext, byte[])
  * decrypts}, once for each attribute of that instance which has a value. What is prepared once for the instance — the
- * key, a {@link javax.crypto.Cipher} — goes into the context's {@link EntityEncryptionContext#getAttachment()
- * attachment}, and is used for every attribute. An instance with nothing to encrypt, or to decrypt, never reaches this
+ * key, a {@link javax.crypto.Cipher} — goes into the context's
+ * {@link EntityEncryptionContext#setAttachment(String, Object) attachments}, and is used for every attribute. An instance with nothing to encrypt, or to decrypt, never reaches this
  * service.
  * <p>
  * <strong>An implementation has to be thread-safe.</strong> The listener holds a single instance, and calls it from
@@ -75,7 +75,7 @@ public interface EntityEncryptionService {
     /**
      * Initializes this service with the specified context, before the first attribute of its entity instance is
      * encrypted, or decrypted: selects the keys, prepares the cipher suite, and keeps what it prepared as the context's
-     * {@link EntityEncryptionContext#setAttachment(Object) attachment}.
+     * {@link EntityEncryptionContext#setAttachment(String, Object) attachments}.
      * <p>
      * Called once for each context, and only when an attribute of its instance is to be encrypted, or decrypted.
      * <p>

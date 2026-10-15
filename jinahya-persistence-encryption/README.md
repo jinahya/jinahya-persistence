@@ -191,7 +191,7 @@ class KmsEncryptionService implements EntityEncryptionService {
     @Override
     public void init(EntityEncryptionContext context) {
         // once per instance: select the key from context.getEntityInstance(), prepare a Cipher,
-        // context.setAttachment(...)
+        // context.setAttachment(name, ...)
     }
 
     @Override

@@ -79,7 +79,7 @@ public interface EntityEncryptionService {
     EntityManagerFactory getEntityManagerFactory();
 
     // once per instance and operation: select the keys from context.getEntityInstance(), never stored, and keep
-    // what was prepared as context.setAttachment(...); only when an attribute has a value
+    // what was prepared as context.setAttachment(name, ...); only when an attribute has a value
     void init(EntityEncryptionContext context);
 
     // the cryptography, bytes in and out, once per attribute, with the context init was given

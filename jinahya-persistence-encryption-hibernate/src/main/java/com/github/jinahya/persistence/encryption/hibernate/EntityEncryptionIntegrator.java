@@ -18,7 +18,8 @@ import java.lang.invoke.MethodHandles;
  * <p>
  * Discovered by Hibernate ORM through {@link java.util.ServiceLoader}, it does nothing unless the persistence unit sets
  * {@value EntityEncryptor#PROPERTY_ENCRYPTION_SERVICE}: to an {@link EntityEncryptionService} instance, passed in the
- * properties of the entity manager factory, or to the name of its class. The service's
+ * properties of the entity manager factory, or to the name of its class, which is instantiated when the session factory
+ * is built, failing it when it cannot be. The service's
  * {@link EntityEncryptionService#getEntityManagerFactory() entity manager factory} is never asked for: the session
  * factory being integrated is the one whose entities are encrypted.
  * <pre>{@code
@@ -57,7 +58,8 @@ public class EntityEncryptionIntegrator implements Integrator {
                        EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE);
             return;
         }
-        final var encryptor = new EntityEncryptor(sessionFactory, () -> EntityEncryptor.getEncryptionService(value));
+        // resolved now, so that a service which cannot be had fails the session factory, not its first write
+        final var encryptor = new EntityEncryptor(sessionFactory, EntityEncryptor.getEncryptionService(value));
         final var engine = new HibernateEntityEncryptor(encryptor);
         final var registry = sessionFactory.getEventListenerRegistry();
         for (final var listener : registry.getEventListenerGroup(EventType.FLUSH_ENTITY).listeners()) {
