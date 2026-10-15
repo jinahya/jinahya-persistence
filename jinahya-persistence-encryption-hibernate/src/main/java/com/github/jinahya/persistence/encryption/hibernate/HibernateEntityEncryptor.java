@@ -10,6 +10,10 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
+import org.hibernate.event.spi.PreUpdateEvent;
+import org.hibernate.event.spi.PreUpdateEventListener;
+import org.hibernate.event.spi.PreUpsertEvent;
+import org.hibernate.event.spi.PreUpsertEventListener;
 import org.hibernate.metamodel.RepresentationMode;
 import org.hibernate.persister.entity.EntityPersister;
 
@@ -31,12 +35,16 @@ import java.util.stream.IntStream;
  *   <li>After a load or an {@code UPDATE}, the snapshot the entity is dirty-checked against — the entry's loaded
  *       state — is set to copies of what the entity holds, its decrypted plaintexts included, so that neither a read
  *       nor a cleared plaintext makes the entity dirty.</li>
+ *   <li>A {@code StatelessSession} is refused any write of an encrypted entity: it neither flushes nor fires load
+ *       events, so its updates would carry the plaintext in the clear, and what it reads is never decrypted.</li>
  * </ul>
  * The entity's plaintexts are never touched.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEventListener, PostLoadEventListener {
+class HibernateEntityEncryptor
+        implements PreInsertEventListener, PreUpdateEventListener, PreUpsertEventListener, PostUpdateEventListener,
+                   PostLoadEventListener {
 
     /**
      * The indices, in an entity's state, of the attributes this engine rewrites.
@@ -233,16 +241,59 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
         indices.all().forEach(i -> loaded[i] = types[i].deepCopy(persister.getValue(entity, i), factory));
     }
 
+    /**
+     * Refuses a write, by a session which is not an event source, of an entity which is encrypted.
+     *
+     * @param session   the session writing.
+     * @param persister the persister of the entity written.
+     * @param indices   the indices of the entity's encrypted attributes.
+     * @throws IllegalStateException when the {@code session} is not an event source — a {@code StatelessSession} —
+     *                               and the entity is encrypted.
+     */
+    private static void refuseStateless(final SharedSessionContractImplementor session,
+                                        final EntityPersister persister, final Indices indices) {
+        if (!indices.isEmpty() && !session.isEventSource()) {
+            throw new IllegalStateException(
+                    "a StatelessSession can't write " + persister.getEntityName() + ", which has encrypted attributes:"
+                    + " it neither flushes nor fires load events, so an update would store the plaintext in the clear,"
+                    + " and what it reads is never decrypted; use a Session (an EntityManager) instead");
+        }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public boolean onPreInsert(final PreInsertEvent event) {
         final var persister = event.getPersister();
         final var indices = indices(persister);
+        refuseStateless(event.getSession(), persister, indices);
         if (!indices.isEmpty()) {
             final var entity = event.getEntity();
             encryptor.encrypt(entity, null);
             writeState(persister, entity, event.getState(), indices, false, event.getSession());
         }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @implNote A session's update is encrypted while it is flushed; only a {@code StatelessSession}'s, which is
+     *         never flushed, reaches here unencrypted, and is refused.
+     */
+    @Override
+    public boolean onPreUpdate(final PreUpdateEvent event) {
+        refuseStateless(event.getSession(), event.getPersister(), indices(event.getPersister()));
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @implNote Only a {@code StatelessSession} upserts; it is refused.
+     */
+    @Override
+    public boolean onPreUpsert(final PreUpsertEvent event) {
+        refuseStateless(event.getSession(), event.getPersister(), indices(event.getPersister()));
         return false;
     }
 

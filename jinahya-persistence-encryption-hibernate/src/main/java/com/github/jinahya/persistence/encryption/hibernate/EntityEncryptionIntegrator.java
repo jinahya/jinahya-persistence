@@ -33,6 +33,7 @@ import java.lang.invoke.MethodHandles;
  *   <li>a plaintext is encrypted again only when it changed, so an unrelated change keeps the stored ciphertext.</li>
  * </ul>
  * It replaces Hibernate ORM's default {@code FLUSH_ENTITY} listener, and fails when another one has been registered.
+ * A {@code StatelessSession} is refused any write of an encrypted entity, and what it reads is never decrypted.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -71,6 +72,8 @@ public class EntityEncryptionIntegrator implements Integrator {
         }
         registry.setListeners(EventType.FLUSH_ENTITY, new EncryptingFlushEntityEventListener(engine));
         registry.appendListeners(EventType.PRE_INSERT, engine);
+        registry.appendListeners(EventType.PRE_UPDATE, engine);
+        registry.appendListeners(EventType.PRE_UPSERT, engine);
         registry.appendListeners(EventType.POST_UPDATE, engine);
         registry.appendListeners(EventType.POST_LOAD, engine);
     }
