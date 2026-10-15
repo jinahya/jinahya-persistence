@@ -68,6 +68,8 @@
   </issueManagement>
 
   <properties>
+    <!-- the Automatic-Module-Name of a module's jar; set by each module, empty (no entry) here -->
+    <module.name/>
     <!--    <revision>0.3.10-SNAPSHOT</revision>-->
     <!-- https://endoflife.date/eclipse-temurin -->
     <!-- https://endoflife.date/amazon-corretto -->
@@ -413,6 +415,10 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.12.0</version>
           <configuration>
+            <!-- classpath mode: there is no module-info yet, and the Automatic-Module-Name the jar plugin writes
+                 would otherwise make javadoc treat each module as a JPMS module, which rejects a package holding a
+                 package-info.java alone (com.github.jinahya.persistence.metamodel) -->
+            <legacyMode>true</legacyMode>
             <doclint>all</doclint>
             <links>
               <link>https://docs.oracle.com/en/java/javase/${maven.compiler.release}/docs/api/</link>
@@ -597,8 +603,10 @@
         <configuration>
           <archive>
             <!-- https://dzone.com/articles/automatic-module-name-calling-all-java-library-maintainers -->
+            <!-- each module's own module.name: the name its module-info draft declares, so that nothing changes for a
+                 module-path user when the drafts become real; empty, as here in the root, no entry is written -->
             <manifestEntries>
-              <!--              <Automatic-Module-Name>com.github.jinahya.bit.io</Automatic-Module-Name>-->
+              <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
             </manifestEntries>
             <!--            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>-->
           </archive>

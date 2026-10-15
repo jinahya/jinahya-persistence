@@ -13,6 +13,11 @@
   <name>${project.artifactId}</name>
   <description>Extended interfaces/class for creating testing classes</description>
 
+  <properties>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence.more</module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>jakarta.validation</groupId>

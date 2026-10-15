@@ -13,6 +13,11 @@
   <name>${project.artifactId}</name>
   <description>Interfaces/classes for testing classes/interfaces created with jinahya-persistence</description>
 
+  <properties>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence.test.util</module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.assertj</groupId>
