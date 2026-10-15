@@ -58,18 +58,18 @@ class DirectListener_Test {
         }
 
         @Override
-        public String getEncryptionIdentifier(final Object entityContext) {
-            return cryptography.getEncryptionIdentifier(entityContext);
+        public void init(final EntityEncryptionContext context) {
+            cryptography.init(context);
         }
 
         @Override
-        public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
-            return cryptography.encrypt(encryptionIdentifier, decryptedBytes);
+        public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
+            return cryptography.encrypt(context, decryptedBytes);
         }
 
         @Override
-        public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
-            return cryptography.decrypt(encryptionIdentifier, encryptedBytes);
+        public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
+            return cryptography.decrypt(context, encryptedBytes);
         }
 
         @Inject

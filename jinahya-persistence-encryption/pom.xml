@@ -14,6 +14,11 @@
   <name>${project.artifactId}</name>
   <description>Application-level encryption of entity attributes for Jakarta Persistence</description>
 
+  <properties>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence.encryption</module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.h2database</groupId>

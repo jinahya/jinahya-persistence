@@ -134,11 +134,10 @@ class EntityEncryptor_Test {
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
             final var service = new EntityEncryptor(manager);
             final var entity = populated();
-            final var identifier = manager.getEncryptionIdentifier(entity);
 
             entity.grade = null;
             // a name the enum codec reads, but cannot find among the constants
-            entity.gradeEnc__ = manager.encrypt(identifier, ValueCodecs.OfLang.encodeString("NOPE"));
+            entity.gradeEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), ValueCodecs.OfLang.encodeString("NOPE"));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .as("the failure has to say which attribute and which java type")
@@ -389,7 +388,7 @@ class EntityEncryptor_Test {
         @DisplayName("an entity with no encrypted attribute passes through untouched (#72)")
         @Test
         void __plainEntityPassesThrough() {
-            // a service whose cryptography must never be reached: not even for the encryption identifier
+            // a service which must never be reached: not even to be initialized
             final var untouchable = new EntityEncryptor(new EntityEncryptionService() {
                 @Override
                 public jakarta.persistence.EntityManagerFactory getEntityManagerFactory() {
@@ -397,17 +396,17 @@ class EntityEncryptor_Test {
                 }
 
                 @Override
-                public String getEncryptionIdentifier(final Object entityContext) {
+                public void init(final EntityEncryptionContext context) {
                     throw new AssertionError("must not be called for a plain entity");
                 }
 
                 @Override
-                public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+                public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
                     throw new AssertionError("must not be called for a plain entity");
                 }
 
                 @Override
-                public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
+                public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
                     throw new AssertionError("must not be called for a plain entity");
                 }
             });
@@ -501,7 +500,7 @@ class EntityEncryptor_Test {
             final var nameEnc = entity.nameEnc__.clone();
             final var noteEnc = entity.secret.getNoteEnc__().clone();
             // three bytes where an Integer reads four
-            entity.ageEnc__ = manager.encrypt(manager.getEncryptionIdentifier(entity), new byte[3]);
+            entity.ageEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), new byte[3]);
 
             assertThatThrownBy(() -> service.decrypt(entity)).isInstanceOf(RuntimeException.class);
 
@@ -524,17 +523,17 @@ class EntityEncryptor_Test {
             final var returned = java.util.Collections.synchronizedList(new java.util.ArrayList<byte[]>());
             final var cryptography = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
                 @Override
-                public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+                public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
                     given.add(decryptedBytes);
-                    final var result = super.encrypt(encryptionIdentifier, decryptedBytes);
+                    final var result = super.encrypt(context, decryptedBytes);
                     returned.add(result);
                     return result;
                 }
 
                 @Override
-                public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
+                public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
                     given.add(encryptedBytes);
-                    final var result = super.decrypt(encryptionIdentifier, encryptedBytes);
+                    final var result = super.decrypt(context, encryptedBytes);
                     returned.add(result);
                     return result;
                 }
@@ -561,43 +560,125 @@ class EntityEncryptor_Test {
         }
     }
 
-    @DisplayName("the encryption identifier is opaque")
+    @DisplayName("the encryption context")
     @Nested
-    class EncryptionIdentifierTest {
+    class EncryptionContextTest {
 
-        @DisplayName("whatever the service returns, null and blank included, reaches encrypt and decrypt as it is")
-        @Test
-        void __identifierPassedAsItIs() {
-            for (final var identifier : new String[]{"", "  ", null, "tenant-1"}) {
-                final var seen = java.util.Collections.synchronizedList(new java.util.ArrayList<String>());
-                final var cryptography = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
-                    @Override
-                    public String getEncryptionIdentifier(final Object entityContext) {
-                        return identifier;
-                    }
+        /**
+         * A service which records what it is called with, attaching a marker of its own in init.
+         */
+        private static final String NAME = "recording";
 
-                    @Override
-                    public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
-                        seen.add(encryptionIdentifier);
-                        return super.encrypt(encryptionIdentifier, decryptedBytes);
-                    }
+        private static final class Recording extends EntityEncryptionServiceImpl {
 
-                    @Override
-                    public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
-                        seen.add(encryptionIdentifier);
-                        return super.decrypt(encryptionIdentifier, encryptedBytes);
-                    }
-                };
-                final var encryptor = new EntityEncryptor(cryptography);
-                final var entity = populated();
-
-                encryptor.encrypt(entity);
-                assertThat(entity.nameEnc__).isNotNull();
-                encryptor.decrypt(entity);
-
-                assertThat(entity.name).as("round trip with identifier %s", identifier).isEqualTo("Jane Roe");
-                assertThat(seen).as("identifiers passed to the service").isNotEmpty().containsOnly(identifier);
+            Recording(final jakarta.persistence.EntityManagerFactory entityManagerFactory) {
+                super(entityManagerFactory);
             }
+
+            @Override
+            public void init(final EntityEncryptionContext context) {
+                calls.add("init");
+                assertThat(context.getAttachment(NAME)).as("a context is new to init").isNull();
+                assertThat(context.setAttachment(NAME, new Object())).as("nothing attached before").isNull();
+                inits.add(context);
+                super.init(context);
+            }
+
+            @Override
+            public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
+                record(context);
+                return super.encrypt(context, decryptedBytes);
+            }
+
+            @Override
+            public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
+                record(context);
+                return super.decrypt(context, encryptedBytes);
+            }
+
+            private void record(final EntityEncryptionContext context) {
+                calls.add("attribute");
+                assertThat(inits).as("initialized before any attribute").isNotEmpty();
+                assertThat(context).as("the context init was given").isSameAs(inits.getLast());
+                assertThat(context.getAttachment(NAME)).as("what init attached").isNotNull();
+            }
+
+            final java.util.List<String> calls = new java.util.ArrayList<>();
+
+            final java.util.List<EntityEncryptionContext> inits = new java.util.ArrayList<>();
+        }
+
+        @DisplayName("init, once, with the instance; then every attribute with that context and its attachment")
+        @Test
+        void __initOncePerOperation() {
+            final var recording = new Recording(ENTITY_MANAGER_FACTORY);
+            final var encryptor = new EntityEncryptor(recording);
+            final var entity = populated();
+
+            encryptor.encrypt(entity);
+            assertThat(recording.inits).hasSize(1);
+            assertThat(recording.inits.getFirst().getEntityInstance()).isSameAs(entity);
+            assertThat(recording.calls.getFirst()).isEqualTo("init");
+            assertThat(recording.calls.subList(1, recording.calls.size()))
+                    .as("more than one attribute, under the one init").hasSizeGreaterThan(1).containsOnly("attribute");
+
+            encryptor.decrypt(entity);
+            assertThat(recording.inits).as("a context of its own for the decryption").hasSize(2);
+            assertThat(recording.inits.get(1)).isNotSameAs(recording.inits.getFirst());
+            assertThat(recording.inits.get(1).getEntityInstance()).isSameAs(entity);
+            assertThat(entity.name).isEqualTo("Jane Roe");
+        }
+
+        @DisplayName("attachments: by name, the previous one returned, null removing, the deprecated one apart")
+        @Test
+        void __attachments() {
+            final var checked = new java.util.concurrent.atomic.AtomicBoolean();
+            final var encryptor = new EntityEncryptor(new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY) {
+                @Override
+                public void init(final EntityEncryptionContext context) {
+                    if (checked.getAndSet(true)) {
+                        return;
+                    }
+                    final var first = new Object();
+                    final var second = new Object();
+                    assertThat(context.getAttachment("a")).isNull();
+                    assertThat(context.setAttachment("a", first)).as("none before").isNull();
+                    assertThat(context.getAttachment("a")).isSameAs(first);
+                    assertThat(context.setAttachment("a", second)).as("the replaced one").isSameAs(first);
+                    assertThat(context.getAttachment("a")).isSameAs(second);
+                    assertThat(context.setAttachment("b", first)).isNull();
+                    assertThat(context.getAttachment("a")).as("names are apart").isSameAs(second);
+                    assertThat(context.setAttachment("a", null)).as("null removes, returning it").isSameAs(second);
+                    assertThat(context.getAttachment("a")).isNull();
+                    assertThat(context.setAttachment("a", null)).as("removing nothing").isNull();
+                    assertThat(context.getAttachment("b")).isSameAs(first);
+                    assertThatThrownBy(() -> context.getAttachment(null)).isInstanceOf(NullPointerException.class);
+                    assertThatThrownBy(() -> context.setAttachment(null, first))
+                            .isInstanceOf(NullPointerException.class);
+                    // the deprecated attachment is the one under the default name, apart from any other
+                    assertThat(context.getAttachment()).isNull();
+                    assertThat(context.setAttachment(first)).isNull();
+                    assertThat(context.getAttachment()).isSameAs(first);
+                    assertThat(context.getAttachment(EntityEncryptionContextConstants.DEFAULT_NAME)).isSameAs(first);
+                    assertThat(context.setAttachment((Object) null)).isSameAs(first);
+                    assertThat(context.getAttachment()).isNull();
+                    assertThat(context.getAttachment("b")).isSameAs(first);
+                }
+            });
+            encryptor.encrypt(populated());
+            assertThat(checked).as("init ran").isTrue();
+        }
+
+        @DisplayName("never initialized when no attribute has a value")
+        @Test
+        void __noInitWithoutValues() {
+            final var recording = new Recording(ENTITY_MANAGER_FACTORY);
+            final var encryptor = new EntityEncryptor(recording);
+            final var entity = new SecretEntity();
+
+            encryptor.encrypt(entity);
+            encryptor.decrypt(entity);
+            assertThat(recording.calls).isEmpty();
         }
     }
 
@@ -614,7 +695,7 @@ class EntityEncryptor_Test {
                     EntityEncryptionServiceImpl.AAD_BYTES];
             // an empty payload; Integer reads four bytes
             final var manager = new EntityEncryptionServiceImpl(ENTITY_MANAGER_FACTORY);
-            entity.ageEnc__ = manager.encrypt("irrelevant", new byte[0]);
+            entity.ageEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), new byte[0]);
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .isInstanceOf(RuntimeException.class)

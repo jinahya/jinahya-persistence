@@ -62,7 +62,7 @@ container without the CDI API on the class path is expected to fail on when it i
                                  │            ▼
  EntityEncryptionService impl ◄──┼──  EntityEncryptor                       (package-private)
    getEntityManagerFactory()     │    one per listener instance, created on the first callback
-   getEncryptionIdentifier(e)    │    ├─ mapping: metamodel → validated pairs, cached per class
+   init(context)                 │    ├─ mapping: metamodel → validated pairs, cached per class
    encrypt / decrypt (bytes)     │    ├─ codec:   value ⇄ bytes (EntityEncryptorUtils, ValueCodecs)
                                  │    └─ walk:    per-mode decision, all-or-nothing writes
 ----
@@ -78,13 +78,14 @@ public interface EntityEncryptionService {
     // which persistence unit: the metamodel the encryptor maps against
     EntityManagerFactory getEntityManagerFactory();
 
-    // which key context, per instance; never stored, derived again on every call
-    String getEncryptionIdentifier(Object entityInstance);
+    // once per instance and operation: select the keys from context.getEntityInstance(), never stored, and keep
+    // what was prepared as context.setAttachment(name, ...); only when an attribute has a value
+    void init(EntityEncryptionContext context);
 
-    // the cryptography, bytes in and out
-    byte[] encrypt(String encryptionIdentifier, byte[] decryptedBytes);
+    // the cryptography, bytes in and out, once per attribute, with the context init was given
+    byte[] encrypt(EntityEncryptionContext context, byte[] decryptedBytes);
 
-    byte[] decrypt(String encryptionIdentifier, byte[] encryptedBytes);
+    byte[] decrypt(EntityEncryptionContext context, byte[] encryptedBytes);
 }
 ----
 
@@ -118,7 +119,10 @@ public interface EntityEncryptionService {
 * Its internals are unchanged: mapping validation against `getEntityManagerFactory().getMetamodel()`, cached per entity class;
   the codecs (no payload header: a value is decoded by its declared java type); the per-mode walk; all-or-nothing
   writes.
-* The identifier only ever comes from the service: the overloads taking an identifier are `private`.
+* What selects the keys only ever comes from the service, in `init(EntityEncryptionContext)`; the encryptor creates a
+  context per operation and initializes the service with it lazily.
+* A persistence provider integration reaches it only through the public `EntityEncryptionEngine` interface, made by
+  `EntityEncryptionEngine.of(...)`; the class itself stays package-private and `final`.
 
 === 3.4 Dependencies
 

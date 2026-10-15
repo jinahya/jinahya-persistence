@@ -74,12 +74,12 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
     }
 
     @Override
-    public String getEncryptionIdentifier(final Object entityContext) {
-        return "irrelevant";
+    public void init(final EntityEncryptionContext context) {
+        // a fresh key per value, carried inside the ciphertext; nothing to prepare
     }
 
     @Override
-    public byte[] encrypt(final String encryptionIdentifier, final byte[] decryptedBytes) {
+    public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
         final var iv = new byte[IV_BYTES];
         try {
             SecureRandom.getInstanceStrong().nextBytes(iv);
@@ -113,7 +113,7 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
     }
 
     @Override
-    public byte[] decrypt(final String encryptionIdentifier, final byte[] encryptedBytes) {
+    public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
         final byte[] iv;
         final byte[] key;
         final byte[] aad;

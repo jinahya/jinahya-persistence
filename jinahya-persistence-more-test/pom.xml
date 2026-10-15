@@ -13,6 +13,11 @@
   <name>${project.artifactId}</name>
   <description>Interfaces/classes for testing classes/interfaces created with jinahya-persistence-more</description>
 
+  <properties>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence.more.test</module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

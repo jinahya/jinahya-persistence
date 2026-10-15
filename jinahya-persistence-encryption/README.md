@@ -37,7 +37,7 @@ class User {
 
 @ApplicationScoped // or a Spring @Component
 class KmsEncryptionService implements EntityEncryptionService {
-    // getEntityManagerFactory(), getEncryptionIdentifier(entity), encrypt(id, bytes), decrypt(id, bytes)
+    // getEntityManagerFactory(), init(context), encrypt(context, bytes), decrypt(context, bytes)
 }
 ```
 
@@ -71,9 +71,12 @@ Two rules about what reaches the service:
 * **`null` is `null`.** An absent value never reaches the service: a `null` plaintext is stored as a `null`
   ciphertext, and a `null` ciphertext read as a `null` plaintext, without a call. So the bytes the service is given,
   and the bytes it returns, are never `null`; every array crossing in either direction is a copy.
-* **The encryption identifier is opaque.** The service derives it from the instance, and gets it back, unchanged, on
-  every `encrypt` and `decrypt` of that instance — `null` included. What it means is entirely the service's; it has to
-  be the same for the whole lifetime of the row ([The application's responsibility](#the-applications-responsibility)).
+* **One context per entity.** Each encryption of an instance, and each decryption of one, gets an
+  `EntityEncryptionContext` of its own: the service is `init`ialized with it once, selecting the keys from the
+  instance and preparing its cipher suite, which it keeps as the context's attachment; then every attribute of that
+  instance is encrypted, or decrypted, with that context. An instance with nothing to encrypt, or to decrypt, never
+  reaches the service. What selects the keys has to be the same for the whole lifetime of the row
+  ([The application's responsibility](#the-applications-responsibility)).
 
 How the listener gets the service is under [Wiring](#wiring).
 
@@ -136,6 +139,8 @@ The plaintext is a *mapped* attribute, and a JPA listener can only keep its valu
 field. These follow, and cannot be fixed inside the standard callbacks: they are the price of using standard Jakarta
 Persistence APIs only.
 
+A [provider integration](#provider-integrations) removes the first three, at the price of that purity.
+
 * **Reading an entity writes it.** `@PostLoad` runs after the provider has taken its loaded-state snapshot, so setting
   the decrypted value leaves the instance dirty from the moment it is read. Measured on both providers: a transaction
   which only reads still issues an `UPDATE`, increments `@Version`, and — encryption being randomized — rewrites the
@@ -184,13 +189,16 @@ class KmsEncryptionService implements EntityEncryptionService {
     }
 
     @Override
-    public String getEncryptionIdentifier(Object entityInstance) { ... }
+    public void init(EntityEncryptionContext context) {
+        // once per instance: select the key from context.getEntityInstance(), prepare a Cipher,
+        // context.setAttachment(name, ...)
+    }
 
     @Override
-    public byte[] encrypt(String encryptionIdentifier, byte[] decryptedBytes) { ... }
+    public byte[] encrypt(EntityEncryptionContext context, byte[] decryptedBytes) { ... } // per attribute
 
     @Override
-    public byte[] decrypt(String encryptionIdentifier, byte[] encryptedBytes) { ... }
+    public byte[] decrypt(EntityEncryptionContext context, byte[] encryptedBytes) { ... } // per attribute
 }
 ```
 
@@ -219,6 +227,35 @@ A listener created without one has no service, and its first callback fails with
 
 **Never encrypt from `@PostPersist` or `@PostUpdate`** — the row is already written by the time the post-callbacks
 run.
+
+## Provider integrations
+
+A provider integration replaces the listener with the persistence provider's own write and read paths. The mapping
+and the `EntityEncryptionService` are the same; the listener must **not** be registered as well. What changes:
+
+* **The entity's plaintext is never nulled.** It is cleared only in what the provider builds the row from.
+* **A read never writes.** The snapshot the provider checks the entity against holds the decrypted plaintext.
+* **An unrelated change keeps the ciphertext.** A plaintext is encrypted again only when its encoding changed, or when
+  its ciphertext is missing — a legacy row, migrated by any write of the entity.
+* **Bean Validation sees the plaintext**, as the entity is never changed under it.
+
+The service comes from the persistence unit property `jinahya.persistence.encryption.service`
+(`EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE`): an instance, passed in the properties of the entity manager factory,
+its class, or the name of its class. Without the property, the integration does nothing.
+
+```java
+var factory = Persistence.createEntityManagerFactory(
+        "unit", Map.of(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service));
+```
+
+| provider | module | mechanism |
+|---|---|---|
+| Hibernate ORM | `jinahya-persistence-encryption-hibernate` | an `Integrator`, found through `ServiceLoader`; replaces the default `FLUSH_ENTITY` listener, and adds `PRE_INSERT`, `POST_UPDATE` and `POST_LOAD` listeners. The session factory is the entity manager factory read, so the service's `getEntityManagerFactory()` is never called. `@DynamicInsert` and `@DynamicUpdate` are supported |
+| EclipseLink | `jinahya-persistence-encryption-eclipselink` | a `SessionCustomizer`, named by `eclipselink.session.customizer` (an application with a customizer of its own calls it from that one); registers a descriptor event listener which encrypts on `preInsert` and `preUpdateWithChanges`, nulls the plaintext columns in the row on `aboutToUpdate`, and decrypts on `postClone`, `postRefresh` and a refresh's `postMerge`, resetting the backup clone. The service's `getEntityManagerFactory()` is called on the first event. Attribute change tracking (weaving) is not supported, and fails |
+
+Neither keeps the plaintext out of a provider's shared cache: under Hibernate ORM, the second-level cache entry
+written by an `INSERT` holds it; under EclipseLink, the shared cache receives the plaintext of a new or changed entity
+when the transaction commits. The rows never hold it. Where that matters, leave the encrypted entities uncached.
 
 ## Constraints
 
@@ -258,8 +295,8 @@ seen either.
 
 This module moves values between the plaintext and the ciphertext; it imposes no policy of its own.
 
-* **The encryption identifier.** `EntityEncryptionService.getEncryptionIdentifier(Object)` is never stored; it is
-  derived again on every encrypt and decrypt, so it has to be the same for the whole lifetime of the row — from an
+* **The key selection.** What `EntityEncryptionService.init(EntityEncryptionContext)` selects the keys by is never
+  stored; it is derived again on every encrypt and decrypt, so it has to be the same for the whole lifetime of the row — from an
   unencrypted, never-updated attribute such as a tenant column; never the version, a *current* key id, or an
   `IDENTITY` id, which is still `null` at `@PrePersist` ([#61](https://github.com/jinahya/jinahya-persistence/issues/61)).
 * **The cipher suite.** `EntityEncryptionService` decides the algorithm and the keys. An *authenticated* mode (AES-GCM,

@@ -130,7 +130,7 @@ service.encrypt(e);               // now dirty; @PreUpdate then sees "already en
 No separate tool, no write freeze, no ordering problem. Every write already produces ciphertext, so the set of
 plaintext rows only ever shrinks. *This is why the sibling column was chosen.*
 * Portable JPA, and a single table.
-* Per-entity key selection (`getEncryptionIdentifier(entity)`).
+* Per-entity key selection (`init(context)`, from the context's entity instance).
 
 *Trade-offs.*
 
