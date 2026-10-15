@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.encryption;
+package com.github.jinahya.persistence.encryption.converter;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -49,7 +49,7 @@ import static java.time.temporal.ChronoField.NANO_OF_SECOND;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public final class ValueCodecs {
+final class ValueCodecs {
 
     private static final VarHandle SHORT = MethodHandles.byteArrayViewVarHandle(short[].class, ByteOrder.BIG_ENDIAN);
 

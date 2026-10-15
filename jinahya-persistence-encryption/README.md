@@ -16,9 +16,9 @@ KMS, Vault, Tink, …).
 |------|------------|---------------|
 | `Encrypted<Type>Converter` | an attribute converter per supported java type; named on each attribute to encrypt | the module |
 | `EntityEncryptionService` | the cryptography: bytes in, bytes out | the application, once |
-| `ValueCodecs` | the encoding of each type into bytes, fixed and pinned by tests | the module |
 
-That is the whole surface. There is no listener, no callback, and no provider-specific code.
+That is the whole surface. There is no listener, no callback, and no provider-specific code. The encoding of each
+type into bytes is fixed and pinned by tests, but it is not an API: nothing outside the converters calls it.
 
 ### A complete example
 
@@ -162,7 +162,8 @@ application's.
 The service receives, and returns, an array of bytes. A value is turned into those bytes by the converter's java
 type, big-endian, and self-contained: a value is reconstructed from its bytes without consulting the database. The
 sizes below are of the encoding, before the service is called. Every encoding is pinned byte for byte by the
-`ValueCodecs_Of*_Test` classes, and never changes once released.
+`ValueCodecs_Of*_Test` classes, and never changes once released. The codecs themselves are package-private: the
+converters are the API.
 
 | converter | attribute | bytes | encoding |
 |---|---|---|---|

@@ -1,6 +1,6 @@
-package com.github.jinahya.persistence.encryption;
+package com.github.jinahya.persistence.encryption.converter;
 
-import com.github.jinahya.persistence.encryption.ValueCodecs.OfPrimitive;
+import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfPrimitive;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

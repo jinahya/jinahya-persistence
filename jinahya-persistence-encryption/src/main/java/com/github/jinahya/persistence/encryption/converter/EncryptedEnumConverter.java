@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
-import com.github.jinahya.persistence.encryption.ValueCodecs.OfLang;
+import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
 
 /**
  * The base of the converters of {@code enum} attributes: a constant is encoded by its {@link Enum#name() name}, never

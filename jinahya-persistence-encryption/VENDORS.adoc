@@ -18,7 +18,7 @@ the build and kept in the tree for reference only. Nothing below brings any of t
 
 * The plaintext is a mapped attribute, and its column holds the ciphertext. Nothing else holds either.
 * Downstream's `EntityEncryptionService` does the encryption and decryption, bytes in and bytes out.
-* The encodings are `ValueCodecs`, unchanged.
+* The encodings, the package-private `ValueCodecs`, are unchanged.
 * The standard module is complete on its own. A vendor module is an extra, never a requirement, and an application
   which drops it loses nothing stored.
 

@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.converter;
 
-import com.github.jinahya.persistence.encryption.ValueCodecs.OfLang;
+import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

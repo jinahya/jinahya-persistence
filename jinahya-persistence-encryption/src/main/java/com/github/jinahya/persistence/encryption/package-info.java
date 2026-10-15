@@ -16,8 +16,9 @@
  *   <dt>{@link com.github.jinahya.persistence.encryption.EntityEncryptionService}</dt>
  *   <dd>What an application implements, once: the cryptography and the keys, bytes in and bytes out. Injected into
  *       the converters by a bean container, or loaded through {@link java.util.ServiceLoader}.</dd>
- *   <dt>{@link com.github.jinahya.persistence.encryption.ValueCodecs}</dt>
- *   <dd>The encodings, fixed per type and pinned by tests: stored data, so they never change once released.</dd>
+ *   <dt>the encodings</dt>
+ *   <dd>Fixed per type, documented with each converter, and pinned by tests: stored data, so they never change once
+ *       released. They are not an API.</dd>
  * </dl>
  * No type information is stored with the bytes: a value is always decoded by the converter the attribute names now.
  *
