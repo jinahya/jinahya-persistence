@@ -381,7 +381,28 @@ final class EntityEncryptor implements EntityEncryptionEngine {
 
     private static boolean isIdOrVersion(final Attribute<?, ?> attribute) {
         return attribute instanceof SingularAttribute<?, ?> singular
-               && (singular.isId() || singular.isVersion());
+               && (singular.isId() || isVersion(singular));
+    }
+
+    /**
+     * Returns whether the specified attribute is a version attribute.
+     *
+     * @param attribute the attribute.
+     * @return {@code true} when the {@code attribute} is a version attribute.
+     * @implNote EclipseLink (5.0.2) {@code SingularAttributeImpl.isVersion()} dereferences the write-lock field of
+     *         the descriptor's optimistic locking policy, which only a version policy has: under field-based locking —
+     *         {@code @OptimisticLocking} of {@code ALL_COLUMNS}, {@code CHANGED_COLUMNS} or {@code SELECTED_COLUMNS}
+     *         — it throws a {@link NullPointerException}. Such an entity has no version attribute at all.
+     */
+    @SuppressWarnings({
+            "java:S1696" // "NullPointerException" should not be caught
+    })
+    private static boolean isVersion(final SingularAttribute<?, ?> attribute) {
+        try {
+            return attribute.isVersion();
+        } catch (final NullPointerException npe) {
+            return false;
+        }
     }
 
     /**

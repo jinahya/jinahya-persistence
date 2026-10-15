@@ -100,6 +100,14 @@ class HibernateEntityEncryptor
             if (!encryptor.hasEncryptedAttributes(mappedClass)) {
                 return Indices.NONE;
             }
+            if (persister.optimisticLockStyle().isAllOrDirty()) {
+                // its WHERE compares the snapshot, which holds the decrypted plaintexts, with columns which hold
+                // NULL; https://github.com/jinahya/jinahya-persistence/issues/105
+                throw new IllegalStateException(
+                        "versionless optimistic locking (" + persister.optimisticLockStyle() + ") is not supported for "
+                        + persister.getEntityName() + ", which has encrypted attributes: it would compare a decrypted"
+                        + " plaintext with a column holding NULL, and fail every update; use a @Version attribute");
+            }
             final var names = Arrays.asList(persister.getPropertyNames());
             final var plaintexts = new HashMap<Integer, String>();
             final var ciphertexts = new HashMap<Integer, String>();

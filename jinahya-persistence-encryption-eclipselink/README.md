@@ -143,6 +143,11 @@ public class MySessionCustomizer implements SessionCustomizer {
   a relationship, and a report's result can't be told safe before it is prepared
   ([#103](https://github.com/jinahya/jinahya-persistence/issues/103)). Direct access to the shared cache, and to its
   objects, is not covered.
+* **No field-based optimistic locking.** An encrypted entity with `@OptimisticLocking` of `ALL_COLUMNS`,
+  `CHANGED_COLUMNS` or `SELECTED_COLUMNS` fails on its first event with an `IllegalStateException`: the `UPDATE`'s
+  `WHERE` would compare the backup clone's decrypted plaintext with a column holding `NULL`, and fail every update.
+  `SELECTED_COLUMNS` without a plaintext column would be safe, but is refused as well, for now. Use a `@Version`
+  attribute ([#105](https://github.com/jinahya/jinahya-persistence/issues/105)).
 * **The shared cache holds the plaintext.** It receives the plaintext of a new or changed entity when the transaction
   commits, although the row never does. Where that matters, leave the encrypted entities uncached
   (`@Cacheable(false)`, or `shared-cache-mode` `NONE`).
