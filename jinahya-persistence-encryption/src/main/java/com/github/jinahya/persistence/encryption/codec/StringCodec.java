@@ -5,6 +5,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.function.IntConsumer;
 
 /**
@@ -29,6 +30,7 @@ public final class StringCodec implements ValueCodec<String> {
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public byte[] encode(final String decoded) {
+        Objects.requireNonNull(decoded, "decoded is null");
         try {
             final var buffer = StandardCharsets.UTF_8.newEncoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
@@ -45,8 +47,11 @@ public final class StringCodec implements ValueCodec<String> {
 
     @Override
     public int encode(final String decoded, final byte[] encoded, final int index) {
+        Objects.requireNonNull(decoded, "decoded is null");
+        Objects.requireNonNull(encoded, "encoded is null");
         // the size is known only once encoded
         final var bytes = encode(decoded);
+        Objects.checkFromIndexSize(index, bytes.length, encoded.length);
         System.arraycopy(bytes, 0, encoded, index, bytes.length);
         return bytes.length;
     }
@@ -54,7 +59,10 @@ public final class StringCodec implements ValueCodec<String> {
     // -----------------------------------------------------------------------------------------------------------------
     @Override
     public String decode(final byte[] encoded, final int index, final IntConsumer consumer) {
-        // the value runs to the end of the array
+        Objects.requireNonNull(encoded, "encoded is null");
+        // the value runs to the end of the array; an index at the end is an empty string
+        Objects.checkFromToIndex(index, encoded.length, encoded.length);
+        Objects.requireNonNull(consumer, "consumer is null");
         final var length = encoded.length - index;
         final String decoded;
         try {

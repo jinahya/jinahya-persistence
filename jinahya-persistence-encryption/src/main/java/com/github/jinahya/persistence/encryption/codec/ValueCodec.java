@@ -25,6 +25,7 @@ public interface ValueCodec<T> {
         // -------------------------------------------------------------------------------------------------------------
         @Override
         public byte[] encode(final T decoded) {
+            Objects.requireNonNull(decoded, "decoded is null");
             final var encoded = new byte[width];
             encode(decoded, encoded);
             return encoded;
@@ -40,6 +41,8 @@ public interface ValueCodec<T> {
 
     @PositiveOrZero
     default int encode(final @Nonnull @NotNull T decoded, final @Nonnull @NotNull byte[] encoded) {
+        Objects.requireNonNull(decoded, "decoded is null");
+        Objects.requireNonNull(encoded, "encoded is null");
         return encode(decoded, encoded, 0);
     }
 
@@ -67,6 +70,8 @@ public interface ValueCodec<T> {
 
     default @Nonnull @NotNull
     T decode(final @Nonnull @NotNull byte[] encoded, final @Nonnull @NotNull IntConsumer consumer) {
+        Objects.requireNonNull(encoded, "encoded is null");
+        Objects.requireNonNull(consumer, "consumer is null");
         return decode(encoded, 0, consumer);
     }
 
