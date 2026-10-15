@@ -9,6 +9,7 @@
     <class>com.github.jinahya.persistence.encryption.hibernate.SecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.hibernate.SecretEmbeddable</class>
     <class>com.github.jinahya.persistence.encryption.hibernate.DynamicSecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.CallbackSecretEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>

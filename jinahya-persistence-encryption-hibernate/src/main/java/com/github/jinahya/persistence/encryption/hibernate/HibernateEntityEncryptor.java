@@ -60,6 +60,9 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
         }
     }
 
+    private static final Runnable NOTHING = () -> {
+    };
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -119,19 +122,15 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns an action which puts back the plaintext attributes the specified event's entity holds now.
+     * Returns an action which puts back the plaintext attributes the specified entity holds now.
      *
-     * @param event the event.
-     * @return an action which restores the plaintext attributes; does nothing for an entity which is not encrypted.
+     * @param persister the persister of the {@code entity}.
+     * @param entity    the entity.
+     * @param indices   the indices of the {@code entity}'s encrypted attributes.
+     * @return an action which restores the plaintext attributes.
      */
-    Runnable capturePlaintexts(final FlushEntityEvent event) {
-        final var persister = event.getEntityEntry().getPersister();
-        final var indices = indices(persister);
-        if (indices.plaintexts().isEmpty()) {
-            return () -> {
-            };
-        }
-        final var entity = event.getEntity();
+    private static Runnable capturePlaintexts(final EntityPersister persister, final Object entity,
+                                              final Indices indices) {
         final var captured = new HashMap<Integer, Object>();
         for (final var index : indices.plaintexts().keySet()) {
             captured.put(index, persister.getValue(entity, index));
@@ -146,20 +145,25 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
     /**
      * Encrypts the specified event's dirty entity, and writes the ciphertexts, and the cleared plaintexts, into the
      * state its {@code UPDATE} is built from, marking those which differ from the snapshot dirty.
+     * <p>
+     * Hibernate ORM may copy that state back into the entity, the cleared plaintexts included; the action returned
+     * puts the plaintexts back as they are now, after the {@code @PreUpdate} callbacks.
      *
      * @param event the event.
+     * @return an action which restores the entity's plaintexts; does nothing for an entity which is not encrypted.
      */
-    void encryptState(final FlushEntityEvent event) {
+    Runnable encryptState(final FlushEntityEvent event) {
         final var entry = event.getEntityEntry();
         if (entry.getStatus() == Status.DELETED) {
-            return;
+            return NOTHING;
         }
         final var persister = entry.getPersister();
         final var indices = indices(persister);
         if (indices.isEmpty()) {
-            return;
+            return NOTHING;
         }
         final var entity = event.getEntity();
+        final var restoration = capturePlaintexts(persister, entity, indices);
         final Object[] loaded = entry.getLoadedState();
         encryptor.encrypt(entity, loaded == null ? null : name -> {
             final var index = indices.indices().get(name);
@@ -169,14 +173,14 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
         writeState(persister, entity, values, indices, true, event.getSession());
         if (loaded == null) {
             // no snapshot to check against; every column is written
-            return;
+            return restoration;
         }
         final var types = persister.getPropertyTypes();
         final var dirty = indices.all()
                 .filter(i -> types[i].isDirty(loaded[i], values[i], event.getSession()))
                 .toArray();
         if (dirty.length == 0) {
-            return;
+            return restoration;
         }
         final var previous = event.getDirtyProperties();
         event.setDirtyProperties(
@@ -184,6 +188,7 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
                         ? dirty
                         : IntStream.concat(Arrays.stream(previous), Arrays.stream(dirty)).distinct().sorted().toArray()
         );
+        return restoration;
     }
 
     /**
