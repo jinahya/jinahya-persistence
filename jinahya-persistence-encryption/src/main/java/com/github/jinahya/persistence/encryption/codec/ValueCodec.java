@@ -8,20 +8,33 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.IntConsumer;
 
-interface ValueCodec<T> {
+public interface ValueCodec<T> {
 
     abstract class OfFixedWidth<T> implements ValueCodec<T> {
 
         OfFixedWidth(final int width) {
             super();
+            if (width < 0) {
+                throw new IllegalArgumentException("negative width: " + width);
+            }
+            this.width = width;
         }
 
+        // -------------------------------------------------------------------------------------------------------------
 
+        // -------------------------------------------------------------------------------------------------------------
+        @Override
+        public byte[] encode(final T decoded) {
+            final var encoded = new byte[width];
+            encode(decoded, encoded);
+            return encoded;
+        }
 
-        private int width;
+        // -------------------------------------------------------------------------------------------------------------
+        final int width;
     }
 
-    class OfPrimitives {
+    final class OfPrimitives {
 
         private OfPrimitives() {
             throw new AssertionError("instantiation is not allowed");
@@ -32,7 +45,8 @@ interface ValueCodec<T> {
     @PositiveOrZero
     int encode(@Nonnull @NotNull T decoded, @Nonnull @NotNull byte[] encoded, @PositiveOrZero int index);
 
-    default @PositiveOrZero int encode(final @Nonnull @NotNull T decoded, final @Nonnull @NotNull byte[] encoded) {
+    @PositiveOrZero
+    default int encode(final @Nonnull @NotNull T decoded, final @Nonnull @NotNull byte[] encoded) {
         return encode(decoded, encoded, 0);
     }
 
@@ -40,7 +54,7 @@ interface ValueCodec<T> {
     @NotNull
     byte[] encode(@Nonnull @NotNull T decoded);
 
-    default void encode(@Nonnull @NotNull T decoded, final @Nonnull @NotNull ByteBuffer encoded) {
+    default void encode(final @Nonnull @NotNull T decoded, final @Nonnull @NotNull ByteBuffer encoded) {
         Objects.requireNonNull(decoded, "decoded is null");
         Objects.requireNonNull(encoded, "encoded is null");
         if (encoded.hasArray()) {
@@ -74,10 +88,11 @@ interface ValueCodec<T> {
             );
         }
         final var bytes = new byte[encoded.remaining()];
-        encoded.get(bytes);
+        encoded.get(encoded.position(), bytes);
         return decode(
                 bytes,
                 l -> {
+                    encoded.position(encoded.position() + l);
                 }
         );
     }
