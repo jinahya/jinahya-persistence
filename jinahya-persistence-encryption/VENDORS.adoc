@@ -1,0 +1,89 @@
+= Provider-specific modules: what they could add
+:toc: macro
+:toclevels: 2
+
+toc::[]
+
+Since the module moved to standard attribute converters, no provider-specific code is required: the converter is
+Jakarta Persistence, and both Hibernate ORM and EclipseLink are measured against the same tests. This note records
+what a provider-specific module *could* add on top of that, and the rules such a module has to keep, so that the
+decision can be made later, item by item.
+
+The earlier integrations, `jinahya-persistence-encryption-hibernate` and `jinahya-persistence-encryption-eclipselink`,
+replaced a listener-based mechanism by rewriting the provider's own state: Hibernate ORM's flush-entity listener,
+loaded-state snapshot and state array; EclipseLink's descriptor events, row and backup clone. They are unlinked from
+the build and kept in the tree for reference only. Nothing below brings any of that back.
+
+== The contract a vendor module may not change
+
+* The plaintext is a mapped attribute, and its column holds the ciphertext. Nothing else holds either.
+* Downstream's `EntityEncryptionService` does the encryption and decryption, bytes in and bytes out.
+* The encodings, the package-private `ValueCodecs`, are unchanged.
+* The standard module is complete on its own. A vendor module is an extra, never a requirement, and an application
+  which drops it loses nothing stored.
+
+A vendor module may change only *how the converter is wired* and *how fast the path is*. It never touches a snapshot,
+a state array, a row or a backup clone, never replaces a provider's listener, and never refuses categories of queries.
+If an extra needs any of that, it is the old design coming back.
+
+== What a Hibernate ORM module could add
+
+[cols="2,4,1",options="header"]
+|===
+| extra | mechanism | verified
+
+| one annotation instead of a converter per type
+| a type-binder meta-annotation (`@Encrypted`) which binds the codec from the attribute's declared type, so
+  `@Convert(converter = EncryptedLocalDateTimeConverter.class)` becomes `@Encrypted`
+| no
+
+| the service by instance
+| read `jinahya.persistence.encryption.service` from the session factory properties, as the earlier integrator did,
+  and hand the instance to the converters; no `ServiceLoader` entry needed
+| no
+
+| ciphertext in the second-level cache
+| a Hibernate type whose disassembled form is the column form; the standard converter caches the attribute's value,
+  the plaintext
+| no; worth measuring first, as it closes a gap the standard path leaves open
+
+| an entity-aware key context on write
+| a pre-insert and pre-update event hook, on the same thread, immediately before the statement is bound, which sets
+  the ambient context the service reads the key from; the read side needs nothing, the frame names the key
+| no
+|===
+
+== What an EclipseLink module could add
+
+[cols="2,4,1",options="header"]
+|===
+| extra | mechanism | verified
+
+| the service by instance
+| a `SessionCustomizer` reading the session property and replacing each converted mapping's converter with
+  EclipseLink's native `Converter`, which receives the session
+| no
+
+| an entity-aware key context on write
+| descriptor events before the row is built, setting the ambient context; to check: that conversion happens after
+  `preInsert` / `preUpdate` and not before
+| no
+|===
+
+== What neither can add
+
+* **A key selected from the entity instance by the service itself.** A converter sees the value only, on every
+  provider. The write-side hook above sets an ambient context; the service still never sees the entity.
+* **Binding a ciphertext to its row** (associated data from the entity id). The same limit. An application which
+  needs it has to carry the binding inside the plaintext it encrypts.
+* **Querying an encrypted attribute.** Ciphertext is opaque to the database on every path.
+
+== Open measurements, before any of the above is built
+
+. Whether each provider's bean container injects into converters: Hibernate ORM with a CDI `BeanManager` does
+  (`Injection_Test`); Jakarta EE containers and Spring Boot with Hibernate ORM are expected to; EclipseLink is
+  measured by the same test under its profile.
+. What Hibernate ORM's second-level cache stores for a converted attribute.
+. EclipseLink's conversion timing relative to its descriptor events.
+. Both providers under bytecode enhancement and weaving.
+. Versionless optimistic locking on a converted attribute, expected to fail every update, to be refused or documented.

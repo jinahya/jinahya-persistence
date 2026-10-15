@@ -1,5 +1,7 @@
 # Notes
 
+> **Historical.** Written for the listener-based design, since replaced by standard attribute converters; see `README.md`.
+
 ## `Serializable` as a plaintext type
 
 > **Decided (#99):** `Serializable` and `java.util.Calendar` are no longer supported. What follows is the analysis

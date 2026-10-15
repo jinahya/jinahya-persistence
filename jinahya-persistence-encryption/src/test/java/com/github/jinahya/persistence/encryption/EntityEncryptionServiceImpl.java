@@ -1,146 +1,74 @@
 package com.github.jinahya.persistence.encryption;
 
-import jakarta.persistence.EntityManagerFactory;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * An encryption service for tests: AES-GCM with a fresh key per value, carried inside the ciphertext. Not secure, by
- * design; it exercises the mechanism, not the cryptography.
+ * An encryption service for tests, named in {@code META-INF/services/}: AES-GCM under a fixed key, with a random IV, so
+ * that encrypting the same value twice yields different bytes. Not secure, by design; it exercises the mechanism, not
+ * the cryptography. It counts its calls.
  */
 public class EntityEncryptionServiceImpl implements EntityEncryptionService {
 
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final String ALGORITHM = "AES";
+    private static final SecretKeySpec KEY = new SecretKeySpec(new byte[32], "AES");
 
-    private static final String MODE = "GCM";
+    static final int IV_BYTES = 12;
 
-    private static final String PADDING = "NoPadding";
+    static final int TAG_BITS = 128;
 
-    private static final String TRANSFORMATION = ALGORITHM + '/' + MODE + '/' + PADDING;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final int IV_SIZE = 96; // 12 bytes
+    static final AtomicInteger ENCRYPTED = new AtomicInteger();
 
-    static final int IV_BYTES = IV_SIZE >> 3;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final int KEY_SIZE = 256;
-
-    static final int KEY_BYTES = KEY_SIZE >> 3;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final int AAD_SIZE = 128; // 16 bytes
-
-    static final int AAD_BYTES = AAD_SIZE >> 3;
-
-    // -----------------------------------------------------------------------------------------------------------------
-    private static final int TAG_SIZE = 128; // 16 bytes
-
-    static final int TAG_BYTES = TAG_SIZE >>> 3; // 16 bytes
-
-    // -----------------------------------------------------------------------------------------------------------------
+    static final AtomicInteger DECRYPTED = new AtomicInteger();
 
     /**
-     * Creates a new instance for the specified persistence unit.
-     *
-     * @param entityManagerFactory the entity manager factory of the persistence unit.
+     * Encrypts the specified bytes under the fixed key; shared with the CDI bean of {@code Injection_Test}.
      */
-    EntityEncryptionServiceImpl(final EntityManagerFactory entityManagerFactory) {
-        super();
-        this.entityManagerFactory = entityManagerFactory;
-    }
-
-    /**
-     * Creates a new instance with no persistence unit, for exercising the cryptography alone.
-     */
-    EntityEncryptionServiceImpl() {
-        this(null);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-    @Override
-    public EntityManagerFactory getEntityManagerFactory() {
-        if (entityManagerFactory == null) {
-            throw new IllegalStateException("no entity manager factory");
-        }
-        return entityManagerFactory;
-    }
-
-    @Override
-    public void init(final EntityEncryptionContext context) {
-        // a fresh key per value, carried inside the ciphertext; nothing to prepare
-    }
-
-    @Override
-    public byte[] encrypt(final EntityEncryptionContext context, final byte[] decryptedBytes) {
+    static byte[] encryptBytes(final byte[] decryptedBytes) {
         final var iv = new byte[IV_BYTES];
+        RANDOM.nextBytes(iv);
         try {
-            SecureRandom.getInstanceStrong().nextBytes(iv);
-        } catch (final NoSuchAlgorithmException nsae) {
-            throw new RuntimeException(nsae);
+            final var cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, KEY, new GCMParameterSpec(TAG_BITS, iv));
+            final var encrypted = cipher.doFinal(decryptedBytes);
+            return ByteBuffer.allocate(IV_BYTES + encrypted.length).put(iv).put(encrypted).array();
+        } catch (final GeneralSecurityException gse) {
+            throw new RuntimeException(gse);
         }
-        final var key = new byte[KEY_BYTES];
+    }
+
+    static byte[] decryptBytes(final byte[] encryptedBytes) {
         try {
-            SecureRandom.getInstanceStrong().nextBytes(key);
-        } catch (final NoSuchAlgorithmException nsae) {
-            throw new RuntimeException(nsae);
+            final var cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, KEY, new GCMParameterSpec(TAG_BITS, encryptedBytes, 0, IV_BYTES));
+            return cipher.doFinal(encryptedBytes, IV_BYTES, encryptedBytes.length - IV_BYTES);
+        } catch (final GeneralSecurityException gse) {
+            throw new RuntimeException(gse);
         }
-        final var keySpec = new SecretKeySpec(key, ALGORITHM);
-        try {
-            final var cipher = Cipher.getInstance(TRANSFORMATION);
-            final var parameterSpec = new GCMParameterSpec(TAG_SIZE, iv);
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, parameterSpec);
-            final var aad = new byte[AAD_BYTES];
-            ThreadLocalRandom.current().nextBytes(aad);
-            cipher.updateAAD(aad);
-            final var finalized = cipher.doFinal(decryptedBytes);
-            final var buffer = ByteBuffer.allocate(iv.length + key.length + aad.length + finalized.length);
-            buffer.put(iv);
-            buffer.put(key);
-            buffer.put(aad);
-            buffer.put(finalized);
-            return buffer.array();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    }
+
+    /**
+     * Creates a new instance; {@link java.util.ServiceLoader} needs this constructor.
+     */
+    public EntityEncryptionServiceImpl() {
+        super();
     }
 
     @Override
-    public byte[] decrypt(final EntityEncryptionContext context, final byte[] encryptedBytes) {
-        final byte[] iv;
-        final byte[] key;
-        final byte[] aad;
-        final byte[] input;
-        {
-            final var buffer = ByteBuffer.wrap(encryptedBytes);
-            iv = new byte[IV_BYTES];
-            buffer.get(iv);
-            key = new byte[KEY_BYTES];
-            buffer.get(key);
-            aad = new byte[AAD_BYTES];
-            buffer.get(aad);
-            input = new byte[buffer.remaining()];
-            buffer.get(input);
-        }
-        final var keySpec = new SecretKeySpec(key, ALGORITHM);
-        try {
-            final var cipher = Cipher.getInstance(TRANSFORMATION);
-            final var parameterSpec = new GCMParameterSpec(TAG_SIZE, iv);
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, parameterSpec);
-            cipher.updateAAD(aad);
-            return cipher.doFinal(input);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+    public byte[] encrypt(final byte[] decryptedBytes) {
+        ENCRYPTED.incrementAndGet();
+        return encryptBytes(decryptedBytes);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-    private final EntityManagerFactory entityManagerFactory;
+    @Override
+    public byte[] decrypt(final byte[] encryptedBytes) {
+        DECRYPTED.incrementAndGet();
+        return decryptBytes(encryptedBytes);
+    }
 }

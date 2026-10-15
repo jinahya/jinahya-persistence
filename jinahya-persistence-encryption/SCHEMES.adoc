@@ -4,6 +4,11 @@
 
 toc::[]
 
+NOTE: *Historical.* These notes describe the listener-based design, in which the plaintext and the ciphertext were two
+mapped attributes moved between in entity callbacks, and the provider integrations which rewrote provider state to
+undo that. The module now encrypts through standard attribute converters; see link:README.md[`README.md`] and
+link:VENDORS.adoc[`VENDORS.adoc`].
+
 Working notes on *where the ciphertext lives* and *how it is moved*, and on what each choice costs. Not a spec.
 
 Key management and the cryptography itself are out of scope: they live behind `EntityEncryptionService`. These notes
