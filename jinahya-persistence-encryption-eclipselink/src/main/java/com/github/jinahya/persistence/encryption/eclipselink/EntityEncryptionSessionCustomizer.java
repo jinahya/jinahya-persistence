@@ -1,7 +1,7 @@
 package com.github.jinahya.persistence.encryption.eclipselink;
 
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
-import com.github.jinahya.persistence.encryption.EntityEncryptor;
+import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import org.eclipse.persistence.sessions.Session;
 import org.eclipse.persistence.sessions.SessionCustomizer;
 
@@ -11,13 +11,13 @@ import org.eclipse.persistence.sessions.SessionCustomizer;
  * {@link com.github.jinahya.persistence.encryption.EntityEncryptionListener EntityEncryptionListener}.
  * <p>
  * Named by the persistence unit property {@code eclipselink.session.customizer}, it reads the encryption service from
- * {@value EntityEncryptor#PROPERTY_ENCRYPTION_SERVICE}: an {@link EntityEncryptionService} instance, passed in the
+ * {@value EntityEncryptionEngine#PROPERTY_ENCRYPTION_SERVICE}: an {@link EntityEncryptionService} instance, passed in the
  * properties of the entity manager factory, its class, or the name of its class. The service's
  * {@link EntityEncryptionService#getEntityManagerFactory() entity manager factory} is asked for on the first event.
  * <pre>{@code
  * Persistence.createEntityManagerFactory("unit", Map.of(
  *         "eclipselink.session.customizer", EntityEncryptionSessionCustomizer.class.getName(),
- *         EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE, service));
+ *         EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service));
  * }</pre>
  * An application which has a customizer of its own calls this one from it.
  * <p>
@@ -46,14 +46,14 @@ public class EntityEncryptionSessionCustomizer implements SessionCustomizer {
      * Registers the encryption engine on every entity descriptor of the specified session.
      *
      * @param session the session being customized.
-     * @throws IllegalArgumentException when {@value EntityEncryptor#PROPERTY_ENCRYPTION_SERVICE} is missing, or
+     * @throws IllegalArgumentException when {@value EntityEncryptionEngine#PROPERTY_ENCRYPTION_SERVICE} is missing, or
      *                                  stands for no encryption service.
      */
     @Override
     public void customize(final Session session) {
-        final var service = EntityEncryptor.getEncryptionService(
-                session.getProperty(EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE));
-        final var engine = new EclipseLinkEntityEncryptor(new EntityEncryptor(service));
+        final var service = EntityEncryptionEngine.getEncryptionService(
+                session.getProperty(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE));
+        final var engine = new EclipseLinkEntityEncryptor(EntityEncryptionEngine.of(service));
         for (final var descriptor : session.getDescriptors().values()) {
             if (!descriptor.isAggregateDescriptor() && !descriptor.isAggregateCollectionDescriptor()) {
                 descriptor.getEventManager().addListener(engine);

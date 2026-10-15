@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.eclipselink;
 
-import com.github.jinahya.persistence.encryption.EntityEncryptor;
+import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -36,7 +36,7 @@ abstract class EntityEncryptionSessionCustomizer_Test {
     void setUp() {
         service = new CountingEncryptionService();
         entityManagerFactory = Persistence.createEntityManagerFactory(
-                unitName, Map.of(EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE, service));
+                unitName, Map.of(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, service));
         service.entityManagerFactory = entityManagerFactory;
     }
 

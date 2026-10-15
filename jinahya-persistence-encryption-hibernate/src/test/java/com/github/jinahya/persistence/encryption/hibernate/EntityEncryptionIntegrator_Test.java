@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.hibernate;
 
-import com.github.jinahya.persistence.encryption.EntityEncryptor;
+import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -34,7 +34,7 @@ class EntityEncryptionIntegrator_Test {
     @BeforeAll
     static void setUp() {
         ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory(
-                "__encryptionHibernatePU", Map.of(EntityEncryptor.PROPERTY_ENCRYPTION_SERVICE, SERVICE));
+                "__encryptionHibernatePU", Map.of(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE, SERVICE));
     }
 
     @AfterAll

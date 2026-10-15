@@ -119,7 +119,10 @@ public interface EntityEncryptionService {
 * Its internals are unchanged: mapping validation against `getEntityManagerFactory().getMetamodel()`, cached per entity class;
   the codecs (no payload header: a value is decoded by its declared java type); the per-mode walk; all-or-nothing
   writes.
-* The identifier only ever comes from the service: the overloads taking an identifier are `private`.
+* What selects the keys only ever comes from the service, in `init(EntityEncryptionContext)`; the encryptor creates a
+  context per operation and initializes the service with it lazily.
+* A persistence provider integration reaches it only through the public `EntityEncryptionEngine` interface, made by
+  `EntityEncryptionEngine.of(...)`; the class itself stays package-private and `final`.
 
 === 3.4 Dependencies
 
