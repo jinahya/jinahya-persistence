@@ -35,15 +35,25 @@ class EncryptingFlushEntityEventListener extends DefaultFlushEntityEventListener
      * {@inheritDoc}
      *
      * @implNote When an interceptor, or a {@code @PreUpdate} callback, changed the state, Hibernate ORM copies
-     *         the whole state back into the entity, the cleared plaintexts included; they are restored afterwards.
+     *         the whole state back into the entity, the cleared plaintexts included; they are restored afterwards, as
+     *         the callbacks left them.
      */
     @Override
     public void onFlushEntity(final FlushEntityEvent event) throws HibernateException {
-        final var restoration = engine.capturePlaintexts(event);
+        final var outer = restoration.get();
+        restoration.remove();
         try {
             super.onFlushEntity(event);
         } finally {
-            restoration.run();
+            final var inner = restoration.get();
+            if (outer == null) {
+                restoration.remove();
+            } else {
+                restoration.set(outer);
+            }
+            if (inner != null) {
+                inner.run();
+            }
         }
     }
 
@@ -51,10 +61,13 @@ class EncryptingFlushEntityEventListener extends DefaultFlushEntityEventListener
     protected boolean invokeInterceptor(final FlushEntityEvent event) {
         // the interceptor, and the @PreUpdate callbacks, first: they may change the entity
         final var intercepted = super.invokeInterceptor(event);
-        engine.encryptState(event);
+        restoration.set(engine.encryptState(event));
         return intercepted;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
     private final HibernateEntityEncryptor engine;
+
+    // the restoration of the entity being flushed on this thread, set once its state is encrypted
+    private final ThreadLocal<Runnable> restoration = new ThreadLocal<>();
 }

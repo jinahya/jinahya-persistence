@@ -305,6 +305,37 @@ class EntityEncryptionIntegrator_Test {
         }
     }
 
+    @DisplayName("callbacks")
+    @Nested
+    class CallbackTest {
+
+        // https://github.com/jinahya/jinahya-persistence/issues/100
+        @DisplayName("a plaintext assigned by @PreUpdate is kept by the entity, and stored as ciphertext only")
+        @Test
+        void __preUpdate() {
+            final long id = apply(em -> {
+                final var entity = new CallbackSecretEntity();
+                entity.name = "original";
+                em.persist(entity);
+                return entity;
+            }).id;
+            apply(em -> {
+                final var found = em.find(CallbackSecretEntity.class, id);
+                found.note = "changed";
+                found.nameOnPreUpdate = "callback-value";
+                em.flush();
+                assertThat(found.name).isEqualTo("callback-value");
+                return null;
+            });
+            assertThat(column(CallbackSecretEntity.TABLE_NAME, "name", id)).isNull();
+            apply(em -> {
+                assertThat(em.find(CallbackSecretEntity.class, id).name).isEqualTo("callback-value");
+                return null;
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("@DynamicInsert / @DynamicUpdate")
     @Nested
     class DynamicTest {
