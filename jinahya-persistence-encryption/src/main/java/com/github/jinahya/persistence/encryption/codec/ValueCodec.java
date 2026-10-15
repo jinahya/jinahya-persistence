@@ -34,13 +34,6 @@ public interface ValueCodec<T> {
         final int width;
     }
 
-    final class OfPrimitives {
-
-        private OfPrimitives() {
-            throw new AssertionError("instantiation is not allowed");
-        }
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
     @PositiveOrZero
     int encode(@Nonnull @NotNull T decoded, @Nonnull @NotNull byte[] encoded, @PositiveOrZero int index);
