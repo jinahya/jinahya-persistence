@@ -1,39 +1,25 @@
 /**
- * Application-level encryption of entity attributes: selected attributes are encrypted inside the application, so that
- * the database only ever stores their ciphertext.
- * <p>
- * Each encrypted value has two attributes in the same entity: a {@code byte[]}-typed one, annotated with
- * {@link EncryptedAttribute @EncryptedAttribute}, holds the ciphertext; the annotation names the other one, which holds
- * the plaintext and, when its column is mapped nullable, is never written with a value in it. An entity with no
- * annotated attribute passes through untouched.
+ * Application-level encryption of entity attributes, through standard attribute converters: the attribute holds the
+ * plaintext, its column holds the ciphertext, and the database never sees the plaintext.
+ * <pre>{@code
+ * @Convert(converter = EncryptedStringConverter.class)
+ * @Column(name = "name_enc")
+ * private String name;
+ * }</pre>
  *
  * <h2>The pieces</h2>
  * <dl>
- *   <dt>{@link EncryptedAttribute}</dt>
- *   <dd>Marks the {@code byte[]} attribute holding a ciphertext, and names its plaintext.</dd>
- *   <dt>{@link EntityEncryptionService}</dt>
- *   <dd>What an application implements, and provides as a bean: the persistence unit, the keys an instance is
- *       encrypted with — selected once per instance, in its {@link EntityEncryptionContext context} — and the
- *       encryption and decryption.</dd>
- *   <dt>{@link EntityEncryptionContext}</dt>
- *   <dd>The context of one instance, for one encryption, or decryption, of it: what the service prepared for that
- *       instance travels in it from one attribute to the next.</dd>
- *   <dt>{@link EntityEncryptionListener}</dt>
- *   <dd>The entity listener an application registers, with
- *       {@link jakarta.persistence.EntityListeners @EntityListeners}. It is injected with the service, and does
- *       everything else: it walks the metamodel of an instance, converts each plaintext to bytes by its java type,
- *       hands them to the service, and moves the result between the two attributes, so that an instance is encrypted
- *       before it is written and decrypted after it is read. Embedded attributes are descended into.</dd>
+ *   <dt>{@link com.github.jinahya.persistence.encryption.EncryptedAttributeConverter} and its subclasses</dt>
+ *   <dd>One converter per supported java type, {@code Encrypted<Type>Converter}, which an application names on each
+ *       attribute to encrypt. They encode a value to bytes, hand the bytes to the service, and store what it returns;
+ *       and the reverse on read.</dd>
+ *   <dt>{@link com.github.jinahya.persistence.encryption.EntityEncryptionService}</dt>
+ *   <dd>What an application implements, once: the cryptography and the keys, bytes in and bytes out. Injected into
+ *       the converters by a bean container, or loaded through {@link java.util.ServiceLoader}.</dd>
+ *   <dt>{@link com.github.jinahya.persistence.encryption.ValueCodecs}</dt>
+ *   <dd>The encodings, fixed per type and pinned by tests: stored data, so they never change once released.</dd>
  * </dl>
- * The plaintext stays mapped to its own column. Before an {@code UPDATE} it is set to {@code null} when, and only when,
- * that column is mapped nullable and the plaintext is not primitive, so that the column is never written with a value;
- * a row written before encryption was introduced keeps its plaintext there until it is next written, which migrates
- * it. Any other plaintext is left as it is: nothing is written which the mapping does not allow, as no Bean Validation
- * constraint is checked.
- * <p>
- * The mapping of an entity class is validated before any instance of it is touched; each encrypt and decrypt is
- * all-or-nothing per instance. An encoded value carries no type information: it is decoded by the attribute's declared
- * java type.
+ * No type information is stored with the bytes: a value is always decoded by the converter the attribute names now.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

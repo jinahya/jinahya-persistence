@@ -6,6 +6,11 @@ Research date: 2026-10-14.
 
 toc::[]
 
+NOTE: *Historical.* These notes describe the listener-based design, in which the plaintext and the ciphertext were two
+mapped attributes moved between in entity callbacks, and the provider integrations which rewrote provider state to
+undo that. The module now encrypts through standard attribute converters; see link:README.md[`README.md`] and
+link:VENDORS.adoc[`VENDORS.adoc`].
+
 == Scope and result
 
 This survey compares this module with existing Java libraries and with EclipseLink and Hibernate extension points.

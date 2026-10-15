@@ -4,6 +4,11 @@
 
 toc::[]
 
+NOTE: *Historical.* These notes describe the listener-based design, in which the plaintext and the ciphertext were two
+mapped attributes moved between in entity callbacks, and the provider integrations which rewrote provider state to
+undo that. The module now encrypts through standard attribute converters; see link:README.md[`README.md`] and
+link:VENDORS.adoc[`VENDORS.adoc`].
+
 Working notes on *how the module is wired into an application*: what the application supplies, what the module
 exposes, and how the pieces find each other at run time. Not a spec. The encryption scheme itself — where the
 ciphertext lives — is in link:SCHEMES.adoc[`SCHEMES.adoc`], working notes which also record the transient-plaintext

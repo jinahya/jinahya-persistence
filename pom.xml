@@ -48,8 +48,10 @@
 
   <modules>
     <module>jinahya-persistence-encryption</module>
-    <module>jinahya-persistence-encryption-eclipselink</module>
-    <module>jinahya-persistence-encryption-hibernate</module>
+    <!-- the provider integrations are unlinked while jinahya-persistence-encryption moves to attribute converters;
+         see jinahya-persistence-encryption/VENDORS.adoc -->
+    <!--    <module>jinahya-persistence-encryption-eclipselink</module>-->
+    <!--    <module>jinahya-persistence-encryption-hibernate</module>-->
     <module>jinahya-persistence-more</module>
     <module>jinahya-persistence-more-test</module>
     <module>jinahya-persistence-test-utils</module>

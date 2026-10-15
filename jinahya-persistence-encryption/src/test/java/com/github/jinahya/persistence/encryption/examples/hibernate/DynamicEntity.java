@@ -1,29 +1,24 @@
 package com.github.jinahya.persistence.encryption.examples.hibernate;
 
-import com.github.jinahya.persistence.encryption.EncryptedAttribute;
-import com.github.jinahya.persistence.encryption.LifecycleListenerEntity;
+import com.github.jinahya.persistence.encryption.EncryptedStringConverter;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.DynamicInsert;
+import jakarta.persistence.Version;
 import org.hibernate.annotations.DynamicUpdate;
 
 /**
- * An entity under Hibernate ORM's {@link DynamicInsert @DynamicInsert} and {@link DynamicUpdate @DynamicUpdate}, which
- * write only the non-{@code null}, and only the changed, columns.
- *
- * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * An encrypted entity under Hibernate ORM's {@code @DynamicUpdate}: an UPDATE carries the changed columns only, so an
+ * unrelated change does not rewrite the ciphertext.
  */
-@DynamicInsert
 @DynamicUpdate
-@EntityListeners(LifecycleListenerEntity.class)
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = DynamicEntity.TABLE_NAME)
@@ -36,17 +31,16 @@ public class DynamicEntity {
     @Column(name = "id")
     public Long id;
 
-    // an ordinary column, for a change which does not touch the secret
+    @Version
+    @Column(name = "version")
+    public Integer version;
+
     @Basic(optional = true)
     @Column(name = "note", nullable = true)
     public String note;
 
-    @Basic(optional = true)
-    @Column(name = "name", nullable = true, insertable = false)
-    public String name;
-
-    @EncryptedAttribute("name")
+    @Convert(converter = EncryptedStringConverter.class)
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
-    public byte[] nameEnc;
+    public String name;
 }

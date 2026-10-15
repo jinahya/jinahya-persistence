@@ -25,30 +25,12 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>jinahya-persistence-utils</artifactId>
-      <!--      <version>${revision}</version>-->
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <!-- jakarta.annotation.Nonnull on EntityEncryptionService's signatures; documentation for tools which read it -->
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <!-- jakarta.enterprise.*; only __DirectListener_Test, which runs the listener in a CDI container. The main
-         sources depend on jakarta.inject alone, so that the module runs under any container which injects listeners -->
+    <!-- jakarta.enterprise.*; only Injection_Test, which hands a CDI container to the persistence provider. The main
+         sources depend on jakarta.inject alone, so that the converters are injected by any container -->
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.cdi-api</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.validation</groupId>
-      <artifactId>jakarta.validation-api</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
@@ -76,20 +58,20 @@
       <artifactId>lombok</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- jakarta.inject.Inject on EntityEncryptionListener, its only injection point; understood by CDI and by Spring -->
+    <!-- jakarta.inject.Inject on EncryptedAttributeConverter, its only injection point; understood by CDI and by Spring -->
     <dependency>
       <groupId>jakarta.inject</groupId>
       <artifactId>jakarta.inject-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- org.jboss.weld.environment.se.*; __DirectListener_Test starts a Weld SE container and hands its BeanManager to
-         the persistence provider, so that the listener is injected -->
+    <!-- org.jboss.weld.environment.se.*; Injection_Test starts a Weld SE container and hands its BeanManager to the
+         persistence provider, so that the converters are injected -->
     <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-junit5</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- __EncryptionLifecycle_Test logs through it directly -->
+    <!-- the tests log through it directly -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
