@@ -127,6 +127,24 @@ column out, a new row gets `NULL` there, or the column's `DEFAULT`: the column h
 the application's: the next flush which updates the entity for any reason — a change to an unrelated column, an
 auto-flush before a query — or a `merge()` of the detached instance would erase the stored ciphertext, silently.
 
+**Nothing may touch an encrypted pair after the listener** ([#101](https://github.com/jinahya/jinahya-persistence/issues/101)).
+Jakarta Persistence runs the listeners first, superclasses' before subclasses', each in the order declared, and the
+entity's own callbacks last. Whatever runs after `EntityEncryptionListener` sees the instance already encrypted, and a
+plaintext it assigns goes out in the `UPDATE` in the clear, the column being updatable, or leaves a stale ciphertext
+behind it. So, on the first `@PrePersist` or `@PreUpdate` of an encrypted entity class, the listener rejects the class
+when it, or one of its superclasses, has a `@PrePersist` or `@PreUpdate` method of its own, or when a listener with one
+is declared after `EntityEncryptionListener`. A listener declared before it, such as an auditing listener, is fine.
+
+* The callback bodies can't be read, so a callback which never touches the pair is rejected too: move it into a
+  listener declared before `EntityEncryptionListener`, or use the [Hibernate ORM integration](#provider-integrations),
+  which encrypts after every callback.
+* An entity read in a transaction is written back by it ([What it costs](#what-it-costs)), so a rejected class fails
+  in a transaction which only reads it, too.
+* Only annotations are read. A callback declared in `orm.xml`, or a listener order rearranged there, is not seen. As
+  a backstop, `@PostUpdate` fails when a plaintext nulled for the `UPDATE` has a value again, and the transaction is
+  rolled back. The statement has carried the plaintext by then, to the driver, the database's logs and any trigger,
+  so this keeps it from being committed, not from being sent.
+
 **After a failed flush, reload the entity; do not retry with the same instance.** When a flush fails between
 `@PreUpdate` and `@PostUpdate` — an optimistic lock failure, a constraint violation — `@PostUpdate` never runs and the
 instance keeps its plaintext nulled; writing that instance again erases the ciphertext. Jakarta Persistence has no
@@ -272,6 +290,7 @@ which breaks any of these is rejected:
 | the plaintext's declared java type has a codec (see [Encoding](#encoding)); for a member of a generic `@MappedSuperclass`, the type the entity binds it to ([#67](https://github.com/jinahya/jinahya-persistence/issues/67)) |
 | the plaintext column is **non-insertable** ([#73](https://github.com/jinahya/jinahya-persistence/issues/73)), and **updatable** when the plaintext is nulled — not primitive, and its column mapped nullable |
 | the ciphertext attribute is `@Basic`, optional, typed `byte[]`, not an identifier or a version, and its column is insertable, updatable and nullable |
+| with `EntityEncryptionListener`: the entity, and its superclasses, have no `@PrePersist` or `@PreUpdate` method of their own, and no listener with one is declared after it; checked on the first write ([#101](https://github.com/jinahya/jinahya-persistence/issues/101)) |
 | an `@Embedded` attribute is not itself annotated; annotate the ciphertext attributes inside the embeddable, which are descended into |
 | an embeddable reached through an `@ElementCollection` — element or map key — holds no `@EncryptedAttribute` at any depth: collections are not walked ([#71](https://github.com/jinahya/jinahya-persistence/issues/71)) |
 

@@ -122,6 +122,18 @@
                 <testExclude>**/Hibernate*_Test.java</testExclude>
               </testExcludes>
             </configuration>
+            <executions>
+              <execution>
+                <id>default-testCompile</id>
+                <configuration>
+                  <compilerArgs>
+                    <!-- EclipseLink's metamodel generator reads an orm.xml entity twice, and fails on its duplicate
+                         name (callbacks-orm.xml); the metamodel of the test entities is generated from annotations -->
+                    <arg>-Aeclipselink.canonicalmodel.load_xml=false</arg>
+                  </compilerArgs>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

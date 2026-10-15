@@ -22,6 +22,14 @@ import java.lang.invoke.MethodHandles;
  * decrypts on {@link PostLoad @PostLoad}, and again on {@link PostUpdate @PostUpdate}, restoring the plaintext which an
  * {@code UPDATE} had to go out without. An instance of a class with no encrypted attribute passes through untouched.
  * <p>
+ * Nothing may change an encrypted pair after this listener has encrypted it. Jakarta Persistence runs the entity's own
+ * callbacks after every listener, so an encrypted entity class is rejected, on its first {@code @PrePersist} or
+ * {@code @PreUpdate}, when it, or a superclass, has a {@code @PrePersist} or {@code @PreUpdate} method of its own, or
+ * when a listener with one is declared after this one. Only annotations are read; as a backstop for what they don't
+ * show, such as callbacks declared in {@code orm.xml}, {@code @PostUpdate} fails, rolling the transaction back, when a
+ * plaintext nulled for the {@code UPDATE} has a value again. An entity which needs such callbacks is encrypted through
+ * a provider integration instead.
+ * <p>
  * The {@link EntityEncryptionService encryption service} is injected, which happens when the persistence provider
  * creates its listeners through a bean container: a Jakarta EE container does; in Java SE, pass the CDI
  * {@code BeanManager} as the {@code jakarta.persistence.bean.manager} property of the {@code EntityManagerFactory};
@@ -61,6 +69,7 @@ public class EntityEncryptionListener {
     @PrePersist
     void onPrePersist(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPrePersist({0})", describe(entityInstance));
+        getEncryptor().validateCallbacks(entityInstance, getClass());
         getEncryptor().encrypt(entityInstance, false);
     }
 
@@ -74,6 +83,7 @@ public class EntityEncryptionListener {
     @PreUpdate
     void onPreUpdate(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPreUpdate({0})", describe(entityInstance));
+        getEncryptor().validateCallbacks(entityInstance, getClass());
         getEncryptor().encrypt(entityInstance, true);
     }
 
@@ -86,6 +96,7 @@ public class EntityEncryptionListener {
     @PostUpdate
     void onPostUpdate(final Object entityInstance) {
         logger.log(System.Logger.Level.TRACE, "onPostUpdate({0})", describe(entityInstance));
+        getEncryptor().checkPlaintextsCleared(entityInstance);
         getEncryptor().decrypt(entityInstance);
     }
 
