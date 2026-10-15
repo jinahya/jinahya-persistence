@@ -223,5 +223,6 @@ class EntityEncryptorUtils_Test {
 
     @SuppressWarnings("serial")
     private static final class UtilDateSubclass extends java.util.Date {
+
     }
 }

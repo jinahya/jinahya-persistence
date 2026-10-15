@@ -12,10 +12,11 @@ import java.util.Set;
  * <p>
  * An integration hooks into the provider's own write and read paths, instead of the entity life cycle callbacks, so
  * that a plaintext is never nulled in the entity, and a read never writes. It encrypts into the entity against the
- * provider's snapshot ({@link #encrypt(Object, Snapshot)}), writes {@link #clearPlaintexts(Class, String, Object)
- * cleared} copies of the {@link #getPlaintextAttributeNames(Class) plaintext attributes} to the row, and
- * {@link #decrypt(Object) decrypts} after a load. An application never uses this type: it maps
- * {@link EncryptedAttribute encrypted attributes}, and provides an {@link EntityEncryptionService}.
+ * provider's snapshot ({@link #encrypt(Object, Snapshot)}), writes
+ * {@link #clearPlaintexts(Class, String, Object) cleared} copies of the
+ * {@link #getPlaintextAttributeNames(Class) plaintext attributes} to the row, and {@link #decrypt(Object) decrypts}
+ * after a load. An application never uses this type: it maps {@link EncryptedAttribute encrypted attributes}, and
+ * provides an {@link EntityEncryptionService}.
  * <p>
  * An engine is thread-safe, and is meant to live exactly as long as its entity manager factory.
  *
@@ -71,8 +72,8 @@ public interface EntityEncryptionEngine {
     }
 
     /**
-     * Returns a new engine working through the specified encryption service, which also names the persistence unit:
-     * its {@link EntityEncryptionService#getEntityManagerFactory() entity manager factory} is asked for on first use.
+     * Returns a new engine working through the specified encryption service, which also names the persistence unit: its
+     * {@link EntityEncryptionService#getEntityManagerFactory() entity manager factory} is asked for on first use.
      *
      * @param encryptionService the encryption service; must not be {@code null}.
      * @return a new engine.

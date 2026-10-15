@@ -18,11 +18,11 @@ import jakarta.validation.constraints.NotNull;
  * <p>
  * <strong>One context, one entity.</strong> Each encryption of an entity instance, and each decryption of one, gets a
  * context of its own: the service is {@link #init(EntityEncryptionContext) initialized} with it once, then
- * {@link #encrypt(EntityEncryptionContext, byte[]) encrypts}, or {@link #decrypt(EntityEncryptionContext, byte[])
- * decrypts}, once for each attribute of that instance which has a value. What is prepared once for the instance — the
- * key, a {@link javax.crypto.Cipher} — goes into the context's
- * {@link EntityEncryptionContext#setAttachment(String, Object) attachments}, and is used for every attribute. An instance with nothing to encrypt, or to decrypt, never reaches this
- * service.
+ * {@link #encrypt(EntityEncryptionContext, byte[]) encrypts}, or
+ * {@link #decrypt(EntityEncryptionContext, byte[]) decrypts}, once for each attribute of that instance which has a
+ * value. What is prepared once for the instance — the key, a {@link javax.crypto.Cipher} — goes into the context's
+ * {@link EntityEncryptionContext#setAttachment(String, Object) attachments}, and is used for every attribute. An
+ * instance with nothing to encrypt, or to decrypt, never reaches this service.
  * <p>
  * <strong>An implementation has to be thread-safe.</strong> The listener holds a single instance, and calls it from
  * the entity life cycle callbacks of every persistence context, so concurrent transactions call every method of one
@@ -79,7 +79,8 @@ public interface EntityEncryptionService {
      * <p>
      * Called once for each context, and only when an attribute of its instance is to be encrypted, or decrypted.
      * <p>
-     * <strong>Nothing about the keys is stored.</strong> Whatever selects them is derived again, independently, on every
+     * <strong>Nothing about the keys is stored.</strong> Whatever selects them is derived again, independently, on
+     * every
      * encryption and every decryption, for as long as the row exists. So it has to be derivable <em>identically for the
      * whole lifetime of the row</em>, from state of the {@link EntityEncryptionContext#getEntityInstance() instance}
      * which is:
@@ -97,8 +98,8 @@ public interface EntityEncryptionService {
      * ciphertext this service returns (a key version in its own frame), never in what the instance holds.
      *
      * @param context the context of the entity instance about to be encrypted, or decrypted; never {@code null}.
-     * @apiNote Called concurrently on one instance, each call with a context of its own; an implementation has to
-     *         be thread-safe.
+     * @apiNote Called concurrently on one instance, each call with a context of its own; an implementation has
+     *         to be thread-safe.
      */
     void init(@Nonnull @NotNull EntityEncryptionContext context);
 
@@ -110,14 +111,14 @@ public interface EntityEncryptionService {
      * prepared once for the context serves every attribute, but each encryption needs what the suite requires to be
      * fresh: an AES-GCM nonce, for one, must never repeat under the same key.
      *
-     * @param context        the context this service was {@link #init(EntityEncryptionContext) initialized} with;
-     *                       never {@code null}.
+     * @param context        the context this service was {@link #init(EntityEncryptionContext) initialized} with; never
+     *                       {@code null}.
      * @param decryptedBytes the decrypted bytes to encrypt; never {@code null}, possibly empty. The encoding of the
      *                       value; an array of the listener's own, which this method may keep.
      * @return an encryption result to be decrypted via {@link #decrypt(EntityEncryptionContext, byte[])} method; never
      *         {@code null}.
-     * @apiNote Called concurrently on one instance, each call with a context of its own; an implementation has to
-     *         be thread-safe.
+     * @apiNote Called concurrently on one instance, each call with a context of its own; an implementation has
+     *         to be thread-safe.
      */
     @Nonnull
     @NotNull
@@ -129,13 +130,13 @@ public interface EntityEncryptionService {
      * <p>
      * Called only for a value which is present: a {@code null} ciphertext never reaches this method.
      *
-     * @param context        the context this service was {@link #init(EntityEncryptionContext) initialized} with;
-     *                       never {@code null}.
+     * @param context        the context this service was {@link #init(EntityEncryptionContext) initialized} with; never
+     *                       {@code null}.
      * @param encryptedBytes an array of bytes resulted via {@link #encrypt(EntityEncryptionContext, byte[])} method;
      *                       never {@code null}. A copy of the stored ciphertext, which this method may keep.
      * @return an array of bytes decrypted from the {@code encryptedBytes}; never {@code null}.
-     * @apiNote Called concurrently on one instance, each call with a context of its own; an implementation has to
-     *         be thread-safe.
+     * @apiNote Called concurrently on one instance, each call with a context of its own; an implementation has
+     *         to be thread-safe.
      */
     @Nonnull
     @NotNull

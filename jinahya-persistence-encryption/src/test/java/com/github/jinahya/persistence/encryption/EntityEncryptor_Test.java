@@ -137,7 +137,8 @@ class EntityEncryptor_Test {
 
             entity.grade = null;
             // a name the enum codec reads, but cannot find among the constants
-            entity.gradeEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity), ValueCodecs.OfLang.encodeString("NOPE"));
+            entity.gradeEnc__ = manager.encrypt(new DefaultEntityEncryptionContext(entity),
+                                                ValueCodecs.OfLang.encodeString("NOPE"));
 
             assertThatThrownBy(() -> service.decrypt(entity))
                     .as("the failure has to say which attribute and which java type")
