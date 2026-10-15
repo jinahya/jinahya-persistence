@@ -27,7 +27,9 @@ import org.eclipse.persistence.sessions.SessionCustomizer;
  *   <li>a read never writes: the backup clone EclipseLink compares an entity with holds the decrypted plaintext;</li>
  *   <li>a plaintext is encrypted again only when it changed, so an unrelated change keeps the stored ciphertext.</li>
  * </ul>
- * Attribute change tracking, which weaving may enable, is not supported, and fails on the first event.
+ * Attribute change tracking, which weaving may enable, is not supported, and fails on the first event. A query which
+ * would return objects never decrypted — read-only, not maintaining the cache, or not registering its results in the
+ * unit of work — is refused, in a persistence unit which has an encrypted entity, whatever it reads.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -43,7 +45,8 @@ public class EntityEncryptionSessionCustomizer implements SessionCustomizer {
     }
 
     /**
-     * Registers the encryption engine on every entity descriptor of the specified session.
+     * Registers the encryption engine on every entity descriptor of the specified session, and a guard against queries
+     * which would return objects never decrypted on the session itself.
      *
      * @param session the session being customized.
      * @throws IllegalArgumentException when {@value EntityEncryptionEngine#PROPERTY_ENCRYPTION_SERVICE} is missing, or
@@ -53,11 +56,14 @@ public class EntityEncryptionSessionCustomizer implements SessionCustomizer {
     public void customize(final Session session) {
         final var service = EntityEncryptionEngine.getEncryptionService(
                 session.getProperty(EntityEncryptionEngine.PROPERTY_ENCRYPTION_SERVICE));
-        final var engine = new EclipseLinkEntityEncryptor(EntityEncryptionEngine.of(service));
+        final var encryptor = EntityEncryptionEngine.of(service);
+        final var engine = new EclipseLinkEntityEncryptor(encryptor);
         for (final var descriptor : session.getDescriptors().values()) {
             if (!descriptor.isAggregateDescriptor() && !descriptor.isAggregateCollectionDescriptor()) {
                 descriptor.getEventManager().addListener(engine);
             }
         }
+        // propagated to every client session and unit of work acquired from this one
+        session.getEventManager().addListener(new UndecryptedReadGuard(encryptor, session));
     }
 }

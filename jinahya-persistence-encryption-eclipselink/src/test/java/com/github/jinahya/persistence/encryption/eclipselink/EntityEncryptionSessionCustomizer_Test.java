@@ -4,6 +4,8 @@ import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.eclipse.persistence.config.QueryHints;
+import org.eclipse.persistence.sessions.UnitOfWork;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Verifies the EclipseLink integration against an in-memory database: what reaches the row, what the entity keeps, and
@@ -289,6 +292,77 @@ abstract class EntityEncryptionSessionCustomizer_Test {
         }
     }
 
+    // https://github.com/jinahya/jinahya-persistence/issues/103
+    @DisplayName("reads which return objects never decrypted are refused")
+    @Nested
+    class UndecryptedReadTest {
+
+        @DisplayName("a read-only query")
+        @Test
+        void __readOnlyQuery() {
+            final long id = persist("alice", 1);
+            assertThatThrownBy(() -> apply(em -> em
+                    .createQuery("SELECT e FROM SecretEntity e WHERE e.id = :id", SecretEntity.class)
+                    .setParameter("id", id)
+                    .setHint(QueryHints.READ_ONLY, true)
+                    .getResultList()))
+                    .hasStackTraceContaining("read-only");
+        }
+
+        @DisplayName("a read-only query of an unrelated, scalar result, too: the rule is unit-wide")
+        @Test
+        void __readOnlyScalarQuery() {
+            assertThatThrownBy(() -> apply(em -> em
+                    .createQuery("SELECT COUNT(e) FROM SecretEntity e", Long.class)
+                    .setHint(QueryHints.READ_ONLY, true)
+                    .getSingleResult()))
+                    .hasStackTraceContaining("read-only");
+        }
+
+        @DisplayName("a find with the read-only hint")
+        @Test
+        void __readOnlyFind() {
+            final long id = persist("alice", 1);
+            assertThatThrownBy(() -> apply(em -> em.find(SecretEntity.class, id,
+                                                         Map.of(QueryHints.READ_ONLY, true))))
+                    .hasStackTraceContaining("read-only");
+        }
+
+        @DisplayName("a query which doesn't maintain the cache")
+        @Test
+        void __noMaintainCache() {
+            final long id = persist("alice", 1);
+            assertThatThrownBy(() -> apply(em -> em
+                    .createQuery("SELECT e FROM SecretEntity e WHERE e.id = :id", SecretEntity.class)
+                    .setParameter("id", id)
+                    .setHint(QueryHints.MAINTAIN_CACHE, false)
+                    .getResultList()))
+                    .hasStackTraceContaining("maintain");
+        }
+
+        @DisplayName("a class made read-only in the unit of work")
+        @Test
+        void __readOnlyClass() {
+            final long id = persist("alice", 1);
+            assertThatThrownBy(() -> apply(em -> {
+                em.unwrap(UnitOfWork.class).addReadOnlyClass(SecretEntity.class);
+                return em.find(SecretEntity.class, id);
+            })).hasStackTraceContaining("read-only");
+        }
+
+        @DisplayName("an ordinary query is unaffected, and decrypted")
+        @Test
+        void __ordinary() {
+            final long id = persist("alice", 1);
+            apply(em -> {
+                assertThat(em.createQuery("SELECT e FROM SecretEntity e WHERE e.id = :id", SecretEntity.class)
+                                   .setParameter("id", id).getSingleResult().name).isEqualTo("alice");
+                return null;
+            });
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("legacy rows")
     @Nested
     class LegacyTest {

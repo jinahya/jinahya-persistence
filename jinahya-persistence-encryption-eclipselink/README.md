@@ -73,6 +73,8 @@ unit of work:
 | `postMerge` | the same, for a refresh which merged the shared cache's object into the working clone. A merge of a detached instance, or of the clone's changes into the shared cache, is left alone |
 
 An object outside a unit of work, such as the one in the shared cache, is never decrypted: it keeps what the row holds.
+So a session event listener, `UndecryptedReadGuard`, also added by the customizer, refuses any query which would
+return such objects ([Rules](#rules)).
 Both cache modes are covered by `EntityEncryptionSessionCustomizer_Isolated_Test` (`shared-cache-mode` `NONE`) and
 `EntityEncryptionSessionCustomizer_Shared_Test` (`ALL`).
 
@@ -132,6 +134,19 @@ public class MySessionCustomizer implements SessionCustomizer {
 * **Do not register `EntityEncryptionListener` as well.** The two are alternatives, not layers.
 * **No attribute change tracking.** Weaving may enable it, and the engine fails on the first event of such an entity.
   Disable it with `eclipselink.weaving.changetracking=false`.
+* **No reads outside the unit of work.** In a persistence unit with any encrypted entity, a query is refused, with an
+  `IllegalStateException`, when it would return objects which are never decrypted. That covers a query (or a `find`)
+  which is read-only (`eclipselink.read-only`), doesn't maintain the cache (`eclipselink.maintain-cache=false`) or
+  doesn't register its results in the unit of work, and any query in a unit of work with read-only classes, or in a
+  unit with a read-only (`@ReadOnly`) or non-registering descriptor. The rule is **unit-wide**: a read-only query of an
+  unrelated entity, or of a scalar result, is refused too, as an unencrypted entity may reach an encrypted one through
+  a relationship, and a report's result can't be told safe before it is prepared
+  ([#103](https://github.com/jinahya/jinahya-persistence/issues/103)). Direct access to the shared cache, and to its
+  objects, is not covered.
+* **Not yet for entities with callbacks of their own.** A plaintext assigned by a JPA `@PreUpdate`, the entity's own
+  or a listener's, is assigned after the engine encrypts, as EclipseLink notifies it first: the column is still
+  nulled, but the new value is never encrypted, and the update is lost
+  ([#107](https://github.com/jinahya/jinahya-persistence/issues/107)).
 * **The shared cache holds the plaintext.** It receives the plaintext of a new or changed entity when the transaction
   commits, although the row never does. Where that matters, leave the encrypted entities uncached
   (`@Cacheable(false)`, or `shared-cache-mode` `NONE`).
