@@ -136,7 +136,7 @@ when it, or one of its superclasses, has a `@PrePersist` or `@PreUpdate` method 
 is declared after `EntityEncryptionListener`. A listener declared before it, such as an auditing listener, is fine.
 
 * The callback bodies can't be read, so a callback which never touches the pair is rejected too: move it into a
-  listener declared before `EntityEncryptionListener`, or use the [Hibernate ORM integration](#provider-integrations),
+  listener declared before `EntityEncryptionListener`, or use a [provider integration](#provider-integrations),
   which encrypts after every callback.
 * An entity read in a transaction is written back by it ([What it costs](#what-it-costs)), so a rejected class fails
   in a transaction which only reads it, too.
@@ -269,7 +269,7 @@ var factory = Persistence.createEntityManagerFactory(
 | provider | module | mechanism |
 |---|---|---|
 | Hibernate ORM | [`jinahya-persistence-encryption-hibernate`](../jinahya-persistence-encryption-hibernate/README.md) | an `Integrator`, found through `ServiceLoader`; replaces the default `FLUSH_ENTITY` listener, and adds `PRE_INSERT`, `PRE_UPDATE`, `PRE_UPSERT`, `POST_UPDATE` and `POST_LOAD` listeners. A `StatelessSession` is refused any write of an encrypted entity, and its reads are not decrypted. The session factory is the entity manager factory read, so the service's `getEntityManagerFactory()` is never called. `@DynamicInsert` and `@DynamicUpdate` are supported |
-| EclipseLink | [`jinahya-persistence-encryption-eclipselink`](../jinahya-persistence-encryption-eclipselink/README.md) | a `SessionCustomizer`, named by `eclipselink.session.customizer` (an application with a customizer of its own calls it from that one); registers a descriptor event listener which encrypts on `preInsert` and `preUpdateWithChanges`, nulls the plaintext columns in the row on `aboutToUpdate`, and decrypts on `postClone`, `postRefresh` and a refresh's `postMerge`, resetting the backup clone. The service's `getEntityManagerFactory()` is called on the first event. Attribute change tracking (weaving) is not supported, and fails. A query which would return objects never decrypted (read-only, not maintaining the cache, not registering its results) is refused, unit-wide |
+| EclipseLink | [`jinahya-persistence-encryption-eclipselink`](../jinahya-persistence-encryption-eclipselink/README.md) | a `SessionCustomizer`, named by `eclipselink.session.customizer` (an application with a customizer of its own calls it from that one); registers a descriptor event listener which encrypts on `preInsert` and, as an internal listener notified after the JPA callbacks, `preUpdateWithChanges`, nulls the plaintext columns in the row on `aboutToUpdate`, and decrypts on `postClone`, `postRefresh` and a refresh's `postMerge`, resetting the backup clone. The service's `getEntityManagerFactory()` is called on the first event. Attribute change tracking (weaving) is not supported, and fails. A query which would return objects never decrypted (read-only, not maintaining the cache, not registering its results) is refused, unit-wide |
 
 Neither keeps the plaintext out of a provider's shared cache: under Hibernate ORM, the second-level cache entry
 written by an `INSERT` holds it; under EclipseLink, the shared cache receives the plaintext of a new or changed entity
