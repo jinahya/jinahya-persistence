@@ -41,6 +41,7 @@ public class EntityEncryptionIntegrator implements Integrator {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
+    // -----------------------------------------------------------------------------------------------------------------
     /**
      * Creates a new instance.
      *
@@ -50,6 +51,7 @@ public class EntityEncryptionIntegrator implements Integrator {
         super();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     @Override
     public void integrate(final Metadata metadata, final BootstrapContext bootstrapContext,
                           final SessionFactoryImplementor sessionFactory) {

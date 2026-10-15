@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.encryption.codec;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -16,6 +17,10 @@ import java.util.function.IntConsumer;
  * index to the end of the array.
  */
 public final class StringCodec implements ValueCodec<String> {
+
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * The instance; stateless, and thread-safe.
@@ -32,7 +37,7 @@ public final class StringCodec implements ValueCodec<String> {
     public byte[] encode(final String decoded) {
         Objects.requireNonNull(decoded, "decoded is null");
         try {
-            final var buffer = StandardCharsets.UTF_8.newEncoder()
+            final var buffer = CHARSET.newEncoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT)
                     .encode(CharBuffer.wrap(decoded));
@@ -66,7 +71,7 @@ public final class StringCodec implements ValueCodec<String> {
         final var length = encoded.length - index;
         final String decoded;
         try {
-            decoded = StandardCharsets.UTF_8.newDecoder()
+            decoded = CHARSET.newDecoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT)
                     .decode(ByteBuffer.wrap(encoded, index, length))
