@@ -146,8 +146,10 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
      * Encrypts the specified event's dirty entity, and writes the ciphertexts, and the cleared plaintexts, into the
      * state its {@code UPDATE} is built from, marking those which differ from the snapshot dirty.
      * <p>
-     * Hibernate ORM may copy that state back into the entity, the cleared plaintexts included; the action returned
-     * puts the plaintexts back as they are now, after the {@code @PreUpdate} callbacks.
+     * That state is final by now, after the {@code @PreUpdate} callbacks and the interceptor: the encrypted
+     * attributes are taken from it into the entity first, so that what an interceptor changed is what is encrypted.
+     * Hibernate ORM may copy the state back into the entity, the cleared plaintexts included; the action returned
+     * puts the plaintexts back as they are now.
      *
      * @param event the event.
      * @return an action which restores the entity's plaintexts; does nothing for an entity which is not encrypted.
@@ -163,13 +165,19 @@ class HibernateEntityEncryptor implements PreInsertEventListener, PostUpdateEven
             return NOTHING;
         }
         final var entity = event.getEntity();
+        final Object[] values = event.getPropertyValues();
+        // the state is final: the @PreUpdate callbacks copied into it, and an interceptor may have changed it since
+        indices.all().forEach(i -> {
+            if (persister.getValue(entity, i) != values[i]) {
+                persister.setValue(entity, i, values[i]);
+            }
+        });
         final var restoration = capturePlaintexts(persister, entity, indices);
         final Object[] loaded = entry.getLoadedState();
         encryptor.encrypt(entity, loaded == null ? null : name -> {
             final var index = indices.indices().get(name);
             return index == null ? null : loaded[index];
         });
-        final Object[] values = event.getPropertyValues();
         writeState(persister, entity, values, indices, true, event.getSession());
         if (loaded == null) {
             // no snapshot to check against; every column is written

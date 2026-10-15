@@ -4,13 +4,16 @@ import com.github.jinahya.persistence.encryption.EntityEncryptionEngine;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
+import org.hibernate.type.Type;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -330,6 +333,37 @@ class EntityEncryptionIntegrator_Test {
             assertThat(column(CallbackSecretEntity.TABLE_NAME, "name", id)).isNull();
             apply(em -> {
                 assertThat(em.find(CallbackSecretEntity.class, id).name).isEqualTo("callback-value");
+                return null;
+            });
+        }
+
+        // https://github.com/jinahya/jinahya-persistence/issues/102
+        @DisplayName("a plaintext an interceptor assigns in onFlushDirty is kept by the entity, and stored as ciphertext"
+                     + " only")
+        @Test
+        void __onFlushDirty() {
+            final long id = persist("original", 1);
+            final var interceptor = new Interceptor() {
+                @Override
+                public boolean onFlushDirty(final Object entity, final Object id, final Object[] currentState,
+                                            final Object[] previousState, final String[] propertyNames,
+                                            final Type[] types) {
+                    currentState[Arrays.asList(propertyNames).indexOf("name")] = "interceptor-value";
+                    return true;
+                }
+            };
+            try (var session = ENTITY_MANAGER_FACTORY.unwrap(SessionFactory.class).withOptions()
+                    .interceptor(interceptor).openSession()) {
+                final var tx = session.beginTransaction();
+                final var found = session.find(SecretEntity.class, id);
+                found.note = "changed";
+                session.flush();
+                assertThat(found.name).isEqualTo("interceptor-value");
+                tx.commit();
+            }
+            assertThat(column(SecretEntity.TABLE_NAME, "name", id)).isNull();
+            apply(em -> {
+                assertThat(em.find(SecretEntity.class, id).name).isEqualTo("interceptor-value");
                 return null;
             });
         }
