@@ -3,8 +3,9 @@ package com.github.jinahya.persistence.encryption;
 /**
  * The service an application provides for encrypting its entity attributes: the cryptography, and the keys.
  * <p>
- * This is the only type an application implements. The module's {@link EncryptedAttributeConverter attribute
- * converters} turn an attribute's value into bytes, hand them to {@link #encrypt(byte[])} before the row is written,
+ * This is the only type an application implements. The module's
+ * {@link com.github.jinahya.persistence.encryption.converter.EncryptedAttributeConverter attribute converters} turn an
+ * attribute's value into bytes, hand them to {@link #encrypt(byte[])} before the row is written,
  * and hand what the row holds to {@link #decrypt(byte[])} after it is read. The module never looks inside the bytes a
  * service returns: the algorithm, the keys, which key a value was encrypted with, the IV, the authentication tag, and
  * any versioning, all belong to the service, inside the bytes it returns.
@@ -29,7 +30,7 @@ package com.github.jinahya.persistence.encryption;
  * encrypted with is recorded by the service itself, inside the bytes.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see EncryptedAttributeConverter
+ * @see com.github.jinahya.persistence.encryption.converter.EncryptedAttributeConverter
  */
 public interface EntityEncryptionService {
 

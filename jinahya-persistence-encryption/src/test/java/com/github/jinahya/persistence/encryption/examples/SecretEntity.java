@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.examples;
 
-import com.github.jinahya.persistence.encryption.EncryptedStringConverter;
+import com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;

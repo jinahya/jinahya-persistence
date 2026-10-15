@@ -1,4 +1,6 @@
-package com.github.jinahya.persistence.encryption;
+package com.github.jinahya.persistence.encryption.converter;
+
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 
 import java.util.ArrayList;
 import java.util.ServiceLoader;

@@ -1,4 +1,7 @@
-package com.github.jinahya.persistence.encryption;
+package com.github.jinahya.persistence.encryption.converter;
+
+import com.github.jinahya.persistence.encryption.EntityEncryptionService;
+import com.github.jinahya.persistence.encryption.ValueCodecs;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.AttributeConverter;

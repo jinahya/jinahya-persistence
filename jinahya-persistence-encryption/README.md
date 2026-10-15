@@ -103,7 +103,7 @@ each converter the entities use, as the specification asks; EclipseLink fails th
 finds the class on its own:
 
 ```xml
-<class>com.github.jinahya.persistence.encryption.EncryptedStringConverter</class>
+<class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
 ```
 
 ## Existing data

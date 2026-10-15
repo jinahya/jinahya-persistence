@@ -9,7 +9,7 @@
  *
  * <h2>The pieces</h2>
  * <dl>
- *   <dt>{@link com.github.jinahya.persistence.encryption.EncryptedAttributeConverter} and its subclasses</dt>
+ *   <dt>{@link com.github.jinahya.persistence.encryption.converter.EncryptedAttributeConverter} and its subclasses</dt>
  *   <dd>One converter per supported java type, {@code Encrypted<Type>Converter}, which an application names on each
  *       attribute to encrypt. They encode a value to bytes, hand the bytes to the service, and store what it returns;
  *       and the reverse on read.</dd>

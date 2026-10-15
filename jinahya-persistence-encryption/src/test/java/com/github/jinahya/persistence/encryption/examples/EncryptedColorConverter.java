@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.encryption.examples;
 
-import com.github.jinahya.persistence.encryption.EncryptedEnumConverter;
+import com.github.jinahya.persistence.encryption.converter.EncryptedEnumConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

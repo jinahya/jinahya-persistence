@@ -34,33 +34,33 @@
     <class>com.github.jinahya.persistence.encryption.examples.AllTypesEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.EncryptedColorConverter</class>
     <!-- a converter class is a managed class: with exclude-unlisted-classes, EclipseLink requires it listed -->
-    <class>com.github.jinahya.persistence.encryption.EncryptedBigDecimalConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedBigIntegerConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedBooleanConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedByteConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedBytesConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedBytesWrappedConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedCharacterConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedCharsConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedCharsWrappedConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedDoubleConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedFloatConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedInstantConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedIntegerConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedLocalDateConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedLocalDateTimeConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedLocalTimeConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedLongConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedOffsetDateTimeConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedOffsetTimeConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedShortConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedSqlDateConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedSqlTimeConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedSqlTimestampConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedStringConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedUtilDateConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedUuidConverter</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedYearConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedBigDecimalConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedBigIntegerConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedBooleanConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedByteConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedBytesConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedBytesWrappedConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedCharacterConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedCharsConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedCharsWrappedConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedDoubleConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedFloatConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedInstantConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedIntegerConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedLocalDateConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedLocalDateTimeConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedLocalTimeConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedLongConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedOffsetDateTimeConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedOffsetTimeConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedShortConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedSqlDateConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedSqlTimeConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedSqlTimestampConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedUtilDateConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedUuidConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedYearConverter</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
@@ -101,7 +101,7 @@
     </description>
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>com.github.jinahya.persistence.encryption.examples.hibernate.DynamicEntity</class>
-    <class>com.github.jinahya.persistence.encryption.EncryptedStringConverter</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
