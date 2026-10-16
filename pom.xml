@@ -539,6 +539,35 @@
               </rules>
             </configuration>
           </execution>
+          <execution>
+            <id>enforce-require-provider-profile</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- The persistence provider comes from an activeByDefault profile, and Maven drops a POM's
+                     activeByDefault profiles as soon as any other profile OF THAT POM is named on the command
+                     line: `-Pfailsafe` alone leaves no provider on the test classpath while
+                     persistence-unit.provider still names Hibernate, and the build then dies much later, in
+                     surefire, with "No Persistence provider for EntityManager named ...". Fail here instead.
+                     The check is on a marker property set only by the two provider profiles of this POM, not
+                     on requireActiveProfile, because that rule matches a profile id wherever it is declared:
+                     jinahya-persistence-encryption carries an activeByDefault profile of the same id, which
+                     `-Pfailsafe` does not deactivate, and which would satisfy the id check while the root's
+                     provider dependencies are missing. -->
+                <requireProperty>
+                  <property>persistence-provider-profile.active</property>
+                  <message>No persistence provider profile is active in the root POM. Naming any other profile of
+                    the root POM on the command line (for example -Pfailsafe) deactivates the activeByDefault
+                    provider profile, and -P!jakarta-ee-11-hibernate-orm removes it outright; the persistence
+                    units then fail to bootstrap far from the cause. Name a provider together with it:
+                    -Pfailsafe,jakarta-ee-11-hibernate-orm or -Pfailsafe,jakarta-ee-11-eclipselink.</message>
+                </requireProperty>
+              </rules>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -827,6 +856,11 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <!-- the marker the enforce-require-provider-profile execution checks; set only by the two provider
+             profiles of this POM -->
+        <persistence-provider-profile.active>true</persistence-provider-profile.active>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.hibernate.orm</groupId>
@@ -842,6 +876,8 @@
       <!-- https://eclipse.dev/eclipselink/releases/index.html -->
       <!-- Jakarta Persistence 3.2 / Jakarta EE 11; version: version.org.eclipse.persistence -->
       <properties>
+        <!-- the marker the enforce-require-provider-profile execution checks -->
+        <persistence-provider-profile.active>true</persistence-provider-profile.active>
         <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
         <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
         <metamodel.generator.artifactId>org.eclipse.persistence.jpa.modelgen.processor</metamodel.generator.artifactId>
