@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.6.7-SNAPSHOT</version>
+  <version>0.6.7</version>
   <!--  <version>${revision}</version>-->
   <packaging>pom</packaging>
 
@@ -60,7 +60,7 @@
     <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
     <url>https://github.com/jinahya/${project.artifactId}</url>
-    <tag>0.5.7</tag>
+    <tag>0.6.7</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
@@ -69,7 +69,7 @@
 
   <properties>
     <!-- the Automatic-Module-Name of a module's jar; set by each module, empty (no entry) here -->
-    <module.name/>
+    <module.name />
     <!--    <revision>0.3.10-SNAPSHOT</revision>-->
     <!-- https://endoflife.date/eclipse-temurin -->
     <!-- https://endoflife.date/amazon-corretto -->
