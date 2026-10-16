@@ -283,6 +283,69 @@ class __AttributeEnumUtilsTest {
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
+
+        // -------------------------------------------------------------------------------------------------------------
+        // the list form promises that every class is validated before any of them is searched; the earlier class
+        // carries the value looked up, so a search which stopped at the first match would never reach the later one
+
+        private static final List<Class<? extends __AttributeEnum<? extends Enum<?>, String>>>
+                MATCHING_THEN_DUPLICATE = List.of(
+                _SomeAttributeEnum1.class,
+                _DuplicateAttributeValueEnum.class
+        );
+
+        private static final List<Class<? extends __AttributeEnum<? extends Enum<?>, String>>>
+                MATCHING_THEN_NULL = List.of(
+                _SomeAttributeEnum1.class,
+                _NullAttributeValueEnum.class
+        );
+
+        @DisplayName("find(enumClasses, matched by an earlier class): a later duplicate still throws")
+        @Test
+        void _IllegalArgumentException_FindLaterDuplicateAfterEarlierMatch() {
+            assertThatThrownBy(() -> find(MATCHING_THEN_DUPLICATE, "A"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("duplicate attributeValue");
+        }
+
+        @DisplayName("find(enumClasses, matched by an earlier class): a later null still throws")
+        @Test
+        void _IllegalArgumentException_FindLaterNullAfterEarlierMatch() {
+            assertThatThrownBy(() -> find(MATCHING_THEN_NULL, "A"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("null attributeValue");
+        }
+
+        @DisplayName("valueOf(enumClasses, matched by an earlier class): a later duplicate still throws")
+        @Test
+        void _IllegalArgumentException_ValueOfLaterDuplicateAfterEarlierMatch() {
+            assertThatThrownBy(() -> valueOf(MATCHING_THEN_DUPLICATE, "A"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("duplicate attributeValue");
+        }
+
+        @DisplayName("find(enumClasses, matched by an earlier class): a later malformed class throws on every lookup")
+        @Test
+        void _IllegalArgumentException_FindLaterDuplicateAfterEarlierMatchNotCached() {
+            for (int i = 0; i < 2; i++) {
+                assertThatThrownBy(() -> find(MATCHING_THEN_DUPLICATE, "A"))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("duplicate attributeValue");
+            }
+        }
+
+        @DisplayName("find(enumClasses, matched by an earlier class): a later well-formed class is not in the way")
+        @Test
+        void __FindLaterWellFormedAfterEarlierMatch() {
+            assertThat(find(ENUM_CLASSES_WELL_FORMED, "A")).hasValue(_SomeAttributeEnum1.A);
+            assertThat(find(ENUM_CLASSES_WELL_FORMED, "B")).hasValue(_SomeAttributeEnum1.B);
+        }
+
+        private static final List<Class<? extends __AttributeEnum<? extends Enum<?>, String>>>
+                ENUM_CLASSES_WELL_FORMED = List.of(
+                _SomeAttributeEnum1.class,
+                _SomeAttributeEnum2.class
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

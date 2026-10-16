@@ -220,6 +220,9 @@ public final class __AttributeEnumUtils {
             if (!enumClass.isEnum()) {
                 throw new IllegalArgumentException("not an enum class: " + enumClass);
             }
+            // builds, and so validates, the map of this class now, before any class is searched; the search below
+            // returns at the first match, and would otherwise never reach a later malformed class
+            CONSTANTS.get(enumClass);
         }
         for (final var enumClass : enumClasses) {
             final var value = find_(enumClass, attributeValue);
