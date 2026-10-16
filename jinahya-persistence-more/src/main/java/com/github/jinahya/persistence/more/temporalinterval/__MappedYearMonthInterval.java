@@ -157,9 +157,12 @@ public abstract class __MappedYearMonthInterval extends ___MappedTemporalInterva
      *
      * @return the period from the {@link #getIntervalStart() start} of this interval to its
      *         {@link #getIntervalEnd() end}; {@code null} when either point of this interval is absent.
-     * @implNote The months between the two points are counted and then
-     *           {@link Period#normalized() normalized}, so the period carries years and months and never a day:
-     *           {@code [2026-01, 2027-03)} measures {@code P1Y2M} rather than {@code P14M}.
+     * @implNote The months between the two points are counted, as a {@code long}, and split into years and the months
+     *           left over, so the period carries years and months and never a day: {@code [2026-01, 2027-03)} measures
+     *           {@code P1Y2M} rather than {@code P14M}. The split is the one {@link Period#normalized() normalized()}
+     *           makes, with the same sign on both parts for a reversed interval, and it happens before any narrowing to
+     *           {@code int}: the whole {@link YearMonth} domain, {@code P1999999998Y11M} end to end, is measurable,
+     *           where a count narrowed first would overflow past {@code P178956970Y7M}.
      */
     @Override
     @Transient
@@ -169,6 +172,7 @@ public abstract class __MappedYearMonthInterval extends ___MappedTemporalInterva
         if (startInclusive == null || endExclusive == null) {
             return null;
         }
-        return Period.ofMonths(Math.toIntExact(startInclusive.until(endExclusive, ChronoUnit.MONTHS))).normalized();
+        final long months = startInclusive.until(endExclusive, ChronoUnit.MONTHS);
+        return Period.of(Math.toIntExact(months / 12), (int) (months % 12), 0);
     }
 }

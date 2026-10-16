@@ -15,9 +15,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.function.Supplier;
 
@@ -219,6 +221,80 @@ class ___MappedTemporalInterval_Test {
 
         OfYearMonth() {
             super(Iv::new, YearMonth.of(2026, 1), YearMonth.of(2027, 3));
+        }
+
+        private static Iv interval(final YearMonth start, final YearMonth end) {
+            final var instance = new Iv();
+            instance.setIntervalStart(start);
+            instance.setIntervalEnd(end);
+            return instance;
+        }
+
+        // ------------------------------------------------------------------------------------------------- the amount
+
+        @DisplayName("the amount carries years and months, never a day: [2026-01, 2027-03) is P1Y2M")
+        @Test
+        void _amount_normalized() {
+            assertThat(interval(YearMonth.of(2026, 1), YearMonth.of(2027, 3)).getTemporalAmount())
+                    .isEqualTo(Period.of(1, 2, 0));
+            assertThat(interval(YearMonth.of(2027, 3), YearMonth.of(2026, 1)).getTemporalAmount())
+                    .isEqualTo(Period.of(-1, -2, 0));
+        }
+
+        // 2_147_483_647 months is 178_956_970 years and 7 months; the counts either side of the int range are the
+        // ones a count narrowed before it is split cannot measure
+
+        @DisplayName("the amount of exactly Integer.MAX_VALUE months is P178956970Y7M")
+        @Test
+        void _amount_maxIntMonths() {
+            final var start = YearMonth.of(0, 1);
+            assertThat(interval(start, start.plusMonths(Integer.MAX_VALUE)).getTemporalAmount())
+                    .isEqualTo(Period.of(178_956_970, 7, 0));
+        }
+
+        @DisplayName("the amount of one month past Integer.MAX_VALUE months is P178956970Y8M, not an overflow")
+        @Test
+        void _amount_pastMaxIntMonths() {
+            final var start = YearMonth.of(0, 1);
+            final var end = start.plusMonths(Integer.MAX_VALUE + 1L);
+            assertThat(interval(start, end).getTemporalAmount()).isEqualTo(Period.of(178_956_970, 8, 0));
+            assertThat(interval(end, start).getTemporalAmount()).isEqualTo(Period.of(-178_956_970, -8, 0));
+        }
+
+        @DisplayName("the amount of exactly Integer.MIN_VALUE months is P-178956970Y-8M")
+        @Test
+        void _amount_minIntMonths() {
+            final var start = YearMonth.of(0, 1);
+            assertThat(interval(start, start.plusMonths(Integer.MIN_VALUE)).getTemporalAmount())
+                    .isEqualTo(Period.of(-178_956_970, -8, 0));
+        }
+
+        @DisplayName("the amount of one month below Integer.MIN_VALUE months is P-178956970Y-9M, not an overflow")
+        @Test
+        void _amount_pastMinIntMonths() {
+            final var start = YearMonth.of(0, 1);
+            assertThat(interval(start, start.plusMonths(Integer.MIN_VALUE - 1L)).getTemporalAmount())
+                    .isEqualTo(Period.of(-178_956_970, -9, 0));
+        }
+
+        @DisplayName("the amount spans the whole YearMonth domain, both ways")
+        @Test
+        void _amount_wholeDomain() {
+            final var min = YearMonth.of(Year.MIN_VALUE, 1);
+            final var max = YearMonth.of(Year.MAX_VALUE, 12);
+            final var years = Year.MAX_VALUE - Year.MIN_VALUE; // 1_999_999_998, and eleven months over
+            assertThat(interval(min, max).getTemporalAmount()).isEqualTo(Period.of(years, 11, 0));
+            assertThat(interval(max, min).getTemporalAmount()).isEqualTo(Period.of(-years, -11, 0));
+        }
+
+        @DisplayName("the amount agrees with lengthIn(MONTHS) across the domain: a consistency check, they share until()")
+        @Test
+        void _amount_agreesWithLengthInMonths() {
+            final var min = YearMonth.of(Year.MIN_VALUE, 1);
+            final var max = YearMonth.of(Year.MAX_VALUE, 12);
+            final var instance = interval(min, max);
+            final var months = instance.lengthIn(ChronoUnit.MONTHS).orElseThrow();
+            assertThat(instance.getTemporalAmount().toTotalMonths()).isEqualTo(months);
         }
     }
 
