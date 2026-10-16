@@ -44,6 +44,13 @@ final class PersistenceTests {
     /**
      * Tells whether the factory is Hibernate ORM's; the other provider this build runs on is EclipseLink.
      */
+    static long columnLength(final EntityManagerFactory factory, final String table, final String column) {
+        return ((Number) apply(factory, em -> em.createNativeQuery(
+                "SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table
+                + "' AND COLUMN_NAME = '" + column + "'")
+                .getSingleResult())).longValue();
+    }
+
     static boolean isHibernate(final EntityManagerFactory factory) {
         return factory.getClass().getName().startsWith("org.hibernate.");
     }

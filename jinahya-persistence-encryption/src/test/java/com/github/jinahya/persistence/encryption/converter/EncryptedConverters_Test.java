@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.encryption.converter;
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.EntityEncryptionServiceImpl;
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -73,15 +74,38 @@ class EncryptedConverters_Test {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("a service which returns null fails the conversion as a PersistenceException")
+    @Test
+    void serviceReturnsNull() {
+        final var converter = EncryptedConverters.forType(String.class, new EntityEncryptionService() {
+            @Override
+            public byte[] encrypt(final byte[] decryptedBytes) {
+                return null;
+            }
+
+            @Override
+            public byte[] decrypt(final byte[] encryptedBytes) {
+                return null;
+            }
+        });
+        assertThatThrownBy(() -> converter.convertToDatabaseColumn("value"))
+                .isInstanceOf(PersistenceException.class).hasMessageNotContaining("value");
+        assertThatThrownBy(() -> converter.convertToEntityAttribute(new byte[] {1}))
+                .isInstanceOf(PersistenceException.class);
+    }
+
     @DisplayName("serviceOf: an instance, a class, a class name, or null for the loaded one")
     @Test
     void serviceOf() {
         final var service = new CountingService();
         assertThat(EncryptedConverters.serviceOf(service)).isSameAs(service);
-        assertThat(EncryptedConverters.serviceOf(EntityEncryptionServiceImpl.class))
-                .isInstanceOf(EntityEncryptionServiceImpl.class);
-        assertThat(EncryptedConverters.serviceOf(EntityEncryptionServiceImpl.class.getName()))
-                .isInstanceOf(EntityEncryptionServiceImpl.class);
+        final var byClass = EncryptedConverters.serviceOf(EntityEncryptionServiceImpl.class);
+        assertThat(byClass).isInstanceOf(EntityEncryptionServiceImpl.class);
+        // one instance per class, however many attributes or units name it
+        assertThat(EncryptedConverters.serviceOf(EntityEncryptionServiceImpl.class)).isSameAs(byClass);
+        assertThat(EncryptedConverters.serviceOf(EntityEncryptionServiceImpl.class.getName())).isSameAs(byClass);
+        assertThat(EncryptedConverters.serviceOf(" " + EntityEncryptionServiceImpl.class.getName() + " "))
+                .isSameAs(byClass);
         assertThat(EncryptedConverters.serviceOf(null)).isInstanceOf(EntityEncryptionServiceImpl.class);
         assertThatThrownBy(() -> EncryptedConverters.serviceOf(42)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> EncryptedConverters.serviceOf("no.such.Class"))

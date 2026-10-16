@@ -11,6 +11,8 @@
     <class>com.github.jinahya.persistence.encryption.eclipselink.examples.AllTypesEntity</class>
     <class>com.github.jinahya.persistence.encryption.eclipselink.examples.MixedEntity</class>
     <class>com.github.jinahya.persistence.encryption.eclipselink.examples.MutableArrayEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.examples.Secret</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.examples.PropertyEntity</class>
     <!-- the standard converter MixedEntity uses next to the named one; a JPA converter class has to be listed -->
     <class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -25,6 +27,42 @@
       <property name="eclipselink.ddl-generation" value="create-tables"/>
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionEclipseLinkBadIdPU">
+    <description>A mapping the encrypted converter refuses, on its own so that the refusal fails nothing else
+      (Refusal_Test)
+    </description>
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.examples.BadIdEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-eclipselink-bad-id;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionEclipseLinkBadVersionPU">
+    <description>A mapping the encrypted converter refuses, on its own so that the refusal fails nothing else
+      (Refusal_Test)
+    </description>
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.examples.BadVersionEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-eclipselink-bad-version;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
     </properties>
   </persistence-unit>
 </persistence>

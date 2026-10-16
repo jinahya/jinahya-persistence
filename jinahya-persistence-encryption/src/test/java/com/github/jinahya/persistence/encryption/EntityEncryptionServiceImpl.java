@@ -27,6 +27,9 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
 
     static final AtomicInteger DECRYPTED = new AtomicInteger();
 
+    // set by a test, for the one call it wants to fail; the message is what the test looks for
+    static volatile boolean FAIL_ENCRYPT;
+
     /**
      * Encrypts the specified bytes under the fixed key; shared with the CDI bean of {@code Injection_Test}.
      */
@@ -62,6 +65,9 @@ public class EntityEncryptionServiceImpl implements EntityEncryptionService {
 
     @Override
     public byte[] encrypt(final byte[] decryptedBytes) {
+        if (FAIL_ENCRYPT) {
+            throw new IllegalStateException("encryption refused, for a test");
+        }
         ENCRYPTED.incrementAndGet();
         return encryptBytes(decryptedBytes);
     }

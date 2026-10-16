@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * ciphertext, and the codec is chosen from the attribute's declared java type.
  * <pre>{@code
  * @Encrypted
- * @Column(name = "name_enc")       // a binary column
+ * @Column(name = "name_enc", length = 2048)   // a binary column, as long as the service makes it
  * private String name;
  * }</pre>
  * One annotation, for every supported type: it composes Hibernate ORM's {@link Type @Type} with

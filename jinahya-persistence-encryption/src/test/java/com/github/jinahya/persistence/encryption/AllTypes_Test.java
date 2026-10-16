@@ -22,9 +22,11 @@ import java.time.Year;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Round-trips one attribute of every supported type through its converter, and checks that every column is binary.
@@ -157,6 +159,59 @@ class AllTypes_Test {
         PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id).aUtilDate = new java.util.Date(5_000L));
         assertThat(PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id)).aUtilDate.getTime())
                 .isEqualTo(5_000L);
+    }
+
+    private static long rows() {
+        return ((Number) PersistenceTests.apply(EMF, em -> em.createNativeQuery(
+                "SELECT COUNT(*) FROM " + AllTypesEntity.TABLE_NAME).getSingleResult())).longValue();
+    }
+
+    @DisplayName("a value longer than the column: the write fails, nothing truncated, where the column has a length"
+                 + " (Hibernate ORM); stored whole where the platform type has none (EclipseLink)")
+    @Test
+    void tooLong() {
+        final var rows = rows();
+        final var value = "x".repeat(2048 + 1);     // the ciphertext is longer still
+        if (PersistenceTests.isHibernate(EMF)) {
+            assertThatThrownBy(() -> PersistenceTests.apply(EMF, em -> {
+                final var e = new AllTypesEntity();
+                e.aString = value;
+                em.persist(e);
+                return e;
+            })).isNotNull();
+            assertThat(rows()).as("no row written").isEqualTo(rows);
+            return;
+        }
+        final var id = PersistenceTests.apply(EMF, em -> {
+            final var e = new AllTypesEntity();
+            e.aString = value;
+            em.persist(e);
+            return e;
+        }).id;
+        assertThat(rows()).isEqualTo(rows + 1);
+        assertThat(PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id)).aString).isEqualTo(value);
+    }
+
+    // the types whose declared length Hibernate ORM does not apply to the converted column
+    private static final Set<Class<?>> TEMPORAL = Set.of(
+            LocalDate.class, LocalTime.class, LocalDateTime.class, OffsetTime.class, OffsetDateTime.class,
+            Instant.class, java.util.Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class);
+
+    @DisplayName("the column lengths: the declared 2048 everywhere, but Hibernate ORM's 255 for a temporal type, and"
+                 + " EclipseLink's platform type with no length at all")
+    @Test
+    void columnLengths() {
+        for (final var field : encryptedFields()) {
+            final var column = field.getAnnotation(jakarta.persistence.Column.class).name();
+            final var length = PersistenceTests.columnLength(EMF, AllTypesEntity.TABLE_NAME, column);
+            if (PersistenceTests.isHibernate(EMF)) {
+                // @Column(length) reaches a converted column, except a temporal attribute's, which keeps the default
+                assertThat(length).as(column).isEqualTo(TEMPORAL.contains(field.getType()) ? 255L : 2048L);
+            } else {
+                // the column is the converter's byte[], LONGVARBINARY: the platform's length, not the declared one
+                assertThat(length).as(column).isGreaterThan(2048L);
+            }
+        }
     }
 
     @DisplayName("a null of every type is a NULL column, and reads back null; a primitive reads its default")

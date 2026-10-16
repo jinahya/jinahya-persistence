@@ -7,6 +7,10 @@ import java.util.ServiceLoader;
 
 /**
  * Finds the one {@link EntityEncryptionService} an application provides through {@link ServiceLoader}.
+ * <p>
+ * The service found is kept for the JVM: every converter of every persistence unit which has no injected service
+ * shares it, and the class loader it was found through is the context class loader of the first conversion. Two
+ * persistence units in one JVM which need two services use the provider modules' property, or injection.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -26,16 +30,23 @@ final class EntityEncryptionServices {
             synchronized (EntityEncryptionServices.class) {
                 result = loaded;
                 if (result == null) {
-                    result = loaded = find();
+                    result = loaded = find(Thread.currentThread().getContextClassLoader());
                 }
             }
         }
         return result;
     }
 
-    private static EntityEncryptionService find() {
+    /**
+     * Finds the one service named in {@code META-INF/services/} through the specified class loader, without keeping it.
+     *
+     * @param loader the class loader to look through; {@code null} for the system class loader.
+     * @return the service found.
+     * @throws IllegalStateException when no implementation is named, or more than one is.
+     */
+    static EntityEncryptionService find(final @org.jspecify.annotations.Nullable ClassLoader loader) {
         final var found = new ArrayList<EntityEncryptionService>();
-        ServiceLoader.load(EntityEncryptionService.class).forEach(found::add);
+        ServiceLoader.load(EntityEncryptionService.class, loader).forEach(found::add);
         if (found.isEmpty()) {
             throw new IllegalStateException(
                     "no " + EntityEncryptionService.class.getName() + " found; provide one as a bean, when the"

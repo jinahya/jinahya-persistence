@@ -31,6 +31,26 @@ class Cache_Test {
         }
     }
 
+    @DisplayName("a cache put costs an encryption: a load from the row encrypts once more, for the cache")
+    @Test
+    void cachePutEncrypts() {
+        final var factory = EMF.unwrap(SessionFactory.class);
+        final var id = PersistenceTests.apply(EMF, em -> {
+            final var e = new CachedEntity();
+            e.name = "put";
+            em.persist(e);
+            return e;
+        }).id;
+        factory.getCache().evictAll();
+        final var encrypted = EntityEncryptionServiceImpl.ENCRYPTED.get();
+        final var decrypted = EntityEncryptionServiceImpl.DECRYPTED.get();
+        assertThat(PersistenceTests.apply(EMF, em -> em.find(CachedEntity.class, id)).name).isEqualTo("put");
+        assertThat(factory.getCache().containsEntity(CachedEntity.class, id)).as("put into the cache").isTrue();
+        assertThat(EntityEncryptionServiceImpl.DECRYPTED.get()).as("the row decrypted once").isEqualTo(decrypted + 1);
+        assertThat(EntityEncryptionServiceImpl.ENCRYPTED.get()).as("the cached form encrypted once")
+                .isEqualTo(encrypted + 1);
+    }
+
     @DisplayName("a cache hit decrypts what the cache holds, and never reads the row")
     @Test
     void cacheHitDecrypts() {

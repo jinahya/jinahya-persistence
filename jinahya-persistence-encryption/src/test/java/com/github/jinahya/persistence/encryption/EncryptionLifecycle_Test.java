@@ -1,6 +1,8 @@
 package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.LegacySecretEntity;
+import com.github.jinahya.persistence.encryption.examples.PropertyEntity;
+import com.github.jinahya.persistence.encryption.examples.Secret;
 import com.github.jinahya.persistence.encryption.examples.SecretEntity;
 import com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter;
 import jakarta.persistence.EntityManager;
@@ -17,8 +19,13 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,10 +54,14 @@ class EncryptionLifecycle_Test {
 
     @AfterAll
     static void close() {
-        assertThat(WriteRecorder.count()).as("writes recorded").isPositive();
-        assertThat(WriteRecorder.anyWriteContains("secret-")).as("no plaintext ever reached the database").isFalse();
-        if (EMF != null) {
-            EMF.close();
+        try {
+            assertThat(WriteRecorder.count()).as("writes recorded").isPositive();
+            assertThat(WriteRecorder.anyWriteContains("secret-")).as("no plaintext ever reached the database")
+                    .isFalse();
+        } finally {
+            if (EMF != null) {
+                EMF.close();
+            }
         }
     }
 
@@ -79,10 +90,68 @@ class EncryptionLifecycle_Test {
         return apply(em -> em.find(SecretEntity.class, id)).name;
     }
 
+    private static long rows() {
+        return ((Number) apply(em -> em.createNativeQuery("SELECT COUNT(*) FROM " + SecretEntity.TABLE_NAME)
+                .getSingleResult())).longValue();
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("persist")
     @Nested
     class Persist {
+
+        @DisplayName("an empty plaintext is a ciphertext, not an empty column, and reads back empty")
+        @Test
+        void __empty() {
+            final var id = persisted("");
+            assertThat((byte[]) row(id)[1]).as("the ciphertext of an empty value").isNotNull().isNotEmpty();
+            assertThat(name(id)).isEmpty();
+        }
+
+        @DisplayName("a service which fails on encrypt fails the transaction, and no row is written")
+        @Test
+        void __serviceFails() {
+            final var rows = rows();
+            EntityEncryptionServiceImpl.FAIL_ENCRYPT = true;
+            try {
+                assertThatThrownBy(() -> persisted("secret-refused")).hasStackTraceContaining("refused, for a test");
+            } finally {
+                EntityEncryptionServiceImpl.FAIL_ENCRYPT = false;
+            }
+            assertThat(rows()).as("no row written").isEqualTo(rows);
+        }
+
+        @DisplayName("an attribute of an embeddable is encrypted like one of the entity")
+        @Test
+        void __embedded() {
+            final var id = apply(em -> {
+                final var e = new SecretEntity();
+                e.secret = new Secret();
+                e.secret.code = "secret-embedded";
+                em.persist(e);
+                return e;
+            }).id;
+            final var stored = (byte[]) apply(em -> em.createNativeQuery(
+                    "SELECT code_enc FROM " + SecretEntity.TABLE_NAME + " WHERE id = " + id).getSingleResult());
+            assertThat(stored).isNotNull().isNotEmpty();
+            assertThat(apply(em -> em.find(SecretEntity.class, id)).secret.code).isEqualTo("secret-embedded");
+        }
+
+        @DisplayName("an attribute mapped on its getter, property access, is encrypted like a field")
+        @Test
+        void __property() {
+            final var id = apply(em -> {
+                final var e = new PropertyEntity();
+                e.setName("secret-property");
+                em.persist(e);
+                return e;
+            }).getId();
+            final var stored = (byte[]) apply(em -> em.createNativeQuery(
+                    "SELECT name_enc FROM " + PropertyEntity.TABLE_NAME + " WHERE id = " + id).getSingleResult());
+            assertThat(stored).isNotNull().isNotEmpty();
+            assertThat(new String(stored, StandardCharsets.ISO_8859_1)).doesNotContain("secret-property");
+            assertThat(apply(em -> em.find(PropertyEntity.class, id)).getName()).isEqualTo("secret-property");
+        }
 
         @DisplayName("stores the ciphertext only, in a binary column, and the value reads back")
         @Test
@@ -125,6 +194,68 @@ class EncryptionLifecycle_Test {
     @DisplayName("read")
     @Nested
     class Read {
+
+        @DisplayName("a projection of the attribute reads the plaintext")
+        @Test
+        void __projection() {
+            final var id = persisted("secret-projected");
+            final var projected = apply(em -> em.createQuery(
+                            "SELECT e.name FROM SecretEntity e WHERE e.id = :id", String.class)
+                    .setParameter("id", id).getSingleResult());
+            assertThat(projected).isEqualTo("secret-projected");
+        }
+
+        @DisplayName("a null check is the one predicate which works: NULL in the column is null in the attribute")
+        @Test
+        void __nullPredicate() {
+            final var absent = persisted(null);
+            final var present = persisted("secret-present");
+            final var ids = List.of(absent, present);
+            final var nulls = apply(em -> em.createQuery(
+                            "SELECT e.id FROM SecretEntity e WHERE e.name IS NULL AND e.id IN :ids", Long.class)
+                    .setParameter("ids", ids).getResultList());
+            assertThat(nulls).containsExactly(absent);
+            final var notNulls = apply(em -> em.createQuery(
+                            "SELECT e.id FROM SecretEntity e WHERE e.name IS NOT NULL AND e.id IN :ids", Long.class)
+                    .setParameter("ids", ids).getResultList());
+            assertThat(notNulls).containsExactly(present);
+        }
+
+        @DisplayName("tampered bytes fail the read, naming no plaintext, instead of yielding a value")
+        @Test
+        void __tampered() {
+            final var id = persisted("secret-tampered");
+            final var tampered = ((byte[]) row(id)[1]).clone();
+            tampered[tampered.length - 1] ^= 0x01;
+            apply(em -> em.createNativeQuery("UPDATE " + SecretEntity.TABLE_NAME + " SET name_enc = ?1 WHERE id = ?2")
+                    .setParameter(1, tampered).setParameter(2, id).executeUpdate());
+            assertThatThrownBy(() -> name(id)).satisfies(t -> {
+                for (var cause = (Throwable) t; cause != null; cause = cause.getCause()) {
+                    assertThat(String.valueOf(cause.getMessage())).doesNotContain("secret-tampered");
+                }
+            });
+        }
+
+        @DisplayName("concurrent persistence contexts share the one converter, and each reads its own value")
+        @Test
+        void __concurrent() throws Exception {
+            final var names = IntStream.range(0, 32).mapToObj(i -> "secret-c" + i).toList();
+            final var ids = new ArrayList<Long>();
+            final var pool = Executors.newFixedThreadPool(8);
+            try {
+                final var persisted = names.stream().map(n -> pool.submit(() -> persisted(n))).toList();
+                for (final var future : persisted) {
+                    ids.add(future.get());
+                }
+                final var read = ids.stream().map(i -> pool.submit(() -> name(i))).toList();
+                for (int i = 0; i < read.size(); i++) {
+                    assertThat(read.get(i).get()).isEqualTo(names.get(i));
+                }
+            } finally {
+                pool.shutdown();
+                assertThat(pool.awaitTermination(1L, TimeUnit.MINUTES)).isTrue();
+            }
+        }
         @DisplayName("the recorder is live: a plaintext handed to the binary column on purpose is seen")
         @Test
         void __recorderControl() {
@@ -197,6 +328,16 @@ class EncryptionLifecycle_Test {
     @DisplayName("update")
     @Nested
     class Update {
+
+        @DisplayName("a bulk JPQL UPDATE with a literal stores the ciphertext, not the literal")
+        @Test
+        void __bulkLiteral() {
+            final var id = persisted("secret-literal");
+            apply(em -> em.createQuery("UPDATE SecretEntity e SET e.name = 'secret-literal2' WHERE e.id = :id")
+                    .setParameter("id", id).executeUpdate());
+            assertThat(new String((byte[]) row(id)[1], StandardCharsets.ISO_8859_1)).doesNotContain("secret-literal2");
+            assertThat(name(id)).isEqualTo("secret-literal2");
+        }
 
         @DisplayName("a changed plaintext is stored as a new ciphertext")
         @Test

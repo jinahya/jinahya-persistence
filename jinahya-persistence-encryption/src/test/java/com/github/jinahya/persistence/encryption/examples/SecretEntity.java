@@ -6,6 +6,7 @@ import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -46,4 +47,8 @@ public class SecretEntity {
     @Basic(optional = true)
     @Column(name = "name_enc", nullable = true, length = 2048)
     public String name;
+
+    // an encrypted attribute of an embeddable, in the same table
+    @Embedded
+    public Secret secret;
 }

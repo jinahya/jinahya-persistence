@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * One named converter on every supported type, an enum and a primitive: all round-trip, every column is
@@ -115,6 +116,38 @@ class AllTypes_Test {
         }
     }
 
+
+
+    private static long rows() {
+        return ((Number) PersistenceTests.apply(EMF, em -> em.createNativeQuery(
+                "SELECT COUNT(*) FROM " + AllTypesEntity.TABLE_NAME).getSingleResult())).longValue();
+    }
+
+    @DisplayName("a value longer than the declared length is stored whole: the platform type has no length to exceed")
+    @Test
+    void tooLong() {
+        final var rows = rows();
+        final var value = "x".repeat(2048 + 1);
+        final var id = PersistenceTests.apply(EMF, em -> {
+            final var e = new AllTypesEntity();
+            e.aString = value;
+            em.persist(e);
+            return e;
+        }).id;
+        assertThat(rows()).isEqualTo(rows + 1);
+        assertThat(PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id)).aString).isEqualTo(value);
+    }
+
+    @DisplayName("the column lengths: the platform's type for byte[], LONGVARBINARY, whose length is the platform's,"
+                 + " not the declared 2048")
+    @Test
+    void columnLengths() {
+        for (final var field : encryptedFields()) {
+            final var column = field.getAnnotation(jakarta.persistence.Column.class).name();
+            assertThat(PersistenceTests.columnLength(EMF, AllTypesEntity.TABLE_NAME, column)).as(column)
+                    .isGreaterThan(2048L);
+        }
+    }
 
     @DisplayName("a null of every type is a NULL column, and reads back null; a primitive reads its default")
     @Test

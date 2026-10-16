@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
@@ -27,6 +29,11 @@ import java.util.function.Function;
  * A converter returned here is one of the module's own ({@code Encrypted<Type>Converter}, or an
  * {@link EncryptedEnumConverter} for an enum type), so its bytes are those of the named converter of the same type;
  * it differs only in that its service is the one given, neither injected nor loaded.
+ * <p>
+ * The service a provider integration hands over comes from the persistence unit property {@value #PROPERTY_SERVICE},
+ * resolved by {@link #serviceOf(Object)}: an instance is used as is; a class, or a class name, is instantiated once
+ * per class in the JVM and shared by every attribute and every persistence unit which names it, as a service has to
+ * be thread-safe anyway, and an instance per attribute would multiply what a service holds, a KMS client for one.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -134,7 +141,8 @@ public final class EncryptedConverters {
      *
      * @param value the value of the property: an {@link EntityEncryptionService}, its {@link Class}, the name of its
      *              class, or {@code null}.
-     * @return the service; a new instance when the {@code value} is a class, or a class name.
+     * @return the service; for a class, or a class name, the one instance of that class this method keeps, created on
+     *         the first call for it through the public no-arg constructor.
      * @throws IllegalArgumentException when the {@code value} is none of the above, or the class cannot be
      *                                  instantiated.
      * @throws IllegalStateException    when the {@code value} is {@code null} and no service can be loaded.
@@ -150,11 +158,7 @@ public final class EncryptedConverters {
         if (value instanceof Class<?> c) {
             type = c;
         } else if (value instanceof String name && !name.isBlank()) {
-            try {
-                type = Class.forName(name.strip(), true, Thread.currentThread().getContextClassLoader());
-            } catch (final ClassNotFoundException cnfe) {
-                throw new IllegalArgumentException("no class named " + name + " for " + PROPERTY_SERVICE, cnfe);
-            }
+            type = classNamed(name.strip());
         } else {
             throw new IllegalArgumentException(
                     PROPERTY_SERVICE + " has to be an EntityEncryptionService, its class, or the name of its class;"
@@ -163,12 +167,34 @@ public final class EncryptedConverters {
         if (!EntityEncryptionService.class.isAssignableFrom(type)) {
             throw new IllegalArgumentException(type.getName() + " is not an EntityEncryptionService");
         }
-        try {
-            return (EntityEncryptionService) type.getConstructor().newInstance();
-        } catch (final ReflectiveOperationException roe) {
-            throw new IllegalArgumentException("failed to instantiate " + type.getName(), roe);
-        }
+        return INSTANCES.computeIfAbsent(type, t -> {
+            try {
+                return (EntityEncryptionService) t.getConstructor().newInstance();
+            } catch (final ReflectiveOperationException roe) {
+                throw new IllegalArgumentException("failed to instantiate " + t.getName(), roe);
+            }
+        });
     }
+
+    // the context class loader first, the application's; this module's own otherwise, for a flat class path
+    private static Class<?> classNamed(final String name) {
+        final var context = Thread.currentThread().getContextClassLoader();
+        final var loaders = context == null
+                ? new ClassLoader[] {EncryptedConverters.class.getClassLoader()}
+                : new ClassLoader[] {context, EncryptedConverters.class.getClassLoader()};
+        ClassNotFoundException last = null;
+        for (final var loader : loaders) {
+            try {
+                return Class.forName(name, true, loader);
+            } catch (final ClassNotFoundException cnfe) {
+                last = cnfe;
+            }
+        }
+        throw new IllegalArgumentException("no class named " + name + " for " + PROPERTY_SERVICE, last);
+    }
+
+    // one instance per service class named by the property, however many attributes and units name it
+    private static final ConcurrentMap<Class<?>, EntityEncryptionService> INSTANCES = new ConcurrentHashMap<>();
 
     private static Class<?> wrap(final Class<?> type) {
         return type.isPrimitive() ? MethodType.methodType(type).wrap().returnType() : type;

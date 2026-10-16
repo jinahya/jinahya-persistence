@@ -66,10 +66,10 @@ class Service_Test {
                 .isEqualTo(loaded);
     }
 
-    @DisplayName("a class name in the properties is instantiated")
+    @DisplayName("a class name in the properties is instantiated once, and shared by every attribute and factory")
     @Test
     void className() {
-        final var instances = NamedService.INSTANCES.get();
+        assertThat(NamedService.INSTANCES.get()).as("none yet").isZero();
         try (var emf = Persistence.createEntityManagerFactory(
                 "__encryptionEclipseLinkPU",
                 Map.of(EncryptedConverters.PROPERTY_SERVICE, NamedService.class.getName()))) {
@@ -81,7 +81,20 @@ class Service_Test {
             }).id;
             assertThat(PersistenceTests.apply(emf, em -> em.find(SecretEntity.class, id)).name).isEqualTo("named");
         }
-        assertThat(NamedService.INSTANCES.get()).isGreaterThan(instances);
+        assertThat(NamedService.INSTANCES.get()).as("one instance for the whole factory").isEqualTo(1);
+        // a second factory naming the same class shares the instance
+        try (var emf = Persistence.createEntityManagerFactory(
+                "__encryptionEclipseLinkPU",
+                Map.of(EncryptedConverters.PROPERTY_SERVICE, NamedService.class.getName()))) {
+            final var id = PersistenceTests.apply(emf, em -> {
+                final var e = new SecretEntity();
+                e.name = "named2";
+                em.persist(e);
+                return e;
+            }).id;
+            assertThat(PersistenceTests.apply(emf, em -> em.find(SecretEntity.class, id)).name).isEqualTo("named2");
+        }
+        assertThat(NamedService.INSTANCES.get()).as("still one").isEqualTo(1);
     }
 
     @DisplayName("a property which names no service fails on the first use of the unit, before any write")

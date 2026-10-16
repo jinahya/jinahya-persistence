@@ -10,6 +10,9 @@
     <class>com.github.jinahya.persistence.encryption.hibernate.examples.AllTypesEntity</class>
     <class>com.github.jinahya.persistence.encryption.hibernate.examples.DynamicEntity</class>
     <class>com.github.jinahya.persistence.encryption.hibernate.examples.MixedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.Secret</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.PropertyEntity</class>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.DefaultLengthEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>
@@ -42,6 +45,51 @@
       <property name="hibernate.generate_statistics" value="true"/>
       <property name="hibernate.cache.use_second_level_cache" value="true"/>
       <property name="hibernate.cache.region.factory_class" value="org.hibernate.testing.cache.CachingRegionFactory"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionHibernateBadIdPU">
+    <description>A mapping @Encrypted refuses, on its own so that the refusal fails nothing else (Refusal_Test)</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.BadIdEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-hibernate-bad-id;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionHibernateBadVersionPU">
+    <description>A mapping @Encrypted refuses, on its own so that the refusal fails nothing else (Refusal_Test)</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.BadVersionEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-hibernate-bad-version;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionHibernateBadNaturalIdPU">
+    <description>A mapping @Encrypted refuses, on its own so that the refusal fails nothing else (Refusal_Test)</description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.hibernate.examples.BadNaturalIdEntity</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-hibernate-bad-natural-id;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
     </properties>
   </persistence-unit>
 </persistence>

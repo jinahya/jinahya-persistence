@@ -38,7 +38,24 @@ listener-based design since replaced; none of it came back.
 
 | the service by instance
 | `jinahya.persistence.encryption.service` read from the `ConfigurationService` settings: an instance, a class, or a
-  class name; `META-INF/services/` otherwise; a bad property fails the session factory
+  class name; `META-INF/services/` otherwise; a bad property fails the session factory. A class, or a class name, is
+  resolved by the generic module's hook to one instance per class in the JVM, shared by every attribute and factory
+| yes: one instance across two factories
+
+| a query literal through the converter
+| the type returns the generic module's converter as its `UserType.getValueConverter()`, so Hibernate ORM binds,
+  extracts and renders literals through it; without it a bulk `UPDATE ... SET e.name = 'literal'` was measured to
+  write the literal's own bytes into the column, a plaintext leak through the application's own query
+| yes: the literal is rendered as the ciphertext's binary literal
+
+| the declared column length, on every type
+| the length of a converted column comes from its relational java type, and Hibernate ORM nulls the length of a
+  temporal attribute on the standard mapping; the type's mapped java type is not temporal, so the length survives
+| yes: 2048 on all 29 columns, where the standard mapping gives 255 on the ten temporal ones
+
+| a refused mapping
+| the constructor refuses `@Id`, `@EmbeddedId`, `@Version` and `@NaturalId`, from the member's own annotations, and
+  fails the session factory; Hibernate ORM itself accepts `@Type` there
 | yes
 
 | ciphertext in the second-level cache
@@ -73,9 +90,19 @@ attribute. The composed `@Type` needs no binder at all.
 
 | the service by instance
 | the session property, an instance, a class, or a class name; `META-INF/services/` otherwise; a bad property fails on
-  the first use of the unit
+  the first use of the unit. A class, or a class name, is one instance per class in the JVM, as on Hibernate ORM
+| yes: one instance across two factories
+
+| a refused mapping
+| `initialize` refuses a mapping whose field is one of the descriptor's primary key fields, or the write-lock field of
+  a `VersionLockingPolicy`, and fails the first use of the unit; EclipseLink itself accepts a converter there
 | yes
 |===
+
+The column EclipseLink generates is its platform's type for `byte[]`, `LONGVARBINARY` on H2, and a length declared
+on the column is not applied to it: nothing is truncated, and a value longer than the declared length is stored whole
+(measured). A converter cannot see a query literal on EclipseLink, and does not need to: a bulk `UPDATE` with a
+literal was measured to store the ciphertext.
 
 Decided against, after measuring: marking the mapping mutable for arrays. EclipseLink compares a mutable attribute
 with its backup clone by `equals` first, identity for an array, and then by converting both sides through the
@@ -96,6 +123,10 @@ shared cache and every persistence context, which the README states (found by Co
   in the ciphertext frame.
 * **A `SessionCustomizer`** replacing standard converters with native ones: the named converter needs none.
 * **A `BeanContainer` lookup** in the Hibernate module: an application which has a bean passes the instance.
+* **A wider default column length in the Hibernate module.** `UserType.getDefaultSqlLength` was tried, and worked,
+  until the value converter came: Hibernate ORM then sizes the column from the relational java type, `byte[]`, whose
+  default is 255, and the type can say nothing. The converter closes a plaintext leak; a default length is a
+  convenience. Declare a length.
 
 == Open
 

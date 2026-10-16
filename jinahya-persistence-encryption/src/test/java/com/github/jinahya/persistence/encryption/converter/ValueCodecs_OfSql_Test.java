@@ -85,12 +85,12 @@ class ValueCodecs_OfSql_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeDate(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeDate(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final java.sql.Date v) {
             final var b = Arrays.copyOf(OfSql.encodeDate(v), OfSql.DATE_BYTES + 1);
-            assertThat(OfSql.decodeDate(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfSql.decodeDate(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -159,12 +159,12 @@ class ValueCodecs_OfSql_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeTime(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeTime(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final java.sql.Time v) {
             final var b = Arrays.copyOf(OfSql.encodeTime(v), OfSql.TIME_BYTES + 1);
-            assertThat(OfSql.decodeTime(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfSql.decodeTime(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -234,12 +234,12 @@ class ValueCodecs_OfSql_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeTimestamp(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeTimestamp(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final java.sql.Timestamp v) {
             final var b = Arrays.copyOf(OfSql.encodeTimestamp(v), OfSql.TIMESTAMP_BYTES + 1);
-            assertThat(OfSql.decodeTimestamp(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfSql.decodeTimestamp(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeTimestamp(byte[]) fails on a nano-of-second of a whole second")

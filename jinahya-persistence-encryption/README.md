@@ -27,8 +27,8 @@ type into bytes is fixed and pinned by tests, but it is not an API: nothing outs
 class User {
 
     @Convert(converter = EncryptedStringConverter.class)
-    @Column(name = "name_enc")      // a binary column; holds the ciphertext only
-    private String name;            // holds the plaintext only
+    @Column(name = "name_enc", length = 2048)   // a binary column; holds the ciphertext only, as long as the
+    private String name;                        // service makes it: declare a length (see the constraints)
 }
 
 class KmsEncryptionService implements EntityEncryptionService {
@@ -63,7 +63,10 @@ The persistence provider does everything else, as for any converted attribute:
   where the provider binds the column, so it also covers a `StatelessSession`, a bulk JPQL `UPDATE` with a parameter,
   and a read-only query.
 
-Measured on both providers by `EncryptionLifecycle_Test`, `AllTypes_Test` and `Injection_Test`.
+A projection of the attribute, and a `refresh`, read the plaintext; a bulk JPQL `UPDATE` with a parameter or a
+literal stores ciphertext; an attribute of an embeddable, or one mapped on its getter, is converted like any other;
+and persistence contexts on several threads share the one converter. Measured on both providers by
+`EncryptionLifecycle_Test`, `AllTypes_Test` and `Injection_Test`.
 
 ## The service
 
@@ -82,7 +85,13 @@ public interface EntityEncryptionService {
 * **It has to be thread-safe.** One instance serves every conversion of every persistence context. A `Cipher` is not
   thread-safe: one per call, or a pool, never a field.
 * **Every array crossing the boundary is a copy.** The service may keep what it is given; what it returns is copied
-  before it is stored or decoded.
+  before it is stored or decoded. An empty value is encrypted like any other: the service is given an empty array.
+* **What it throws passes through.** A service which fails on encrypt fails the flush, and nothing is written; one
+  which fails on decrypt, on tampered bytes for instance, fails the read instead of yielding a value. A service which
+  returns `null`, and a value which cannot be encoded or decoded, are a `PersistenceException` whose message never
+  holds the value.
+* **It is not told where the bytes belong**, so it cannot bind them there. See the constraints: a ciphertext moved to
+  another row or column decrypts as well as where it was written.
 
 ### How the converters find it
 
@@ -94,7 +103,10 @@ Provide the service once, in one of two ways:
 | **through `ServiceLoader`**, from `META-INF/services/` | otherwise; the implementation needs a public no-arg constructor, and exactly one has to be named |
 
 A converter looks for an injected service first, and loads one on its first conversion otherwise. With neither, the
-first conversion fails with an `IllegalStateException`.
+first conversion fails with an `IllegalStateException`; so does more than one implementation named
+(`EntityEncryptionServices_Test`). The loaded service is **one per JVM**: every converter without an injected service
+shares it, found through the context class loader of the first conversion. Two persistence units in one JVM which
+need two services inject them, or use a provider module, whose persistence unit property names the service per unit.
 
 ### Listing the converters
 
@@ -140,7 +152,23 @@ application's.
 
 * **Querying an encrypted attribute matches nothing.** The database holds ciphertext, and a randomized cipher never
   produces the same bytes twice, so a predicate or an ordering on the attribute compares against what is stored and
-  finds nothing, silently. Ordering, ranges and date arithmetic are gone with it.
+  finds nothing, silently. Ordering, ranges and date arithmetic are gone with it. The one predicate which works is a
+  null check: `IS NULL` and `IS NOT NULL` see the column, which is `NULL` exactly when the attribute is.
+* **The bytes are not bound to their row.** The service sees bytes only, with no associated data naming the entity,
+  attribute or row, so a ciphertext copied into another row, or another column of the same type, decrypts there as
+  well as where it was written; an authenticated mode detects a changed ciphertext, not a moved one. Where that
+  matters, the service frames each value with what it must stay bound to, from the application's own context.
+* **The length of the ciphertext follows the length of the plaintext**, by whatever the cipher adds; a `String`'s
+  byte length is readable from its column. Padding, where the length is a secret, is the service's.
+* **The column needs a length, and gets what the provider makes of it.** A ciphertext is as long as the service's
+  frame makes it, a KMS envelope for one, so declare `@Column(length = ...)` on every encrypted attribute. Without
+  one, Hibernate ORM gives the column its default length of `255` bytes, and a longer ciphertext fails the write. On
+  Hibernate ORM the declared length reaches a converted column of every type **but a temporal one**: an attribute
+  of a `java.time`, `java.util.Date` or `java.sql` type keeps the default `255` whatever its `length` says, so widen
+  such a column with `columnDefinition`, or map it through the Hibernate module, whose type applies the length to
+  every type. EclipseLink types the column by the converter's `byte[]`, `LONGVARBINARY` on H2, and applies no length
+  at all. A value which does not fit fails the write, on neither provider is anything truncated
+  (`AllTypes_Test.columnLengths`, `tooLong`).
 * **No type information is stored.** A value is decoded by the converter the attribute names *now*. Changing an
   attribute's declared type, or its converter, is a breaking change for the rows already written: decrypt them with
   the old converter and re-encrypt with the new.
@@ -164,8 +192,11 @@ application's.
 The service receives, and returns, an array of bytes. A value is turned into those bytes by the converter's java
 type, big-endian, and self-contained: a value is reconstructed from its bytes without consulting the database. The
 sizes below are of the encoding, before the service is called. Every encoding is pinned byte for byte by the
-`ValueCodecs_Of*_Test` classes, and never changes once released. The codecs themselves are package-private: the
-converters are the API.
+`ValueCodecs_Of*_Test` classes, and never changes once released. A fixed-width codec decodes an array of exactly its
+width and rejects any other: a value stored under one type is never read as a prefix of another, silently. The codecs
+themselves are package-private: the converters are the API. A type the module has no converter for is brought by
+extending `EncryptedAttributeConverter` with an encoder and a decoder of one's own, whose bytes are then one's own to
+keep stable.
 
 | converter | attribute | bytes | encoding |
 |---|---|---|---|
@@ -188,7 +219,7 @@ converters are the API.
 | `EncryptedOffsetDateTimeConverter` | `OffsetDateTime` | `20` | `toLocalDateTime()`(`16`) + offset seconds(`4`) |
 | `EncryptedInstantConverter` | `Instant` | `12` | `getEpochSecond()`(`8`) + `getNano()`(`4`) |
 | `EncryptedYearConverter` | `Year` | `4` | `getValue()`(`Integer`) |
-| `EncryptedUtilDateConverter` | `java.util.Date` | `8` | `getTime()`(`Long`); exactly `java.util.Date`, not a subclass |
+| `EncryptedUtilDateConverter` | `java.util.Date` | `8` | `getTime()`(`Long`); for an attribute declared exactly `java.util.Date`, not a subclass |
 | `EncryptedSqlDateConverter` | `java.sql.Date` | `8` | `getTime()`(`Long`) |
 | `EncryptedSqlTimeConverter` | `java.sql.Time` | `8` | `getTime()`(`Long`) |
 | `EncryptedSqlTimestampConverter` | `java.sql.Timestamp` | `12` | `toInstant()`(`Instant`); the nanos are kept |

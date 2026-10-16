@@ -42,10 +42,25 @@ The same shapes exist in each module, so a scenario reads the same in all three 
 |===
 | Fixture | `generic` | `hibernate` | `eclipselink`
 
-| secret entity: `name` (encrypted, `@Size`), `note` (plain), `version`
-| `examples.SecretEntity`, `@Convert(EncryptedStringConverter)`
-| `examples.SecretEntity`, `@Encrypted`
-| `examples.SecretEntity`, `@Convert("encrypted")`; also `bytes` and `@Mutable Date when`
+| secret entity: `name` (encrypted, `@Size`), `note` (plain), `version`, and an embedded `secret.code` (encrypted)
+| `examples.SecretEntity`, `@Convert(EncryptedStringConverter)`; `examples.Secret`
+| `examples.SecretEntity`, `@Encrypted`; `examples.Secret`
+| `examples.SecretEntity`, `@Convert("encrypted")`; also `bytes` and `@Mutable Date when`; `examples.Secret`
+
+| property-access entity: the mapping on the getter
+| `examples.PropertyEntity`
+| same
+| same
+
+| refused mappings: an encrypted `@Id`, `@Version`, `@NaturalId`, each in a unit of its own
+| n/a: the provider refuses a standard converter there, as the specification says
+| `examples.BadIdEntity`, `BadVersionEntity`, `BadNaturalIdEntity`
+| `examples.BadIdEntity`, `BadVersionEntity`; EclipseLink has no natural id
+
+| default-length entity: the native and the standard mapping on columns declaring no length
+| n/a: measured on the hibernate module, which has both mappings
+| `examples.DefaultLengthEntity`
+| n/a: EclipseLink applies no length to the column
 
 | all-types entity: the 27 supported types, an enum
 | `examples.AllTypesEntity`, the 27 plus `int anInt`
@@ -73,12 +88,14 @@ The same shapes exist in each module, so a scenario reads the same in all three 
 | —
 
 | persistence unit
-| `__encryptionPU` (converters listed), `__encryptionHibernatePU`, `__encryptionHibernateCachedPU`
-| `__encryptionHibernatePU`, `__encryptionHibernateCachedPU`
-| `__encryptionEclipseLinkPU` (`MixedEntity` and `EncryptedStringConverter` listed)
+| `__encryptionPU` (converters listed), `__encryptionHibernatePU`, `__encryptionHibernateCachedPU`; the in-memory
+  databases are named and kept open, as an unnamed one is private to each connection of the pool
+| `__encryptionHibernatePU`, `__encryptionHibernateCachedPU`, `__encryptionHibernateBad{Id,Version,NaturalId}PU`
+| `__encryptionEclipseLinkPU` (`MixedEntity` and `EncryptedStringConverter` listed), `__encryptionEclipseLinkBad{Id,Version}PU`
 
 | service
-| `EntityEncryptionServiceImpl` through `META-INF/services`, counters `ENCRYPTED` and `DECRYPTED`
+| `EntityEncryptionServiceImpl` through `META-INF/services`, counters `ENCRYPTED` and `DECRYPTED`, and a
+  `FAIL_ENCRYPT` switch; `AnotherEntityEncryptionServiceImpl`, never named, for the two-named case
 | same, plus `Service_Test.CountingService` and `NamedService` through the unit property
 | same as `hibernate`
 
@@ -220,14 +237,15 @@ service called for nothing else. Every column must have a cell, or an `n/a` with
 | `Service_Test.instance` (unit property)
 
 | C21
-| a service given by class name is instantiated
-| n/a: no property in the standard mapping
-| `Service_Test.className`
-| `Service_Test.className`
+| a service given by class name is instantiated once, and shared by every attribute and every factory naming it
+| `converter.EncryptedConverters_Test.serviceOf` (the hook: the same instance for the class, its name, and again)
+| `Service_Test.className` (one instance across two factories)
+| `Service_Test.className` (one instance across two factories)
 
 | C22
-| a service which cannot be resolved fails, naming it
-| `converter.EncryptedConverters_Test.serviceOf` (hook level only)
+| a service which cannot be resolved fails, naming it; none named, or two named, fails the `ServiceLoader` path
+| `converter.EncryptedConverters_Test.serviceOf` (a bad name), `converter.EntityEncryptionServices_Test` (none, one,
+  two, through a class loader of the test's own)
 | `Service_Test.invalid` (fails the factory)
 | `Service_Test.invalid` (fails the first use, lazy init)
 
@@ -249,6 +267,92 @@ service called for nothing else. Every column must have a cell, or an `n/a` with
 | `EncryptionLifecycle_Test.Legacy.__`
 | n/a: a recipe on the entity, independent of the mapping
 | n/a: same
+
+| C26
+| an empty plaintext is a ciphertext, not an empty column, and reads back empty
+| `EncryptionLifecycle_Test.Persist.__empty`
+| `EncryptedUserType_Test.Persist.__empty`
+| `EncryptedConverter_Test.Persist.__empty`
+
+| C27
+| a service which fails on encrypt fails the transaction, and no row is written
+| `EncryptionLifecycle_Test.Persist.__serviceFails`
+| `EncryptedUserType_Test.Persist.__serviceFails`
+| `EncryptedConverter_Test.Persist.__serviceFails`
+
+| C28
+| a service which returns null fails the conversion as a `PersistenceException`, naming no value
+| `converter.EncryptedConverters_Test.serviceReturnsNull` (hook level: the converters are the same objects)
+| same converters
+| same converters
+
+| C29
+| tampered bytes fail the read, naming no plaintext, instead of yielding a value
+| `EncryptionLifecycle_Test.Read.__tampered`
+| `EncryptedUserType_Test.Read.__tampered`
+| `EncryptedConverter_Test.Read.__tampered`
+
+| C30
+| a projection of the attribute reads the plaintext
+| `EncryptionLifecycle_Test.Read.__projection`
+| `EncryptedUserType_Test.Read.__projection`
+| `EncryptedConverter_Test.Read.__projection`
+
+| C31
+| a null check is the one predicate which works: `IS NULL` and `IS NOT NULL` see the column
+| `EncryptionLifecycle_Test.Read.__nullPredicate`
+| `EncryptedUserType_Test.Read.__nullPredicate`
+| `EncryptedConverter_Test.Read.__nullPredicate`
+
+| C32
+| a bulk JPQL `UPDATE` with a literal stores the literal's ciphertext, not its bytes
+| `EncryptionLifecycle_Test.Update.__bulkLiteral`
+| `EncryptedUserType_Test.Update.__bulkLiteral` (through the type's value converter; measured to leak without it)
+| `EncryptedConverter_Test.Update.__bulkLiteral`
+
+| C33
+| an attribute of an embeddable is encrypted like one of the entity
+| `EncryptionLifecycle_Test.Persist.__embedded`
+| `EncryptedUserType_Test.Persist.__embedded`
+| `EncryptedConverter_Test.Persist.__embedded`
+
+| C34
+| an attribute mapped on its getter, property access, is encrypted like a field
+| `EncryptionLifecycle_Test.Persist.__property`
+| `EncryptedUserType_Test.Persist.__property`
+| `EncryptedConverter_Test.Persist.__property`
+
+| C35
+| persistence contexts on several threads share the one converter, and each reads its own value
+| `EncryptionLifecycle_Test.Read.__concurrent`
+| `EncryptedUserType_Test.Read.__concurrent`
+| `EncryptedConverter_Test.Read.__concurrent`
+
+| C36
+| the column lengths: what each provider makes of the declared length, per type
+| `AllTypes_Test.columnLengths`: Hibernate ORM 2048 but 255 on the ten temporal types; EclipseLink the platform's,
+  above 2048, on every type
+| `AllTypes_Test.columnLengths`: 2048 on every type
+| `AllTypes_Test.columnLengths`: the platform's, above 2048, on every type
+
+| C37
+| a value longer than the column: the write fails and nothing is truncated where the column has a length; stored
+  whole where the platform type has none
+| `AllTypes_Test.tooLong` (fails on Hibernate ORM, stored on EclipseLink)
+| `AllTypes_Test.tooLong` (fails)
+| `AllTypes_Test.tooLong` (stored whole)
+
+| C38
+| an encrypted identifier, version or natural id is refused, before any row is written
+| n/a: the provider refuses a standard converter there
+| `Refusal_Test.id`, `version`, `naturalId` (fail the factory)
+| `Refusal_Test.id`, `version` (fail the first use of the unit)
+
+| C39
+| a column with no declared length gets the provider's default: declare one
+| (255 on Hibernate ORM, as `C36` shows for the temporal columns; EclipseLink has no length)
+| `EncryptedUserType_Test.defaultLength` (255 through either mapping)
+| n/a: no length at all
 |===
 
 == Provider scenarios
@@ -276,6 +380,12 @@ column applies only under that provider's profile.
 | a second-level cache hit issues no statement; what it holds is the mapping's
 | `HibernateCache_Test.cacheHitDecryptsNothing`: decrypts *nothing*, the cache holds the plaintext
 | `Cache_Test.cacheHitDecrypts`: decrypts, the cache holds the ciphertext
+| n/a
+
+| P-H05
+| a second-level cache put costs an encryption: a load from the row encrypts once more
+| n/a: the standard converter caches the plaintext, nothing is encrypted for the cache
+| `Cache_Test.cachePutEncrypts`
 | n/a
 
 | P-H04
@@ -321,8 +431,8 @@ repeat the tests.
 | Id | Scenario | `generic`
 
 | U01
-| every codec round-trips its type, rejects what it must, and its encoding is frozen (bytes compared, not only
-  round-tripped)
+| every codec round-trips its type, rejects what it must, a longer array included for a fixed-width codec, and its
+  encoding is frozen (bytes compared, not only round-tripped)
 | `converter.ValueCodecs_OfLang_Test`, `_OfMath_Test`, `_OfPrimitive_Test`, `_OfSql_Test`, `_OfTime_Test`,
   `_OfUtil_Test`
 
@@ -378,6 +488,19 @@ native NULL checks, and the measured `@Mutable` array):
   entity, which broke the shared fixture's read and unrelated-change tests when it was tried there.
 * P-H02 and P-H03 on `generic`: the standard converter works through a stateless session, and leaves the plaintext
   in the second-level cache. That last one is the measured counterpart of the Hibernate module's cache test.
+
+Closed on 2026-10-16, second pass, after a review of the three modules against this matrix (C26 to C39, P-H05):
+
+* C26, C27, C29, C30, C31, C33, C34, C35 on all three: measured as the contract says.
+* C32: the standard converter already converted a literal on both providers; `@Encrypted` did *not*, and wrote the
+  literal's own bytes into the column, until the type exposed its converter as Hibernate ORM's value converter.
+* C36, C37, C39: Hibernate ORM's default of 255, the lost length of a temporal attribute on the standard mapping,
+  and EclipseLink's platform type with no length, all documented in the READMEs as constraints.
+* C38: both adapters refuse what a randomized ciphertext cannot be; the generic path is refused by the provider.
+* C21, C22: a class-named service is one instance; none or two named fails, measured through a class loader of the
+  test's own.
+* The generic module's in-memory databases are named and kept open: C35 showed that an unnamed one is private to
+  each connection.
 
 == Rules
 

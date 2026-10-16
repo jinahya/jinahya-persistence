@@ -2,6 +2,8 @@ package com.github.jinahya.persistence.encryption.eclipselink;
 
 import com.github.jinahya.persistence.encryption.converter.EncryptedConverters;
 import jakarta.persistence.AttributeConverter;
+import org.eclipse.persistence.descriptors.VersionLockingPolicy;
+import org.eclipse.persistence.internal.helper.DatabaseField;
 import org.eclipse.persistence.mappings.DatabaseMapping;
 import org.eclipse.persistence.mappings.converters.Converter;
 import org.eclipse.persistence.mappings.foundation.AbstractDirectMapping;
@@ -28,6 +30,10 @@ import org.eclipse.persistence.sessions.Session;
  * The rows, and the bytes, are those of the generic module's converters: a value stored through one reads through the
  * other. EclipseLink's shared cache holds the attribute's value, the plaintext, as for any attribute; leave encrypted
  * entities uncached where that matters.
+ * <p>
+ * The column is the platform's type for {@code byte[]}, {@code LONGVARBINARY} on H2 for one, and a length declared on
+ * the column is not applied to it. An identifier or a version attribute is refused when the mapping is initialized: a
+ * randomized ciphertext can be neither, as the column never compares equal to what is bound.
  * <p>
  * <strong>Mutable values.</strong> This converter reports itself immutable, so an attribute of an array or a
  * {@code java.util.Date} type is, unless the mapping says otherwise with EclipseLink's
@@ -57,8 +63,8 @@ public class EncryptedConverter implements Converter {
     /**
      * {@inheritDoc}
      *
-     * @throws IllegalStateException    when the mapping is not a direct mapping of a supported type, or no service
-     *                                  can be loaded.
+     * @throws IllegalStateException    when the mapping is not a direct mapping of a supported type, or is a primary
+     *                                  key or the version, or no service can be loaded.
      * @throws IllegalArgumentException when the service property names no service.
      */
     @Override
@@ -68,6 +74,19 @@ public class EncryptedConverter implements Converter {
             throw new IllegalStateException(
                     "the encrypted converter applies to a direct mapping only; found " + mapping.getClass().getName()
                     + " for " + mapping.getDescriptor().getJavaClassName() + '.' + mapping.getAttributeName());
+        }
+        final var descriptor = mapping.getDescriptor();
+        final var field = direct.getField();
+        if (descriptor.getPrimaryKeyFields().stream().anyMatch(pk -> sameField(pk, field))) {
+            throw new IllegalStateException(
+                    "the encrypted converter on a primary key, which a randomized ciphertext cannot be: "
+                    + descriptor.getJavaClassName() + '.' + mapping.getAttributeName());
+        }
+        if (descriptor.getOptimisticLockingPolicy() instanceof VersionLockingPolicy locking
+            && sameField(locking.getWriteLockField(), field)) {
+            throw new IllegalStateException(
+                    "the encrypted converter on the version, which a randomized ciphertext cannot be: "
+                    + descriptor.getJavaClassName() + '.' + mapping.getAttributeName());
         }
         var type = direct.getAttributeClassification();
         if (type == null) {
@@ -115,6 +134,15 @@ public class EncryptedConverter implements Converter {
         return false;
     }
 
+    // the fields may not be qualified with their table yet, when the mapping is initialized
+    private static boolean sameField(final @org.jspecify.annotations.Nullable DatabaseField a,
+                                     final @org.jspecify.annotations.Nullable DatabaseField b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b) || a.getName().equalsIgnoreCase(b.getName());
+    }
+
     private AttributeConverter<Object, byte[]> delegate() {
         final var result = delegate;
         if (result == null) {
@@ -124,6 +152,6 @@ public class EncryptedConverter implements Converter {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    // set when the mapping is initialized
-    private transient @org.jspecify.annotations.Nullable AttributeConverter<Object, byte[]> delegate;
+    // set when the mapping is initialized, by one thread; read by every conversion, on any thread
+    private transient volatile @org.jspecify.annotations.Nullable AttributeConverter<Object, byte[]> delegate;
 }

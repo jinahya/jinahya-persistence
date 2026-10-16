@@ -32,6 +32,13 @@ final class PersistenceTests {
                 .getSingleResult()).toUpperCase();
     }
 
+    static long columnLength(final EntityManagerFactory factory, final String table, final String column) {
+        return ((Number) apply(factory, em -> em.createNativeQuery(
+                "SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + table
+                + "' AND COLUMN_NAME = '" + column + "'")
+                .getSingleResult())).longValue();
+    }
+
     private PersistenceTests() {
         throw new AssertionError("instantiation is not allowed");
     }

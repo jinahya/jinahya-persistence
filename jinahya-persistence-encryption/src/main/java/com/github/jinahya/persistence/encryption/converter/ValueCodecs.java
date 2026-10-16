@@ -43,9 +43,9 @@ import static java.time.temporal.ChronoField.NANO_OF_SECOND;
  * The bytes stand for a single value, so whatever holds them, a column or a payload, already knows where they end.
  * <p>
  * Every check is made whether or not assertions are enabled. A decoding method throws {@link IllegalArgumentException}
- * for an array which is shorter than the value, or, for an array of a primitive type, whose length is not a multiple of
- * the element's width. A decoding method of a single value reads only the value's own bytes: whether bytes beyond it
- * are allowed is the caller's to decide.
+ * for an array which is not exactly the value's width, or, for an array of a primitive type, whose length is not a
+ * multiple of the element's width. A longer array is never read as a prefix: with no type information stored, a value
+ * decoded by the wrong type has to fail, not come out as another value.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -87,6 +87,24 @@ final class ValueCodecs {
         if (Objects.requireNonNull(b, "b is null").length < least) {
             throw new IllegalArgumentException(
                     "an array of " + b.length + " byte(s); this codec reads " + least);
+        }
+        return b;
+    }
+
+    /**
+     * Returns the specified array after checking that it is exactly as long as the specified number of bytes.
+     *
+     * @param b     the array to check.
+     * @param width the number of bytes the {@code b} has to hold; the width of the codec.
+     * @return the {@code b}.
+     * @throws NullPointerException     when the {@code b} is {@code null}.
+     * @throws IllegalArgumentException when the {@code b} is not {@code width} bytes long.
+     */
+    private static byte[] checkExact(final byte[] b, final int width) {
+        if (Objects.requireNonNull(b, "b is null").length != width) {
+            // a longer array would otherwise be read as a prefix, a value of another type, silently
+            throw new IllegalArgumentException(
+                    "an array of " + b.length + " byte(s); this codec reads exactly " + width);
         }
         return b;
     }
@@ -176,16 +194,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code byte} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code byte} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is empty.
+         * @throws IllegalArgumentException when the {@code b} is not one byte long.
          */
         public static byte decodeByte(final byte[] b) {
-            return decodeByte(checkLength(b, Byte.BYTES), 0);
+            return decodeByte(checkExact(b, Byte.BYTES), 0);
         }
 
         /**
@@ -298,16 +315,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code short} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code short} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than two bytes.
+         * @throws IllegalArgumentException when the {@code b} is not two bytes long.
          */
         public static short decodeShort(final byte[] b) {
-            return decodeShort(checkLength(b, Short.BYTES), 0);
+            return decodeShort(checkExact(b, Short.BYTES), 0);
         }
 
         /**
@@ -425,16 +441,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes an {@code int} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes an {@code int} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than four bytes.
+         * @throws IllegalArgumentException when the {@code b} is not four bytes long.
          */
         public static int decodeInt(final byte[] b) {
-            return decodeInt(checkLength(b, Integer.BYTES), 0);
+            return decodeInt(checkExact(b, Integer.BYTES), 0);
         }
 
         /**
@@ -553,16 +568,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code long} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code long} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          */
         public static long decodeLong(final byte[] b) {
-            return decodeLong(checkLength(b, Long.BYTES), 0);
+            return decodeLong(checkExact(b, Long.BYTES), 0);
         }
 
         /**
@@ -680,16 +694,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code char} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code char} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than two bytes.
+         * @throws IllegalArgumentException when the {@code b} is not two bytes long.
          */
         public static char decodeChar(final byte[] b) {
-            return decodeChar(checkLength(b, Character.BYTES), 0);
+            return decodeChar(checkExact(b, Character.BYTES), 0);
         }
 
         /**
@@ -816,16 +829,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code float} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code float} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than four bytes.
+         * @throws IllegalArgumentException when the {@code b} is not four bytes long.
          */
         public static float decodeFloat(final byte[] b) {
-            return decodeFloat(checkLength(b, Float.BYTES), 0);
+            return decodeFloat(checkExact(b, Float.BYTES), 0);
         }
 
         /**
@@ -951,16 +963,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code double} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code double} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          */
         public static double decodeDouble(final byte[] b) {
-            return decodeDouble(checkLength(b, Double.BYTES), 0);
+            return decodeDouble(checkExact(b, Double.BYTES), 0);
         }
 
         /**
@@ -1092,15 +1103,15 @@ final class ValueCodecs {
 
         /**
          * Decodes a {@code boolean} value from the beginning of the specified array; {@code false} for {@code 0}, and
-         * {@code true} for any other byte. Any byte beyond the value is not read.
+         * {@code true} for any other byte. The array has to hold exactly the value's one byte.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is empty.
+         * @throws IllegalArgumentException when the {@code b} is not one byte long.
          */
         public static boolean decodeBoolean(final byte[] b) {
-            return decodeBoolean(checkLength(b, Byte.BYTES), 0);
+            return decodeBoolean(checkExact(b, Byte.BYTES), 0);
         }
 
         /**
@@ -1528,16 +1539,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code Date} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code Date} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          */
         public static java.sql.Date decodeDate(final byte[] b) {
-            return decodeDate(checkLength(b, DATE_BYTES), 0);
+            return decodeDate(checkExact(b, DATE_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------------- Time
@@ -1599,16 +1609,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code Time} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code Time} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          */
         public static java.sql.Time decodeTime(final byte[] b) {
-            return decodeTime(checkLength(b, TIME_BYTES), 0);
+            return decodeTime(checkExact(b, TIME_BYTES), 0);
         }
 
         // --------------------------------------------------------------------------------------------------- Timestamp
@@ -1673,19 +1682,18 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code Timestamp} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code Timestamp} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than twelve bytes; or when the instant is
+         * @throws IllegalArgumentException when the {@code b} is not twelve bytes long; or when the instant is
          *                                  beyond the range of a {@code Timestamp}.
          * @throws DateTimeException        when the instant is not valid, as {@link OfTime#decodeInstant(byte[])}
          *                                  rejects it.
          */
         public static java.sql.Timestamp decodeTimestamp(final byte[] b) {
-            return decodeTimestamp(checkLength(b, TIMESTAMP_BYTES), 0);
+            return decodeTimestamp(checkExact(b, TIMESTAMP_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------------------
@@ -1763,17 +1771,16 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code LocalDate} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code LocalDate} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          * @throws DateTimeException        when the epoch day is beyond the range of {@code LocalDate}.
          */
         public static LocalDate decodeLocalDate(final byte[] b) {
-            return decodeLocalDate(checkLength(b, LOCAL_DATE_BYTES), 0);
+            return decodeLocalDate(checkExact(b, LOCAL_DATE_BYTES), 0);
         }
 
         // --------------------------------------------------------------------------------------------------- LocalTime
@@ -1836,17 +1843,16 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code LocalTime} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code LocalTime} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          * @throws DateTimeException        when the nano-of-day is beyond a day.
          */
         public static LocalTime decodeLocalTime(final byte[] b) {
-            return decodeLocalTime(checkLength(b, LOCAL_TIME_BYTES), 0);
+            return decodeLocalTime(checkExact(b, LOCAL_TIME_BYTES), 0);
         }
 
         // ----------------------------------------------------------------------------------------------- LocalDateTime
@@ -1910,17 +1916,17 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code LocalDateTime} value from the beginning of the specified array; any byte beyond the value is
-         * not read.
+         * Decodes a {@code LocalDateTime} value from the specified array, which has to hold exactly the value's
+         * bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than sixteen bytes.
+         * @throws IllegalArgumentException when the {@code b} is not sixteen bytes long.
          * @throws DateTimeException        when the date, or the time, is beyond the range of its type.
          */
         public static LocalDateTime decodeLocalDateTime(final byte[] b) {
-            return decodeLocalDateTime(checkLength(b, LOCAL_DATE_TIME_BYTES), 0);
+            return decodeLocalDateTime(checkExact(b, LOCAL_DATE_TIME_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------- ZoneOffset
@@ -1983,17 +1989,17 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code ZoneOffset} value from the beginning of the specified array; any byte beyond the value is
-         * not read.
+         * Decodes a {@code ZoneOffset} value from the specified array, which has to hold exactly the value's
+         * bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than four bytes.
+         * @throws IllegalArgumentException when the {@code b} is not four bytes long.
          * @throws DateTimeException        when the offset is beyond {@code +/-18:00}.
          */
         public static ZoneOffset decodeZoneOffset(final byte[] b) {
-            return decodeZoneOffset(checkLength(b, ZONE_OFFSET_BYTES), 0);
+            return decodeZoneOffset(checkExact(b, ZONE_OFFSET_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------- OffsetTime
@@ -2057,17 +2063,17 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code OffsetTime} value from the beginning of the specified array; any byte beyond the value is
-         * not read.
+         * Decodes a {@code OffsetTime} value from the specified array, which has to hold exactly the value's
+         * bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than twelve bytes.
+         * @throws IllegalArgumentException when the {@code b} is not twelve bytes long.
          * @throws DateTimeException        when the time, or the offset, is beyond the range of its type.
          */
         public static OffsetTime decodeOffsetTime(final byte[] b) {
-            return decodeOffsetTime(checkLength(b, OFFSET_TIME_BYTES), 0);
+            return decodeOffsetTime(checkExact(b, OFFSET_TIME_BYTES), 0);
         }
 
         // ---------------------------------------------------------------------------------------------- OffsetDateTime
@@ -2132,17 +2138,16 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code OffsetDateTime} value from the beginning of the specified array; any byte beyond the value
-         * is not read.
+         * Decodes a {@code OffsetDateTime} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than twenty bytes.
+         * @throws IllegalArgumentException when the {@code b} is not twenty bytes long.
          * @throws DateTimeException        when the date-time, or the offset, is beyond the range of its type.
          */
         public static OffsetDateTime decodeOffsetDateTime(final byte[] b) {
-            return decodeOffsetDateTime(checkLength(b, OFFSET_DATE_TIME_BYTES), 0);
+            return decodeOffsetDateTime(checkExact(b, OFFSET_DATE_TIME_BYTES), 0);
         }
 
         // ----------------------------------------------------------------------------------------------------- Instant
@@ -2210,19 +2215,18 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code Instant} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code Instant} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than twelve bytes.
+         * @throws IllegalArgumentException when the {@code b} is not twelve bytes long.
          * @throws DateTimeException        when the nano-of-second is not between {@code 0} and {@code 999,999,999},
          *                                  which {@code Instant} would otherwise silently carry into the second; or the
          *                                  instant is beyond the range of {@code Instant}.
          */
         public static Instant decodeInstant(final byte[] b) {
-            return decodeInstant(checkLength(b, INSTANT_BYTES), 0);
+            return decodeInstant(checkExact(b, INSTANT_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------------- Year
@@ -2285,17 +2289,16 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code Year} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code Year} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than four bytes.
+         * @throws IllegalArgumentException when the {@code b} is not four bytes long.
          * @throws DateTimeException        when the value is beyond {@code +/-999,999,999}.
          */
         public static Year decodeYear(final byte[] b) {
-            return decodeYear(checkLength(b, YEAR_BYTES), 0);
+            return decodeYear(checkExact(b, YEAR_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------------------
@@ -2387,13 +2390,12 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code Date} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code Date} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than eight bytes.
+         * @throws IllegalArgumentException when the {@code b} is not eight bytes long.
          * @see <a
          *         href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#deprecations">
          *         Jakarta Persistence 3.2, A.1.1. Deprecations</a>
@@ -2402,7 +2404,7 @@ final class ValueCodecs {
          */
         @Deprecated
         public static java.util.Date decodeDate(final byte[] b) {
-            return decodeDate(checkLength(b, DATE_BYTES), 0);
+            return decodeDate(checkExact(b, DATE_BYTES), 0);
         }
         // -------------------------------------------------------------------------------------------------------- UUID
 
@@ -2462,16 +2464,15 @@ final class ValueCodecs {
         }
 
         /**
-         * Decodes a {@code UUID} value from the beginning of the specified array; any byte beyond the value is not
-         * read.
+         * Decodes a {@code UUID} value from the specified array, which has to hold exactly the value's bytes.
          *
          * @param b the array from which the value is decoded.
          * @return the decoded value.
          * @throws NullPointerException     when the {@code b} is {@code null}.
-         * @throws IllegalArgumentException when the {@code b} is shorter than sixteen bytes.
+         * @throws IllegalArgumentException when the {@code b} is not sixteen bytes long.
          */
         public static UUID decodeUuid(final byte[] b) {
-            return decodeUuid(checkLength(b, UUID_BYTES), 0);
+            return decodeUuid(checkExact(b, UUID_BYTES), 0);
         }
 
         // -------------------------------------------------------------------------------------------------------------

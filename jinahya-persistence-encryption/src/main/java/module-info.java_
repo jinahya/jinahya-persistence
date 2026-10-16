@@ -1,12 +1,14 @@
 module com.github.jinahya.persistence.encryption {
 
-    requires transitive com.github.jinahya.persistence;
-    requires transitive jakarta.annotation;
-    requires transitive jakarta.inject;
     requires transitive jakarta.persistence;
-    requires transitive jakarta.validation;
+
+    // jakarta.inject.Inject on EncryptedAttributeConverter, its only injection point
+    requires static jakarta.inject;
 
     requires static org.jspecify;
 
     exports com.github.jinahya.persistence.encryption;
+    exports com.github.jinahya.persistence.encryption.converter;
+
+    uses com.github.jinahya.persistence.encryption.EntityEncryptionService;
 }

@@ -91,12 +91,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeLocalDate(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeLocalDate(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final LocalDate v) {
             final var b = Arrays.copyOf(OfTime.encodeLocalDate(v), OfTime.LOCAL_DATE_BYTES + 1);
-            assertThat(OfTime.decodeLocalDate(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeLocalDate(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeLocalDate(byte[]) fails on an epoch day beyond LocalDate.MAX")
@@ -177,12 +177,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeLocalTime(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeLocalTime(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final LocalTime v) {
             final var b = Arrays.copyOf(OfTime.encodeLocalTime(v), OfTime.LOCAL_TIME_BYTES + 1);
-            assertThat(OfTime.decodeLocalTime(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeLocalTime(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeLocalTime(byte[]) fails on a nano-of-day of a whole day")
@@ -262,12 +262,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeLocalDateTime(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeLocalDateTime(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final LocalDateTime v) {
             final var b = Arrays.copyOf(OfTime.encodeLocalDateTime(v), OfTime.LOCAL_DATE_TIME_BYTES + 1);
-            assertThat(OfTime.decodeLocalDateTime(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeLocalDateTime(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeLocalDateTime(byte[]) fails on a time beyond a day")
@@ -348,12 +348,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeZoneOffset(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeZoneOffset(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final ZoneOffset v) {
             final var b = Arrays.copyOf(OfTime.encodeZoneOffset(v), OfTime.ZONE_OFFSET_BYTES + 1);
-            assertThat(OfTime.decodeZoneOffset(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeZoneOffset(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeZoneOffset(byte[]) fails on an offset beyond +18:00")
@@ -433,12 +433,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeOffsetTime(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeOffsetTime(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final OffsetTime v) {
             final var b = Arrays.copyOf(OfTime.encodeOffsetTime(v), OfTime.OFFSET_TIME_BYTES + 1);
-            assertThat(OfTime.decodeOffsetTime(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeOffsetTime(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeOffsetTime(byte[]) fails on an offset beyond -18:00")
@@ -521,12 +521,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeOffsetDateTime(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeOffsetDateTime(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final OffsetDateTime v) {
             final var b = Arrays.copyOf(OfTime.encodeOffsetDateTime(v), OfTime.OFFSET_DATE_TIME_BYTES + 1);
-            assertThat(OfTime.decodeOffsetDateTime(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeOffsetDateTime(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeOffsetDateTime(byte[]) fails on an offset beyond +18:00")
@@ -606,12 +606,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeInstant(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeInstant(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final Instant v) {
             final var b = Arrays.copyOf(OfTime.encodeInstant(v), OfTime.INSTANT_BYTES + 1);
-            assertThat(OfTime.decodeInstant(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeInstant(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeInstant(byte[]) fails on a nano-of-second of a whole second, rather than carrying it into"
@@ -713,12 +713,12 @@ class ValueCodecs_OfTime_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeYear(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeYear(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final Year v) {
             final var b = Arrays.copyOf(OfTime.encodeYear(v), OfTime.YEAR_BYTES + 1);
-            assertThat(OfTime.decodeYear(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfTime.decodeYear(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("decodeYear(byte[]) fails on a value beyond Year.MAX_VALUE")

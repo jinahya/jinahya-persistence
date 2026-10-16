@@ -84,12 +84,12 @@ class ValueCodecs_OfUtil_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeDate(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeDate(byte[]) fails on an array longer than the value")
         @MethodSource("values")
         @ParameterizedTest
         void __longer(final java.util.Date v) {
             final var b = Arrays.copyOf(OfUtil.encodeDate(v), OfUtil.DATE_BYTES + 1);
-            assertThat(OfUtil.decodeDate(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfUtil.decodeDate(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -153,12 +153,12 @@ class ValueCodecs_OfUtil_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeUuid(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeUuid(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
             final var v = UUID.randomUUID();
             final var b = Arrays.copyOf(OfUtil.encodeUuid(v), OfUtil.UUID_BYTES + 1);
-            assertThat(OfUtil.decodeUuid(b)).isEqualTo(v);
+            assertThatThrownBy(() -> OfUtil.decodeUuid(b)).isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")

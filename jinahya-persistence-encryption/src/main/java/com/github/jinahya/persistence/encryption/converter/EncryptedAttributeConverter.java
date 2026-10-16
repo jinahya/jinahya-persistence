@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.encryption.converter;
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import jakarta.inject.Inject;
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.PersistenceException;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -12,8 +13,8 @@ import java.util.function.Function;
  * attribute holds the plaintext, the column holds the ciphertext, and the two meet here only.
  * <pre>{@code
  * @Convert(converter = EncryptedStringConverter.class)
- * @Column(name = "name_enc")          // a binary column; holds the ciphertext only
- * private String name;                // holds the plaintext only
+ * @Column(name = "name_enc", length = 2048)   // a binary column; holds the ciphertext only, as long as the
+ * private String name;                        // service makes it: declare a length
  * }</pre>
  * Going to the column, the value is encoded to bytes by the codec of its type ({@link ValueCodecs}), and the bytes are
  * handed to the application's {@link EntityEncryptionService#encrypt(byte[]) encryption service}; what it returns is
@@ -32,6 +33,14 @@ import java.util.function.Function;
  * <p>
  * The service is injected, when the provider creates its converters through a bean container, and otherwise loaded
  * through {@link java.util.ServiceLoader} on the first conversion.
+ * <p>
+ * <strong>A type of one's own.</strong> The codecs are not an API, but this class is open: a subclass may bring its own
+ * encoder and decoder through the {@linkplain #EncryptedAttributeConverter(Class, Function, Function) protected
+ * constructor}, for a type the module has no converter for. Its bytes are then its own to keep stable, as the module's
+ * are; and, as for every converter, the subclass declares {@code implements AttributeConverter<X, byte[]>} again.
+ * <p>
+ * A failure to encode, to decrypt or to decode is a {@link PersistenceException}; the value never appears in its
+ * message.
  *
  * @implNote Each subclass declares {@code implements AttributeConverter<X, byte[]>} again, with its own type:
  *         EclipseLink reads a converter's type arguments from the class's own interface clause only, and derives the
@@ -45,11 +54,11 @@ import java.util.function.Function;
 public abstract class EncryptedAttributeConverter<X> implements AttributeConverter<X, byte[]> {
 
     /**
-     * Creates a new instance with the specified codec.
+     * Creates a new instance with the specified codec; the extension point for a type of one's own.
      *
      * @param javaType the java type of the attribute, for diagnostics.
-     * @param encoder  the function which encodes a value into bytes.
-     * @param decoder  the function which decodes a value from bytes.
+     * @param encoder  the function which encodes a value into bytes; it has to return a new array for each call.
+     * @param decoder  the function which decodes a value from bytes; the array it is given is a copy it may keep.
      */
     protected EncryptedAttributeConverter(final Class<X> javaType, final Function<? super X, byte[]> encoder,
                                           final Function<byte[], ? extends X> decoder) {
@@ -81,7 +90,8 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
      * {@inheritDoc}
      *
      * @return the ciphertext of the encoded {@code attribute}; {@code null} for a {@code null} attribute.
-     * @throws RuntimeException when the value cannot be encoded, or the service fails, or returns {@code null}.
+     * @throws PersistenceException when the value cannot be encoded, or the service returns {@code null}; what the
+     *                              service itself throws passes through.
      * @implNote The message of an exception never carries the value.
      */
     @Override
@@ -94,11 +104,11 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
         try {
             encoded = encoder.apply(attribute);
         } catch (final RuntimeException re) {
-            throw new RuntimeException("cannot encode a value of " + javaType.getName(), re);
+            throw new PersistenceException("cannot encode a value of " + javaType.getName(), re);
         }
         final var encrypted = service().encrypt(encoded);
         if (encrypted == null) {
-            throw new RuntimeException("encryption service returned null; java type: " + javaType.getName());
+            throw new PersistenceException("encryption service returned null; java type: " + javaType.getName());
         }
         // a copy: the service may keep, or reuse, the array it returned
         return encrypted.clone();
@@ -108,7 +118,8 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
      * {@inheritDoc}
      *
      * @return the value decoded from the decrypted {@code dbData}; {@code null} for a {@code NULL} column.
-     * @throws RuntimeException when the service fails, or returns {@code null}, or the bytes cannot be decoded.
+     * @throws PersistenceException when the service returns {@code null}, or the bytes cannot be decoded; what the
+     *                              service itself throws passes through.
      */
     @Override
     public final @org.jspecify.annotations.Nullable X convertToEntityAttribute(
@@ -119,12 +130,12 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
         // a copy: the service must not be handed the provider's own array
         final var decrypted = service().decrypt(dbData.clone());
         if (decrypted == null) {
-            throw new RuntimeException("encryption service returned null; java type: " + javaType.getName());
+            throw new PersistenceException("encryption service returned null; java type: " + javaType.getName());
         }
         try {
             return decoder.apply(decrypted.clone());
         } catch (final RuntimeException re) {
-            throw new RuntimeException(
+            throw new PersistenceException(
                     "cannot decode a value of " + javaType.getName() + " from " + decrypted.length + " byte(s)", re);
         }
     }

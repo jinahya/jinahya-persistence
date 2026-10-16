@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * One {@code @Encrypted} annotation on every supported type, an enum and a primitive: all round-trip, every column is
@@ -147,6 +148,35 @@ class AllTypes_Test {
         PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id).aUtilDate = new java.util.Date(5_000L));
         assertThat(PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id)).aUtilDate.getTime())
                 .isEqualTo(5_000L);
+    }
+
+
+    private static long rows() {
+        return ((Number) PersistenceTests.apply(EMF, em -> em.createNativeQuery(
+                "SELECT COUNT(*) FROM " + AllTypesEntity.TABLE_NAME).getSingleResult())).longValue();
+    }
+
+    @DisplayName("a value whose ciphertext exceeds the column fails the write; nothing is truncated")
+    @Test
+    void tooLong() {
+        final var rows = rows();
+        assertThatThrownBy(() -> PersistenceTests.apply(EMF, em -> {
+            final var e = new AllTypesEntity();
+            e.aString = "x".repeat(2048 + 1);     // the ciphertext is longer still
+            em.persist(e);
+            return e;
+        })).isNotNull();
+        assertThat(rows()).as("no row written").isEqualTo(rows);
+    }
+
+    @DisplayName("the column lengths: the declared 2048, for every type, a temporal one included")
+    @Test
+    void columnLengths() {
+        for (final var field : encryptedFields()) {
+            final var column = field.getAnnotation(jakarta.persistence.Column.class).name();
+            assertThat(PersistenceTests.columnLength(EMF, AllTypesEntity.TABLE_NAME, column)).as(column)
+                    .isEqualTo(2048L);
+        }
     }
 
     @DisplayName("a null of every type is a NULL column, and reads back null; a primitive reads its default")

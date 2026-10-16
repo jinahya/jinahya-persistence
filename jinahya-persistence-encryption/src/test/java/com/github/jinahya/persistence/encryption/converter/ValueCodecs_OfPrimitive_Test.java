@@ -65,10 +65,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeByte(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeByte(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(OfPrimitive.decodeByte(new byte[]{-2, 3})).isEqualTo((byte) -2);
+            assertThatThrownBy(() -> OfPrimitive.decodeByte(new byte[]{-2, 3}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail outside the array")
@@ -172,10 +173,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeShort(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeShort(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(OfPrimitive.decodeShort(new byte[]{1, 2, 3})).isEqualTo((short) 0x0102);
+            assertThatThrownBy(() -> OfPrimitive.decodeShort(new byte[]{1, 2, 3}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -287,10 +289,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeInt(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeInt(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(OfPrimitive.decodeInt(new byte[]{1, 2, 3, 4, 5})).isEqualTo(0x01020304);
+            assertThatThrownBy(() -> OfPrimitive.decodeInt(new byte[]{1, 2, 3, 4, 5}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -402,10 +405,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeLong(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeLong(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(OfPrimitive.decodeLong(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9})).isEqualTo(0x0102030405060708L);
+            assertThatThrownBy(() -> OfPrimitive.decodeLong(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -518,10 +522,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeChar(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeChar(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(OfPrimitive.decodeChar(new byte[]{1, 2, 3})).isEqualTo('\u0102');
+            assertThatThrownBy(() -> OfPrimitive.decodeChar(new byte[]{1, 2, 3}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -645,11 +650,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeFloat(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeFloat(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(Float.floatToRawIntBits(OfPrimitive.decodeFloat(new byte[]{1, 2, 3, 4, 5})))
-                    .isEqualTo(0x01020304);
+            assertThatThrownBy(() -> OfPrimitive.decodeFloat(new byte[]{1, 2, 3, 4, 5}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -779,12 +784,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeDouble(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeDouble(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(Double.doubleToRawLongBits(
-                    OfPrimitive.decodeDouble(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9})))
-                    .isEqualTo(0x0102030405060708L);
+            assertThatThrownBy(() -> OfPrimitive.decodeDouble(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail when the value does not fit")
@@ -917,10 +921,11 @@ class ValueCodecs_OfPrimitive_Test {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("decodeBoolean(byte[]) reads the beginning of a longer array, and leaves the rest")
+        @DisplayName("decodeBoolean(byte[]) fails on an array longer than the value")
         @Test
         void __longer() {
-            assertThat(OfPrimitive.decodeBoolean(new byte[]{1, 2, 3})).isTrue();
+            assertThatThrownBy(() -> OfPrimitive.decodeBoolean(new byte[]{1, 2, 3}))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("the index-based methods fail outside the array")

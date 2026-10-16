@@ -25,12 +25,17 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="${persistence.version}">
   <persistence-unit name="__encryptionPU">
-    <description>Persistence Unit for exercising this module against an in-memory DB</description>
+    <description>Persistence Unit for exercising this module against an in-memory DB; named, and kept open, so that
+      every connection of the provider's pool sees the one database (an unnamed in-memory database is private to each
+      connection, which a test running on several threads showed)
+    </description>
     <!--    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
     <!--    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>-->
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.encryption.examples.SecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.LegacySecretEntity</class>
+    <class>com.github.jinahya.persistence.encryption.examples.Secret</class>
+    <class>com.github.jinahya.persistence.encryption.examples.PropertyEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.AllTypesEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.EncryptedColorConverter</class>
     <!-- a converter class is a managed class: with exclude-unlisted-classes, EclipseLink requires it listed -->
@@ -67,7 +72,7 @@
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
-      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->
@@ -109,7 +114,7 @@
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <!-- https://github.com/eclipse-ee4j/eclipselink/issues/1393 -->
-      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-generic-hibernate;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->
