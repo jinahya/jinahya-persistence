@@ -9,6 +9,10 @@
     <!-- the entities only: the named converter needs no listing -->
     <class>com.github.jinahya.persistence.encryption.eclipselink.examples.SecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.eclipselink.examples.AllTypesEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.examples.MixedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.eclipselink.examples.MutableArrayEntity</class>
+    <!-- the standard converter MixedEntity uses next to the named one; a JPA converter class has to be listed -->
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>CALLBACK</validation-mode>

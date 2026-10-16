@@ -92,6 +92,20 @@
     <!-- the Hibernate ORM specific examples, and their tests, compile against Hibernate ORM's own annotations, which
          are on the test class path under jakarta-ee-11-hibernate-orm only -->
     <profile>
+      <id>jakarta-ee-11-hibernate-orm</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <!-- org.hibernate.testing.cache.CachingRegionFactory; HibernateCache_Test turns the second-level cache on -->
+        <dependency>
+          <groupId>org.hibernate.orm</groupId>
+          <artifactId>hibernate-testing</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>jakarta-ee-11-eclipselink</id>
       <build>
         <plugins>

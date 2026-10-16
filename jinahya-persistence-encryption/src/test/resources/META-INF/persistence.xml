@@ -100,6 +100,7 @@
       under the jakarta-ee-11-hibernate-orm profile only
     </description>
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.examples.SecretEntity</class>
     <class>com.github.jinahya.persistence.encryption.examples.hibernate.DynamicEntity</class>
     <class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -132,6 +133,28 @@
       <property name="jinahya.persistence.table_catalog" value="UNNAMED"/>
       <property name="jinahya.persistence.table_schema" value="PUBLIC"/>
       <property name="jinahya.persistence.table_types" value="BASE TABLE"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="__encryptionHibernateCachedPU">
+    <description>The second-level cache on, with Hibernate ORM's testing region factory; used, and compiled, under
+      the jakarta-ee-11-hibernate-orm profile only
+    </description>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.github.jinahya.persistence.encryption.examples.hibernate.CachedEntity</class>
+    <class>com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>ALL</shared-cache-mode>
+    <validation-mode>NONE</validation-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:h2:mem:encryption-cached;DB_CLOSE_DELAY=-1;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.generate_statistics" value="true"/>
+      <property name="hibernate.cache.use_second_level_cache" value="true"/>
+      <property name="hibernate.cache.region.factory_class" value="org.hibernate.testing.cache.CachingRegionFactory"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="__encryptionItPU">

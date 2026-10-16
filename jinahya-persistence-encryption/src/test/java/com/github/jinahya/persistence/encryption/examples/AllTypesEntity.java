@@ -203,4 +203,10 @@ public class AllTypesEntity {
     @Basic(optional = true)
     @Column(name = "a_color", nullable = true, length = 2048)
     public Color aColor;
+
+    // a primitive: converted through its wrapper's converter
+    @Convert(converter = EncryptedIntegerConverter.class)
+    @Basic(optional = false)
+    @Column(name = "an_int", nullable = false, length = 2048)
+    public int anInt;
 }

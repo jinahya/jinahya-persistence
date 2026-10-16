@@ -232,6 +232,9 @@ for them, so the bytes are the same and an attribute mapped either way reads wha
 
 What they keep, what was decided against and what stays open is in [`VENDORS.adoc`](VENDORS.adoc).
 
+The scenarios all three modules are tested on, which test covers each in which module, and the gaps, are in
+[`docs/TESTCASES.adoc`](docs/TESTCASES.adoc).
+
 ## Design notes
 
 The module reached this shape after a listener-based design, which moved the value between a plaintext attribute and

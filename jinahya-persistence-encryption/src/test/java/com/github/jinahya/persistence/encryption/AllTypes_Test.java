@@ -76,6 +76,7 @@ class AllTypes_Test {
         e.chars = new char[] {'a', 'é', 'c'};
         e.charsWrapped = new Character[] {'x', 'y'};
         e.aColor = Color.GREEN;
+        e.anInt = 42;
         return e;
     }
 
@@ -113,7 +114,52 @@ class AllTypes_Test {
         }
     }
 
-    @DisplayName("a null of every type is a NULL column, and reads back null")
+    @DisplayName("an array changed in place: detected on Hibernate ORM, not on EclipseLink; assigned anew, stored")
+    @Test
+    void arrayInPlace() {
+        final var id = PersistenceTests.apply(EMF, em -> {
+            final var e = filled();
+            em.persist(e);
+            return e;
+        }).id;
+        PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id).bytes[0] = 99);
+        final var loaded = PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id));
+        if (PersistenceTests.isHibernate(EMF)) {
+            // the converted type keeps the domain type's mutability plan: a copy is kept, and compared
+            assertThat(loaded.bytes[0]).isEqualTo((byte) 99);
+        } else {
+            // a converted mapping is immutable unless @Mutable: the instance is compared with itself
+            assertThat(loaded.bytes[0]).isEqualTo((byte) 1);
+        }
+        PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id).bytes = new byte[] {77, 2, 3, -4});
+        assertThat(PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id)).bytes)
+                .isEqualTo(new byte[] {77, 2, 3, -4});
+    }
+
+    @DisplayName("a Date changed in place: detected on Hibernate ORM, not on EclipseLink; assigned anew, stored")
+    @Test
+    void dateInPlace() {
+        final var id = PersistenceTests.apply(EMF, em -> {
+            final var e = filled();
+            em.persist(e);
+            return e;
+        }).id;
+        PersistenceTests.apply(EMF, em -> {
+            em.find(AllTypesEntity.class, id).aUtilDate.setTime(0L);
+            return null;
+        });
+        final var loaded = PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id));
+        if (PersistenceTests.isHibernate(EMF)) {
+            assertThat(loaded.aUtilDate.getTime()).isZero();
+        } else {
+            assertThat(loaded.aUtilDate.getTime()).isEqualTo(1234567890123L);
+        }
+        PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id).aUtilDate = new java.util.Date(5_000L));
+        assertThat(PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id)).aUtilDate.getTime())
+                .isEqualTo(5_000L);
+    }
+
+    @DisplayName("a null of every type is a NULL column, and reads back null; a primitive reads its default")
     @Test
     void nulls() throws ReflectiveOperationException {
         final var id = PersistenceTests.apply(EMF, em -> {
@@ -123,6 +169,15 @@ class AllTypes_Test {
         }).id;
         final var loaded = PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id));
         for (final var field : encryptedFields()) {
+            final var column = field.getAnnotation(jakarta.persistence.Column.class).name();
+            final var stored = PersistenceTests.apply(EMF, em -> em.createNativeQuery(
+                    "SELECT " + column + " FROM " + AllTypesEntity.TABLE_NAME + " WHERE id = " + id).getSingleResult());
+            if (field.getType().isPrimitive()) {
+                assertThat(stored).as(column).isNotNull();
+                assertThat(field.get(loaded)).as(field.getName()).isEqualTo(0);
+                continue;
+            }
+            assertThat(stored).as("%s is SQL NULL", column).isNull();
             assertThat(field.get(loaded)).as(field.getName()).isNull();
         }
     }

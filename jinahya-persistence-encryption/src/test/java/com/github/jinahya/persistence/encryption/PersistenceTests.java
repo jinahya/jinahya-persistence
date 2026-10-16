@@ -41,6 +41,13 @@ final class PersistenceTests {
                 .getSingleResult()).toUpperCase();
     }
 
+    /**
+     * Tells whether the factory is Hibernate ORM's; the other provider this build runs on is EclipseLink.
+     */
+    static boolean isHibernate(final EntityManagerFactory factory) {
+        return factory.getClass().getName().startsWith("org.hibernate.");
+    }
+
     private PersistenceTests() {
         throw new AssertionError("instantiation is not allowed");
     }

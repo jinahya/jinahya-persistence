@@ -1,0 +1,391 @@
+= Test cases and scenarios
+:toc:
+:toclevels: 2
+
+The one checklist for the three encryption modules. Every scenario the modules must behave the same on has a row
+here, and every row names the test method which covers it in each module. An empty cell is a gap; `n/a` is a case
+which cannot apply to that module, with the reason.
+
+This document is maintained by hand. The rule is simple: a test method is added or renamed together with its row,
+and a review of any of the three modules reads the matrix before it reads the code.
+
+== Columns
+
+[cols="1,2,4"]
+|===
+| Column | Module | What it runs
+
+| `generic`
+| `jinahya-persistence-encryption`
+| The standard `AttributeConverter` mapping. Its persistence tests run under *both* providers, through the
+  `jakarta-ee-11-hibernate-orm` and `jakarta-ee-11-eclipselink` profiles, so one cell here means two runs. Tests
+  named `Hibernate*_Test` are excluded on the EclipseLink profile.
+
+| `hibernate`
+| `jinahya-persistence-encryption-hibernate`
+| `@Encrypted`, a `UserType` over the generic converters' bytes. Hibernate ORM only.
+
+| `eclipselink`
+| `jinahya-persistence-encryption-eclipselink`
+| `@Convert("encrypted")`, a native `Converter` over the generic converters' bytes. EclipseLink only.
+|===
+
+Cells name `Class.method`, with the nested class when there is one. Test classes sit in
+`com.github.jinahya.persistence.encryption`, `...encryption.hibernate` and `...encryption.eclipselink` under each
+module's `src/test/java`.
+
+== Fixtures
+
+The same shapes exist in each module, so a scenario reads the same in all three columns.
+
+[cols="1,2,2,2"]
+|===
+| Fixture | `generic` | `hibernate` | `eclipselink`
+
+| secret entity: `name` (encrypted, `@Size`), `note` (plain), `version`
+| `examples.SecretEntity`, `@Convert(EncryptedStringConverter)`
+| `examples.SecretEntity`, `@Encrypted`
+| `examples.SecretEntity`, `@Convert("encrypted")`; also `bytes` and `@Mutable Date when`
+
+| all-types entity: the 27 supported types, an enum
+| `examples.AllTypesEntity`, the 27 plus `int anInt`
+| same
+| same
+
+| dynamic-update entity
+| `examples.hibernate.DynamicEntity`
+| `examples.DynamicEntity`
+| n/a: no EclipseLink counterpart is needed, it writes changed columns only
+
+| cached entity
+| `examples.hibernate.CachedEntity`, unit `__encryptionHibernateCachedPU`
+| `examples.CachedEntity`, unit `__encryptionHibernateCachedPU`
+| —
+
+| mixed entity: native and standard mapping side by side
+| n/a: one mapping
+| `examples.MixedEntity`
+| `examples.MixedEntity`
+
+| legacy entity: plaintext column migrated on read
+| `examples.LegacySecretEntity`
+| —
+| —
+
+| persistence unit
+| `__encryptionPU` (converters listed), `__encryptionHibernatePU`, `__encryptionHibernateCachedPU`
+| `__encryptionHibernatePU`, `__encryptionHibernateCachedPU`
+| `__encryptionEclipseLinkPU` (`MixedEntity` and `EncryptedStringConverter` listed)
+
+| service
+| `EntityEncryptionServiceImpl` through `META-INF/services`, counters `ENCRYPTED` and `DECRYPTED`
+| same, plus `Service_Test.CountingService` and `NamedService` through the unit property
+| same as `hibernate`
+
+| write recorder: an H2 trigger on the secret entity's table, recording every row written
+| `WriteRecorder`
+| `WriteRecorder`
+| `WriteRecorder`
+|===
+
+== Contract scenarios
+
+What the specification promises whatever the mapping: plaintext in the application, ciphertext in the column, the
+service called for nothing else. Every column must have a cell, or an `n/a` with a reason.
+
+[cols="1,4,3,3,3"]
+|===
+| Id | Scenario | `generic` | `hibernate` | `eclipselink`
+
+| C01
+| persist stores a non-empty ciphertext in a binary column, and the value reads back in a fresh context
+| `EncryptionLifecycle_Test.Persist.__`
+| `EncryptedUserType_Test.Persist.__`
+| `EncryptedConverter_Test.Persist.__`
+
+| C02
+| a null plaintext is a NULL column, the service is not called, and it reads back null
+| `EncryptionLifecycle_Test.Persist.__null`
+| `EncryptedUserType_Test.Persist.__null`
+| `EncryptedConverter_Test.Persist.__null`
+
+| C03
+| Bean Validation sees the plaintext: over `@Size` fails, within it is stored although the ciphertext is longer
+| `EncryptionLifecycle_Test.Persist.__validated`
+| `EncryptedUserType_Test.Persist.__validated`
+| `EncryptedConverter_Test.Persist.__validated`
+
+| C04
+| a read, flushed and committed, never writes: version, ciphertext and encrypt count unchanged
+| `EncryptionLifecycle_Test.Read.__`
+| `EncryptedUserType_Test.Read.__`
+| `EncryptedConverter_Test.Read.__`
+
+| C05
+| a JPQL predicate on the plaintext matches nothing, because the column holds ciphertext
+| `EncryptionLifecycle_Test.Read.__query`
+| `EncryptedUserType_Test.Read.__query`
+| `EncryptedConverter_Test.Read.__query`
+
+| C06
+| a changed plaintext is stored as a new ciphertext, and reads back
+| `EncryptionLifecycle_Test.Update.__changed`
+| `EncryptedUserType_Test.Update.__changed`
+| `EncryptedConverter_Test.Update.__changed`
+
+| C07
+| a plaintext set to null is stored as NULL
+| `EncryptionLifecycle_Test.Update.__nulled`
+| `EncryptedUserType_Test.Update.__changed` (second half)
+| `EncryptedConverter_Test.Update.__changed` (second half)
+
+| C08
+| an unrelated change bumps the version and the plaintext still reads back; whether the ciphertext is rewritten is
+  the provider's (Hibernate rewrites every column without `@DynamicUpdate`, EclipseLink writes changed columns only)
+| `EncryptionLifecycle_Test.Update.__unrelated` (logs which)
+| `EncryptedUserType_Test.Update.__unrelated` (asserts rewritten, encrypted once more)
+| `EncryptedConverter_Test.Update.__unrelated` (asserts kept)
+
+| C09
+| a detached instance merged with a changed plaintext stores it
+| `EncryptionLifecycle_Test.Update.__merged`
+| `EncryptedUserType_Test.Update.__merged`
+| `EncryptedConverter_Test.Update.__merged`
+
+| C10
+| a bulk JPQL `UPDATE` with a parameter stores ciphertext, not the parameter
+| `EncryptionLifecycle_Test.Update.__bulk`
+| `EncryptedUserType_Test.Update.__bulk`
+| `EncryptedConverter_Test.Update.__bulk`
+
+| C11
+| every supported type reads back equal
+| `AllTypes_Test.roundTrip`
+| `AllTypes_Test.roundTrip`
+| `AllTypes_Test.roundTrip`
+
+| C12
+| every encrypted column is binary, whatever the Java type
+| `AllTypes_Test.columnsAreBinary`
+| `AllTypes_Test.columnsAreBinary`
+| `AllTypes_Test.columnsAreBinary`
+
+| C13
+| a null of every type is a SQL NULL column, read natively, and reads back null
+| `AllTypes_Test.nulls`
+| `AllTypes_Test.nulls`
+| `AllTypes_Test.nulls`
+
+| C14
+| a primitive attribute round-trips; unset, its column is not NULL and it reads back its default
+| `AllTypes_Test.roundTrip`, `nulls` (`anInt`, asserted `0`)
+| `AllTypes_Test.roundTrip`, `nulls` (`anInt`, asserted `0`)
+| `AllTypes_Test.roundTrip`, `nulls` (`anInt`, asserted `0`)
+
+| C15
+| an enum attribute round-trips
+| `AllTypes_Test.roundTrip` (`aColor`, through `EncryptedColorConverter`)
+| `AllTypes_Test.roundTrip` (`aColor`)
+| `AllTypes_Test.roundTrip` (`aColor`)
+
+| C16
+| an array changed in place is detected and stored; one assigned anew is stored on every provider
+| `AllTypes_Test.arrayInPlace`: detected on Hibernate ORM, *not* on EclipseLink, asserted per provider
+| `AllTypes_Test.arrayInPlace`
+| `EncryptedConverter_Test.Update.__arrayInPlace`: *not* detected without `@Mutable`; with it, see P-E02
+
+| C17
+| a `java.util.Date` changed in place is detected and stored; one assigned anew is stored on every provider
+| `AllTypes_Test.dateInPlace`: detected on Hibernate ORM, *not* on EclipseLink, asserted per provider
+| `AllTypes_Test.dateInPlace`
+| `EncryptedConverter_Test.Update.__mutableDateInPlace` (with `@Mutable`)
+
+| C18
+| no plaintext ever reaches the database, in any write, text or binary column, recorded by a trigger over the
+  whole class; the recorder is proven live by a plaintext written on purpose
+| `EncryptionLifecycle_Test.close` (`WriteRecorder`, the `secret-` prefix), `Read.__recorderControl`
+| `EncryptedUserType_Test.close` (`WriteRecorder`, every plaintext the class stored), `Read.__recorderControl`
+| `EncryptedConverter_Test.close` (same), `Read.__recorderControl`
+
+| C19
+| the default service is the `ServiceLoader` one
+| every persistence test
+| every persistence test
+| every persistence test
+
+| C20
+| an explicitly given service is used, and the loaded one is not
+| `Injection_Test.__` (a CDI bean)
+| `Service_Test.instance` (unit property)
+| `Service_Test.instance` (unit property)
+
+| C21
+| a service given by class name is instantiated
+| n/a: no property in the standard mapping
+| `Service_Test.className`
+| `Service_Test.className`
+
+| C22
+| a service which cannot be resolved fails, naming it
+| `converter.EncryptedConverters_Test.serviceOf` (hook level only)
+| `Service_Test.invalid` (fails the factory)
+| `Service_Test.invalid` (fails the first use, lazy init)
+
+| C23
+| bytes written through one mapping read back through another
+| `converter.EncryptedConverters_Test.sameBytesAsTheNamedConverter` (hook vs. named converter, `String`)
+| `EncryptedUserType_Test.mixed` (native vs. standard, same row)
+| `EncryptedConverter_Test.mixed` (native vs. standard, same row)
+
+| C24
+| `refresh` after an external change of the column reads the new plaintext
+| `EncryptionLifecycle_Test.Read.__refresh`
+| `EncryptedUserType_Test.Read.__refresh`
+| `EncryptedConverter_Test.Read.__refresh`
+
+| C25
+| a legacy row holding plaintext in the old column reads it, migrates it in the reading transaction, and then
+  never writes on read again
+| `EncryptionLifecycle_Test.Legacy.__`
+| n/a: a recipe on the entity, independent of the mapping
+| n/a: same
+|===
+
+== Provider scenarios
+
+Behaviour which exists on one provider only. The cell in the other provider's column is `n/a`, and the `generic`
+column applies only under that provider's profile.
+
+[cols="1,4,3,3,3"]
+|===
+| Id | Scenario | `generic` | `hibernate` | `eclipselink`
+
+| P-H01
+| under `@DynamicUpdate` an unrelated change keeps the stored ciphertext, and encrypts nothing
+| `HibernateDynamic_Test.unrelatedChangeKeepsCiphertext`
+| `EncryptedUserType_Test.Update.__dynamic`
+| n/a
+
+| P-H02
+| a `StatelessSession` stores ciphertext, reads it decrypted, and updates
+| `HibernateStateless_Test.stateless`
+| `EncryptedUserType_Test.stateless`
+| n/a
+
+| P-H03
+| a second-level cache hit issues no statement; what it holds is the mapping's
+| `HibernateCache_Test.cacheHitDecryptsNothing`: decrypts *nothing*, the cache holds the plaintext
+| `Cache_Test.cacheHitDecrypts`: decrypts, the cache holds the ciphertext
+| n/a
+
+| P-H04
+| the query cache and the natural-id cache: what they hold
+| (not measured, as on `hibernate`)
+|
+| n/a
+
+| P-E01
+| a query with the `eclipselink.read-only` hint is decrypted like any other
+| `EncryptionLifecycle_Test.Read.__readOnly` (the hint is set; a plain query under the Hibernate profile)
+| n/a
+| `EncryptedConverter_Test.Read.__readOnly`
+
+| P-E02
+| mutability is `@Mutable`'s: an array without it is compared by identity, a `Date` with it is compared by value
+  and a read never writes; a `@Mutable` array is detected in place but rewrites on every flush, a plain read included,
+  because the comparison converts both sides and the ciphertext is randomized
+| n/a: `@Mutable` is EclipseLink's annotation, and the generic module has no EclipseLink-only sources
+| n/a
+| `EncryptedConverter_Test.Update.__arrayInPlace`, `__mutableDateInPlace`, `mutableArray` (`MutableArrayEntity`)
+
+| P-E03
+| the shared cache: what it holds, and that an immutable array instance is shared between contexts
+| (not measured, as on `eclipselink`)
+| n/a
+| (units run with `shared-cache-mode` NONE; documented in `VENDORS.adoc`, not measured)
+
+| P-E04
+| remote-session serialization of the converter
+| n/a: no converter of this module is serialized by EclipseLink's remote sessions, the standard ones are held by name
+| n/a
+| (recorded as open in `VENDORS.adoc`, not measured)
+|===
+
+== Unit scenarios
+
+The generic module only: what the converters are made of. The vendor modules reuse these converters and do not
+repeat the tests.
+
+[cols="1,5,4"]
+|===
+| Id | Scenario | `generic`
+
+| U01
+| every codec round-trips its type, rejects what it must, and its encoding is frozen (bytes compared, not only
+  round-tripped)
+| `converter.ValueCodecs_OfLang_Test`, `_OfMath_Test`, `_OfPrimitive_Test`, `_OfSql_Test`, `_OfTime_Test`,
+  `_OfUtil_Test`
+
+| U02
+| `EncryptedConverters.forType` gives a converter with the same bytes as the named one, wraps primitives, passes
+  null through without a call, and rejects an unsupported type
+| `converter.EncryptedConverters_Test.sameBytesAsTheNamedConverter`, `nullsAndRejections`
+
+| U03
+| `EncryptedConverters.serviceOf` accepts an instance, a class, a class name or null, and rejects the rest
+| `converter.EncryptedConverters_Test.serviceOf`
+
+| U04
+| a CDI bean is injected into the converter and preferred over the `ServiceLoader` one
+| `Injection_Test.__`
+|===
+
+== Gaps
+
+Read from the empty cells above.
+
+[cols="1,4,5"]
+|===
+| Id | Missing in | Note
+
+| P-H04
+| `generic`, `hibernate`
+| The query cache and the natural-id cache. Open in `VENDORS.adoc`; not planned until asked for.
+
+| P-E03
+| `generic`, `eclipselink`
+| The shared cache. The units run with `shared-cache-mode` NONE; what it holds, and the shared array instance, are
+  documented in `VENDORS.adoc` and not measured.
+
+| P-E04
+| `eclipselink`
+| Remote-session serialization of the converter. Open in `VENDORS.adoc`; not planned until asked for.
+|===
+
+Closed on 2026-10-16, with the measurements they gave (after a Codex review, which asked for the binary search in
+the recorder and its positive control, the split of the two in-place mutations with distinct replacement values, the
+native NULL checks, and the measured `@Mutable` array):
+
+* C08 on `hibernate`: without `@DynamicUpdate` every column is rewritten, and the unchanged plaintext encrypted once
+  more.
+* C10 on `generic`: a bulk `UPDATE` parameter goes through the converter on both providers.
+* C14, C16, C17 on `generic`: a primitive round-trips through its wrapper's converter on both providers; an in-place
+  change of an array or a `Date` is detected on Hibernate ORM and not on EclipseLink, where a converted mapping is
+  immutable unless `@Mutable`.
+* C18 on both vendor modules, C23 on `eclipselink`, C24 everywhere; P-E01 on `generic`.
+* P-E02 on `eclipselink`, the `@Mutable` array: detected in place, and rewritten on every flush, a plain read
+  included. It lives on its own fixture, `MutableArrayEntity`, because it bumps the version of every flush of its
+  entity, which broke the shared fixture's read and unrelated-change tests when it was tried there.
+* P-H02 and P-H03 on `generic`: the standard converter works through a stateless session, and leaves the plaintext
+  in the second-level cache. That last one is the measured counterpart of the Hibernate module's cache test.
+
+== Rules
+
+* A new scenario gets the next free id in its section and a cell in every column, even if the cell is a gap.
+* A test method covers one row, or names the rows it covers in its `@DisplayName`. A row covered by half of a method
+  says so in the cell, as C07 does.
+* `n/a` always carries its reason. "Not written yet" is a gap, never `n/a`.
+* The three `SecretEntity` and `AllTypesEntity` fixtures stay shape-equal: a field added to one is added to the others
+  in the same change, or the fixture row above says why not.
+* When a provider behaves differently on a contract scenario, the cell says what is asserted, as C16 does, and the
+  difference is recorded in `VENDORS.adoc`.

@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.LegacySecretEntity;
 import com.github.jinahya.persistence.encryption.examples.SecretEntity;
+import com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -45,6 +47,7 @@ class EncryptionLifecycle_Test {
 
     @AfterAll
     static void close() {
+        assertThat(WriteRecorder.count()).as("writes recorded").isPositive();
         assertThat(WriteRecorder.anyWriteContains("secret-")).as("no plaintext ever reached the database").isFalse();
         if (EMF != null) {
             EMF.close();
@@ -122,6 +125,18 @@ class EncryptionLifecycle_Test {
     @DisplayName("read")
     @Nested
     class Read {
+        @DisplayName("the recorder is live: a plaintext handed to the binary column on purpose is seen")
+        @Test
+        void __recorderControl() {
+            final var id = persisted(null);
+            final var writes = WriteRecorder.count();
+            apply(em -> em.createNativeQuery("UPDATE " + SecretEntity.TABLE_NAME + " SET name_enc = ?1 WHERE id = ?2")
+                    .setParameter(1, "control-plaintext".getBytes(StandardCharsets.UTF_8)).setParameter(2, id)
+                    .executeUpdate());
+            assertThat(WriteRecorder.count()).isGreaterThan(writes);
+            assertThat(WriteRecorder.anyWriteContains("control-plaintext")).isTrue();
+        }
+
 
         @DisplayName("a read, flushed and committed, never writes: version, bytes and encrypt calls unchanged")
         @Test
@@ -140,6 +155,31 @@ class EncryptionLifecycle_Test {
             assertThat(after[0]).as("version").isEqualTo(before[0]);
             assertThat((byte[]) after[1]).as("ciphertext").isEqualTo((byte[]) before[1]);
             assertThat(EntityEncryptionServiceImpl.ENCRYPTED.get()).as("encrypt calls").isEqualTo(encrypted);
+        }
+
+        @DisplayName("a refresh after an external change of the column reads the new plaintext")
+        @Test
+        void __refresh() {
+            final var id = persisted("secret-henry");
+            final var external = new EncryptedStringConverter().convertToDatabaseColumn("secret-henry2");
+            final var refreshed = apply(em -> {
+                final var e = em.find(SecretEntity.class, id);
+                em.createNativeQuery("UPDATE " + SecretEntity.TABLE_NAME + " SET name_enc = ?1 WHERE id = ?2")
+                        .setParameter(1, external).setParameter(2, id).executeUpdate();
+                em.refresh(e);
+                return e;
+            });
+            assertThat(refreshed.name).isEqualTo("secret-henry2");
+        }
+
+        @DisplayName("a query with EclipseLink's read-only hint is decrypted like any other; a plain query elsewhere")
+        @Test
+        void __readOnly() {
+            final var id = persisted("secret-readonly");
+            final var found = apply(em -> em.createQuery(
+                            "SELECT e FROM SecretEntity e WHERE e.id = :id", SecretEntity.class)
+                    .setParameter("id", id).setHint("eclipselink.read-only", "true").getSingleResult());
+            assertThat(found.name).isEqualTo("secret-readonly");
         }
 
         @DisplayName("a JPQL predicate on the plaintext matches what is stored, which is ciphertext: nothing")
@@ -198,6 +238,16 @@ class EncryptionLifecycle_Test {
             detached.name = "secret-gina2";
             apply(em -> em.merge(detached));
             assertThat(name(id)).isEqualTo("secret-gina2");
+        }
+
+        @DisplayName("a bulk JPQL UPDATE with a parameter stores the ciphertext, not the parameter")
+        @Test
+        void __bulk() {
+            final var id = persisted("secret-bulk");
+            apply(em -> em.createQuery("UPDATE SecretEntity e SET e.name = :name WHERE e.id = :id")
+                    .setParameter("name", "secret-bulk2").setParameter("id", id).executeUpdate());
+            assertThat(new String((byte[]) row(id)[1])).doesNotContain("secret-bulk2");
+            assertThat(name(id)).isEqualTo("secret-bulk2");
         }
     }
 

@@ -64,10 +64,12 @@ Without the property the service is loaded from `META-INF/services/`, as for the
 * **Mutable values follow EclipseLink's `@Mutable`.** The converter reports itself immutable, so an array or a
   `java.util.Date` attribute is, unless its mapping is `@Mutable`, treated as a value: an in-place change is not
   detected, and one instance is shared between the shared cache and every persistence context. Declare `@Mutable`
-  on a `Date` attribute to get copies and in-place change detection (measured). On an array attribute, `@Mutable` also
-  makes every flush write it again, because EclipseLink compares a mutable attribute with its backup copy by `equals`,
-  identity for an array, and then by converting both sides, and a randomized ciphertext never compares equal. For an
-  array, assign a new array, and leave the entity out of the shared cache where sharing an instance matters.
+  on a `Date` attribute to get copies and in-place change detection (measured). On an array attribute, `@Mutable`
+  detects the in-place change too, but also makes every flush of the entity write it again, a plain read included
+  (measured: the version moves on every transaction which loads the entity), because EclipseLink compares a mutable
+  attribute with its backup copy by `equals`, identity for an array, and then by converting both sides, and a
+  randomized ciphertext never compares equal. For an array, assign a new array instead, and leave the entity out of
+  the shared cache where sharing an instance matters.
 * **The shared cache holds the plaintext**, as it holds any attribute's value. Leave encrypted entities uncached where
   that matters (`@Cacheable(false)`, or `shared-cache-mode` `NONE`).
 

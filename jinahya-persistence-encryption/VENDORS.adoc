@@ -81,8 +81,9 @@ Decided against, after measuring: marking the mapping mutable for arrays. Eclips
 with its backup clone by `equals` first, identity for an array, and then by converting both sides through the
 converter, and a randomized ciphertext never compares equal, so every flush wrote the attribute. A `Date` compares by
 `equals` and is fine. So the converter reports itself immutable and leaves the mapping's mutability to EclipseLink's
-own `@Mutable`: declared on a `Date`, it gives copies and in-place change detection (measured); on an array it would
-bring the rewrite back. Without `@Mutable`, EclipseLink shares one instance of an array or a `Date` between the
+own `@Mutable`: declared on a `Date`, it gives copies and in-place change detection (measured); on an array it
+detects the in-place change and brings the rewrite back, on every flush of the entity, a plain read included
+(measured, on its own fixture: it moves the version of every transaction which loads the entity). Without `@Mutable`, EclipseLink shares one instance of an array or a `Date` between the
 shared cache and every persistence context, which the README states (found by Codex's review).
 
 == Not built, on purpose

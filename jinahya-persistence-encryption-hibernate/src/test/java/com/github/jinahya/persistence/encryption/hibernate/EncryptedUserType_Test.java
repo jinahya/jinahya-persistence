@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.encryption.hibernate;
 
+import com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter;
 import com.github.jinahya.persistence.encryption.hibernate.examples.DynamicEntity;
 import com.github.jinahya.persistence.encryption.hibernate.examples.MixedEntity;
 import com.github.jinahya.persistence.encryption.hibernate.examples.SecretEntity;
@@ -14,7 +15,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,13 +33,29 @@ class EncryptedUserType_Test {
 
     private static EntityManagerFactory EMF;
 
+    /**
+     * Every plaintext this class stored; none may appear in any write the database saw.
+     */
+    private static final Set<String> PLAINTEXTS = ConcurrentHashMap.newKeySet();
+
     @BeforeAll
     static void open() {
         EMF = Persistence.createEntityManagerFactory("__encryptionHibernatePU");
+        // records every row the database is asked to write, so that a plaintext written and then overwritten is seen
+        apply(em -> em.createNativeQuery(
+                        "CREATE TRIGGER IF NOT EXISTS trg_" + SecretEntity.TABLE_NAME
+                        + " BEFORE INSERT, UPDATE ON " + SecretEntity.TABLE_NAME
+                        + " FOR EACH ROW CALL \"" + WriteRecorder.class.getName() + "\"")
+                .executeUpdate());
     }
 
     @AfterAll
     static void close() {
+        assertThat(WriteRecorder.count()).as("writes recorded").isPositive();
+        for (final var plaintext : PLAINTEXTS) {
+            assertThat(WriteRecorder.anyWriteContains(plaintext)).as("no plaintext ever reached the database: %s", plaintext)
+                    .isFalse();
+        }
         if (EMF != null) {
             EMF.close();
         }
@@ -52,6 +72,9 @@ class EncryptedUserType_Test {
     }
 
     private static long persisted(final String name) {
+        if (name != null) {
+            PLAINTEXTS.add(name);
+        }
         return apply(em -> {
             final var e = new SecretEntity();
             e.name = name;
@@ -110,6 +133,18 @@ class EncryptedUserType_Test {
     @DisplayName("read")
     @Nested
     class Read {
+        @DisplayName("the recorder is live: a plaintext handed to the binary column on purpose is seen")
+        @Test
+        void __recorderControl() {
+            final var id = persisted(null);
+            final var writes = WriteRecorder.count();
+            apply(em -> em.createNativeQuery("UPDATE " + SecretEntity.TABLE_NAME + " SET name_enc = ?1 WHERE id = ?2")
+                    .setParameter(1, "control-plaintext".getBytes(StandardCharsets.UTF_8)).setParameter(2, id)
+                    .executeUpdate());
+            assertThat(WriteRecorder.count()).isGreaterThan(writes);
+            assertThat(WriteRecorder.anyWriteContains("control-plaintext")).isTrue();
+        }
+
 
         @DisplayName("a read, flushed and committed, never writes")
         @Test
@@ -127,6 +162,22 @@ class EncryptedUserType_Test {
             assertThat(after[0]).isEqualTo(before[0]);
             assertThat((byte[]) after[1]).isEqualTo((byte[]) before[1]);
             assertThat(EntityEncryptionServiceImpl.ENCRYPTED.get()).isEqualTo(encrypted);
+        }
+
+        @DisplayName("a refresh after an external change of the column reads the new plaintext")
+        @Test
+        void __refresh() {
+            final var id = persisted("henry");
+            PLAINTEXTS.add("henry2");
+            final var external = new EncryptedStringConverter().convertToDatabaseColumn("henry2");
+            final var refreshed = apply(em -> {
+                final var e = em.find(SecretEntity.class, id);
+                em.createNativeQuery("UPDATE " + SecretEntity.TABLE_NAME + " SET name_enc = ?1 WHERE id = ?2")
+                        .setParameter(1, external).setParameter(2, id).executeUpdate();
+                em.refresh(e);
+                return e;
+            });
+            assertThat(refreshed.name).isEqualTo("henry2");
         }
 
         @DisplayName("a JPQL predicate on the plaintext matches nothing")
@@ -149,6 +200,7 @@ class EncryptedUserType_Test {
         void __changed() {
             final var id = persisted("dave");
             final var before = row(id);
+            PLAINTEXTS.add("dave2");
             apply(em -> em.find(SecretEntity.class, id).name = "dave2");
             assertThat((byte[]) row(id)[1]).isNotEqualTo((byte[]) before[1]);
             assertThat(name(id)).isEqualTo("dave2");
@@ -156,11 +208,27 @@ class EncryptedUserType_Test {
             assertThat(row(id)[1]).isNull();
         }
 
+        @DisplayName("an unrelated change bumps the version and keeps the plaintext readable; every column is rewritten")
+        @Test
+        void __unrelated() {
+            final var id = persisted("carol");
+            final var before = row(id);
+            final var encrypted = EntityEncryptionServiceImpl.ENCRYPTED.get();
+            apply(em -> em.find(SecretEntity.class, id).note = "changed");
+            final var after = row(id);
+            assertThat(after[0]).as("version").isEqualTo((Integer) before[0] + 1);
+            // without @DynamicUpdate the UPDATE names every column: the unchanged plaintext is encrypted again
+            assertThat((byte[]) after[1]).as("ciphertext rewritten").isNotEqualTo((byte[]) before[1]);
+            assertThat(EntityEncryptionServiceImpl.ENCRYPTED.get()).as("encrypted again").isEqualTo(encrypted + 1);
+            assertThat(name(id)).isEqualTo("carol");
+        }
+
         @DisplayName("a detached instance merged with a changed plaintext stores it")
         @Test
         void __merged() {
             final var id = persisted("gina");
             final var detached = apply(em -> em.find(SecretEntity.class, id));
+            PLAINTEXTS.add("gina2");
             detached.name = "gina2";
             apply(em -> em.merge(detached));
             assertThat(name(id)).isEqualTo("gina2");
@@ -189,6 +257,7 @@ class EncryptedUserType_Test {
         @Test
         void __bulk() {
             final var id = persisted("bulk");
+            PLAINTEXTS.add("bulk2");
             apply(em -> em.createQuery("UPDATE SecretEntity e SET e.name = :name WHERE e.id = :id")
                     .setParameter("name", "bulk2").setParameter("id", id).executeUpdate());
             assertThat(new String((byte[]) row(id)[1])).doesNotContain("bulk2");
@@ -202,6 +271,8 @@ class EncryptedUserType_Test {
         final var factory = EMF.unwrap(SessionFactory.class);
         final var e = new SecretEntity();
         e.name = "stateless";
+        PLAINTEXTS.add("stateless");
+        PLAINTEXTS.add("stateless2");
         try (var session = factory.openStatelessSession()) {
             final var tx = session.beginTransaction();
             session.insert(e);

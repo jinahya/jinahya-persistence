@@ -126,9 +126,15 @@ class AllTypes_Test {
         }).id;
         final var loaded = PersistenceTests.apply(EMF, em -> em.find(AllTypesEntity.class, id));
         for (final var field : encryptedFields()) {
+            final var column = field.getAnnotation(jakarta.persistence.Column.class).name();
+            final var stored = PersistenceTests.apply(EMF, em -> em.createNativeQuery(
+                    "SELECT " + column + " FROM " + AllTypesEntity.TABLE_NAME + " WHERE id = " + id).getSingleResult());
             if (field.getType().isPrimitive()) {
+                assertThat(stored).as(column).isNotNull();
+                assertThat(field.get(loaded)).as(field.getName()).isEqualTo(0);
                 continue;
             }
+            assertThat(stored).as("%s is SQL NULL", column).isNull();
             assertThat(field.get(loaded)).as(field.getName()).isNull();
         }
     }
