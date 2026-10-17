@@ -33,7 +33,10 @@ import jakarta.persistence.AttributeConverter;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote An interface, carrying nothing: an implementation spends no inheritance on it, and is free to extend
  *         whatever it likes. {@link __NumberStringAttributeConverter},
- *         {@link __TemporalAccessorStringAttributeConverter}, {@link __TemporalAmountStringAttributeConverter} and
+ *         {@link com.github.jinahya.persistence.more.converter.time.__TemporalAccessorStringAttributeConverter
+ *         __TemporalAccessorStringAttributeConverter},
+ *         {@link com.github.jinahya.persistence.more.converter.time.__TemporalAmountStringAttributeConverter
+ *         __TemporalAmountStringAttributeConverter} and
  *         {@link __JoinedStringAttributeConverter} are the abstract classes built on it.
  */
 @SuppressWarnings({

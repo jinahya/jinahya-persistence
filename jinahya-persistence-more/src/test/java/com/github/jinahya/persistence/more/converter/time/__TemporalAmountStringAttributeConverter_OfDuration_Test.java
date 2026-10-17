@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.converter;
+package com.github.jinahya.persistence.more.converter.time;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.converter.test;
 
-import com.github.jinahya.persistence.more.converter.__TemporalAmountStringAttributeConverters;
+import com.github.jinahya.persistence.more.converter.time.__TemporalAmountStringAttributeConverters;
 
 import java.time.Period;
 

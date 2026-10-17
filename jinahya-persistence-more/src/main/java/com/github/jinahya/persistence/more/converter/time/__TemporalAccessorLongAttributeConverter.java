@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.converter;
+package com.github.jinahya.persistence.more.converter.time;
 
 /*-
  * #%L
@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import com.github.jinahya.persistence.more.converter.__LongAttributeConverter;
 import org.jspecify.annotations.Nullable;
 
 import java.time.temporal.TemporalAccessor;
@@ -74,7 +75,7 @@ import java.util.function.ToLongFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __TemporalAccessorLongAttributeConverter<X extends TemporalAccessor>
-        implements __LongAttributeConverter<X> {
+        implements __LongAttributeConverter<X>, __TemporalAccessorAttributeConverter<X, Long> {
 
     // --------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

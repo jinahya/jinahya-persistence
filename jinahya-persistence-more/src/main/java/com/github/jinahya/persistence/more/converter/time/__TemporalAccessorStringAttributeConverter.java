@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.converter;
+package com.github.jinahya.persistence.more.converter.time;
 
 /*-
  * #%L
@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import jakarta.persistence.Converter;
 import org.jspecify.annotations.Nullable;
 
@@ -66,7 +67,7 @@ import java.util.Objects;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __TemporalAccessorStringAttributeConverter<X extends TemporalAccessor>
-        implements __StringAttributeConverter<X> {
+        implements __StringAttributeConverter<X>, __TemporalAccessorAttributeConverter<X, String> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -93,8 +94,9 @@ public abstract class __TemporalAccessorStringAttributeConverter<X extends Tempo
      *         class which has neither is <em>not</em> rejected: a subclass which overrides the read never needs one,
      *         and only a subclass which does neither finds out, from {@link #convertToEntityAttribute(String)}, that
      *         there is nothing to call. Not every {@link TemporalAccessor} has a {@code parse} &mdash;
-     *         {@link java.time.Month Month} and {@link java.time.ZoneOffset ZoneOffset} do not, which is why neither
-     *         has a converter here.
+     *         {@link java.time.DayOfWeek DayOfWeek} and {@link java.time.Month Month} do not, and are read through a
+     *         formatter instead, by {@link __TemporalAccessorTextStringAttributeConverter}; {@link java.time.ZoneOffset
+     *         ZoneOffset} does not either, and has no converter here.
      * @see #attributeClass
      * @see #formatter
      */

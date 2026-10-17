@@ -8,7 +8,9 @@
  * attribute, whatever it is, in a {@code String} column. The attribute axis is
  * {@link com.github.jinahya.persistence.more.converter.__NumberAttributeConverter} and
  * {@link com.github.jinahya.persistence.more.converter.__BooleanAttributeConverter} &mdash; a number, or a boolean, in
- * whatever column. Both are interfaces carrying nothing, so a converter pinned on both axes implements one of each, as
+ * whatever column &mdash; with the {@code java.time} axis in
+ * {@link com.github.jinahya.persistence.more.converter.time the time sub-package}. Both are interfaces carrying
+ * nothing, so a converter pinned on both axes implements one of each, as
  * {@link com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverter} does, and still has its
  * inheritance to spend elsewhere.
  *
@@ -25,20 +27,10 @@
  * of a pair of functions.
  *
  * <h2>Dates, times and amounts of time</h2>
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverter} stores a
- * {@code java.time} value as the ISO-8601 text its own type reads back, or through a
- * {@link java.time.format.DateTimeFormatter} given to it;
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAmountStringAttributeConverter} does the same for a
- * {@link java.time.Duration} or a {@link java.time.Period}. The concrete converters of each live in
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverters} and
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAmountStringAttributeConverters}.
- * <p>
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverter} stores such a value
- * as the one integral coordinate its type is measured by instead &mdash; a nanosecond of the day, an epoch day &mdash;
- * which is compact, exact, and the same column on every database where a {@code TIME} or {@code TIMESTAMP} is not. Its
- * concrete converters are in
- * {@link com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverters}, and there are only
- * two: the encoding has to be increasing and lossless, and few types have one.
+ * Everything which converts a {@code java.time} value &mdash; as ISO-8601 text, as the one integral coordinate the
+ * type is measured by, or as the name of a day or a month in a named locale &mdash; lives in
+ * {@link com.github.jinahya.persistence.more.converter.time the time sub-package}, with the attribute axis of its own
+ * that those types call for.
  *
  * <h2>Yes-or-no flags</h2>
  * {@link com.github.jinahya.persistence.more.converter.__BooleanYnAttributeConverters} holds four converters for a

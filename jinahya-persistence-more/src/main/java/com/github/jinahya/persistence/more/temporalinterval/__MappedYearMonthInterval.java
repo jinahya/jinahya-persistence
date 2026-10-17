@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.temporalinterval;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverters;
+import com.github.jinahya.persistence.more.converter.time.__TemporalAccessorStringAttributeConverters;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.AttributeOverride;

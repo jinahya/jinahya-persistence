@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.converter;
+package com.github.jinahya.persistence.more.converter.time;
 
 /*-
  * #%L

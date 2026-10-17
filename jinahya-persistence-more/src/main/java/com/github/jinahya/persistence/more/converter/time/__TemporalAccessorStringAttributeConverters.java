@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.converter;
+package com.github.jinahya.persistence.more.converter.time;
 
 /*-
  * #%L
@@ -40,9 +40,10 @@ import java.util.Objects;
  * Concrete {@link __TemporalAccessorStringAttributeConverter}s, one per {@code java.time} type which can be written as
  * text and read back.
  * <p>
- * {@link java.time.Month Month} and {@link java.time.ZoneOffset ZoneOffset} are absent: both are
- * {@link java.time.temporal.TemporalAccessor TemporalAccessor}s, and neither declares the {@code parse(CharSequence)}
- * the read defaults to.
+ * {@link java.time.DayOfWeek DayOfWeek}, {@link java.time.Month Month} and {@link java.time.ZoneOffset ZoneOffset} are
+ * absent: all three are {@link java.time.temporal.TemporalAccessor TemporalAccessor}s, and none declares the
+ * {@code parse(CharSequence)} the read defaults to. The first two are a single named field, and have converters of
+ * their own in {@link __TemporalAccessorTextStringAttributeConverters}, which store the name.
  * <p>
  * Each converter has two constructors, and only the no-argument one is ever reached by a persistence provider: a
  * converter is registered by class, and nothing in {@link jakarta.persistence.Convert @Convert} or in

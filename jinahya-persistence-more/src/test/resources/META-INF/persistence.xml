@@ -81,7 +81,7 @@
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does.
          __MappedYearMonthInterval names this one, and without it a YearMonth would be stored as bytes. -->
-    <class>com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverters$OfYearMonth</class>
+    <class>com.github.jinahya.persistence.more.converter.time.__TemporalAccessorStringAttributeConverters$OfYearMonth</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <!-- so that the @AssertTrue invariant on __MappedTemporalInterval is actually evaluated -->

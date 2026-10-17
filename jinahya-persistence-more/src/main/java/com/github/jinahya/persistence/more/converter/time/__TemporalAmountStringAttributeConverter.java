@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.converter;
+package com.github.jinahya.persistence.more.converter.time;
 
 /*-
  * #%L
@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -52,7 +53,7 @@ import java.util.Objects;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __TemporalAmountStringAttributeConverter<X extends TemporalAmount>
-        implements __StringAttributeConverter<X> {
+        implements __StringAttributeConverter<X>, __TemporalAmountAttributeConverter<X, String> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

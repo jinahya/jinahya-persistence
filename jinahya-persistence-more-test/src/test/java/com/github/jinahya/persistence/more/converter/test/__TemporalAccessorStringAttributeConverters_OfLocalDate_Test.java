@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.converter.test;
 
-import com.github.jinahya.persistence.more.converter.__TemporalAccessorStringAttributeConverters;
+import com.github.jinahya.persistence.more.converter.time.__TemporalAccessorStringAttributeConverters;
 
 import java.time.LocalDate;
 

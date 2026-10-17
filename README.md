@@ -136,6 +136,7 @@ Five packages, by what they are for:
 | --- | --- |
 | `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
+| `…persistence.more.converter.time` | The `java.time` converters — ISO-8601 text, integral coordinates, day and month names — with the attribute axis those types call for. See below. |
 | `…persistence.more.colormodel` | Mapped superclasses for a colour in each of four models — RGB, CMYK, HSL, HWB, and RGB once more with an alpha column — sharing one normalized way of addressing whatever components a model has. Four models but one space: every conversion goes through sRGB, following CSS Color 4. |
 | `…persistence.more.temporalinterval` | Mapped superclasses for an interval on a temporal axis — `[start, end)`, either bound optional, one class per `java.time` point type, each measuring in the amount natural to it. Bound by `Temporal`, so the length of an interval is itself a value. |
 | `…persistence.more.orderedrange` | Mapped superclasses for a range over anything merely `Comparable` — `Duration`, `BigDecimal`, `Integer`, `String` — carrying the full open/closed bound lattice, encoded into a column which still sorts by its endpoint. No axis, so no length. |
@@ -152,18 +153,36 @@ public abstract class __NumberStringAttributeConverter<X extends Number>
         implements __StringAttributeConverter<X>, __NumberAttributeConverter<X, String> { … }
 ```
 
+The column axis is `__StringAttributeConverter` and `__LongAttributeConverter`; the attribute axis is
+`__NumberAttributeConverter`, `__BooleanAttributeConverter`, `__TemporalAccessorAttributeConverter` and
+`__TemporalAmountAttributeConverter`, with `__TemporalAttributeConverter` and `__TemporalAdjusterAttributeConverter`
+refining the third along `java.time.temporal`'s own lines. The four `java.time` axes, and every converter built on
+them, live in the `…converter.time` sub-package; the column axes stay in `…converter`, shared with the Number and
+Boolean families.
+
 Every abstract contract sits alone in its file, and the concrete converters — the ones carrying `@Converter` and
-registrable in a persistence unit — live in a `…Converters` holder per family:
+registrable in a persistence unit — live in a `…Converters` holder per family
+(the `__Temporal…` holders in `…converter.time`, the rest in `…converter`):
 
 | Holder | Converters |
 | --- | --- |
 | `__NumberStringAttributeConverters` | `BigDecimal`, `Integer`, `Long`, `Float`, `Double`, each stored as its exact decimal text |
 | `__TemporalAccessorStringAttributeConverters` | the ten `java.time` types with a `parse(CharSequence)`, in ISO-8601 or through a `DateTimeFormatter` |
+| `__TemporalAccessorTextStringAttributeConverters` | `DayOfWeek` and `Month`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
 | `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
 | `__BooleanYnAttributeConverters` | a legacy `'Y'`/`'N'` flag, as a `Character` or a `String`, strict or lenient |
 
 `__AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
 a converter has to name its enum class and that class belongs to the consumer.
+
+#### Upgrading to 0.6.8
+
+The `java.time` converters moved to a sub-package of their own, `com.github.jinahya.persistence.more.converter.time`,
+together with the attribute-axis interfaces added for them. A converter named in `persistence.xml` or in `@Convert`
+has to be renamed accordingly — `…more.converter.__TemporalAccessorStringAttributeConverters$OfYearMonth` is now
+`…more.converter.time.__TemporalAccessorStringAttributeConverters$OfYearMonth`. Nothing else in `…converter` moved.
+New in the same package: `__TemporalAccessorTextStringAttributeConverters.OfDayOfWeek` and `.OfMonth`, which store a
+day or a month as its name in a locale the converter names, English by default and never the server's.
 
 #### Upgrading to 0.5.5
 

@@ -107,7 +107,7 @@ import java.time.LocalTime;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __MappedLocalDateTimeInterval
- * @see com.github.jinahya.persistence.more.converter.__TemporalAccessorLongAttributeConverters.OfLocalTime
+ * @see com.github.jinahya.persistence.more.converter.time.__TemporalAccessorLongAttributeConverters.OfLocalTime
  */
 @Access(AccessType.FIELD)
 @MappedSuperclass
