@@ -32,6 +32,13 @@
  * {@link com.github.jinahya.persistence.more.converter.time the time sub-package}, with the attribute axis of its own
  * that those types call for.
  *
+ * <h2>PostgreSQL arrays and intervals</h2>
+ * Nothing above names a database. The one sub-package which does,
+ * {@link com.github.jinahya.persistence.more.converter.postgresql the postgresql sub-package}, maps a
+ * {@link java.util.List} to a one-dimensional PostgreSQL array column &mdash; each element through one of the
+ * converters above &mdash; and a {@link java.time.Duration} or a {@link java.time.Period} to an {@code interval}
+ * column, written once for both providers.
+ *
  * <h2>Yes-or-no flags</h2>
  * {@link com.github.jinahya.persistence.more.converter.__BooleanYnAttributeConverters} holds four converters for a
  * {@link java.lang.Boolean} stored as a {@code 'Y'}/{@code 'N'} flag, crossing the column type

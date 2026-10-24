@@ -137,6 +137,7 @@ Five packages, by what they are for:
 | `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
 | `…persistence.more.converter.time` | The `java.time` converters — ISO-8601 text, integral coordinates, day and month names — with the attribute axis those types call for. See below. |
+| `…persistence.more.converter.postgresql` | Converters for two column types PostgreSQL has and Jakarta Persistence does not — a one-dimensional array and an `interval` — written once for both providers. See below. |
 | `…persistence.more.colormodel` | Mapped superclasses for a colour in each of four models — RGB, CMYK, HSL, HWB, and RGB once more with an alpha column — sharing one normalized way of addressing whatever components a model has. Four models but one space: every conversion goes through sRGB, following CSS Color 4. |
 | `…persistence.more.temporalinterval` | Mapped superclasses for an interval on a temporal axis — `[start, end)`, either bound optional, one class per `java.time` point type, each measuring in the amount natural to it. Bound by `Temporal`, so the length of an interval is itself a value. |
 | `…persistence.more.orderedrange` | Mapped superclasses for a range over anything merely `Comparable` — `Duration`, `BigDecimal`, `Integer`, `String` — carrying the full open/closed bound lattice, encoded into a column which still sorts by its endpoint. No axis, so no length. |
@@ -171,11 +172,25 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 | `__TemporalAccessorTextStringAttributeConverters` | `DayOfWeek` and `Month`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
 | `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
 | `__BooleanYnAttributeConverters` | a legacy `'Y'`/`'N'` flag, as a `Character` or a `String`, strict or lenient |
+| `__ArrayAttributeConverters` | a `List` of `String`, `Integer` or `Long` in a PostgreSQL array column, each element through the parent package's converter for it; in `…converter.postgresql` |
+| `__IntervalAttributeConverters` | `Duration` and `Period` in a PostgreSQL `interval` column, each refusing the fields its type has no room for; in `…converter.postgresql` |
 
 `__AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
 a converter has to name its enum class and that class belongs to the consumer.
 
+The `…converter.postgresql` sub-package is the one place a database is named. Its two abstract converters —
+`__ArrayAttributeConverter`, a `List` as a one-dimensional array literal, and `__IntervalAttributeConverter`, a
+`TemporalAmount` as an `interval` — declare their column side as `Object`, because Hibernate and EclipseLink hand a
+converter different things for the same column (a `java.sql.Array` or a Java array; the interval as text or as the
+driver's own object), and each accepts all of them. Towards the server a value is bound as text, which needs
+`stringtype=unspecified` on the JDBC URL so the server casts it to the column's type. Every style the server prints an
+`interval` in — `postgres`, `postgres_verbose`, `sql_standard`, `iso_8601` — reads back.
+
 #### Upgrading to 0.6.8
+
+New: the `…converter.postgresql` sub-package, with `__ArrayAttributeConverters.OfStrings`, `.OfIntegers` and
+`.OfLongs` for a PostgreSQL array column, and `__IntervalAttributeConverters.OfDuration` and `.OfPeriod` for an
+`interval` column.
 
 The `java.time` converters moved to a sub-package of their own, `com.github.jinahya.persistence.more.converter.time`,
 together with the attribute-axis interfaces added for them. A converter named in `persistence.xml` or in `@Convert`
