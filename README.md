@@ -45,6 +45,8 @@ platform out from under the implementations.
 | Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Hibernate Validator | 9.1.4.Final | 9.1.4.Final | current |
 | Jakarta Expression Language 6.0 | `jakarta.el-api` 6.0.1 | Expressly (required by Hibernate Validator) | 6.0.0 | 6.0.0 | current |
 | Jakarta CDI 4.1 | `jakarta.enterprise.cdi-api` 4.1.0 | Weld, via `weld-junit5` | weld-junit5 5.0.3.Final → weld-se-core 6.0.3.Final | weld-junit5 5.0.3.Final (Weld 6.0.4.Final) | current — `weld-junit5` 5.0.3 pins Weld 6.0.3 |
+| Jakarta JSON Processing 2.1 | `jakarta.json-api` 2.1.3 | Eclipse Parsson (`jinahya-persistence-more` tests only; the API is `provided`) | 1.1.9 | 1.1.9 | current |
+| Jakarta JSON Binding 3.0 | `jakarta.json.bind-api` 3.0.1 | Eclipse Yasson (`jinahya-persistence-more` tests only; the API is `provided`) | 3.0.5 | 3.0.5 | current |
 
 `version.org.jboss.weld` is the **weld-junit5 (weld-testing)** version, not the Weld
 version: weld-junit5 5.0.x is the Weld 6 / CDI 4.1 line.

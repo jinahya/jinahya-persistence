@@ -3,6 +3,8 @@ module com.github.jinahya.persistence.more {
     requires transitive jakarta.annotation;
     requires transitive jakarta.persistence;
     requires transitive jakarta.validation;
+    requires static jakarta.json;
+    requires static jakarta.json.bind;
 
 //    exports com.github.jinahya.persistence.more;
 //    opens com.github.jinahya.persistence.more to nl.jqno.equalsverifier;

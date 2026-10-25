@@ -39,6 +39,11 @@
  * converters above &mdash; and a {@link java.time.Duration} or a {@link java.time.Period} to an {@code interval}
  * column, written once for both providers.
  *
+ * <h2>JSON</h2>
+ * A {@link jakarta.json.JsonValue}, or anything Jakarta JSON Binding maps, stored as JSON text in a {@code String}
+ * column, is in {@link com.github.jinahya.persistence.more.converter.json the json sub-package}; both APIs are
+ * {@code provided}, left to the application.
+ *
  * <h2>Yes-or-no flags</h2>
  * {@link com.github.jinahya.persistence.more.converter.__BooleanYnAttributeConverters} holds four converters for a
  * {@link java.lang.Boolean} stored as a {@code 'Y'}/{@code 'N'} flag, crossing the column type

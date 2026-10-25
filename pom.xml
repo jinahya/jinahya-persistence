@@ -123,6 +123,12 @@
     <!-- https://eclipse.dev/eclipselink/releases/index.html -->
     <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
     <version.org.eclipse.persistence>5.0.2</version.org.eclipse.persistence>
+    <!-- Jakarta JSON Processing 2.1 -->
+    <!-- https://central.sonatype.com/artifact/org.eclipse.parsson/parsson/versions -->
+    <version.org.eclipse.parsson>1.1.9</version.org.eclipse.parsson>
+    <!-- Jakarta JSON Binding 3.0 -->
+    <!-- https://central.sonatype.com/artifact/org.eclipse/yasson/versions -->
+    <version.org.eclipse.yasson>3.0.5</version.org.eclipse.yasson>
     <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
     <!-- hibernate-validator: 9 / expressly: 6 -->
     <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly -->
@@ -265,6 +271,16 @@
         <groupId>org.eclipse.persistence</groupId>
         <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
         <version>${version.org.eclipse.persistence}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.parsson</groupId>
+        <artifactId>parsson</artifactId>
+        <version>${version.org.eclipse.parsson}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse</groupId>
+        <artifactId>yasson</artifactId>
+        <version>${version.org.eclipse.yasson}</version>
       </dependency>
       <dependency>
         <groupId>org.glassfish.expressly</groupId>

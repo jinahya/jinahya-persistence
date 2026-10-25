@@ -24,6 +24,23 @@
       <artifactId>jakarta.validation-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- the @PostConstruct/@PreDestroy of __JsonbStringAttributeConverter -->
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- the converter.json sub-package; left to the application, which brings an implementation too -->
+    <dependency>
+      <groupId>jakarta.json</groupId>
+      <artifactId>jakarta.json-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.json.bind</groupId>
+      <artifactId>jakarta.json.bind-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
@@ -44,6 +61,17 @@
     <dependency>
       <groupId>org.glassfish.expressly</groupId>
       <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the converter.json tests need an implementation of each API -->
+    <dependency>
+      <groupId>org.eclipse.parsson</groupId>
+      <artifactId>parsson</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>yasson</artifactId>
       <scope>test</scope>
     </dependency>
     <!--    <dependency>-->

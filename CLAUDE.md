@@ -63,6 +63,8 @@ runtime failures here.
 | Jakarta Validation (`jakarta.validation-api`) | Hibernate Validator (`org.hibernate.validator:hibernate-validator`) | `version.org.hibernate.validator` |
 | Jakarta Expression Language (`jakarta.el-api`) | Expressly (`org.glassfish.expressly:expressly`) — required by Hibernate Validator | `version.org.glassfish.expressly` |
 | Jakarta CDI (`jakarta.enterprise.cdi-api`) | Weld (`org.jboss.weld*`, `weld-junit5`) | `version.org.jboss.weld` |
+| Jakarta JSON Processing (`jakarta.json-api`) | Eclipse Parsson (`org.eclipse.parsson:parsson`) — test scope | `version.org.eclipse.parsson` |
+| Jakarta JSON Binding (`jakarta.json.bind-api`) | Eclipse Yasson (`org.eclipse:yasson`) — test scope | `version.org.eclipse.yasson` |
 
 Rules:
 
