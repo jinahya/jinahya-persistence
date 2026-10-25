@@ -26,7 +26,6 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -189,10 +188,7 @@ import java.util.Objects;
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
-        // both cut fields are declared @Nullable and both setters assign null the same way; the rule sees the
-        // JSpecify type-use annotation on one of the pair and not on the other
-        "java:S2637" // "@NonNull" values should not be set to null
+        "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __MappedOrderedRange<C extends Comparable<? super C>> implements ___OrderedRange<C> {
 
@@ -324,7 +320,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      */
     @Override
     @Transient
-    public @Nullable C getRangeLower() {
+    public C getRangeLower() {
         return rangeLower == null ? null : decompose(rangeLower);
     }
 
@@ -335,7 +331,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      */
     @Override
     @Transient
-    public @Nullable __BoundType getLowerBoundType() {
+    public __BoundType getLowerBoundType() {
         return rangeLower == null
                 ? null
                 : __BoundType.ofLowerCharacter(rangeLower.charAt(rangeLower.length() - 1));
@@ -357,7 +353,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      *         the data says — which is the case this class exists for — use
      *         {@link #setRangeLower(Comparable, __BoundType)} and say it.
      */
-    public void setRangeLower(final @Nullable C value) {
+    public void setRangeLower(final C value) {
         setRangeLower(value, __BoundType.CLOSED);
     }
 
@@ -375,7 +371,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      *           when a caller modified this range, so the provider would see no dirty attribute, issue no
      *           {@code UPDATE}, and never reach the callback — the change would be lost silently.
      */
-    public void setRangeLower(final @Nullable C value, final __BoundType boundType) {
+    public void setRangeLower(final C value, final __BoundType boundType) {
         Objects.requireNonNull(boundType, "boundType is null");
         rangeLower = value == null ? null : compose(value, boundType.getLowerCharacter());
     }
@@ -389,7 +385,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      */
     @Override
     @Transient
-    public @Nullable C getRangeUpper() {
+    public C getRangeUpper() {
         return rangeUpper == null ? null : decompose(rangeUpper);
     }
 
@@ -400,7 +396,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      */
     @Override
     @Transient
-    public @Nullable __BoundType getUpperBoundType() {
+    public __BoundType getUpperBoundType() {
         return rangeUpper == null
                 ? null
                 : __BoundType.ofUpperCharacter(rangeUpper.charAt(rangeUpper.length() - 1));
@@ -417,7 +413,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      *         written as {@code 23:59:59} stands in for an open one, and the substitution is never exact, only
      *         close enough at whatever precision happens to be in play.
      */
-    public void setRangeUpper(final @Nullable C value) {
+    public void setRangeUpper(final C value) {
         setRangeUpper(value, __BoundType.OPEN);
     }
 
@@ -432,7 +428,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      * @implSpec As {@link #setRangeLower(Comparable, __BoundType)}: composed here rather than at flush time,
      *           which is what makes the attribute dirty.
      */
-    public void setRangeUpper(final @Nullable C value, final __BoundType boundType) {
+    public void setRangeUpper(final C value, final __BoundType boundType) {
         Objects.requireNonNull(boundType, "boundType is null");
         rangeUpper = value == null ? null : compose(value, boundType.getUpperCharacter());
     }
@@ -445,7 +441,7 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      */
     @Basic(optional = true)
     @Column(name = COLUMN_NAME_RANGE_LOWER, nullable = true, insertable = true, updatable = true)
-    private @Nullable String rangeLower;
+    private String rangeLower;
 
     /**
      * The upper cut — the encoded endpoint followed by its bound character — mapped to the
@@ -453,5 +449,5 @@ public abstract class __MappedOrderedRange<C extends Comparable<? super C>> impl
      */
     @Basic(optional = true)
     @Column(name = COLUMN_NAME_RANGE_UPPER, nullable = true, insertable = true, updatable = true)
-    private @Nullable String rangeUpper;
+    private String rangeUpper;
 }

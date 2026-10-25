@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more.orderedrange;
 
 import com.github.jinahya.persistence.more.temporalinterval.___TemporalInterval;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -116,7 +115,6 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      *
      * @return the lower endpoint; {@code null} when this range has no lower bound.
      */
-    @Nullable
     C getRangeLower();
 
     /**
@@ -126,7 +124,6 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      *         {@code null}.
      */
     @Transient
-    @Nullable
     __BoundType getLowerBoundType();
 
     /**
@@ -134,7 +131,6 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      *
      * @return the upper endpoint; {@code null} when this range has no upper bound.
      */
-    @Nullable
     C getRangeUpper();
 
     /**
@@ -144,7 +140,6 @@ public interface ___OrderedRange<C extends Comparable<? super C>> {
      *         {@code null}.
      */
     @Transient
-    @Nullable
     __BoundType getUpperBoundType();
 
     /**

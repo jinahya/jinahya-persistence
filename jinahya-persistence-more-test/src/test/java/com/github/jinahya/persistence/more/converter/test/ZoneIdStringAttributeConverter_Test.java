@@ -20,25 +20,24 @@ package com.github.jinahya.persistence.more.converter.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.postgresql.__IntervalAttributeConverters;
+import com.github.jinahya.persistence.more.converter.time.ZoneIdStringAttributeConverter;
 
-import java.time.Period;
+import java.time.ZoneId;
 import java.util.List;
 
-class __IntervalAttributeConverters_OfPeriod_Test
-        extends __AttributeConverter_Test<__IntervalAttributeConverters.OfPeriod, Period, Object> {
+class ZoneIdStringAttributeConverter_Test
+        extends __AttributeConverter_Test<ZoneIdStringAttributeConverter, ZoneId, String> {
 
-    __IntervalAttributeConverters_OfPeriod_Test() {
-        super(__IntervalAttributeConverters.OfPeriod.class);
+    ZoneIdStringAttributeConverter_Test() {
+        super(ZoneIdStringAttributeConverter.class);
     }
 
     @Override
-    protected List<__AttributeConverterTestCase<Period, Object>> testCases() {
+    protected List<__AttributeConverterTestCase<ZoneId, String>> testCases() {
         return List.of(
-                __AttributeConverterTestCase.of(Period.ZERO, "P0D"),
-                __AttributeConverterTestCase.of(Period.of(1, 2, 3), "P1Y2M3D"),
-                __AttributeConverterTestCase.of(Period.ofMonths(14), "P14M"),
-                __AttributeConverterTestCase.of(Period.ofDays(-45), "P-45D")
+                __AttributeConverterTestCase.of(ZoneId.of("Asia/Seoul"), "Asia/Seoul"),
+                __AttributeConverterTestCase.of(ZoneId.of("Z"), "Z"),
+                __AttributeConverterTestCase.of(ZoneId.of("+09:00"), "+09:00")
         );
     }
 }

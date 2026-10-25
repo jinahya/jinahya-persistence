@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.converter;
  */
 
 import jakarta.persistence.AttributeConverter;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,7 +111,7 @@ public class __JoinedStringAttributeConverter<X> implements __StringAttributeCon
      *                                  delimiter.
      */
     @Override
-    public @Nullable String convertToDatabaseColumn(final @Nullable List<X> attribute) {
+    public String convertToDatabaseColumn(final List<X> attribute) {
         if (attribute == null) {
             return null;
         }
@@ -177,7 +176,7 @@ public class __JoinedStringAttributeConverter<X> implements __StringAttributeCon
     @SuppressWarnings({
             "java:S1168" // Empty arrays and collections should be returned instead of null
     })
-    public @Nullable List<X> convertToEntityAttribute(final @Nullable String dbData) {
+    public List<X> convertToEntityAttribute(final String dbData) {
         if (dbData == null) {
             return null;
         }

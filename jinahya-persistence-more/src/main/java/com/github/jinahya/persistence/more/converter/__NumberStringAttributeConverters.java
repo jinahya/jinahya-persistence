@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -83,7 +82,7 @@ public final class __NumberStringAttributeConverters {
          *         {@code attribute} is {@code null}.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable BigDecimal attribute) {
+        public String convertToDatabaseColumn(final BigDecimal attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -101,7 +100,7 @@ public final class __NumberStringAttributeConverters {
          *         {@code "1.50"} reads back with a scale of two, not as {@code 1.5}.
          */
         @Override
-        public @Nullable BigDecimal convertToEntityAttribute(final @Nullable String dbData) {
+        public BigDecimal convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -133,7 +132,7 @@ public final class __NumberStringAttributeConverters {
          *         {@code attribute} is {@code null}.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable Integer attribute) {
+        public String convertToDatabaseColumn(final Integer attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -149,7 +148,7 @@ public final class __NumberStringAttributeConverters {
          *                               {@link Integer}.
          */
         @Override
-        public @Nullable Integer convertToEntityAttribute(final @Nullable String dbData) {
+        public Integer convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -181,7 +180,7 @@ public final class __NumberStringAttributeConverters {
          *         {@code attribute} is {@code null}.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable Long attribute) {
+        public String convertToDatabaseColumn(final Long attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -197,7 +196,7 @@ public final class __NumberStringAttributeConverters {
          *                               {@link Long}.
          */
         @Override
-        public @Nullable Long convertToEntityAttribute(final @Nullable String dbData) {
+        public Long convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -238,7 +237,7 @@ public final class __NumberStringAttributeConverters {
          *         {@link OfBigDecimal}; see {@link OfFloat the class javadoc} for what that costs on the way back.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable Float attribute) {
+        public String convertToDatabaseColumn(final Float attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -259,7 +258,7 @@ public final class __NumberStringAttributeConverters {
          *                               {@code "Infinity"} and {@code "-Infinity"} nor a valid decimal.
          */
         @Override
-        public @Nullable Float convertToEntityAttribute(final @Nullable String dbData) {
+        public Float convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -306,7 +305,7 @@ public final class __NumberStringAttributeConverters {
          *         {@link OfBigDecimal}; see {@link OfDouble the class javadoc} for what that costs on the way back.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable Double attribute) {
+        public String convertToDatabaseColumn(final Double attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -327,7 +326,7 @@ public final class __NumberStringAttributeConverters {
          *                               {@code "Infinity"} and {@code "-Infinity"} nor a valid decimal.
          */
         @Override
-        public @Nullable Double convertToEntityAttribute(final @Nullable String dbData) {
+        public Double convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }

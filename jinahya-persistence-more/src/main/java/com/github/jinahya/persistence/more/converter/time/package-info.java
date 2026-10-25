@@ -24,6 +24,12 @@
  * {@link java.time.DayOfWeek} or a {@link java.time.Month} as its <em>name</em> in a locale it is given &mdash; never
  * the default one &mdash; and reads it back regardless of case; its concrete converters, which pin English, are in
  * {@link com.github.jinahya.persistence.more.converter.time.__TemporalAccessorTextStringAttributeConverters}.
+ * <p>
+ * {@link com.github.jinahya.persistence.more.converter.time.ZoneIdStringAttributeConverter} stores a
+ * {@link java.time.ZoneId} as its identifier. A zone is no {@link java.time.temporal.TemporalAccessor}, so the
+ * converter sits on the column axis alone, and is concrete itself rather than one of a holder's. Nested in it,
+ * {@link com.github.jinahya.persistence.more.converter.time.ZoneIdStringAttributeConverter.TimeZoneStringAttributeConverter}
+ * stores a {@link java.util.TimeZone} through it.
  *
  * <h2>As a number</h2>
  * {@link com.github.jinahya.persistence.more.converter.time.__TemporalAccessorLongAttributeConverter} stores a value as

@@ -175,7 +175,6 @@
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a href="https://www.iso.org/standard/70907.html">ISO 8601-1:2019</a>
  */
-@org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.more.temporalinterval;
 
 /*-

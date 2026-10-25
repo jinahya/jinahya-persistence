@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.more;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An interface for {@link __SelfReferencing} entities whose siblings are <em>ordered</em>.
@@ -110,7 +109,6 @@ public interface __SelfReferencingOrdered<T extends __SelfReferencingOrdered<T>>
      *         accessor already answers this question overrides it and never comes here.
      * @see __SelfReferencingUtils#ordinalOf(__SelfReferencingOrdered)
      */
-    @Nullable
     @NotNull
     @PositiveOrZero
     @Transient

@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.temporalinterval;
  */
 
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.time.DateTimeException;
 import java.time.temporal.Temporal;
@@ -150,7 +149,6 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      *
      * @return the inclusive start of this interval; {@code null} when this interval has no lower bound.
      */
-    @Nullable
     T getIntervalStart();
 
     /**
@@ -159,7 +157,6 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      * @return the exclusive end of this interval; {@code null} when this interval has no upper bound.
      * @see #getIntervalStart()
      */
-    @Nullable
     T getIntervalEnd();
 
     /**
@@ -223,7 +220,6 @@ public interface ___TemporalInterval<T extends Temporal & Comparable<? super T>>
      * @see #lengthIn(TemporalUnit)
      */
     @Transient
-    @Nullable
     TemporalAmount getTemporalAmount();
 
     /**

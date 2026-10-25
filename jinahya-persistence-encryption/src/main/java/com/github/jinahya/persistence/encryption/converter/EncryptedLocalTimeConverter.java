@@ -26,7 +26,7 @@ public final class EncryptedLocalTimeConverter extends EncryptedAttributeConvert
         this(null);
     }
 
-    EncryptedLocalTimeConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedLocalTimeConverter(final EntityEncryptionService service) {
         super(LocalTime.class, OfTime::encodeLocalTime, OfTime::decodeLocalTime, service);
     }
 }

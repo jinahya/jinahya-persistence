@@ -33,7 +33,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A concrete entity which orders its siblings, using {@link AccessType#FIELD FIELD} access and marking its fields.
@@ -67,7 +66,7 @@ public class _CategoryEntity implements __SelfReferencingOrdered<_CategoryEntity
         super();
     }
 
-    _CategoryEntity(final String name, final @Nullable _CategoryEntity parent, final Integer siblingOrdinal) {
+    _CategoryEntity(final String name, final _CategoryEntity parent, final Integer siblingOrdinal) {
         this.name = name;
         this.parent = parent;
         this.siblingOrdinal = siblingOrdinal;
@@ -75,7 +74,6 @@ public class _CategoryEntity implements __SelfReferencingOrdered<_CategoryEntity
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    @Nullable
     @Override
     public _CategoryEntity getHierarchyParent() {
         return __SelfReferencingUtils.parentOf(this);

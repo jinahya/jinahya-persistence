@@ -25,7 +25,7 @@ public final class EncryptedSqlDateConverter extends EncryptedAttributeConverter
         this(null);
     }
 
-    EncryptedSqlDateConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedSqlDateConverter(final EntityEncryptionService service) {
         super(java.sql.Date.class, OfSql::encodeDate, OfSql::decodeDate, service);
     }
 }

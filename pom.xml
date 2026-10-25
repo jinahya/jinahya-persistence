@@ -151,14 +151,6 @@
     <!-- https://central.sonatype.com/artifact/org.mockito/mockito-bom/versions -->
     <version.org.mockito>5.24.0</version.org.mockito>
     <version.org.projectlombok>1.18.48</version.org.projectlombok>
-    <!-- https://central.sonatype.com/artifact/org.jspecify/jspecify/versions -->
-    <version.org.jspecify>1.0.1</version.org.jspecify>
-    <!-- https://central.sonatype.com/artifact/com.google.errorprone/error_prone_core/versions -->
-    <version.com.google.errorprone>2.50.0</version.com.google.errorprone>
-    <!-- https://central.sonatype.com/artifact/com.uber.nullaway/nullaway/versions -->
-    <version.com.uber.nullaway>0.14.2</version.com.uber.nullaway>
-    <!-- NullAway severity for main sources; test sources do not run Error Prone at all -->
-    <nullaway.severity>ERROR</nullaway.severity>
     <!-- https://central.sonatype.com/artifact/ch.qos.logback/logback-parent -->
     <!-- https://central.sonatype.com/artifact/org.slf4j/slf4j-bom/versions -->
     <version.org.slf4j>2.0.20</version.org.slf4j>
@@ -318,11 +310,6 @@
         <version>${version.org.hibernate.validator}</version>
       </dependency>
       <dependency>
-        <groupId>org.jspecify</groupId>
-        <artifactId>jspecify</artifactId>
-        <version>${version.org.jspecify}</version>
-      </dependency>
-      <dependency>
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-junit5</artifactId>
         <version>${version.org.jboss.weld}</version>
@@ -387,16 +374,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk-platform-logging</artifactId>
       <scope>test</scope>
-    </dependency>
-    <!-- declared once for the whole reactor: every module is annotated with it, at the same scope.
-         provided, not compile: these are libraries, and a library's published pom should not decide the
-         nullness tooling of its consumers. A consumer which wants the annotations (RUNTIME-retention, so
-         visible to reflection and to checkers reading our class files) declares jspecify itself, at
-         compile scope; without it, the annotations are simply absent at run time, which is harmless -->
-    <dependency>
-      <groupId>org.jspecify</groupId>
-      <artifactId>jspecify</artifactId>
-      <scope>provided</scope>
     </dependency>
     <!-- likewise: this is a Jakarta Persistence project, every module compiles against the API and
          none of them ship it. Version comes from the umbrella BOM -->
@@ -604,16 +581,6 @@
               <artifactId>lombok</artifactId>
               <version>${version.org.projectlombok}</version>
             </path>
-            <path>
-              <groupId>com.google.errorprone</groupId>
-              <artifactId>error_prone_core</artifactId>
-              <version>${version.com.google.errorprone}</version>
-            </path>
-            <path>
-              <groupId>com.uber.nullaway</groupId>
-              <artifactId>nullaway</artifactId>
-              <version>${version.com.uber.nullaway}</version>
-            </path>
             <!--            &lt;!&ndash; =================================================================================================== &ndash;&gt;-->
             <!--            <path>-->
             <!--              <groupId>com.querydsl</groupId>-->
@@ -627,24 +594,7 @@
             <!--            </path>-->
             <!-- =================================================================================================== -->
           </annotationProcessorPaths>
-          <!-- Error Prone + NullAway; see .mvn/jvm.config for the required add-exports/add-opens flags -->
-          <compilerArgs>
-            <arg>-XDcompilePolicy=simple</arg>
-            <arg>--should-stop=ifError=FLOW</arg>
-            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
-            <!-- the generated JPA static metamodel is not ours to annotate; keep Error Prone off it -->
-            <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.* -XepOpt:NullAway:OnlyNullMarked=true -XepOpt:NullAway:JSpecifyMode=true -XepOpt:NullAway:AssertsEnabled=true -Xep:NullAway:${nullaway.severity}</arg>
-          </compilerArgs>
         </configuration>
-        <executions>
-          <execution>
-            <!-- Error Prone / NullAway are not run over test sources: tests deliberately pass null. -->
-            <id>default-testCompile</id>
-            <configuration>
-              <compilerArgs combine.self="override" />
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

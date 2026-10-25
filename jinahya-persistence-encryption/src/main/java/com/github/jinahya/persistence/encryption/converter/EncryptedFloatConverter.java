@@ -25,7 +25,7 @@ public final class EncryptedFloatConverter extends EncryptedAttributeConverter<F
         this(null);
     }
 
-    EncryptedFloatConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedFloatConverter(final EntityEncryptionService service) {
         super(Float.class, OfPrimitive::encodeFloat, OfPrimitive::decodeFloat, service);
     }
 }

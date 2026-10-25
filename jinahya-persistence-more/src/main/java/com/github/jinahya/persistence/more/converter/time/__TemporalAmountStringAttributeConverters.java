@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more.converter.time;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Period;
@@ -80,7 +79,7 @@ public final class __TemporalAmountStringAttributeConverters {
          *         inherited from {@link __TemporalAmountStringAttributeConverter}.
          */
         @Override
-        public @Nullable Duration convertToEntityAttribute(final @Nullable String dbData) {
+        public Duration convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -121,7 +120,7 @@ public final class __TemporalAmountStringAttributeConverters {
          *         inherited from {@link __TemporalAmountStringAttributeConverter}.
          */
         @Override
-        public @Nullable Period convertToEntityAttribute(final @Nullable String dbData) {
+        public Period convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }

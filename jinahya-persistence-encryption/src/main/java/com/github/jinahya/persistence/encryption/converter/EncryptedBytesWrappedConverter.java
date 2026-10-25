@@ -25,7 +25,7 @@ public final class EncryptedBytesWrappedConverter extends EncryptedAttributeConv
         this(null);
     }
 
-    EncryptedBytesWrappedConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedBytesWrappedConverter(final EntityEncryptionService service) {
         super(Byte[].class, OfLang::encodeBytesWrapped, OfLang::decodeBytesWrapped, service);
     }
 }

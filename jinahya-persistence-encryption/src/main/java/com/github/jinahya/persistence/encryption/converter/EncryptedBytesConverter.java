@@ -25,7 +25,7 @@ public final class EncryptedBytesConverter extends EncryptedAttributeConverter<b
         this(null);
     }
 
-    EncryptedBytesConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedBytesConverter(final EntityEncryptionService service) {
         super(byte[].class, OfPrimitive::encodeBytes, OfPrimitive::decodeBytes, service);
     }
 }

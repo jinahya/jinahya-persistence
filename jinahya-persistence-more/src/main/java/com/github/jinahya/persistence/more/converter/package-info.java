@@ -32,13 +32,6 @@
  * {@link com.github.jinahya.persistence.more.converter.time the time sub-package}, with the attribute axis of its own
  * that those types call for.
  *
- * <h2>PostgreSQL arrays and intervals</h2>
- * Nothing above names a database. The one sub-package which does,
- * {@link com.github.jinahya.persistence.more.converter.postgresql the postgresql sub-package}, maps a
- * {@link java.util.List} to a one-dimensional PostgreSQL array column &mdash; each element through one of the
- * converters above &mdash; and a {@link java.time.Duration} or a {@link java.time.Period} to an {@code interval}
- * column, written once for both providers.
- *
  * <h2>JSON</h2>
  * A {@link jakarta.json.JsonValue}, or anything Jakarta JSON Binding maps, stored as JSON text in a {@code String}
  * column, is in {@link com.github.jinahya.persistence.more.converter.json the json sub-package}; both APIs are
@@ -63,7 +56,6 @@
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.more.converter;
 
 /*-

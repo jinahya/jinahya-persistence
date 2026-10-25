@@ -25,7 +25,7 @@ public final class EncryptedIntegerConverter extends EncryptedAttributeConverter
         this(null);
     }
 
-    EncryptedIntegerConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedIntegerConverter(final EntityEncryptionService service) {
         super(Integer.class, OfPrimitive::encodeInt, OfPrimitive::decodeInt, service);
     }
 }

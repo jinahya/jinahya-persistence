@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.converter;
  */
 
 import jakarta.persistence.Converter;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Converters for a {@link Boolean} entity attribute stored as a yes-or-no flag.
@@ -101,7 +100,7 @@ public final class __BooleanYnAttributeConverters {
          *         {@link Boolean#FALSE}; {@code null} when it is {@code null}.
          */
         @Override
-        public @Nullable Character convertToDatabaseColumn(final @Nullable Boolean attribute) {
+        public Character convertToDatabaseColumn(final Boolean attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -117,7 +116,7 @@ public final class __BooleanYnAttributeConverters {
          * @throws IllegalArgumentException when the {@code dbData} is neither.
          */
         @Override
-        public @Nullable Boolean convertToEntityAttribute(final @Nullable Character dbData) {
+        public Boolean convertToEntityAttribute(final Character dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -172,7 +171,7 @@ public final class __BooleanYnAttributeConverters {
          * @implSpec Delegated to {@link OfCharacter} unchanged.
          */
         @Override
-        public @Nullable Character convertToDatabaseColumn(final @Nullable Boolean attribute) {
+        public Character convertToDatabaseColumn(final Boolean attribute) {
             return strictConverter.convertToDatabaseColumn(attribute);
         }
 
@@ -189,7 +188,7 @@ public final class __BooleanYnAttributeConverters {
          *         holding what this converter writes never reaches the {@code catch}.
          */
         @Override
-        public @Nullable Boolean convertToEntityAttribute(final @Nullable Character dbData) {
+        public Boolean convertToEntityAttribute(final Character dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -259,7 +258,7 @@ public final class __BooleanYnAttributeConverters {
          *         {@link Boolean#FALSE}; {@code null} when it is {@code null}.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable Boolean attribute) {
+        public String convertToDatabaseColumn(final Boolean attribute) {
             if (attribute == null) {
                 return null;
             }
@@ -276,7 +275,7 @@ public final class __BooleanYnAttributeConverters {
          *                                  {@code String} included.
          */
         @Override
-        public @Nullable Boolean convertToEntityAttribute(final @Nullable String dbData) {
+        public Boolean convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }
@@ -333,7 +332,7 @@ public final class __BooleanYnAttributeConverters {
          * @implSpec Delegated to {@link OfString} unchanged.
          */
         @Override
-        public @Nullable String convertToDatabaseColumn(final @Nullable Boolean attribute) {
+        public String convertToDatabaseColumn(final Boolean attribute) {
             return strictConverter.convertToDatabaseColumn(attribute);
         }
 
@@ -350,7 +349,7 @@ public final class __BooleanYnAttributeConverters {
          *         holding what this converter writes never reaches the {@code catch}.
          */
         @Override
-        public @Nullable Boolean convertToEntityAttribute(final @Nullable String dbData) {
+        public Boolean convertToEntityAttribute(final String dbData) {
             if (dbData == null) {
                 return null;
             }

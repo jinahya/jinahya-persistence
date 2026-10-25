@@ -32,7 +32,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An entity which orders its siblings under {@link jakarta.persistence.AccessType#PROPERTY PROPERTY} access, declaring
@@ -68,14 +67,13 @@ public class _PropertyAccessNodeEntity implements __SelfReferencingOrdered<_Prop
         super();
     }
 
-    _PropertyAccessNodeEntity(final @Nullable _PropertyAccessNodeEntity parent, final Integer displayOrder) {
+    _PropertyAccessNodeEntity(final _PropertyAccessNodeEntity parent, final Integer displayOrder) {
         this.parent = parent;
         this.displayOrder = displayOrder;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    @Nullable
     @Transient
     @Override
     public _PropertyAccessNodeEntity getHierarchyParent() {
@@ -107,11 +105,11 @@ public class _PropertyAccessNodeEntity implements __SelfReferencingOrdered<_Prop
     @__SelfReferencingParent
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = COLUMN_NAME_PARENT, nullable = true, insertable = true, updatable = true)
-    public @Nullable _PropertyAccessNodeEntity getParent() {
+    public _PropertyAccessNodeEntity getParent() {
         return parent;
     }
 
-    public void setParent(final @Nullable _PropertyAccessNodeEntity parent) {
+    public void setParent(final _PropertyAccessNodeEntity parent) {
         this.parent = parent;
     }
 

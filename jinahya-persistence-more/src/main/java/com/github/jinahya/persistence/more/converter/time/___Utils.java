@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.more.converter.time;
  * #L%
  */
 
-import org.jspecify.annotations.Nullable;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -59,7 +57,6 @@ final class ___Utils {
      *         {@link #invokeStaticFactory(Method, Class, Object) invoking} it can not fail the cast; a method which
      *         merely shares the name and parameter is not accepted.
      */
-    @Nullable
     static Method findStaticFactory(final Class<?> clazz, final String name, final Class<?> parameterType) {
         assert clazz != null;
         assert name != null;
@@ -89,9 +86,8 @@ final class ___Utils {
      *         the expected form is the useful exception, and burying it in an {@link InvocationTargetException} would
      *         hide it behind the fact that this package used reflection.
      */
-    @Nullable
     static <X> X invokeStaticFactory(final Method method, final Class<X> resultClass,
-                                     final @Nullable Object argument) {
+                                     final Object argument) {
         assert method != null;
         assert resultClass != null;
         try {

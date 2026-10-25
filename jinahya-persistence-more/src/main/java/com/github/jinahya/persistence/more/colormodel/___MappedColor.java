@@ -24,7 +24,6 @@ import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -290,7 +289,7 @@ public abstract class ___MappedColor implements Serializable {
      * @return {@code true} when the {@code other} color is of this class and matches component for component;
      *         {@code false} otherwise.
      */
-    public boolean hasSameComponentsAs(final @Nullable ___MappedColor other) {
+    public boolean hasSameComponentsAs(final ___MappedColor other) {
         if (other == null || getClass() != other.getClass()) {
             return false;
         }

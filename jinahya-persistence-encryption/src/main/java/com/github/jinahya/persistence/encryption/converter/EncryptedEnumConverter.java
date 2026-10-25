@@ -33,7 +33,7 @@ public abstract class EncryptedEnumConverter<E extends Enum<E>> extends Encrypte
     }
 
     EncryptedEnumConverter(final Class<E> enumClass,
-                           final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+                           final EntityEncryptionService service) {
         super(enumClass, OfLang::encodeEnum, b -> OfLang.decodeEnum(b, enumClass), service);
     }
 }

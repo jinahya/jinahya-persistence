@@ -25,7 +25,7 @@ public final class EncryptedCharsConverter extends EncryptedAttributeConverter<c
         this(null);
     }
 
-    EncryptedCharsConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedCharsConverter(final EntityEncryptionService service) {
         super(char[].class, OfPrimitive::encodeChars, OfPrimitive::decodeChars, service);
     }
 }

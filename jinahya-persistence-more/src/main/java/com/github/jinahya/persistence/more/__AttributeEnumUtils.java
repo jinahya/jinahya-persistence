@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +97,6 @@ public final class __AttributeEnumUtils {
      *         an enum whose attribute values are {@code null} or duplicated therefore fails on its first use, rather
      *         than resolving to whichever constant happens to be declared first.
      */
-    @Nullable
     @SuppressWarnings({"unchecked"})
     private static <E extends __AttributeEnum<?, ?>>
     E find_(final Class<? extends E> enumClass, final Object attributeValue) {

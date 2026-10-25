@@ -29,7 +29,6 @@ import jakarta.json.JsonString;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 import jakarta.persistence.AttributeConverter;
-import org.jspecify.annotations.Nullable;
 import jakarta.persistence.Converter;
 
 import java.io.StringReader;
@@ -111,7 +110,7 @@ public abstract class JsonpStringAttributeConverter<X extends JsonValue>
     // ---------------------------------------------------------------------------------------------- AttributeConverter
 
     @Override
-    public @Nullable String convertToDatabaseColumn(final @Nullable X attribute) {
+    public String convertToDatabaseColumn(final X attribute) {
         if (attribute == null) {
             return null;
         }
@@ -119,7 +118,7 @@ public abstract class JsonpStringAttributeConverter<X extends JsonValue>
     }
 
     @Override
-    public @Nullable X convertToEntityAttribute(final @Nullable String dbData) {
+    public X convertToEntityAttribute(final String dbData) {
         if (dbData == null) {
             return null;
         }

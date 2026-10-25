@@ -20,8 +20,6 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
-import org.jspecify.annotations.Nullable;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -73,7 +71,7 @@ final class ___Utils {
      *         separate marks. Bridge and synthetic members are skipped for the same reason: a covariant return
      *         generates them, and they carry the annotations of the method they stand for.
      */
-    static @Nullable Member findMember(final Class<?> type, final Class<? extends Annotation> annotationClass) {
+    static Member findMember(final Class<?> type, final Class<? extends Annotation> annotationClass) {
         assert type != null;
         assert annotationClass != null;
         Field field = null;
@@ -150,7 +148,7 @@ final class ___Utils {
      *         accessor which derives the value it holds is running its caller's own code here, and burying its failure
      *         inside a reflection error would hide the only part of the stack which explains it.
      */
-    static @Nullable Object valueOf(final Member member, final Object instance) throws ReflectiveOperationException {
+    static Object valueOf(final Member member, final Object instance) throws ReflectiveOperationException {
         assert member != null;
         assert instance != null;
         if (member instanceof Method method) {

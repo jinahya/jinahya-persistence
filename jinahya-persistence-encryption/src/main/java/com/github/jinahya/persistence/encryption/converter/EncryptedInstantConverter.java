@@ -26,7 +26,7 @@ public final class EncryptedInstantConverter extends EncryptedAttributeConverter
         this(null);
     }
 
-    EncryptedInstantConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedInstantConverter(final EntityEncryptionService service) {
         super(Instant.class, OfTime::encodeInstant, OfTime::decodeInstant, service);
     }
 }

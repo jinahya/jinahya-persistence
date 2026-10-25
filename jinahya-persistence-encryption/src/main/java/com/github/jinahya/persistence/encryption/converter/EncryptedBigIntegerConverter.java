@@ -26,7 +26,7 @@ public final class EncryptedBigIntegerConverter extends EncryptedAttributeConver
         this(null);
     }
 
-    EncryptedBigIntegerConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedBigIntegerConverter(final EntityEncryptionService service) {
         super(BigInteger.class, OfMath::encodeBigInteger, OfMath::decodeBigInteger, service);
     }
 }

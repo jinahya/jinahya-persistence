@@ -105,14 +105,14 @@ public class EncryptedConverter implements Converter {
     }
 
     @Override
-    public @org.jspecify.annotations.Nullable Object convertObjectValueToDataValue(
-            final @org.jspecify.annotations.Nullable Object objectValue, final Session session) {
+    public Object convertObjectValueToDataValue(
+            final Object objectValue, final Session session) {
         return objectValue == null ? null : delegate().convertToDatabaseColumn(objectValue);
     }
 
     @Override
-    public @org.jspecify.annotations.Nullable Object convertDataValueToObjectValue(
-            final @org.jspecify.annotations.Nullable Object dataValue, final Session session) {
+    public Object convertDataValueToObjectValue(
+            final Object dataValue, final Session session) {
         if (dataValue == null) {
             return null;
         }
@@ -135,8 +135,8 @@ public class EncryptedConverter implements Converter {
     }
 
     // the fields may not be qualified with their table yet, when the mapping is initialized
-    private static boolean sameField(final @org.jspecify.annotations.Nullable DatabaseField a,
-                                     final @org.jspecify.annotations.Nullable DatabaseField b) {
+    private static boolean sameField(final DatabaseField a,
+                                     final DatabaseField b) {
         if (a == null || b == null) {
             return false;
         }
@@ -153,5 +153,5 @@ public class EncryptedConverter implements Converter {
 
     // -----------------------------------------------------------------------------------------------------------------
     // set when the mapping is initialized, by one thread; read by every conversion, on any thread
-    private transient volatile @org.jspecify.annotations.Nullable AttributeConverter<Object, byte[]> delegate;
+    private transient volatile AttributeConverter<Object, byte[]> delegate;
 }

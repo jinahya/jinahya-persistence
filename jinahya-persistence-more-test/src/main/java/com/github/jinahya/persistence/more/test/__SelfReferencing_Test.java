@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more.test;
 
 import com.github.jinahya.persistence.more.__SelfReferencing;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -172,7 +171,7 @@ public abstract class __SelfReferencing_Test<T extends __SelfReferencing<T>> {
      * @return the method; {@code null} when the entity class tree declares none, which is an entity inheriting the
      *         accessor from elsewhere.
      */
-    private @Nullable Method findDeclaredAccessor(final String name) {
+    private Method findDeclaredAccessor(final String name) {
         for (Class<?> c = entityClass; c != null && c != Object.class; c = c.getSuperclass()) {
             try {
                 return c.getDeclaredMethod(name);

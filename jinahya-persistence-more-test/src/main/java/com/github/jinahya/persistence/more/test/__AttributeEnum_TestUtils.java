@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.test;
  */
 
 import com.github.jinahya.persistence.more.__AttributeEnum;
-import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +50,7 @@ public final class __AttributeEnum_TestUtils {
      * @param <R>       result type parameter
      * @return the result of the {@code function}.
      */
-    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R extends @Nullable Object>
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R>
     R applyEnumConstantStream(final Class<ENUM> enumClass,
                               final Function<? super Stream<ENUM>, ? extends R> function) {
         Objects.requireNonNull(enumClass, "enumClass is null");
@@ -75,7 +74,7 @@ public final class __AttributeEnum_TestUtils {
     void acceptEnumConstantStream(final Class<ENUM> enumClass,
                                   final Consumer<? super Stream<ENUM>> consumer) {
         Objects.requireNonNull(consumer, "consumer is null");
-        __AttributeEnum_TestUtils.<ENUM, @Nullable Void>applyEnumConstantStream(
+        __AttributeEnum_TestUtils.<ENUM, Void>applyEnumConstantStream(
                 enumClass,
                 s -> {
                     consumer.accept(s);
@@ -97,7 +96,7 @@ public final class __AttributeEnum_TestUtils {
      * @param <R>         result type parameter
      * @return the result of the {@code function}.
      */
-    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R extends @Nullable Object>
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R>
     R applyAttributeValueStream(final Class<ENUM> enumClass,
                                 final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
         Objects.requireNonNull(enumClass, "enumClass is null");
@@ -123,7 +122,7 @@ public final class __AttributeEnum_TestUtils {
                                     final Consumer<? super Stream<ATTRIBUTE>> consumer) {
         Objects.requireNonNull(enumClass, "enumClass is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        __AttributeEnum_TestUtils.<ENUM, ATTRIBUTE, @Nullable Void>applyAttributeValueStream(
+        __AttributeEnum_TestUtils.<ENUM, ATTRIBUTE, Void>applyAttributeValueStream(
                 enumClass,
                 s -> {
                     consumer.accept(s);
@@ -165,12 +164,9 @@ public final class __AttributeEnum_TestUtils {
      * @return the result of the {@code function}; {@code null} if the {@code enumClass} doesn't have any constant.
      * @see #getRandomEnumConstant(Class)
      */
-    // NullAway cannot infer a @Nullable type argument for the generic call below from the lambda body;
-    // the enclosing method is declared @Nullable and documents the null result.
-    @SuppressWarnings("NullAway")
-    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R extends @Nullable Object>
-    @Nullable R applyRandomEnumConstant(final Class<ENUM> enumClass,
-                                        final Function<? super ENUM, ? extends R> function) {
+    public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>, R>
+    R applyRandomEnumConstant(final Class<ENUM> enumClass,
+                              final Function<? super ENUM, ? extends R> function) {
         Objects.requireNonNull(function, "function is null");
         return applyEnumConstantStream(
                 enumClass,
@@ -195,7 +191,6 @@ public final class __AttributeEnum_TestUtils {
      *         constant.
      * @see #applyRandomEnumConstant(Class, Function)
      */
-    @Nullable
     public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ?>>
     ENUM getRandomEnumConstant(final Class<ENUM> enumClass) {
         return applyRandomEnumConstant(enumClass, Function.identity());
@@ -213,7 +208,6 @@ public final class __AttributeEnum_TestUtils {
      * @return the result of the {@code function}; {@code null} if the {@code enumClass} doesn't have any constant.
      * @see #getRandomAttributeValue(Class)
      */
-    @Nullable
     public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE, R>
     R applyRandomAttributeValue(final Class<ENUM> enumClass,
                                 final Function<? super ATTRIBUTE, ? extends R> function) {
@@ -231,7 +225,6 @@ public final class __AttributeEnum_TestUtils {
      *         any constant.
      * @see #applyRandomAttributeValue(Class, Function)
      */
-    @Nullable
     public static <ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>
     ATTRIBUTE getRandomAttributeValue(final Class<ENUM> enumClass) {
         return applyRandomAttributeValue(enumClass, Function.identity());

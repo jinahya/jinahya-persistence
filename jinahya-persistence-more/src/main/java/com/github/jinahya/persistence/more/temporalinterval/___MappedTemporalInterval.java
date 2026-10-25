@@ -27,7 +27,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.AssertTrue;
-import org.jspecify.annotations.Nullable;
 
 import java.time.temporal.Temporal;
 
@@ -186,10 +185,7 @@ import java.time.temporal.Temporal;
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
-        "java:S101", // Class names should comply with a naming convention
-        // intervalEnd is declared @Nullable -- an absent upper bound is the documented case, and the rule does not
-        // read the JSpecify type-use annotation on a type variable
-        "java:S2637" // "@NonNull" values should not be set to null
+        "java:S101" // Class names should comply with a naming convention
 })
 public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<? super T>>
         implements ___TemporalInterval<T> {
@@ -237,7 +233,7 @@ public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<
      * @return {@inheritDoc}
      */
     @Override
-    public @Nullable T getIntervalStart() {
+    public T getIntervalStart() {
         return intervalStart;
     }
 
@@ -247,7 +243,7 @@ public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<
      * @param startInclusive new value for the {@code intervalStart} attribute; {@code null} for no lower
      *                       bound.
      */
-    public void setIntervalStart(final @Nullable T startInclusive) {
+    public void setIntervalStart(final T startInclusive) {
         intervalStart = startInclusive;
     }
 
@@ -259,7 +255,7 @@ public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<
      * @return {@inheritDoc}
      */
     @Override
-    public @Nullable T getIntervalEnd() {
+    public T getIntervalEnd() {
         return intervalEnd;
     }
 
@@ -268,7 +264,7 @@ public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<
      *
      * @param endExclusive new value for the {@code intervalEnd} attribute; {@code null} for no upper bound.
      */
-    public void setIntervalEnd(final @Nullable T endExclusive) {
+    public void setIntervalEnd(final T endExclusive) {
         intervalEnd = endExclusive;
     }
 
@@ -280,7 +276,7 @@ public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<
      */
     @Basic(optional = true)
     @Column(name = COLUMN_NAME_INTERVAL_START, nullable = true, insertable = true, updatable = true)
-    private @Nullable T intervalStart;
+    private T intervalStart;
 
     /**
      * The point at which this interval ends, which it does not contain, mapped to the
@@ -288,5 +284,5 @@ public abstract class ___MappedTemporalInterval<T extends Temporal & Comparable<
      */
     @Basic(optional = true)
     @Column(name = COLUMN_NAME_INTERVAL_END, nullable = true, insertable = true, updatable = true)
-    private @Nullable T intervalEnd;
+    private T intervalEnd;
 }

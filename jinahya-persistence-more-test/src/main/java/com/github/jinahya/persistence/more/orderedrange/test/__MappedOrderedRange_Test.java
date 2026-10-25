@@ -24,7 +24,6 @@ import com.github.jinahya.persistence.more.orderedrange.__BoundType;
 import com.github.jinahya.persistence.more.orderedrange.__MappedOrderedRange;
 import com.github.jinahya.persistence.more.orderedrange.__RangeBounds;
 import com.github.jinahya.persistence.more.test.___Utils;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -164,9 +163,6 @@ public abstract class __MappedOrderedRange_Test<
     /**
      * Verifies that a {@code null} bound type is refused, whatever the endpoint is.
      */
-    // the null is the point of the assertion: these methods are specified to refuse one, and NullAway cannot tell
-    // a deliberate null argument from an accidental one
-    @SuppressWarnings("NullAway")
     @DisplayName("a null bound type is refused, whatever the endpoint is")
     @Test
     protected void _NullPointerException_NullBoundType() {
@@ -257,9 +253,6 @@ public abstract class __MappedOrderedRange_Test<
     /**
      * Verifies that a {@code null} value is refused rather than answered.
      */
-    // the null is the point of the assertion: these methods are specified to refuse one, and NullAway cannot tell
-    // a deliberate null argument from an accidental one
-    @SuppressWarnings("NullAway")
     @DisplayName("a null value is refused rather than answered")
     @Test
     protected void _NullPointerException_ContainsNull() {
@@ -379,7 +372,7 @@ public abstract class __MappedOrderedRange_Test<
      * @implSpec The default implementation returns {@code null}. A subclass overrides it by delegating to the
      *           {@code protected} method on the range class, which it can reach when it sits in that class's package.
      */
-    protected @Nullable String encode(final R instance, final C value) {
+    protected String encode(final R instance, final C value) {
         return null;
     }
 
@@ -391,7 +384,7 @@ public abstract class __MappedOrderedRange_Test<
      * @return the decoded endpoint; {@code null} for a subclass which does not expose the codec.
      * @implSpec As {@link #encode(__MappedOrderedRange, Comparable)}.
      */
-    protected @Nullable C decode(final R instance, final String encoded) {
+    protected C decode(final R instance, final String encoded) {
         return null;
     }
 
@@ -434,8 +427,8 @@ public abstract class __MappedOrderedRange_Test<
      * @param upperBoundType whether the {@code upper} endpoint belongs to the range.
      * @return a new instance holding the two ends.
      */
-    protected final R newRange(final @Nullable C lower, final __BoundType lowerBoundType,
-                               final @Nullable C upper, final __BoundType upperBoundType) {
+    protected final R newRange(final C lower, final __BoundType lowerBoundType,
+                               final C upper, final __BoundType upperBoundType) {
         final var instance = newRangeInstance();
         instance.setRangeLower(lower, lowerBoundType);
         instance.setRangeUpper(upper, upperBoundType);

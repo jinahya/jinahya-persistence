@@ -26,7 +26,7 @@ public final class EncryptedUuidConverter extends EncryptedAttributeConverter<UU
         this(null);
     }
 
-    EncryptedUuidConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedUuidConverter(final EntityEncryptionService service) {
         super(UUID.class, OfUtil::encodeUuid, OfUtil::decodeUuid, service);
     }
 }

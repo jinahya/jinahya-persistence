@@ -139,14 +139,14 @@ public class EncryptedUserType implements UserType<Object> {
     }
 
     @Override
-    public @org.jspecify.annotations.Nullable Object nullSafeGet(final ResultSet rs, final int position,
+    public Object nullSafeGet(final ResultSet rs, final int position,
                                                             final WrapperOptions options) throws SQLException {
         final var bytes = rs.getBytes(position);
         return bytes == null || rs.wasNull() ? null : converter.convertToEntityAttribute(bytes);
     }
 
     @Override
-    public void nullSafeSet(final PreparedStatement st, final @org.jspecify.annotations.Nullable Object value,
+    public void nullSafeSet(final PreparedStatement st, final Object value,
                             final int index, final WrapperOptions options) throws SQLException {
         if (value == null) {
             st.setNull(index, Types.VARBINARY);
@@ -156,7 +156,7 @@ public class EncryptedUserType implements UserType<Object> {
     }
 
     @Override
-    public @org.jspecify.annotations.Nullable Object deepCopy(final @org.jspecify.annotations.Nullable Object value) {
+    public Object deepCopy(final Object value) {
         if (value == null || !mutable) {
             return value;
         }
@@ -181,8 +181,8 @@ public class EncryptedUserType implements UserType<Object> {
      * @return the ciphertext of the {@code value}: what the second-level cache holds.
      */
     @Override
-    public @org.jspecify.annotations.Nullable Serializable disassemble(
-            final @org.jspecify.annotations.Nullable Object value) {
+    public Serializable disassemble(
+            final Object value) {
         return value == null ? null : converter.convertToDatabaseColumn(value);
     }
 
@@ -192,14 +192,14 @@ public class EncryptedUserType implements UserType<Object> {
      * @return the value decrypted from the {@code cached} ciphertext.
      */
     @Override
-    public @org.jspecify.annotations.Nullable Object assemble(
-            final @org.jspecify.annotations.Nullable Serializable cached, final Object owner) {
+    public Object assemble(
+            final Serializable cached, final Object owner) {
         return cached == null ? null : converter.convertToEntityAttribute((byte[]) cached);
     }
 
     @Override
-    public @org.jspecify.annotations.Nullable Object replace(final @org.jspecify.annotations.Nullable Object detached,
-                                                        final @org.jspecify.annotations.Nullable Object managed,
+    public Object replace(final Object detached,
+                                                        final Object managed,
                                                         final Object owner) {
         return deepCopy(detached);
     }

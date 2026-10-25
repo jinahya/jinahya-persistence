@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more;
  */
 
 import jakarta.validation.constraints.NotNull;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Member;
 import java.util.Objects;
@@ -38,7 +37,6 @@ import java.util.Objects;
  * {@snippet lang = "java":
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @Nullable
  * @Transient
  * @Override public Category getHierarchyParent() { return __SelfReferencingUtils.parentOf(this); }}
  *         <p>
@@ -148,7 +146,7 @@ public final class __SelfReferencingUtils {
      *         prefer.
      * @see __SelfReferencingParent
      */
-    public static <T extends __SelfReferencing<T>> @Nullable T parentOf(final T instance) {
+    public static <T extends __SelfReferencing<T>> T parentOf(final T instance) {
         Objects.requireNonNull(instance, "instance is null");
         final var member = PARENT_MEMBERS.get(instance.getClass());
         try {
@@ -193,7 +191,7 @@ public final class __SelfReferencingUtils {
      *         constraint.
      * @see __SelfReferencingOrdinal
      */
-    public static <T extends __SelfReferencingOrdered<T>> @Nullable Integer ordinalOf(final T instance) {
+    public static <T extends __SelfReferencingOrdered<T>> Integer ordinalOf(final T instance) {
         Objects.requireNonNull(instance, "instance is null");
         final var member = ORDINAL_MEMBERS.get(instance.getClass());
         try {

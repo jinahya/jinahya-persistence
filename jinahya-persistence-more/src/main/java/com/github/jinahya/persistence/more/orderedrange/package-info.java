@@ -84,7 +84,6 @@
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a href="https://www.postgresql.org/docs/current/rangetypes.html">PostgreSQL range types</a>
  */
-@org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.more.orderedrange;
 
 /*-

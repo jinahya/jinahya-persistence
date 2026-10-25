@@ -5,8 +5,6 @@ module com.github.jinahya.persistence.encryption {
     // jakarta.inject.Inject on EncryptedAttributeConverter, its only injection point
     requires static jakarta.inject;
 
-    requires static org.jspecify;
-
     exports com.github.jinahya.persistence.encryption;
     exports com.github.jinahya.persistence.encryption.converter;
 

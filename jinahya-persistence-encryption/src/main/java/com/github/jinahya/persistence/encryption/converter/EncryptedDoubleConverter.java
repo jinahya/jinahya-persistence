@@ -25,7 +25,7 @@ public final class EncryptedDoubleConverter extends EncryptedAttributeConverter<
         this(null);
     }
 
-    EncryptedDoubleConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedDoubleConverter(final EntityEncryptionService service) {
         super(Double.class, OfPrimitive::encodeDouble, OfPrimitive::decodeDouble, service);
     }
 }

@@ -28,7 +28,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Period;
 import java.time.YearMonth;
@@ -166,7 +165,7 @@ public abstract class __MappedYearMonthInterval extends ___MappedTemporalInterva
      */
     @Override
     @Transient
-    public @Nullable Period getTemporalAmount() {
+    public Period getTemporalAmount() {
         final YearMonth startInclusive = getIntervalStart();
         final YearMonth endExclusive = getIntervalEnd();
         if (startInclusive == null || endExclusive == null) {

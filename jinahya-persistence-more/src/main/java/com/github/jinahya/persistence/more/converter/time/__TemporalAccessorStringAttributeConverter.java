@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more.converter.time;
 
 import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import jakarta.persistence.Converter;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.time.Instant;
@@ -101,7 +100,7 @@ public abstract class __TemporalAccessorStringAttributeConverter<X extends Tempo
      * @see #formatter
      */
     protected __TemporalAccessorStringAttributeConverter(final Class<X> attributeClass,
-                                                         final @Nullable DateTimeFormatter formatter) {
+                                                         final DateTimeFormatter formatter) {
         super();
         this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");
         this.formatter = formatter;
@@ -126,7 +125,7 @@ public abstract class __TemporalAccessorStringAttributeConverter<X extends Tempo
      *         {@link #convertToEntityAttribute(String)}.
      */
     @Override
-    public @Nullable String convertToDatabaseColumn(final @Nullable X attribute) {
+    public String convertToDatabaseColumn(final X attribute) {
         if (attribute == null) {
             return null;
         }
@@ -153,7 +152,7 @@ public abstract class __TemporalAccessorStringAttributeConverter<X extends Tempo
      *         the expected form &mdash; is thrown from here unchanged.
      */
     @Override
-    public @Nullable X convertToEntityAttribute(final @Nullable String dbData) {
+    public X convertToEntityAttribute(final String dbData) {
         if (dbData == null) {
             return null;
         }
@@ -175,12 +174,12 @@ public abstract class __TemporalAccessorStringAttributeConverter<X extends Tempo
     /**
      * The formatter which writes and reads the column; {@code null} when the type's own ISO-8601 form is used.
      */
-    protected final transient @Nullable DateTimeFormatter formatter;
+    protected final transient DateTimeFormatter formatter;
 
     /**
      * The static factory {@link #convertToEntityAttribute(String)} reads a column with &mdash;
      * {@code parse(CharSequence)} with no {@link #formatter}, {@code from(TemporalAccessor)} with one; {@code null}
      * when {@link #attributeClass} declares neither.
      */
-    private final transient @Nullable Method factoryMethod;
+    private final transient Method factoryMethod;
 }

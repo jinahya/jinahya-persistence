@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more.temporalinterval.test;
 
 import com.github.jinahya.persistence.more.temporalinterval.___MappedTemporalInterval;
 import com.github.jinahya.persistence.more.test.___Utils;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -188,9 +187,6 @@ public abstract class ___MappedTemporalInterval_Test<
     /**
      * Verifies that a {@code null} point is refused rather than answered.
      */
-    // the null is the point of the assertion: these methods are specified to refuse one, and NullAway cannot tell
-    // a deliberate null argument from an accidental one
-    @SuppressWarnings("NullAway")
     @DisplayName("a null point is refused rather than answered")
     @Test
     protected void _NullPointerException_ContainsNull() {
@@ -266,7 +262,7 @@ public abstract class ___MappedTemporalInterval_Test<
      * @param endExclusive   the point at which the interval ends; {@code null} for no upper bound.
      * @return a new instance holding the two points.
      */
-    protected final I newInterval(final @Nullable P startInclusive, final @Nullable P endExclusive) {
+    protected final I newInterval(final P startInclusive, final P endExclusive) {
         final var instance = newIntervalInstance();
         instance.setIntervalStart(startInclusive);
         instance.setIntervalEnd(endExclusive);

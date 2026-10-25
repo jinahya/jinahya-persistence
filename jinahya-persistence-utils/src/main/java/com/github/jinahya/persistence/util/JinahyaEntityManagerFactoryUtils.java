@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.util;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -67,7 +66,7 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @see PersistenceUnitUtil#getIdentifier(Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> @Nullable Y getIdentifier(final EntityManagerFactory factory, final Object entity) {
+    public static <Y> Y getIdentifier(final EntityManagerFactory factory, final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
         return (Y) getPersistenceUnitUtil(factory).getIdentifier(entity);
@@ -84,7 +83,7 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @see PersistenceUnitUtil#getVersion(Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> @Nullable Y getVersion(final EntityManagerFactory factory, final Object entity) {
+    public static <Y> Y getVersion(final EntityManagerFactory factory, final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
         return (Y) getPersistenceUnitUtil(factory).getVersion(entity);

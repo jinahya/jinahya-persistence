@@ -26,7 +26,7 @@ public final class EncryptedOffsetDateTimeConverter extends EncryptedAttributeCo
         this(null);
     }
 
-    EncryptedOffsetDateTimeConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedOffsetDateTimeConverter(final EntityEncryptionService service) {
         super(OffsetDateTime.class, OfTime::encodeOffsetDateTime, OfTime::decodeOffsetDateTime, service);
     }
 }

@@ -24,7 +24,6 @@ import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -151,7 +150,7 @@ public abstract class __MappedOffsetDateTimeInterval extends ___MappedTemporalIn
      */
     @Override
     @Transient
-    public @Nullable Duration getTemporalAmount() {
+    public Duration getTemporalAmount() {
         final OffsetDateTime startInclusive = getIntervalStart();
         final OffsetDateTime endExclusive = getIntervalEnd();
         if (startInclusive == null || endExclusive == null) {

@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.temporalinterval;
  */
 
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
@@ -89,7 +88,7 @@ public interface ___DiscreteInterval<T extends Temporal & Comparable<? super T>>
             "unchecked" // (T) Temporal, per Temporal#minus(long, TemporalUnit)
     })
     @Transient
-    default @Nullable T getIntervalEndInclusive() {
+    default T getIntervalEndInclusive() {
         final T endExclusive = getIntervalEnd();
         if (endExclusive == null || isEmpty()) {
             return null;

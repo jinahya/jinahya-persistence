@@ -4,7 +4,6 @@ import com.github.jinahya.persistence.more.__SelfReferencingOrdered;
 import com.github.jinahya.persistence.more.__SelfReferencingOrdinal;
 import com.github.jinahya.persistence.more.__SelfReferencingParent;
 import com.github.jinahya.persistence.more.__SelfReferencingUtils;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An ordered self-referencing sample which keeps the default {@code getSiblingOrdinal()}, so that the marked ordinal
@@ -12,7 +11,6 @@ import org.jspecify.annotations.Nullable;
  */
 class _SampleOrderedNode implements __SelfReferencingOrdered<_SampleOrderedNode> {
 
-    @Nullable
     @Override
     public _SampleOrderedNode getHierarchyParent() {
         return __SelfReferencingUtils.parentOf(this);
@@ -24,9 +22,9 @@ class _SampleOrderedNode implements __SelfReferencingOrdered<_SampleOrderedNode>
     }
 
     @__SelfReferencingParent
-    private @Nullable _SampleOrderedNode parent;
+    private _SampleOrderedNode parent;
 
     // an Integer, so that an unassigned ordinal reads null and is reported by @NotNull rather than read as zero
     @__SelfReferencingOrdinal
-    private @Nullable Integer ordinal;
+    private Integer ordinal;
 }

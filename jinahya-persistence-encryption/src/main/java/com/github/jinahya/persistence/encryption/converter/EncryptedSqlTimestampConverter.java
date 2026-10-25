@@ -25,7 +25,7 @@ public final class EncryptedSqlTimestampConverter extends EncryptedAttributeConv
         this(null);
     }
 
-    EncryptedSqlTimestampConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedSqlTimestampConverter(final EntityEncryptionService service) {
         super(java.sql.Timestamp.class, OfSql::encodeTimestamp, OfSql::decodeTimestamp, service);
     }
 }

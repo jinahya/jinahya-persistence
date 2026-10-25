@@ -76,7 +76,7 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
      */
     EncryptedAttributeConverter(final Class<X> javaType, final Function<? super X, byte[]> encoder,
                                 final Function<byte[], ? extends X> decoder,
-                                final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+                                final EntityEncryptionService service) {
         super();
         this.javaType = Objects.requireNonNull(javaType, "javaType is null");
         this.encoder = Objects.requireNonNull(encoder, "encoder is null");
@@ -95,8 +95,8 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
      * @implNote The message of an exception never carries the value.
      */
     @Override
-    public final byte @org.jspecify.annotations.Nullable [] convertToDatabaseColumn(
-            final @org.jspecify.annotations.Nullable X attribute) {
+    public final byte[] convertToDatabaseColumn(
+            final X attribute) {
         if (attribute == null) {
             return null;
         }
@@ -122,8 +122,8 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
      *                              service itself throws passes through.
      */
     @Override
-    public final @org.jspecify.annotations.Nullable X convertToEntityAttribute(
-            final byte @org.jspecify.annotations.Nullable [] dbData) {
+    public final X convertToEntityAttribute(
+            final byte[] dbData) {
         if (dbData == null) {
             return null;
         }
@@ -165,5 +165,5 @@ public abstract class EncryptedAttributeConverter<X> implements AttributeConvert
 
     // injected when the persistence provider creates converters through a bean container; loaded otherwise
     @Inject
-    private volatile @org.jspecify.annotations.Nullable EntityEncryptionService service;
+    private volatile EntityEncryptionService service;
 }

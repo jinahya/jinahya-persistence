@@ -195,7 +195,6 @@
  * @see <a href="https://www.w3.org/TR/css-color-5/">CSS Color Module Level 5</a>
  * @see <a href="https://www.w3.org/TR/css-values-4/">CSS Values and Units Module Level 4</a>
  */
-@org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.more.colormodel;
 
 /*-

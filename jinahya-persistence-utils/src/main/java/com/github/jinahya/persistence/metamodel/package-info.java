@@ -35,7 +35,6 @@
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-@org.jspecify.annotations.NullMarked
 package com.github.jinahya.persistence.metamodel;
 
 import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;

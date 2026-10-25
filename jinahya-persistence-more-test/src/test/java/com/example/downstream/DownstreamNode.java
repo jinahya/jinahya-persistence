@@ -4,12 +4,10 @@ import com.github.jinahya.persistence.more.__SelfReferencingOrdered;
 import com.github.jinahya.persistence.more.__SelfReferencingOrdinal;
 import com.github.jinahya.persistence.more.__SelfReferencingParent;
 import com.github.jinahya.persistence.more.__SelfReferencingUtils;
-import org.jspecify.annotations.Nullable;
 
 /** A hierarchy a downstream maps, answering through the marked members. */
 public class DownstreamNode implements __SelfReferencingOrdered<DownstreamNode> {
 
-    @Nullable
     @Override
     public DownstreamNode getHierarchyParent() {
         return __SelfReferencingUtils.parentOf(this);
@@ -21,8 +19,8 @@ public class DownstreamNode implements __SelfReferencingOrdered<DownstreamNode> 
     }
 
     @__SelfReferencingParent
-    private @Nullable DownstreamNode parent;
+    private DownstreamNode parent;
 
     @__SelfReferencingOrdinal
-    private @Nullable Integer ordinal;
+    private Integer ordinal;
 }

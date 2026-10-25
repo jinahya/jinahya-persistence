@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.metamodel.util;
  */
 
 import jakarta.persistence.metamodel.Attribute;
-import org.jspecify.annotations.Nullable;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -78,12 +77,9 @@ public final class JinahyaAttributeUtils {
      * @throws IllegalArgumentException when the {@code attribute}'s java member is neither a {@link Method} nor a
      *                                  {@link Field}.
      */
-    // NullAway does not propagate @Nullable through the nested wildcard type arguments below; the two
-    // `apply(null)` calls are exactly what the annotated signature already declares.
-    @SuppressWarnings("NullAway")
     public static <R> R applyJavaMember(
             final Attribute<?, ?> attribute,
-            final Function<? super @Nullable Method, ? extends Function<? super @Nullable Field, ? extends R>> function) {
+            final Function<? super Method, ? extends Function<? super Field, ? extends R>> function) {
         Objects.requireNonNull(attribute, "attribute is null");
         Objects.requireNonNull(function, "function is null");
         final var javaMember = attribute.getJavaMember();
@@ -138,7 +134,7 @@ public final class JinahyaAttributeUtils {
      * @return an instance of the {@code annotation} on the {@code attribute}'s java member; {@code null} when not
      *         found.
      */
-    public static <A extends Annotation> @Nullable A getJavaMemberAnnotation(
+    public static <A extends Annotation> A getJavaMemberAnnotation(
             final Attribute<?, ?> attribute, final Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass, "annotationClass is null");
         return applyJavaMember(
@@ -161,14 +157,14 @@ public final class JinahyaAttributeUtils {
      * @param <Y>       attribute type parameter
      * @return the value of the {@code attribute} of the {@code entity}; possibly {@code null}.
      * @throws RuntimeException when the value cannot be read reflectively.
-     * @apiNote The result is {@link Nullable @Nullable} because an attribute value simply is: an optional
+     * @apiNote The result may be {@code null} because an attribute value simply may be: an optional
      *         basic column, an unset association, or a not-yet-assigned generated id all read back as {@code null}.
      *         Callers must check.
      * @see #setAttributeValue(Object, Attribute, Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> @Nullable Y getAttributeValue(final Object entity,
-                                                    final Attribute<?, ? extends Y> attribute) {
+    public static <Y> Y getAttributeValue(final Object entity,
+                                          final Attribute<?, ? extends Y> attribute) {
         Objects.requireNonNull(entity, "entity is null");
         return applyJavaMember(
                 attribute,
@@ -350,12 +346,10 @@ public final class JinahyaAttributeUtils {
      * @throws RuntimeException when the value cannot be set reflectively.
      * @see #getAttributeValue(Object, Attribute)
      */
-    // NullAway cannot infer a @Nullable type argument for the generic call below from the lambda body;
-    // the enclosing method is declared @Nullable and documents the null result.
-    @SuppressWarnings({"NullAway", "unchecked"})
-    public static <T> @Nullable T setAttributeValue(final Object entity,
-                                                    final Attribute<?, ? extends T> attribute,
-                                                    final @Nullable Object value) {
+    @SuppressWarnings("unchecked")
+    public static <T> T setAttributeValue(final Object entity,
+                                          final Attribute<?, ? extends T> attribute,
+                                          final Object value) {
         Objects.requireNonNull(entity, "entity is null");
         return applyJavaMember(
                 attribute,

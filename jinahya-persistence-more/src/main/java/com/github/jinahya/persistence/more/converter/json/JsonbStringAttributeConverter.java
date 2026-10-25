@@ -27,7 +27,6 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
 import jakarta.persistence.AttributeConverter;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -56,8 +55,6 @@ public abstract class JsonbStringAttributeConverter<X>
     }
 
     @PreDestroy
-    // the jsonb is there only between @PostConstruct and @PreDestroy, which NullAway cannot tell
-    @SuppressWarnings("NullAway")
     private void closeJsonb() {
         try {
             jsonb.close();
@@ -70,9 +67,7 @@ public abstract class JsonbStringAttributeConverter<X>
     // ---------------------------------------------------------------------------------------------- AttributeConverter
 
     @Override
-    // the jsonb is there only between @PostConstruct and @PreDestroy, which NullAway cannot tell
-    @SuppressWarnings("NullAway")
-    public @Nullable String convertToDatabaseColumn(final @Nullable X attribute) {
+    public String convertToDatabaseColumn(final X attribute) {
         if (attribute == null) {
             return null;
         }
@@ -84,9 +79,7 @@ public abstract class JsonbStringAttributeConverter<X>
     }
 
     @Override
-    // the jsonb is there only between @PostConstruct and @PreDestroy, which NullAway cannot tell
-    @SuppressWarnings("NullAway")
-    public @Nullable X convertToEntityAttribute(final @Nullable String dbData) {
+    public X convertToEntityAttribute(final String dbData) {
         if (dbData == null) {
             return null;
         }
@@ -101,6 +94,6 @@ public abstract class JsonbStringAttributeConverter<X>
     // -----------------------------------------------------------------------------------------------------------------
     private final Type attributeType;
 
-    private @Nullable Jsonb jsonb;
+    private Jsonb jsonb;
 }
 

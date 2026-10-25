@@ -24,7 +24,6 @@ import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Period;
 import java.time.Year;
@@ -105,7 +104,7 @@ public abstract class __MappedYearInterval extends ___MappedTemporalInterval<Yea
      */
     @Override
     @Transient
-    public @Nullable Period getTemporalAmount() {
+    public Period getTemporalAmount() {
         final Year startInclusive = getIntervalStart();
         final Year endExclusive = getIntervalEnd();
         if (startInclusive == null || endExclusive == null) {

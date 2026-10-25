@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An entity carrying two intervals, each in columns of its own.
@@ -53,7 +52,7 @@ public class _BookingEntity {
      *
      * @return the period this booking is stayed for.
      */
-    public @Nullable _DateIntervalEmbeddable getStay() {
+    public _DateIntervalEmbeddable getStay() {
         return stay;
     }
 
@@ -62,7 +61,7 @@ public class _BookingEntity {
      *
      * @param stay new value for the {@code stay} attribute.
      */
-    public void setStay(final @Nullable _DateIntervalEmbeddable stay) {
+    public void setStay(final _DateIntervalEmbeddable stay) {
         this.stay = stay;
     }
 
@@ -71,7 +70,7 @@ public class _BookingEntity {
      *
      * @return the period this booking is held for.
      */
-    public @Nullable _DateIntervalEmbeddable getHold() {
+    public _DateIntervalEmbeddable getHold() {
         return hold;
     }
 
@@ -80,7 +79,7 @@ public class _BookingEntity {
      *
      * @param hold new value for the {@code hold} attribute.
      */
-    public void setHold(final @Nullable _DateIntervalEmbeddable hold) {
+    public void setHold(final _DateIntervalEmbeddable hold) {
         this.hold = hold;
     }
 
@@ -91,10 +90,10 @@ public class _BookingEntity {
     @AttributeOverride(name = "intervalStart", column = @Column(name = COLUMN_NAME_STAY_START))
     @AttributeOverride(name = "intervalEnd", column = @Column(name = COLUMN_NAME_STAY_END))
     @Embedded
-    private @Nullable _DateIntervalEmbeddable stay;
+    private _DateIntervalEmbeddable stay;
 
     @AttributeOverride(name = "intervalStart", column = @Column(name = COLUMN_NAME_HOLD_START))
     @AttributeOverride(name = "intervalEnd", column = @Column(name = COLUMN_NAME_HOLD_END))
     @Embedded
-    private @Nullable _DateIntervalEmbeddable hold;
+    private _DateIntervalEmbeddable hold;
 }

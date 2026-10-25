@@ -147,7 +147,7 @@ public final class EncryptedConverters {
      *                                  instantiated.
      * @throws IllegalStateException    when the {@code value} is {@code null} and no service can be loaded.
      */
-    public static EntityEncryptionService serviceOf(final @org.jspecify.annotations.Nullable Object value) {
+    public static EntityEncryptionService serviceOf(final Object value) {
         if (value == null) {
             return loadService();
         }

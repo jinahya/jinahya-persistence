@@ -25,7 +25,7 @@ public final class EncryptedUtilDateConverter extends EncryptedAttributeConverte
         this(null);
     }
 
-    EncryptedUtilDateConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedUtilDateConverter(final EntityEncryptionService service) {
         super(java.util.Date.class, OfUtil::encodeDate, OfUtil::decodeDate, service);
     }
 }

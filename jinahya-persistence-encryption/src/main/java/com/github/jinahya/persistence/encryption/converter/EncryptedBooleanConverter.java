@@ -25,7 +25,7 @@ public final class EncryptedBooleanConverter extends EncryptedAttributeConverter
         this(null);
     }
 
-    EncryptedBooleanConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedBooleanConverter(final EntityEncryptionService service) {
         super(Boolean.class, OfPrimitive::encodeBoolean, OfPrimitive::decodeBoolean, service);
     }
 }

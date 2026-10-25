@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.converter.time;
  */
 
 import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
-import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
@@ -86,7 +85,7 @@ public abstract class __TemporalAmountStringAttributeConverter<X extends Tempora
      *         this method along with {@link #convertToEntityAttribute(String)}.
      */
     @Override
-    public @Nullable String convertToDatabaseColumn(final @Nullable X attribute) {
+    public String convertToDatabaseColumn(final X attribute) {
         if (attribute == null) {
             return null;
         }
@@ -107,7 +106,7 @@ public abstract class __TemporalAmountStringAttributeConverter<X extends Tempora
      *         not hold the type's ISO-8601 form &mdash; is thrown from here unchanged.
      */
     @Override
-    public @Nullable X convertToEntityAttribute(final @Nullable String dbData) {
+    public X convertToEntityAttribute(final String dbData) {
         if (dbData == null) {
             return null;
         }
@@ -128,5 +127,5 @@ public abstract class __TemporalAmountStringAttributeConverter<X extends Tempora
      * The {@code public static parse(CharSequence)} method of {@link #attributeClass}; {@code null} when it declares
      * none.
      */
-    private final transient @Nullable Method parseMethod;
+    private final transient Method parseMethod;
 }

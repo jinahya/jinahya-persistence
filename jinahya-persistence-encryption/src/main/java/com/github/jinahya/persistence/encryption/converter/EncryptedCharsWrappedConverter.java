@@ -25,7 +25,7 @@ public final class EncryptedCharsWrappedConverter extends EncryptedAttributeConv
         this(null);
     }
 
-    EncryptedCharsWrappedConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedCharsWrappedConverter(final EntityEncryptionService service) {
         super(Character[].class, OfLang::encodeCharsWrapped, OfLang::decodeCharsWrapped, service);
     }
 }

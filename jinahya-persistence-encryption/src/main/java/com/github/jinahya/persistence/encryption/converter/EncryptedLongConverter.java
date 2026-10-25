@@ -25,7 +25,7 @@ public final class EncryptedLongConverter extends EncryptedAttributeConverter<Lo
         this(null);
     }
 
-    EncryptedLongConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedLongConverter(final EntityEncryptionService service) {
         super(Long.class, OfPrimitive::encodeLong, OfPrimitive::decodeLong, service);
     }
 }

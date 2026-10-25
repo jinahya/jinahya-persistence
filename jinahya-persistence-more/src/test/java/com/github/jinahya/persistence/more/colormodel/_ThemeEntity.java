@@ -30,7 +30,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An entity carrying <em>two</em> colors, each overriding the three column names it inherits.
@@ -65,19 +64,19 @@ public class _ThemeEntity {
         return id;
     }
 
-    public @Nullable _RgbEmbeddable getForeground() {
+    public _RgbEmbeddable getForeground() {
         return foreground;
     }
 
-    public void setForeground(final @Nullable _RgbEmbeddable foreground) {
+    public void setForeground(final _RgbEmbeddable foreground) {
         this.foreground = foreground;
     }
 
-    public @Nullable _RgbEmbeddable getBackground() {
+    public _RgbEmbeddable getBackground() {
         return background;
     }
 
-    public void setBackground(final @Nullable _RgbEmbeddable background) {
+    public void setBackground(final _RgbEmbeddable background) {
         this.background = background;
     }
 
@@ -89,11 +88,11 @@ public class _ThemeEntity {
     @AttributeOverride(name = __MappedRgb.ATTRIBUTE_NAME_GREEN, column = @Column(name = COLUMN_NAME_FOREGROUND_GREEN))
     @AttributeOverride(name = __MappedRgb.ATTRIBUTE_NAME_BLUE, column = @Column(name = COLUMN_NAME_FOREGROUND_BLUE))
     @Embedded
-    private @Nullable _RgbEmbeddable foreground;
+    private _RgbEmbeddable foreground;
 
     @AttributeOverride(name = __MappedRgb.ATTRIBUTE_NAME_RED, column = @Column(name = COLUMN_NAME_BACKGROUND_RED))
     @AttributeOverride(name = __MappedRgb.ATTRIBUTE_NAME_GREEN, column = @Column(name = COLUMN_NAME_BACKGROUND_GREEN))
     @AttributeOverride(name = __MappedRgb.ATTRIBUTE_NAME_BLUE, column = @Column(name = COLUMN_NAME_BACKGROUND_BLUE))
     @Embedded
-    private @Nullable _RgbEmbeddable background;
+    private _RgbEmbeddable background;
 }

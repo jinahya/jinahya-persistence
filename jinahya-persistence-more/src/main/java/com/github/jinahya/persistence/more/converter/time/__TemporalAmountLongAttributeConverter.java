@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.converter.time;
  */
 
 import com.github.jinahya.persistence.more.converter.__LongAttributeConverter;
-import org.jspecify.annotations.Nullable;
 
 import java.time.temporal.TemporalAmount;
 import java.util.Objects;
@@ -95,7 +94,7 @@ public abstract class __TemporalAmountLongAttributeConverter<X extends TemporalA
      * @implSpec The default implementation applies the {@code encoder} this converter was constructed with.
      */
     @Override
-    public @Nullable Long convertToDatabaseColumn(final @Nullable X attribute) {
+    public Long convertToDatabaseColumn(final X attribute) {
         if (attribute == null) {
             return null;
         }
@@ -110,7 +109,7 @@ public abstract class __TemporalAmountLongAttributeConverter<X extends TemporalA
      * @implSpec The default implementation applies the {@code decoder} this converter was constructed with.
      */
     @Override
-    public @Nullable X convertToEntityAttribute(final @Nullable Long dbData) {
+    public X convertToEntityAttribute(final Long dbData) {
         if (dbData == null) {
             return null;
         }

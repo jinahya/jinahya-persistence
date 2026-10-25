@@ -22,7 +22,6 @@ package com.github.jinahya.persistence.more;
 
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.PositiveOrZero;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An interface for entities which reference other instances of their own type, forming a hierarchy.
@@ -72,7 +71,6 @@ public interface __SelfReferencing<T extends __SelfReferencing<T>> {
      *         {@link Transient @Transient}; an annotation here would not reach it.
      * @see __SelfReferencingUtils#parentOf(__SelfReferencing)
      */
-    @Nullable
     T getHierarchyParent();
 
     /**

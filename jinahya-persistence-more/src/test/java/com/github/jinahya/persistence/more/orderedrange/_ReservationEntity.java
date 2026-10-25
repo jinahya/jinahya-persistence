@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.jspecify.annotations.Nullable;
 
 /**
  * An entity carrying <em>two</em> ranges, each overriding the two column names it inherits.
@@ -35,19 +34,19 @@ public class _ReservationEntity {
         return id;
     }
 
-    public @Nullable _DateRangeEmbeddable getStay() {
+    public _DateRangeEmbeddable getStay() {
         return stay;
     }
 
-    public void setStay(final @Nullable _DateRangeEmbeddable stay) {
+    public void setStay(final _DateRangeEmbeddable stay) {
         this.stay = stay;
     }
 
-    public @Nullable _DateRangeEmbeddable getHold() {
+    public _DateRangeEmbeddable getHold() {
         return hold;
     }
 
-    public void setHold(final @Nullable _DateRangeEmbeddable hold) {
+    public void setHold(final _DateRangeEmbeddable hold) {
         this.hold = hold;
     }
 
@@ -58,10 +57,10 @@ public class _ReservationEntity {
     @AttributeOverride(name = "rangeLower", column = @Column(name = COLUMN_NAME_STAY_LOWER))
     @AttributeOverride(name = "rangeUpper", column = @Column(name = COLUMN_NAME_STAY_UPPER))
     @Embedded
-    private @Nullable _DateRangeEmbeddable stay;
+    private _DateRangeEmbeddable stay;
 
     @AttributeOverride(name = "rangeLower", column = @Column(name = COLUMN_NAME_HOLD_LOWER))
     @AttributeOverride(name = "rangeUpper", column = @Column(name = COLUMN_NAME_HOLD_UPPER))
     @Embedded
-    private @Nullable _DateRangeEmbeddable hold;
+    private _DateRangeEmbeddable hold;
 }

@@ -3,7 +3,6 @@ package com.github.jinahya.persistence.more;
 import jakarta.persistence.Transient;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +49,6 @@ class __SelfReferencing_Test {
             this.depth = depth;
         }
 
-        @Nullable
         @Override
         public Node getHierarchyParent() {
             return null;

@@ -24,7 +24,6 @@ import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
-import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -139,7 +138,7 @@ public abstract class __MappedLocalTimeInterval extends ___MappedTemporalInterva
      */
     @Override
     @Transient
-    public @Nullable Duration getTemporalAmount() {
+    public Duration getTemporalAmount() {
         final LocalTime startInclusive = getIntervalStart();
         final LocalTime endExclusive = getIntervalEnd();
         if (startInclusive == null || endExclusive == null) {

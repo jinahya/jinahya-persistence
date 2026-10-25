@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.more.converter;
 import com.github.jinahya.persistence.more.__AttributeEnum;
 import com.github.jinahya.persistence.more.__AttributeEnumUtils;
 import jakarta.persistence.AttributeConverter;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -160,7 +159,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      * @return a database column value; {@code null} when {@code attribute} is {@code null}.
      */
     @Override
-    public @Nullable ATTRIBUTE convertToDatabaseColumn(final @Nullable E attribute) {
+    public ATTRIBUTE convertToDatabaseColumn(final E attribute) {
         if (attribute == null) {
             return null;
         }
@@ -176,7 +175,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      *                                  no constant of {@link #enumClass} carries it.
      */
     @Override
-    public @Nullable E convertToEntityAttribute(final @Nullable ATTRIBUTE dbData) {
+    public E convertToEntityAttribute(final ATTRIBUTE dbData) {
         if (dbData == null) {
             return null;
         }

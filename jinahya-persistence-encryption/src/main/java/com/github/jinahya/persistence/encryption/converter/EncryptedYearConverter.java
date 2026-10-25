@@ -26,7 +26,7 @@ public final class EncryptedYearConverter extends EncryptedAttributeConverter<Ye
         this(null);
     }
 
-    EncryptedYearConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedYearConverter(final EntityEncryptionService service) {
         super(Year.class, OfTime::encodeYear, OfTime::decodeYear, service);
     }
 }

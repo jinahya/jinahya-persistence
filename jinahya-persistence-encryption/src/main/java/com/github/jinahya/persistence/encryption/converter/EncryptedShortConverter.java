@@ -25,7 +25,7 @@ public final class EncryptedShortConverter extends EncryptedAttributeConverter<S
         this(null);
     }
 
-    EncryptedShortConverter(final @org.jspecify.annotations.Nullable EntityEncryptionService service) {
+    EncryptedShortConverter(final EntityEncryptionService service) {
         super(Short.class, OfPrimitive::encodeShort, OfPrimitive::decodeShort, service);
     }
 }

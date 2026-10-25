@@ -3,7 +3,6 @@ package com.github.jinahya.persistence.more.test;
 import com.github.jinahya.persistence.more.__SelfReferencing;
 import com.github.jinahya.persistence.more.__SelfReferencingParent;
 import com.github.jinahya.persistence.more.__SelfReferencingUtils;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A self-referencing sample which answers through the marked member, which is the path
@@ -11,7 +10,6 @@ import org.jspecify.annotations.Nullable;
  */
 class _SampleNode implements __SelfReferencing<_SampleNode> {
 
-    @Nullable
     @Override
     public _SampleNode getHierarchyParent() {
         return __SelfReferencingUtils.parentOf(this);
@@ -23,5 +21,5 @@ class _SampleNode implements __SelfReferencing<_SampleNode> {
     }
 
     @__SelfReferencingParent
-    private @Nullable _SampleNode parent;
+    private _SampleNode parent;
 }
