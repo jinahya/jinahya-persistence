@@ -33,7 +33,11 @@ import java.util.TimeZone;
  * A converter for an entity attribute of {@link ZoneId}, stored as its {@link ZoneId#getId() identifier}.
  * <p>
  * A {@link ZoneId} is not a {@link java.time.temporal.TemporalAccessor}, so this converter sits on none of this
- * package's attribute axes, only on the parent's column axis, {@link __StringAttributeConverter}.
+ * package's attribute axes. It implements {@link AttributeConverter AttributeConverter&lt;ZoneId, String&gt;} itself,
+ * not the parent's column axis, {@link __StringAttributeConverter}: EclipseLink takes a converter's column type from
+ * the type arguments of the interface the class names, and from {@code __StringAttributeConverter<ZoneId>}, whose
+ * only argument is the attribute type, it took {@link ZoneId} for the column, and failed to bind the {@link String}
+ * this converter returns ({@code EclipseLink-3002}).
  * <p>
  * It is also the core of {@link TimeZoneStringAttributeConverter}, which stores a {@link TimeZone} as the identifier of
  * its zone.
@@ -47,7 +51,7 @@ import java.util.TimeZone;
  *         does not know cannot be read back at all.
  */
 @Converter(autoApply = false)
-public class ZoneIdStringAttributeConverter implements __StringAttributeConverter<ZoneId> {
+public class ZoneIdStringAttributeConverter implements AttributeConverter<ZoneId, String> {
 
     /**
      * A converter for an entity attribute of {@link TimeZone}, stored as the identifier of its
