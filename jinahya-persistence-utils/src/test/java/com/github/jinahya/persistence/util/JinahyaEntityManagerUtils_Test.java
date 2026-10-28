@@ -435,17 +435,17 @@ class JinahyaEntityManagerUtils_Test {
             when(manager.createQuery(query)).thenReturn(typed);
             when(typed.getSingleResult()).thenReturn(3L);
 
-            assertThat(JinahyaEntityManagerUtils.selectCount(manager, String.class)).isEqualTo(3L);
+            assertThat(JinahyaEntityManagerUtils.selectEntityCount(manager, String.class)).isEqualTo(3L);
             verify(query).select(count);
         }
 
         @DisplayName("null arguments are rejected by name")
         @Test
         void _NullPointerException_ForNullArguments() {
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.selectCount(null, String.class))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.selectEntityCount(null, String.class))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("manager");
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.selectCount(mock(EntityManager.class), null))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.selectEntityCount(mock(EntityManager.class), null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("entityClass");
         }
@@ -466,7 +466,7 @@ class JinahyaEntityManagerUtils_Test {
             final var entity = new Object();
             when(persistenceUnitUtil.getIdentifier(entity)).thenReturn(42L);
 
-            final Long identifier = JinahyaEntityManagerUtils.getIdentifier(manager, entity);
+            final Long identifier = JinahyaEntityManagerUtils.getEntityIdentifier(manager, entity);
 
             assertThat(identifier).isEqualTo(42L);
         }
@@ -474,9 +474,9 @@ class JinahyaEntityManagerUtils_Test {
         @DisplayName("a null manager is rejected by name")
         @Test
         void _NullPointerException_NullManager() {
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.getIdentifier(null, new Object()))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.getEntityIdentifier(null, new Object()))
                     .isInstanceOf(NullPointerException.class)
-                    .hasMessageContaining("manager");
+                    .hasMessageContaining("entityManager");
         }
     }
 }

@@ -55,8 +55,8 @@ public final class JinahyaEntityManagerUtils {
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
-     * What the {@code void} variants hand back to the generic methods they adapt: a value, rather than {@code null},
-     * so that nothing here has to widen a result type to nullable for a result nobody reads.
+     * What the {@code void} variants hand back to the generic methods they adapt: a value, rather than {@code null}, so
+     * that nothing here has to widen a result type to nullable for a result nobody reads.
      */
     private static final Object NOTHING = new Object();
 
@@ -82,8 +82,8 @@ public final class JinahyaEntityManagerUtils {
      *         here.
      *         <p>
      *         The guard reads {@link EntityManager#isJoinedToTransaction() isJoinedToTransaction()}, which the
-     *         specification words for JTA. Both providers this project supports answer it, for a resource-local
-     *         entity manager, with exactly {@code getTransaction().isActive()} &mdash; Hibernate ORM through
+     *         specification words for JTA. Both providers this project supports answer it, for a resource-local entity
+     *         manager, with exactly {@code getTransaction().isActive()} &mdash; Hibernate ORM through
      *         {@code JdbcResourceLocalTransactionCoordinatorImpl.isJoined()}, EclipseLink through
      *         {@code EntityTransactionWrapper.isJoinedToTransaction(..)} &mdash; so it is the same question, asked in
      *         the one way that also answers correctly for a JTA entity manager which has been joined.
@@ -360,50 +360,50 @@ public final class JinahyaEntityManagerUtils {
     }
 
     /**
-     * Starts a resource-level transaction of the specified entity manager, applies the {@link Connection} underlying
-     * the {@code manager} to the specified function, and returns the result.
+     * Starts a resource-level transaction of the specified entity manager, applies the {@link Connection}
+     * underlying the {@code entityManager} to the specified function, and returns the result.
      *
-     * @param manager  the entity manager.
-     * @param function the function to be applied with the connection of the {@code manager}.
-     * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
-     * @param <R>      result type parameter
+     * @param entityManager the entity manager.
+     * @param function      the function to be applied with the connection of the {@code entityManager}.
+     * @param rollback      a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
+     * @param <R>           result type parameter
      * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalArgumentException when the {@code entityManager} is already joined to a transaction.
      * @apiNote The connection is only borrowed; see
      *         {@link #applyUnwrappedConnection(EntityManager, Function)}.
      * @see #applyUnwrappedConnection(EntityManager, Function)
      * @see #getInTransaction(EntityManager, Supplier, boolean)
      */
     public static <R> R applyUnwrappedConnectionInTransaction(
-            final EntityManager manager,
+            final EntityManager entityManager,
             final Function<? super Connection, ? extends R> function,
             final boolean rollback) {
         Objects.requireNonNull(function, "function is null");
         return getInTransaction(
-                manager,
-                () -> applyUnwrappedConnection(manager, function),
+                entityManager,
+                () -> applyUnwrappedConnection(entityManager, function),
                 rollback
         );
     }
 
     /**
-     * Starts a resource-level transaction of the specified entity manager, applies the {@link Connection} underlying
-     * the {@code manager} to the specified function, and rolls the transaction back.
+     * Starts a resource-level transaction of the specified entity manager, applies the {@link Connection}
+     * underlying the {@code entityManager} to the specified function, and rolls the transaction back.
      *
-     * @param manager  the entity manager.
-     * @param function the function to be applied with the connection of the {@code manager}.
-     * @param <R>      result type parameter
+     * @param entityManager the entity manager.
+     * @param function      the function to be applied with the connection of the {@code entityManager}.
+     * @param <R>           result type parameter
      * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalArgumentException when the {@code entityManager} is already joined to a transaction.
      * @apiNote The connection is only borrowed, and nothing the {@code function} does is persisted; this is
      *         intended for tests.
      * @see #applyUnwrappedConnectionInTransaction(EntityManager, Function, boolean)
      */
     public static <R> R applyUnwrappedConnectionInTransactionAndRollback(
-            final EntityManager manager,
+            final EntityManager entityManager,
             final Function<? super Connection, ? extends R> function) {
         return applyUnwrappedConnectionInTransaction(
-                manager,
+                entityManager,
                 function,
                 true
         );
@@ -444,11 +444,11 @@ public final class JinahyaEntityManagerUtils {
      * @throws IllegalArgumentException when the {@code entityClass} is not an entity of the {@code manager}'s
      *                                  persistence unit.
      * @implNote Built with the Criteria API, rooted at the class itself, so neither the entity name nor the
-     *         class name goes into a query string. {@code COUNT} with no {@code GROUP BY} always yields exactly one
-     *         row holding a number, so the result is neither {@code null} nor a
+     *         class name goes into a query string. {@code COUNT} with no {@code GROUP BY} always yields exactly one row
+     *         holding a number, so the result is neither {@code null} nor a
      *         {@link jakarta.persistence.NoResultException NoResultException}.
      */
-    public static long selectCount(final EntityManager manager, final Class<?> entityClass) {
+    public static long selectEntityCount(final EntityManager manager, final Class<?> entityClass) {
         Objects.requireNonNull(manager, "manager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
         final var builder = manager.getCriteriaBuilder();
@@ -463,9 +463,9 @@ public final class JinahyaEntityManagerUtils {
     /**
      * Returns the id of the specified entity, from the persistence unit of the specified entity manager.
      *
-     * @param manager the entity manager.
-     * @param entity  the entity instance whose id is to be returned.
-     * @param <Y>     identifier type parameter
+     * @param entityManager the entity manager.
+     * @param entity        the entity instance whose id is to be returned.
+     * @param <Y>           identifier type parameter
      * @return the id of the {@code entity} cast as {@link Y}; {@code null} when the {@code entity} does not yet have an
      *         id.
      * @apiNote EclipseLink answers this by instantiating the identifier class &mdash; an
@@ -473,11 +473,11 @@ public final class JinahyaEntityManagerUtils {
      *         &mdash; through {@link Class#getConstructor(Class[])}, which sees public constructors only; one with no
      *         {@code public} no-arg constructor fails with {@code EclipseLink-222}. The specification requires that
      *         constructor of a primary key class to be public (Jakarta Persistence 3.2, &sect;2.4).
-     * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
+     * @see JinahyaEntityManagerFactoryUtils#getEntityIdentifier(EntityManagerFactory, Object)
      */
-    public static <Y> Y getIdentifier(final EntityManager manager, final Object entity) {
-        Objects.requireNonNull(manager, "manager is null");
-        return JinahyaEntityManagerFactoryUtils.getIdentifier(manager.getEntityManagerFactory(), entity);
+    public static <Y> Y getEntityIdentifier(final EntityManager entityManager, final Object entity) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        return JinahyaEntityManagerFactoryUtils.getEntityIdentifier(entityManager.getEntityManagerFactory(), entity);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

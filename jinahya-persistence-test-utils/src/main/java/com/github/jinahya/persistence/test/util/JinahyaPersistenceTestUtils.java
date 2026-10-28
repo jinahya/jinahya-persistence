@@ -4,7 +4,6 @@ import com.github.jinahya.persistence.util.JinahyaEntityManagerUtils;
 import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Utilities for testing persistence.
@@ -22,11 +21,11 @@ public final class JinahyaPersistenceTestUtils {
      * @return the number of all instances of the {@code entityClass}.
      * @throws NullPointerException when either argument is {@code null}.
      * @deprecated Counting is not specific to tests; use
-     *         {@link JinahyaEntityManagerUtils#selectCount(EntityManager, Class)}, which this now merely calls.
+     *         {@link JinahyaEntityManagerUtils#selectEntityCount(EntityManager, Class)}, which this now merely calls.
      */
     @Deprecated(forRemoval = true)
     public static <T> long selectCount(final EntityManager entityManager, final Class<T> entityClass) {
-        return JinahyaEntityManagerUtils.selectCount(entityManager, entityClass);
+        return JinahyaEntityManagerUtils.selectEntityCount(entityManager, entityClass);
     }
 
     /**
@@ -37,24 +36,12 @@ public final class JinahyaPersistenceTestUtils {
      * @param <T>           entity type parameter
      * @return an optional of a randomly chosen instance of the {@code entityClass}; {@code empty} when there is none.
      * @throws NullPointerException when either argument is {@code null}.
-     * @implNote The offset is chosen from the first {@link Integer#MAX_VALUE} instances only, for
-     *         {@link jakarta.persistence.TypedQuery#setFirstResult(int)} takes an {@code int}.
+     * @deprecated Use {@link JinahyaEntityManagerTestUtils#selectRandomEntity(EntityManager, Class)}, which this now merely
+     *         calls.
      */
+    @Deprecated(forRemoval = true)
     public static <T> Optional<T> selectRandom(final EntityManager entityManager, final Class<T> entityClass) {
-        final var count = JinahyaEntityManagerUtils.selectCount(entityManager, entityClass);
-        if (count == 0L) {
-            return Optional.empty();
-        }
-        final var builder = entityManager.getCriteriaBuilder();
-        final var query = builder.createQuery(entityClass);
-        final var root = query.from(entityClass);
-        query.select(root);
-        return entityManager.createQuery(query)
-                .setFirstResult(ThreadLocalRandom.current().nextInt((int) Math.min(count, Integer.MAX_VALUE)))
-                .setMaxResults(1)
-                .getResultList()
-                .stream()
-                .findFirst();
+        return JinahyaEntityManagerTestUtils.selectRandomEntity(entityManager, entityClass);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

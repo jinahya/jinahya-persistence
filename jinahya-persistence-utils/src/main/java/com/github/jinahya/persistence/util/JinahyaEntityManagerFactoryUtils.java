@@ -23,7 +23,6 @@ package com.github.jinahya.persistence.util;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
-import jakarta.persistence.metamodel.Metamodel;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -37,24 +36,6 @@ import java.util.function.Function;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaEntityManagerFactoryUtils {
-
-    /**
-     * Returns the {@link PersistenceUnitUtil} of the specified entity manager factory.
-     *
-     * @param factory the entity manager factory whose {@link PersistenceUnitUtil} is returned.
-     * @return the {@link PersistenceUnitUtil} of the {@code factory}.
-     * @implNote This used to memoize the result in a {@code WeakHashMap} keyed by the {@code factory}. The
-     *         memoization could never expire &mdash; a {@link PersistenceUnitUtil} holds its factory, so the value
-     *         strongly reached its own key and the entry outlived the factory it was supposed to track &mdash; and it
-     *         bought nothing, because both providers return an already-built instance from a field.
-     * @see EntityManagerFactory#getPersistenceUnitUtil()
-     */
-    public static PersistenceUnitUtil getPersistenceUnitUtil(final EntityManagerFactory factory) {
-        Objects.requireNonNull(factory, "factory is null");
-        return factory.getPersistenceUnitUtil();
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
 
     /**
      * Applies a new entity manager of the specified entity manager factory to the specified function, and closes the
@@ -90,10 +71,10 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @see PersistenceUnitUtil#getIdentifier(Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> Y getIdentifier(final EntityManagerFactory factory, final Object entity) {
+    public static <Y> Y getEntityIdentifier(final EntityManagerFactory factory, final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
-        return (Y) getPersistenceUnitUtil(factory).getIdentifier(entity);
+        return (Y) factory.getPersistenceUnitUtil().getIdentifier(entity);
     }
 
     /**
@@ -107,27 +88,10 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @see PersistenceUnitUtil#getVersion(Object)
      */
     @SuppressWarnings({"unchecked"})
-    public static <Y> Y getVersion(final EntityManagerFactory factory, final Object entity) {
+    public static <Y> Y getEntityVersion(final EntityManagerFactory factory, final Object entity) {
         Objects.requireNonNull(factory, "factory is null");
         Objects.requireNonNull(entity, "entity is null");
-        return (Y) getPersistenceUnitUtil(factory).getVersion(entity);
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Returns the {@link Metamodel} of the specified entity manager factory.
-     *
-     * @param factory the entity manager factory whose {@link Metamodel} is returned.
-     * @return the {@link Metamodel} of the {@code factory}.
-     * @implNote Memoized here until it turned out that the memoization both leaked and paid for nothing; see
-     *         {@link #getPersistenceUnitUtil(EntityManagerFactory)}, whose cache had the same shape and was removed for
-     *         the same reasons.
-     * @see EntityManagerFactory#getMetamodel()
-     */
-    public static Metamodel getMetamodel(final EntityManagerFactory factory) {
-        Objects.requireNonNull(factory, "factory is null");
-        return factory.getMetamodel();
+        return (Y) factory.getPersistenceUnitUtil().getVersion(entity);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
