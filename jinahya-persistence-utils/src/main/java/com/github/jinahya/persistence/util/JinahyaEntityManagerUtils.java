@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static java.lang.System.Logger.Level;
 
@@ -54,27 +53,21 @@ public final class JinahyaEntityManagerUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-    /**
-     * What the {@code void} variants hand back to the generic methods they adapt: a value, rather than {@code null}, so
-     * that nothing here has to widen a result type to nullable for a result nobody reads.
-     */
-    private static final Object NOTHING = new Object();
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Starts a resource-level transaction of the specified entity manager, and returns the result of the specified
-     * supplier.
+     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function, and
+     * returns the result.
      *
      * @param manager  the entity manager.
-     * @param supplier the supplier to be applied to the {@code manager}.
+     * @param function the function to be applied to the {@code manager}.
      * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
      * @param <R>      result type parameter
-     * @return the result of the {@code supplier}.
+     * @return the result of the {@code function}.
      * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
      * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
      *                                  transaction to start.
-     * @implNote Whatever the {@code supplier}, the commit or the rollback throws propagates <em>unchanged</em>,
+     * @implNote Whatever the {@code function}, the commit or the rollback throws propagates <em>unchanged</em>,
      *         so a caller can still catch {@link jakarta.persistence.OptimisticLockException} and friends by type. A
      *         failure while rolling back is attached to it as a
      *         {@linkplain Throwable#addSuppressed(Throwable) suppressed} exception rather than replacing it. Note that
@@ -88,17 +81,18 @@ public final class JinahyaEntityManagerUtils {
      *         {@code EntityTransactionWrapper.isJoinedToTransaction(..)} &mdash; so it is the same question, asked in
      *         the one way that also answers correctly for a JTA entity manager which has been joined.
      */
-    public static <R> R getInTransaction(final EntityManager manager, final Supplier<? extends R> supplier,
-                                         final boolean rollback) {
+    public static <R> R applyInTransaction(final EntityManager manager,
+                                           final Function<? super EntityManager, ? extends R> function,
+                                           final boolean rollback) {
         Objects.requireNonNull(manager, "manager is null");
         if (manager.isJoinedToTransaction()) {
             throw new IllegalArgumentException("manager is already joined to a transaction");
         }
-        Objects.requireNonNull(supplier, "supplier is null");
+        Objects.requireNonNull(function, "function is null");
         final var transaction = manager.getTransaction();
         transaction.begin();
         try {
-            final R result = supplier.get();
+            final R result = function.apply(manager);
             if (rollback) {
                 logger.log(Level.DEBUG, "rolling back...");
                 transaction.rollback();
@@ -124,154 +118,6 @@ public final class JinahyaEntityManagerUtils {
             }
             throw e;
         }
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, returns the result of the specified
-     * supplier, and rolls the transaction back.
-     *
-     * @param manager  the entity manager.
-     * @param supplier the supplier to be applied to the {@code manager}.
-     * @param <R>      result type parameter
-     * @return the result of the {@code supplier}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @apiNote Nothing the {@code supplier} does is persisted; this is intended for tests.
-     * @see #getInTransaction(EntityManager, Supplier, boolean)
-     */
-    public static <R> R getInTransactionAndRollback(final EntityManager manager,
-                                                    final Supplier<? extends R> supplier) {
-        return getInTransaction(
-                manager,
-                supplier,
-                true
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, and runs the specified runnable.
-     *
-     * @param manager  the entity manager.
-     * @param runnable the runnable to run.
-     * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @see #getInTransaction(EntityManager, Supplier, boolean)
-     */
-    public static void runInTransaction(final EntityManager manager, final Runnable runnable,
-                                        final boolean rollback) {
-        Objects.requireNonNull(runnable, "runnable is null");
-        getInTransaction(
-                manager,
-                () -> {
-                    runnable.run();
-                    return NOTHING;
-                },
-                rollback
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, runs the specified runnable, and rolls the
-     * transaction back.
-     *
-     * @param manager  the entity manager.
-     * @param runnable the runnable to run.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @apiNote Nothing the {@code runnable} does is persisted; this is intended for tests.
-     * @see #runInTransaction(EntityManager, Runnable, boolean)
-     */
-    public static void runInTransactionAndRollback(final EntityManager manager, final Runnable runnable) {
-        runInTransaction(
-                manager,
-                runnable,
-                true
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function, and
-     * returns the result.
-     *
-     * @param manager  the entity manager.
-     * @param function the function to be applied to the {@code manager}.
-     * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
-     * @param <R>      result type parameter
-     * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @see #applyUnwrappedConnectionInTransactionAndRollback(EntityManager, Function)
-     */
-    public static <R> R applyInTransaction(final EntityManager manager,
-                                           final Function<? super EntityManager, ? extends R> function,
-                                           final boolean rollback) {
-        Objects.requireNonNull(function, "function is null");
-        return getInTransaction(
-                manager,
-                () -> function.apply(manager),
-                rollback
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function, and
-     * rolls the transaction back.
-     *
-     * @param manager  the entity manager.
-     * @param function the function to be applied to the {@code manager}.
-     * @param <R>      result type parameter
-     * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @apiNote Nothing the {@code function} does is persisted; this is intended for tests.
-     * @see #applyInTransaction(EntityManager, Function, boolean)
-     */
-    public static <R> R applyInTransactionAndRollback(
-            final EntityManager manager,
-            final Function<? super EntityManager, ? extends R> function) {
-        return applyInTransaction(
-                manager,
-                function,
-                true
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, and accepts it to the specified consumer.
-     *
-     * @param manager  the entity manager.
-     * @param consumer the consumer to accept the {@code manager}.
-     * @param rollback a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @see #applyInTransaction(EntityManager, Function, boolean)
-     */
-    public static void acceptInTransaction(final EntityManager manager,
-                                           final Consumer<? super EntityManager> consumer,
-                                           final boolean rollback) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyInTransaction(
-                manager,
-                m -> {
-                    consumer.accept(m);
-                    return NOTHING;
-                },
-                rollback
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, accepts it to the specified consumer, and
-     * rolls the transaction back.
-     *
-     * @param manager  the entity manager.
-     * @param consumer the consumer to accept the {@code manager}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @apiNote Nothing the {@code consumer} does is persisted; this is intended for tests.
-     * @see #acceptInTransaction(EntityManager, Consumer, boolean)
-     */
-    public static void acceptInTransactionAndRollback(final EntityManager manager,
-                                                      final Consumer<? super EntityManager> consumer) {
-        acceptInTransaction(
-                manager,
-                consumer,
-                true
-        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -335,102 +181,6 @@ public final class JinahyaEntityManagerUtils {
             }
             throw (Error) caught;
         }
-    }
-
-    /**
-     * Accepts the {@link Connection} underlying the specified entity manager to the specified consumer.
-     *
-     * @param manager  the entity manager.
-     * @param consumer the consumer to accept the connection of the {@code manager}.
-     * @throws PersistenceException when no connection can be obtained from the {@code manager}.
-     * @apiNote The connection is only borrowed; see
-     *         {@link #applyUnwrappedConnection(EntityManager, Function)}.
-     * @see #applyUnwrappedConnection(EntityManager, Function)
-     */
-    public static void acceptUnwrappedConnection(final EntityManager manager,
-                                                 final Consumer<? super Connection> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyUnwrappedConnection(
-                manager,
-                c -> {
-                    consumer.accept(c);
-                    return NOTHING;
-                }
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, applies the {@link Connection}
-     * underlying the {@code entityManager} to the specified function, and returns the result.
-     *
-     * @param entityManager the entity manager.
-     * @param function      the function to be applied with the connection of the {@code entityManager}.
-     * @param rollback      a flag for rolling-back; {@code true} for rolling-back; {@code false} for committing.
-     * @param <R>           result type parameter
-     * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code entityManager} is already joined to a transaction.
-     * @apiNote The connection is only borrowed; see
-     *         {@link #applyUnwrappedConnection(EntityManager, Function)}.
-     * @see #applyUnwrappedConnection(EntityManager, Function)
-     * @see #getInTransaction(EntityManager, Supplier, boolean)
-     */
-    public static <R> R applyUnwrappedConnectionInTransaction(
-            final EntityManager entityManager,
-            final Function<? super Connection, ? extends R> function,
-            final boolean rollback) {
-        Objects.requireNonNull(function, "function is null");
-        return getInTransaction(
-                entityManager,
-                () -> applyUnwrappedConnection(entityManager, function),
-                rollback
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, applies the {@link Connection}
-     * underlying the {@code entityManager} to the specified function, and rolls the transaction back.
-     *
-     * @param entityManager the entity manager.
-     * @param function      the function to be applied with the connection of the {@code entityManager}.
-     * @param <R>           result type parameter
-     * @return the result of the {@code function}.
-     * @throws IllegalArgumentException when the {@code entityManager} is already joined to a transaction.
-     * @apiNote The connection is only borrowed, and nothing the {@code function} does is persisted; this is
-     *         intended for tests.
-     * @see #applyUnwrappedConnectionInTransaction(EntityManager, Function, boolean)
-     */
-    public static <R> R applyUnwrappedConnectionInTransactionAndRollback(
-            final EntityManager entityManager,
-            final Function<? super Connection, ? extends R> function) {
-        return applyUnwrappedConnectionInTransaction(
-                entityManager,
-                function,
-                true
-        );
-    }
-
-    /**
-     * Starts a resource-level transaction of the specified entity manager, accepts the {@link Connection} underlying
-     * the {@code manager} to the specified consumer, and rolls the transaction back.
-     *
-     * @param manager  the entity manager.
-     * @param consumer the consumer to accept the connection of the {@code manager}.
-     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
-     * @apiNote The connection is only borrowed, and nothing the {@code consumer} does is persisted; this is
-     *         intended for tests.
-     * @see #applyUnwrappedConnectionInTransactionAndRollback(EntityManager, Function)
-     */
-    public static void acceptUnwrappedConnectionInTransactionAndRollback(
-            final EntityManager manager,
-            final Consumer<? super Connection> consumer) {
-        Objects.requireNonNull(consumer, "consumer is null");
-        applyUnwrappedConnectionInTransactionAndRollback(
-                manager,
-                c -> {
-                    consumer.accept(c);
-                    return NOTHING;
-                }
-        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

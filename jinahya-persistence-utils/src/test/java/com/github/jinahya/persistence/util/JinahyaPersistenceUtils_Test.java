@@ -2,7 +2,6 @@ package com.github.jinahya.persistence.util;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,15 +35,11 @@ class JinahyaPersistenceUtils_Test {
 
     private EntityManager manager;
 
-    private EntityTransaction transaction;
-
     @BeforeEach
     void mockPersistence() {
         factory = mock(EntityManagerFactory.class);
         manager = mock(EntityManager.class);
-        transaction = mock(EntityTransaction.class);
         when(factory.createEntityManager()).thenReturn(manager);
-        when(manager.getTransaction()).thenReturn(transaction);
         persistence = mockStatic(Persistence.class);
         persistence.when(() -> Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME)).thenReturn(factory);
     }
@@ -101,61 +95,6 @@ class JinahyaPersistenceUtils_Test {
             final var result = JinahyaPersistenceUtils.applyEntityManager(PERSISTENCE_UNIT_NAME, m -> m);
 
             assertThat(result).isSameAs(manager);
-            verify(manager).close();
-            verify(factory).close();
-        }
-    }
-
-    @DisplayName("applyEntityManagerInTransaction(persistenceUnitName, function, rollback)")
-    @Nested
-    class ApplyEntityManagerInTransaction_Test {
-
-        @DisplayName("rollback true rolls the transaction back")
-        @Test
-        void __rolledBack() {
-            final var result = JinahyaPersistenceUtils.applyEntityManagerInTransactionAndRollback(
-                    PERSISTENCE_UNIT_NAME,
-                    m -> m
-            );
-
-            assertThat(result).isSameAs(manager);
-            verify(transaction).begin();
-            verify(transaction).rollback();
-            verify(transaction, never()).commit();
-            verify(manager).close();
-            verify(factory).close();
-        }
-
-        @DisplayName("rollback false commits the transaction")
-        @Test
-        void __committed() {
-            final var result = JinahyaPersistenceUtils.applyEntityManagerInTransaction(
-                    PERSISTENCE_UNIT_NAME,
-                    m -> m,
-                    false
-            );
-
-            assertThat(result).isSameAs(manager);
-            verify(transaction).begin();
-            verify(transaction).commit();
-            verify(transaction, never()).rollback();
-        }
-
-        @DisplayName("rollback false still rolls back, without committing, when the function throws")
-        @Test
-        void __rolledBackWhenThrown() {
-            final var thrown = new IllegalStateException("thrown");
-            when(transaction.isActive()).thenReturn(true);
-
-            assertThatThrownBy(() -> JinahyaPersistenceUtils.applyEntityManagerInTransaction(
-                    PERSISTENCE_UNIT_NAME,
-                    m -> {
-                        throw thrown;
-                    },
-                    false
-            )).isSameAs(thrown);
-            verify(transaction).rollback();
-            verify(transaction, never()).commit();
             verify(manager).close();
             verify(factory).close();
         }

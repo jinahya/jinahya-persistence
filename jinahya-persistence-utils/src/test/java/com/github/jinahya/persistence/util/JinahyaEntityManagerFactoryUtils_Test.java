@@ -34,9 +34,9 @@ class JinahyaEntityManagerFactoryUtils_Test {
         when(factory.getPersistenceUnitUtil()).thenReturn(persistenceUnitUtil);
     }
 
-    @DisplayName("getIdentifier(factory, entity)")
+    @DisplayName("getEntityIdentifier(factory, entity)")
     @Nested
-    class GetIdentifier_Test {
+    class GetEntityIdentifier_Test {
 
         @DisplayName("the identifier comes back cast to the caller's type")
         @Test
@@ -70,9 +70,9 @@ class JinahyaEntityManagerFactoryUtils_Test {
         }
     }
 
-    @DisplayName("getVersion(factory, entity)")
+    @DisplayName("getEntityVersion(factory, entity)")
     @Nested
-    class GetVersion_Test {
+    class GetEntityVersion_Test {
 
         @DisplayName("the version comes back cast to the caller's type")
         @Test

@@ -85,55 +85,6 @@ public final class JinahyaPersistenceUtils {
         );
     }
 
-    /**
-     * Applies a new entity manager, of a new factory of the persistence unit of the specified name, to the specified
-     * function, inside a resource-level transaction, and closes both.
-     *
-     * @param persistenceUnitName the name of the persistence unit.
-     * @param function            the function to be applied with the entity manager.
-     * @param rollback            a flag for rolling-back; {@code true} for rolling-back; {@code false} for
-     *                            committing.
-     * @param <R>                 result type parameter
-     * @return the result of the {@code function}.
-     * @apiNote With {@code rollback} {@code false}, what the {@code function} writes outlives the call.
-     * @implNote The transaction is driven by
-     *         {@link JinahyaEntityManagerUtils#applyInTransaction(EntityManager, Function, boolean)}: it is rolled
-     *         back, whatever the flag, when the {@code function} throws.
-     * @see #applyEntityManager(String, Function)
-     * @see JinahyaEntityManagerUtils#applyInTransaction(EntityManager, Function, boolean)
-     */
-    public static <R> R applyEntityManagerInTransaction(
-            final String persistenceUnitName,
-            final Function<? super EntityManager, ? extends R> function,
-            final boolean rollback) {
-        Objects.requireNonNull(function, "function is null");
-        return applyEntityManager(
-                persistenceUnitName,
-                m -> JinahyaEntityManagerUtils.applyInTransaction(m, function, rollback)
-        );
-    }
-
-    /**
-     * Applies a new entity manager, of a new factory of the persistence unit of the specified name, to the specified
-     * function, inside a resource-level transaction which is always rolled back, and closes both.
-     *
-     * @param persistenceUnitName the name of the persistence unit.
-     * @param function            the function to be applied with the entity manager.
-     * @param <R>                 result type parameter
-     * @return the result of the {@code function}.
-     * @apiNote Nothing the {@code function} does is persisted; this is intended for tests.
-     * @see #applyEntityManagerInTransaction(String, Function, boolean)
-     */
-    public static <R> R applyEntityManagerInTransactionAndRollback(
-            final String persistenceUnitName,
-            final Function<? super EntityManager, ? extends R> function) {
-        return applyEntityManagerInTransaction(
-                persistenceUnitName,
-                function,
-                true
-        );
-    }
-
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
