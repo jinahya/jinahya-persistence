@@ -1,8 +1,13 @@
 package com.github.jinahya.persistence.metamodel.util;
 
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.BasicType;
+import jakarta.persistence.metamodel.EmbeddableType;
 import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.Metamodel;
+import jakarta.persistence.metamodel.SingularAttribute;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -172,6 +177,73 @@ class JinayaManagedTypeUtils_Test {
                     Alpha.class,
                     List.of(knowingNothing(), knowing(Alpha.class, expected))
             )).containsSame(expected);
+        }
+    }
+
+    @DisplayName("resolveAttributePath(managedType, attributePath)")
+    @Nested
+    class ResolveAttributePath_Test {
+
+        private ManagedType<?> root;
+
+        private SingularAttribute<?, ?> id;
+
+        private Attribute<?, ?> promoId;
+
+        /**
+         * A root type whose {@code id} is an embeddable with a {@code promoId}, and whose {@code name} is basic.
+         */
+        @BeforeEach
+        void mockTypes() {
+            final var embeddable = mock(EmbeddableType.class);
+            promoId = mock(Attribute.class);
+            doReturn(promoId).when(embeddable).getAttribute("promoId");
+            doThrow(new IllegalArgumentException("absent")).when(embeddable).getAttribute("absent");
+            id = mock(SingularAttribute.class);
+            doReturn(embeddable).when(id).getType();
+            final var name = mock(SingularAttribute.class);
+            doReturn(mock(BasicType.class)).when(name).getType();
+            root = mock(ManagedType.class);
+            doReturn(id).when(root).getAttribute("id");
+            doReturn(name).when(root).getAttribute("name");
+        }
+
+        @DisplayName("a single segment names an attribute of the type itself")
+        @Test
+        void __singleSegment() {
+            assertThat(JinayaManagedTypeUtils.resolveAttributePath(root, "id")).isSameAs(id);
+        }
+
+        @DisplayName("a dotted path is resolved through the embeddable")
+        @Test
+        void __dottedPath() {
+            assertThat(JinayaManagedTypeUtils.resolveAttributePath(root, "id.promoId")).isSameAs(promoId);
+        }
+
+        @DisplayName("a segment past a basic attribute is an IllegalArgumentException")
+        @Test
+        void _IllegalArgumentException_PastBasic() {
+            assertThatThrownBy(() -> JinayaManagedTypeUtils.resolveAttributePath(root, "name.x"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("'name'");
+        }
+
+        @DisplayName("an absent attribute is an IllegalArgumentException")
+        @Test
+        void _IllegalArgumentException_Absent() {
+            assertThatThrownBy(() -> JinayaManagedTypeUtils.resolveAttributePath(root, "id.absent"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("null arguments are rejected by name")
+        @Test
+        void _NullPointerException_ForNullArguments() {
+            assertThatThrownBy(() -> JinayaManagedTypeUtils.resolveAttributePath(null, "id"))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("managedType");
+            assertThatThrownBy(() -> JinayaManagedTypeUtils.resolveAttributePath(root, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("attributePath");
         }
     }
 }

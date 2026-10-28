@@ -436,6 +436,28 @@ public final class JinahyaEntityManagerUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Returns the id of the specified entity, from the persistence unit of the specified entity manager.
+     *
+     * @param manager the entity manager.
+     * @param entity  the entity instance whose id is to be returned.
+     * @param <Y>     identifier type parameter
+     * @return the id of the {@code entity} cast as {@link Y}; {@code null} when the {@code entity} does not yet have an
+     *         id.
+     * @apiNote EclipseLink answers this by instantiating the identifier class &mdash; an
+     *         {@link jakarta.persistence.EmbeddedId EmbeddedId} or an {@link jakarta.persistence.IdClass IdClass}
+     *         &mdash; through {@link Class#getConstructor(Class[])}, which sees public constructors only; one with no
+     *         {@code public} no-arg constructor fails with {@code EclipseLink-222}. The specification requires that
+     *         constructor of a primary key class to be public (Jakarta Persistence 3.2, &sect;2.4).
+     * @see JinahyaEntityManagerFactoryUtils#getIdentifier(EntityManagerFactory, Object)
+     */
+    public static <Y> Y getIdentifier(final EntityManager manager, final Object entity) {
+        Objects.requireNonNull(manager, "manager is null");
+        return JinahyaEntityManagerFactoryUtils.getIdentifier(manager.getEntityManagerFactory(), entity);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Creates a new instance, which is not allowed.
      */
     private JinahyaEntityManagerUtils() {

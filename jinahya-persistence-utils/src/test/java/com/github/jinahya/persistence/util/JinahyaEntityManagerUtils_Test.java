@@ -2,9 +2,11 @@ package com.github.jinahya.persistence.util;
 
 import jakarta.persistence.ConnectionFunction;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceException;
+import jakarta.persistence.PersistenceUnitUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -404,6 +406,35 @@ class JinahyaEntityManagerUtils_Test {
             JinahyaEntityManagerUtils.acceptUnwrappedConnection(manager, seen::set);
 
             assertThat(seen).hasValue(connection);
+        }
+    }
+
+    @DisplayName("getIdentifier(manager, entity)")
+    @Nested
+    class GetIdentifier_Test {
+
+        @DisplayName("the identifier is read from the manager's own persistence unit")
+        @Test
+        void __readFromTheManagersFactory() {
+            final var manager = mock(EntityManager.class);
+            final var factory = mock(EntityManagerFactory.class);
+            final var persistenceUnitUtil = mock(PersistenceUnitUtil.class);
+            when(manager.getEntityManagerFactory()).thenReturn(factory);
+            when(factory.getPersistenceUnitUtil()).thenReturn(persistenceUnitUtil);
+            final var entity = new Object();
+            when(persistenceUnitUtil.getIdentifier(entity)).thenReturn(42L);
+
+            final Long identifier = JinahyaEntityManagerUtils.getIdentifier(manager, entity);
+
+            assertThat(identifier).isEqualTo(42L);
+        }
+
+        @DisplayName("a null manager is rejected by name")
+        @Test
+        void _NullPointerException_NullManager() {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.getIdentifier(null, new Object()))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("manager");
         }
     }
 }

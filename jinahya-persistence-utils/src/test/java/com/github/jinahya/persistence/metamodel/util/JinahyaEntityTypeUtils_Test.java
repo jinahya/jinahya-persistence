@@ -159,4 +159,26 @@ class JinahyaEntityTypeUtils_Test {
             assertThat(actual).isSameAs(expected);
         }
     }
+
+    @DisplayName("getEntityName(entityClass, entityManagerFactory)")
+    @Nested
+    class GetEntityName_Test {
+
+        @DisplayName("the entity type's own name is returned")
+        @Test
+        void __nameOfTheEntityType() {
+            final var entityType = mock(EntityType.class);
+            when(entityType.getName()).thenReturn("Alpha_");
+
+            assertThat(JinahyaEntityTypeUtils.getEntityName(Alpha.class, knowing(Alpha.class, entityType)))
+                    .isEqualTo("Alpha_");
+        }
+
+        @DisplayName("a class the factory does not map is an IllegalArgumentException")
+        @Test
+        void _IllegalArgumentException_NotMapped() {
+            assertThatThrownBy(() -> JinahyaEntityTypeUtils.getEntityName(Alpha.class, knowingNothing()))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
 }

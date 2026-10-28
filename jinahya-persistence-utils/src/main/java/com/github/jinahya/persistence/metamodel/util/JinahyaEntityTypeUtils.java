@@ -156,6 +156,24 @@ public final class JinahyaEntityTypeUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Returns the entity name of the specified entity class, in the metamodel of the specified entity manager factory.
+     *
+     * @param entityClass          the entity class whose entity name is returned.
+     * @param entityManagerFactory the entity manager factory to look the {@code entityClass} up in.
+     * @return the entity name of the {@code entityClass}; the name a query refers to it by.
+     * @throws IllegalArgumentException when the {@code entityManagerFactory} does not map the {@code entityClass} as an
+     *                                  entity.
+     * @see #getEntityType(Class, EntityManagerFactory)
+     * @see EntityType#getName()
+     */
+    public static String getEntityName(final Class<?> entityClass,
+                                       final EntityManagerFactory entityManagerFactory) {
+        return getEntityType(entityClass, entityManagerFactory).getName();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Creates a new instance, which is not allowed.
      */
     private JinahyaEntityTypeUtils() {

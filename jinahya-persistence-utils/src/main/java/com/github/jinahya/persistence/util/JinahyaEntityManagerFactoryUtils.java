@@ -20,11 +20,13 @@ package com.github.jinahya.persistence.util;
  * #L%
  */
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * A utility class for {@link EntityManagerFactory}.
@@ -50,6 +52,28 @@ public final class JinahyaEntityManagerFactoryUtils {
     public static PersistenceUnitUtil getPersistenceUnitUtil(final EntityManagerFactory factory) {
         Objects.requireNonNull(factory, "factory is null");
         return factory.getPersistenceUnitUtil();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Applies a new entity manager of the specified entity manager factory to the specified function, and closes the
+     * entity manager.
+     *
+     * @param factory  the entity manager factory.
+     * @param function the function to be applied with the entity manager.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @implNote The transaction is left to the {@code function}.
+     * @see EntityManagerFactory#createEntityManager()
+     */
+    public static <R> R applyEntityManager(final EntityManagerFactory factory,
+                                           final Function<? super EntityManager, ? extends R> function) {
+        Objects.requireNonNull(factory, "factory is null");
+        Objects.requireNonNull(function, "function is null");
+        try (var manager = factory.createEntityManager()) {
+            return function.apply(manager);
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------

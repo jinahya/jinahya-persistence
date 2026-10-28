@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.util;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
@@ -150,6 +151,47 @@ class JinahyaEntityManagerFactoryUtils_Test {
             assertThatThrownBy(() -> JinahyaEntityManagerFactoryUtils.getMetamodel(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("factory");
+        }
+    }
+
+    @DisplayName("applyEntityManager(factory, function)")
+    @Nested
+    class ApplyEntityManager_Test {
+
+        @DisplayName("the function gets a new entity manager, which is closed afterwards")
+        @Test
+        void __appliedAndClosed() {
+            final var manager = mock(EntityManager.class);
+            when(factory.createEntityManager()).thenReturn(manager);
+
+            final EntityManager applied = JinahyaEntityManagerFactoryUtils.applyEntityManager(factory, m -> m);
+
+            assertThat(applied).isSameAs(manager);
+            org.mockito.Mockito.verify(manager).close();
+        }
+
+        @DisplayName("the entity manager is closed when the function throws")
+        @Test
+        void __closedWhenThrown() {
+            final var manager = mock(EntityManager.class);
+            when(factory.createEntityManager()).thenReturn(manager);
+            final var thrown = new IllegalStateException("thrown");
+
+            assertThatThrownBy(() -> JinahyaEntityManagerFactoryUtils.applyEntityManager(factory, m -> {
+                throw thrown;
+            })).isSameAs(thrown);
+            org.mockito.Mockito.verify(manager).close();
+        }
+
+        @DisplayName("null arguments are rejected by name")
+        @Test
+        void _NullPointerException_ForNullArguments() {
+            assertThatThrownBy(() -> JinahyaEntityManagerFactoryUtils.applyEntityManager(null, m -> m))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("factory");
+            assertThatThrownBy(() -> JinahyaEntityManagerFactoryUtils.applyEntityManager(factory, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("function");
         }
     }
 }
