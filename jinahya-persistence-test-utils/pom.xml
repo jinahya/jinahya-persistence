@@ -30,6 +30,13 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- com.github.jinahya.persistence.util.*; JinahyaPersistenceTestUtils counts through JinahyaEntityManagerUtils -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>jinahya-persistence-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
     <!-- com.github.jinahya.object.randomizer.*; the randomizer role EntityPersisterUtils locates, and the three engine
          flavors a consumer extends. Every dependency it declares is 'provided' or 'test', so it brings nothing along -->
     <dependency>

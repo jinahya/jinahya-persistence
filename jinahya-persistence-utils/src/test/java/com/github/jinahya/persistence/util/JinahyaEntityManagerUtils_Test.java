@@ -7,6 +7,11 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.PersistenceUnitUtil;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -406,6 +411,43 @@ class JinahyaEntityManagerUtils_Test {
             JinahyaEntityManagerUtils.acceptUnwrappedConnection(manager, seen::set);
 
             assertThat(seen).hasValue(connection);
+        }
+    }
+
+    @DisplayName("selectCount(manager, entityClass)")
+    @Nested
+    class SelectCount_Test {
+
+        @DisplayName("COUNT of a root of the class is selected, and its single result returned")
+        @SuppressWarnings({"unchecked"})
+        @Test
+        void __countOfTheRoot() {
+            final var manager = mock(EntityManager.class);
+            final var builder = mock(CriteriaBuilder.class);
+            final var query = mock(CriteriaQuery.class);
+            final var root = mock(Root.class);
+            final var count = mock(Expression.class);
+            final var typed = mock(TypedQuery.class);
+            when(manager.getCriteriaBuilder()).thenReturn(builder);
+            when(builder.createQuery(Long.class)).thenReturn(query);
+            when(query.from(String.class)).thenReturn(root);
+            when(builder.count(root)).thenReturn(count);
+            when(manager.createQuery(query)).thenReturn(typed);
+            when(typed.getSingleResult()).thenReturn(3L);
+
+            assertThat(JinahyaEntityManagerUtils.selectCount(manager, String.class)).isEqualTo(3L);
+            verify(query).select(count);
+        }
+
+        @DisplayName("null arguments are rejected by name")
+        @Test
+        void _NullPointerException_ForNullArguments() {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.selectCount(null, String.class))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("manager");
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.selectCount(mock(EntityManager.class), null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("entityClass");
         }
     }
 

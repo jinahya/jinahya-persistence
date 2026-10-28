@@ -1,8 +1,8 @@
 package com.github.jinahya.persistence.test.util;
 
+import com.github.jinahya.persistence.util.JinahyaEntityManagerUtils;
 import jakarta.persistence.EntityManager;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -21,15 +21,12 @@ public final class JinahyaPersistenceTestUtils {
      * @param <T>           entity type parameter
      * @return the number of all instances of the {@code entityClass}.
      * @throws NullPointerException when either argument is {@code null}.
+     * @deprecated Counting is not specific to tests; use
+     *         {@link JinahyaEntityManagerUtils#selectCount(EntityManager, Class)}, which this now merely calls.
      */
+    @Deprecated(forRemoval = true)
     public static <T> long selectCount(final EntityManager entityManager, final Class<T> entityClass) {
-        Objects.requireNonNull(entityManager, "entityManager is null");
-        Objects.requireNonNull(entityClass, "entityClass is null");
-        final var builder = entityManager.getCriteriaBuilder();
-        final var query = builder.createQuery(Long.class);
-        final var root = query.from(entityClass);
-        query.select(builder.count(root));
-        return entityManager.createQuery(query).getSingleResult();
+        return JinahyaEntityManagerUtils.selectCount(entityManager, entityClass);
     }
 
     /**
@@ -44,7 +41,7 @@ public final class JinahyaPersistenceTestUtils {
      *         {@link jakarta.persistence.TypedQuery#setFirstResult(int)} takes an {@code int}.
      */
     public static <T> Optional<T> selectRandom(final EntityManager entityManager, final Class<T> entityClass) {
-        final var count = selectCount(entityManager, entityClass);
+        final var count = JinahyaEntityManagerUtils.selectCount(entityManager, entityClass);
         if (count == 0L) {
             return Optional.empty();
         }

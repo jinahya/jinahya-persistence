@@ -436,6 +436,31 @@ public final class JinahyaEntityManagerUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Selects the number of all instances of the specified entity class; {@code SELECT COUNT(e) FROM Entity e}.
+     *
+     * @param manager     the entity manager.
+     * @param entityClass the entity class whose instances are counted.
+     * @return the number of all instances of the {@code entityClass}; {@code 0} when there is none.
+     * @throws IllegalArgumentException when the {@code entityClass} is not an entity of the {@code manager}'s
+     *                                  persistence unit.
+     * @implNote Built with the Criteria API, rooted at the class itself, so neither the entity name nor the
+     *         class name goes into a query string. {@code COUNT} with no {@code GROUP BY} always yields exactly one
+     *         row holding a number, so the result is neither {@code null} nor a
+     *         {@link jakarta.persistence.NoResultException NoResultException}.
+     */
+    public static long selectCount(final EntityManager manager, final Class<?> entityClass) {
+        Objects.requireNonNull(manager, "manager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        final var builder = manager.getCriteriaBuilder();
+        final var query = builder.createQuery(Long.class);
+        final var root = query.from(entityClass);
+        query.select(builder.count(root));
+        return manager.createQuery(query).getSingleResult();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Returns the id of the specified entity, from the persistence unit of the specified entity manager.
      *
      * @param manager the entity manager.
