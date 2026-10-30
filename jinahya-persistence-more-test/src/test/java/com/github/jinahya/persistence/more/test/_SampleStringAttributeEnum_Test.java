@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-class _SampleStringAttributeEnum_Test extends __AttributeEnum_Test.__OfStringTest<_SampleStringAttributeEnum> {
+class _SampleStringAttributeEnum_Test extends AttributeEnum_Test.OfStringTest<_SampleStringAttributeEnum> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     _SampleStringAttributeEnum_Test() {

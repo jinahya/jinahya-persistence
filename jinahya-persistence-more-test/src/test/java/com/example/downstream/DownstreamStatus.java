@@ -1,9 +1,9 @@
 package com.example.downstream;
 
-import com.github.jinahya.persistence.more.__AttributeEnum;
+import com.github.jinahya.persistence.more.AttributeEnum;
 
 /** An enum a downstream persists by its attribute value. */
-public enum DownstreamStatus implements __AttributeEnum.__OfString<DownstreamStatus> {
+public enum DownstreamStatus implements AttributeEnum.OfString<DownstreamStatus> {
 
     OPEN("O"),
 

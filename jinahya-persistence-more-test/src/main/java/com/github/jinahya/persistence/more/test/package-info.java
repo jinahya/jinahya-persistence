@@ -22,12 +22,12 @@
  * charging for itself twice.
  *
  * <h2>Attribute enums</h2>
- * {@link com.github.jinahya.persistence.more.test.__AttributeEnum_Test} verifies that an
- * {@link com.github.jinahya.persistence.more.__AttributeEnum} has no {@code null} and no duplicate attribute values,
- * and mirrors the {@code __OfString}, {@code __OfNumber}, {@code __OfInteger} and {@code __OfLong} nests of what it
+ * {@link com.github.jinahya.persistence.more.test.AttributeEnum_Test} verifies that an
+ * {@link com.github.jinahya.persistence.more.AttributeEnum} has no {@code null} and no duplicate attribute values,
+ * and mirrors the {@code OfString}, {@code __OfNumber}, {@code __OfInteger} and {@code __OfLong} nests of what it
  * tests, so a subclass names only what those do not already fix. Round-tripping the constants through a converter is
- * {@link com.github.jinahya.persistence.more.converter.test.__AttributeEnumConverter_Test}, next door with the rest
- * of the converters. {@link com.github.jinahya.persistence.more.test.__AttributeEnum_TestUtils} offers the same
+ * {@link com.github.jinahya.persistence.more.converter.test.AttributeEnumConverter_Test}, next door with the rest
+ * of the converters. {@link com.github.jinahya.persistence.more.test.AttributeEnum_TestUtils} offers the same
  * traversals, including random constant selection, to tests which do not extend those classes.
  *
  * <h2>Self-referencing entities</h2>

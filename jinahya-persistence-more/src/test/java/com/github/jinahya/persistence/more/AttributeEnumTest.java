@@ -31,14 +31,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         "java:S114", // Interface names should comply with a naming convention
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __AttributeEnumTest {
+class AttributeEnumTest {
 
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("__OfInteger")
     @Nested
     class OfInteger_Test {
 
-        private enum _SomeIntegerAttributeEnum implements __AttributeEnum.__OfInteger<_SomeIntegerAttributeEnum> {
+        private enum _SomeIntegerAttributeEnum implements AttributeEnum.__OfInteger<_SomeIntegerAttributeEnum> {
 
             A(11),
 
@@ -66,7 +66,7 @@ class __AttributeEnumTest {
         @DisplayName("valueOfAttributeValue(enumClass, int)")
         @Test
         void valueOfAttributeValue__() {
-            assertThat(__AttributeEnum.__OfInteger.valueOfAttributeValue(_SomeIntegerAttributeEnum.class, 22))
+            assertThat(AttributeEnum.__OfInteger.valueOfAttributeValue(_SomeIntegerAttributeEnum.class, 22))
                     .isSameAs(_SomeIntegerAttributeEnum.B);
         }
 
@@ -74,7 +74,7 @@ class __AttributeEnumTest {
         @Test
         void valueOfAttributeValue_IllegalArgumentException_Unknown() {
             assertThatThrownBy(
-                    () -> __AttributeEnum.__OfInteger.valueOfAttributeValue(_SomeIntegerAttributeEnum.class, 33))
+                    () -> AttributeEnum.__OfInteger.valueOfAttributeValue(_SomeIntegerAttributeEnum.class, 33))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -84,7 +84,7 @@ class __AttributeEnumTest {
     @Nested
     class NullAttributeValue_Test {
 
-        private enum _NullValued implements __AttributeEnum.__OfInteger<_NullValued> {
+        private enum _NullValued implements AttributeEnum.__OfInteger<_NullValued> {
 
             INSTANCE;
 
@@ -94,7 +94,7 @@ class __AttributeEnumTest {
             }
         }
 
-        private enum _NullValuedLong implements __AttributeEnum.__OfLong<_NullValuedLong> {
+        private enum _NullValuedLong implements AttributeEnum.__OfLong<_NullValuedLong> {
 
             INSTANCE;
 
@@ -125,7 +125,7 @@ class __AttributeEnumTest {
     @Nested
     class OfLong_Test {
 
-        private enum _SomeLongAttributeEnum implements __AttributeEnum.__OfLong<_SomeLongAttributeEnum> {
+        private enum _SomeLongAttributeEnum implements AttributeEnum.__OfLong<_SomeLongAttributeEnum> {
 
             A(11L),
 
@@ -153,7 +153,7 @@ class __AttributeEnumTest {
         @DisplayName("valueOfAttributeValue(enumClass, long)")
         @Test
         void valueOfAttributeValue__() {
-            assertThat(__AttributeEnum.__OfLong.valueOfAttributeValue(_SomeLongAttributeEnum.class, 22L))
+            assertThat(AttributeEnum.__OfLong.valueOfAttributeValue(_SomeLongAttributeEnum.class, 22L))
                     .isSameAs(_SomeLongAttributeEnum.B);
         }
 
@@ -161,7 +161,7 @@ class __AttributeEnumTest {
         @Test
         void valueOfAttributeValue_IllegalArgumentException_Unknown() {
             assertThatThrownBy(
-                    () -> __AttributeEnum.__OfLong.valueOfAttributeValue(_SomeLongAttributeEnum.class, 33L))
+                    () -> AttributeEnum.__OfLong.valueOfAttributeValue(_SomeLongAttributeEnum.class, 33L))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 

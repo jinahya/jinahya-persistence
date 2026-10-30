@@ -44,8 +44,8 @@
  * refused, or read as {@link java.lang.Boolean#FALSE}.
  *
  * <h2>Enums with stable persisted values</h2>
- * {@link com.github.jinahya.persistence.more.converter.__AttributeEnumConverter} is the converter for an
- * {@link com.github.jinahya.persistence.more.__AttributeEnum}, whose constants declare the value actually written to
+ * {@link com.github.jinahya.persistence.more.converter.AttributeEnumConverter} is the converter for an
+ * {@link com.github.jinahya.persistence.more.AttributeEnum}, whose constants declare the value actually written to
  * the database. The enum side of that pairing lives in {@link com.github.jinahya.persistence.more the parent package}.
  *
  * <h2>Registration</h2>

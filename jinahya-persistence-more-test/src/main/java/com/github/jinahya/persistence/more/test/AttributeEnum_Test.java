@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.__AttributeEnum;
+import com.github.jinahya.persistence.more.AttributeEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * An abstract base class for testing {@link __AttributeEnum} implementations.
+ * An abstract base class for testing {@link AttributeEnum} implementations.
  * <p>
  * Extending it gives an enum two checks for free: that no constant carries a {@code null} attribute value, and that no
  * two constants carry the same one — the second of which is what keeps a converter's lookup unambiguous.
@@ -44,42 +44,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @param <ENUM>      entity type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __AttributeEnum_TestUtils
- * @see com.github.jinahya.persistence.more.converter.test.__AttributeEnumConverter_Test
+ * @see AttributeEnum_TestUtils
+ * @see com.github.jinahya.persistence.more.converter.test.AttributeEnumConverter_Test
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE> {
+public abstract class AttributeEnum_Test<ENUM extends Enum<ENUM> & AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE> {
 
     /**
-     * An abstract base class for testing {@link __AttributeEnum.__OfString} implementations.
+     * An abstract base class for testing {@link AttributeEnum.OfString} implementations.
      *
      * @param <E> enum type parameter
      */
-    public abstract static class __OfStringTest<E extends Enum<E> & __AttributeEnum.__OfString<E>>
-            extends __AttributeEnum_Test<E, String> {
+    public abstract static class OfStringTest<E extends Enum<E> & AttributeEnum.OfString<E>>
+            extends AttributeEnum_Test<E, String> {
 
         /**
          * Creates a new instance for testing specific enum types.
          *
          * @param enumClass the enum class to test.
          */
-        protected __OfStringTest(final Class<E> enumClass) {
+        protected OfStringTest(final Class<E> enumClass) {
             super(enumClass);
         }
     }
 
     /**
-     * An abstract base class for testing {@link __AttributeEnum.__OfNumber} implementations.
+     * An abstract base class for testing {@link AttributeEnum.__OfNumber} implementations.
      *
      * @param <E> enum type parameter
      * @param <N> number type parameter
      */
-    public abstract static class __OfNumberTest<E extends Enum<E> & __AttributeEnum.__OfNumber<E, N>,
+    public abstract static class __OfNumberTest<E extends Enum<E> & AttributeEnum.__OfNumber<E, N>,
             N extends Number>
-            extends __AttributeEnum_Test<E, N> {
+            extends AttributeEnum_Test<E, N> {
 
         /**
          * Creates a new instance for testing specific enum types.
@@ -92,11 +92,11 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
     }
 
     /**
-     * An abstract base class for testing {@link __AttributeEnum.__OfInteger} implementations.
+     * An abstract base class for testing {@link AttributeEnum.__OfInteger} implementations.
      *
      * @param <E> enum type parameter
      */
-    public abstract static class __OfIntegerTest<E extends Enum<E> & __AttributeEnum.__OfInteger<E>>
+    public abstract static class __OfIntegerTest<E extends Enum<E> & AttributeEnum.__OfInteger<E>>
             extends __OfNumberTest<E, Integer> {
 
         /**
@@ -110,11 +110,11 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
     }
 
     /**
-     * An abstract base class for testing {@link __AttributeEnum.__OfLong} implementations.
+     * An abstract base class for testing {@link AttributeEnum.__OfLong} implementations.
      *
      * @param <E> enum type parameter
      */
-    public abstract static class __OfLongTest<E extends Enum<E> & __AttributeEnum.__OfLong<E>>
+    public abstract static class __OfLongTest<E extends Enum<E> & AttributeEnum.__OfLong<E>>
             extends __OfNumberTest<E, Long> {
 
         /**
@@ -134,7 +134,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      *
      * @param enumClass the enum class to test.
      */
-    protected __AttributeEnum_Test(final Class<ENUM> enumClass) {
+    protected AttributeEnum_Test(final Class<ENUM> enumClass) {
         super();
         this.enumClass = Objects.requireNonNull(enumClass, "enumClass is null");
     }
@@ -147,7 +147,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
     @DisplayName("no null attribute value")
     @Test
     protected void _NoNull_AttributeValue() {
-        __AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(
+        AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(
                 enumClass,
                 (ec, av) -> {
                     assertNotNull(av, () -> "null attribute value of " + ec);
@@ -161,7 +161,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
     @DisplayName("no duplicates of attribute values")
     @Test
     protected void _NoDuplicates_AttributeValues() {
-        __AttributeEnum_TestUtils.acceptAttributeValueStream(
+        AttributeEnum_TestUtils.acceptAttributeValueStream(
                 enumClass,
                 s -> {
                     // AssertJ's doesNotHaveDuplicates() is the one assertion here with no counterpart in
@@ -191,7 +191,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      */
     protected void acceptEachEnumConstantAndAttributeValue(
             final BiConsumer<? super ENUM, ? super ATTRIBUTE> consumer) {
-        __AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
+        AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(enumClass, consumer);
     }
 
     /**
@@ -204,7 +204,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @see #acceptEnumConstantStream(Consumer)
      */
     protected final <R> R applyEnumConstantStream(final Function<? super Stream<ENUM>, ? extends R> function) {
-        return __AttributeEnum_TestUtils.applyEnumConstantStream(enumClass, function);
+        return AttributeEnum_TestUtils.applyEnumConstantStream(enumClass, function);
     }
 
     /**
@@ -214,7 +214,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @see #applyEnumConstantStream(Function)
      */
     protected final void acceptEnumConstantStream(final Consumer<? super Stream<ENUM>> consumer) {
-        __AttributeEnum_TestUtils.acceptEnumConstantStream(enumClass, consumer);
+        AttributeEnum_TestUtils.acceptEnumConstantStream(enumClass, consumer);
     }
 
     /**
@@ -228,7 +228,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      */
     protected final <R> R applyAttributeValueStream(
             final Function<? super Stream<ATTRIBUTE>, ? extends R> function) {
-        return __AttributeEnum_TestUtils.applyAttributeValueStream(enumClass, function);
+        return AttributeEnum_TestUtils.applyAttributeValueStream(enumClass, function);
     }
 
     /**
@@ -238,7 +238,7 @@ public abstract class __AttributeEnum_Test<ENUM extends Enum<ENUM> & __Attribute
      * @see #applyAttributeValueStream(Function)
      */
     protected final void acceptAttributeValueStream(final Consumer<? super Stream<ATTRIBUTE>> consumer) {
-        __AttributeEnum_TestUtils.acceptAttributeValueStream(enumClass, consumer);
+        AttributeEnum_TestUtils.acceptAttributeValueStream(enumClass, consumer);
     }
 
     // ------------------------------------------------------------------------------------------------------- enumClass

@@ -30,20 +30,20 @@ package com.github.jinahya.persistence.more;
  * @param <SELF>      self type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see com.github.jinahya.persistence.more.converter.__AttributeEnumConverter
+ * @see com.github.jinahya.persistence.more.converter.AttributeEnumConverter
  * @see __AttributeEnumUtils
  */
 @SuppressWarnings({
         "java:S114", // Interface names should comply with a naming convention
         "java:S119" // Type parameter names should comply with a naming convention
 })
-public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF, ATTRIBUTE>, ATTRIBUTE> {
+public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATTRIBUTE>, ATTRIBUTE> {
 
     /**
      * An interface for defining enum constants with attribute values of string attribute values.
      * <p>
      * Note that the default {@link #attributeValue()} returns {@link Enum#name() name()}, which re-couples the
-     * persisted value to the constant's name — the very coupling {@link __AttributeEnum} exists to break. Override it
+     * persisted value to the constant's name — the very coupling {@link AttributeEnum} exists to break. Override it
      * in every constant whose stored value should survive a rename.
      *
      * @param <SELF> self type parameter
@@ -51,13 +51,13 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention
     })
-    interface __OfString<SELF extends Enum<SELF> & __OfString<SELF>> extends __AttributeEnum<SELF, String> {
+    interface OfString<SELF extends Enum<SELF> & OfString<SELF>> extends AttributeEnum<SELF, String> {
 
         /**
          * {@inheritDoc}
          *
          * @return {@inheritDoc}
-         * @apiNote The {@code attributeValue()} method of {@code __OfString} class returns
+         * @apiNote The {@code attributeValue()} method of {@code OfString} class returns
          *         {@link Enum#name() this.name()}.
          */
         @Override
@@ -74,7 +74,7 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      * @param <NUMBER> number type parameter
      * @apiNote This interface defines no default {@link #attributeValue()}, and cannot: the
      *         {@link Enum#name() name()} of a constant is a {@link String}, and the only numeric candidate,
-     *         {@link Enum#ordinal() ordinal()}, is exactly the coupling {@link __AttributeEnum} exists to break — it
+     *         {@link Enum#ordinal() ordinal()}, is exactly the coupling {@link AttributeEnum} exists to break — it
      *         changes whenever constants are reordered. Every constant therefore has to declare its own value.
      * @apiNote The named subtypes stop at {@link __OfInteger} and {@link __OfLong} on purpose. A constant is
      *         looked up by its attribute value through {@link Object#equals(Object) equals} and
@@ -86,14 +86,14 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      *         for bit. This interface stays generic over {@code NUMBER} regardless, so an enum with a genuine need can
      *         still implement it with any {@link Number} &mdash; it simply does so knowingly, and without the
      *         convenience the named subtypes add.
-     * @see __OfString
+     * @see OfString
      */
     @SuppressWarnings({
             "java:S114", // Interface names should comply with a naming convention
             "java:S119"  // Type parameter names should comply with a naming convention
     })
     interface __OfNumber<SELF extends Enum<SELF> & __OfNumber<SELF, NUMBER>, NUMBER extends Number>
-            extends __AttributeEnum<SELF, NUMBER> {
+            extends AttributeEnum<SELF, NUMBER> {
 
     }
 
@@ -101,7 +101,7 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      * An interface for defining enum constants with {@link Integer} attribute values.
      *
      * @param <SELF> self type parameter
-     * @see com.github.jinahya.persistence.more.converter.__AttributeEnumConverter.__OfInteger
+     * @see com.github.jinahya.persistence.more.converter.AttributeEnumConverter.__OfInteger
      */
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention
@@ -147,7 +147,7 @@ public interface __AttributeEnum<SELF extends Enum<SELF> & __AttributeEnum<SELF,
      * An interface for defining enum constants with {@link Long} attribute values.
      *
      * @param <SELF> self type parameter
-     * @see com.github.jinahya.persistence.more.converter.__AttributeEnumConverter.__OfLong
+     * @see com.github.jinahya.persistence.more.converter.AttributeEnumConverter.__OfLong
      */
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention

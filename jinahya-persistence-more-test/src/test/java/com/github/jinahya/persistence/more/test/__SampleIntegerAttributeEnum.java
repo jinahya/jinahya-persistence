@@ -20,12 +20,12 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.__AttributeEnum;
+import com.github.jinahya.persistence.more.AttributeEnum;
 
 @SuppressWarnings({
         "java:S114" // Interface names should comply with a naming convention
 })
 public interface __SampleIntegerAttributeEnum<E extends Enum<E> & __SampleIntegerAttributeEnum<E>>
-        extends __AttributeEnum.__OfInteger<E> {
+        extends AttributeEnum.__OfInteger<E> {
 
 }

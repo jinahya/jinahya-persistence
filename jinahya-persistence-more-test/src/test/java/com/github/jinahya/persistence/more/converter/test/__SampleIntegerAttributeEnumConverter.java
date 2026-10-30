@@ -20,14 +20,14 @@ package com.github.jinahya.persistence.more.converter.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
+import com.github.jinahya.persistence.more.converter.AttributeEnumConverter;
 import com.github.jinahya.persistence.more.test.__SampleIntegerAttributeEnum;
 
 @SuppressWarnings({
         "java:S119" // Type parameter names should comply with a naming convention
 })
 abstract class __SampleIntegerAttributeEnumConverter<E extends Enum<E> & __SampleIntegerAttributeEnum<E>>
-        extends __AttributeEnumConverter.__OfInteger<E> {
+        extends AttributeEnumConverter.__OfInteger<E> {
 
     __SampleIntegerAttributeEnumConverter(final Class<E> enumClass) {
         super(enumClass);

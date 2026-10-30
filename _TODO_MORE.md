@@ -84,7 +84,7 @@ Worth having in `…more.converter`:
 - `Locale`, via `toLanguageTag` (BCP 47), never `toString`.
 - `Currency`, `ZoneId`/`ZoneOffset`, `URI`, `InetAddress`.
 - `byte[]` as hex or Base64.
-- An `EnumSet` converter over `__AttributeEnum`, joining the **declared** values — which is what
+- An `EnumSet` converter over `AttributeEnum`, joining the **declared** values — which is what
   that interface exists for — composing with `__JoinedStringAttributeConverter`.
 
 Cheapest item here, and it lands in an existing package.

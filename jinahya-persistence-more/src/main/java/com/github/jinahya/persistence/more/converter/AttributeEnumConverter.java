@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.__AttributeEnum;
+import com.github.jinahya.persistence.more.AttributeEnum;
 import com.github.jinahya.persistence.more.__AttributeEnumUtils;
 import jakarta.persistence.AttributeConverter;
 
@@ -30,7 +30,7 @@ import java.util.Objects;
  * An abstract attribute converter for converting between {@link E} type and {@link ATTRIBUTE} type.
  * <p>
  * A subclass only has to name its enum class; the conversion itself is
- * {@link __AttributeEnum#attributeValue() attributeValue()} on the way out, and a lookup of the constant carrying that
+ * {@link AttributeEnum#attributeValue() attributeValue()} on the way out, and a lookup of the constant carrying that
  * value on the way in.
  *
  * @param <E>         enum type parameter
@@ -38,24 +38,24 @@ import java.util.Objects;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote This class is not annotated with {@link jakarta.persistence.Converter @Converter}; a concrete
  *         subclass has to carry that annotation itself, or the persistence unit will not know about it.
- * @see __AttributeEnum
+ * @see AttributeEnum
  * @see __AttributeEnumUtils#valueOf(Class, Object)
  */
 @SuppressWarnings({
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
+public abstract class AttributeEnumConverter<E extends Enum<E> & AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
         implements AttributeConverter<E, ATTRIBUTE> {
 
     /**
      * An abstract attribute converter for converting between {@link E} and {@link String} attribute type.
      *
      * @param <E> enum type parameter
-     * @see __AttributeEnum.__OfString
+     * @see AttributeEnum.OfString
      */
-    public abstract static class __OfString<E extends Enum<E> & __AttributeEnum.__OfString<E>>
-            extends __AttributeEnumConverter<E, String> {
+    public abstract static class OfString<E extends Enum<E> & AttributeEnum.OfString<E>>
+            extends AttributeEnumConverter<E, String> {
 
         /**
          * Creates a new instance for the specified enum class.
@@ -63,7 +63,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
          * @param enumClass the enum class.
          * @see #enumClass
          */
-        protected __OfString(final Class<E> enumClass) {
+        protected OfString(final Class<E> enumClass) {
             super(enumClass, String.class);
         }
     }
@@ -73,13 +73,13 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      *
      * @param <E> enum type parameter
      * @param <N> number type parameter
-     * @apiNote Unlike {@link __AttributeEnum.__OfString}, there is no default attribute value for a number — an
+     * @apiNote Unlike {@link AttributeEnum.OfString}, there is no default attribute value for a number — an
      *         {@link Enum#ordinal() ordinal} would re-introduce exactly the coupling this package avoids — so each
      *         constant has to declare its own.
-     * @see __AttributeEnum.__OfNumber
+     * @see AttributeEnum.__OfNumber
      */
-    public abstract static class __OfNumber<E extends Enum<E> & __AttributeEnum.__OfNumber<E, N>, N extends Number>
-            extends __AttributeEnumConverter<E, N> {
+    public abstract static class __OfNumber<E extends Enum<E> & AttributeEnum.__OfNumber<E, N>, N extends Number>
+            extends AttributeEnumConverter<E, N> {
 
         /**
          * Creates a new instance for the specified enum class and number class.
@@ -98,9 +98,9 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      * An abstract attribute converter for converting between {@link E} and {@link Integer} attribute type.
      *
      * @param <E> enum type parameter
-     * @see __AttributeEnum.__OfInteger
+     * @see AttributeEnum.__OfInteger
      */
-    public abstract static class __OfInteger<E extends Enum<E> & __AttributeEnum.__OfInteger<E>>
+    public abstract static class __OfInteger<E extends Enum<E> & AttributeEnum.__OfInteger<E>>
             extends __OfNumber<E, Integer> {
 
         /**
@@ -118,9 +118,9 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      * An abstract attribute converter for converting between {@link E} and {@link Long} attribute type.
      *
      * @param <E> enum type parameter
-     * @see __AttributeEnum.__OfLong
+     * @see AttributeEnum.__OfLong
      */
-    public abstract static class __OfLong<E extends Enum<E> & __AttributeEnum.__OfLong<E>>
+    public abstract static class __OfLong<E extends Enum<E> & AttributeEnum.__OfLong<E>>
             extends __OfNumber<E, Long> {
 
         /**
@@ -144,7 +144,7 @@ public abstract class __AttributeEnumConverter<E extends Enum<E> & __AttributeEn
      * @see #enumClass
      * @see #attributeClass
      */
-    protected __AttributeEnumConverter(final Class<E> enumClass, final Class<ATTRIBUTE> attributeClass) {
+    protected AttributeEnumConverter(final Class<E> enumClass, final Class<ATTRIBUTE> attributeClass) {
         super();
         this.enumClass = Objects.requireNonNull(enumClass, "enumClass is null");
         this.attributeClass = Objects.requireNonNull(attributeClass, "attributeClass is null");

@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Utilities for {@link __AttributeEnum}.
+ * Utilities for {@link AttributeEnum}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @implNote Looking a constant up by its attribute value is backed by a map, built once per enum class and held
@@ -50,17 +50,17 @@ public final class __AttributeEnumUtils {
      * @implNote A {@link ClassValue} associates each map with the enum class it was built from, so that neither
      *         outlives the class, and so that a redeployed application does not leak its class loader.
      */
-    private static final ClassValue<Map<Object, __AttributeEnum<?, ?>>> CONSTANTS = new ClassValue<>() {
+    private static final ClassValue<Map<Object, AttributeEnum<?, ?>>> CONSTANTS = new ClassValue<>() {
         @Override
-        protected Map<Object, __AttributeEnum<?, ?>> computeValue(final Class<?> type) {
+        protected Map<Object, AttributeEnum<?, ?>> computeValue(final Class<?> type) {
             assert type != null;
             assert type.isEnum();
             final var constants = type.getEnumConstants();
-            final Map<Object, __AttributeEnum<?, ?>> map = new HashMap<>(constants.length);
+            final Map<Object, AttributeEnum<?, ?>> map = new HashMap<>(constants.length);
             for (final var constant : constants) {
-                if (!(constant instanceof __AttributeEnum<?, ?> attributeEnum)) {
+                if (!(constant instanceof AttributeEnum<?, ?> attributeEnum)) {
                     throw new IllegalArgumentException(
-                            "not an " + __AttributeEnum.class.getSimpleName() + " constant: " + constant +
+                            "not an " + AttributeEnum.class.getSimpleName() + " constant: " + constant +
                             "; of " + type
                     );
                 }
@@ -98,7 +98,7 @@ public final class __AttributeEnumUtils {
      *         than resolving to whichever constant happens to be declared first.
      */
     @SuppressWarnings({"unchecked"})
-    private static <E extends __AttributeEnum<?, ?>>
+    private static <E extends AttributeEnum<?, ?>>
     E find_(final Class<? extends E> enumClass, final Object attributeValue) {
         if (!Objects.requireNonNull(enumClass, "enumClass is null").isEnum()) {
             throw new IllegalArgumentException("not an enum class: " + enumClass);
@@ -129,7 +129,7 @@ public final class __AttributeEnumUtils {
      *         to implement {@link Object#hashCode() hashCode()} consistently with it.
      * @see #valueOf(Class, Object)
      */
-    public static <E extends Enum<E> & __AttributeEnum<E, A>, A>
+    public static <E extends Enum<E> & AttributeEnum<E, A>, A>
     Optional<E> find(final Class<E> enumClass, final A attributeValue) {
         return Optional.ofNullable(find_(enumClass, attributeValue));
     }
@@ -152,7 +152,7 @@ public final class __AttributeEnumUtils {
      * @see #find(Class, Object)
      * @see #valueOf(List, Object)
      */
-    public static <E extends Enum<E> & __AttributeEnum<E, A>, A>
+    public static <E extends Enum<E> & AttributeEnum<E, A>, A>
     E valueOf(final Class<E> enumClass, final A attributeValue) {
         return find(enumClass, attributeValue).orElseThrow(() -> new IllegalArgumentException(
                 "no enum constant, of " + enumClass + ", for attributeValue: " + attributeValue
@@ -182,15 +182,15 @@ public final class __AttributeEnumUtils {
      *         is reported whether or not an earlier class happens to match first.
      *         <p>
      *         The {@code E} type parameter is bound to the interface alone &mdash;
-     *         {@code __AttributeEnum<? extends Enum<?>, A>} &mdash; rather than to
-     *         {@code Enum<E> & __AttributeEnum<E, A>}, as it is in {@link #find(Class, Object)}. The self-referential
+     *         {@code AttributeEnum<? extends Enum<?>, A>} &mdash; rather than to
+     *         {@code Enum<E> & AttributeEnum<E, A>}, as it is in {@link #find(Class, Object)}. The self-referential
      *         form is not merely avoided here, it is unusable: {@code E} has to be a common supertype of distinct enum
      *         classes, and nothing satisfies {@code E extends Enum<E>} except the concrete enum classes themselves,
      *         which are effectively final, so {@code List<Class<? extends E>>} would accept just one class &mdash;
      *         which is exactly {@link #find(Class, Object)}; while any real common supertype of two enum classes is an
      *         interface, and an interface cannot extend {@link Enum}.
      *         <p>
-     *         A weaker constraint, {@code E extends Enum<?> & __AttributeEnum<? extends Enum<?>, A>}, does compile, and
+     *         A weaker constraint, {@code E extends Enum<?> & AttributeEnum<? extends Enum<?>, A>}, does compile, and
      *         does reject a non-enum class at compile time. It is not used because it only holds where the compiler can
      *         infer {@code E} as the intersection of the classes actually given, and that type cannot be written down:
      *         the argument then has to be an inline {@code List.of(...)}, or a {@code var} local. A
@@ -204,7 +204,7 @@ public final class __AttributeEnumUtils {
      *         {@code false} for it and {@link Class#getEnumConstants() getEnumConstants()} returns {@code null}.
      * @see #valueOf(List, Object)
      */
-    public static <E extends __AttributeEnum<? extends Enum<?>, A>, A>
+    public static <E extends AttributeEnum<? extends Enum<?>, A>, A>
     Optional<E> find(final List<Class<? extends E>> enumClasses, final A attributeValue) {
         Objects.requireNonNull(attributeValue, "attributeValue is null");
         if (Objects.requireNonNull(enumClasses, "enumClasses is null").isEmpty()) {
@@ -248,7 +248,7 @@ public final class __AttributeEnumUtils {
      * @see #find(List, Object)
      * @see #valueOf(Class, Object)
      */
-    public static <E extends __AttributeEnum<? extends Enum<?>, A>, A>
+    public static <E extends AttributeEnum<? extends Enum<?>, A>, A>
     E valueOf(final List<Class<? extends E>> enumClasses, final A attributeValue) {
         return find(enumClasses, attributeValue).orElseThrow(() -> new IllegalArgumentException(
                 "no enum constant, in any of " + enumClasses + ", for attributeValue: " + attributeValue

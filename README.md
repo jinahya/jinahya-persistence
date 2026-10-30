@@ -136,7 +136,7 @@ Five packages, by what they are for:
 
 | Package | What it holds |
 | --- | --- |
-| `…persistence.more` | `__AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
+| `…persistence.more` | `AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
 | `…persistence.more.converter.time` | The `java.time` converters — ISO-8601 text, integral coordinates, day and month names — with the attribute axis those types call for. See below. |
 | `…persistence.more.colormodel` | Mapped superclasses for a colour in each of four models — RGB, CMYK, HSL, HWB, and RGB once more with an alpha column — sharing one normalized way of addressing whatever components a model has. Four models but one space: every conversion goes through sRGB, following CSS Color 4. |
@@ -175,7 +175,7 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 | `ZoneIdStringAttributeConverter` | a `ZoneId`, stored as its identifier — `Asia/Seoul`, `+09:00` — a concrete converter on its own, with no holder; and, nested in it and built on it, `TimeZoneStringAttributeConverter`, a `java.util.TimeZone` stored as the identifier of its zone; in `…converter.time` |
 | `__BooleanYnAttributeConverters` | a legacy `'Y'`/`'N'` flag, as a `Character` or a `String`, strict or lenient |
 
-`__AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
+`AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
 a converter has to name its enum class and that class belongs to the consumer.
 
 #### Upgrading to 0.6.8

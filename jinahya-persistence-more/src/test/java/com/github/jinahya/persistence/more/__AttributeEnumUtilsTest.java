@@ -45,7 +45,7 @@ class __AttributeEnumUtilsTest {
             "java:S119" // Type parameter names should comply with a naming convention
     })
     private interface __SomeAttributeEnum<E extends Enum<E> & __SomeAttributeEnum<E>>
-            extends __AttributeEnum.__OfString<E> {
+            extends AttributeEnum.OfString<E> {
 
     }
 
@@ -225,7 +225,7 @@ class __AttributeEnumUtilsTest {
     class InvalidAttributeValues_Test {
 
         private enum _DuplicateAttributeValueEnum
-                implements __AttributeEnum<_DuplicateAttributeValueEnum, String> {
+                implements AttributeEnum<_DuplicateAttributeValueEnum, String> {
 
             A,
 
@@ -238,7 +238,7 @@ class __AttributeEnumUtilsTest {
         }
 
         private enum _NullAttributeValueEnum
-                implements __AttributeEnum<_NullAttributeValueEnum, String> {
+                implements AttributeEnum<_NullAttributeValueEnum, String> {
 
             A;
 
@@ -288,13 +288,13 @@ class __AttributeEnumUtilsTest {
         // the list form promises that every class is validated before any of them is searched; the earlier class
         // carries the value looked up, so a search which stopped at the first match would never reach the later one
 
-        private static final List<Class<? extends __AttributeEnum<? extends Enum<?>, String>>>
+        private static final List<Class<? extends AttributeEnum<? extends Enum<?>, String>>>
                 MATCHING_THEN_DUPLICATE = List.of(
                 _SomeAttributeEnum1.class,
                 _DuplicateAttributeValueEnum.class
         );
 
-        private static final List<Class<? extends __AttributeEnum<? extends Enum<?>, String>>>
+        private static final List<Class<? extends AttributeEnum<? extends Enum<?>, String>>>
                 MATCHING_THEN_NULL = List.of(
                 _SomeAttributeEnum1.class,
                 _NullAttributeValueEnum.class
@@ -341,7 +341,7 @@ class __AttributeEnumUtilsTest {
             assertThat(find(ENUM_CLASSES_WELL_FORMED, "B")).hasValue(_SomeAttributeEnum1.B);
         }
 
-        private static final List<Class<? extends __AttributeEnum<? extends Enum<?>, String>>>
+        private static final List<Class<? extends AttributeEnum<? extends Enum<?>, String>>>
                 ENUM_CLASSES_WELL_FORMED = List.of(
                 _SomeAttributeEnum1.class,
                 _SomeAttributeEnum2.class

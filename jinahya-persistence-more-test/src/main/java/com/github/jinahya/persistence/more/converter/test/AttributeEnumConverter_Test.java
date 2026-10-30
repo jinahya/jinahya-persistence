@@ -20,9 +20,9 @@ package com.github.jinahya.persistence.more.converter.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.__AttributeEnum;
-import com.github.jinahya.persistence.more.converter.__AttributeEnumConverter;
-import com.github.jinahya.persistence.more.test.__AttributeEnum_Test;
+import com.github.jinahya.persistence.more.AttributeEnum;
+import com.github.jinahya.persistence.more.converter.AttributeEnumConverter;
+import com.github.jinahya.persistence.more.test.AttributeEnum_Test;
 import com.github.jinahya.persistence.more.test.___Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,44 +34,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * An abstract base class for testing {@link __AttributeEnumConverter} implementations.
+ * An abstract base class for testing {@link AttributeEnumConverter} implementations.
  * <p>
- * Beyond what {@link __AttributeEnum_Test} already checks of the enum itself, this class round-trips every constant
+ * Beyond what {@link AttributeEnum_Test} already checks of the enum itself, this class round-trips every constant
  * through the converter, and asserts that {@code null} maps to {@code null} in both directions.
  *
  * @param <CONVERTER> converter type parameter
  * @param <ENUM>      enums type parameter
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __AttributeEnum_Test
+ * @see AttributeEnum_Test
  */
 @SuppressWarnings({
         "java:S100", // Method names should comply with a naming convention
         "java:S101", // Class names should comply with a naming convention
         "java:S119"  // Type parameter names should comply with a naming convention
 })
-public abstract class __AttributeEnumConverter_Test<
-        CONVERTER extends __AttributeEnumConverter<ENUM, ATTRIBUTE>,
-        ENUM extends Enum<ENUM> & __AttributeEnum<ENUM, ATTRIBUTE>,
+public abstract class AttributeEnumConverter_Test<
+        CONVERTER extends AttributeEnumConverter<ENUM, ATTRIBUTE>,
+        ENUM extends Enum<ENUM> & AttributeEnum<ENUM, ATTRIBUTE>,
         ATTRIBUTE
         >
-        extends __AttributeEnum_Test<ENUM, ATTRIBUTE> {
+        extends AttributeEnum_Test<ENUM, ATTRIBUTE> {
 
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfString}.
+     * An abstract test class for testing subclasses of {@link AttributeEnumConverter.OfString}.
      *
      * @param <CONVERTER> converter type parameter
      * @param <ENUM>      entity type parameter
      * @see #converterClass
      * @see #enumClass
      */
-    public abstract static class __OfStringTest<
-            CONVERTER extends __AttributeEnumConverter.__OfString<ENUM>,
-            ENUM extends Enum<ENUM> & __AttributeEnum.__OfString<ENUM>
+    public abstract static class OfStringTest<
+            CONVERTER extends AttributeEnumConverter.OfString<ENUM>,
+            ENUM extends Enum<ENUM> & AttributeEnum.OfString<ENUM>
             >
-            extends __AttributeEnumConverter_Test<CONVERTER, ENUM, String> {
+            extends AttributeEnumConverter_Test<CONVERTER, ENUM, String> {
 
         /**
          * Creates a new instance for testing the specified converter class, whose attribute value is a
@@ -82,13 +82,13 @@ public abstract class __AttributeEnumConverter_Test<
          * @see #converterClass
          * @see #enumClass
          */
-        protected __OfStringTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
+        protected OfStringTest(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
             super(converterClass, enumClass);
         }
     }
 
     /**
-     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfNumber}.
+     * An abstract test class for testing subclasses of {@link AttributeEnumConverter.__OfNumber}.
      *
      * @param <CONVERTER> converter type parameter
      * @param <ENUM>      enum type parameter
@@ -97,11 +97,11 @@ public abstract class __AttributeEnumConverter_Test<
      * @see #enumClass
      */
     public abstract static class __OfNumberTest<
-            CONVERTER extends __AttributeEnumConverter.__OfNumber<ENUM, NUMBER>,
-            ENUM extends Enum<ENUM> & __AttributeEnum.__OfNumber<ENUM, NUMBER>,
+            CONVERTER extends AttributeEnumConverter.__OfNumber<ENUM, NUMBER>,
+            ENUM extends Enum<ENUM> & AttributeEnum.__OfNumber<ENUM, NUMBER>,
             NUMBER extends Number
             >
-            extends __AttributeEnumConverter_Test<CONVERTER, ENUM, NUMBER> {
+            extends AttributeEnumConverter_Test<CONVERTER, ENUM, NUMBER> {
 
         /**
          * Creates a new instance for testing the specified converter class, whose attribute value is a
@@ -116,7 +116,7 @@ public abstract class __AttributeEnumConverter_Test<
     }
 
     /**
-     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfInteger}.
+     * An abstract test class for testing subclasses of {@link AttributeEnumConverter.__OfInteger}.
      *
      * @param <CONVERTER> converter type parameter
      * @param <ENUM>      enum type parameter
@@ -124,8 +124,8 @@ public abstract class __AttributeEnumConverter_Test<
      * @see #enumClass
      */
     public abstract static class __OfIntegerTest<
-            CONVERTER extends __AttributeEnumConverter.__OfInteger<ENUM>,
-            ENUM extends Enum<ENUM> & __AttributeEnum.__OfInteger<ENUM>
+            CONVERTER extends AttributeEnumConverter.__OfInteger<ENUM>,
+            ENUM extends Enum<ENUM> & AttributeEnum.__OfInteger<ENUM>
             >
             extends __OfNumberTest<CONVERTER, ENUM, Integer> {
 
@@ -142,7 +142,7 @@ public abstract class __AttributeEnumConverter_Test<
     }
 
     /**
-     * An abstract test class for testing subclasses of {@link __AttributeEnumConverter.__OfLong}.
+     * An abstract test class for testing subclasses of {@link AttributeEnumConverter.__OfLong}.
      *
      * @param <CONVERTER> converter type parameter
      * @param <ENUM>      enum type parameter
@@ -150,8 +150,8 @@ public abstract class __AttributeEnumConverter_Test<
      * @see #enumClass
      */
     public abstract static class __OfLongTest<
-            CONVERTER extends __AttributeEnumConverter.__OfLong<ENUM>,
-            ENUM extends Enum<ENUM> & __AttributeEnum.__OfLong<ENUM>
+            CONVERTER extends AttributeEnumConverter.__OfLong<ENUM>,
+            ENUM extends Enum<ENUM> & AttributeEnum.__OfLong<ENUM>
             >
             extends __OfNumberTest<CONVERTER, ENUM, Long> {
 
@@ -175,7 +175,7 @@ public abstract class __AttributeEnumConverter_Test<
      * @param enumClass      the enum class the converter converts.
      * @see #converterClass
      */
-    protected __AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
+    protected AttributeEnumConverter_Test(final Class<CONVERTER> converterClass, final Class<ENUM> enumClass) {
         super(enumClass);
         this.converterClass = Objects.requireNonNull(converterClass, "converterClass is null");
     }
@@ -184,7 +184,7 @@ public abstract class __AttributeEnumConverter_Test<
 
     /**
      * A nested test class for testing
-     * {@link __AttributeEnumConverter#convertToDatabaseColumn(Enum) convertToDatabaseColumn(E)}.
+     * {@link AttributeEnumConverter#convertToDatabaseColumn(Enum) convertToDatabaseColumn(E)}.
      */
     @DisplayName("convertToDatabaseColumn(E)E.attributeValue")
     @Nested
@@ -227,7 +227,7 @@ public abstract class __AttributeEnumConverter_Test<
 
     /**
      * A nested test class for testing
-     * {@link __AttributeEnumConverter#convertToEntityAttribute(Object) convertToEntityAttribute(ATTRIBUTE)}.
+     * {@link AttributeEnumConverter#convertToEntityAttribute(Object) convertToEntityAttribute(ATTRIBUTE)}.
      */
     @DisplayName("convertToEntityAttribute(E)E.attributeValue")
     @Nested

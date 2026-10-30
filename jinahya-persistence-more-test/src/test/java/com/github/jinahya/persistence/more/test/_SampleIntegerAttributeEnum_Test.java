@@ -21,7 +21,7 @@ package com.github.jinahya.persistence.more.test;
  */
 
 class _SampleIntegerAttributeEnum_Test
-        extends __AttributeEnum_Test.__OfIntegerTest<_SampleIntegerAttributeEnum> {
+        extends AttributeEnum_Test.__OfIntegerTest<_SampleIntegerAttributeEnum> {
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
     _SampleIntegerAttributeEnum_Test() {
