@@ -21,9 +21,12 @@
  * Attribute converters which store an attribute as JSON text in a {@code String} column.
  *
  * <h2>Two APIs</h2>
- * {@link com.github.jinahya.persistence.more.converter.json.JsonpStringAttributeConverter} stores a Jakarta JSON
- * Processing {@link jakarta.json.JsonValue} as it is, and its concrete converters, one per value type, are nested in
- * it.
+ * {@link com.github.jinahya.persistence.more.converter.json.JsonpAttributeConverter} stores a Jakarta JSON
+ * Processing {@link jakarta.json.JsonValue} as it is, as the JSON text in a {@code String} column through its
+ * {@link com.github.jinahya.persistence.more.converter.json.JsonpAttributeConverter.OfString OfString}, or in UTF-8
+ * in a {@code byte[]} column through its
+ * {@link com.github.jinahya.persistence.more.converter.json.JsonpAttributeConverter.OfBytes OfBytes}; the concrete
+ * converters, one per value type, are nested in each.
  * {@link com.github.jinahya.persistence.more.converter.json.JsonbAttributeConverter} stores any type Jakarta JSON
  * Binding maps, as the JSON text in a {@code String} column through its
  * {@link com.github.jinahya.persistence.more.converter.json.JsonbAttributeConverter.OfString OfString}, or in UTF-8
