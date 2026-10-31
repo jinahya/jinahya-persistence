@@ -24,8 +24,12 @@
  * {@link com.github.jinahya.persistence.more.converter.json.JsonpStringAttributeConverter} stores a Jakarta JSON
  * Processing {@link jakarta.json.JsonValue} as it is, and its concrete converters, one per value type, are nested in
  * it.
- * {@link com.github.jinahya.persistence.more.converter.json.JsonbStringAttributeConverter} stores any type Jakarta
- * JSON Binding maps, and is subclassed once per attribute type.
+ * {@link com.github.jinahya.persistence.more.converter.json.JsonbAttributeConverter} stores any type Jakarta JSON
+ * Binding maps, as the JSON text in a {@code String} column through its
+ * {@link com.github.jinahya.persistence.more.converter.json.JsonbAttributeConverter.OfString OfString}, or in UTF-8
+ * in a {@code byte[]} column through its
+ * {@link com.github.jinahya.persistence.more.converter.json.JsonbAttributeConverter.OfBytes OfBytes}; either is
+ * subclassed once per attribute type.
  *
  * <h2>Dependencies</h2>
  * Neither API is a dependency of this module at run time: both are declared {@code provided}, and the application

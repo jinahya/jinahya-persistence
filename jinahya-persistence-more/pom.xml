@@ -24,7 +24,7 @@
       <artifactId>jakarta.validation-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- the @PostConstruct/@PreDestroy of __JsonbStringAttributeConverter -->
+    <!-- the @PostConstruct/@PreDestroy of JsonbAttributeConverter -->
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
