@@ -35,8 +35,7 @@
       <artifactId>lombok</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- @Slf4j on _SampleStringAttributeConverter_Test generates an org.slf4j.Logger field;
-         it used to arrive transitively through logback-classic -->
+    <!-- @Slf4j on _SampleStringAttributeConverter_Test generates an org.slf4j.Logger field -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
