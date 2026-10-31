@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         "java:S114", // Interface names should comply with a naming convention
         "java:S3577" // Test classes should comply with a naming convention
 })
-class AttributeEnumTest {
+class AttributeEnum_Test {
 
     // -----------------------------------------------------------------------------------------------------------------
     @DisplayName("__OfInteger")

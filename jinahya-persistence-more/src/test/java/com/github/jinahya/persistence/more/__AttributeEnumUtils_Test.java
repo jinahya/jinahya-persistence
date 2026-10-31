@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         "java:S114", // Interface names should comply with a naming convention
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __AttributeEnumUtilsTest {
+class __AttributeEnumUtils_Test {
 
     // -----------------------------------------------------------------------------------------------------------------
     @SuppressWarnings({
