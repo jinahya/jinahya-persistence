@@ -1,3 +1,5 @@
+# The same in every project of jakarta-persistence-applied-book-projects; what a single project adds goes at the end,
+# under "This project".
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -38,6 +40,7 @@ Temporary Items
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/macos
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Created by https://www.toptal.com/developers/gitignore/api/maven
@@ -91,7 +94,7 @@ buildNumber.properties
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 # Created by https://www.toptal.com/developers/gitignore/api/jenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=jenv
 
@@ -105,11 +108,18 @@ buildNumber.properties
 # End of https://www.toptal.com/developers/gitignore/api/jenv
 
 
-
 # ----------------------------------------------------------------------------------------------------------------------
+# IntelliJ IDEA: everything under .idea but the shared code style. `.idea/*`, not `.idea`: a directory which is itself
+# ignored cannot have a path under it brought back with `!`.
 *.iml
-.idea
-!.idea/codeStyles
+*.iws
+out/
+.idea/*
+!.idea/codeStyles/
+
+# IDE AI tooling (AI Assistant / Junie): project MCP config, machine-specific
+.ai/
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Annotation processor output written OUTSIDE target/ by IntelliJ IDEA's own (non-Maven) build.
@@ -127,3 +137,9 @@ buildNumber.properties
 /generated-test-sources/
 /*/generated-sources/
 /*/generated-test-sources/
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# The output of _mvn_effective_poms.sh, and Python's byte code (the ERD generator under .claude/skills).
+effective-pom.xml
+__pycache__/

@@ -2,6 +2,11 @@
 
 Guidance for Claude Code when working in this repository.
 
+**`.idea/codeStyles` is a git submodule (`onacit/dot-idea-codestyles`), and we don't touch it.** Unlike the other
+projects of jakarta-persistence-applied-book-projects, which track the same plain `.idea/codeStyles` files, this one
+keeps the submodule with its own content: never replace it with plain files, align it with the others, or bump it.
+The `.gitignore` is the one all the projects share.
+
 ## Dependency convergence
 
 Dependency convergence is **very important** in this project. A multi-module Maven
