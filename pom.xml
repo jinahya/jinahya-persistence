@@ -126,6 +126,11 @@
     <!-- Jakarta JSON Binding 3.0 -->
     <!-- https://central.sonatype.com/artifact/org.eclipse/yasson/versions -->
     <version.org.eclipse.yasson>3.0.5</version.org.eclipse.yasson>
+    <!-- Jakarta XML Binding 4.0; not in the Jakarta EE 11 platform, so not in its BOM, and versioned here -->
+    <!-- https://central.sonatype.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api/versions -->
+    <version.jakarta.xml.bind-api>4.0.5</version.jakarta.xml.bind-api>
+    <!-- https://central.sonatype.com/artifact/org.glassfish.jaxb/jaxb-runtime/versions -->
+    <version.org.glassfish.jaxb>4.0.9</version.org.glassfish.jaxb>
     <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
     <!-- hibernate-validator: 9 / expressly: 6 -->
     <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly -->
@@ -263,6 +268,16 @@
         <groupId>org.eclipse</groupId>
         <artifactId>yasson</artifactId>
         <version>${version.org.eclipse.yasson}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${version.jakarta.xml.bind-api}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>${version.org.glassfish.jaxb}</version>
       </dependency>
       <dependency>
         <groupId>org.glassfish.expressly</groupId>

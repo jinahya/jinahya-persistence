@@ -65,6 +65,7 @@ runtime failures here.
 | Jakarta CDI (`jakarta.enterprise.cdi-api`) | Weld (`org.jboss.weld*`, `weld-junit5`) | `version.org.jboss.weld` |
 | Jakarta JSON Processing (`jakarta.json-api`) | Eclipse Parsson (`org.eclipse.parsson:parsson`) — test scope | `version.org.eclipse.parsson` |
 | Jakarta JSON Binding (`jakarta.json.bind-api`) | Eclipse Yasson (`org.eclipse:yasson`) — test scope | `version.org.eclipse.yasson` |
+| Jakarta XML Binding (`jakarta.xml.bind-api`, **not** in the EE 11 BOM: `version.jakarta.xml.bind-api`) | GlassFish JAXB runtime (`org.glassfish.jaxb:jaxb-runtime`) — test scope | `version.org.glassfish.jaxb` |
 
 Rules:
 
