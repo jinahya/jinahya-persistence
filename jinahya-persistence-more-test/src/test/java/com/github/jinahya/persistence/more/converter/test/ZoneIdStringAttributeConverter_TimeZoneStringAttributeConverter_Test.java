@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.converter.test;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.time.ZoneIdStringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter;
 
 import java.util.List;
 import java.util.TimeZone;

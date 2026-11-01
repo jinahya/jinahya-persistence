@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.temporalinterval;
 
-import com.github.jinahya.persistence.more.converter.time.__TemporalAccessorStringAttributeConverters.OfYearMonth;
+import com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverters.OfYearMonth;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Convert;

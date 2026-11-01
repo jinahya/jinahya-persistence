@@ -33,7 +33,7 @@ import jakarta.persistence.AttributeConverter;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote An interface, carrying nothing: an implementation spends no inheritance on it, and is free to extend
  *         whatever it likes. 
- *         {@link com.github.jinahya.persistence.more.converter.time.__TemporalAccessorLongAttributeConverter
+ *         {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorLongAttributeConverter
  *         __TemporalAccessorLongAttributeConverter} is the abstract class built on it.
  * @apiNote {@code Long} rather than {@code long}: an
  *         {@link AttributeConverter AttributeConverter} carries the column type as a type argument, which cannot be a

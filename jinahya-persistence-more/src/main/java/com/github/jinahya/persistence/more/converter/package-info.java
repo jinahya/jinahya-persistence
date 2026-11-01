@@ -9,7 +9,7 @@
  * {@link com.github.jinahya.persistence.more.converter.__NumberAttributeConverter} and
  * {@link com.github.jinahya.persistence.more.converter.__BooleanAttributeConverter} &mdash; a number, or a boolean, in
  * whatever column &mdash; with the {@code java.time} axis in
- * {@link com.github.jinahya.persistence.more.converter.time the time sub-package}. Both are interfaces carrying
+ * {@link com.github.jinahya.persistence.more.converter.javatime the javatime sub-package}. Both are interfaces carrying
  * nothing, so a converter pinned on both axes implements one of each, as
  * {@link com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverter} does, and still has its
  * inheritance to spend elsewhere.
@@ -29,13 +29,18 @@
  * <h2>Dates, times and amounts of time</h2>
  * Everything which converts a {@code java.time} value &mdash; as ISO-8601 text, as the one integral coordinate the
  * type is measured by, or as the name of a day or a month in a named locale &mdash; lives in
- * {@link com.github.jinahya.persistence.more.converter.time the time sub-package}, with the attribute axis of its own
- * that those types call for.
+ * {@link com.github.jinahya.persistence.more.converter.javatime the javatime sub-package}, with the attribute axis of
+ * its own that those types call for.
  *
  * <h2>JSON</h2>
- * A {@link jakarta.json.JsonValue}, or anything Jakarta JSON Binding maps, stored as JSON text in a {@code String}
- * column, is in {@link com.github.jinahya.persistence.more.converter.json the json sub-package}; both APIs are
- * {@code provided}, left to the application.
+ * A {@link jakarta.json.JsonValue} stored as JSON text is in
+ * {@link com.github.jinahya.persistence.more.converter.jakartajson the jakartajson sub-package}, and anything Jakarta
+ * JSON Binding maps in {@link com.github.jinahya.persistence.more.converter.jakartajsonbind the jakartajsonbind
+ * sub-package}; both APIs are {@code provided}, left to the application.
+ *
+ * <h2>XML</h2>
+ * A DOM {@link org.w3c.dom.Node} stored as XML text, a whole document or content, is in
+ * {@link com.github.jinahya.persistence.more.converter.orgw3cdom the orgw3cdom sub-package}.
  *
  * <h2>Yes-or-no flags</h2>
  * {@link com.github.jinahya.persistence.more.converter.__BooleanYnAttributeConverters} holds four converters for a

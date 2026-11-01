@@ -30,7 +30,7 @@
       <artifactId>jakarta.annotation-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- the converter.json sub-package; left to the application, which brings an implementation too -->
+    <!-- the converter.jakartajson and converter.jakartajsonbind sub-packages; left to the application, which brings an implementation too -->
     <dependency>
       <groupId>jakarta.json</groupId>
       <artifactId>jakarta.json-api</artifactId>
@@ -63,7 +63,7 @@
       <artifactId>expressly</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- the converter.json tests need an implementation of each API -->
+    <!-- the converter.jakartajson and converter.jakartajsonbind tests need an implementation of each API -->
     <dependency>
       <groupId>org.eclipse.parsson</groupId>
       <artifactId>parsson</artifactId>

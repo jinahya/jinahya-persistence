@@ -138,7 +138,7 @@ Five packages, by what they are for:
 | --- | --- |
 | `…persistence.more` | `AttributeEnum`, whose constants declare the value actually written to the database so the persisted form survives renaming and reordering; and `__SelfReferencing`, the view of an entity's position within a hierarchy of its own type — with `__SelfReferencingOrdered` for the hierarchies whose children are a sequence rather than a set. |
 | `…persistence.more.converter` | Everything which converts an attribute. See below. |
-| `…persistence.more.converter.time` | The `java.time` converters — ISO-8601 text, integral coordinates, day and month names — with the attribute axis those types call for. See below. |
+| `…persistence.more.converter.javatime` | The `java.time` converters — ISO-8601 text, integral coordinates, day and month names — with the attribute axis those types call for. See below. |
 | `…persistence.more.colormodel` | Mapped superclasses for a colour in each of four models — RGB, CMYK, HSL, HWB, and RGB once more with an alpha column — sharing one normalized way of addressing whatever components a model has. Four models but one space: every conversion goes through sRGB, following CSS Color 4. |
 | `…persistence.more.temporalinterval` | Mapped superclasses for an interval on a temporal axis — `[start, end)`, either bound optional, one class per `java.time` point type, each measuring in the amount natural to it. Bound by `Temporal`, so the length of an interval is itself a value. |
 | `…persistence.more.orderedrange` | Mapped superclasses for a range over anything merely `Comparable` — `Duration`, `BigDecimal`, `Integer`, `String` — carrying the full open/closed bound lattice, encoded into a column which still sorts by its endpoint. No axis, so no length. |
@@ -159,12 +159,12 @@ The column axis is `__StringAttributeConverter` and `__LongAttributeConverter`; 
 `__NumberAttributeConverter`, `__BooleanAttributeConverter`, `__TemporalAccessorAttributeConverter` and
 `__TemporalAmountAttributeConverter`, with `__TemporalAttributeConverter` and `__TemporalAdjusterAttributeConverter`
 refining the third along `java.time.temporal`'s own lines. The four `java.time` axes, and every converter built on
-them, live in the `…converter.time` sub-package; the column axes stay in `…converter`, shared with the Number and
+them, live in the `…converter.javatime` sub-package; the column axes stay in `…converter`, shared with the Number and
 Boolean families.
 
 Every abstract contract sits alone in its file, and the concrete converters — the ones carrying `@Converter` and
 registrable in a persistence unit — live in a `…Converters` holder per family
-(the `__Temporal…` holders in `…converter.time`, the rest in `…converter`):
+(the `__Temporal…` holders in `…converter.javatime`, the rest in `…converter`):
 
 | Holder | Converters |
 | --- | --- |
@@ -172,11 +172,21 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 | `__TemporalAccessorStringAttributeConverters` | the ten `java.time` types with a `parse(CharSequence)`, in ISO-8601 or through a `DateTimeFormatter` |
 | `__TemporalAccessorTextStringAttributeConverters` | `DayOfWeek` and `Month`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
 | `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
-| `ZoneIdStringAttributeConverter` | a `ZoneId`, stored as its identifier — `Asia/Seoul`, `+09:00` — a concrete converter on its own, with no holder; and, nested in it and built on it, `TimeZoneStringAttributeConverter`, a `java.util.TimeZone` stored as the identifier of its zone; in `…converter.time` |
+| `ZoneIdStringAttributeConverter` | a `ZoneId`, stored as its identifier — `Asia/Seoul`, `+09:00` — a concrete converter on its own, with no holder; and, nested in it and built on it, `TimeZoneStringAttributeConverter`, a `java.util.TimeZone` stored as the identifier of its zone; in `…converter.javatime` |
 | `__BooleanYnAttributeConverters` | a legacy `'Y'`/`'N'` flag, as a `Character` or a `String`, strict or lenient |
 
 `AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
 a converter has to name its enum class and that class belongs to the consumer.
+
+#### Upgrading to 0.6.11
+
+The converter sub-packages are named after the whole package of the API they convert, with the dots left out:
+`…converter.time` is now `…converter.javatime`, `…converter.util` is now `…converter.javautil`, and `…converter.json`
+is split into `…converter.jakartajson`, for `JsonpAttributeConverter`, and `…converter.jakartajsonbind`, for
+`JsonbAttributeConverter`. A converter named in `persistence.xml` or in `@Convert` has to be renamed accordingly —
+`…more.converter.time.ZoneIdStringAttributeConverter` is now `…more.converter.javatime.ZoneIdStringAttributeConverter`.
+New in `…converter.orgw3cdom`: `NodeAttributeConverter`, which stores a DOM `Document`, `DocumentFragment` or
+`Element` as XML text, and reads whatever an XML column holds, a document or content.
 
 #### Upgrading to 0.6.8
 
