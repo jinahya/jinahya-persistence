@@ -25,15 +25,16 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * A utility class for {@link Persistence}, for working with a persistence unit by its name.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote Each method here opens a new factory of the named persistence unit, and closes it once done.
- *         Opening a factory is what costs &mdash; the provider reads the descriptor, builds the metamodel and connects
- *         to the database &mdash; so these suit a test, or a one-off task, rather than a call made over and over.
+ * @apiNote Each method here opens a new factory of the named persistence unit, and closes it once done. Opening
+ *         a factory is what costs &mdash; the provider reads the descriptor, builds the metamodel and connects to the
+ *         database &mdash; so these suit a test, or a one-off task, rather than a call made over and over.
  * @see JinahyaEntityManagerFactoryUtils
  * @see JinahyaEntityManagerUtils
  */
@@ -82,6 +83,37 @@ public final class JinahyaPersistenceUtils {
         return applyEntityManagerFactory(
                 persistenceUnitName,
                 f -> JinahyaEntityManagerFactoryUtils.applyEntityManager(f, function)
+        );
+    }
+
+    /**
+     * Accepts a new factory of the persistence unit of the specified name to the specified consumer, applies a new
+     * entity manager of the factory to the specified function, and closes both.
+     * <p>
+     * The {@code consumer} configures the factory before any entity manager of it is created, e.g. with
+     * {@link EntityManagerFactory#addNamedQuery(String, jakarta.persistence.Query)} or
+     * {@link EntityManagerFactory#addNamedEntityGraph(String, jakarta.persistence.EntityGraph)}.
+     *
+     * @param persistenceUnitName the name of the persistence unit.
+     * @param consumer            the consumer to be accepted with the factory.
+     * @param function            the function to be applied with the entity manager.
+     * @param <R>                 result type parameter
+     * @return the result of the {@code function}.
+     * @implNote The transaction is left to the {@code function}.
+     * @see #applyEntityManagerFactory(String, Function)
+     * @see JinahyaEntityManagerFactoryUtils#applyEntityManager(EntityManagerFactory, Function)
+     */
+    public static <R> R applyEntityManager(final String persistenceUnitName,
+                                           final Consumer<? super EntityManagerFactory> consumer,
+                                           final Function<? super EntityManager, ? extends R> function) {
+        Objects.requireNonNull(consumer, "consumer is null");
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManagerFactory(
+                persistenceUnitName,
+                f -> {
+                    consumer.accept(f);
+                    return JinahyaEntityManagerFactoryUtils.applyEntityManager(f, function);
+                }
         );
     }
 
