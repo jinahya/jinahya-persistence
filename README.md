@@ -169,7 +169,7 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 
 | Holder | Converters |
 | --- | --- |
-| `__NumberStringAttributeConverters` | `BigDecimal`, `Integer`, `Long`, `Float`, `Double`, each stored as its exact decimal text |
+| `__NumberStringAttributeConverters` | `BigDecimal`, `BigInteger`, `Byte`, `Short`, `Integer`, `Long`, `Float`, `Double`, each stored as its exact decimal text |
 | `__TemporalAccessorStringAttributeConverters` | the ten `java.time` types with a `parse(CharSequence)`, in ISO-8601 or through a `DateTimeFormatter` |
 | `__TemporalAccessorTextStringAttributeConverters` | `DayOfWeek` and `Month`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
 | `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
@@ -191,6 +191,21 @@ New in `…converter.orgw3cdom`: `NodeAttributeConverter`, which stores a DOM `D
 New in `…converter.jakartaxmlbind`: `JaxbAttributeConverter`, which stores any type Jakarta XML Binding maps as XML
 text, as a `String` or as a `byte[]`; a subclass passes the attribute class and overrides `context()`, `write(...)`
 or `read(...)` for its own context, such as one with an `ObjectFactory`, marshaller properties and reading.
+New in `…converter.javautil`: `Base64StringAttributeConverter`, which stores a `byte[]` as its `java.util.Base64`
+text, one nested converter for each encoder — `OfBasic`, `OfUrl` and `OfMime`, each also `…WithoutPadding`.
+Also new there: `HexFormatStringAttributeConverter`, which stores a `byte[]` as its `java.util.HexFormat` digits,
+`OfLowerCase` or `OfUpperCase`, and reads either case; and `UuidAttributeConverter`, which stores a `UUID` as its
+text, `OfString`, as its 16 big-endian bytes, `OfBytes`, or as their 32 hexadecimal digits, `OfHexString`, for a
+text or a binary column; each keeps the order of version 6 and 7 UUIDs. A column of a native UUID type takes no
+converter.
+Also new: `OfBigInteger`, `OfByte` and `OfShort` in `__NumberStringAttributeConverters`; and a converter each, as
+its text, for a `Currency` (its ISO 4217 code) in `…converter.javautil`, a `URI` in the new `…converter.javanet`, a
+`Charset` (its canonical name) in the new `…converter.javaniocharset` and a `ZoneOffset` in `…converter.javatime`;
+and `BitSetBytesAttributeConverter`, in `…converter.javautil`, which stores a `BitSet` as its `toByteArray()`. A
+`BitSet` changed in place is stored by Hibernate ORM, not by EclipseLink; assign a changed copy instead.
+New in `LocaleStringAttributeConverter`: `OfLenient`, which stores a locale as the arguments of `Locale.of` —
+`ko`, `ko_KR`, `en_US_POSIX` — and reads any column, of one, two or three parts, a `Locale.toString()` one included,
+dropping a script and extensions.
 
 #### Upgrading to 0.6.8
 

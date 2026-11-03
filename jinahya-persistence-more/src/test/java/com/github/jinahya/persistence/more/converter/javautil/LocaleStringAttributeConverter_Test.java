@@ -27,6 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -307,6 +308,114 @@ class LocaleStringAttributeConverter_Test {
             assertThat(converter.convertToEntityAttribute(null)).isNull();
             assertThat(converter.convertToEntityAttribute("")).isNull();
             assertThat(converter.convertToEntityAttribute("  ")).isNull();
+        }
+    }
+
+    @DisplayName("OfLenient")
+    @Nested
+    class OfLenient_Test {
+
+        private final LocaleStringAttributeConverter.OfLenient converter =
+                new LocaleStringAttributeConverter.OfLenient();
+
+        @DisplayName("a locale of Locale.of is stored as its arguments, joined by '_', and read back equal to itself")
+        @ParameterizedTest
+        @ValueSource(strings = {"ko", "ko_KR", "_KR", "__POSIX", "en_US_POSIX", "de__POSIX_X", "ja_JP_JP", "th_TH_TH"})
+        void __roundTrip(final String text) {
+            final var parts = text.split("_", 3);
+            final var value = switch (parts.length) {
+                case 1 -> Locale.of(parts[0]);
+                case 2 -> Locale.of(parts[0], parts[1]);
+                default -> Locale.of(parts[0], parts[1], parts[2]);
+            };
+            assertThat(converter.convertToDatabaseColumn(value)).isEqualTo(text);
+            assertThat(converter.convertToEntityAttribute(text)).isEqualTo(value);
+        }
+
+        @DisplayName("every available locale is stored, and read back as its language, country and variant")
+        @Test
+        void __availableLocales() {
+            assertThat(Locale.availableLocales()).allSatisfy(value -> {
+                final var column = converter.convertToDatabaseColumn(value);
+                if (column == null) {
+                    assertThat(value.getLanguage() + value.getCountry() + value.getVariant()).isEmpty();
+                    return;
+                }
+                final var read = converter.convertToEntityAttribute(column);
+                assertThat(read.getLanguage()).isEqualTo(value.getLanguage());
+                assertThat(read.getCountry()).isEqualTo(value.getCountry());
+                assertThat(read.getVariant()).isEqualTo(value.getVariant());
+                assertThat(read.getScript()).isEmpty();
+            });
+        }
+
+        @DisplayName("the script and the extensions are dropped")
+        @Test
+        void __scriptAndExtensionsDropped() {
+            assertThat(converter.convertToDatabaseColumn(Locale.forLanguageTag("zh-Hans-CN"))).isEqualTo("zh_CN");
+            assertThat(converter.convertToDatabaseColumn(Locale.forLanguageTag("ko-KR-u-ca-dangi"))).isEqualTo("ko_KR");
+        }
+
+        @DisplayName("a column of Locale.toString() is read without its script and extensions")
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "zh_CN_#Hans:zh_CN",
+                "zh__#Hans:zh",
+                "ko_KR_#u-ca-dangi:ko_KR",
+                "de_DE_1996_#u-co-phonebk:de_DE_1996",
+                "ja_JP_JP_#u-ca-japanese:ja_JP_JP"
+        })
+        void __toString(final String pair) {
+            final var texts = pair.split(":");
+            final var value = converter.convertToEntityAttribute(texts[0]);
+            assertThat(value.getScript()).isEmpty();
+            assertThat(converter.convertToDatabaseColumn(value)).isEqualTo(texts[1]);
+        }
+
+        @DisplayName("a column is read as Locale.of reads it, its case and legacy language normalized")
+        @Test
+        void __normalized() {
+            assertThat(converter.convertToEntityAttribute("KO_kr")).isEqualTo(Locale.KOREA);
+            assertThat(converter.convertToEntityAttribute("iw_IL")).isEqualTo(Locale.of("he", "IL"));
+        }
+
+        @DisplayName("a column is never refused")
+        @ParameterizedTest
+        @ValueSource(strings = {"ko-KR", "!!!", "a_b_c_d", "_", "__", "#", "_#x"})
+        void __neverRefused(final String text) {
+            assertThat(converter.convertToEntityAttribute(text)).isNotNull();
+        }
+
+        @DisplayName("one of the patterns matches every column")
+        @Test
+        void __everyColumnMatched() {
+            final var alphabet = "ab_#-X1 ".toCharArray();
+            final var random = ThreadLocalRandom.current();
+            for (int i = 0; i < 10_000; i++) {
+                final var text = new StringBuilder();
+                for (int j = random.nextInt(1, 12); j > 0; j--) {
+                    text.append(alphabet[random.nextInt(alphabet.length)]);
+                }
+                if (text.toString().isBlank()) {
+                    continue;
+                }
+                assertThat(converter.convertToEntityAttribute(text.toString())).as(text.toString()).isNotNull();
+            }
+        }
+
+        @DisplayName("Locale.ROOT is stored as null, and an empty or blank column reads back as null")
+        @Test
+        void __rootAndBlank() {
+            assertThat(converter.convertToDatabaseColumn(Locale.ROOT)).isNull();
+            assertThat(converter.convertToDatabaseColumn(Locale.forLanguageTag("und-Hans"))).isNull();
+            assertThat(converter.convertToEntityAttribute("")).isNull();
+            assertThat(converter.convertToEntityAttribute("  ")).isNull();
+        }
+
+        @Test
+        void __null() {
+            assertThat(converter.convertToDatabaseColumn(null)).isNull();
+            assertThat(converter.convertToEntityAttribute(null)).isNull();
         }
     }
 }

@@ -43,6 +43,17 @@
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
     <class>com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverters$OfBigDecimal</class>
+    <class>com.github.jinahya.persistence.more.converter.javautil.UuidAttributeConverter$OfString</class>
+    <class>com.github.jinahya.persistence.more.converter.javautil.UuidAttributeConverter$OfBytes</class>
+    <class>com.github.jinahya.persistence.more.converter.javautil.UuidAttributeConverter$OfHexString</class>
+    <class>com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverters$OfBigInteger</class>
+    <class>com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverters$OfByte</class>
+    <class>com.github.jinahya.persistence.more.converter.__NumberStringAttributeConverters$OfShort</class>
+    <class>com.github.jinahya.persistence.more.converter.javautil.CurrencyStringAttributeConverter</class>
+    <class>com.github.jinahya.persistence.more.converter.javanet.UriStringAttributeConverter</class>
+    <class>com.github.jinahya.persistence.more.converter.javaniocharset.CharsetStringAttributeConverter</class>
+    <class>com.github.jinahya.persistence.more.converter.javatime.ZoneOffsetStringAttributeConverter</class>
+    <class>com.github.jinahya.persistence.more.converter.javautil.BitSetBytesAttributeConverter</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <!-- so that the @DecimalMin/@DecimalMax on every component are actually evaluated -->

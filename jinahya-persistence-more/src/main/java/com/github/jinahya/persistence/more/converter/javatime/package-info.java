@@ -30,6 +30,8 @@
  * converter sits on the column axis alone, and is concrete itself rather than one of a holder's. Nested in it,
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter.TimeZoneStringAttributeConverter}
  * stores a {@link java.util.TimeZone} through it.
+ * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneOffsetStringAttributeConverter} stores a
+ * {@link java.time.ZoneOffset} as its identifier, in the same way.
  *
  * <h2>As a number</h2>
  * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorLongAttributeConverter} stores a value as

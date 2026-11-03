@@ -26,6 +26,7 @@ import jakarta.persistence.Converter;
 
 import java.util.Arrays;
 import java.util.IllformedLocaleException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -36,7 +37,39 @@ import java.util.stream.Collectors;
 /**
  * An abstract converter for an entity attribute of {@link Locale}, stored as a {@link String}.
  * <p>
- * How a locale is spelled in the column is left to each subclass.
+ * How a locale is spelled in the column is left to each subclass. The nested converters store one of six forms:
+ * <table>
+ * <caption>Converters</caption>
+ * <thead>
+ * <tr><th>Converter</th><th>Form</th><th>Example</th><th>Stored</th></tr>
+ * </thead>
+ * <tbody>
+ * <tr><td>{@link OfLanguage}</td><td>{@link Locale#getLanguage()}</td><td>{@code "ko"}</td><td>the language</td>
+ * </tr>
+ * <tr><td>{@link OfISO3Language}</td><td>{@link Locale#getISO3Language()}</td><td>{@code "kor"}</td>
+ * <td>the language</td></tr>
+ * <tr><td>{@link OfCountry}</td><td>{@link Locale#getCountry()}</td><td>{@code "KR"}</td><td>the country</td></tr>
+ * <tr><td>{@link OfISO3Country}</td><td>{@link Locale#getISO3Country()}</td><td>{@code "KOR"}</td>
+ * <td>the country</td></tr>
+ * <tr><td>{@link OfLanguageTag}</td><td>{@link Locale#toLanguageTag()}</td><td>{@code "ko-KR"}</td>
+ * <td>the whole locale</td></tr>
+ * <tr><td>{@link OfLenient}</td><td>the arguments of {@link Locale#of(String, String, String)}</td>
+ * <td>{@code "ko_KR"}</td><td>the language, the country and the variant</td></tr>
+ * </tbody>
+ * </table>
+ * <p>
+ * These forms of a locale are read by none of them:
+ * <ul>
+ * <li>The script and the extensions of {@link Locale#toString()} &mdash; the {@code "#Hans"} of
+ * {@code "zh_CN_#Hans"}, the {@code "#u-ca-dangi"} of {@code "ko_KR_#u-ca-dangi"}. The JDK has no method which reads
+ * them back, and {@link Locale#toString()} itself points to {@link Locale#toLanguageTag()} for a form to read.
+ * {@link OfLenient} reads the rest of such a column, and drops them; a column of this form whose scripts and
+ * extensions matter is to be rewritten as language tags, which {@link OfLanguageTag} reads.</li>
+ * <li>{@link Locale#getDisplayName() A display name} &mdash; {@code "Korean (South Korea)"}, {@code "한국어 (대한민국)"}
+ * &mdash; which depends on the locale it is displayed in, and does not read back.</li>
+ * <li>A POSIX locale of an environment &mdash; {@code "en_US.UTF-8"}, {@code "de_DE@euro"} &mdash; whose encoding and
+ * modifier are no part of a {@link Locale}.</li>
+ * </ul>
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -434,6 +467,145 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
             } catch (final IllformedLocaleException ile) {
                 throw new IllegalArgumentException("not a well-formed language tag: " + dbData, ile);
             }
+        }
+    }
+
+    /**
+     * A converter for an entity attribute of {@link Locale}, stored as the three arguments of
+     * {@link Locale#of(String, String, String)}, of which the last two are optional.
+     * <p>
+     * A value is stored as its {@link Locale#getLanguage() language}, {@link Locale#getCountry() country} and
+     * {@link Locale#getVariant() variant}, joined by {@code '_'}, with the empty ones at the end left out &mdash;
+     * {@code "ko"}, {@code "ko_KR"}, {@code "_KR"}, {@code "__POSIX"}, {@code "en_US_POSIX"} &mdash; which is
+     * {@link Locale#toString()} for a locale of no script and no extensions.
+     * <p>
+     * A column is read against three patterns, from the longest to the shortest, and the first which matches it gives
+     * the arguments of {@link Locale#of(String, String, String)}, {@link Locale#of(String, String)} or
+     * {@link Locale#of(String)}:
+     * <table>
+     * <caption>Patterns</caption>
+     * <thead>
+     * <tr><th>Pattern</th><th>Column</th><th>Read as</th></tr>
+     * </thead>
+     * <tbody>
+     * <tr><td><i>language</i>{@code _}<i>country</i>{@code _}<i>variant</i></td><td>{@code "en_US_POSIX"}</td>
+     * <td>{@code Locale.of("en", "US", "POSIX")}</td></tr>
+     * <tr><td><i>language</i>{@code _}<i>country</i></td><td>{@code "ko_KR"}</td>
+     * <td>{@code Locale.of("ko", "KR")}</td></tr>
+     * <tr><td><i>language</i></td><td>{@code "ko"}</td><td>{@code Locale.of("ko")}</td></tr>
+     * </tbody>
+     * </table>
+     * <p>
+     * A language and a country have neither a {@code '_'} nor a {@code '#'}, and a variant has no {@code '#'}, but may
+     * have a {@code '_'} of its own: {@code "de__POSIX_X"} reads as {@code Locale.of("de", "", "POSIX_X")}. Each
+     * pattern ends with what {@link Locale#toString()} writes after {@code "_#"}, or {@code "#"} &mdash; the script and
+     * the extensions &mdash; which is matched, and dropped: {@code "zh_CN_#Hans"} reads as
+     * {@code Locale.of("zh", "CN")}.
+     *
+     * @implSpec Neither conversion fails. A locale's script and extensions are dropped when it is stored, and a locale
+     *         with neither a language, a country nor a variant &mdash; {@link Locale#ROOT} &mdash; is stored as
+     *         {@code null}. One of the patterns matches every column, as a column has no {@code '_'}, one, or more
+     *         before its first {@code '#'}; and each part is read as {@link Locale#of(String, String, String)} reads
+     *         it, which validates nothing, lower-cases the language, upper-cases the country and maps a legacy language
+     *         ({@code "iw"} reads back as {@code he}). An empty or blank column reads back as {@code null}.
+     * @apiNote A locale of no script and no extensions reads back equal to itself; so do {@code ja_JP_JP} and
+     *         {@code th_TH_TH}, whose extension {@link Locale#of(String, String, String)} adds itself. Any other
+     *         locale reads back without its script and extensions. A column holding a language tag is not one this
+     *         converter reads: {@code "ko-KR"} reads back as a language {@code "ko-kr"}, not as {@code ko_KR}.
+     */
+    @Converter(autoApply = false)
+    public static class OfLenient extends LocaleStringAttributeConverter
+            implements AttributeConverter<Locale, String> {
+
+        /**
+         * The pattern of a language, or of a country, which has neither a {@code '_'} nor a {@code '#'}.
+         */
+        private static final String PART = "([^_#]*)";
+
+        /**
+         * The pattern of a variant, which may have a {@code '_'} of its own, but no {@code '#'}.
+         */
+        private static final String VARIANT = "([^#]*?)";
+
+        /**
+         * The pattern of the script and the extensions {@link Locale#toString()} writes after {@code "_#"}, or
+         * {@code "#"}, which are dropped.
+         */
+        private static final String REST = "(?:_?#.*)?";
+
+        /**
+         * The patterns of a column, of three parts, of two and of one, in the order they are tried.
+         */
+        private static final List<Pattern> PATTERNS = List.of(
+                Pattern.compile(PART + '_' + PART + '_' + VARIANT + REST, Pattern.DOTALL),
+                Pattern.compile(PART + '_' + PART + REST, Pattern.DOTALL),
+                Pattern.compile(PART + REST, Pattern.DOTALL)
+        );
+
+        /**
+         * Creates a new instance.
+         *
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
+         */
+        public OfLenient() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the language, the country and the variant of the {@code attribute}, joined by {@code '_'};
+         *         {@code null} when the {@code attribute} is {@code null}, or has none of them.
+         */
+        @Override
+        public String convertToDatabaseColumn(final Locale attribute) {
+            if (attribute == null) {
+                return null;
+            }
+            final var language = attribute.getLanguage();
+            final var country = attribute.getCountry();
+            final var variant = attribute.getVariant();
+            if (!variant.isEmpty()) {
+                return language + '_' + country + '_' + variant;
+            }
+            if (!country.isEmpty()) {
+                return language + '_' + country;
+            }
+            if (!language.isEmpty()) {
+                return language;
+            }
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return the locale of the {@code dbData}'s language, country and variant; {@code null} when the
+         *         {@code dbData} is {@code null}, or blank.
+         * @implSpec The {@code dbData} is matched against the patterns of three parts, of two and of one, in that
+         *         order, and read by the first which matches it.
+         */
+        @Override
+        public Locale convertToEntityAttribute(final String dbData) {
+            if (dbData == null || dbData.isBlank()) {
+                return null;
+            }
+            for (final var pattern : PATTERNS) {
+                final var matcher = pattern.matcher(dbData);
+                if (!matcher.matches()) {
+                    continue;
+                }
+                return switch (matcher.groupCount()) {
+                    case 3 -> Locale.of(matcher.group(1), matcher.group(2), matcher.group(3));
+                    case 2 -> Locale.of(matcher.group(1), matcher.group(2));
+                    default -> Locale.of(matcher.group(1));
+                };
+            }
+            // a column has no '_', one, or more; one of the patterns matches every column
+            throw new AssertionError("no pattern matched: " + dbData);
         }
     }
 

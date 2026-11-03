@@ -24,6 +24,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -201,6 +202,149 @@ public final class __NumberStringAttributeConverters {
                 return null;
             }
             return Long.valueOf(dbData);
+        }
+    }
+
+    /**
+     * A converter for an entity attribute of {@link BigInteger}.
+     *
+     * @implSpec A value is stored as the {@link BigInteger#toString() decimal string} of the attribute.
+     */
+    @Converter(autoApply = false)
+    public static class OfBigInteger extends __NumberStringAttributeConverter<BigInteger>
+            implements AttributeConverter<BigInteger, String> {
+
+        /**
+         * Creates a new instance.
+         */
+        public OfBigInteger() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the {@link BigInteger#toString() decimal string} of the {@code attribute}; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         */
+        @Override
+        public String convertToDatabaseColumn(final BigInteger attribute) {
+            if (attribute == null) {
+                return null;
+            }
+            return attribute.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link BigInteger} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid decimal.
+         */
+        @Override
+        public BigInteger convertToEntityAttribute(final String dbData) {
+            if (dbData == null) {
+                return null;
+            }
+            return new BigInteger(dbData);
+        }
+    }
+
+    /**
+     * A converter for an entity attribute of {@link Byte}.
+     *
+     * @implSpec A value is stored as the {@link Byte#toString() decimal string} of the attribute.
+     */
+    @Converter(autoApply = false)
+    public static class OfByte extends __NumberStringAttributeConverter<Byte>
+            implements AttributeConverter<Byte, String> {
+
+        /**
+         * Creates a new instance.
+         */
+        public OfByte() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the {@link Byte#toString() decimal string} of the {@code attribute}; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         */
+        @Override
+        public String convertToDatabaseColumn(final Byte attribute) {
+            if (attribute == null) {
+                return null;
+            }
+            return attribute.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Byte} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid decimal, or does not fit in a
+         *                               {@link Byte}.
+         */
+        @Override
+        public Byte convertToEntityAttribute(final String dbData) {
+            if (dbData == null) {
+                return null;
+            }
+            return Byte.valueOf(dbData);
+        }
+    }
+
+    /**
+     * A converter for an entity attribute of {@link Short}.
+     *
+     * @implSpec A value is stored as the {@link Short#toString() decimal string} of the attribute.
+     */
+    @Converter(autoApply = false)
+    public static class OfShort extends __NumberStringAttributeConverter<Short>
+            implements AttributeConverter<Short, String> {
+
+        /**
+         * Creates a new instance.
+         */
+        public OfShort() {
+            super();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param attribute {@inheritDoc}
+         * @return the {@link Short#toString() decimal string} of the {@code attribute}; {@code null} when the
+         *         {@code attribute} is {@code null}.
+         */
+        @Override
+        public String convertToDatabaseColumn(final Short attribute) {
+            if (attribute == null) {
+                return null;
+            }
+            return attribute.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @param dbData {@inheritDoc}
+         * @return a {@link Short} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid decimal, or does not fit in a
+         *                               {@link Short}.
+         */
+        @Override
+        public Short convertToEntityAttribute(final String dbData) {
+            if (dbData == null) {
+                return null;
+            }
+            return Short.valueOf(dbData);
         }
     }
 
