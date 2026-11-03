@@ -206,6 +206,10 @@ and `BitSetBytesAttributeConverter`, in `…converter.javautil`, which stores a 
 New in `LocaleStringAttributeConverter`: `OfLenient`, which stores a locale as the arguments of `Locale.of` —
 `ko`, `ko_KR`, `en_US_POSIX` — and reads any column, of one, two or three parts, a `Locale.toString()` one included,
 dropping a script and extensions.
+`JinahyaPersistenceTestUtils.selectCount` and `selectRandom`, deprecated for removal, are removed; use
+`JinahyaEntityManagerUtils.selectEntityCount` and `JinahyaEntityManagerTestUtils.selectRandomEntity`, which they
+merely called. New there: `applyEntityManagerFactory(persistenceUnitName, function)`, which opens the factory of a
+unit once and applies the same one to each later call, closing it when the virtual machine shuts down.
 
 #### Upgrading to 0.6.8
 
