@@ -54,7 +54,7 @@ public final class JinahyaPersistenceTestUtils {
      * @see JinahyaPersistenceUtils#applyEntityManagerFactory(String, Function)
      * @see Persistence#createEntityManagerFactory(String)
      */
-    public static <R> R applyEntityManagerFactory(
+    public static <R> R applyCachedEntityManagerFactory(
             final String persistenceUnitName,
             final Function<? super EntityManagerFactory, ? extends R> function) {
         Objects.requireNonNull(persistenceUnitName, "persistenceUnitName is null");

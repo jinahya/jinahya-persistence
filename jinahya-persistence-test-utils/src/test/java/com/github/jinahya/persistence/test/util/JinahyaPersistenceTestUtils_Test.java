@@ -22,15 +22,17 @@ class JinahyaPersistenceTestUtils_Test {
 
     private static final String PERSISTENCE_UNIT_NAME = __PersistenceProducer.PERSISTENCE_UNIT_NAME;
 
-    @DisplayName("applyEntityManagerFactory(persistenceUnitName, function)")
+    @DisplayName("applyCachedEntityManagerFactory(persistenceUnitName, function)")
     @Nested
-    class ApplyEntityManagerFactory_Test {
+    class ApplyCachedEntityManagerFactory_Test {
 
         @DisplayName("the same open factory is applied to each call for the same unit")
         @Test
         void __cached() {
-            final var first = JinahyaPersistenceTestUtils.applyEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> f);
-            final var second = JinahyaPersistenceTestUtils.applyEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> f);
+            final var first =
+                    JinahyaPersistenceTestUtils.applyCachedEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> f);
+            final var second =
+                    JinahyaPersistenceTestUtils.applyCachedEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> f);
             assertThat(second).isSameAs(first);
             assertThat(second.isOpen()).isTrue();
         }
@@ -38,20 +40,21 @@ class JinahyaPersistenceTestUtils_Test {
         @DisplayName("a factory found closed is opened again, as a new one")
         @Test
         void __reopenedWhenClosed() {
-            final var closed = JinahyaPersistenceTestUtils.applyEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> {
+            final var closed = JinahyaPersistenceTestUtils.applyCachedEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> {
                 f.close();
                 return f;
             });
-            final var reopened = JinahyaPersistenceTestUtils.applyEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> f);
+            final var reopened =
+                    JinahyaPersistenceTestUtils.applyCachedEntityManagerFactory(PERSISTENCE_UNIT_NAME, f -> f);
             assertThat(reopened).isNotSameAs(closed);
             assertThat(reopened.isOpen()).isTrue();
         }
 
         @Test
         void __null() {
-            assertThatThrownBy(() -> JinahyaPersistenceTestUtils.applyEntityManagerFactory(null, f -> f))
+            assertThatThrownBy(() -> JinahyaPersistenceTestUtils.applyCachedEntityManagerFactory(null, f -> f))
                     .isInstanceOf(NullPointerException.class);
-            assertThatThrownBy(() -> JinahyaPersistenceTestUtils.applyEntityManagerFactory(
+            assertThatThrownBy(() -> JinahyaPersistenceTestUtils.applyCachedEntityManagerFactory(
                     PERSISTENCE_UNIT_NAME, (Function<EntityManagerFactory, Object>) null))
                     .isInstanceOf(NullPointerException.class);
         }
