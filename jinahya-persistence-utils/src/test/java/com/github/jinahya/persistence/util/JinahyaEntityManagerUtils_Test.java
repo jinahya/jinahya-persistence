@@ -190,7 +190,7 @@ class JinahyaEntityManagerUtils_Test {
         }
     }
 
-    @DisplayName("applyUnwrappedConnection(manager, function)")
+    @DisplayName("applyConnection(manager, function)")
     @Nested
     class ApplyUnwrappedConnection_Test {
 
@@ -227,7 +227,7 @@ class JinahyaEntityManagerUtils_Test {
             providerHandingOut(connection);
             final var seen = new AtomicReference<Connection>();
 
-            final String result = JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            final String result = JinahyaEntityManagerUtils.applyConnection(manager, c -> {
                 seen.set(c);
                 return "ok";
             });
@@ -242,7 +242,7 @@ class JinahyaEntityManagerUtils_Test {
             providerHandingOut(connection);
             final var calls = new AtomicInteger();
 
-            JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> calls.incrementAndGet());
+            JinahyaEntityManagerUtils.applyConnection(manager, c -> calls.incrementAndGet());
 
             // a function handed a Connection usually writes; applying it twice would repeat that
             assertThat(calls).hasValue(1);
@@ -256,7 +256,7 @@ class JinahyaEntityManagerUtils_Test {
 
             // Hibernate ORM wraps this in a bare RuntimeException and EclipseLink in a PersistenceException,
             // so a caller could no longer catch its own failure by type. Peel it back off.
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyConnection(manager, c -> {
                 throw boom;
             })).isSameAs(boom);
         }
@@ -267,7 +267,7 @@ class JinahyaEntityManagerUtils_Test {
             providerHandingOut(connection);
             final var boom = new AssertionError("a failing assertion inside a test");
 
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyConnection(manager, c -> {
                 throw boom;
             })).isSameAs(boom);
         }
@@ -279,7 +279,7 @@ class JinahyaEntityManagerUtils_Test {
             doThrow(failure).when(manager).callWithConnection(any());
             final var calls = new AtomicInteger();
 
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyConnection(manager, c -> {
                 calls.incrementAndGet();
                 return "unreachable";
             })).isSameAs(failure);
@@ -294,7 +294,7 @@ class JinahyaEntityManagerUtils_Test {
             providerHandingOut(null);
             final var calls = new AtomicInteger();
 
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> {
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyConnection(manager, c -> {
                 calls.incrementAndGet();
                 return "unreachable";
             }))
@@ -311,7 +311,7 @@ class JinahyaEntityManagerUtils_Test {
             when(manager.isJoinedToTransaction()).thenReturn(false);
             providerHandingOut(connection);
 
-            final String result = JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, c -> "ok");
+            final String result = JinahyaEntityManagerUtils.applyConnection(manager, c -> "ok");
 
             assertThat(result).isEqualTo("ok");
         }
@@ -319,10 +319,10 @@ class JinahyaEntityManagerUtils_Test {
         @DisplayName("null arguments are rejected by name")
         @Test
         void _NullPointerException_ForNullArguments() {
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(null, c -> "v"))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyConnection(null, c -> "v"))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("manager");
-            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyUnwrappedConnection(manager, null))
+            assertThatThrownBy(() -> JinahyaEntityManagerUtils.applyConnection(manager, null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("function");
         }
