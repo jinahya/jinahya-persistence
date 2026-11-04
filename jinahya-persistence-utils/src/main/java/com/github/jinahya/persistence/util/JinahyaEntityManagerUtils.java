@@ -186,9 +186,13 @@ public final class JinahyaEntityManagerUtils {
      *         EclipseLink in a {@link PersistenceException}, and neither limits that to the checked exceptions the
      *         specification mentions. Since a caller has to be able to catch its own failure by type, the function's
      *         throwable is captured as it leaves and rethrown here in place of the wrapper.
+     * @deprecated What this adds to the specification is not worth having: a {@link Function} cannot throw the
+     *         {@link java.sql.SQLException} nearly every use of the connection does; use
+     *         {@link EntityManager#callWithConnection(ConnectionFunction)}.
      */
-    public static <R> R applyConnection(final EntityManager manager,
-                                        final Function<? super Connection, ? extends R> function) {
+    @Deprecated(forRemoval = true)
+    public static <R> R applyUnwrappedConnection(final EntityManager manager,
+                                                 final Function<? super Connection, ? extends R> function) {
         Objects.requireNonNull(manager, "manager is null");
         Objects.requireNonNull(function, "function is null");
         if (!manager.isJoinedToTransaction()) {
@@ -222,24 +226,6 @@ public final class JinahyaEntityManagerUtils {
             }
             throw (Error) caught;
         }
-    }
-
-    /**
-     * Applies the {@link Connection} underlying the specified entity manager to the specified function, and returns the
-     * result.
-     *
-     * @param manager  the entity manager.
-     * @param function the function to be applied with the connection of the {@code manager}.
-     * @param <R>      result type parameter
-     * @return the result of the {@code function}.
-     * @throws PersistenceException when no connection can be obtained from the {@code manager}.
-     * @deprecated The connection is no longer unwrapped from the {@code manager}, so the name no longer fits; use
-     *         {@link #applyConnection(EntityManager, Function)}, which this now merely calls.
-     */
-    @Deprecated(forRemoval = true)
-    public static <R> R applyUnwrappedConnection(final EntityManager manager,
-                                                 final Function<? super Connection, ? extends R> function) {
-        return applyConnection(manager, function);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
