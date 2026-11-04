@@ -25,6 +25,7 @@ import com.github.jinahya.persistence.more.temporalinterval.___MappedTemporalInt
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
 
@@ -54,6 +55,8 @@ public abstract class ___DiscreteInterval_Test<
         P extends Temporal & Comparable<? super P>
         >
         extends ___MappedTemporalInterval_Test<I, P> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

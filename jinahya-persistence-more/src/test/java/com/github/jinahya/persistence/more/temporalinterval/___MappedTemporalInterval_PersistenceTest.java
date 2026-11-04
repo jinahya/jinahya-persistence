@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
  * Verifies that the interval mapped superclasses map as declared against a real persistence provider.
  * <p>
  * What the unit tests cannot reach is here: the names of the columns, the types the provider chooses for them, whether
- * a value survives a write and a read, whether an inverted interval is accepted at persist time, and whether the containment
- * this package is written for actually runs in SQL.
+ * a value survives a write and a read, whether an inverted interval is accepted at persist time, and whether the
+ * containment this package is written for actually runs in SQL.
  * <p>
  * The classes differ only in their point type, so {@link Case} states the expectations once and each nested class
  * supplies a point type and two samples, as in {@link ___MappedTemporalInterval_Test}. What is particular to one class
@@ -55,8 +55,8 @@ class ___MappedTemporalInterval_PersistenceTest {
      * Returns whether the provider under test is EclipseLink.
      *
      * @return {@code true} when the factory was built by EclipseLink.
-     * @implNote The factory's own class names the provider: the persistence unit takes its {@code <provider>} from
-     *         the {@code persistence-unit.provider} property, which the {@code __eclipselink-5.0-jakarta-ee-11}
+     * @implNote The factory's own class names the provider: the persistence unit takes its {@code <provider>}
+     *         from the {@code persistence-unit.provider} property, which the {@code __eclipselink-5.0-jakarta-ee-11}
      *         profile overrides, so reading it here needs no build plumbing and holds however the profile was
      *         activated.
      */
@@ -173,8 +173,8 @@ class ___MappedTemporalInterval_PersistenceTest {
          *
          * @param actual   the point read back.
          * @param expected the point which was written.
-         * @implSpec The default implementation asserts equality. A subclass whose point type carries more than the
-         *         database keeps overrides this — see {@link OfOffsetDateTime}.
+         * @implSpec The default implementation asserts equality. A subclass whose point type carries more than
+         *         the database keeps overrides this — see {@link OfOffsetDateTime}.
          */
         void assertSamePoint(final P actual, final P expected) {
             assertThat(actual).isEqualTo(expected);

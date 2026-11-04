@@ -21,13 +21,13 @@
  * Attribute converters which store a DOM {@link org.w3c.dom.Node} as XML text.
  *
  * <h2>Documents and content</h2>
- * {@link com.github.jinahya.persistence.more.converter.orgw3cdom.NodeAttributeConverter} stores a node as the XML
- * text, without the XML declaration, in a {@code String} column through its
- * {@link com.github.jinahya.persistence.more.converter.orgw3cdom.NodeAttributeConverter.OfString OfString}, or in
- * UTF-8 in a {@code byte[]} column through its
- * {@link com.github.jinahya.persistence.more.converter.orgw3cdom.NodeAttributeConverter.OfBytes OfBytes}. An XML
- * column may hold a whole document or content, several roots and text among them; the converter does not know which
- * the column takes, and reads either: {@code OfNode} returns a {@link org.w3c.dom.Document} or a
+ * {@link com.github.jinahya.persistence.more.converter.orgw3cdom.NodeAttributeConverter} stores a node as the XML text,
+ * without the XML declaration, in a {@code String} column through its
+ * {@link com.github.jinahya.persistence.more.converter.orgw3cdom.NodeAttributeConverter.OfString OfString}, or in UTF-8
+ * in a {@code byte[]} column through its
+ * {@link com.github.jinahya.persistence.more.converter.orgw3cdom.NodeAttributeConverter.OfBytes OfBytes}. An XML column
+ * may hold a whole document or content, several roots and text among them; the converter does not know which the column
+ * takes, and reads either: {@code OfNode} returns a {@link org.w3c.dom.Document} or a
  * {@link org.w3c.dom.DocumentFragment}, whichever the text is, {@code OfDocumentFragment} reads a document as content,
  * too, and {@code OfDocument} and {@code OfElement} take a document only. A DOCTYPE is not read.
  *

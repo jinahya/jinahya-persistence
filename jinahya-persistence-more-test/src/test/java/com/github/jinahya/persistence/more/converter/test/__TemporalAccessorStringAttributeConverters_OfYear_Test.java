@@ -7,7 +7,8 @@ import java.time.Year;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAccessorStringAttributeConverters.OfYear} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAccessorStringAttributeConverters.OfYear} against what every attribute converter is expected
+ * to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfYear_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfYear, Year> {

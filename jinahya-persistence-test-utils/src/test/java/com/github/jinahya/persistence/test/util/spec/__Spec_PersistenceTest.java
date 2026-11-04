@@ -1,7 +1,7 @@
 package com.github.jinahya.persistence.test.util.spec;
 
-import com.github.jinahya.persistence.test.util.__PersistenceProducer;
 import com.github.jinahya.persistence.test.util.EntityPersisterUtils;
+import com.github.jinahya.persistence.test.util.__PersistenceProducer;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import lombok.AccessLevel;

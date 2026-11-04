@@ -25,6 +25,7 @@ import com.github.jinahya.persistence.more.test.___Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -38,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * An abstract base class for testing {@link ___MappedColor} implementations.
  * <p>
  * Everything checked here is checked through the component index and the sRGB conversion, which is the whole point of
- * that root class: the columns a model declares are its own, but the way they are addressed and converted is common,
- * so a test of it need not know which model it is looking at. A subclass names a concrete class and gets the lot.
+ * that root class: the columns a model declares are its own, but the way they are addressed and converted is common, so
+ * a test of it need not know which model it is looking at. A subclass names a concrete class and gets the lot.
  *
  * @param <COLOR> the color class under test
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -49,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "java:S101"  // Class names should comply with a naming convention
 })
 public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * The tolerance, {@value}, within which a component is expected to survive a conversion to sRGB and back.
@@ -90,9 +93,9 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
     /**
      * Verifies that the maximum component is accepted at every index.
      *
-     * @implNote Accepted, and not read back: a hue is circular, so a normalized {@code 1.0} is the same angle as
-     *         {@code 0.0} and is reported as the latter. Which index carries a hue is a model's own business, so what
-     *         can be said here of every index is that the value is in range.
+     * @implNote Accepted, and not read back: a hue is circular, so a normalized {@code 1.0} is the same angle
+     *         as {@code 0.0} and is reported as the latter. Which index carries a hue is a model's own business, so
+     *         what can be said here of every index is that the value is in range.
      */
     @DisplayName("the maximum component is accepted at every index")
     @Test
@@ -163,8 +166,8 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
     /**
      * Verifies that writing sRGB components leaves the alpha alone.
      *
-     * @implNote The alpha is not an sRGB component, so a model which carries one keeps it across a conversion. A
-     *         model which lost it here would silently turn every converted color opaque.
+     * @implNote The alpha is not an sRGB component, so a model which carries one keeps it across a conversion.
+     *         A model which lost it here would silently turn every converted color opaque.
      */
     @DisplayName("writing sRGB leaves the alpha alone")
     @Test
@@ -210,12 +213,12 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
     // ------------------------------------------------------------------------------------------------------ notation
 
     /**
-     * Verifies that each notation is well formed, and that all three agree with {@link ___MappedColor#isOpaque()}
-     * about whether the alpha is carried.
+     * Verifies that each notation is well formed, and that all three agree with {@link ___MappedColor#isOpaque()} about
+     * whether the alpha is carried.
      *
      * @implNote The three notations each decide, separately, whether to write the alpha, and each asks
-     *         {@link ___MappedColor#isOpaque() isOpaque()} to find out. Asserting the agreement is what catches a
-     *         model whose alpha is opaque to one of them and not to the others.
+     *         {@link ___MappedColor#isOpaque() isOpaque()} to find out. Asserting the agreement is what catches a model
+     *         whose alpha is opaque to one of them and not to the others.
      */
     @DisplayName("the three notations are well formed, and agree about the alpha")
     @Test
@@ -254,8 +257,8 @@ public abstract class ___MappedColor_Test<COLOR extends ___MappedColor> {
      * Creates a new instance of {@link #colorClass}.
      *
      * @return a new instance of {@link #colorClass}.
-     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence requires
-     *           every entity to declare.
+     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence
+     *         requires every entity to declare.
      */
     protected COLOR newColorInstance() {
         return ___Utils.newInstance(colorClass);

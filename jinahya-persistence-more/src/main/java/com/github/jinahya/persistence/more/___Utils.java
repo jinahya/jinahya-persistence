@@ -21,6 +21,7 @@ package com.github.jinahya.persistence.more;
  */
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -44,6 +45,8 @@ import java.util.HashSet;
         "java:S101" // Class names should comply with a naming convention
 })
 final class ___Utils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

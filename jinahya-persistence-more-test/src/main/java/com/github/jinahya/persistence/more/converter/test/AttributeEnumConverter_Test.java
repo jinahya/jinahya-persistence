@@ -28,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,6 +58,8 @@ public abstract class AttributeEnumConverter_Test<
         >
         extends AttributeEnum_Test<ENUM, ATTRIBUTE> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -74,8 +77,7 @@ public abstract class AttributeEnumConverter_Test<
             extends AttributeEnumConverter_Test<CONVERTER, ENUM, String> {
 
         /**
-         * Creates a new instance for testing the specified converter class, whose attribute value is a
-         * {@link String}.
+         * Creates a new instance for testing the specified converter class, whose attribute value is a {@link String}.
          *
          * @param converterClass the converter class to test.
          * @param enumClass      the enum class the {@code converterClass} converts.
@@ -104,8 +106,7 @@ public abstract class AttributeEnumConverter_Test<
             extends AttributeEnumConverter_Test<CONVERTER, ENUM, NUMBER> {
 
         /**
-         * Creates a new instance for testing the specified converter class, whose attribute value is a
-         * {@link Number}.
+         * Creates a new instance for testing the specified converter class, whose attribute value is a {@link Number}.
          *
          * @param converterClass the converter class to test.
          * @param enumClass      the enum class the {@code converterClass} converts.

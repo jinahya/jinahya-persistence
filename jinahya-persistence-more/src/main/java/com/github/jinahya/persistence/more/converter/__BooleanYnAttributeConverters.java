@@ -22,6 +22,8 @@ package com.github.jinahya.persistence.more.converter;
 
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Converters for a {@link Boolean} entity attribute stored as a yes-or-no flag.
  * <p>
@@ -55,6 +57,8 @@ import jakarta.persistence.Converter;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __BooleanYnAttributeConverters {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

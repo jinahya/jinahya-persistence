@@ -30,6 +30,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
 import java.io.Serial;
+import java.lang.invoke.MethodHandles;
 import java.util.function.DoubleFunction;
 
 /**
@@ -57,6 +58,8 @@ import java.util.function.DoubleFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __MappedHwb extends ___MappedHueColor {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = 6284069818616861963L;
@@ -152,8 +155,8 @@ public abstract class __MappedHwb extends ___MappedHueColor {
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @implSpec {@value ___MappedHueColor#COMPONENT_INDEX_HUE} reads {@link #getNormalizedHue()} &mdash; the
      *         <em>normalized</em> hue, not the one in degrees {@link #getHue()} returns, because this method speaks
-     *         only in normalized values &mdash; {@value #COMPONENT_INDEX_WHITENESS} reads {@link #getWhiteness()},
-     *         and {@value #COMPONENT_INDEX_BLACKNESS} reads {@link #getBlackness()}.
+     *         only in normalized values &mdash; {@value #COMPONENT_INDEX_WHITENESS} reads {@link #getWhiteness()}, and
+     *         {@value #COMPONENT_INDEX_BLACKNESS} reads {@link #getBlackness()}.
      */
     @Transient
     @Override

@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Set;
@@ -42,6 +43,8 @@ import java.util.Set;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __NumberStringAttributeConverters {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -95,8 +98,7 @@ public final class __NumberStringAttributeConverters {
          *
          * @param dbData {@inheritDoc}
          * @return a {@link BigDecimal} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
-         * @throws NumberFormatException when the {@code dbData} is not a valid representation of a
-         *                               {@link BigDecimal}.
+         * @throws NumberFormatException when the {@code dbData} is not a valid representation of a {@link BigDecimal}.
          * @implSpec The scale is that of the stored text, as {@link BigDecimal#BigDecimal(String)} reads it;
          *         {@code "1.50"} reads back with a scale of two, not as {@code 1.5}.
          */
@@ -374,9 +376,9 @@ public final class __NumberStringAttributeConverters {
          * {@inheritDoc}
          *
          * @param attribute {@inheritDoc}
-         * @return the decimal string of the {@code attribute}, free of an exponent; {@code "NaN"},
-         *         {@code "Infinity"} or {@code "-Infinity"} for a non-finite value; {@code null} when the
-         *         {@code attribute} is {@code null}.
+         * @return the decimal string of the {@code attribute}, free of an exponent; {@code "NaN"}, {@code "Infinity"}
+         *         or {@code "-Infinity"} for a non-finite value; {@code null} when the {@code attribute} is
+         *         {@code null}.
          * @implSpec A finite value is widened with {@link BigDecimal#valueOf(double)} and written by
          *         {@link OfBigDecimal}; see {@link OfFloat the class javadoc} for what that costs on the way back.
          */
@@ -398,8 +400,8 @@ public final class __NumberStringAttributeConverters {
          *
          * @param dbData {@inheritDoc}
          * @return a {@link Float} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
-         * @throws NumberFormatException when the {@code dbData} is neither one of {@code "NaN"},
-         *                               {@code "Infinity"} and {@code "-Infinity"} nor a valid decimal.
+         * @throws NumberFormatException when the {@code dbData} is neither one of {@code "NaN"}, {@code "Infinity"} and
+         *                               {@code "-Infinity"} nor a valid decimal.
          */
         @Override
         public Float convertToEntityAttribute(final String dbData) {
@@ -442,9 +444,9 @@ public final class __NumberStringAttributeConverters {
          * {@inheritDoc}
          *
          * @param attribute {@inheritDoc}
-         * @return the decimal string of the {@code attribute}, free of an exponent; {@code "NaN"},
-         *         {@code "Infinity"} or {@code "-Infinity"} for a non-finite value; {@code null} when the
-         *         {@code attribute} is {@code null}.
+         * @return the decimal string of the {@code attribute}, free of an exponent; {@code "NaN"}, {@code "Infinity"}
+         *         or {@code "-Infinity"} for a non-finite value; {@code null} when the {@code attribute} is
+         *         {@code null}.
          * @implSpec A finite value is widened with {@link BigDecimal#valueOf(double)} and written by
          *         {@link OfBigDecimal}; see {@link OfDouble the class javadoc} for what that costs on the way back.
          */
@@ -466,8 +468,8 @@ public final class __NumberStringAttributeConverters {
          *
          * @param dbData {@inheritDoc}
          * @return a {@link Double} of the {@code dbData}; {@code null} when the {@code dbData} is {@code null}.
-         * @throws NumberFormatException when the {@code dbData} is neither one of {@code "NaN"},
-         *                               {@code "Infinity"} and {@code "-Infinity"} nor a valid decimal.
+         * @throws NumberFormatException when the {@code dbData} is neither one of {@code "NaN"}, {@code "Infinity"} and
+         *                               {@code "-Infinity"} nor a valid decimal.
          */
         @Override
         public Double convertToEntityAttribute(final String dbData) {

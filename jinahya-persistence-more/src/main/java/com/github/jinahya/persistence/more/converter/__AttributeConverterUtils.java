@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.more.converter;
 
 import jakarta.persistence.AttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -37,6 +38,8 @@ import java.util.function.Function;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __AttributeConverterUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new attribute converter with specified functions.

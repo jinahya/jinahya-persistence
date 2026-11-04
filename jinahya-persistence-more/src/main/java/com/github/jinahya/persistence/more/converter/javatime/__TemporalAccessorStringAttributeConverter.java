@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
 import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -68,6 +69,8 @@ import java.util.Objects;
 public abstract class __TemporalAccessorStringAttributeConverter<X extends TemporalAccessor>
         implements __StringAttributeConverter<X>, __TemporalAccessorAttributeConverter<X, String> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
@@ -94,8 +97,8 @@ public abstract class __TemporalAccessorStringAttributeConverter<X extends Tempo
      *         and only a subclass which does neither finds out, from {@link #convertToEntityAttribute(String)}, that
      *         there is nothing to call. Not every {@link TemporalAccessor} has a {@code parse} &mdash;
      *         {@link java.time.DayOfWeek DayOfWeek} and {@link java.time.Month Month} do not, and are read through a
-     *         formatter instead, by {@link __TemporalAccessorTextStringAttributeConverter}; {@link java.time.ZoneOffset
-     *         ZoneOffset} does not either, and has no converter here.
+     *         formatter instead, by {@link __TemporalAccessorTextStringAttributeConverter};
+     *         {@link java.time.ZoneOffset ZoneOffset} does not either, and has no converter here.
      * @see #attributeClass
      * @see #formatter
      */

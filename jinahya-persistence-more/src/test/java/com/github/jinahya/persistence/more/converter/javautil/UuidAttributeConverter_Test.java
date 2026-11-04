@@ -200,7 +200,7 @@ class UuidAttributeConverter_Test {
         @DisplayName("a column which is not 32 hexadecimal digits is refused")
         @ParameterizedTest
         @ValueSource(strings = {"", "6f9619ff", "6f9619ff-8b86-d011-b42d-00c04fc964ff",
-                                "6f9619ff8b86d011b42d00c04fc964ff00", "6f9619ff8b86d011b42d00c04fc964fg"})
+                "6f9619ff8b86d011b42d00c04fc964ff00", "6f9619ff8b86d011b42d00c04fc964fg"})
         void __notHex(final String text) {
             assertThatThrownBy(() -> converter.convertToEntityAttribute(text))
                     .isInstanceOf(IllegalArgumentException.class);

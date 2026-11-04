@@ -3,6 +3,7 @@ package com.github.jinahya.persistence.encryption.converter;
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import jakarta.persistence.AttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -38,6 +39,8 @@ import java.util.function.Function;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 public final class EncryptedConverters {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * The name of the persistence unit property a persistence provider integration reads its service from:

@@ -2,8 +2,8 @@
  * Interfaces and classes which complement Jakarta Persistence when creating a persistence unit.
  *
  * <h2>Enums with stable persisted values</h2>
- * {@link com.github.jinahya.persistence.more.AttributeEnum} lets an enum constant declare the value actually written
- * to the database, so the persisted form survives renaming and reordering of constants, and
+ * {@link com.github.jinahya.persistence.more.AttributeEnum} lets an enum constant declare the value actually written to
+ * the database, so the persisted form survives renaming and reordering of constants, and
  * {@link com.github.jinahya.persistence.more.__AttributeEnumUtils} looks a constant up by its attribute value. The
  * converter which carries a value in either direction,
  * {@link com.github.jinahya.persistence.more.converter.AttributeEnumConverter}, lives with the other converters.
@@ -20,8 +20,8 @@
  * <h2>Subpackages</h2>
  * {@link com.github.jinahya.persistence.more.converter} holds the attribute converters — the base for storing a value
  * as a {@code String}, a whole list in one delimited column, and the two ways of composing a converter rather than
- * writing one. {@link com.github.jinahya.persistence.more.colormodel} holds a mapped superclass per color model —
- * RGB, CMYK, HSL, HWB — over one normalized way of addressing whatever components a model has.
+ * writing one. {@link com.github.jinahya.persistence.more.colormodel} holds a mapped superclass per color model — RGB,
+ * CMYK, HSL, HWB — over one normalized way of addressing whatever components a model has.
  * {@link com.github.jinahya.persistence.more.temporalinterval} holds the intervals on a temporal axis, and
  * {@link com.github.jinahya.persistence.more.orderedrange} the ranges over anything merely {@code Comparable}.
  *

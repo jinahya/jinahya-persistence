@@ -25,8 +25,8 @@ import jakarta.persistence.AccessType;
 import jakarta.persistence.Embeddable;
 
 /**
- * The embeddable form — what a table carrying <em>two</em> colors needs, since a {@code @MappedSuperclass} is
- * inherited once.
+ * The embeddable form — what a table carrying <em>two</em> colors needs, since a {@code @MappedSuperclass} is inherited
+ * once.
  * <p>
  * Concrete, public and with a no-arg constructor, which is what an {@link Embeddable @Embeddable} has to be; it adds
  * nothing of its own. The {@link Access @Access}({@code FIELD}) matches the hierarchy above it.

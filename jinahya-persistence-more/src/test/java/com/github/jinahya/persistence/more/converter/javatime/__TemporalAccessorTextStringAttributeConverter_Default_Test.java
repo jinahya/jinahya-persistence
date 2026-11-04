@@ -7,26 +7,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.time.DateTimeException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import java.time.DayOfWeek;
 import java.time.Month;
 import java.time.format.DateTimeParseException;
@@ -97,7 +77,7 @@ class __TemporalAccessorTextStringAttributeConverter_Default_Test {
         final var saved = Locale.getDefault();
         try {
             // Korean names nothing in Latin letters; Turkish upper-cases 'i' to a dotted capital
-            for (final var locale : new Locale[] {Locale.KOREAN, Locale.forLanguageTag("tr")}) {
+            for (final var locale : new Locale[]{Locale.KOREAN, Locale.forLanguageTag("tr")}) {
                 Locale.setDefault(locale);
                 assertThat(converter.convertToDatabaseColumn(value)).isEqualTo(name);
                 assertThat(converter.convertToEntityAttribute(name)).isEqualTo(value);

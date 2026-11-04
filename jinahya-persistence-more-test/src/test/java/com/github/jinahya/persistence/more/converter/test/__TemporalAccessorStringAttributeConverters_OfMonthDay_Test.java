@@ -7,7 +7,8 @@ import java.time.MonthDay;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAccessorStringAttributeConverters.OfMonthDay} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAccessorStringAttributeConverters.OfMonthDay} against what every attribute converter is
+ * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfMonthDay_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfMonthDay, MonthDay> {

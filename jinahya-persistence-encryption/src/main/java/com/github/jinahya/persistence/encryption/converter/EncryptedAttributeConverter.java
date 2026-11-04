@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.PersistenceException;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -52,6 +53,8 @@ import java.util.function.Function;
  * @see ValueCodecs
  */
 public abstract class EncryptedAttributeConverter<X> implements AttributeConverter<X, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance with the specified codec; the extension point for a type of one's own.

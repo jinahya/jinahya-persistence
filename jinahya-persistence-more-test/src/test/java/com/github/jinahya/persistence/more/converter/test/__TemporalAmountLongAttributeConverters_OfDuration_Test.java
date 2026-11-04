@@ -7,7 +7,8 @@ import java.time.Duration;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAmountLongAttributeConverters.OfDuration} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAmountLongAttributeConverters.OfDuration} against what every attribute converter is expected
+ * to do.
  */
 class __TemporalAmountLongAttributeConverters_OfDuration_Test
         extends __AttributeConverter_Test<__TemporalAmountLongAttributeConverters.OfDuration, Duration, Long> {

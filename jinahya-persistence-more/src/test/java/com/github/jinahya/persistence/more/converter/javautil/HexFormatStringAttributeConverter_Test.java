@@ -50,7 +50,7 @@ class HexFormatStringAttributeConverter_Test {
     }
 
     private static Stream<Arguments> texts() {
-        final var bytes = new byte[] {0x00, 0x0A, (byte) 0xFB, (byte) 0xFF};
+        final var bytes = new byte[]{0x00, 0x0A, (byte) 0xFB, (byte) 0xFF};
         return Stream.of(
                 Arguments.of(new HexFormatStringAttributeConverter.OfLowerCase(), bytes, "000afbff"),
                 Arguments.of(new HexFormatStringAttributeConverter.OfUpperCase(), bytes, "000AFBFF")
@@ -82,7 +82,7 @@ class HexFormatStringAttributeConverter_Test {
     @MethodSource("converters")
     @ParameterizedTest
     void __eitherCase(final HexFormatStringAttributeConverter converter) {
-        final var bytes = new byte[] {(byte) 0xFB, (byte) 0xFF};
+        final var bytes = new byte[]{(byte) 0xFB, (byte) 0xFF};
         assertThat(converter.convertToEntityAttribute("fbff")).isEqualTo(bytes);
         assertThat(converter.convertToEntityAttribute("FBFF")).isEqualTo(bytes);
         assertThat(converter.convertToEntityAttribute("fBfF")).isEqualTo(bytes);
@@ -98,7 +98,7 @@ class HexFormatStringAttributeConverter_Test {
             ThreadLocalRandom.current().nextBytes(a);
             ThreadLocalRandom.current().nextBytes(b);
             assertThat(Integer.signum(converter.convertToDatabaseColumn(a)
-                                               .compareTo(converter.convertToDatabaseColumn(b))))
+                                              .compareTo(converter.convertToDatabaseColumn(b))))
                     .isEqualTo(Integer.signum(Arrays.compareUnsigned(a, b)));
         }
     }

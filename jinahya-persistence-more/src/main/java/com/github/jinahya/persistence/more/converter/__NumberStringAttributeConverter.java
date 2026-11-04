@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * An abstract class for converting {@code String} db data to an entity attribute of a specific subtype of
  * {@link Number}, and vice versa.
@@ -40,6 +42,8 @@ package com.github.jinahya.persistence.more.converter;
 })
 public abstract class __NumberStringAttributeConverter<X extends Number>
         implements __StringAttributeConverter<X>, __NumberAttributeConverter<X, String> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

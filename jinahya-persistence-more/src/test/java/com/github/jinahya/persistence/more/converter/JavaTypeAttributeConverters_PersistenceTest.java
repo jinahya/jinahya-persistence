@@ -39,8 +39,8 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Persists the attributes the converters of {@code java} types convert, so that the provider binds the column type
- * each converter names.
+ * Persists the attributes the converters of {@code java} types convert, so that the provider binds the column type each
+ * converter names.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

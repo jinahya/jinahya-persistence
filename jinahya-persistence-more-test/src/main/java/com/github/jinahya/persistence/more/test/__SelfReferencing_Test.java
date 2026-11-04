@@ -25,6 +25,7 @@ import jakarta.persistence.Transient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -38,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>
  * Everything checked here is checked through the interface, never through the mechanism behind it. That is deliberate:
  * an entity may answer {@link __SelfReferencing#getHierarchyParent() getHierarchyParent()} from its own accessor, or
- * delegate to {@link com.github.jinahya.persistence.more.__SelfReferencingUtils#parentOf(__SelfReferencing)
+ * delegate to
+ * {@link com.github.jinahya.persistence.more.__SelfReferencingUtils#parentOf(__SelfReferencing)
  * __SelfReferencingUtils.parentOf(instance)} and let the
  * {@link com.github.jinahya.persistence.more.__SelfReferencingParent @__SelfReferencingParent} mark find the member.
  * Both are supported, only one of them can fail for a reason the compiler cannot see, and calling the interface method
@@ -54,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "java:S101"  // Class names should comply with a naming convention
 })
 public abstract class __SelfReferencing_Test<T extends __SelfReferencing<T>> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
@@ -76,9 +80,9 @@ public abstract class __SelfReferencing_Test<T extends __SelfReferencing<T>> {
      *         {@link __SelfReferencing#getHierarchyParent() getHierarchyParent()} by delegating to
      *         {@link com.github.jinahya.persistence.more.__SelfReferencingUtils#parentOf(__SelfReferencing)
      *         parentOf(instance)} carries the parent association on a member marked
-     *         {@link com.github.jinahya.persistence.more.__SelfReferencingParent @__SelfReferencingParent}, and
-     *         nothing checks that the mark is there, is there once, and sits on something readable until the first
-     *         call — which, without this test, is a call made by the application.
+     *         {@link com.github.jinahya.persistence.more.__SelfReferencingParent @__SelfReferencingParent}, and nothing
+     *         checks that the mark is there, is there once, and sits on something readable until the first call —
+     *         which, without this test, is a call made by the application.
      */
     @DisplayName("the parent of a new instance can be read")
     @Test
@@ -185,13 +189,13 @@ public abstract class __SelfReferencing_Test<T extends __SelfReferencing<T>> {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Returns whether the entity under test maps its attributes by property access, that is, whether the provider
-     * reads its accessors rather than its fields.
+     * Returns whether the entity under test maps its attributes by property access, that is, whether the provider reads
+     * its accessors rather than its fields.
      *
      * @return {@code true} when the entity maps by property access; {@code false} otherwise.
-     * @implSpec The default implementation returns {@code false}, which is field access — the more common mapping,
-     *           and the one for which the {@link Transient @Transient} question does not arise. An entity which puts
-     *           its {@code @Id} on an accessor overrides this method.
+     * @implSpec The default implementation returns {@code false}, which is field access — the more common
+     *         mapping, and the one for which the {@link Transient @Transient} question does not arise. An entity which
+     *         puts its {@code @Id} on an accessor overrides this method.
      */
     protected boolean mapsByPropertyAccess() {
         return false;
@@ -201,9 +205,9 @@ public abstract class __SelfReferencing_Test<T extends __SelfReferencing<T>> {
      * Creates a new instance of {@link #entityClass}.
      *
      * @return a new instance of {@link #entityClass}.
-     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence requires
-     *           every entity to declare. An entity whose instances are not usable until something is set overrides
-     *           this method and returns one which is.
+     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence
+     *         requires every entity to declare. An entity whose instances are not usable until something is set
+     *         overrides this method and returns one which is.
      */
     protected T newEntityInstance() {
         return ___Utils.newInstance(entityClass);

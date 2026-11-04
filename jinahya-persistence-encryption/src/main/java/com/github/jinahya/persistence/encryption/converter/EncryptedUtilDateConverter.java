@@ -6,6 +6,8 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfUtil;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Encrypts a {@code java.util.Date} attribute into its column, and decrypts it back.
  * <p>
@@ -17,6 +19,8 @@ import jakarta.persistence.Converter;
 @Converter
 public final class EncryptedUtilDateConverter extends EncryptedAttributeConverter<java.util.Date>
         implements AttributeConverter<java.util.Date, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance.

@@ -27,6 +27,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -49,6 +50,8 @@ import java.util.function.Function;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaAttributeUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -104,9 +107,9 @@ public final class JinahyaAttributeUtils {
      * @return the {@link Field#getType() type} of the field, or the {@link Method#getReturnType() return type} of the
      *         method, the {@code attribute} is mapped to.
      * @apiNote Prefer this over {@link Attribute#getJavaType()} wherever the answer has to mean the same thing
-     *         on every provider &mdash; picking a codec, say, or checking a value against the type which will hold
-     *         it. {@link Attribute#getJavaType()} is the provider's view of the attribute, and providers disagree:
-     *         for a {@code java.util.Date} field mapped as a timestamp, Hibernate ORM 7.4 and EclipseLink report
+     *         on every provider &mdash; picking a codec, say, or checking a value against the type which will hold it.
+     *         {@link Attribute#getJavaType()} is the provider's view of the attribute, and providers disagree: for a
+     *         {@code java.util.Date} field mapped as a timestamp, Hibernate ORM 7.4 and EclipseLink report
      *         {@code java.util.Date}, while Hibernate ORM 7.2 reports {@code java.sql.Timestamp} &mdash; a type no
      *         value ever actually held. The java member cannot drift that way: it is the field, or the getter, as
      *         written.
@@ -157,9 +160,9 @@ public final class JinahyaAttributeUtils {
      * @param <Y>       attribute type parameter
      * @return the value of the {@code attribute} of the {@code entity}; possibly {@code null}.
      * @throws RuntimeException when the value cannot be read reflectively.
-     * @apiNote The result may be {@code null} because an attribute value simply may be: an optional
-     *         basic column, an unset association, or a not-yet-assigned generated id all read back as {@code null}.
-     *         Callers must check.
+     * @apiNote The result may be {@code null} because an attribute value simply may be: an optional basic
+     *         column, an unset association, or a not-yet-assigned generated id all read back as {@code null}. Callers
+     *         must check.
      * @see #setAttributeValue(Object, Attribute, Object)
      */
     @SuppressWarnings({"unchecked"})
@@ -222,8 +225,8 @@ public final class JinahyaAttributeUtils {
      *         what it describes: the entries hang off the class they were computed for and go when it does. The inner
      *         map is keyed by the attribute <em>name</em> rather than by the {@link Attribute} itself for the same
      *         reason &mdash; an {@link Attribute} reaches its metamodel, and so the factory which built it, and a build
-     *         which opens and closes a factory per test would otherwise accumulate one live persistence unit per
-     *         entry. A class cannot declare two attributes of one name, so the name is as selective as the instance.
+     *         which opens and closes a factory per test would otherwise accumulate one live persistence unit per entry.
+     *         A class cannot declare two attributes of one name, so the name is as selective as the instance.
      *         <p>
      *         The lookup is memoized at all because, unlike a metamodel lookup, introspecting a bean and then scanning
      *         its hierarchy is not cheap.

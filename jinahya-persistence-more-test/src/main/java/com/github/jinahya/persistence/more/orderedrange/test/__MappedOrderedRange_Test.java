@@ -27,6 +27,7 @@ import com.github.jinahya.persistence.more.test.___Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,8 +51,8 @@ import static org.junit.jupiter.api.Assumptions.abort;
  * class documentation is explicit that the contract is <em>"relied on rather than checked"</em>: nothing at runtime
  * verifies any of the four, and the failures they produce are quiet ones — a column which sorts correctly under every
  * query while
- * {@link com.github.jinahya.persistence.more.orderedrange.___OrderedRange#contains(Comparable) contains(value)}
- * answers differently about the same range. Checking it is exactly a test's job, and this is where it gets done.
+ * {@link com.github.jinahya.persistence.more.orderedrange.___OrderedRange#contains(Comparable) contains(value)} answers
+ * differently about the same range. Checking it is exactly a test's job, and this is where it gets done.
  * <p>
  * Those four assertions need the encoding itself, which {@link __MappedOrderedRange} keeps {@code protected}. A
  * subclass of this class reaches it in one line, because a test for an entity conventionally sits in that entity's own
@@ -60,9 +61,8 @@ import static org.junit.jupiter.api.Assumptions.abort;
  * protected String encode(final MyRange instance, final BigDecimal value) {
  *     return instance.encode(value); // an @Override, omitted here: javadoc reads a leading @ as a block tag
  * }
- *}
- * Left alone, those four assertions are
- * {@linkplain org.junit.jupiter.api.Assumptions#abort(String) skipped} rather than passed.
+ *} Left alone, those four assertions are {@linkplain org.junit.jupiter.api.Assumptions#abort(String) skipped} rather
+ * than passed.
  *
  * @param <R> the range class under test
  * @param <C> its endpoint type
@@ -77,14 +77,16 @@ public abstract class __MappedOrderedRange_Test<
         C extends Comparable<? super C>
         > {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance for testing the specified range class with the specified sample endpoints.
      *
      * @param rangeClass the range class to test.
-     * @param samples    at least two sample endpoints, in strictly ascending order; the more of them, and the more
-     *                   they differ in length and in shape, the more the encoding contract is actually exercised.
+     * @param samples    at least two sample endpoints, in strictly ascending order; the more of them, and the more they
+     *                   differ in length and in shape, the more the encoding contract is actually exercised.
      */
     protected __MappedOrderedRange_Test(final Class<R> rangeClass, final List<C> samples) {
         super();
@@ -100,9 +102,9 @@ public abstract class __MappedOrderedRange_Test<
     /**
      * Verifies that the samples this test was given really are in strictly ascending order.
      *
-     * @implNote Everything below reads the samples as ordered, and the encoding contract is decided against that
-     *           order, so a mis-ordered sample list would report a failure of the class under test which is in fact a
-     *           failure of the test.
+     * @implNote Everything below reads the samples as ordered, and the encoding contract is decided against
+     *         that order, so a mis-ordered sample list would report a failure of the class under test which is in fact
+     *         a failure of the test.
      */
     @DisplayName("the sample endpoints are in strictly ascending order")
     @Test
@@ -289,9 +291,9 @@ public abstract class __MappedOrderedRange_Test<
     /**
      * Verifies that no endpoint encodes to empty text.
      *
-     * @implNote A stored cut is the encoded endpoint followed by its bound character, so empty text would leave the
-     *         column holding the marker alone — which the class rejects when it reads the cut back, at which point the
-     *         row is already written.
+     * @implNote A stored cut is the encoded endpoint followed by its bound character, so empty text would leave
+     *         the column holding the marker alone — which the class rejects when it reads the cut back, at which point
+     *         the row is already written.
      */
     @DisplayName("no endpoint encodes to empty text")
     @Test
@@ -336,12 +338,12 @@ public abstract class __MappedOrderedRange_Test<
     /**
      * Verifies that the encoding sorts the way the endpoint type does.
      *
-     * @implNote This is the quiet one. An encoding which sorts by something other than {@code C}'s natural order
-     *         leaves every index and every query looking correct while
+     * @implNote This is the quiet one. An encoding which sorts by something other than {@code C}'s natural
+     *         order leaves every index and every query looking correct while
      *         {@link com.github.jinahya.persistence.more.orderedrange.___OrderedRange#contains(Comparable) contains}
      *         and {@link com.github.jinahya.persistence.more.orderedrange.___OrderedRange#isEmpty() isEmpty} — which
-     *         answer by {@code compareTo} — disagree with the database about the same range. Where the wanted order
-     *         is not the natural one, the endpoint type is what needs changing, not the encoding.
+     *         answer by {@code compareTo} — disagree with the database about the same range. Where the wanted order is
+     *         not the natural one, the endpoint type is what needs changing, not the encoding.
      */
     @DisplayName("the encoding preserves the natural order of the endpoint type")
     @Test
@@ -370,7 +372,7 @@ public abstract class __MappedOrderedRange_Test<
      * @return the encoded text; {@code null} for a subclass which does not expose the codec, which leaves the four
      *         assertions above skipped.
      * @implSpec The default implementation returns {@code null}. A subclass overrides it by delegating to the
-     *           {@code protected} method on the range class, which it can reach when it sits in that class's package.
+     *         {@code protected} method on the range class, which it can reach when it sits in that class's package.
      */
     protected String encode(final R instance, final C value) {
         return null;
@@ -421,9 +423,9 @@ public abstract class __MappedOrderedRange_Test<
     /**
      * Creates a new instance of {@link #rangeClass} holding the specified ends.
      *
-     * @param lower         the lower endpoint; {@code null} for no lower bound.
+     * @param lower          the lower endpoint; {@code null} for no lower bound.
      * @param lowerBoundType whether the {@code lower} endpoint belongs to the range.
-     * @param upper         the upper endpoint; {@code null} for no upper bound.
+     * @param upper          the upper endpoint; {@code null} for no upper bound.
      * @param upperBoundType whether the {@code upper} endpoint belongs to the range.
      * @return a new instance holding the two ends.
      */
@@ -439,8 +441,8 @@ public abstract class __MappedOrderedRange_Test<
      * Creates a new instance of {@link #rangeClass}.
      *
      * @return a new instance of {@link #rangeClass}, holding neither endpoint.
-     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence requires
-     *           every entity to declare.
+     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence
+     *         requires every entity to declare.
      */
     protected R newRangeInstance() {
         return ___Utils.newInstance(rangeClass);

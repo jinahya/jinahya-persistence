@@ -19,6 +19,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * limitations under the License.
  * #L%
  */
+
 import jakarta.persistence.AttributeConverter;
 
 import java.time.temporal.TemporalAccessor;
@@ -31,8 +32,8 @@ import java.time.temporal.TemporalAccessor;
  * column open, because the column a {@code java.time} value is kept in is a schema's decision and not the value's
  * &mdash; its ISO-8601 text, the one integral coordinate it is measured by, or the name of one of its fields.
  * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter __StringAttributeConverter} and
- * {@link com.github.jinahya.persistence.more.converter.__LongAttributeConverter __LongAttributeConverter} are the
- * other axis, fixing the column and leaving the attribute open; {@link __TemporalAccessorStringAttributeConverter} and
+ * {@link com.github.jinahya.persistence.more.converter.__LongAttributeConverter __LongAttributeConverter} are the other
+ * axis, fixing the column and leaving the attribute open; {@link __TemporalAccessorStringAttributeConverter} and
  * {@link __TemporalAccessorLongAttributeConverter} are what sit on both.
  *
  * @param <X> temporal accessor type parameter

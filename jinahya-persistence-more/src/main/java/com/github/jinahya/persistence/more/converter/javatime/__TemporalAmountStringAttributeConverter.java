@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
 
 import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Period;
@@ -53,6 +54,8 @@ import java.util.Objects;
 })
 public abstract class __TemporalAmountStringAttributeConverter<X extends TemporalAmount>
         implements __StringAttributeConverter<X>, __TemporalAmountAttributeConverter<X, String> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

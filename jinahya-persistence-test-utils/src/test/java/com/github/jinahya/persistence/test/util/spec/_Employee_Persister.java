@@ -11,8 +11,8 @@ import java.util.Objects;
  * The persister located, by the naming convention, for {@link _Employee}.
  * <p>
  * An {@code _Employee} may not be written without a {@link _Department}, and the randomizer deliberately leaves that
- * association alone; supplying it is this class's job, and is the reason {@link EntityPersister} is a role of its
- * own rather than a call to {@link EntityManager#persist(Object)}.
+ * association alone; supplying it is this class's job, and is the reason {@link EntityPersister} is a role of its own
+ * rather than a call to {@link EntityManager#persist(Object)}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -25,8 +25,8 @@ public class _Employee_Persister
     /**
      * Creates a new instance.
      *
-     * @apiNote The no-argument constructor is what {@link EntityPersisterUtils} instantiates a located persister
-     *         by.
+     * @apiNote The no-argument constructor is what {@link EntityPersisterUtils} instantiates a located
+     *         persister by.
      */
     public _Employee_Persister() {
         super(_Employee.class);

@@ -27,16 +27,17 @@
  * of a pair of functions.
  *
  * <h2>Dates, times and amounts of time</h2>
- * Everything which converts a {@code java.time} value &mdash; as ISO-8601 text, as the one integral coordinate the
- * type is measured by, or as the name of a day or a month in a named locale &mdash; lives in
+ * Everything which converts a {@code java.time} value &mdash; as ISO-8601 text, as the one integral coordinate the type
+ * is measured by, or as the name of a day or a month in a named locale &mdash; lives in
  * {@link com.github.jinahya.persistence.more.converter.javatime the javatime sub-package}, with the attribute axis of
  * its own that those types call for.
  *
  * <h2>JSON</h2>
  * A {@link jakarta.json.JsonValue} stored as JSON text is in
  * {@link com.github.jinahya.persistence.more.converter.jakartajson the jakartajson sub-package}, and anything Jakarta
- * JSON Binding maps in {@link com.github.jinahya.persistence.more.converter.jakartajsonbind the jakartajsonbind
- * sub-package}; both APIs are {@code provided}, left to the application.
+ * JSON Binding maps in
+ * {@link com.github.jinahya.persistence.more.converter.jakartajsonbind the jakartajsonbind sub-package}; both APIs are
+ * {@code provided}, left to the application.
  *
  * <h2>XML</h2>
  * A DOM {@link org.w3c.dom.Node} stored as XML text, a whole document or content, is in
@@ -50,8 +51,8 @@
  *
  * <h2>Enums with stable persisted values</h2>
  * {@link com.github.jinahya.persistence.more.converter.AttributeEnumConverter} is the converter for an
- * {@link com.github.jinahya.persistence.more.AttributeEnum}, whose constants declare the value actually written to
- * the database. The enum side of that pairing lives in {@link com.github.jinahya.persistence.more the parent package}.
+ * {@link com.github.jinahya.persistence.more.AttributeEnum}, whose constants declare the value actually written to the
+ * database. The enum side of that pairing lives in {@link com.github.jinahya.persistence.more the parent package}.
  *
  * <h2>Registration</h2>
  * Only a concrete converter carries {@link jakarta.persistence.Converter @Converter}, and every one of them declares

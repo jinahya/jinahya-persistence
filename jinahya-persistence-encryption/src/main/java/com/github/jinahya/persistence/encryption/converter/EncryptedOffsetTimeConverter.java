@@ -5,6 +5,7 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfTime;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import java.lang.invoke.MethodHandles;
 import java.time.OffsetTime;
 
 /**
@@ -18,6 +19,8 @@ import java.time.OffsetTime;
 @Converter
 public final class EncryptedOffsetTimeConverter extends EncryptedAttributeConverter<OffsetTime>
         implements AttributeConverter<OffsetTime, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance.

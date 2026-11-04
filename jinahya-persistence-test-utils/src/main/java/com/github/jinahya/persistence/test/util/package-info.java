@@ -2,8 +2,8 @@
  * Interfaces and classes for testing classes/interfaces created with {@code jinahya-persistence}.
  * <p>
  * A target class is randomized, and then persisted, by an
- * {@link com.github.jinahya.object.randomizer.ObjectRandomizer randomizer} and an
- * {@link EntityPersister persister}, each of which is located, for the target class, by a naming convention; see
+ * {@link com.github.jinahya.object.randomizer.ObjectRandomizer randomizer} and an {@link EntityPersister persister},
+ * each of which is located, for the target class, by a naming convention; see
  * {@link com.github.jinahya.object.randomizer.ObjectRandomizerUtils the randomizer convention} and
  * {@link EntityPersisterUtils the persister convention} for the conventions applied.
  *

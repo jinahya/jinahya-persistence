@@ -19,18 +19,19 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * limitations under the License.
  * #L%
  */
+
 import java.time.temporal.Temporal;
 
 /**
- * An interface for converting an entity attribute of a subtype of {@link Temporal} to a database column value, and
- * vice versa.
+ * An interface for converting an entity attribute of a subtype of {@link Temporal} to a database column value, and vice
+ * versa.
  * <p>
  * A refinement of {@link __TemporalAccessorAttributeConverter} for the values which can be <em>moved</em> &mdash;
  * {@link java.time.LocalDate LocalDate}, {@link java.time.Instant Instant}, {@link java.time.Year Year} &mdash; as
- * against the two which can only be read, {@link java.time.DayOfWeek DayOfWeek} and {@link java.time.Month Month}.
- * The abstract converters of this package bound their attribute on {@link java.time.temporal.TemporalAccessor
- * TemporalAccessor}, which every {@code Temporal} is, so a converter for a {@code Temporal} may pin itself here on top
- * of extending one of them.
+ * against the two which can only be read, {@link java.time.DayOfWeek DayOfWeek} and {@link java.time.Month Month}. The
+ * abstract converters of this package bound their attribute on
+ * {@link java.time.temporal.TemporalAccessor TemporalAccessor}, which every {@code Temporal} is, so a converter for a
+ * {@code Temporal} may pin itself here on top of extending one of them.
  *
  * @param <X> temporal type parameter
  * @param <Y> table column type parameter

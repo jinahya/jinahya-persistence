@@ -14,6 +14,7 @@ import org.hibernate.usertype.UserTypeCreationContext;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -61,6 +62,8 @@ import java.util.Objects;
  * @see Encrypted
  */
 public class EncryptedUserType implements UserType<Object> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance for the attribute the specified annotation sits on.

@@ -24,31 +24,34 @@ import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.TimeZone;
 
 /**
  * A converter for an entity attribute of {@link TimeZone}, stored as its {@link TimeZone#getID() ID}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @implSpec A value is stored as {@link TimeZone#getID()} &mdash; {@code "Asia/Seoul"}, {@code "GMT+09:00"} &mdash;
- *         and read back with {@link TimeZone#getTimeZone(String)}, as it is: an ID it does not know, {@code "GTM"} as
- *         much as {@code "Asia/Nowhere"}, reads as {@code GMT}.
- * @deprecated {@link TimeZone#getTimeZone(String)} never fails, so a column holding a mistyped or unknown ID reads
- *         back as {@code GMT} with no error, and the three-letter IDs it accepts are themselves deprecated by the JDK.
- *         Use {@link ZoneIdStringAttributeConverter.TimeZoneStringAttributeConverter}, which stores the same
+ * @implSpec A value is stored as {@link TimeZone#getID()} &mdash; {@code "Asia/Seoul"}, {@code "GMT+09:00"}
+ *         &mdash; and read back with {@link TimeZone#getTimeZone(String)}, as it is: an ID it does not know,
+ *         {@code "GTM"} as much as {@code "Asia/Nowhere"}, reads as {@code GMT}.
+ * @deprecated {@link TimeZone#getTimeZone(String)} never fails, so a column holding a mistyped or unknown ID reads back
+ *         as {@code GMT} with no error, and the three-letter IDs it accepts are themselves deprecated by the JDK. Use
+ *         {@link ZoneIdStringAttributeConverter.TimeZoneStringAttributeConverter}, which stores the same
  *         {@link TimeZone} through {@link java.time.ZoneId} and refuses an ID no zone has.
  */
 @Deprecated
 @Converter(autoApply = false)
 public class TimeZoneStringAttributeConverter implements __StringAttributeConverter<TimeZone> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public TimeZoneStringAttributeConverter() {
         super();
@@ -74,8 +77,8 @@ public class TimeZoneStringAttributeConverter implements __StringAttributeConver
      * {@inheritDoc}
      *
      * @param dbData {@inheritDoc}
-     * @return the time zone of the {@code dbData}, {@code GMT} for an ID the JDK does not know; {@code null} when
-     *         the {@code dbData} is {@code null}.
+     * @return the time zone of the {@code dbData}, {@code GMT} for an ID the JDK does not know; {@code null} when the
+     *         {@code dbData} is {@code null}.
      */
     @Override
     public TimeZone convertToEntityAttribute(final String dbData) {

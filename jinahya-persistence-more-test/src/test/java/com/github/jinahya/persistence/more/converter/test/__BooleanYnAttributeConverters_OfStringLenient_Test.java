@@ -5,7 +5,8 @@ import com.github.jinahya.persistence.more.converter.__BooleanYnAttributeConvert
 import java.util.List;
 
 /**
- * Tests {@link __BooleanYnAttributeConverters.OfStringLenient} against what every attribute converter is expected to do.
+ * Tests {@link __BooleanYnAttributeConverters.OfStringLenient} against what every attribute converter is expected to
+ * do.
  */
 class __BooleanYnAttributeConverters_OfStringLenient_Test
         extends __AttributeConverter_Test<__BooleanYnAttributeConverters.OfStringLenient, Boolean, String> {

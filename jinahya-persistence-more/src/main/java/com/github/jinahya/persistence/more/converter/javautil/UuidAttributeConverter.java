@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.util.HexFormat;
 import java.util.UUID;
@@ -32,8 +33,8 @@ import java.util.UUID;
  * <p>
  * Jakarta Persistence 3.1 made {@link UUID} a basic type, but leaves its column type to the provider, and providers do
  * not agree on a column of an ordinary type: one takes a text column for the text of a UUID, another for hexadecimal
- * bytes, and a column of 16 bytes is a {@link UUID} only to the provider which chose it. A concrete converter is one
- * of the nested classes, by the column, and makes that column type the same for every provider:
+ * bytes, and a column of 16 bytes is a {@link UUID} only to the provider which chose it. A concrete converter is one of
+ * the nested classes, by the column, and makes that column type the same for every provider:
  * <table>
  * <caption>Converters</caption>
  * <thead>
@@ -65,18 +66,21 @@ import java.util.UUID;
  *
  * @param <Y> the column type
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote Jakarta Persistence applies no converter to an identifier attribute, so an identifier of such a column is
- *         mapped as its column type, not through this converter.
+ * @apiNote Jakarta Persistence applies no converter to an identifier attribute, so an identifier of such a
+ *         column is mapped as its column type, not through this converter.
  */
 public abstract class UuidAttributeConverter<Y>
         implements AttributeConverter<UUID, Y> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     /**
      * Stores a value as its text.
      *
-     * @implSpec A value is stored as {@link UUID#toString()} &mdash; {@code "6f9619ff-8b86-d011-b42d-00c04fc964ff"},
-     *         in lower case &mdash; and read back with {@link UUID#fromString(String)}, which is its inverse and reads
-     *         either case: a column the database writes in upper case reads back as the same {@link UUID}.
+     * @implSpec A value is stored as {@link UUID#toString()} &mdash;
+     *         {@code "6f9619ff-8b86-d011-b42d-00c04fc964ff"}, in lower case &mdash; and read back with
+     *         {@link UUID#fromString(String)}, which is its inverse and reads either case: a column the database writes
+     *         in upper case reads back as the same {@link UUID}.
      */
     @Converter(autoApply = false)
     public static class OfString
@@ -85,8 +89,8 @@ public abstract class UuidAttributeConverter<Y>
         /**
          * Creates a new instance.
          *
-         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
-         *         the persistence provider, and is documented as needing a public no-argument constructor.
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
          */
         public OfString() {
             super();
@@ -128,10 +132,10 @@ public abstract class UuidAttributeConverter<Y>
      * Stores a value as its 16 bytes.
      *
      * @implSpec A value is stored as its {@link UUID#getMostSignificantBits() most significant} and then its
-     *         {@link UUID#getLeastSignificantBits() least significant} bits, each in big-endian order &mdash; the
-     *         order of its text, and of RFC 9562 &mdash; and read back from exactly 16 bytes.
-     * @apiNote The bytes of a {@code uniqueidentifier}, as SQL Server and .NET's {@code Guid.ToByteArray()} give
-     *         them, are in another order, the first three fields little-endian, and do not read back as the same
+     *         {@link UUID#getLeastSignificantBits() least significant} bits, each in big-endian order &mdash; the order
+     *         of its text, and of RFC 9562 &mdash; and read back from exactly 16 bytes.
+     * @apiNote The bytes of a {@code uniqueidentifier}, as SQL Server and .NET's {@code Guid.ToByteArray()}
+     *         give them, are in another order, the first three fields little-endian, and do not read back as the same
      *         {@link UUID}; nor do the bytes MySQL's {@code UUID_TO_BIN(uuid, 1)} swaps.
      */
     @Converter(autoApply = false)
@@ -141,8 +145,8 @@ public abstract class UuidAttributeConverter<Y>
         /**
          * Creates a new instance.
          *
-         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
-         *         the persistence provider, and is documented as needing a public no-argument constructor.
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
          */
         public OfBytes() {
             super();
@@ -192,8 +196,8 @@ public abstract class UuidAttributeConverter<Y>
         /**
          * Creates a new instance.
          *
-         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
-         *         the persistence provider, and is documented as needing a public no-argument constructor.
+         * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated
+         *         by the persistence provider, and is documented as needing a public no-argument constructor.
          */
         public OfHexString() {
             super();

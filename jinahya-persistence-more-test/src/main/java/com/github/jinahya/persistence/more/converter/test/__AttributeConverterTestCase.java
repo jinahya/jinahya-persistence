@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.more.converter.test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -10,6 +11,8 @@ import java.util.Objects;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 public class __AttributeConverterTestCase<X, Y> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ------------------------------------------------------------------------------------------ STATIC_FACTORY_METHODS
 

@@ -30,6 +30,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
 import java.io.Serial;
+import java.lang.invoke.MethodHandles;
 import java.util.function.DoubleFunction;
 
 /**
@@ -59,6 +60,8 @@ import java.util.function.DoubleFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __MappedRgb extends ___MappedColor {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = 8261125405927873932L;
@@ -192,8 +195,8 @@ public abstract class __MappedRgb extends ___MappedColor {
      * @param component {@inheritDoc}
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws IllegalArgumentException  {@inheritDoc}
-     * @implSpec {@value #COMPONENT_INDEX_RED} writes {@link #setRed(double)}, {@value #COMPONENT_INDEX_GREEN} writes
-     *         {@link #setGreen(double)}, and {@value #COMPONENT_INDEX_BLUE} writes {@link #setBlue(double)}.
+     * @implSpec {@value #COMPONENT_INDEX_RED} writes {@link #setRed(double)}, {@value #COMPONENT_INDEX_GREEN}
+     *         writes {@link #setGreen(double)}, and {@value #COMPONENT_INDEX_BLUE} writes {@link #setBlue(double)}.
      */
     @Override
     public void setComponent(final int index, final double component) {

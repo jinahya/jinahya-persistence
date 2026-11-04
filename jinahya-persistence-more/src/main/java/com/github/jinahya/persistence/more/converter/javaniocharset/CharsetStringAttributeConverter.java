@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javaniocharset;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 
 /**
@@ -33,7 +34,8 @@ import java.nio.charset.Charset;
  * the same {@link Charset} as {@code "UTF-8"}, and is stored as {@code "UTF-8"} again.
  * <p>
  * It implements {@link AttributeConverter AttributeConverter&lt;Charset, String&gt;} itself, not the parent's column
- * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a converter's column type from the type arguments of the interface the class names, as
+ * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a
+ * converter's column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -41,13 +43,15 @@ import java.nio.charset.Charset;
 @Converter(autoApply = false)
 public class CharsetStringAttributeConverter implements AttributeConverter<Charset, String> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public CharsetStringAttributeConverter() {
         super();

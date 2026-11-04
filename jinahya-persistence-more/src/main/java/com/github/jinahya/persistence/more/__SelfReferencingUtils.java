@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.more;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Member;
 import java.util.Objects;
 
@@ -62,6 +63,8 @@ import java.util.Objects;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __SelfReferencingUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * The member annotated with {@link __SelfReferencingParent @__SelfReferencingParent}, of each type.
@@ -177,18 +180,17 @@ public final class __SelfReferencingUtils {
      * @throws IllegalStateException when the class tree of the {@code instance} carries no member annotated with
      *                               {@link __SelfReferencingOrdinal @__SelfReferencingOrdinal}, carries more than one,
      *                               or carries one which is typed neither {@code int} nor {@link Integer}.
-     * @apiNote The parameter is an {@link __SelfReferencingOrdered}, not a {@link __SelfReferencing}, and that is
-     *         the whole point of the distinction. The two absences which used to answer alike are now separated, and
-     *         each is reported by whatever can actually see it: a type which does not order its siblings is turned
-     *         away here by the compiler, and an instance which orders them but has not been given its ordinal answers
+     * @apiNote The parameter is an {@link __SelfReferencingOrdered}, not a {@link __SelfReferencing}, and that
+     *         is the whole point of the distinction. The two absences which used to answer alike are now separated, and
+     *         each is reported by whatever can actually see it: a type which does not order its siblings is turned away
+     *         here by the compiler, and an instance which orders them but has not been given its ordinal answers
      *         {@code null}, for {@link NotNull @NotNull} to report.
      *         <p>
-     *         That second one deliberately does <em>not</em> fail here. Jakarta Validation evaluates the constraints
-     *         on {@link __SelfReferencingOrdered#getSiblingOrdinal() getSiblingOrdinal()} by calling it, so a read
-     *         which threw on an unassigned ordinal would abort the very validation pass which exists to name the
-     *         problem — Hibernate Validator reports {@code HV000090: Unable to access getSiblingOrdinal} and no
-     *         violation at all. Reading the member and answering with what is there leaves the judgment to the
-     *         constraint.
+     *         That second one deliberately does <em>not</em> fail here. Jakarta Validation evaluates the constraints on
+     *         {@link __SelfReferencingOrdered#getSiblingOrdinal() getSiblingOrdinal()} by calling it, so a read which
+     *         threw on an unassigned ordinal would abort the very validation pass which exists to name the problem —
+     *         Hibernate Validator reports {@code HV000090: Unable to access getSiblingOrdinal} and no violation at all.
+     *         Reading the member and answering with what is there leaves the judgment to the constraint.
      * @see __SelfReferencingOrdinal
      */
     public static <T extends __SelfReferencingOrdered<T>> Integer ordinalOf(final T instance) {

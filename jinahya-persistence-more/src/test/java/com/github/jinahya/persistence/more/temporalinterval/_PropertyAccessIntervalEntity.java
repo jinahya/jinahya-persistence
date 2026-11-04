@@ -19,9 +19,9 @@ import jakarta.persistence.Table;
  * <p>
  * The {@link Access @Access}({@code PROPERTY}) is stated rather than inferred, exactly as
  * {@code _PropertyAccessRangeEntity} states it and for the same reason: {@link ___MappedTemporalInterval} is the root
- * of this mapped-superclass chain, and Hibernate ORM 7.2 pushes a root's access type onto the entity instead of
- * reading it from where the entity puts its {@code @Id}. 7.4 and EclipseLink infer it correctly. The library's own
- * javadoc now tells a downstream to state it either way, and this is that advice taken.
+ * of this mapped-superclass chain, and Hibernate ORM 7.2 pushes a root's access type onto the entity instead of reading
+ * it from where the entity puts its {@code @Id}. 7.4 and EclipseLink infer it correctly. The library's own javadoc now
+ * tells a downstream to state it either way, and this is that advice taken.
  */
 @Entity
 @Access(AccessType.PROPERTY)

@@ -24,8 +24,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnitUtil;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.Function;
+
+import static com.github.jinahya.persistence.util.JinahyaEntityManagerUtils.applyInTransactionAndCommit;
+import static com.github.jinahya.persistence.util.JinahyaEntityManagerUtils.applyInTransactionAndRollback;
 
 /**
  * A utility class for {@link EntityManagerFactory}.
@@ -36,6 +40,8 @@ import java.util.function.Function;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaEntityManagerFactoryUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Applies a new entity manager of the specified entity manager factory to the specified function, and closes the
@@ -55,6 +61,59 @@ public final class JinahyaEntityManagerFactoryUtils {
         try (var manager = factory.createEntityManager()) {
             return function.apply(manager);
         }
+    }
+
+    /**
+     * Applies a new entity manager of the specified entity manager factory to the specified function, in a
+     * resource-level transaction which is rolled back, and closes the entity manager.
+     *
+     * @param factory  the entity manager factory.
+     * @param function the function to be applied with the entity manager.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
+     *                               transaction to start.
+     * @apiNote Nothing the {@code function} does stays in the database, which suits a test. The rollback, and
+     *         then the closing, detaches every entity, so an entity the {@code function} returns comes back detached; a
+     *         lazy association it has not loaded inside the {@code function} cannot be loaded afterwards.
+     * @see #applyEntityManager(EntityManagerFactory, Function)
+     * @see JinahyaEntityManagerUtils#applyInTransactionAndRollback(EntityManager, Function)
+     */
+    public static <R> R applyEntityManagerInTransactionAndRollback(
+            final EntityManagerFactory factory,
+            final Function<? super EntityManager, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManager(
+                factory,
+                em -> applyInTransactionAndRollback(em, function)
+        );
+    }
+
+    /**
+     * Applies a new entity manager of the specified entity manager factory to the specified function, in a
+     * resource-level transaction which is committed, and closes the entity manager.
+     *
+     * @param factory  the entity manager factory.
+     * @param function the function to be applied with the entity manager.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
+     *                               transaction to start.
+     * @apiNote Jakarta Persistence 3.2 has {@link EntityManagerFactory#callInTransaction(Function)} for the
+     *         same, which works for a JTA factory as well; this one is the counterpart of
+     *         {@link #applyEntityManagerInTransactionAndRollback(EntityManagerFactory, Function)}, and fails the same
+     *         way, through {@link JinahyaEntityManagerUtils#applyInTransaction(EntityManager, Function, boolean)}.
+     * @see #applyEntityManager(EntityManagerFactory, Function)
+     * @see JinahyaEntityManagerUtils#applyInTransactionAndCommit(EntityManager, Function)
+     */
+    public static <R> R applyEntityManagerInTransactionAndCommit(
+            final EntityManagerFactory factory,
+            final Function<? super EntityManager, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManager(
+                factory,
+                em -> applyInTransactionAndCommit(em, function)
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------

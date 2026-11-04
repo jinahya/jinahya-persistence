@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -56,6 +57,8 @@ import java.util.regex.Pattern;
 // whatever the column stores, a document or content, with or without the XML declaration, is read; a DOCTYPE is not
 public abstract class NodeAttributeConverter<X extends Node, Y>
         implements AttributeConverter<X, Y> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // stored as the XML text, without the XML declaration
     public abstract static class OfString<X extends Node>

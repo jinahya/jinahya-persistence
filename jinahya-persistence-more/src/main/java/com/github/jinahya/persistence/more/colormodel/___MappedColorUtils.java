@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.colormodel;
  * #L%
  */
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
 
@@ -40,6 +41,8 @@ import java.util.function.DoubleFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class ___MappedColorUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ------------------------------------------------------------------------------------------------------ HSL <-> RGB
     // https://www.w3.org/TR/css-color-4/#hsl-to-rgb

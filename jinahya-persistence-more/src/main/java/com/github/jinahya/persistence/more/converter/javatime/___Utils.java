@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * #L%
  */
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -42,6 +43,8 @@ import java.lang.reflect.Modifier;
         "java:S101" // Class names should comply with a naming convention
 })
 final class ___Utils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

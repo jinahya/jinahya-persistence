@@ -32,12 +32,12 @@ import jakarta.persistence.AttributeConverter;
  * @param <X> entity attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote An interface, carrying nothing: an implementation spends no inheritance on it, and is free to extend
- *         whatever it likes. 
+ *         whatever it likes.
  *         {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorLongAttributeConverter
  *         __TemporalAccessorLongAttributeConverter} is the abstract class built on it.
- * @apiNote {@code Long} rather than {@code long}: an
- *         {@link AttributeConverter AttributeConverter} carries the column type as a type argument, which cannot be a
- *         primitive, and a nullable column needs the reference type in any case.
+ * @apiNote {@code Long} rather than {@code long}: an {@link AttributeConverter AttributeConverter} carries the
+ *         column type as a type argument, which cannot be a primitive, and a nullable column needs the reference type
+ *         in any case.
  * @see __StringAttributeConverter
  */
 @SuppressWarnings({

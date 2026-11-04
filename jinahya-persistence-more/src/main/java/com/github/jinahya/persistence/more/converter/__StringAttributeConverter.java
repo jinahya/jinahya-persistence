@@ -36,8 +36,8 @@ import jakarta.persistence.AttributeConverter;
  *         {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverter
  *         __TemporalAccessorStringAttributeConverter},
  *         {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAmountStringAttributeConverter
- *         __TemporalAmountStringAttributeConverter} and
- *         {@link __JoinedStringAttributeConverter} are the abstract classes built on it.
+ *         __TemporalAmountStringAttributeConverter} and {@link __JoinedStringAttributeConverter} are the abstract
+ *         classes built on it.
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

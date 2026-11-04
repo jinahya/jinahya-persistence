@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.more.AttributeEnum;
 import com.github.jinahya.persistence.more.__AttributeEnumUtils;
 import jakarta.persistence.AttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -47,6 +48,8 @@ import java.util.Objects;
 })
 public abstract class AttributeEnumConverter<E extends Enum<E> & AttributeEnum<E, ATTRIBUTE>, ATTRIBUTE>
         implements AttributeConverter<E, ATTRIBUTE> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * An abstract attribute converter for converting between {@link E} and {@link String} attribute type.

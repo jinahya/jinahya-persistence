@@ -24,6 +24,8 @@ import com.github.jinahya.persistence.more.__SelfReferencingOrdered;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public abstract class __SelfReferencingOrdered_Test<T extends __SelfReferencingOrdered<T>>
         extends __SelfReferencing_Test<T> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
@@ -64,13 +68,13 @@ public abstract class __SelfReferencingOrdered_Test<T extends __SelfReferencingO
     /**
      * Verifies that the sibling ordinal of a fresh instance is answered rather than thrown for.
      *
-     * @implNote An instance whose ordinal has not been assigned has to answer {@code null}, and the interface says
-     *         at length why: Jakarta Validation evaluates the {@code @NotNull} on
+     * @implNote An instance whose ordinal has not been assigned has to answer {@code null}, and the interface
+     *         says at length why: Jakarta Validation evaluates the {@code @NotNull} on
      *         {@link __SelfReferencingOrdered#getSiblingOrdinal() getSiblingOrdinal()} by <em>calling</em> it, so an
      *         override which throws for an instance it considers incomplete does not produce a violation — it aborts
-     *         the validation pass, and Hibernate Validator reports {@code HV000090: Unable to access
-     *         getSiblingOrdinal} and nothing else. This is that mistake, caught in a unit test rather than in the
-     *         log of a failed insert. The same call is what verifies the
+     *         the validation pass, and Hibernate Validator reports {@code HV000090: Unable to access getSiblingOrdinal}
+     *         and nothing else. This is that mistake, caught in a unit test rather than in the log of a failed insert.
+     *         The same call is what verifies the
      *         {@link com.github.jinahya.persistence.more.__SelfReferencingOrdinal @__SelfReferencingOrdinal} mark for
      *         an entity which keeps the default implementation.
      */

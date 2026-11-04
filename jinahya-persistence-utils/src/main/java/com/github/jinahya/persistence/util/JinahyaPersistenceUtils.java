@@ -24,6 +24,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -42,6 +43,8 @@ import java.util.function.Function;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaPersistenceUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.more.converter.test;
 
 import com.github.jinahya.persistence.more.converter.__JoinedStringAttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 /**
@@ -20,6 +21,8 @@ public abstract class __JoinedStringAttributeConverter_Test<
         X
         >
         extends __StringAttributeConverter_Test<CONVERTER, List<X>> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance for testing the specified converter class.

@@ -11,8 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @DisplayName("OfZonedDateTime")
-class __TemporalAccessorStringAttributeConverter_OfZonedDateTime_Test
- {
+class __TemporalAccessorStringAttributeConverter_OfZonedDateTime_Test {
 
     private final __TemporalAccessorStringAttributeConverters.OfZonedDateTime converter =
             new __TemporalAccessorStringAttributeConverters.OfZonedDateTime();
@@ -23,5 +22,4 @@ class __TemporalAccessorStringAttributeConverter_OfZonedDateTime_Test
         assertThat(converter.convertToDatabaseColumn(null)).isNull();
         assertThat(converter.convertToEntityAttribute(null)).isNull();
     }
-
 }

@@ -8,8 +8,8 @@ import java.util.function.BiFunction;
  * An interface for persisting instances of a specific entity class.
  * <p>
  * This is the role which the {@linkplain EntityPersisterUtils naming convention} locates for an entity class, and which
- * {@link EntityPersisterUtils#newPersistedInstanceOf(EntityManager, Class)} applies. Implement it directly for a persister
- * which owes nothing to the machinery of {@link AbstractEntityPersister}; extend that class for the plain
+ * {@link EntityPersisterUtils#newPersistedInstanceOf(EntityManager, Class)} applies. Implement it directly for a
+ * persister which owes nothing to the machinery of {@link AbstractEntityPersister}; extend that class for the plain
  * {@link EntityManager#persist(Object) persist} it brings, and for the entity class it remembers, which is what lets a
  * located persister be checked against the class it was located for.
  *

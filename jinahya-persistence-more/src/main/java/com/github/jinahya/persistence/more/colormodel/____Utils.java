@@ -20,10 +20,14 @@ package com.github.jinahya.persistence.more.colormodel;
  * #L%
  */
 
+import java.lang.invoke.MethodHandles;
+
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 final class ____Utils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // Math.clamp is available since 21
     // Coped form the JDK

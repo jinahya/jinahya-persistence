@@ -261,7 +261,6 @@ class ___MappedColor_PersistenceTest {
                     .as("lightness was not overridden, and keeps its declared name")
                     .contains(__MappedHsl.COLUMN_NAME_LIGHTNESS);
         }
-
     }
 
     // -----------------------------------------------------------------------------------------------------------------

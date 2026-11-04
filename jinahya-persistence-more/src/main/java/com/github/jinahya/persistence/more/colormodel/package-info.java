@@ -1,16 +1,16 @@
 /**
  * Abstract mapped superclasses for a color in each of four models, sharing one way of addressing their components.
  * <p>
- * {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} is the root. It maps no column of its own;
- * it fixes only what every color model has in common — a component count, normalized access to each component, an
- * alpha, and a conversion to and from <a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">sRGB</a> — and leaves
- * each model to declare the columns natural to it. Code which does not care which model a color is in can still read
- * it, render it as a
- * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toHexNotation() hex notation}, or
- * serialize it in either the
+ * {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} is the root. It maps no column of its own; it
+ * fixes only what every color model has in common — a component count, normalized access to each component, an alpha,
+ * and a conversion to and from <a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">sRGB</a> — and leaves each
+ * model to declare the columns natural to it. Code which does not care which model a color is in can still read it,
+ * render it as a
+ * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toHexNotation() hex notation}, or serialize
+ * it in either the
  * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toLegacyRgbNotation() legacy} or the
- * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toModernRgbNotation() modern}
- * {@code rgb()} syntax of CSS Color 4.
+ * {@linkplain com.github.jinahya.persistence.more.colormodel.___MappedColor#toModernRgbNotation() modern} {@code rgb()}
+ * syntax of CSS Color 4.
  *
  * <h2>Models</h2>
  * <ul>
@@ -89,107 +89,90 @@
  *
  * <h2>Extending</h2>
  * {@snippet lang = "java":
+ *
  * @Access(AccessType.FIELD) // Hibernate infers this; EclipseLink requires it
  * @Entity
- * @Table(name = "swatch")
- * public class Swatch extends __MappedRgba {
- *
- *     @Id
- *     @GeneratedValue(strategy = GenerationType.IDENTITY)
- *     private Long id;
- * }
- *
- * final var swatch = new Swatch();
- * swatch.setSrgb(1.0d, .0d, .0d);
- * swatch.setAlpha(.5d);
- *
- * swatch.toModernRgbNotation();  // rgb(255 0 0 / 0.5)
- * swatch.toLegacyRgbNotation();  // rgba(255, 0, 0, 0.5)
- * swatch.toHexNotation();        // #ff000080
- *}
- * Converting between models goes through sRGB, in either direction:
- * {@snippet lang = "java":
- * hsl.applySrgb(r -> g -> b -> { cmyk.setSrgb(r, g, b); return null; });
+ * @Table(name = "swatch") public class Swatch extends __MappedRgba {
+ *         <p>
+ *         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id; }
+ *         <p>
+ *         final var swatch = new Swatch(); swatch.setSrgb(1.0d, .0d, .0d); swatch.setAlpha(.5d);
+ *         <p>
+ *         swatch.toModernRgbNotation();  // rgb(255 0 0 / 0.5) swatch.toLegacyRgbNotation();  // rgba(255, 0, 0, 0.5)
+ *         swatch.toHexNotation();        // #ff000080 } Converting between models goes through sRGB, in either
+ *         direction:
+ *         {@snippet lang = "java":
+ *         hsl.applySrgb(r -> g -> b -> { cmyk.setSrgb(r, g, b); return null; });
  *}
  *
- * <h2>Two colors in one table</h2>
- * An entity extends one of these classes and gets one color, because a {@code @MappedSuperclass} is inherited once. A
- * table carrying two — a theme has a foreground and a background, which is the ordinary case — needs the second form:
- * a downstream {@link jakarta.persistence.Embeddable @Embeddable} of its own extending one of these classes, embedded
- * as many times as wanted, each with its own {@link jakarta.persistence.AttributeOverride @AttributeOverride} set.
- * {@snippet lang = "java":
+ *         <h2>Two colors in one table</h2>
+ *         An entity extends one of these classes and gets one color, because a {@code @MappedSuperclass} is inherited
+ *         once. A table carrying two — a theme has a foreground and a background, which is the ordinary case — needs
+ *         the second form: a downstream {@link jakarta.persistence.Embeddable @Embeddable} of its own extending one of
+ *         these classes, embedded as many times as wanted, each with its own
+ *         {@link jakarta.persistence.AttributeOverride @AttributeOverride} set.
+ *         {@snippet lang = "java":
  * @Embeddable
+ * @Access(AccessType.FIELD) public class Rgb extends __MappedRgb {}
  * @Access(AccessType.FIELD)
- * public class Rgb extends __MappedRgb {
- * }
+ * @Entity public class Theme {
+ *         <p>
+ *         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
+ *         <p>
+ *         @Embedded @AttributeOverride(name = "red", column = @Column(name = "fg_red")) @AttributeOverride(name =
+ *         "green", column = @Column(name = "fg_green")) @AttributeOverride(name = "blue", column = @Column(name =
+ *         "fg_blue")) private Rgb foreground;
+ *         <p>
+ *         @Embedded @AttributeOverride(name = "red", column = @Column(name = "bg_red")) @AttributeOverride(name =
+ *         "green", column = @Column(name = "bg_green")) @AttributeOverride(name = "blue", column = @Column(name =
+ *         "bg_blue")) private Rgb background; }} Which settles what these classes may fix and what they may not. The
+ *         column names they declare are
+ *         <em>defaults</em>: a downstream with two colors replaces every one of them, and
+ *         {@value com.github.jinahya.persistence.more.colormodel.__MappedRgb#COLUMN_NAME_RED} is then never written to
+ *         a schema at all. The attribute names are the opposite —
+ *         {@value com.github.jinahya.persistence.more.colormodel.__MappedRgb#ATTRIBUTE_NAME_RED} and its siblings are
+ *         declared here and cannot be renamed, so they are what an {@code @AttributeOverride} and every query path must
+ *         spell exactly.
+ *         <p>
+ *         The embeddable has to be concrete, public and have a no-arg constructor, and should carry
+ *         {@code @Access(AccessType.FIELD)} like the hierarchy above it. That last one is not decoration: EclipseLink
+ *         walks the mapped-superclass chain of an {@code @Embeddable} and fails with a {@link NullPointerException} —
+ *         in {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata} — where any link in that chain has no access
+ *         type of its own. Every class here has one for that reason, the root
+ *         {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} included, even though it maps no
+ *         column.
  *
- * @Access(AccessType.FIELD)
- * @Entity
- * public class Theme {
- *
- *     @Id
- *     @GeneratedValue(strategy = GenerationType.IDENTITY)
- *     private Long id;
- *
- *     @Embedded
- *     @AttributeOverride(name = "red", column = @Column(name = "fg_red"))
- *     @AttributeOverride(name = "green", column = @Column(name = "fg_green"))
- *     @AttributeOverride(name = "blue", column = @Column(name = "fg_blue"))
- *     private Rgb foreground;
- *
- *     @Embedded
- *     @AttributeOverride(name = "red", column = @Column(name = "bg_red"))
- *     @AttributeOverride(name = "green", column = @Column(name = "bg_green"))
- *     @AttributeOverride(name = "blue", column = @Column(name = "bg_blue"))
- *     private Rgb background;
- * }
- *}
- * Which settles what these classes may fix and what they may not. The column names they declare are
- * <em>defaults</em>: a downstream with two colors replaces every one of them, and
- * {@value com.github.jinahya.persistence.more.colormodel.__MappedRgb#COLUMN_NAME_RED} is then never written to a
- * schema at all. The attribute names are the opposite —
- * {@value com.github.jinahya.persistence.more.colormodel.__MappedRgb#ATTRIBUTE_NAME_RED} and its siblings are
- * declared here and cannot be renamed, so they are what an {@code @AttributeOverride} and every query path must spell
- * exactly.
- * <p>
- * The embeddable has to be concrete, public and have a no-arg constructor, and should carry
- * {@code @Access(AccessType.FIELD)} like the hierarchy above it. That last one is not decoration: EclipseLink walks
- * the mapped-superclass chain of an {@code @Embeddable} and fails with a {@link NullPointerException} — in
- * {@code EmbeddableAccessor.preProcessMappedSuperclassMetadata} — where any link in that chain has no access type of
- * its own. Every class here has one for that reason, the root
- * {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} included, even though it maps no column.
- *
- * <h2>References</h2>
- * Everything in this package is derived from these, and each class and conversion method links the section it
- * implements.
- * <table class="striped">
- *   <caption>Normative sources</caption>
- *   <thead>
- *     <tr><th scope="col">Source</th><th scope="col">What it governs here</th></tr>
- *   </thead>
- *   <tbody>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">CSS Color 4, &sect;5</a></td>
- *         <td>sRGB, {@code rgb()}/{@code rgba()}, the eight-bit component scale</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-4/#hex-notation">CSS Color 4, &sect;4.2</a></td>
- *         <td>the hex notation, and its three- and four-digit short forms</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-4/#the-hsl-notation">CSS Color 4, &sect;7</a></td>
- *         <td>HSL, and the conversions in &sect;7.1 and &sect;7.2</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-4/#the-hwb-notation">CSS Color 4, &sect;8</a></td>
- *         <td>HWB, and the conversions in &sect;8.1 and &sect;8.2</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-4/#typedef-hue">CSS Color 4, &lt;hue&gt;</a></td>
- *         <td>the hue in degrees, normalized to {@code [0, 360)}</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-4/#color-conversion-code">CSS Color 4, &sect;19</a></td>
- *         <td>the sample code every conversion here follows</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-color-5/#device-cmyk">CSS Color 5, &sect;6</a></td>
- *         <td>{@code device-cmyk()}, and the naive conversion to sRGB in &sect;6.1</td></tr>
- *     <tr><td><a href="https://www.w3.org/TR/css-values-4/">CSS Values 4</a></td>
- *         <td>{@code <number>} and {@code <percentage>}, as serialized</td></tr>
- *   </tbody>
- * </table>
- * One conversion has <em>no</em> normative source: sRGB to CMYK. CSS defines only the direction into sRGB, so
- * {@link com.github.jinahya.persistence.more.colormodel.___MappedColorUtils#rgbToCmyk(double, double, double,
- * java.util.function.DoubleFunction) rgbToCmyk} states its own contract — the exact algebraic inverse of the naive
- * forward conversion, under maximum black generation. Its javadoc says precisely what that guarantees.
+ *         <h2>References</h2>
+ *         Everything in this package is derived from these, and each class and conversion method links the section it
+ *         implements.
+ *         <table class="striped">
+ *           <caption>Normative sources</caption>
+ *           <thead>
+ *             <tr><th scope="col">Source</th><th scope="col">What it governs here</th></tr>
+ *           </thead>
+ *           <tbody>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-4/#numeric-srgb">CSS Color 4, &sect;5</a></td>
+ *                 <td>sRGB, {@code rgb()}/{@code rgba()}, the eight-bit component scale</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-4/#hex-notation">CSS Color 4, &sect;4.2</a></td>
+ *                 <td>the hex notation, and its three- and four-digit short forms</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-4/#the-hsl-notation">CSS Color 4, &sect;7</a></td>
+ *                 <td>HSL, and the conversions in &sect;7.1 and &sect;7.2</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-4/#the-hwb-notation">CSS Color 4, &sect;8</a></td>
+ *                 <td>HWB, and the conversions in &sect;8.1 and &sect;8.2</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-4/#typedef-hue">CSS Color 4, &lt;hue&gt;</a></td>
+ *                 <td>the hue in degrees, normalized to {@code [0, 360)}</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-4/#color-conversion-code">CSS Color 4, &sect;19</a></td>
+ *                 <td>the sample code every conversion here follows</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-color-5/#device-cmyk">CSS Color 5, &sect;6</a></td>
+ *                 <td>{@code device-cmyk()}, and the naive conversion to sRGB in &sect;6.1</td></tr>
+ *             <tr><td><a href="https://www.w3.org/TR/css-values-4/">CSS Values 4</a></td>
+ *                 <td>{@code <number>} and {@code <percentage>}, as serialized</td></tr>
+ *           </tbody>
+ *         </table>
+ *         One conversion has <em>no</em> normative source: sRGB to CMYK. CSS defines only the direction into sRGB, so
+ *         {@link com.github.jinahya.persistence.more.colormodel.___MappedColorUtils#rgbToCmyk(double, double, double,
+ *         java.util.function.DoubleFunction) rgbToCmyk} states its own contract — the exact algebraic inverse of the naive
+ *         forward conversion, under maximum black generation. Its javadoc says precisely what that guarantees.
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see <a href="https://www.w3.org/TR/css-color-4/">CSS Color Module Level 4</a>
  * @see <a href="https://www.w3.org/TR/css-color-5/">CSS Color Module Level 5</a>

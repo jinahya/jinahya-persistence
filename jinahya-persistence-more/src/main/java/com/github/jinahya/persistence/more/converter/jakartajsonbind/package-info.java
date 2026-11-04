@@ -25,13 +25,13 @@
  * JSON text in a {@code String} column through its
  * {@link com.github.jinahya.persistence.more.converter.jakartajsonbind.JsonbAttributeConverter.OfString OfString}, or
  * in UTF-8 in a {@code byte[]} column through its
- * {@link com.github.jinahya.persistence.more.converter.jakartajsonbind.JsonbAttributeConverter.OfBytes OfBytes};
- * either is subclassed once per attribute type.
+ * {@link com.github.jinahya.persistence.more.converter.jakartajsonbind.JsonbAttributeConverter.OfBytes OfBytes}; either
+ * is subclassed once per attribute type.
  *
  * <h2>Dependencies</h2>
  * The API is not a dependency of this module at run time: it is declared {@code provided}, and the application which
- * uses a converter here brings it and an implementation of it &mdash; Eclipse Yasson, or whatever its container
- * already ships.
+ * uses a converter here brings it and an implementation of it &mdash; Eclipse Yasson, or whatever its container already
+ * ships.
  *
  * <h2>Registration</h2>
  * As in the parent package: only a concrete converter carries {@link jakarta.persistence.Converter @Converter}, every

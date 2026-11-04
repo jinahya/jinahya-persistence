@@ -9,8 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * A range of strings encoded as themselves — order-preserving, but neither prefix-free nor non-empty, so it breaks
- * the contract on {@link __MappedOrderedRange#encode(Comparable)} in the one way monotonicity alone does not cover.
+ * A range of strings encoded as themselves — order-preserving, but neither prefix-free nor non-empty, so it breaks the
+ * contract on {@link __MappedOrderedRange#encode(Comparable)} in the one way monotonicity alone does not cover.
  */
 @Entity
 @Table(name = _PrefixUnsafeStringRangeEntity.TABLE_NAME)

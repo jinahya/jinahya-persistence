@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -54,15 +55,17 @@ import java.util.Objects;
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @implSpec A value is stored as the text of its encoder, and read back with the decoder of the same alphabet. A
- *         decoder of {@link Base64} reads its text with or without the padding, so a converter without padding reads
+ * @implSpec A value is stored as the text of its encoder, and read back with the decoder of the same alphabet.
+ *         A decoder of {@link Base64} reads its text with or without the padding, so a converter without padding reads
  *         a padded column, and the other way round. The basic and the URL decoders refuse any character out of their
  *         alphabets, a line separator included; the MIME decoder skips them.
- * @apiNote Jakarta Persistence applies no converter to an identifier attribute, so an identifier of such a column is
- *         mapped as a {@link String}, not through this converter.
+ * @apiNote Jakarta Persistence applies no converter to an identifier attribute, so an identifier of such a
+ *         column is mapped as a {@link String}, not through this converter.
  */
 public abstract class Base64StringAttributeConverter
         implements AttributeConverter<byte[], String> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Stores a value in the basic alphabet, padded.

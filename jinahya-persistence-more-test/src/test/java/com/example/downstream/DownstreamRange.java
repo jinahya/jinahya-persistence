@@ -2,7 +2,9 @@ package com.example.downstream;
 
 import com.github.jinahya.persistence.more.orderedrange.__MappedOrderedRange;
 
-/** A range a downstream maps, supplying the codec the mapped superclass leaves abstract. */
+/**
+ * A range a downstream maps, supplying the codec the mapped superclass leaves abstract.
+ */
 public class DownstreamRange extends __MappedOrderedRange<Long> {
 
     private static final long BIAS = -(long) Long.MIN_VALUE;

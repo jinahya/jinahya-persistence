@@ -1,5 +1,6 @@
 package com.github.jinahya.persistence.test.util;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -15,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 final class _Utils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance of the specified class, using its no-argument constructor.

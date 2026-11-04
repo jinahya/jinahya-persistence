@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.BitSet;
 
 /**
@@ -36,21 +37,23 @@ import java.util.BitSet;
  * takes a converter's column type from the type arguments of the interface the class names, finds both of them.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote A {@link BitSet} is mutable, and providers do not agree on a set changed in place: Hibernate ORM stores a
- *         bit set on a managed entity, and EclipseLink does not. For the change to be stored by every provider, copy
- *         the set, change the copy, and assign the copy to the attribute; the set the attribute held must stay as it
- *         was, for it is what the change is found against.
+ * @apiNote A {@link BitSet} is mutable, and providers do not agree on a set changed in place: Hibernate ORM
+ *         stores a bit set on a managed entity, and EclipseLink does not. For the change to be stored by every
+ *         provider, copy the set, change the copy, and assign the copy to the attribute; the set the attribute held
+ *         must stay as it was, for it is what the change is found against.
  */
 @Converter(autoApply = false)
 public class BitSetBytesAttributeConverter implements AttributeConverter<BitSet, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public BitSetBytesAttributeConverter() {
         super();

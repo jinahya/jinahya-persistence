@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,8 @@ import java.util.Optional;
         "java:S2583" // Conditionally executed code should be reachable
 })
 public final class __AttributeEnumUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * The constants of each enum class, mapped by their attribute values.
@@ -182,13 +185,13 @@ public final class __AttributeEnumUtils {
      *         is reported whether or not an earlier class happens to match first.
      *         <p>
      *         The {@code E} type parameter is bound to the interface alone &mdash;
-     *         {@code AttributeEnum<? extends Enum<?>, A>} &mdash; rather than to
-     *         {@code Enum<E> & AttributeEnum<E, A>}, as it is in {@link #find(Class, Object)}. The self-referential
-     *         form is not merely avoided here, it is unusable: {@code E} has to be a common supertype of distinct enum
-     *         classes, and nothing satisfies {@code E extends Enum<E>} except the concrete enum classes themselves,
-     *         which are effectively final, so {@code List<Class<? extends E>>} would accept just one class &mdash;
-     *         which is exactly {@link #find(Class, Object)}; while any real common supertype of two enum classes is an
-     *         interface, and an interface cannot extend {@link Enum}.
+     *         {@code AttributeEnum<? extends Enum<?>, A>} &mdash; rather than to {@code Enum<E> & AttributeEnum<E, A>},
+     *         as it is in {@link #find(Class, Object)}. The self-referential form is not merely avoided here, it is
+     *         unusable: {@code E} has to be a common supertype of distinct enum classes, and nothing satisfies
+     *         {@code E extends Enum<E>} except the concrete enum classes themselves, which are effectively final, so
+     *         {@code List<Class<? extends E>>} would accept just one class &mdash; which is exactly
+     *         {@link #find(Class, Object)}; while any real common supertype of two enum classes is an interface, and an
+     *         interface cannot extend {@link Enum}.
      *         <p>
      *         A weaker constraint, {@code E extends Enum<?> & AttributeEnum<? extends Enum<?>, A>}, does compile, and
      *         does reject a non-enum class at compile time. It is not used because it only holds where the compiler can

@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javanet;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 
 /**
@@ -35,8 +36,9 @@ import java.net.URI;
  * {@link java.net.URL#hashCode() hashCode} resolve the host, and its constructors are deprecated. Map a {@link URI},
  * and convert it with {@link URI#toURL()} where a {@link java.net.URL} is needed.
  * <p>
- * It implements {@link AttributeConverter AttributeConverter&lt;URI, String&gt;} itself, not the parent's column
- * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a converter's column type from the type arguments of the interface the class names, as
+ * It implements {@link AttributeConverter AttributeConverter&lt;URI, String&gt;} itself, not the parent's column axis,
+ * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a converter's
+ * column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -44,13 +46,15 @@ import java.net.URI;
 @Converter(autoApply = false)
 public class UriStringAttributeConverter implements AttributeConverter<URI, String> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public UriStringAttributeConverter() {
         super();

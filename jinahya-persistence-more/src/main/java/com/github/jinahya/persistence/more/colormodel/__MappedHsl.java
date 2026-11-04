@@ -30,6 +30,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
 import java.io.Serial;
+import java.lang.invoke.MethodHandles;
 import java.util.function.DoubleFunction;
 
 /**
@@ -54,6 +55,8 @@ import java.util.function.DoubleFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __MappedHsl extends ___MappedHueColor {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = -8420570677180334911L;

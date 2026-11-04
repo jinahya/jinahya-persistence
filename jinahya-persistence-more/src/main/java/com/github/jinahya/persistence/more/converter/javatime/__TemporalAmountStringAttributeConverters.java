@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.Period;
 
@@ -37,6 +38,8 @@ import java.time.Period;
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __TemporalAmountStringAttributeConverters {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

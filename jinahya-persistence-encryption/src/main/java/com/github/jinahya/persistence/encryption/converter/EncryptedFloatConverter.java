@@ -6,6 +6,8 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfPrimiti
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * Encrypts a {@code Float} attribute into its column, and decrypts it back.
  * <p>
@@ -17,6 +19,8 @@ import jakarta.persistence.Converter;
 @Converter
 public final class EncryptedFloatConverter extends EncryptedAttributeConverter<Float>
         implements AttributeConverter<Float, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance.

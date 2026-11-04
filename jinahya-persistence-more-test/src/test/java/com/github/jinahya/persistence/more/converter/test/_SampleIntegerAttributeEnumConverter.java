@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.converter.test;
  */
 
 import com.github.jinahya.persistence.more.test._SampleIntegerAttributeEnum;
-import com.github.jinahya.persistence.more.test.__SampleIntegerAttributeEnum;
 
 class _SampleIntegerAttributeEnumConverter
         extends __SampleIntegerAttributeEnumConverter<_SampleIntegerAttributeEnum> {

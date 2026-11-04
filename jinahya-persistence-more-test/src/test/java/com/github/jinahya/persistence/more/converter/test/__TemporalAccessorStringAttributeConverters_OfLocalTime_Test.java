@@ -7,7 +7,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAccessorStringAttributeConverters.OfLocalTime} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAccessorStringAttributeConverters.OfLocalTime} against what every attribute converter is
+ * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfLocalTime_Test
         extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalTime, LocalTime> {

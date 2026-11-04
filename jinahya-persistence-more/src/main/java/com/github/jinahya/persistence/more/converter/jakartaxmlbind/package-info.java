@@ -25,20 +25,24 @@
  * text in a {@code String} column through its
  * {@link com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter.OfString OfString}, or as
  * the XML bytes in a {@code byte[]} column through its
- * {@link com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter.OfBytes OfBytes};
- * either is subclassed once per attribute type, with the attribute class passed to its constructor.
+ * {@link com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter.OfBytes OfBytes}; either
+ * is subclassed once per attribute type, with the attribute class passed to its constructor.
  *
  * <h2>Binding</h2>
  * Everything Jakarta XML Binding decides is left to the subclass, through three methods, each with a default:
  * {@link com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter#context() context}, for
  * the classes the context knows, such as an {@code ObjectFactory};
- * {@link com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter#write(jakarta.xml.bind.Marshaller, java.lang.Object, javax.xml.transform.Result) write},
- * for the element written and the marshaller's properties, such as the XML declaration and the encoding; and
- * {@link com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter#read(jakarta.xml.bind.Unmarshaller, javax.xml.transform.Source) read},
- * for how a value is read. By default a value is written as an {@code @XmlRootElement} without the XML declaration, and
- * read as the attribute class whatever its root element. The converter keeps the rest: a new marshaller and
- * unmarshaller for each conversion, the column as the result written to, {@code null} for {@code null}, and a parser
- * which rejects a DOCTYPE, so no entity but the predefined ones is resolved.
+ * {@link
+ * com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter#write(jakarta.xml.bind.Marshaller,
+ * java.lang.Object, javax.xml.transform.Result) write}, for the element written and the marshaller's properties, such
+ * as the XML declaration and the encoding; and
+ * {@link
+ * com.github.jinahya.persistence.more.converter.jakartaxmlbind.JaxbAttributeConverter#read(jakarta.xml.bind.Unmarshaller,
+ * javax.xml.transform.Source) read}, for how a value is read. By default a value is written as an
+ * {@code @XmlRootElement} without the XML declaration, and read as the attribute class whatever its root element. The
+ * converter keeps the rest: a new marshaller and unmarshaller for each conversion, the column as the result written to,
+ * {@code null} for {@code null}, and a parser which rejects a DOCTYPE, so no entity but the predefined ones is
+ * resolved.
  *
  * <h2>Dependencies</h2>
  * The API is not a dependency of this module at run time: it is declared {@code provided}, and the application which

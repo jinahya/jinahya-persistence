@@ -30,6 +30,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
 import java.io.Serial;
+import java.lang.invoke.MethodHandles;
 import java.util.function.DoubleFunction;
 
 /**
@@ -60,6 +61,8 @@ import java.util.function.DoubleFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __MappedCmyk extends ___MappedColor {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = 1256034697884069713L;
@@ -183,8 +186,8 @@ public abstract class __MappedCmyk extends ___MappedColor {
      * @param index {@inheritDoc}
      * @return {@inheritDoc}
      * @throws IndexOutOfBoundsException {@inheritDoc}
-     * @implSpec {@value #COMPONENT_INDEX_CYAN} reads {@link #getCyan()}, {@value #COMPONENT_INDEX_MAGENTA} reads
-     *         {@link #getMagenta()}, {@value #COMPONENT_INDEX_YELLOW} reads {@link #getYellow()}, and
+     * @implSpec {@value #COMPONENT_INDEX_CYAN} reads {@link #getCyan()}, {@value #COMPONENT_INDEX_MAGENTA}
+     *         reads {@link #getMagenta()}, {@value #COMPONENT_INDEX_YELLOW} reads {@link #getYellow()}, and
      *         {@value #COMPONENT_INDEX_BLACK} reads {@link #getBlack()}.
      */
     @Transient
@@ -206,9 +209,9 @@ public abstract class __MappedCmyk extends ___MappedColor {
      * @param component {@inheritDoc}
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws IllegalArgumentException  {@inheritDoc}
-     * @implSpec {@value #COMPONENT_INDEX_CYAN} writes {@link #setCyan(double)}, {@value #COMPONENT_INDEX_MAGENTA}
-     *         writes {@link #setMagenta(double)}, {@value #COMPONENT_INDEX_YELLOW} writes
-     *         {@link #setYellow(double)}, and {@value #COMPONENT_INDEX_BLACK} writes {@link #setBlack(double)}.
+     * @implSpec {@value #COMPONENT_INDEX_CYAN} writes {@link #setCyan(double)},
+     *         {@value #COMPONENT_INDEX_MAGENTA} writes {@link #setMagenta(double)}, {@value #COMPONENT_INDEX_YELLOW}
+     *         writes {@link #setYellow(double)}, and {@value #COMPONENT_INDEX_BLACK} writes {@link #setBlack(double)}.
      */
     @Override
     public void setComponent(final int index, final double component) {

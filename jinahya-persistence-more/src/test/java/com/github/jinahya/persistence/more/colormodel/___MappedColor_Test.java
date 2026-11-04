@@ -31,16 +31,16 @@ import static org.assertj.core.api.Assertions.within;
 /**
  * Tests what these colour models do which a downstream implementation is not also expected to do.
  * <p>
- * The parts of {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} which every implementation
- * shares — the component index, its bounds and its rejections, and sRGB into a model and back — are run against all
- * five classes of this package by {@code ___MappedColor_Test} in {@code jinahya-persistence-more-test}, from that
- * module's own tests.
+ * The parts of {@link com.github.jinahya.persistence.more.colormodel.___MappedColor} which every implementation shares
+ * — the component index, its bounds and its rejections, and sRGB into a model and back — are run against all five
+ * classes of this package by {@code ___MappedColor_Test} in {@code jinahya-persistence-more-test}, from that module's
+ * own tests.
  * <p>
- * What stays here is the colour science and the claims which span models: the conversions themselves, CMYK's
- * projection onto maximum black, a hue reduced onto a half-open circle, the eight-bit setters, the exact notation
- * strings, and the design claims — that an alpha is not a component, that a model without an alpha column is opaque,
- * and that no equality is inherited. None of that is a contract a downstream inherits, and none of it can be asserted
- * without reaching the {@code protected} helpers this package keeps to itself.
+ * What stays here is the colour science and the claims which span models: the conversions themselves, CMYK's projection
+ * onto maximum black, a hue reduced onto a half-open circle, the eight-bit setters, the exact notation strings, and the
+ * design claims — that an alpha is not a component, that a model without an alpha column is opaque, and that no
+ * equality is inherited. None of that is a contract a downstream inherits, and none of it can be asserted without
+ * reaching the {@code protected} helpers this package keeps to itself.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -293,7 +293,6 @@ class ___MappedColor_Test {
                 return null;
             });
         }
-
     }
 
     // -----------------------------------------------------------------------------------------------------------------

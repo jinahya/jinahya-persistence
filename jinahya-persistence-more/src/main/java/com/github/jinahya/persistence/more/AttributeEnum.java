@@ -43,8 +43,8 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
      * An interface for defining enum constants with attribute values of string attribute values.
      * <p>
      * Note that the default {@link #attributeValue()} returns {@link Enum#name() name()}, which re-couples the
-     * persisted value to the constant's name — the very coupling {@link AttributeEnum} exists to break. Override it
-     * in every constant whose stored value should survive a rename.
+     * persisted value to the constant's name — the very coupling {@link AttributeEnum} exists to break. Override it in
+     * every constant whose stored value should survive a rename.
      *
      * @param <SELF> self type parameter
      */

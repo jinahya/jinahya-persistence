@@ -19,6 +19,8 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * limitations under the License.
  * #L%
  */
+
+import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -36,8 +38,8 @@ import java.util.Objects;
  * {@link TemporalAccessor} which is nothing but one named field, and vice versa.
  * <p>
  * A value is stored as the <em>name</em> of its field in a given {@link Locale} and {@link TextStyle} &mdash;
- * {@code "Monday"} for {@link DayOfWeek#MONDAY}, {@code "March"} for {@link Month#MARCH} &mdash; which is what a
- * column that was filled by {@code TO_CHAR(d, 'Day')} or by hand holds, and what the ISO-8601 form of
+ * {@code "Monday"} for {@link DayOfWeek#MONDAY}, {@code "March"} for {@link Month#MARCH} &mdash; which is what a column
+ * that was filled by {@code TO_CHAR(d, 'Day')} or by hand holds, and what the ISO-8601 form of
  * {@link __TemporalAccessorStringAttributeConverter} cannot be, since neither type has one: {@link DayOfWeek} and
  * {@link Month} declare no {@code parse(CharSequence)}. The column is read back case-insensitively, so
  * {@code "MONDAY"}, {@code "monday"} and {@code "Monday"} are all {@link DayOfWeek#MONDAY}.
@@ -58,8 +60,8 @@ import java.util.Objects;
  *         {@link DateTimeFormatterBuilder#appendText(TemporalField, TextStyle) one text field}, in the locale given.
  *         The write is then what {@link DayOfWeek#getDisplayName(TextStyle, Locale)} returns for the same style and
  *         locale, and the read is {@code from(TemporalAccessor)} over what the formatter parsed, which both types
- *         declare. {@link Locale#ROOT} is <em>not</em> a neutral choice for this: the JDK's locale data spells the
- *         full forms there as the short ones, {@code "Mon"} and {@code "Jan"}.
+ *         declare. {@link Locale#ROOT} is <em>not</em> a neutral choice for this: the JDK's locale data spells the full
+ *         forms there as the short ones, {@code "Mon"} and {@code "Jan"}.
  * @see __TemporalAccessorTextStringAttributeConverters
  * @see DayOfWeek#getDisplayName(TextStyle, Locale)
  * @see Month#getDisplayName(TextStyle, Locale)
@@ -70,6 +72,8 @@ import java.util.Objects;
 public abstract class __TemporalAccessorTextStringAttributeConverter<X extends TemporalAccessor & TemporalAdjuster>
         extends __TemporalAccessorStringAttributeConverter<X>
         implements __TemporalAdjusterAttributeConverter<X, String> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -116,14 +120,14 @@ public abstract class __TemporalAccessorTextStringAttributeConverter<X extends T
      * the specified style and locale.
      *
      * @param attributeClass the class of the entity attribute this converter converts.
-     * @param field          the field whose text the column holds; {@link java.time.temporal.ChronoField#DAY_OF_WEEK
-     *                       DAY_OF_WEEK} for a {@link DayOfWeek}.
+     * @param field          the field whose text the column holds;
+     *                       {@link java.time.temporal.ChronoField#DAY_OF_WEEK DAY_OF_WEEK} for a {@link DayOfWeek}.
      * @param textStyle      the style of the text; see {@link #DEFAULT_TEXT_STYLE}.
      * @param locale         the locale of the text; see {@link #DEFAULT_LOCALE}.
      * @apiNote The {@code attributeClass} has to be one whose every value is determined by the {@code field}
-     *         alone, and which declares {@code public static from(TemporalAccessor)} &mdash; what the read rebuilds
-     *         the value with out of the one field the column holds. A type with more fields than that loses them in
-     *         the column, and the read fails the way
+     *         alone, and which declares {@code public static from(TemporalAccessor)} &mdash; what the read rebuilds the
+     *         value with out of the one field the column holds. A type with more fields than that loses them in the
+     *         column, and the read fails the way
      *         {@link __TemporalAccessorStringAttributeConverter#convertToEntityAttribute(String) the superclass}
      *         describes for a lossy formatter.
      */

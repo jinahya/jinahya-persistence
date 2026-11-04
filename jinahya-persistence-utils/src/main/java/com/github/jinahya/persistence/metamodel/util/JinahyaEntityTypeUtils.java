@@ -25,6 +25,7 @@ import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.Metamodel;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -33,15 +34,17 @@ import java.util.stream.StreamSupport;
  * A utility class for {@link EntityType}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @apiNote The methods here look a type up across an {@link Iterable} of entity manager factories, and take
- *         the first match. None memoizes: a lookup which took the first match found for a class, whichever factories
- *         a later caller passed, is not a cache but a wrong answer waiting for a second persistence unit.
+ * @apiNote The methods here look a type up across an {@link Iterable} of entity manager factories, and take the
+ *         first match. None memoizes: a lookup which took the first match found for a class, whichever factories a
+ *         later caller passed, is not a cache but a wrong answer waiting for a second persistence unit.
  * @see JinayaManagedTypeUtils
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinahyaEntityTypeUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

@@ -25,6 +25,7 @@ import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.TimeZone;
@@ -35,17 +36,17 @@ import java.util.TimeZone;
  * A {@link ZoneId} is not a {@link java.time.temporal.TemporalAccessor}, so this converter sits on none of this
  * package's attribute axes. It implements {@link AttributeConverter AttributeConverter&lt;ZoneId, String&gt;} itself,
  * not the parent's column axis, {@link __StringAttributeConverter}: EclipseLink takes a converter's column type from
- * the type arguments of the interface the class names, and from {@code __StringAttributeConverter<ZoneId>}, whose
- * only argument is the attribute type, it took {@link ZoneId} for the column, and failed to bind the {@link String}
- * this converter returns ({@code EclipseLink-3002}).
+ * the type arguments of the interface the class names, and from {@code __StringAttributeConverter<ZoneId>}, whose only
+ * argument is the attribute type, it took {@link ZoneId} for the column, and failed to bind the {@link String} this
+ * converter returns ({@code EclipseLink-3002}).
  * <p>
  * It is also the core of {@link TimeZoneStringAttributeConverter}, which stores a {@link TimeZone} as the identifier of
  * its zone.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @implSpec A value is stored as {@link ZoneId#getId()} &mdash; {@code "Asia/Seoul"}, {@code "Z"}, {@code "+09:00"}
- *         &mdash; and read back with {@link ZoneId#of(String)}, which is its inverse: a region reads back as the same
- *         region, and an offset as a {@link java.time.ZoneOffset}.
+ * @implSpec A value is stored as {@link ZoneId#getId()} &mdash; {@code "Asia/Seoul"}, {@code "Z"},
+ *         {@code "+09:00"} &mdash; and read back with {@link ZoneId#of(String)}, which is its inverse: a region reads
+ *         back as the same region, and an offset as a {@link java.time.ZoneOffset}.
  * @apiNote Only the identifier is stored, never the rules. A region whose rules change with a later time-zone
  *         database reads back under the new rules, which is what a zone column is for; and a region the running JDK
  *         does not know cannot be read back at all.
@@ -53,14 +54,16 @@ import java.util.TimeZone;
 @Converter(autoApply = false)
 public class ZoneIdStringAttributeConverter implements AttributeConverter<ZoneId, String> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     /**
      * A converter for an entity attribute of {@link TimeZone}, stored as the identifier of its
      * {@link TimeZone#toZoneId() zone}, through a {@link ZoneIdStringAttributeConverter}.
      *
-     * @implSpec A value is converted to a {@link ZoneId} with {@link TimeZone#toZoneId()}, which is then stored by
-     *         {@link ZoneIdStringAttributeConverter}; a column is read back by {@link ZoneIdStringAttributeConverter},
-     *         and the zone converted with {@link TimeZone#getTimeZone(ZoneId)}. {@code "Asia/Seoul"}, {@code "GMT"}
-     *         and {@code "GMT+09:00"} come back as they went in.
+     * @implSpec A value is converted to a {@link ZoneId} with {@link TimeZone#toZoneId()}, which is then stored
+     *         by {@link ZoneIdStringAttributeConverter}; a column is read back by
+     *         {@link ZoneIdStringAttributeConverter}, and the zone converted with {@link TimeZone#getTimeZone(ZoneId)}.
+     *         {@code "Asia/Seoul"}, {@code "GMT"} and {@code "GMT+09:00"} come back as they went in.
      * @apiNote The column follows {@link ZoneId}, not {@link TimeZone}. A deprecated three-letter ID is stored
      *         as the region it stands for &mdash; {@code "PST"} as {@code "America/Los_Angeles"}, with the same rules
      *         &mdash; and an ID no zone has is refused when read, where {@link TimeZone#getTimeZone(String)} would
@@ -97,8 +100,8 @@ public class ZoneIdStringAttributeConverter implements AttributeConverter<ZoneId
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public ZoneIdStringAttributeConverter() {
         super();

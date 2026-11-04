@@ -5,6 +5,7 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfUtil;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import java.lang.invoke.MethodHandles;
 import java.util.UUID;
 
 /**
@@ -18,6 +19,8 @@ import java.util.UUID;
 @Converter
 public final class EncryptedUuidConverter extends EncryptedAttributeConverter<UUID>
         implements AttributeConverter<UUID, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance.

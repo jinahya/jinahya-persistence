@@ -7,7 +7,8 @@ import java.time.Period;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAmountStringAttributeConverters.OfPeriod} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAmountStringAttributeConverters.OfPeriod} against what every attribute converter is expected
+ * to do.
  */
 class __TemporalAmountStringAttributeConverters_OfPeriod_Test
         extends __StringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfPeriod, Period> {

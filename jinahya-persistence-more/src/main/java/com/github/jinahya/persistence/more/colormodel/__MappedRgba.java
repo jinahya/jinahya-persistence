@@ -30,6 +30,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
 import java.io.Serial;
+import java.lang.invoke.MethodHandles;
 
 /**
  * An abstract mapped superclass for colors in the
@@ -63,6 +64,8 @@ import java.io.Serial;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __MappedRgba extends __MappedRgb {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = -3055377264126889216L;

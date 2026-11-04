@@ -22,14 +22,11 @@ package com.github.jinahya.persistence.more.converter.javautil;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.BitSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link BitSetBytesAttributeConverter}.
@@ -71,7 +68,7 @@ class BitSetBytesAttributeConverter_Test {
     @DisplayName("trailing zero bytes of a column read back as no bits")
     @Test
     void __trailingZeros() {
-        final var value = converter.convertToEntityAttribute(new byte[] {0x01, 0x00, 0x00});
+        final var value = converter.convertToEntityAttribute(new byte[]{0x01, 0x00, 0x00});
         assertThat(value.cardinality()).isOne();
         assertThat(converter.convertToDatabaseColumn(value)).containsExactly(0x01);
     }

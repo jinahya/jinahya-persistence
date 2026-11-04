@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.more.test;
 
 import com.github.jinahya.persistence.more.AttributeEnum;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,6 +41,8 @@ import java.util.stream.Stream;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public final class AttributeEnum_TestUtils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Applies a stream of all constants of the specified enum class to the specified function, and returns the result.
@@ -221,8 +224,8 @@ public final class AttributeEnum_TestUtils {
      * @param enumClass   the enum class.
      * @param <ENUM>      enum type parameter
      * @param <ATTRIBUTE> attribute type parameter
-     * @return a random attribute value of the {@code enumClass}; {@code null} if the {@code enumClass} doesn't have
-     *         any constant.
+     * @return a random attribute value of the {@code enumClass}; {@code null} if the {@code enumClass} doesn't have any
+     *         constant.
      * @see #applyRandomAttributeValue(Class, Function)
      */
     public static <ENUM extends Enum<ENUM> & AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE>

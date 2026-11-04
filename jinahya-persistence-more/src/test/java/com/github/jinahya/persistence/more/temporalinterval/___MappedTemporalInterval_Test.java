@@ -29,17 +29,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests what these mapped superclasses do which a downstream implementation is not also expected to do.
  * <p>
  * The interval contract itself — what a fresh instance holds, what the two points decide, what the derived values
- * answer when a bound is absent — is no longer stated here. It is
- * {@code com.github.jinahya.persistence.more.test}'s {@code ___MappedTemporalInterval_Test}, in
- * {@code jinahya-persistence-more-test}, which runs it against all seven classes of this package from that module's
- * own tests. Stating it in both places meant maintaining it in both, and the copy which a downstream also inherits is
- * the one worth keeping.
+ * answer when a bound is absent — is no longer stated here. It is {@code com.github.jinahya.persistence.more.test}'s
+ * {@code ___MappedTemporalInterval_Test}, in {@code jinahya-persistence-more-test}, which runs it against all seven
+ * classes of this package from that module's own tests. Stating it in both places meant maintaining it in both, and the
+ * copy which a downstream also inherits is the one worth keeping.
  * <p>
  * What stays is what that base deliberately cannot carry. {@link Case} keeps the assertions which need a
  * {@link jakarta.validation.Validator} — the published test layer takes no validation implementation — and the
  * {@code toString} form. {@link DiscreteAxisTest} keeps the structural claim about which point types are discrete,
- * which is a fact about this package rather than about any one interval. {@link OfOffsetDateTime} keeps its own,
- * being the one class here which compares instants rather than natural order.
+ * which is a fact about this package rather than about any one interval. {@link OfOffsetDateTime} keeps its own, being
+ * the one class here which compares instants rather than natural order.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -287,7 +286,8 @@ class ___MappedTemporalInterval_Test {
             assertThat(interval(max, min).getTemporalAmount()).isEqualTo(Period.of(-years, -11, 0));
         }
 
-        @DisplayName("the amount agrees with lengthIn(MONTHS) across the domain: a consistency check, they share until()")
+        @DisplayName(
+                "the amount agrees with lengthIn(MONTHS) across the domain: a consistency check, they share until()")
         @Test
         void _amount_agreesWithLengthInMonths() {
             final var min = YearMonth.of(Year.MIN_VALUE, 1);

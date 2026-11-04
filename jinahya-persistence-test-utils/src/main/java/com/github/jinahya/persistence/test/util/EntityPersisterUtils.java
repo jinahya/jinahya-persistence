@@ -61,8 +61,8 @@ public final class EntityPersisterUtils {
      * class.
      *
      * @param targetClass the entity class whose persister class is located.
-     * @return an optional of the persister class of the {@code targetClass}; {@code empty} when the convention names
-     *         no usable one.
+     * @return an optional of the persister class of the {@code targetClass}; {@code empty} when the convention names no
+     *         usable one.
      * @throws NullPointerException when the {@code targetClass} is {@code null}.
      * @implNote The postfixes are probed in order, and the first candidate which exists <em>and</em> implements
      *         {@link EntityPersister} is taken; whether it can be instantiated is left to
@@ -122,14 +122,14 @@ public final class EntityPersisterUtils {
      * @param persister   the located persister.
      * @param <T>         the entity type parameter.
      * @return the {@code persister}.
-     * @throws RuntimeException when the class the {@code persister} is declared for is neither the
-     *                          {@code targetClass} nor a superclass of it.
-     * @apiNote A persister is a <em>consumer</em>, and so is contravariant in the class it is declared for:
-     *         one declared for a superclass of the {@code targetClass} accepts instances of the {@code targetClass},
-     *         while one declared for a subclass, or for an unrelated class, does not. This is what lets an entity
-     *         hierarchy share one implementation -- a {@code _RgbaEntity_Persister extends __MappedRgbaPersister},
-     *         declared for {@code __MappedRgba}, persists an {@code _RgbaEntity} -- without every subclass
-     *         re-declaring its target class.
+     * @throws RuntimeException when the class the {@code persister} is declared for is neither the {@code targetClass}
+     *                          nor a superclass of it.
+     * @apiNote A persister is a <em>consumer</em>, and so is contravariant in the class it is declared for: one
+     *         declared for a superclass of the {@code targetClass} accepts instances of the {@code targetClass}, while
+     *         one declared for a subclass, or for an unrelated class, does not. This is what lets an entity hierarchy
+     *         share one implementation -- a {@code _RgbaEntity_Persister extends __MappedRgbaPersister}, declared for
+     *         {@code __MappedRgba}, persists an {@code _RgbaEntity} -- without every subclass re-declaring its target
+     *         class.
      *         <p>
      *         Unlike a {@link ObjectRandomizer randomizer}, which is a producer, and is judged on what it returned, a
      *         persister is judged on its declaration: applying it <em>is</em> the side effect, so there is nothing to

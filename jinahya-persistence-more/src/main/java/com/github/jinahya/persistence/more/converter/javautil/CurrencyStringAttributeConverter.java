@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Currency;
 
 /**
@@ -33,7 +34,8 @@ import java.util.Currency;
  * with {@link Currency#getInstance(String)}, which is its inverse: a currency has one instance for its code.
  * <p>
  * It implements {@link AttributeConverter AttributeConverter&lt;Currency, String&gt;} itself, not the parent's column
- * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a converter's column type from the type arguments of the interface the class names, as
+ * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a
+ * converter's column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -41,13 +43,15 @@ import java.util.Currency;
 @Converter(autoApply = false)
 public class CurrencyStringAttributeConverter implements AttributeConverter<Currency, String> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public CurrencyStringAttributeConverter() {
         super();

@@ -30,6 +30,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 
 import java.io.Serial;
+import java.lang.invoke.MethodHandles;
 
 /**
  * An abstract mapped superclass for colors whose first component is a hue.
@@ -58,6 +59,8 @@ import java.io.Serial;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class ___MappedHueColor extends ___MappedColor {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = 5148340843748231186L;

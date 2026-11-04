@@ -5,6 +5,7 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfTime;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import java.lang.invoke.MethodHandles;
 import java.time.LocalTime;
 
 /**
@@ -18,6 +19,8 @@ import java.time.LocalTime;
 @Converter
 public final class EncryptedLocalTimeConverter extends EncryptedAttributeConverter<LocalTime>
         implements AttributeConverter<LocalTime, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance.

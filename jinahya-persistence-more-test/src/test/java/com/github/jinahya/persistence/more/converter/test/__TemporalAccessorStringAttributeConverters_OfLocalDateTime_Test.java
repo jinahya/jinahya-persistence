@@ -7,10 +7,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAccessorStringAttributeConverters.OfLocalDateTime} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAccessorStringAttributeConverters.OfLocalDateTime} against what every attribute converter is
+ * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfLocalDateTime_Test
-        extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalDateTime, LocalDateTime> {
+        extends
+        __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalDateTime, LocalDateTime> {
 
     __TemporalAccessorStringAttributeConverters_OfLocalDateTime_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfLocalDateTime.class);
@@ -19,7 +21,8 @@ class __TemporalAccessorStringAttributeConverters_OfLocalDateTime_Test
     @Override
     protected List<__AttributeConverterTestCase<LocalDateTime, String>> testCases() {
         return List.of(
-                __AttributeConverterTestCase.of(LocalDateTime.of(2026, 9, 19, 11, 22, 33), LocalDateTime.of(2026, 9, 19, 11, 22, 33).toString())
+                __AttributeConverterTestCase.of(LocalDateTime.of(2026, 9, 19, 11, 22, 33),
+                                                LocalDateTime.of(2026, 9, 19, 11, 22, 33).toString())
         );
     }
 }

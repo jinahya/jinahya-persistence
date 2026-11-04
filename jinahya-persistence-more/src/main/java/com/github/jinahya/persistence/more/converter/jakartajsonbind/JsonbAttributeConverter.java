@@ -28,12 +28,15 @@ import jakarta.persistence.AttributeConverter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class JsonbAttributeConverter<X, Y>
         implements AttributeConverter<X, Y> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // stored as the JSON text
     public abstract static class OfString<X>

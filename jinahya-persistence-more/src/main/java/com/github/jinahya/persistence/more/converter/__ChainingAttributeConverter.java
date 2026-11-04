@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.more.converter;
 
 import jakarta.persistence.AttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -40,13 +41,15 @@ import java.util.Objects;
  *         {@code persistence.xml} or in {@link jakarta.persistence.Convert @Convert}. Where none of that is needed, an
  *         instance composes two converters inline:
  *         {@snippet lang = "java":
- *                         final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second);
+ *                                 final AttributeConverter<T, V> converter = new __ChainingAttributeConverter<>(first, second);
  *}
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public class __ChainingAttributeConverter<T, U, V> implements AttributeConverter<T, V> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 

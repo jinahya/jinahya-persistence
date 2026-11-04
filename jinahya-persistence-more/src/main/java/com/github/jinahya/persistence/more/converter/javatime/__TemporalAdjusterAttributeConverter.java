@@ -19,6 +19,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * limitations under the License.
  * #L%
  */
+
 import jakarta.persistence.AttributeConverter;
 
 import java.time.temporal.TemporalAdjuster;
@@ -28,9 +29,9 @@ import java.time.temporal.TemporalAdjuster;
  * and vice versa.
  * <p>
  * This is the attribute axis of this package for a value which <em>adjusts</em> a date or a time: it fixes what the
- * attribute is, and leaves the column open. Most {@code java.time} values are adjusters as well as accessors &mdash;
- * a {@link java.time.LocalDate LocalDate} sets the date of whatever it is applied to &mdash; but the axis earns its
- * place for the two which are adjusters and accessors and nothing more: {@link java.time.DayOfWeek DayOfWeek} and
+ * attribute is, and leaves the column open. Most {@code java.time} values are adjusters as well as accessors &mdash; a
+ * {@link java.time.LocalDate LocalDate} sets the date of whatever it is applied to &mdash; but the axis earns its place
+ * for the two which are adjusters and accessors and nothing more: {@link java.time.DayOfWeek DayOfWeek} and
  * {@link java.time.Month Month}, each a single named field and neither a {@link java.time.temporal.Temporal Temporal}.
  * {@link __TemporalAccessorTextStringAttributeConverter} sits on this axis together with
  * {@link __TemporalAccessorAttributeConverter}, by bounding its attribute on both.

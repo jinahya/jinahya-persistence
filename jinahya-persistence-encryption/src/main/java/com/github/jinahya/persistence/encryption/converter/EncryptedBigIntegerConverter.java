@@ -5,6 +5,7 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfMath;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 
 /**
@@ -18,6 +19,8 @@ import java.math.BigInteger;
 @Converter
 public final class EncryptedBigIntegerConverter extends EncryptedAttributeConverter<BigInteger>
         implements AttributeConverter<BigInteger, byte[]> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance.

@@ -8,7 +8,8 @@ import java.time.temporal.ChronoUnit;
 /**
  * Tests {@link __MappedLocalDateTimeInterval} against what every interval is expected to do.
  */
-class __MappedLocalDateTimeInterval_Test extends ___MappedTemporalInterval_Test<__MappedLocalDateTimeInterval_Test.Iv, LocalDateTime> {
+class __MappedLocalDateTimeInterval_Test
+        extends ___MappedTemporalInterval_Test<__MappedLocalDateTimeInterval_Test.Iv, LocalDateTime> {
 
     static final class Iv extends __MappedLocalDateTimeInterval {
 

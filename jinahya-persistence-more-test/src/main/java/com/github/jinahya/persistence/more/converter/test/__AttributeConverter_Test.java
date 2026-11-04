@@ -139,14 +139,13 @@ public abstract class __AttributeConverter_Test<C extends AttributeConverter<X, 
      * Returns the test cases with which both directions of the converter are checked.
      * <p>
      * Overriding this method is all a subclass has to do to get both assertions below running; the
-     * {@link __ConvertToDatabaseColumnTestInvocationContextProvider provider} machinery is for a subclass which wants
-     * a separate invocation, with its own display name, per case.
+     * {@link __ConvertToDatabaseColumnTestInvocationContextProvider provider} machinery is for a subclass which wants a
+     * separate invocation, with its own display name, per case.
      *
      * @return the test cases; empty — as it is here — for a subclass which drives the assertions itself.
      * @implSpec The default implementation returns an empty list, which leaves both assertions below
-     *         {@linkplain org.junit.jupiter.api.Assumptions#assumeFalse(boolean, String) skipped} rather than
-     *         passing. A test which reports green without having converted anything is the one outcome worth ruling
-     *         out here.
+     *         {@linkplain org.junit.jupiter.api.Assumptions#assumeFalse(boolean, String) skipped} rather than passing.
+     *         A test which reports green without having converted anything is the one outcome worth ruling out here.
      */
     protected List<__AttributeConverterTestCase<X, Y>> testCases() {
         return List.of();

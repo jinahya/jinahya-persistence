@@ -13,8 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @DisplayName("OfDuration")
-class __TemporalAmountStringAttributeConverter_OfDuration_Test
- {
+class __TemporalAmountStringAttributeConverter_OfDuration_Test {
 
     private final __TemporalAmountStringAttributeConverters.OfDuration converter =
             new __TemporalAmountStringAttributeConverters.OfDuration();
@@ -37,5 +36,4 @@ class __TemporalAmountStringAttributeConverter_OfDuration_Test
     void __days() {
         assertThat(converter.convertToDatabaseColumn(Duration.ofDays(2L))).isEqualTo("PT48H");
     }
-
 }

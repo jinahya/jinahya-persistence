@@ -120,6 +120,47 @@ public final class JinahyaEntityManagerUtils {
         }
     }
 
+    /**
+     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function, rolls
+     * the transaction back, and returns the result.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied to the {@code manager}.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
+     *                                  transaction to start.
+     * @apiNote Nothing the {@code function} does stays in the database, which suits a test. The rollback
+     *         detaches every entity the {@code manager} was managing, so an entity the {@code function} returns comes
+     *         back detached, and its state, such as a generated identifier or a version, may not match any row in the
+     *         database.
+     * @see #applyInTransaction(EntityManager, Function, boolean)
+     */
+    public static <R> R applyInTransactionAndRollback(final EntityManager manager,
+                                                      final Function<? super EntityManager, ? extends R> function) {
+        return applyInTransaction(manager, function, true);
+    }
+
+    /**
+     * Starts a resource-level transaction of the specified entity manager, applies it to the specified function,
+     * commits the transaction, and returns the result.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied to the {@code manager}.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
+     *                                  transaction to start.
+     * @see #applyInTransaction(EntityManager, Function, boolean)
+     * @see EntityManagerFactory#callInTransaction(Function)
+     */
+    public static <R> R applyInTransactionAndCommit(final EntityManager manager,
+                                                    final Function<? super EntityManager, ? extends R> function) {
+        return applyInTransaction(manager, function, false);
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
@@ -156,15 +197,15 @@ public final class JinahyaEntityManagerUtils {
         // the function's own failure, held so the provider's wrapper can be peeled back off below
         final var thrown = new AtomicReference<Throwable>();
         try {
-            return manager.<Connection, R>callWithConnection(connection -> {
+            return manager.<Connection, R>callWithConnection(c -> {
                 try {
-                    if (connection == null) {
+                    if (c == null) {
                         // EclipseLink reads the accessor's connection, which outside a transaction may not
                         // exist; handing the function a null Connection would only move the failure
                         throw new PersistenceException("no connection from " + manager);
                     }
-                    logger.log(Level.DEBUG, "connection: {0}", connection);
-                    return function.apply(connection);
+                    logger.log(Level.DEBUG, "connection: {0}", c);
+                    return function.apply(c);
                 } catch (final RuntimeException | Error e) {
                     thrown.set(e);
                     throw e;

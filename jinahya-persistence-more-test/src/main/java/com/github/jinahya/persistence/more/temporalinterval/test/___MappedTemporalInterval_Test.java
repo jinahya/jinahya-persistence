@@ -25,6 +25,7 @@ import com.github.jinahya.persistence.more.test.___Utils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
@@ -64,6 +65,8 @@ public abstract class ___MappedTemporalInterval_Test<
         P extends Temporal & Comparable<? super P>
         > {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
@@ -71,8 +74,8 @@ public abstract class ___MappedTemporalInterval_Test<
      *
      * @param intervalClass the interval class to test.
      * @param earlier       a point.
-     * @param later         a point strictly after the {@code earlier} one, by whatever order the
-     *                      {@code intervalClass} decides it.
+     * @param later         a point strictly after the {@code earlier} one, by whatever order the {@code intervalClass}
+     *                      decides it.
      * @param unit          a unit the point type supports.
      * @param length        the number of complete {@code unit}s from {@code earlier} to {@code later}.
      */
@@ -273,8 +276,8 @@ public abstract class ___MappedTemporalInterval_Test<
      * Creates a new instance of {@link #intervalClass}.
      *
      * @return a new instance of {@link #intervalClass}, holding neither point.
-     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence requires
-     *           every entity to declare.
+     * @implSpec The default implementation invokes the no-argument constructor which Jakarta Persistence
+     *         requires every entity to declare.
      */
     protected I newIntervalInstance() {
         return ___Utils.newInstance(intervalClass);

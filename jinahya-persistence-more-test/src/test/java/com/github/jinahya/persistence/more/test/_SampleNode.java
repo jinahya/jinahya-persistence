@@ -5,8 +5,8 @@ import com.github.jinahya.persistence.more.__SelfReferencingParent;
 import com.github.jinahya.persistence.more.__SelfReferencingUtils;
 
 /**
- * A self-referencing sample which answers through the marked member, which is the path
- * {@link __SelfReferencing_Test} exists to check.
+ * A self-referencing sample which answers through the marked member, which is the path {@link __SelfReferencing_Test}
+ * exists to check.
  */
 class _SampleNode implements __SelfReferencing<_SampleNode> {
 

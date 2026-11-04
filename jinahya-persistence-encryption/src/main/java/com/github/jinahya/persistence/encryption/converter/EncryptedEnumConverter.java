@@ -3,6 +3,8 @@ package com.github.jinahya.persistence.encryption.converter;
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * The base of the converters of {@code enum} attributes: a constant is encoded by its {@link Enum#name() name}, never
  * its ordinal, so reordering constants is safe, and renaming one is a breaking change for the rows already written.
@@ -22,6 +24,8 @@ import com.github.jinahya.persistence.encryption.converter.ValueCodecs.OfLang;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 public abstract class EncryptedEnumConverter<E extends Enum<E>> extends EncryptedAttributeConverter<E> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance for the specified enum type.

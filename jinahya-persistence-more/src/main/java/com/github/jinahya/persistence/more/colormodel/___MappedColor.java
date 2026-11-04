@@ -27,6 +27,7 @@ import jakarta.persistence.Transient;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
@@ -95,6 +96,8 @@ import java.util.function.DoubleFunction;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class ___MappedColor implements Serializable {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     @Serial
     private static final long serialVersionUID = -3671525436570428941L;

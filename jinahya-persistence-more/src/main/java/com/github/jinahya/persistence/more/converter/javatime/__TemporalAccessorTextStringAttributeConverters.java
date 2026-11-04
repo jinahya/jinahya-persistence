@@ -19,9 +19,11 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * limitations under the License.
  * #L%
  */
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -38,25 +40,22 @@ import java.util.Locale;
  * {@link __TemporalAccessorTextStringAttributeConverter#DEFAULT_TEXT_STYLE full standalone} name in
  * {@link __TemporalAccessorTextStringAttributeConverter#DEFAULT_LOCALE English}, never in the default locale. The one
  * taking a {@link TextStyle} and a {@link Locale} is for holding the converter directly &mdash; composed into another,
- * or delegated to from one which <em>is</em> registered. Registering a converter for another language means
- * subclassing one of these and carrying {@link Converter @Converter} on the subclass, which is a constructor and an
- * annotation:
+ * or delegated to from one which <em>is</em> registered. Registering a converter for another language means subclassing
+ * one of these and carrying {@link Converter @Converter} on the subclass, which is a constructor and an annotation:
  * {@snippet lang = "java":
- * @Converter(autoApply = false)
- * public class KoreanDayOfWeekConverter extends __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek {
- *     public KoreanDayOfWeekConverter() {
- *         super(TextStyle.FULL_STANDALONE, Locale.KOREAN); // 월요일
- *     }
- * }
- * }
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
+ * @Converter(autoApply = false) public class KoreanDayOfWeekConverter extends
+ *         __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek { public KoreanDayOfWeekConverter() {
+ *         super(TextStyle.FULL_STANDALONE, Locale.KOREAN); // 월요일 }}}
  * @see __TemporalAccessorTextStringAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public final class __TemporalAccessorTextStringAttributeConverters {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     // -----------------------------------------------------------------------------------------------------------------
 

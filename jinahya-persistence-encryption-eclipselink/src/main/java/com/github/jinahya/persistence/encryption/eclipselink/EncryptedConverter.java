@@ -9,6 +9,8 @@ import org.eclipse.persistence.mappings.converters.Converter;
 import org.eclipse.persistence.mappings.foundation.AbstractDirectMapping;
 import org.eclipse.persistence.sessions.Session;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * EclipseLink's own way into the generic module: one named converter for every supported type, which picks the codec
  * from the mapped attribute's declared java type when the mapping is initialized, and makes the column binary.
@@ -48,6 +50,8 @@ import org.eclipse.persistence.sessions.Session;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 public class EncryptedConverter implements Converter {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     private static final long serialVersionUID = 1L;
 

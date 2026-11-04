@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.encryption.converter;
 
 import com.github.jinahya.persistence.encryption.EntityEncryptionService;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.ServiceLoader;
 
@@ -15,6 +16,8 @@ import java.util.ServiceLoader;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 final class EntityEncryptionServices {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     private static volatile EntityEncryptionService loaded;
 

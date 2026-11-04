@@ -71,9 +71,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *         A marked accessor has to take no arguments and return a value; anything else fails the lookup. Marking a
  *         field
  *         <em>and</em> its own accessor is allowed, and the accessor wins — reading through it is what lets an
- *         uninitialized
- *         proxy answer with its parent instead of with {@code null}, which is the one behavioural difference between
- *         the two placements; see {@link __SelfReferencingUtils#parentOf(__SelfReferencing) parentOf(instance)}.
+ *         uninitialized proxy answer with its parent instead of with {@code null}, which is the one behavioural
+ *         difference between the two placements; see
+ *         {@link __SelfReferencingUtils#parentOf(__SelfReferencing) parentOf(instance)}.
  *         <p>
  *         A marked accessor does not become {@link jakarta.persistence.Transient @Transient}, and does not stop being a
  *         mapping candidate, by virtue of this mark. Under {@link AccessType#PROPERTY PROPERTY} access an entity which

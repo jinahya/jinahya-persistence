@@ -2,6 +2,8 @@ package com.github.jinahya.persistence.more.converter.test;
 
 import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 
+import java.lang.invoke.MethodHandles;
+
 /**
  * An abstract class for testing {@link __StringAttributeConverter} implementations, whose database column type is
  * always {@link String}.
@@ -16,6 +18,8 @@ import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 })
 public abstract class __StringAttributeConverter_Test<C extends __StringAttributeConverter<X>, X>
         extends __AttributeConverter_Test<C, X, String> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance for testing the specified converter class.

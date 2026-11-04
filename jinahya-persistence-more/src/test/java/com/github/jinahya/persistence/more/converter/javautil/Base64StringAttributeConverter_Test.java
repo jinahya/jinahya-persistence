@@ -53,7 +53,7 @@ class Base64StringAttributeConverter_Test {
 
     // {0xFB, 0xFF} is the one which shows the alphabet, and its padding
     private static Stream<Arguments> texts() {
-        final var bytes = new byte[] {(byte) 0xFB, (byte) 0xFF};
+        final var bytes = new byte[]{(byte) 0xFB, (byte) 0xFF};
         return Stream.of(
                 Arguments.of(new Base64StringAttributeConverter.OfBasic(), bytes, "+/8="),
                 Arguments.of(new Base64StringAttributeConverter.OfBasicWithoutPadding(), bytes, "+/8"),
@@ -87,7 +87,7 @@ class Base64StringAttributeConverter_Test {
     @DisplayName("a converter reads its text with or without the padding")
     @Test
     void __padding() {
-        final var bytes = new byte[] {(byte) 0xFB, (byte) 0xFF};
+        final var bytes = new byte[]{(byte) 0xFB, (byte) 0xFF};
         assertThat(new Base64StringAttributeConverter.OfBasic().convertToEntityAttribute("+/8")).isEqualTo(bytes);
         assertThat(new Base64StringAttributeConverter.OfBasicWithoutPadding().convertToEntityAttribute("+/8="))
                 .isEqualTo(bytes);

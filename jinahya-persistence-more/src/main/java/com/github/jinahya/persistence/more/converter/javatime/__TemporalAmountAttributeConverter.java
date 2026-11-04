@@ -19,6 +19,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * limitations under the License.
  * #L%
  */
+
 import jakarta.persistence.AttributeConverter;
 
 import java.time.temporal.TemporalAmount;
@@ -28,11 +29,11 @@ import java.time.temporal.TemporalAmount;
  * and vice versa.
  * <p>
  * This is the attribute axis of this package for an amount of time: it fixes what the attribute is, and leaves the
- * column open, because the column a {@link java.time.Duration Duration} or a {@link java.time.Period Period} is kept
- * in is a schema's decision and not the amount's &mdash; its ISO-8601 text, or the one count it is measured by.
+ * column open, because the column a {@link java.time.Duration Duration} or a {@link java.time.Period Period} is kept in
+ * is a schema's decision and not the amount's &mdash; its ISO-8601 text, or the one count it is measured by.
  * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter __StringAttributeConverter} and
- * {@link com.github.jinahya.persistence.more.converter.__LongAttributeConverter __LongAttributeConverter} are the
- * other axis, fixing the column and leaving the attribute open; {@link __TemporalAmountStringAttributeConverter} and
+ * {@link com.github.jinahya.persistence.more.converter.__LongAttributeConverter __LongAttributeConverter} are the other
+ * axis, fixing the column and leaving the attribute open; {@link __TemporalAmountStringAttributeConverter} and
  * {@link __TemporalAmountLongAttributeConverter} are what sit on both.
  *
  * @param <X> temporal amount type parameter

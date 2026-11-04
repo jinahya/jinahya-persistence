@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HexFormat;
 import java.util.Objects;
 
@@ -47,16 +48,17 @@ import java.util.Objects;
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @implSpec A value is stored as {@link HexFormat#formatHex(byte[])}, two digits for each byte with no delimiter,
- *         and read back with {@link HexFormat#parseHex(CharSequence)} of {@link HexFormat#of()}, whichever case the
- *         converter writes in, as it reads the digits in either case: a converter reads a column the other one
- *         writes. The digits of the bytes sort, in either case, as the bytes
- *         do, compared as unsigned.
+ * @implSpec A value is stored as {@link HexFormat#formatHex(byte[])}, two digits for each byte with no
+ *         delimiter, and read back with {@link HexFormat#parseHex(CharSequence)} of {@link HexFormat#of()}, whichever
+ *         case the converter writes in, as it reads the digits in either case: a converter reads a column the other one
+ *         writes. The digits of the bytes sort, in either case, as the bytes do, compared as unsigned.
  * @apiNote The formats of a delimiter, a prefix or a suffix, which {@link HexFormat} also offers, are not among
  *         these converters.
  */
 public abstract class HexFormatStringAttributeConverter
         implements AttributeConverter<byte[], String> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Stores a value in lower case.

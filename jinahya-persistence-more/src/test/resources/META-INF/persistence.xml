@@ -26,7 +26,8 @@
              version="${persistence.version}">
   <persistence-unit name="__morePU">
     <description>Persistence Unit for exercising this module's mapped superclasses, converters and marks against
-      an in-memory DB</description>
+      an in-memory DB
+    </description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
     <class>com.github.jinahya.persistence.more.colormodel._RgbaEntity</class>
@@ -76,7 +77,8 @@
   </persistence-unit>
   <persistence-unit name="__temporalIntervalPU">
     <description>Persistence Unit for exercising the temporal-interval mapped superclasses against an in-memory
-      DB</description>
+      DB
+    </description>
     <provider>${persistence-unit.provider}</provider>
     <!-- listed explicitly: discovery of unlisted classes is provider-specific in Java SE -->
     <class>com.github.jinahya.persistence.more.temporalinterval._LocalDateIntervalEntity</class>
@@ -115,7 +117,8 @@
   </persistence-unit>
   <persistence-unit name="__orderedRangePU">
     <description>Persistence Unit for exercising the ordered-range mapped superclasses against an in-memory
-      DB</description>
+      DB
+    </description>
     <provider>${persistence-unit.provider}</provider>
     <class>com.github.jinahya.persistence.more.orderedrange._LocalDateRangeEntity</class>
     <class>com.github.jinahya.persistence.more.orderedrange._IntegerRangeEntity</class>

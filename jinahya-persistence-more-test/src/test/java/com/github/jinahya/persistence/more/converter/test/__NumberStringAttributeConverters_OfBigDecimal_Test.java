@@ -7,7 +7,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Tests {@link __NumberStringAttributeConverters.OfBigDecimal} against what every attribute converter is expected to do.
+ * Tests {@link __NumberStringAttributeConverters.OfBigDecimal} against what every attribute converter is expected to
+ * do.
  */
 class __NumberStringAttributeConverters_OfBigDecimal_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigDecimal, BigDecimal> {

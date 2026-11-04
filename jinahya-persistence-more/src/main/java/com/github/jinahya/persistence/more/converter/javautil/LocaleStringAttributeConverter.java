@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.IllformedLocaleException;
 import java.util.List;
@@ -75,18 +76,20 @@ import java.util.stream.Collectors;
  */
 public abstract class LocaleStringAttributeConverter implements __StringAttributeConverter<Locale> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     /**
      * A converter for an entity attribute of {@link Locale}, stored as its {@link Locale#getLanguage() language}.
      *
-     * @implSpec A value is stored as {@link Locale#getLanguage()} &mdash; {@code "ko"}, {@code "en"} &mdash; and
-     *         read back with {@link Locale#of(String)}, which is its inverse: the column reads back as the locale of
-     *         that language alone. A locale with no language, whose {@link Locale#getLanguage()} is empty
-     *         &mdash; {@link Locale#ROOT}, or a country-only locale &mdash; is stored as {@code null}, and an empty or
-     *         blank column reads back as {@code null}.
+     * @implSpec A value is stored as {@link Locale#getLanguage()} &mdash; {@code "ko"}, {@code "en"} &mdash;
+     *         and read back with {@link Locale#of(String)}, which is its inverse: the column reads back as the locale
+     *         of that language alone. A locale with no language, whose {@link Locale#getLanguage()} is empty &mdash;
+     *         {@link Locale#ROOT}, or a country-only locale &mdash; is stored as {@code null}, and an empty or blank
+     *         column reads back as {@code null}.
      * @apiNote Only the language is stored. Anything else the locale has &mdash; its country, script, variant,
      *         and extensions &mdash; is dropped: {@code en_US} and {@code en_GB} are both stored as {@code "en"}, and
-     *         read back as {@link Locale#ENGLISH}. {@link Locale#ROOT} does not survive a round trip; it reads back
-     *         as {@code null}.
+     *         read back as {@link Locale#ENGLISH}. {@link Locale#ROOT} does not survive a round trip; it reads back as
+     *         {@code null}.
      */
     @Converter(autoApply = false)
     public static class OfLanguage extends LocaleStringAttributeConverter
@@ -106,8 +109,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * {@inheritDoc}
          *
          * @param attribute {@inheritDoc}
-         * @return the language of the {@code attribute}; {@code null} when the {@code attribute} is {@code null},
-         *         or has no language.
+         * @return the language of the {@code attribute}; {@code null} when the {@code attribute} is {@code null}, or
+         *         has no language.
          */
         @Override
         public String convertToDatabaseColumn(final Locale attribute) {
@@ -125,8 +128,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * {@inheritDoc}
          *
          * @param dbData {@inheritDoc}
-         * @return the locale of the {@code dbData} language; {@code null} when the {@code dbData} is {@code null},
-         *         or blank.
+         * @return the locale of the {@code dbData} language; {@code null} when the {@code dbData} is {@code null}, or
+         *         blank.
          */
         @Override
         public Locale convertToEntityAttribute(final String dbData) {
@@ -138,8 +141,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
     }
 
     /**
-     * A converter for an entity attribute of {@link Locale}, stored as the {@link Locale#getISO3Language() three-letter
-     * code} of its language.
+     * A converter for an entity attribute of {@link Locale}, stored as the
+     * {@link Locale#getISO3Language() three-letter code} of its language.
      *
      * @implSpec A value is stored as {@link Locale#getISO3Language()} &mdash; {@code "kor"}, {@code "eng"},
      *         {@code "fil"} &mdash; and read back as the locale of that language alone: a code which is the
@@ -148,11 +151,11 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
      *         ({@code "fil"} as {@code fil}). A locale with no language is stored as {@code null}, and an empty or
      *         blank column reads back as {@code null}. A column is read case-insensitively.
      * @apiNote Only the language is stored, as {@link OfLanguage} stores it. A locale is refused, with an
-     *         {@link IllegalArgumentException}, when its language has no three-letter code, or when the code would
-     *         not read back as that language &mdash; {@code Locale.of("deu")}, whose code {@code "deu"} reads back as
+     *         {@link IllegalArgumentException}, when its language has no three-letter code, or when the code would not
+     *         read back as that language &mdash; {@code Locale.of("deu")}, whose code {@code "deu"} reads back as
      *         {@code de}. A column holding an ISO 639-2 bibliographic code &mdash; {@code "ger"} rather than
-     *         {@code "deu"} &mdash; is not one this converter writes, and reads back as a language of that code, not
-     *         as {@code de}.
+     *         {@code "deu"} &mdash; is not one this converter writes, and reads back as a language of that code, not as
+     *         {@code de}.
      */
     @Converter(autoApply = false)
     public static class OfISO3Language extends LocaleStringAttributeConverter
@@ -187,8 +190,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * @param attribute {@inheritDoc}
          * @return the three-letter code of the language of the {@code attribute}; {@code null} when the
          *         {@code attribute} is {@code null}, or has no language.
-         * @throws IllegalArgumentException when the language of the {@code attribute} has no three-letter code, or
-         *                                  the code does not read back as that language.
+         * @throws IllegalArgumentException when the language of the {@code attribute} has no three-letter code, or the
+         *                                  code does not read back as that language.
          */
         @Override
         public String convertToDatabaseColumn(final Locale attribute) {
@@ -254,14 +257,14 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
     /**
      * A converter for an entity attribute of {@link Locale}, stored as its {@link Locale#getCountry() country}.
      *
-     * @implSpec A value is stored as {@link Locale#getCountry()} &mdash; {@code "KR"}, {@code "US"}, {@code "419"}
-     *         &mdash; and read back with {@link Locale#of(String, String) Locale.of("", country)}, which is its
-     *         inverse: the column reads back as the locale of that country alone. A locale with no country, whose
-     *         {@link Locale#getCountry()} is empty, is stored as {@code null}, and an empty or blank column reads back
-     *         as {@code null}.
-     * @apiNote Only the country is stored. Anything else the locale has &mdash; its language, script, variant, and
-     *         extensions &mdash; is dropped: {@code ko_KR} and {@code en_KR} are both stored as {@code "KR"}, and read
-     *         back as a locale of no language, which {@link OfLanguage} stores as {@code null}. A UN M.49 region
+     * @implSpec A value is stored as {@link Locale#getCountry()} &mdash; {@code "KR"}, {@code "US"},
+     *         {@code "419"} &mdash; and read back with {@link Locale#of(String, String) Locale.of("", country)}, which
+     *         is its inverse: the column reads back as the locale of that country alone. A locale with no country,
+     *         whose {@link Locale#getCountry()} is empty, is stored as {@code null}, and an empty or blank column reads
+     *         back as {@code null}.
+     * @apiNote Only the country is stored. Anything else the locale has &mdash; its language, script, variant,
+     *         and extensions &mdash; is dropped: {@code ko_KR} and {@code en_KR} are both stored as {@code "KR"}, and
+     *         read back as a locale of no language, which {@link OfLanguage} stores as {@code null}. A UN M.49 region
      *         &mdash; {@code "419"}, {@code "150"} &mdash; takes three characters.
      */
     @Converter(autoApply = false)
@@ -282,8 +285,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * {@inheritDoc}
          *
          * @param attribute {@inheritDoc}
-         * @return the country of the {@code attribute}; {@code null} when the {@code attribute} is {@code null}, or
-         *         has no country.
+         * @return the country of the {@code attribute}; {@code null} when the {@code attribute} is {@code null}, or has
+         *         no country.
          */
         @Override
         public String convertToDatabaseColumn(final Locale attribute) {
@@ -314,17 +317,17 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
     }
 
     /**
-     * A converter for an entity attribute of {@link Locale}, stored as the {@link Locale#getISO3Country() three-letter
-     * code} of its country.
+     * A converter for an entity attribute of {@link Locale}, stored as the
+     * {@link Locale#getISO3Country() three-letter code} of its country.
      *
-     * @implSpec A value is stored as {@link Locale#getISO3Country()} &mdash; {@code "KOR"}, {@code "USA"} &mdash; and
-     *         read back as the locale of the {@link Locale#getISOCountries() ISO 3166 alpha-2 country} of that code
-     *         alone ({@code "KOR"} as {@code _KR}). A locale with no country is stored as {@code null}, and an empty
-     *         or blank column reads back as {@code null}. A column is read case-insensitively.
+     * @implSpec A value is stored as {@link Locale#getISO3Country()} &mdash; {@code "KOR"}, {@code "USA"}
+     *         &mdash; and read back as the locale of the {@link Locale#getISOCountries() ISO 3166 alpha-2 country} of
+     *         that code alone ({@code "KOR"} as {@code _KR}). A locale with no country is stored as {@code null}, and
+     *         an empty or blank column reads back as {@code null}. A column is read case-insensitively.
      * @apiNote Only the country is stored, as {@link OfCountry} stores it. A locale is refused, with an
-     *         {@link IllegalArgumentException}, when its country has no three-letter code &mdash; a UN M.49 region
-     *         such as {@code "419"}, or a code outside ISO 3166 such as {@code "XK"} &mdash; and so is a column which
-     *         is the three-letter code of no ISO 3166 country.
+     *         {@link IllegalArgumentException}, when its country has no three-letter code &mdash; a UN M.49 region such
+     *         as {@code "419"}, or a code outside ISO 3166 such as {@code "XK"} &mdash; and so is a column which is the
+     *         three-letter code of no ISO 3166 country.
      */
     @Converter(autoApply = false)
     public static class OfISO3Country extends LocaleStringAttributeConverter
@@ -352,8 +355,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * @param attribute {@inheritDoc}
          * @return the three-letter code of the country of the {@code attribute}; {@code null} when the
          *         {@code attribute} is {@code null}, or has no country.
-         * @throws IllegalArgumentException when the country of the {@code attribute} has no three-letter code, or
-         *                                  the code does not read back as that country.
+         * @throws IllegalArgumentException when the country of the {@code attribute} has no three-letter code, or the
+         *                                  code does not read back as that country.
          */
         @Override
         public String convertToDatabaseColumn(final Locale attribute) {
@@ -398,17 +401,17 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
     }
 
     /**
-     * A converter for an entity attribute of {@link Locale}, stored as its {@link Locale#toLanguageTag() IETF BCP 47
-     * language tag}.
+     * A converter for an entity attribute of {@link Locale}, stored as its
+     * {@link Locale#toLanguageTag() IETF BCP 47 language tag}.
      *
-     * @implSpec A value is stored as {@link Locale#toLanguageTag()} &mdash; {@code "ko-KR"}, {@code "zh-Hans-CN"},
-     *         {@code "ja-JP-u-ca-japanese-x-lvariant-JP"}, {@code "und"} for {@link Locale#ROOT} &mdash; and read back
-     *         with {@link Locale.Builder#setLanguageTag(String)}, which reads it as
+     * @implSpec A value is stored as {@link Locale#toLanguageTag()} &mdash; {@code "ko-KR"},
+     *         {@code "zh-Hans-CN"}, {@code "ja-JP-u-ca-japanese-x-lvariant-JP"}, {@code "und"} for {@link Locale#ROOT}
+     *         &mdash; and read back with {@link Locale.Builder#setLanguageTag(String)}, which reads it as
      *         {@link Locale#forLanguageTag(String)} does, but refuses an ill-formed tag rather than dropping what
      *         follows the first ill-formed subtag. The whole locale is stored, and reads back equal to it. An empty or
      *         blank column reads back as {@code null}.
-     * @apiNote {@link Locale#toLanguageTag()} drops the fields of a locale which are ill-formed in BCP 47, so a locale
-     *         is refused, with an {@link IllegalArgumentException}, when its tag does not read back equal to it
+     * @apiNote {@link Locale#toLanguageTag()} drops the fields of a locale which are ill-formed in BCP 47, so a
+     *         locale is refused, with an {@link IllegalArgumentException}, when its tag does not read back equal to it
      *         &mdash; {@code Locale.of("en", "U S")}, whose tag is {@code "en"}, or the legacy {@code no_NO_NY}, whose
      *         tag {@code "nn-NO"} reads back as {@code nn_NO}. A column is read case-insensitively, and a tag
      *         equivalent to one this converter writes &mdash; {@code "KO-kr"}, extensions in another order, a
@@ -453,8 +456,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * {@inheritDoc}
          *
          * @param dbData {@inheritDoc}
-         * @return the locale of the {@code dbData} language tag; {@code null} when the {@code dbData} is
-         *         {@code null}, or blank.
+         * @return the locale of the {@code dbData} language tag; {@code null} when the {@code dbData} is {@code null},
+         *         or blank.
          * @throws IllegalArgumentException when the {@code dbData} is not a well-formed language tag.
          */
         @Override
@@ -502,16 +505,16 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
      * the extensions &mdash; which is matched, and dropped: {@code "zh_CN_#Hans"} reads as
      * {@code Locale.of("zh", "CN")}.
      *
-     * @implSpec Neither conversion fails. A locale's script and extensions are dropped when it is stored, and a locale
-     *         with neither a language, a country nor a variant &mdash; {@link Locale#ROOT} &mdash; is stored as
+     * @implSpec Neither conversion fails. A locale's script and extensions are dropped when it is stored, and a
+     *         locale with neither a language, a country nor a variant &mdash; {@link Locale#ROOT} &mdash; is stored as
      *         {@code null}. One of the patterns matches every column, as a column has no {@code '_'}, one, or more
      *         before its first {@code '#'}; and each part is read as {@link Locale#of(String, String, String)} reads
      *         it, which validates nothing, lower-cases the language, upper-cases the country and maps a legacy language
      *         ({@code "iw"} reads back as {@code he}). An empty or blank column reads back as {@code null}.
      * @apiNote A locale of no script and no extensions reads back equal to itself; so do {@code ja_JP_JP} and
-     *         {@code th_TH_TH}, whose extension {@link Locale#of(String, String, String)} adds itself. Any other
-     *         locale reads back without its script and extensions. A column holding a language tag is not one this
-     *         converter reads: {@code "ko-KR"} reads back as a language {@code "ko-kr"}, not as {@code ko_KR}.
+     *         {@code th_TH_TH}, whose extension {@link Locale#of(String, String, String)} adds itself. Any other locale
+     *         reads back without its script and extensions. A column holding a language tag is not one this converter
+     *         reads: {@code "ko-KR"} reads back as a language {@code "ko-kr"}, not as {@code ko_KR}.
      */
     @Converter(autoApply = false)
     public static class OfLenient extends LocaleStringAttributeConverter
@@ -585,8 +588,8 @@ public abstract class LocaleStringAttributeConverter implements __StringAttribut
          * @param dbData {@inheritDoc}
          * @return the locale of the {@code dbData}'s language, country and variant; {@code null} when the
          *         {@code dbData} is {@code null}, or blank.
-         * @implSpec The {@code dbData} is matched against the patterns of three parts, of two and of one, in that
-         *         order, and read by the first which matches it.
+         * @implSpec The {@code dbData} is matched against the patterns of three parts, of two and of one, in
+         *         that order, and read by the first which matches it.
          */
         @Override
         public Locale convertToEntityAttribute(final String dbData) {

@@ -40,7 +40,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Base64;
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
@@ -57,6 +57,8 @@ import java.util.Objects;
  */
 public abstract class JaxbAttributeConverter<X, Y>
         implements AttributeConverter<X, Y> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Stores a value as the XML text.

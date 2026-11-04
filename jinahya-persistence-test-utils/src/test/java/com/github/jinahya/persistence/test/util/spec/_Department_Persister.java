@@ -6,9 +6,9 @@ import com.github.jinahya.persistence.test.util.AbstractEntityPersister;
  * The persister located, by the naming convention, for {@link _Department}.
  * <p>
  * A department requires nothing to be persisted first, so this class adds nothing to
- * {@link AbstractEntityPersister#apply(jakarta.persistence.EntityManager, Object)}. It exists because the
- * convention is what makes a class persistable at all: without it, {@link _Employee_Persister} could not ask for
- * a persisted department.
+ * {@link AbstractEntityPersister#apply(jakarta.persistence.EntityManager, Object)}. It exists because the convention is
+ * what makes a class persistable at all: without it, {@link _Employee_Persister} could not ask for a persisted
+ * department.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */

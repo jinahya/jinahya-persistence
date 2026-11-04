@@ -23,6 +23,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+import java.lang.invoke.MethodHandles;
 import java.time.DateTimeException;
 import java.time.ZoneOffset;
 
@@ -34,7 +35,8 @@ import java.time.ZoneOffset;
  * {@link java.time.ZoneId} holds an offset or a region, {@link ZoneIdStringAttributeConverter} stores it.
  * <p>
  * It implements {@link AttributeConverter AttributeConverter&lt;ZoneOffset, String&gt;} itself, not the parent's column
- * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a converter's column type from the type arguments of the interface the class names, as
+ * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a
+ * converter's column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -42,13 +44,15 @@ import java.time.ZoneOffset;
 @Converter(autoApply = false)
 public class ZoneOffsetStringAttributeConverter implements AttributeConverter<ZoneOffset, String> {
 
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
+
     // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
      * Creates a new instance.
      *
-     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by the
-     *         persistence provider, and is documented as needing a public no-argument constructor.
+     * @implNote {@code public}, not {@code protected}: a {@link Converter @Converter} class is instantiated by
+     *         the persistence provider, and is documented as needing a public no-argument constructor.
      */
     public ZoneOffsetStringAttributeConverter() {
         super();

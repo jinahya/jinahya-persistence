@@ -20,11 +20,12 @@ package com.github.jinahya.persistence.more.test;
  * #L%
  */
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 
 /**
- * Utilities shared by the abstract test classes of this package and of the sibling {@code .test}
- * packages mirroring what {@code jinahya-persistence-more} lays out.
+ * Utilities shared by the abstract test classes of this package and of the sibling {@code .test} packages mirroring
+ * what {@code jinahya-persistence-more} lays out.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -33,6 +34,8 @@ import java.util.Objects;
         "java:S3011" // Reflection should not be used to increase accessibility of classes, methods, or fields
 })
 public final class ___Utils {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * Creates a new instance of the specified class, using its no-argument constructor.

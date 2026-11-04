@@ -13,8 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @DisplayName("OfPeriod")
-class __TemporalAmountStringAttributeConverter_OfPeriod_Test
- {
+class __TemporalAmountStringAttributeConverter_OfPeriod_Test {
 
     private final __TemporalAmountStringAttributeConverters.OfPeriod converter =
             new __TemporalAmountStringAttributeConverters.OfPeriod();
@@ -43,5 +42,4 @@ class __TemporalAmountStringAttributeConverter_OfPeriod_Test
         assertThat(read.getYears()).isZero();
         assertThat(read.getMonths()).isEqualTo(14);
     }
-
 }

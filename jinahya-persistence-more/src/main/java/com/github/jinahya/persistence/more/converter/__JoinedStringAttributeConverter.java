@@ -22,6 +22,7 @@ package com.github.jinahya.persistence.more.converter;
 
 import jakarta.persistence.AttributeConverter;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +51,8 @@ import java.util.regex.Pattern;
         "java:S101" // Class names should comply with a naming convention
 })
 public class __JoinedStringAttributeConverter<X> implements __StringAttributeConverter<List<X>> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * An abstract class for converting a {@link List} of {@link String} elements, which requires no element

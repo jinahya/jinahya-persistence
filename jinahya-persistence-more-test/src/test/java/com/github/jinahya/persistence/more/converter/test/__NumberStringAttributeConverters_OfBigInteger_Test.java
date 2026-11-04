@@ -6,7 +6,8 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * Tests {@link __NumberStringAttributeConverters.OfBigInteger} against what every attribute converter is expected to do.
+ * Tests {@link __NumberStringAttributeConverters.OfBigInteger} against what every attribute converter is expected to
+ * do.
  */
 class __NumberStringAttributeConverters_OfBigInteger_Test
         extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigInteger, BigInteger> {

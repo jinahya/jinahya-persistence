@@ -24,6 +24,7 @@ import com.github.jinahya.persistence.more.AttributeEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -52,6 +53,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "java:S119"  // Type parameter names should comply with a naming convention
 })
 public abstract class AttributeEnum_Test<ENUM extends Enum<ENUM> & AttributeEnum<ENUM, ATTRIBUTE>, ATTRIBUTE> {
+
+    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
     /**
      * An abstract base class for testing {@link AttributeEnum.OfString} implementations.

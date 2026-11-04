@@ -5,7 +5,9 @@ import com.github.jinahya.persistence.more.__SelfReferencingOrdinal;
 import com.github.jinahya.persistence.more.__SelfReferencingParent;
 import com.github.jinahya.persistence.more.__SelfReferencingUtils;
 
-/** A hierarchy a downstream maps, answering through the marked members. */
+/**
+ * A hierarchy a downstream maps, answering through the marked members.
+ */
 public class DownstreamNode implements __SelfReferencingOrdered<DownstreamNode> {
 
     @Override

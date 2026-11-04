@@ -9,10 +9,12 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAccessorStringAttributeConverters.OfOffsetDateTime} against what every attribute converter is expected to do.
+ * Tests {@link __TemporalAccessorStringAttributeConverters.OfOffsetDateTime} against what every attribute converter is
+ * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfOffsetDateTime_Test
-        extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetDateTime, OffsetDateTime> {
+        extends
+        __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetDateTime, OffsetDateTime> {
 
     __TemporalAccessorStringAttributeConverters_OfOffsetDateTime_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfOffsetDateTime.class);
@@ -21,7 +23,9 @@ class __TemporalAccessorStringAttributeConverters_OfOffsetDateTime_Test
     @Override
     protected List<__AttributeConverterTestCase<OffsetDateTime, String>> testCases() {
         return List.of(
-                __AttributeConverterTestCase.of(OffsetDateTime.of(LocalDateTime.of(2026, 9, 19, 11, 22, 33), ZoneOffset.ofHours(9)), OffsetDateTime.of(LocalDateTime.of(2026, 9, 19, 11, 22, 33), ZoneOffset.ofHours(9)).toString())
+                __AttributeConverterTestCase.of(
+                        OffsetDateTime.of(LocalDateTime.of(2026, 9, 19, 11, 22, 33), ZoneOffset.ofHours(9)),
+                        OffsetDateTime.of(LocalDateTime.of(2026, 9, 19, 11, 22, 33), ZoneOffset.ofHours(9)).toString())
         );
     }
 }
