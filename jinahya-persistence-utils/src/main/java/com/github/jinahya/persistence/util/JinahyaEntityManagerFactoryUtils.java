@@ -20,11 +20,15 @@ package com.github.jinahya.persistence.util;
  * #L%
  */
 
+import jakarta.persistence.ConnectionConsumer;
+import jakarta.persistence.ConnectionFunction;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceException;
 import jakarta.persistence.PersistenceUnitUtil;
 
 import java.lang.invoke.MethodHandles;
+import java.sql.Connection;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -63,6 +67,7 @@ public final class JinahyaEntityManagerFactoryUtils {
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
     /**
      * Applies a new entity manager of the specified entity manager factory to the specified function, in a
      * resource-level transaction which is rolled back, and closes the entity manager.
@@ -99,12 +104,12 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @return the result of the {@code function}.
      * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
      *                               transaction to start.
+     * @apiNote Jakarta Persistence 3.2 has {@link EntityManagerFactory#callInTransaction(Function)} for the same,
+     *         which works for a JTA factory as well; this one is the counterpart of
+     *         {@link #applyEntityManagerInTransactionAndRollback(EntityManagerFactory, Function)}.
      * @see #applyEntityManager(EntityManagerFactory, Function)
      * @see JinahyaEntityManagerUtils#applyInTransactionAndCommit(EntityManager, Function)
-     * @deprecated Jakarta Persistence 3.2 has the same of its own; use
-     *         {@link EntityManagerFactory#callInTransaction(Function)}, which also works for a JTA factory.
      */
-    @Deprecated(forRemoval = true)
     public static <R> R applyEntityManagerInTransactionAndCommit(
             final EntityManagerFactory factory,
             final Function<? super EntityManager, ? extends R> function) {
@@ -112,6 +117,115 @@ public final class JinahyaEntityManagerFactoryUtils {
         return applyEntityManager(
                 factory,
                 em -> applyInTransactionAndCommit(em, function)
+        );
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * Applies the {@link Connection} underlying a new entity manager of the specified entity manager factory to the
+     * specified function, in a resource-level transaction which is rolled back, and closes the entity manager.
+     *
+     * @param factory  the entity manager factory.
+     * @param function the function to be applied with the connection.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
+     *                               transaction to start.
+     * @throws PersistenceException  wrapping what the {@code function} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one is
+     *         active, and hands a {@code null} to the {@code function} otherwise. Nothing the {@code function} does
+     *         stays in the database. The connection is the provider's; the {@code function} must neither close it nor
+     *         commit or roll back on it.
+     * @see JinahyaEntityManagerUtils#applyConnectionInTransactionAndRollback(EntityManager, ConnectionFunction)
+     */
+    public static <R> R applyConnectionInTransactionAndRollback(
+            final EntityManagerFactory factory,
+            final ConnectionFunction<? super Connection, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManager(
+                factory,
+                em -> JinahyaEntityManagerUtils.applyConnectionInTransactionAndRollback(em, function)
+        );
+    }
+
+    /**
+     * Applies the {@link Connection} underlying a new entity manager of the specified entity manager factory to the
+     * specified function, in a resource-level transaction which is committed, and closes the entity manager.
+     *
+     * @param factory  the entity manager factory.
+     * @param function the function to be applied with the connection.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
+     *                               transaction to start.
+     * @throws PersistenceException  wrapping what the {@code function} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one is
+     *         active, and hands a {@code null} to the {@code function} otherwise. The connection is the provider's; the
+     *         {@code function} must neither close it nor commit or roll back on it.
+     * @see JinahyaEntityManagerUtils#applyConnectionInTransactionAndCommit(EntityManager, ConnectionFunction)
+     */
+    public static <R> R applyConnectionInTransactionAndCommit(
+            final EntityManagerFactory factory,
+            final ConnectionFunction<? super Connection, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyEntityManager(
+                factory,
+                em -> JinahyaEntityManagerUtils.applyConnectionInTransactionAndCommit(em, function)
+        );
+    }
+
+    /**
+     * Accepts the {@link Connection} underlying a new entity manager of the specified entity manager factory to the
+     * specified action, in a resource-level transaction which is rolled back, and closes the entity manager.
+     *
+     * @param factory the entity manager factory.
+     * @param action  the action to be accepted with the connection.
+     * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
+     *                               transaction to start.
+     * @throws PersistenceException  wrapping what the {@code action} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one is
+     *         active, and hands a {@code null} to the {@code action} otherwise. Nothing the {@code action} does stays
+     *         in the database. The connection is the provider's; the {@code action} must neither close it nor commit
+     *         or roll back on it.
+     * @see JinahyaEntityManagerUtils#acceptConnectionInTransactionAndRollback(EntityManager, ConnectionConsumer)
+     */
+    public static void acceptConnectionInTransactionAndRollback(
+            final EntityManagerFactory factory,
+            final ConnectionConsumer<? super Connection> action) {
+        Objects.requireNonNull(action, "action is null");
+        applyEntityManager(
+                factory,
+                em -> {
+                    JinahyaEntityManagerUtils.acceptConnectionInTransactionAndRollback(em, action);
+                    return null;
+                }
+        );
+    }
+
+    /**
+     * Accepts the {@link Connection} underlying a new entity manager of the specified entity manager factory to the
+     * specified action, in a resource-level transaction which is committed, and closes the entity manager.
+     *
+     * @param factory the entity manager factory.
+     * @param action  the action to be accepted with the connection.
+     * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
+     *                               transaction to start.
+     * @throws PersistenceException  wrapping what the {@code action} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one is
+     *         active, and hands a {@code null} to the {@code action} otherwise. The connection is the provider's; the
+     *         {@code action} must neither close it nor commit or roll back on it.
+     * @see JinahyaEntityManagerUtils#acceptConnectionInTransactionAndCommit(EntityManager, ConnectionConsumer)
+     */
+    public static void acceptConnectionInTransactionAndCommit(
+            final EntityManagerFactory factory,
+            final ConnectionConsumer<? super Connection> action) {
+        Objects.requireNonNull(action, "action is null");
+        applyEntityManager(
+                factory,
+                em -> {
+                    JinahyaEntityManagerUtils.acceptConnectionInTransactionAndCommit(em, action);
+                    return null;
+                }
         );
     }
 

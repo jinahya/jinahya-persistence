@@ -1,16 +1,26 @@
 package com.github.jinahya.persistence.util;
 
+import jakarta.persistence.ConnectionConsumer;
+import jakarta.persistence.ConnectionFunction;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceUnitUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -144,6 +154,109 @@ class JinahyaEntityManagerFactoryUtils_Test {
             assertThatThrownBy(() -> JinahyaEntityManagerFactoryUtils.applyEntityManager(factory, null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("function");
+        }
+    }
+
+    @DisplayName("apply|acceptConnectionInTransactionAndRollback|Commit(factory, function|action)")
+    @Nested
+    class ApplyConnectionInTransaction_Test {
+
+        private EntityManager manager;
+
+        private EntityTransaction transaction;
+
+        private Connection connection;
+
+        @BeforeEach
+        void mockManager() {
+            manager = mock(EntityManager.class);
+            transaction = mock(EntityTransaction.class);
+            connection = mock(Connection.class);
+            when(factory.createEntityManager()).thenReturn(manager);
+            when(manager.getTransaction()).thenReturn(transaction);
+            // the way a provider does: the function is invoked with the connection
+            when(manager.callWithConnection(any())).thenAnswer(
+                    i -> i.<ConnectionFunction<Connection, ?>>getArgument(0).apply(connection));
+            doAnswer(i -> {
+                i.<ConnectionConsumer<Connection>>getArgument(0).accept(connection);
+                return null;
+            }).when(manager).runWithConnection(any());
+        }
+
+        @DisplayName("the function gets the connection in a transaction, which is rolled back")
+        @Test
+        void __rolledBack() {
+            final Connection applied = JinahyaEntityManagerFactoryUtils.applyConnectionInTransactionAndRollback(
+                    factory, c -> c);
+
+            assertThat(applied).isSameAs(connection);
+            verify(transaction).begin();
+            verify(transaction).rollback();
+            verify(transaction, never()).commit();
+            verify(manager).close();
+        }
+
+        @DisplayName("the function gets the connection in a transaction, which is committed")
+        @Test
+        void __committed() {
+            final Connection applied = JinahyaEntityManagerFactoryUtils.applyConnectionInTransactionAndCommit(
+                    factory, c -> c);
+
+            assertThat(applied).isSameAs(connection);
+            verify(transaction).begin();
+            verify(transaction).commit();
+            verify(transaction, never()).rollback();
+            verify(manager).close();
+        }
+
+        @DisplayName("the action gets the connection in a transaction, which is rolled back")
+        @Test
+        void __acceptedAndRolledBack() {
+            final var accepted = new AtomicReference<Connection>();
+
+            JinahyaEntityManagerFactoryUtils.acceptConnectionInTransactionAndRollback(factory, accepted::set);
+
+            assertThat(accepted).hasValue(connection);
+            verify(transaction).begin();
+            verify(transaction).rollback();
+            verify(transaction, never()).commit();
+            verify(manager).close();
+        }
+
+        @DisplayName("the action gets the connection in a transaction, which is committed")
+        @Test
+        void __acceptedAndCommitted() {
+            final var accepted = new AtomicReference<Connection>();
+
+            JinahyaEntityManagerFactoryUtils.acceptConnectionInTransactionAndCommit(factory, accepted::set);
+
+            assertThat(accepted).hasValue(connection);
+            verify(transaction).begin();
+            verify(transaction).commit();
+            verify(transaction, never()).rollback();
+            verify(manager).close();
+        }
+
+        @DisplayName("null arguments are rejected by name, before any entity manager is created")
+        @Test
+        void _NullPointerException_ForNullArguments() {
+            assertThatThrownBy(
+                    () -> JinahyaEntityManagerFactoryUtils.applyConnectionInTransactionAndRollback(factory, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("function");
+            assertThatThrownBy(
+                    () -> JinahyaEntityManagerFactoryUtils.applyConnectionInTransactionAndCommit(factory, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("function");
+            assertThatThrownBy(
+                    () -> JinahyaEntityManagerFactoryUtils.acceptConnectionInTransactionAndRollback(factory, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("action");
+            assertThatThrownBy(
+                    () -> JinahyaEntityManagerFactoryUtils.acceptConnectionInTransactionAndCommit(factory, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessageContaining("action");
+            verify(factory, never()).createEntityManager();
         }
     }
 }

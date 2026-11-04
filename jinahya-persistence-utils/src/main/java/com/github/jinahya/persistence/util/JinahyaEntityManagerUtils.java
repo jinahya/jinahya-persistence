@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.util;
  * #L%
  */
 
+import jakarta.persistence.ConnectionConsumer;
 import jakarta.persistence.ConnectionFunction;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -226,6 +227,132 @@ public final class JinahyaEntityManagerUtils {
             }
             throw (Error) caught;
         }
+    }
+
+    /**
+     * Applies the {@link Connection} underlying the specified entity manager to the specified function, in a
+     * resource-level transaction which is rolled back, and returns the result.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied with the connection.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
+     *                                  transaction to start.
+     * @throws PersistenceException     wrapping what the {@code function} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one
+     *         is active, and hands a {@code null} to the {@code function} otherwise. Nothing the {@code function} does
+     *         stays in the database. The connection is the provider's; the {@code function} must neither close it nor
+     *         commit or roll back on it.
+     *         <p>
+     *         A {@code manager} already in a transaction needs none of this; call
+     *         {@link EntityManager#callWithConnection(ConnectionFunction)} on it directly.
+     * @see #applyInTransactionAndRollback(EntityManager, Function)
+     * @see EntityManager#callWithConnection(ConnectionFunction)
+     */
+    public static <R> R applyConnectionInTransactionAndRollback(
+            final EntityManager manager,
+            final ConnectionFunction<? super Connection, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyInTransactionAndRollback(
+                manager,
+                em -> em.<Connection, R>callWithConnection(function::apply)
+        );
+    }
+
+    /**
+     * Applies the {@link Connection} underlying the specified entity manager to the specified function, in a
+     * resource-level transaction which is committed, and returns the result.
+     *
+     * @param manager  the entity manager.
+     * @param function the function to be applied with the connection.
+     * @param <R>      result type parameter
+     * @return the result of the {@code function}.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
+     *                                  transaction to start.
+     * @throws PersistenceException     wrapping what the {@code function} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one
+     *         is active, and hands a {@code null} to the {@code function} otherwise. The connection is the provider's;
+     *         the {@code function} must neither close it nor commit or roll back on it.
+     *         <p>
+     *         A {@code manager} already in a transaction needs none of this; call
+     *         {@link EntityManager#callWithConnection(ConnectionFunction)} on it directly.
+     * @see #applyInTransactionAndCommit(EntityManager, Function)
+     * @see EntityManager#callWithConnection(ConnectionFunction)
+     */
+    public static <R> R applyConnectionInTransactionAndCommit(
+            final EntityManager manager,
+            final ConnectionFunction<? super Connection, ? extends R> function) {
+        Objects.requireNonNull(function, "function is null");
+        return applyInTransactionAndCommit(
+                manager,
+                em -> em.<Connection, R>callWithConnection(function::apply)
+        );
+    }
+
+    /**
+     * Accepts the {@link Connection} underlying the specified entity manager to the specified action, in a
+     * resource-level transaction which is rolled back, and returns.
+     *
+     * @param manager the entity manager.
+     * @param action  the action to be accepted with the connection.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
+     *                                  transaction to start.
+     * @throws PersistenceException     wrapping what the {@code action} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one
+     *         is active, and hands a {@code null} to the {@code action} otherwise. Nothing the {@code action} does
+     *         stays in the database. The connection is the provider's; the {@code action} must neither close it nor
+     *         commit or roll back on it.
+     *         <p>
+     *         A {@code manager} already in a transaction needs none of this; call
+     *         {@link EntityManager#runWithConnection(ConnectionConsumer)} on it directly.
+     * @see #applyInTransactionAndRollback(EntityManager, Function)
+     * @see EntityManager#runWithConnection(ConnectionConsumer)
+     */
+    public static void acceptConnectionInTransactionAndRollback(final EntityManager manager,
+                                                                final ConnectionConsumer<? super Connection> action) {
+        Objects.requireNonNull(action, "action is null");
+        applyInTransactionAndRollback(
+                manager,
+                em -> {
+                    em.<Connection>runWithConnection(action::accept);
+                    return null;
+                }
+        );
+    }
+
+    /**
+     * Accepts the {@link Connection} underlying the specified entity manager to the specified action, in a
+     * resource-level transaction which is committed, and returns.
+     *
+     * @param manager the entity manager.
+     * @param action  the action to be accepted with the connection.
+     * @throws IllegalArgumentException when the {@code manager} is already joined to a transaction.
+     * @throws IllegalStateException    when the {@code manager} is a JTA entity manager, which has no resource-level
+     *                                  transaction to start.
+     * @throws PersistenceException     wrapping what the {@code action} throws, as the provider does.
+     * @apiNote The transaction is what makes this portable: EclipseLink hands out a connection only while one
+     *         is active, and hands a {@code null} to the {@code action} otherwise. The connection is the provider's;
+     *         the {@code action} must neither close it nor commit or roll back on it.
+     *         <p>
+     *         A {@code manager} already in a transaction needs none of this; call
+     *         {@link EntityManager#runWithConnection(ConnectionConsumer)} on it directly.
+     * @see #applyInTransactionAndCommit(EntityManager, Function)
+     * @see EntityManager#runWithConnection(ConnectionConsumer)
+     */
+    public static void acceptConnectionInTransactionAndCommit(final EntityManager manager,
+                                                              final ConnectionConsumer<? super Connection> action) {
+        Objects.requireNonNull(action, "action is null");
+        applyInTransactionAndCommit(
+                manager,
+                em -> {
+                    em.<Connection>runWithConnection(action::accept);
+                    return null;
+                }
+        );
     }
 
     // -----------------------------------------------------------------------------------------------------------------
