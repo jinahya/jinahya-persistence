@@ -99,13 +99,12 @@ public final class JinahyaEntityManagerFactoryUtils {
      * @return the result of the {@code function}.
      * @throws IllegalStateException when the {@code factory} is a JTA one, whose entity managers have no resource-level
      *                               transaction to start.
-     * @apiNote Jakarta Persistence 3.2 has {@link EntityManagerFactory#callInTransaction(Function)} for the
-     *         same, which works for a JTA factory as well; this one is the counterpart of
-     *         {@link #applyEntityManagerInTransactionAndRollback(EntityManagerFactory, Function)}, and fails the same
-     *         way, through {@link JinahyaEntityManagerUtils#applyInTransaction(EntityManager, Function, boolean)}.
      * @see #applyEntityManager(EntityManagerFactory, Function)
      * @see JinahyaEntityManagerUtils#applyInTransactionAndCommit(EntityManager, Function)
+     * @deprecated Jakarta Persistence 3.2 has the same of its own; use
+     *         {@link EntityManagerFactory#callInTransaction(Function)}, which also works for a JTA factory.
      */
+    @Deprecated(forRemoval = true)
     public static <R> R applyEntityManagerInTransactionAndCommit(
             final EntityManagerFactory factory,
             final Function<? super EntityManager, ? extends R> function) {
