@@ -23,156 +23,100 @@ package com.github.jinahya.persistence.metamodel.util;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.ManagedType;
-import jakarta.persistence.metamodel.Metamodel;
-import jakarta.persistence.metamodel.SingularAttribute;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 /**
- * A utility class for {@link ManagedType}.
+ * A utility class for {@link ManagedType}, under its misspelled name.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see JinahyaEntityTypeUtils
+ * @deprecated The name is misspelled; use {@link JinahyaManagedTypeUtils}, which each method of this class merely
+ *         calls.
  */
+@Deprecated(forRemoval = true)
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public final class JinayaManagedTypeUtils {
 
-    private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
-
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
      * Finds the {@link ManagedType} of the specified type class in the metamodel of the specified entity manager
      * factory.
      *
-     * @param typeClass            the class whose {@link ManagedType} is returned; it does not have to be an entity
-     *                             class.
+     * @param typeClass            the class whose {@link ManagedType} is returned.
      * @param entityManagerFactory the entity manager factory to look the {@code typeClass} up in.
      * @param <X>                  represented type
-     * @return an optional of the {@link ManagedType} of the {@code typeClass}; {@link Optional#empty() empty} when the
-     *         {@code entityManagerFactory} does not manage it.
-     * @implNote {@link Metamodel#managedType(Class)} <em>throws</em> for a class it does not manage; it never
-     *         returns {@code null}. That is what this method exists to turn into an answer a caller can branch on.
-     * @see Metamodel#managedType(Class)
+     * @return an optional of the {@link ManagedType} of the {@code typeClass}.
+     * @deprecated use {@link JinahyaManagedTypeUtils#findManagedType(Class, EntityManagerFactory)}.
      */
+    @Deprecated(forRemoval = true)
     public static <X> Optional<ManagedType<X>> findManagedType(final Class<X> typeClass,
                                                                final EntityManagerFactory entityManagerFactory) {
-        Objects.requireNonNull(typeClass, "typeClass is null");
-        Objects.requireNonNull(entityManagerFactory, "entityManagerFactory is null");
-        try {
-            return Optional.of(entityManagerFactory.getMetamodel().managedType(typeClass));
-        } catch (final IllegalArgumentException iae) {
-            return Optional.empty();
-        }
+        return JinahyaManagedTypeUtils.findManagedType(typeClass, entityManagerFactory);
     }
 
     /**
-     * Finds the {@link ManagedType} of the specified type class, in the first of the specified entity manager factories
-     * which knows it.
+     * Finds the {@link ManagedType} of the specified type class in the first of the specified entity manager factories
+     * which manages it.
      *
-     * @param typeClass              the class whose {@link ManagedType} is returned; it does not have to be an entity
-     *                               class.
-     * @param entityManagerFactories an iterable of entity manager factories to look the {@code typeClass} up in.
+     * @param typeClass              the class whose {@link ManagedType} is returned.
+     * @param entityManagerFactories the entity manager factories to look the {@code typeClass} up in, in order.
      * @param <X>                    represented type
-     * @return an optional of the {@link ManagedType} of the {@code typeClass}; {@link Optional#empty() empty} when none
-     *         of the {@code entityManagerFactories} manages it.
-     * @see #findManagedType(Class, EntityManagerFactory)
+     * @return an optional of the {@link ManagedType} of the {@code typeClass}.
+     * @deprecated use {@link JinahyaManagedTypeUtils#findManagedType(Class, Iterable)}.
      */
+    @Deprecated(forRemoval = true)
     public static <X> Optional<ManagedType<X>> findManagedType(
             final Class<X> typeClass,
             final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
-        Objects.requireNonNull(typeClass, "typeClass is null");
-        Objects.requireNonNull(entityManagerFactories, "entityManagerFactories is null");
-        return StreamSupport.stream(entityManagerFactories.spliterator(), false)
-                .map(f -> findManagedType(typeClass, f))
-                .flatMap(Optional::stream)
-                .findFirst();
+        return JinahyaManagedTypeUtils.findManagedType(typeClass, entityManagerFactories);
     }
 
     /**
-     * Returns the {@link ManagedType} of the specified type class, from the metamodel of the specified entity manager
+     * Returns the {@link ManagedType} of the specified type class in the metamodel of the specified entity manager
      * factory.
      *
-     * @param typeClass            the class whose {@link ManagedType} is returned; it does not have to be an entity
-     *                             class.
+     * @param typeClass            the class whose {@link ManagedType} is returned.
      * @param entityManagerFactory the entity manager factory to look the {@code typeClass} up in.
      * @param <X>                  represented type
      * @return the {@link ManagedType} of the {@code typeClass}.
-     * @throws IllegalArgumentException when the {@code entityManagerFactory} does not manage the {@code typeClass}.
-     * @see #findManagedType(Class, EntityManagerFactory)
+     * @deprecated use {@link JinahyaManagedTypeUtils#getManagedType(Class, EntityManagerFactory)}.
      */
+    @Deprecated(forRemoval = true)
     public static <X> ManagedType<X> getManagedType(final Class<X> typeClass,
                                                     final EntityManagerFactory entityManagerFactory) {
-        return findManagedType(typeClass, entityManagerFactory).orElseThrow(
-                () -> new IllegalArgumentException("no managed type found for type class: " + typeClass)
-        );
+        return JinahyaManagedTypeUtils.getManagedType(typeClass, entityManagerFactory);
     }
 
     /**
-     * Returns the {@link ManagedType} of the specified type class, from the first of the specified entity manager
-     * factories which knows it.
+     * Returns the {@link ManagedType} of the specified type class in the first of the specified entity manager
+     * factories which manages it.
      *
-     * @param typeClass              the class whose {@link ManagedType} is returned; it does not have to be an entity
-     *                               class.
-     * @param entityManagerFactories an iterable of entity manager factories to look the {@code typeClass} up in.
+     * @param typeClass              the class whose {@link ManagedType} is returned.
+     * @param entityManagerFactories the entity manager factories to look the {@code typeClass} up in, in order.
      * @param <X>                    represented type
      * @return the {@link ManagedType} of the {@code typeClass}.
-     * @throws IllegalArgumentException when none of the {@code entityManagerFactories} manages the {@code typeClass}.
-     * @implNote The result used to be memoized in a {@code static} map keyed by the {@code typeClass} alone.
-     *         That cache answered a later call from a <em>different</em> set of factories with the first caller's
-     *         factory, and, being keyed by a {@link Class} and never evicted, pinned the application's classes for the
-     *         life of the JVM. The lookup it saved is a map lookup inside the provider's metamodel, so it is now
-     *         performed on each call.
-     * @see #findManagedType(Class, Iterable)
+     * @deprecated use {@link JinahyaManagedTypeUtils#getManagedType(Class, Iterable)}.
      */
+    @Deprecated(forRemoval = true)
     public static <X> ManagedType<X> getManagedType(
             final Class<X> typeClass,
             final Iterable<? extends EntityManagerFactory> entityManagerFactories) {
-        return findManagedType(typeClass, entityManagerFactories).orElseThrow(
-                () -> new IllegalArgumentException("no managed type found for type class: " + typeClass)
-        );
+        return JinahyaManagedTypeUtils.getManagedType(typeClass, entityManagerFactories);
     }
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     /**
-     * Resolves the specified dotted attribute path, {@code id.promoId} say, from the specified managed type, and
-     * returns the attribute the last segment names.
-     * <p>
-     * Each segment but the last has to name a singular attribute whose type is itself a managed type &mdash; an
-     * embeddable or an entity &mdash; which the next segment is then resolved against. The last segment may name any
-     * attribute.
+     * Resolves the specified dotted attribute path against the specified managed type.
      *
-     * @param managedType   the managed type to start from.
-     * @param attributePath the path to resolve; one or more attribute names joined by {@code .}.
-     * @return the attribute the last segment of {@code attributePath} names.
-     * @throws IllegalArgumentException when a segment names no attribute of the type it is resolved against, or when a
-     *                                  segment but the last names an attribute whose type is not a managed type.
-     * @see ManagedType#getAttribute(String)
+     * @param managedType   the managed type the path starts from.
+     * @param attributePath the dotted path of attribute names.
+     * @return the attribute of the path's last segment.
+     * @deprecated use {@link JinahyaManagedTypeUtils#resolveAttributePath(ManagedType, String)}.
      */
+    @Deprecated(forRemoval = true)
     public static Attribute<?, ?> resolveAttributePath(final ManagedType<?> managedType,
                                                        final String attributePath) {
-        Objects.requireNonNull(managedType, "managedType is null");
-        Objects.requireNonNull(attributePath, "attributePath is null");
-        final var segments = attributePath.split("\\.", -1);
-        ManagedType<?> current = managedType;
-        Attribute<?, ?> attribute = null;
-        for (int i = 0; i < segments.length; i++) {
-            if (current == null) {
-                throw new IllegalArgumentException(
-                        "'" + segments[i - 1] + "' of '" + attributePath + "' is not of a managed type;"
-                        + " cannot resolve '" + segments[i] + "' against it");
-            }
-            attribute = current.getAttribute(segments[i]); // IllegalArgumentException when absent
-            current = attribute instanceof SingularAttribute<?, ?> singular
-                      && singular.getType() instanceof ManagedType<?> next ? next : null;
-        }
-        return Objects.requireNonNull(attribute, "attribute is null"); // the split gives one segment at least
+        return JinahyaManagedTypeUtils.resolveAttributePath(managedType, attributePath);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

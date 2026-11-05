@@ -145,7 +145,7 @@ class JinahyaEntityTypeUtils_Test {
     @Nested
     class DeprecatedGetManagedType_Test {
 
-        @DisplayName("still answers, by delegating to JinayaManagedTypeUtils")
+        @DisplayName("still answers, by delegating to JinahyaManagedTypeUtils")
         @Test
         @SuppressWarnings({"removal"})
         void __delegates() {

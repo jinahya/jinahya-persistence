@@ -21,7 +21,7 @@
 /**
  * Utilities for working with the Jakarta Persistence metamodel.
  * <p>
- * These classes bridge the gap between the metamodel and plain reflection: {@link JinayaManagedTypeUtils} and
+ * These classes bridge the gap between the metamodel and plain reflection: {@link JinahyaManagedTypeUtils} and
  * {@link JinahyaEntityTypeUtils} resolve a {@link jakarta.persistence.metamodel.ManagedType managedType} or an
  * {@link jakarta.persistence.metamodel.EntityType entityType} for a class, from a single
  * {@link jakarta.persistence.EntityManagerFactory entityManagerFactory} or from the first of several which knows it,
@@ -37,4 +37,4 @@ package com.github.jinahya.persistence.metamodel;
 
 import com.github.jinahya.persistence.metamodel.util.JinahyaAttributeUtils;
 import com.github.jinahya.persistence.metamodel.util.JinahyaEntityTypeUtils;
-import com.github.jinahya.persistence.metamodel.util.JinayaManagedTypeUtils;
+import com.github.jinahya.persistence.metamodel.util.JinahyaManagedTypeUtils;
