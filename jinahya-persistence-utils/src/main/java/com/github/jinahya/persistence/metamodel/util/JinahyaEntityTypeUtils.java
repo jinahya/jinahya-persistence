@@ -21,9 +21,11 @@ package com.github.jinahya.persistence.metamodel.util;
  */
 
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 import jakarta.persistence.metamodel.Metamodel;
+import jakarta.persistence.metamodel.SingularAttribute;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
@@ -172,6 +174,65 @@ public final class JinahyaEntityTypeUtils {
     public static String getEntityName(final Class<?> entityClass,
                                        final EntityManagerFactory entityManagerFactory) {
         return getEntityType(entityClass, entityManagerFactory).getName();
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the single identifier attribute, either an {@link jakarta.persistence.Id @Id} or an
+     * {@link jakarta.persistence.EmbeddedId @EmbeddedId}, of the specified entity type.
+     *
+     * @param entityType the entity type whose identifier attribute is returned.
+     * @param <X>        represented entity type
+     * @return the single identifier attribute of the {@code entityType}.
+     * @throws IllegalArgumentException when the {@code entityType} does not have a single identifier attribute; e.g.
+     *                                  it has an {@link jakarta.persistence.IdClass @IdClass}.
+     * @apiNote {@link EntityType#getId(Class)} is not used, for providers disagree on the type it expects for a
+     *         primitive identifier; EclipseLink, e.g., reports {@link Long} as the {@link EntityType#getIdType() id type}
+     *         of a {@code long} identifier, and then rejects it.
+     * @see EntityType#hasSingleIdAttribute()
+     */
+    public static <X> SingularAttribute<? super X, ?> getSingleIdAttribute(final EntityType<X> entityType) {
+        Objects.requireNonNull(entityType, "entityType is null");
+        if (!entityType.hasSingleIdAttribute()) {
+            throw new IllegalArgumentException("no single id attribute in " + entityType);
+        }
+        return entityType.getSingularAttributes().stream()
+                .filter(SingularAttribute::isId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("no single id attribute in " + entityType));
+    }
+
+    /**
+     * Returns the path, from the specified path to an entity, of the value which the {@link jakarta.persistence.IdClass
+     * @IdClass} holds for the specified identifier attribute; the attribute itself, or, for an association (a derived
+     * identity), the identifier of the associated entity.
+     *
+     * @param metamodel        the metamodel to look the associated entity up in.
+     * @param path             the path to an entity; e.g. a {@link jakarta.persistence.criteria.Root}.
+     * @param idClassAttribute one of the {@link EntityType#getIdClassAttributes() id class attributes} of the entity.
+     * @return the path of the value of the {@code idClassAttribute}.
+     * @throws IllegalArgumentException when the {@code idClassAttribute} is an association to an entity which does not
+     *                                  have a single identifier attribute.
+     * @see EntityType#getIdClassAttributes()
+     */
+    public static Path<?> getIdClassAttributePath(final Metamodel metamodel, final Path<?> path,
+                                                  final SingularAttribute<?, ?> idClassAttribute) {
+        Objects.requireNonNull(metamodel, "metamodel is null");
+        Objects.requireNonNull(path, "path is null");
+        Objects.requireNonNull(idClassAttribute, "idClassAttribute is null");
+        final var attributePath = path.get(idClassAttribute.getName());
+        if (!idClassAttribute.isAssociation()) {
+            return attributePath;
+        }
+        final var associatedType = metamodel.entity(idClassAttribute.getJavaType());
+        if (!associatedType.hasSingleIdAttribute()) {
+            throw new IllegalArgumentException(
+                    "the entity, " + associatedType.getJavaType() + ", associated by an identifier attribute, "
+                    + idClassAttribute + ", does not have a single identifier attribute"
+            );
+        }
+        return attributePath.get(getSingleIdAttribute(associatedType).getName());
     }
 
     // -----------------------------------------------------------------------------------------------------------------

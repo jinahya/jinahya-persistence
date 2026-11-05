@@ -365,6 +365,59 @@ class JinahyaEntityManagerUtils_Test {
         }
     }
 
+    @DisplayName("getSelectableEntityIndex(manager, entityClass)")
+    @Nested
+    class GetSelectableEntityIndex_Test {
+
+        @SuppressWarnings({"unchecked"})
+        private EntityManager counting(final long count) {
+            final var manager = mock(EntityManager.class);
+            final var builder = mock(CriteriaBuilder.class);
+            final var query = mock(CriteriaQuery.class);
+            final var typed = mock(TypedQuery.class);
+            when(manager.getCriteriaBuilder()).thenReturn(builder);
+            when(builder.createQuery(Long.class)).thenReturn(query);
+            when(query.from(String.class)).thenReturn(mock(Root.class));
+            when(manager.createQuery(query)).thenReturn(typed);
+            when(typed.getSingleResult()).thenReturn(count);
+            return manager;
+        }
+
+        @DisplayName("no instance -> empty")
+        @Test
+        void _Empty_NoInstance() {
+            assertThat(JinahyaEntityManagerUtils.getSelectableEntityIndex(counting(0L), String.class)).isEmpty();
+        }
+
+        @DisplayName("a single instance -> 0")
+        @Test
+        void _Zero_SingleInstance() {
+            assertThat(JinahyaEntityManagerUtils.getSelectableEntityIndex(counting(1L), String.class)).hasValue(0);
+        }
+
+        @DisplayName("an index less than the count")
+        @Test
+        void _LessThanCount() {
+            final var manager = counting(3L);
+            for (int i = 0; i < 128; i++) {
+                final var index = JinahyaEntityManagerUtils.getSelectableEntityIndex(manager, String.class);
+                assertThat(index).isPresent();
+                assertThat(index.getAsInt()).isBetween(0, 2);
+            }
+        }
+
+        @DisplayName("a non-negative int, when the count does not fit an int")
+        @Test
+        void _NonNegativeInt_CountExceedsInt() {
+            final var manager = counting(Long.MAX_VALUE);
+            for (int i = 0; i < 128; i++) {
+                final var index = JinahyaEntityManagerUtils.getSelectableEntityIndex(manager, String.class);
+                assertThat(index).isPresent();
+                assertThat(index.getAsInt()).isNotNegative();
+            }
+        }
+    }
+
     @DisplayName("getEntityIdentifier(entityManager, entity)")
     @Nested
     class GetEntityIdentifier_Test {

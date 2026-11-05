@@ -30,6 +30,8 @@ import jakarta.persistence.PersistenceException;
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.util.Objects;
+import java.util.OptionalInt;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -378,6 +380,31 @@ public final class JinahyaEntityManagerUtils {
         final var root = query.from(entityClass);
         query.select(builder.count(root));
         return manager.createQuery(query).getSingleResult();
+    }
+
+    /**
+     * Returns a randomly chosen position, of an instance of the specified entity class, which
+     * {@link jakarta.persistence.TypedQuery#setFirstResult(int)} can select.
+     *
+     * @param manager     the entity manager.
+     * @param entityClass the entity class whose instances are counted.
+     * @return an optional of a random index, from {@code 0} (inclusive) to the
+     *         {@link #selectEntityCount(EntityManager, Class) number of instances} of the {@code entityClass}, capped
+     *         at {@link Integer#MAX_VALUE} (exclusive); {@link OptionalInt#empty() empty} when there is none.
+     * @throws IllegalArgumentException when the {@code entityClass} is not an entity of the {@code manager}'s
+     *                                  persistence unit.
+     * @implNote The count is capped at {@link Integer#MAX_VALUE}, for
+     *         {@link jakarta.persistence.TypedQuery#setFirstResult(int)} takes an {@code int}; instances past the first
+     *         {@code Integer.MAX_VALUE} ones are never chosen.
+     * @see #selectEntityCount(EntityManager, Class)
+     */
+    public static OptionalInt getSelectableEntityIndex(final EntityManager manager, final Class<?> entityClass) {
+        final var count = selectEntityCount(manager, entityClass);
+        if (count == 0L) {
+            return OptionalInt.empty();
+        }
+        final var bound = (int) Math.min(count, Integer.MAX_VALUE);
+        return OptionalInt.of(ThreadLocalRandom.current().nextInt(bound));
     }
 
     // -----------------------------------------------------------------------------------------------------------------
