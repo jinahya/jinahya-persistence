@@ -88,8 +88,10 @@ public abstract class AttributeEnum_Test<ENUM extends Enum<ENUM> & AttributeEnum
      * @param <E> enum type parameter
      * @param <N> number type parameter
      */
-    public abstract static class OfNumberTest<E extends Enum<E> & AttributeEnum.OfNumber<E, N>,
-            N extends Number>
+    public abstract static class OfNumberTest<
+            E extends Enum<E> & AttributeEnum.OfNumber<E, N>,
+            N extends Number
+            >
             extends AttributeEnum_Test<E, N> {
 
         /**
