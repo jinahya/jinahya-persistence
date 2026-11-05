@@ -24,7 +24,7 @@
  * <h2>Attribute enums</h2>
  * {@link com.github.jinahya.persistence.more.test.AttributeEnum_Test} verifies that an
  * {@link com.github.jinahya.persistence.more.AttributeEnum} has no {@code null} and no duplicate attribute values, and
- * mirrors the {@code OfString}, {@code __OfNumber}, {@code __OfInteger} and {@code __OfLong} nests of what it tests, so
+ * mirrors the {@code OfString}, {@code OfNumber}, {@code OfInteger} and {@code OfLong} nests of what it tests, so
  * a subclass names only what those do not already fix. Round-tripping the constants through a converter is
  * {@link com.github.jinahya.persistence.more.converter.test.AttributeEnumConverter_Test}, next door with the rest of
  * the converters. {@link com.github.jinahya.persistence.more.test.AttributeEnum_TestUtils} offers the same traversals,

@@ -23,7 +23,7 @@ package com.github.jinahya.persistence.more.converter.test;
 import com.github.jinahya.persistence.more.test._SampleIntegerAttributeEnum;
 
 class _SampleIntegerAttributeEnumConverter_Test
-        extends AttributeEnumConverter_Test.__OfIntegerTest<
+        extends AttributeEnumConverter_Test.OfIntegerTest<
         _SampleIntegerAttributeEnumConverter,
         _SampleIntegerAttributeEnum
         > {

@@ -20,6 +20,8 @@ package com.github.jinahya.persistence.more;
  * #L%
  */
 
+import com.github.jinahya.persistence.more.converter.AttributeEnumConverter;
+
 /**
  * An interface for defining enum constants with a specific type of attribute values.
  * <p>
@@ -31,7 +33,7 @@ package com.github.jinahya.persistence.more;
  * @param <ATTRIBUTE> attribute type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see com.github.jinahya.persistence.more.converter.AttributeEnumConverter
- * @see __AttributeEnumUtils
+ * @see AttributeEnumUtils
  */
 @SuppressWarnings({
         "java:S114", // Interface names should comply with a naming convention
@@ -76,7 +78,7 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
      *         {@link Enum#name() name()} of a constant is a {@link String}, and the only numeric candidate,
      *         {@link Enum#ordinal() ordinal()}, is exactly the coupling {@link AttributeEnum} exists to break — it
      *         changes whenever constants are reordered. Every constant therefore has to declare its own value.
-     * @apiNote The named subtypes stop at {@link __OfInteger} and {@link __OfLong} on purpose. A constant is
+     * @apiNote The named subtypes stop at {@link OfInteger} and {@link OfLong} on purpose. A constant is
      *         looked up by its attribute value through {@link Object#equals(Object) equals} and
      *         {@link Object#hashCode() hashCode()}, and the remaining common numeric types do not behave under that
      *         contract the way a discriminator has to: {@link java.math.BigDecimal#equals(Object) BigDecimal.equals} is
@@ -92,7 +94,7 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
             "java:S114", // Interface names should comply with a naming convention
             "java:S119"  // Type parameter names should comply with a naming convention
     })
-    interface __OfNumber<SELF extends Enum<SELF> & __OfNumber<SELF, NUMBER>, NUMBER extends Number>
+    interface OfNumber<SELF extends Enum<SELF> & OfNumber<SELF, NUMBER>, NUMBER extends Number>
             extends AttributeEnum<SELF, NUMBER> {
 
     }
@@ -101,12 +103,12 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
      * An interface for defining enum constants with {@link Integer} attribute values.
      *
      * @param <SELF> self type parameter
-     * @see com.github.jinahya.persistence.more.converter.AttributeEnumConverter.__OfInteger
+     * @see AttributeEnumConverter.OfInteger
      */
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention
     })
-    interface __OfInteger<SELF extends Enum<SELF> & __OfInteger<SELF>> extends __OfNumber<SELF, Integer> {
+    interface OfInteger<SELF extends Enum<SELF> & OfInteger<SELF>> extends OfNumber<SELF, Integer> {
 
         /**
          * Finds the constant, of the specified enum class, whose attribute value equals the specified value.
@@ -119,11 +121,11 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
          *                                  {@code attributeValue}.
          * @apiNote Taking an {@code int} keeps the value boxed as an {@link Integer}; a {@link Long} of the
          *         same numeric value does not match a constant of this interface.
-         * @see __AttributeEnumUtils#valueOf(Class, Object)
+         * @see AttributeEnumUtils#valueOf(Class, Object)
          */
-        static <E extends Enum<E> & __OfInteger<E>> E valueOfAttributeValue(final Class<E> enumClass,
-                                                                            final int attributeValue) {
-            return __AttributeEnumUtils.valueOf(enumClass, attributeValue);
+        static <E extends Enum<E> & OfInteger<E>> E valueOfAttributeValue(final Class<E> enumClass,
+                                                                          final int attributeValue) {
+            return AttributeEnumUtils.valueOf(enumClass, attributeValue);
         }
 
         /**
@@ -133,7 +135,7 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
          * @throws NullPointerException when this constant's {@link #attributeValue() attributeValue} is {@code null}.
          * @implSpec The conversion is exact; unlike {@link Number#intValue()} on an arbitrary number, nothing
          *         is narrowed or rounded here. A {@code null} {@code attributeValue} is a declaration error &mdash;
-         *         {@link __AttributeEnumUtils} rejects one outright &mdash; but this method does not go through that
+         *         {@link AttributeEnumUtils} rejects one outright &mdash; but this method does not go through that
          *         map, so it names the offending constant rather than unboxing into a bare
          *         {@link NullPointerException}.
          */
@@ -147,12 +149,12 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
      * An interface for defining enum constants with {@link Long} attribute values.
      *
      * @param <SELF> self type parameter
-     * @see com.github.jinahya.persistence.more.converter.AttributeEnumConverter.__OfLong
+     * @see AttributeEnumConverter.OfLong
      */
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention
     })
-    interface __OfLong<SELF extends Enum<SELF> & __OfLong<SELF>> extends __OfNumber<SELF, Long> {
+    interface OfLong<SELF extends Enum<SELF> & OfLong<SELF>> extends OfNumber<SELF, Long> {
 
         /**
          * Finds the constant, of the specified enum class, whose attribute value equals the specified value.
@@ -165,11 +167,11 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
          *                                  {@code attributeValue}.
          * @apiNote Taking a {@code long} keeps the value boxed as a {@link Long}; an {@link Integer} of the
          *         same numeric value does not match a constant of this interface.
-         * @see __AttributeEnumUtils#valueOf(Class, Object)
+         * @see AttributeEnumUtils#valueOf(Class, Object)
          */
-        static <E extends Enum<E> & __OfLong<E>> E valueOfAttributeValue(final Class<E> enumClass,
-                                                                         final long attributeValue) {
-            return __AttributeEnumUtils.valueOf(enumClass, attributeValue);
+        static <E extends Enum<E> & OfLong<E>> E valueOfAttributeValue(final Class<E> enumClass,
+                                                                       final long attributeValue) {
+            return AttributeEnumUtils.valueOf(enumClass, attributeValue);
         }
 
         /**
@@ -179,7 +181,7 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
          * @throws NullPointerException when this constant's {@link #attributeValue() attributeValue} is {@code null}.
          * @implSpec The conversion is exact; unlike {@link Number#longValue()} on an arbitrary number, nothing
          *         is narrowed or rounded here. A {@code null} {@code attributeValue} is a declaration error &mdash;
-         *         {@link __AttributeEnumUtils} rejects one outright &mdash; but this method does not go through that
+         *         {@link AttributeEnumUtils} rejects one outright &mdash; but this method does not go through that
          *         map, so it names the offending constant rather than unboxing into a bare
          *         {@link NullPointerException}.
          */

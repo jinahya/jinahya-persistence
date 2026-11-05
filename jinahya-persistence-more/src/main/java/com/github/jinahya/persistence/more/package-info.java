@@ -4,7 +4,7 @@
  * <h2>Enums with stable persisted values</h2>
  * {@link com.github.jinahya.persistence.more.AttributeEnum} lets an enum constant declare the value actually written to
  * the database, so the persisted form survives renaming and reordering of constants, and
- * {@link com.github.jinahya.persistence.more.__AttributeEnumUtils} looks a constant up by its attribute value. The
+ * {@link com.github.jinahya.persistence.more.AttributeEnumUtils} looks a constant up by its attribute value. The
  * converter which carries a value in either direction,
  * {@link com.github.jinahya.persistence.more.converter.AttributeEnumConverter}, lives with the other converters.
  *

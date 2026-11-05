@@ -15,7 +15,7 @@
  * {@link com.github.jinahya.persistence.more.converter.test.AttributeEnumConverter_Test} extends
  * {@link com.github.jinahya.persistence.more.test.AttributeEnum_Test} next door — what it tests is a converter, but
  * what it converts is an enum, and both halves are worth checking at once — and round-trips every constant through its
- * converter. It mirrors the {@code OfString}, {@code __OfNumber}, {@code __OfInteger} and {@code __OfLong} nests of
+ * converter. It mirrors the {@code OfString}, {@code OfNumber}, {@code OfInteger} and {@code OfLong} nests of
  * what it tests, so a subclass names only what those do not already fix.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;

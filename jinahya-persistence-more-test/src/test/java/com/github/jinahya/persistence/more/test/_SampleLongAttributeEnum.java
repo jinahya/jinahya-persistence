@@ -2,7 +2,7 @@ package com.github.jinahya.persistence.more.test;
 
 import com.github.jinahya.persistence.more.AttributeEnum;
 
-public enum _SampleLongAttributeEnum implements AttributeEnum.__OfLong<_SampleLongAttributeEnum> {
+public enum _SampleLongAttributeEnum implements AttributeEnum.OfLong<_SampleLongAttributeEnum> {
 
     A(0L),
 

@@ -28,8 +28,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
 
-import static com.github.jinahya.persistence.more.__AttributeEnumUtils.find;
-import static com.github.jinahya.persistence.more.__AttributeEnumUtils.valueOf;
+import static com.github.jinahya.persistence.more.AttributeEnumUtils.find;
+import static com.github.jinahya.persistence.more.AttributeEnumUtils.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         "java:S114", // Interface names should comply with a naming convention
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __AttributeEnumUtils_Test {
+class AttributeEnumUtils_Test {
 
     // -----------------------------------------------------------------------------------------------------------------
     @SuppressWarnings({
@@ -170,7 +170,7 @@ class __AttributeEnumUtils_Test {
                     __SomeOtherAttributeEnum.class
             );
             assertThatThrownBy(() -> {
-                __AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOf(enumClasses, "X");
+                AttributeEnumUtils.<__SomeAttributeEnum, Object>valueOf(enumClasses, "X");
             }).isInstanceOf(IllegalArgumentException.class);
         }
     }

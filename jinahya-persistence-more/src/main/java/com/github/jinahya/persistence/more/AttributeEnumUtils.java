@@ -43,7 +43,7 @@ import java.util.Optional;
         // IllegalArgumentException it throws for a null attribute value
         "java:S2583" // Conditionally executed code should be reachable
 })
-public final class __AttributeEnumUtils {
+public final class AttributeEnumUtils {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -263,7 +263,7 @@ public final class __AttributeEnumUtils {
     /**
      * Creates a new instance, which is not allowed.
      */
-    private __AttributeEnumUtils() {
+    private AttributeEnumUtils() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

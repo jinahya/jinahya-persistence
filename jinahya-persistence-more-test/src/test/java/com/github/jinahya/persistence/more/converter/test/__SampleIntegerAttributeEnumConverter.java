@@ -27,7 +27,7 @@ import com.github.jinahya.persistence.more.test.__SampleIntegerAttributeEnum;
         "java:S119" // Type parameter names should comply with a naming convention
 })
 abstract class __SampleIntegerAttributeEnumConverter<E extends Enum<E> & __SampleIntegerAttributeEnum<E>>
-        extends AttributeEnumConverter.__OfInteger<E> {
+        extends AttributeEnumConverter.OfInteger<E> {
 
     __SampleIntegerAttributeEnumConverter(final Class<E> enumClass) {
         super(enumClass);
