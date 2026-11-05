@@ -106,6 +106,14 @@ public final class JinahyaEntityManagerTestUtils {
     }
 
     // -----------------------------------------------------------------------------------------------------------------
+    private static <T> Optional<Object> selectRandomEntityId_(final EntityManager entityManager,
+                                                              final Class<T> entityClass) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        final var persistenceUnitUtil = entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
+        return selectRandomEntityReference(entityManager, entityClass)
+                .map(persistenceUnitUtil::getIdentifier);
+    }
 
     /**
      * Selects the identifier of a randomly chosen instance of the specified entity class; the
@@ -121,9 +129,9 @@ public final class JinahyaEntityManagerTestUtils {
      * @throws NullPointerException     when either argument is {@code null}.
      * @throws IllegalArgumentException when the {@code entityClass} is not an entity.
      * @apiNote The {@code U} is inferred from the call site, e.g.
-     *         {@code Optional<Long> id = selectRandomEntityId(em, Some.class)}, and is not checked against the type of the
-     *         identifier; a wrong one fails with a {@link ClassCastException} where the value is used, not here. The
-     *         identifier of a primitive type comes as its wrapper.
+     *         {@code Optional<Long> id = selectRandomEntityId(em, Some.class)}, and is not checked against the type of
+     *         the identifier; a wrong one fails with a {@link ClassCastException} where the value is used, not here.
+     *         The identifier of a primitive type comes as its wrapper.
      * @implNote The offset is chosen from the first {@link Integer#MAX_VALUE} instances only, for
      *         {@link jakarta.persistence.TypedQuery#setFirstResult(int)} takes an {@code int}.
      * @see #selectRandomEntityReference(EntityManager, Class)
@@ -133,9 +141,34 @@ public final class JinahyaEntityManagerTestUtils {
                                                           final Class<T> entityClass) {
         Objects.requireNonNull(entityManager, "entityManager is null");
         Objects.requireNonNull(entityClass, "entityClass is null");
-        final var persistenceUnitUtil = entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
-        return selectRandomEntityReference(entityManager, entityClass)
-                .map(r -> (U) persistenceUnitUtil.getIdentifier(r));
+        return (Optional<U>) selectRandomEntityId_(entityManager, entityClass);
+    }
+
+    /**
+     * Selects the identifier, as an instance of the specified class, of a randomly chosen instance of the specified
+     * entity class.
+     *
+     * @param entityManager an entity manager.
+     * @param entityClass   the entity class whose identifier is selected.
+     * @param idClass       the class of the identifier; the type of the {@link jakarta.persistence.Id @Id} (the
+     *                      wrapper, for a primitive one), of the {@link jakarta.persistence.EmbeddedId @EmbeddedId}, or
+     *                      the {@link jakarta.persistence.IdClass @IdClass}; or any of their supertypes.
+     * @param <T>           entity type parameter
+     * @param <U>           identifier type parameter
+     * @return an optional of the identifier of a randomly chosen instance of the {@code entityClass}; {@code empty}
+     *         when there is none.
+     * @throws NullPointerException     when any argument is {@code null}.
+     * @throws IllegalArgumentException when the {@code entityClass} is not an entity.
+     * @throws ClassCastException       when the identifier selected is not an instance of the {@code idClass}.
+     * @see #selectRandomEntityId(EntityManager, Class)
+     */
+    public static <T, U> Optional<U> selectRandomEntityId(final EntityManager entityManager,
+                                                          final Class<T> entityClass, final Class<U> idClass) {
+        Objects.requireNonNull(entityManager, "entityManager is null");
+        Objects.requireNonNull(entityClass, "entityClass is null");
+        Objects.requireNonNull(idClass, "idClass is null");
+        return selectRandomEntityId_(entityManager, entityClass)
+                .map(idClass::cast);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

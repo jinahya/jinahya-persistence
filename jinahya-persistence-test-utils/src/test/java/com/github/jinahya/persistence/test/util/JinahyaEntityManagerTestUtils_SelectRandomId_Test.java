@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests {@link JinahyaEntityManagerTestUtils#selectRandomEntityId(EntityManager, Class)} against each shape of
@@ -57,7 +58,8 @@ class JinahyaEntityManagerTestUtils_SelectRandomId_Test {
             final var ids = List.of(_Embeddable.of(1, "a"), _Embeddable.of(1, "b"), _Embeddable.of(2, "a"));
             ids.forEach(id -> em.persist(_Embedded.of(id)));
             em.flush();
-            final Optional<_Embeddable> selected = JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Embedded.class);
+            final Optional<_Embeddable> selected
+                    = JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Embedded.class);
             assertThat(selected).hasValueSatisfying(id -> assertThat(id).isIn(ids));
         });
     }
@@ -73,7 +75,8 @@ class JinahyaEntityManagerTestUtils_SelectRandomId_Test {
             em.persist(_IdClass.of(1, "b"));
             em.persist(_IdClass.of(2, "a"));
             em.flush();
-            final Optional<_IdClassId> selected = JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _IdClass.class);
+            final Optional<_IdClassId> selected
+                    = JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _IdClass.class);
             assertThat(selected).hasValueSatisfying(id -> assertThat(id).isIn(ids));
         });
     }
@@ -93,7 +96,8 @@ class JinahyaEntityManagerTestUtils_SelectRandomId_Test {
             em.persist(_Derived.of(basic2, 1));
             em.flush();
             final var ids = List.of(_DerivedId.of(1L, 1), _DerivedId.of(1L, 2), _DerivedId.of(2L, 1));
-            final Optional<_DerivedId> selected = JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Derived.class);
+            final Optional<_DerivedId> selected
+                    = JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Derived.class);
             assertThat(selected).hasValueSatisfying(id -> assertThat(id).isIn(ids));
         });
     }
@@ -123,6 +127,37 @@ class JinahyaEntityManagerTestUtils_SelectRandomId_Test {
                         assertThat(r).isInstanceOf(_IdClass.class);
                         assertThat(util.getIdentifier(r)).isIn(_IdClassId.of(1, "a"), _IdClassId.of(2, "b"));
                     });
+        });
+    }
+
+    @DisplayName("selectRandomEntityId(entityManager, entityClass, idClass)")
+    @Test
+    void __selectRandomEntityId_idClass() {
+        acceptEntityManagerInTransactionAndRollback(em -> {
+            assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _IdClass.class, _IdClassId.class))
+                    .isEmpty();
+            final var basic = _Basic.of(1L);
+            em.persist(basic);
+            em.persist(_Embedded.of(_Embeddable.of(1, "a")));
+            em.persist(_IdClass.of(1, "a"));
+            em.persist(_Derived.of(basic, 1));
+            em.flush();
+            assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Basic.class, Long.class))
+                    .hasValue(1L);
+            assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Basic.class, Number.class))
+                    .hasValue(1L);
+            assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Embedded.class, _Embeddable.class))
+                    .hasValue(_Embeddable.of(1, "a"));
+            assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _IdClass.class, _IdClassId.class))
+                    .hasValue(_IdClassId.of(1, "a"));
+            assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Derived.class, _DerivedId.class))
+                    .hasValue(_DerivedId.of(1L, 1));
+            assertThatThrownBy(
+                    () -> JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _Basic.class, String.class))
+                    .isInstanceOf(ClassCastException.class);
+            assertThatThrownBy(
+                    () -> JinahyaEntityManagerTestUtils.selectRandomEntityId(em, _IdClass.class, _DerivedId.class))
+                    .isInstanceOf(ClassCastException.class);
         });
     }
 
