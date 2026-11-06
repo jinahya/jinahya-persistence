@@ -145,4 +145,32 @@
       <property name="hibernate.show_sql" value="false"/>
     </properties>
   </persistence-unit>
+  <persistence-unit name="__attributeEnumConverterPU">
+    <description>Persistence Unit for exercising AttributeEnumConverter3, with an attribute of an enum and another of
+      a shared interface, against an in-memory DB; a unit of its own, so that a provider refusing the latter does not
+      take the other units down with it
+    </description>
+    <provider>${persistence-unit.provider}</provider>
+    <class>com.github.jinahya.persistence.more.converter._SizedEntity</class>
+    <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
+         exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
+    <class>com.github.jinahya.persistence.more.converter._SizeConverters$OfSize</class>
+    <class>com.github.jinahya.persistence.more.converter._SizeConverters$OfISize</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <properties>
+      <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
+      <property name="jakarta.persistence.jdbc.url"
+                value="jdbc:h2:mem:attributeenumconverter;database_to_upper=false;MODE=LEGACY"/>
+      <property name="jakarta.persistence.jdbc.user" value="sa"/>
+      <property name="jakarta.persistence.jdbc.password" value="password"/>
+      <!-- eclipselink -->
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.level" value="WARNING"/>
+      <!-- hibernate -->
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+      <property name="hibernate.show_sql" value="false"/>
+    </properties>
+  </persistence-unit>
 </persistence>
