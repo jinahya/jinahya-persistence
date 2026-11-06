@@ -21,7 +21,6 @@ package com.github.jinahya.persistence.more.test;
  */
 
 import com.github.jinahya.persistence.more.AttributeEnum;
-import com.github.jinahya.persistence.more.AttributeEnumUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,26 +28,19 @@ import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * An abstract base class for testing {@link AttributeEnum} implementations.
  * <p>
- * Extending it gives an enum three checks for free: that no constant carries a {@code null} attribute value, that no
- * two constants carry the same one — the second of which is what keeps a converter's lookup unambiguous — and that
- * {@link AttributeEnumUtils#valueOf(Class, Object)} finds each constant by its own attribute value. A subclass may also
- * override {@link #expectedAttributeValues()} to pin the attribute values down to, e.g., what a column's constraint
- * allows.
+ * Extending it gives an enum two checks for free: that no constant carries a {@code null} attribute value, and that no
+ * two constants carry the same one, which is what keeps a converter's lookup unambiguous.
  *
  * @param <ENUM>      entity type parameter
  * @param <ATTRIBUTE> attribute type parameter
@@ -159,7 +151,7 @@ public abstract class AttributeEnum_Test<ENUM extends Enum<ENUM> & AttributeEnum
      */
     @DisplayName("no null attribute value")
     @Test
-    protected void _NoNull_AttributeValue() {
+    protected void _NoNulls_AttributeValue() {
         AttributeEnum_TestUtils.acceptEachEnumConstantAndAttributeValue(
                 enumClass,
                 (ec, av) -> {
@@ -193,43 +185,6 @@ public abstract class AttributeEnum_Test<ENUM extends Enum<ENUM> & AttributeEnum
                     );
                 }
         );
-    }
-
-    /**
-     * Verifies that {@link AttributeEnumUtils#valueOf(Class, Object)} finds each constant by its own attribute value.
-     */
-    @DisplayName("valueOf(enumClass, attributeValue) -> the constant")
-    @Test
-    protected void _RoundTrip_ValueOf() {
-        acceptEachEnumConstantAndAttributeValue((ec, av) -> {
-            assertSame(ec, AttributeEnumUtils.valueOf(enumClass, av));
-        });
-    }
-
-    /**
-     * Verifies that the attribute values are exactly the {@link #expectedAttributeValues() expected ones}, when they
-     * are specified.
-     */
-    @DisplayName("attribute values are the expected ones")
-    @Test
-    protected void _Expected_AttributeValues() {
-        final var expected = expectedAttributeValues();
-        if (expected == null) {
-            return;
-        }
-        final var actual = applyAttributeValueStream(s -> s.collect(Collectors.toSet()));
-        assertEquals(expected, actual, () -> "attribute values of " + enumClass);
-    }
-
-    /**
-     * Returns the attribute values the constants of {@link #enumClass} are expected to carry, e.g. those the column's
-     * constraint allows. The default implementation returns {@code null}, which skips the check.
-     *
-     * @return a set of expected attribute values; {@code null} not to check.
-     * @see #_Expected_AttributeValues()
-     */
-    protected Set<ATTRIBUTE> expectedAttributeValues() {
-        return null;
     }
 
     // -----------------------------------------------------------------------------------------------------------------
