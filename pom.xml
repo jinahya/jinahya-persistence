@@ -93,6 +93,9 @@
     <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
     <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
     <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
+    <!-- whether EclipseLink weaves the entities as they are loaded; overridden by jakarta-ee-11-eclipselink-weaving,
+         and handed to the tests as a system property of the same name -->
+    <eclipselink.woven>false</eclipselink.woven>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.6.0</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
@@ -468,6 +471,12 @@
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/build-helper-maven-plugin/versions -->
+          <version>3.6.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
           <artifactId>versions-maven-plugin</artifactId>
           <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/versions-maven-plugin/versions -->
           <version>2.22.0</version>
@@ -628,6 +637,32 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${version.maven-surefire}</version>
+        <configuration>
+          <systemPropertyVariables>
+            <eclipselink.woven>${eclipselink.woven}</eclipselink.woven>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- the test sources every module shares, e.g. __PersistenceProviders; each module compiles them into
+                 its own test classes. maven.multiModuleProjectDirectory is the directory holding .mvn, this one,
+                 wherever the build is started from -->
+            <id>add-shared-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${maven.multiModuleProjectDirectory}/src/test-shared/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -802,6 +837,11 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <systemPropertyVariables>
+                <eclipselink.woven>${eclipselink.woven}</eclipselink.woven>
+              </systemPropertyVariables>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -856,6 +896,19 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+    </profile>
+    <profile>
+      <id>jakarta-ee-11-eclipselink-weaving</id>
+      <!-- An add-on to jakarta-ee-11-eclipselink, not a provider: named alone, it hands the agent to a JVM with no
+           EclipseLink to run it. The EclipseLink jar is itself a Java agent (Premain-Class JavaSECMPInitializerAgent),
+           which weaves the entities as they are loaded, so EclipseLink honours LAZY on a basic attribute and on a
+           to-one association, and an entity graph naming one is accepted. Nothing on disk is rewritten; the classes
+           under target/ and the jars stay unwoven. jacoco:prepare-agent appends its own agent to the same argLine.
+           It sets no persistence-provider-profile.active, so it does not stand in for a provider profile. -->
+      <properties>
+        <argLine>-javaagent:${settings.localRepository}/org/eclipse/persistence/org.eclipse.persistence.jpa/${version.org.eclipse.persistence}/org.eclipse.persistence.jpa-${version.org.eclipse.persistence}.jar</argLine>
+        <eclipselink.woven>true</eclipselink.woven>
+      </properties>
     </profile>
   </profiles>
 </project>
