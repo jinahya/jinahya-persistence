@@ -1,11 +1,8 @@
 package com.github.jinahya.persistence.test.util.spec;
 
-import com.github.jinahya.persistence.shared.__PersistenceProviders;
-import org.junit.jupiter.api.BeforeEach;
+import com.github.jinahya.persistence.test.util.condition.DisabledIfWovenByEclipseLink;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Verifies that the Instancio flavor of {@link com.github.jinahya.object.randomizer.AbstractObjectRandomizer} is wired
@@ -21,18 +18,18 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 })
 class _Department_Randomizer_Instancio_Test {
 
-    // woven, _Department carries the members EclipseLink adds, which the engine cannot populate
-    @BeforeEach
-    void assumeNotWoven() {
-        assumeFalse(__PersistenceProviders.isWovenByEclipseLink(_Department.class), "woven by EclipseLink");
-    }
-
+    @DisabledIfWovenByEclipseLink(
+            value = "com.github.jinahya.persistence.test.util.spec._Department",
+            disabledReason = "woven, it carries the members EclipseLink adds, which the engine cannot populate")
     @DisplayName("get() -> populated, with every excluded attribute left as the constructor left it")
     @Test
     void get_ExcludedFieldsLeftAlone_() {
         _Department_Randomized_Verifier.verify(new _Department_Randomizer_Instancio().get());
     }
 
+    @DisabledIfWovenByEclipseLink(
+            value = "com.github.jinahya.persistence.test.util.spec._Department",
+            disabledReason = "woven, it carries the members EclipseLink adds, which the engine cannot populate")
     @DisplayName("get() -> a varying name on every call")
     @Test
     void get_Varies_() {

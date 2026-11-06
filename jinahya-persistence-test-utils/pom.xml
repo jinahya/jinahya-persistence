@@ -24,6 +24,13 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- the condition annotations of com.github.jinahya.persistence.test.util.condition; a consumer writing tests
+         brings its own JUnit Jupiter -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <!-- the persistence unit under src/test/resources; the provider itself comes from the __* profiles -->
     <dependency>
       <groupId>com.h2database</groupId>

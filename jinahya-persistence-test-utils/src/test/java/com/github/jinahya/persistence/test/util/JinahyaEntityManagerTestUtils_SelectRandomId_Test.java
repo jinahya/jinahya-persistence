@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.test.util;
 
-import com.github.jinahya.persistence.shared.__PersistenceProviders;
+import com.github.jinahya.persistence.test.util.condition.DisabledIfWovenByEclipseLink;
 import com.github.jinahya.persistence.test.util.randomid._Basic;
 import com.github.jinahya.persistence.test.util.randomid._Derived;
 import com.github.jinahya.persistence.test.util.randomid._DerivedId;
@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Tests {@link JinahyaEntityManagerTestUtils#selectRandomEntityId(EntityManager, Class)} against each shape of
@@ -105,11 +104,11 @@ class JinahyaEntityManagerTestUtils_SelectRandomId_Test {
     }
 
     @DisplayName("selectRandomEntityReference(entityManager, entityClass)")
+    @DisabledIfWovenByEclipseLink(
+            value = "com.github.jinahya.persistence.test.util.randomid._Basic",
+            disabledReason = "woven, EclipseLink's getReference fails; its descriptor has no id fetch group")
     @Test
     void __selectRandomEntityReference() {
-        // woven, EclipseLink's getReference fails; its descriptor has no id fetch group
-        assumeFalse(__PersistenceProviders.isWovenByEclipseLink(_Basic.class),
-                    "woven, EclipseLink cannot build a reference");
         acceptEntityManagerInTransactionAndRollback(em -> {
             assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityReference(em, _Basic.class)).isEmpty();
             assertThat(JinahyaEntityManagerTestUtils.selectRandomEntityReference(em, _IdClass.class)).isEmpty();
