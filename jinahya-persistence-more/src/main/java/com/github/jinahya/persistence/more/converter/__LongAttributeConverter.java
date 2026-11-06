@@ -25,7 +25,7 @@ import jakarta.persistence.AttributeConverter;
 /**
  * An interface for converting an entity attribute to a {@code Long} db data, and vice versa.
  * <p>
- * This is a column axis of this package, alongside {@link __StringAttributeConverter}: it fixes what the column is
+ * This is a column axis of this package, alongside {@link StringAttributeConverter}: it fixes what the column is
  * &mdash; one integral number, a {@code BIGINT} or whatever the database calls it &mdash; and says nothing about what
  * the attribute is.
  *
@@ -38,7 +38,7 @@ import jakarta.persistence.AttributeConverter;
  * @apiNote {@code Long} rather than {@code long}: an {@link AttributeConverter AttributeConverter} carries the
  *         column type as a type argument, which cannot be a primitive, and a nullable column needs the reference type
  *         in any case.
- * @see __StringAttributeConverter
+ * @see StringAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

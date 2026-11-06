@@ -20,7 +20,7 @@ public abstract class __JoinedStringAttributeConverter_Test<
         CONVERTER extends __JoinedStringAttributeConverter<X>,
         X
         >
-        extends __StringAttributeConverter_Test<CONVERTER, List<X>> {
+        extends StringAttributeConverter_Test<CONVERTER, List<X>> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 

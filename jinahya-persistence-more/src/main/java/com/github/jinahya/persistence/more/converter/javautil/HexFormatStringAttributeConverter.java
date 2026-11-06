@@ -43,7 +43,7 @@ import java.util.Objects;
  * </table>
  * <p>
  * It implements {@link AttributeConverter AttributeConverter&lt;byte[], String&gt;} itself, not the parent's column
- * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a
+ * axis, {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter}: EclipseLink takes a
  * converter's column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *

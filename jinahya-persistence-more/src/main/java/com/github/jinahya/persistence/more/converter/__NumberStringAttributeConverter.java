@@ -27,21 +27,21 @@ import java.lang.invoke.MethodHandles;
  * {@link Number}, and vice versa.
  * <p>
  * It sits on both of this package's axes at once: the column is a {@code String}, which is what
- * {@link __StringAttributeConverter} says, and the attribute is a {@link Number}, which is what
+ * {@link StringAttributeConverter} says, and the attribute is a {@link Number}, which is what
  * {@link __NumberAttributeConverter} says. Neither is the primary one, which is why both are implemented rather than
  * one of them extended.
  *
  * @param <X> number type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __NumberStringAttributeConverters
- * @see __StringAttributeConverter
+ * @see StringAttributeConverter
  * @see __NumberAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __NumberStringAttributeConverter<X extends Number>
-        implements __StringAttributeConverter<X>, __NumberAttributeConverter<X, String> {
+        implements StringAttributeConverter<X>, __NumberAttributeConverter<X, String> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 

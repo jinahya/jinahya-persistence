@@ -11,7 +11,7 @@ import java.util.List;
  * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfLocalTime_Test
-        extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalTime, LocalTime> {
+        extends StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalTime, LocalTime> {
 
     __TemporalAccessorStringAttributeConverters_OfLocalTime_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfLocalTime.class);

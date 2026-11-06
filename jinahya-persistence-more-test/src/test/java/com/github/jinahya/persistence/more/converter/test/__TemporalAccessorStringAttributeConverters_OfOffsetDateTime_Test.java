@@ -14,7 +14,7 @@ import java.util.List;
  */
 class __TemporalAccessorStringAttributeConverters_OfOffsetDateTime_Test
         extends
-        __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetDateTime, OffsetDateTime> {
+        StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetDateTime, OffsetDateTime> {
 
     __TemporalAccessorStringAttributeConverters_OfOffsetDateTime_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfOffsetDateTime.class);

@@ -8,7 +8,7 @@ import java.util.List;
  * Tests {@link __NumberStringAttributeConverters.OfByte} against what every attribute converter is expected to do.
  */
 class __NumberStringAttributeConverters_OfByte_Test
-        extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfByte, Byte> {
+        extends StringAttributeConverter_Test<__NumberStringAttributeConverters.OfByte, Byte> {
 
     __NumberStringAttributeConverters_OfByte_Test() {
         super(__NumberStringAttributeConverters.OfByte.class);

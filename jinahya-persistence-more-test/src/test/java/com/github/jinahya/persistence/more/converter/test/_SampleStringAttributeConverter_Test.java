@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 class _SampleStringAttributeConverter_Test
-        extends __StringAttributeConverter_Test<_SampleStringAttributeConverter, String> {
+        extends StringAttributeConverter_Test<_SampleStringAttributeConverter, String> {
 
     _SampleStringAttributeConverter_Test() {
         super(_SampleStringAttributeConverter.class);

@@ -28,7 +28,7 @@ import jakarta.persistence.AttributeConverter;
  * <p>
  * This is the attribute axis of this package: it fixes what the attribute is, and leaves the column open, because the
  * column a number is kept in is a schema's decision and not the number's &mdash; a numeric column of some width, or
- * text where the exact digits matter more than arithmetic does. {@link __StringAttributeConverter} is the other axis,
+ * text where the exact digits matter more than arithmetic does. {@link StringAttributeConverter} is the other axis,
  * fixing the column and leaving the attribute open; {@link __NumberStringAttributeConverter} is what sits on both.
  *
  * @param <X> number type parameter
@@ -37,7 +37,7 @@ import jakarta.persistence.AttributeConverter;
  * @apiNote An interface, carrying nothing: an implementation spends no inheritance on it, and is free to extend
  *         whatever it likes.
  * @see __NumberStringAttributeConverter
- * @see __StringAttributeConverter
+ * @see StringAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

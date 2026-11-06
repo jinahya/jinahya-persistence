@@ -11,7 +11,7 @@ import java.util.List;
  * do.
  */
 class __NumberStringAttributeConverters_OfBigDecimal_Test
-        extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigDecimal, BigDecimal> {
+        extends StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigDecimal, BigDecimal> {
 
     __NumberStringAttributeConverters_OfBigDecimal_Test() {
         super(__NumberStringAttributeConverters.OfBigDecimal.class);

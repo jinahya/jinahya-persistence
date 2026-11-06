@@ -11,7 +11,7 @@ import java.util.List;
  * to do.
  */
 class __TemporalAmountStringAttributeConverters_OfPeriod_Test
-        extends __StringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfPeriod, Period> {
+        extends StringAttributeConverter_Test<__TemporalAmountStringAttributeConverters.OfPeriod, Period> {
 
     __TemporalAmountStringAttributeConverters_OfPeriod_Test() {
         super(__TemporalAmountStringAttributeConverters.OfPeriod.class);

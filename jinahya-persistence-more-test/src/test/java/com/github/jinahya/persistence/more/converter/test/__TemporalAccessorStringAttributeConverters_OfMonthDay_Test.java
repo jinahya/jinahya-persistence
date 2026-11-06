@@ -11,7 +11,7 @@ import java.util.List;
  * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfMonthDay_Test
-        extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfMonthDay, MonthDay> {
+        extends StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfMonthDay, MonthDay> {
 
     __TemporalAccessorStringAttributeConverters_OfMonthDay_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfMonthDay.class);

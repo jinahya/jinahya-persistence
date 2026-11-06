@@ -3,7 +3,7 @@
  *
  * <h2>Two axes, as in the parent package</h2>
  * The column axis is the parent's &mdash;
- * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter} and
+ * {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter} and
  * {@link com.github.jinahya.persistence.more.converter.__LongAttributeConverter}. The attribute axis is this package's:
  * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorAttributeConverter} for a date or a
  * time, {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAmountAttributeConverter} for an amount

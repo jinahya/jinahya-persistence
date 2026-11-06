@@ -34,7 +34,7 @@ import java.nio.charset.Charset;
  * the same {@link Charset} as {@code "UTF-8"}, and is stored as {@code "UTF-8"} again.
  * <p>
  * It implements {@link AttributeConverter AttributeConverter&lt;Charset, String&gt;} itself, not the parent's column
- * axis, {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a
+ * axis, {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter}: EclipseLink takes a
  * converter's column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *

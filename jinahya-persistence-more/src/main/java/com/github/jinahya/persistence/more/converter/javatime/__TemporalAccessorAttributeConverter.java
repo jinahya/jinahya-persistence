@@ -31,7 +31,7 @@ import java.time.temporal.TemporalAccessor;
  * This is the attribute axis of this package for a date or a time: it fixes what the attribute is, and leaves the
  * column open, because the column a {@code java.time} value is kept in is a schema's decision and not the value's
  * &mdash; its ISO-8601 text, the one integral coordinate it is measured by, or the name of one of its fields.
- * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter __StringAttributeConverter} and
+ * {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter StringAttributeConverter} and
  * {@link com.github.jinahya.persistence.more.converter.__LongAttributeConverter __LongAttributeConverter} are the other
  * axis, fixing the column and leaving the attribute open; {@link __TemporalAccessorStringAttributeConverter} and
  * {@link __TemporalAccessorLongAttributeConverter} are what sit on both.

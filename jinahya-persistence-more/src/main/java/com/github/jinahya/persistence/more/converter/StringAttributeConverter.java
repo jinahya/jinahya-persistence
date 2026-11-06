@@ -42,6 +42,6 @@ import jakarta.persistence.AttributeConverter;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public interface __StringAttributeConverter<X> extends AttributeConverter<X, String> {
+public interface StringAttributeConverter<X> extends AttributeConverter<X, String> {
 
 }

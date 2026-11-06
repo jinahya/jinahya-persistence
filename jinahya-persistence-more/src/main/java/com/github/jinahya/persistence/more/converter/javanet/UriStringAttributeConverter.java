@@ -37,7 +37,7 @@ import java.net.URI;
  * and convert it with {@link URI#toURL()} where a {@link java.net.URL} is needed.
  * <p>
  * It implements {@link AttributeConverter AttributeConverter&lt;URI, String&gt;} itself, not the parent's column axis,
- * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}: EclipseLink takes a converter's
+ * {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter}: EclipseLink takes a converter's
  * column type from the type arguments of the interface the class names, as
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} explains.
  *

@@ -153,10 +153,10 @@ inheritance to spend elsewhere:
 
 ```java
 public abstract class __NumberStringAttributeConverter<X extends Number>
-        implements __StringAttributeConverter<X>, __NumberAttributeConverter<X, String> { … }
+        implements StringAttributeConverter<X>, __NumberAttributeConverter<X, String> { … }
 ```
 
-The column axis is `__StringAttributeConverter` and `__LongAttributeConverter`; the attribute axis is
+The column axis is `StringAttributeConverter` and `__LongAttributeConverter`; the attribute axis is
 `__NumberAttributeConverter`, `__BooleanAttributeConverter`, `__TemporalAccessorAttributeConverter` and
 `__TemporalAmountAttributeConverter`, with `__TemporalAttributeConverter` and `__TemporalAdjusterAttributeConverter`
 refining the third along `java.time.temporal`'s own lines. The four `java.time` axes, and every converter built on
@@ -186,6 +186,9 @@ The converter sub-packages are named after the whole package of the API they con
 is split into `…converter.jakartajson`, for `JsonpAttributeConverter`, and `…converter.jakartajsonbind`, for
 `JsonbAttributeConverter`. A converter named in `persistence.xml` or in `@Convert` has to be renamed accordingly —
 `…more.converter.time.ZoneIdStringAttributeConverter` is now `…more.converter.javatime.ZoneIdStringAttributeConverter`.
+`__StringAttributeConverter` is now `StringAttributeConverter`, in the same package, and its test base in
+`jinahya-persistence-more-test` is now `StringAttributeConverter_Test`; a class which implements or extends either has
+to be renamed accordingly.
 New in `…converter.orgw3cdom`: `NodeAttributeConverter`, which stores a DOM `Document`, `DocumentFragment` or
 `Element` as XML text, and reads whatever an XML column holds, a document or content.
 New in `…converter.jakartaxmlbind`: `JaxbAttributeConverter`, which stores any type Jakarta XML Binding maps as XML

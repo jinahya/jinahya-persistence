@@ -60,7 +60,7 @@ import java.util.UUID;
  * <p>
  * This class implements {@link AttributeConverter} with both type arguments itself, and each nested class names its
  * column type as this class's only one: EclipseLink takes a converter's column type from those arguments, and did not
- * find it in {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter}, whose only argument is
+ * find it in {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter}, whose only argument is
  * the attribute type, as {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter}
  * explains.
  *

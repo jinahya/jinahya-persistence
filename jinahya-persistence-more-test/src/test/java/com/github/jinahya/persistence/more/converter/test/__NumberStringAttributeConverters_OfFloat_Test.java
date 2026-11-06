@@ -8,7 +8,7 @@ import java.util.List;
  * Tests {@link __NumberStringAttributeConverters.OfFloat} against what every attribute converter is expected to do.
  */
 class __NumberStringAttributeConverters_OfFloat_Test
-        extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfFloat, Float> {
+        extends StringAttributeConverter_Test<__NumberStringAttributeConverters.OfFloat, Float> {
 
     __NumberStringAttributeConverters_OfFloat_Test() {
         super(__NumberStringAttributeConverters.OfFloat.class);

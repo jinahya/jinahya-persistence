@@ -8,7 +8,7 @@
  * {@link com.github.jinahya.persistence.more.converter.test.__AttributeConverter_Test#testCases() testCases()} is all
  * it takes to get both directions checked; the {@code TestTemplate} providers are the other path, for a subclass
  * wanting an invocation of its own per case.
- * {@link com.github.jinahya.persistence.more.converter.test.__StringAttributeConverter_Test} and
+ * {@link com.github.jinahya.persistence.more.converter.test.StringAttributeConverter_Test} and
  * {@link com.github.jinahya.persistence.more.converter.test.__JoinedStringAttributeConverter_Test} specialize it for
  * the {@code String}-valued converters.
  * <p>

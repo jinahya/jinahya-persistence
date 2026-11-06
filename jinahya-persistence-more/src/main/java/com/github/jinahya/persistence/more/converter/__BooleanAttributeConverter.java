@@ -27,7 +27,7 @@ import jakarta.persistence.AttributeConverter;
  * <p>
  * This is the attribute axis of this package: it fixes what the attribute is, and leaves the column open, because a
  * boolean has been spelled in a column in every way a column can be spelled &mdash; a character, a string, a number, a
- * real boolean where the database has one. {@link __StringAttributeConverter} is the other axis, fixing the column and
+ * real boolean where the database has one. {@link StringAttributeConverter} is the other axis, fixing the column and
  * leaving the attribute open.
  *
  * @param <Y> table column type parameter
@@ -35,7 +35,7 @@ import jakarta.persistence.AttributeConverter;
  * @apiNote An interface, carrying nothing: an implementation spends no inheritance on it, and is free to extend
  *         whatever it likes.
  * @see __BooleanYnAttributeConverter
- * @see __StringAttributeConverter
+ * @see StringAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

@@ -12,7 +12,7 @@ import java.util.List;
  */
 class __TemporalAccessorStringAttributeConverters_OfLocalDateTime_Test
         extends
-        __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalDateTime, LocalDateTime> {
+        StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfLocalDateTime, LocalDateTime> {
 
     __TemporalAccessorStringAttributeConverters_OfLocalDateTime_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfLocalDateTime.class);

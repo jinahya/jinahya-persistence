@@ -8,7 +8,7 @@ import java.util.List;
  * Tests {@link __NumberStringAttributeConverters.OfLong} against what every attribute converter is expected to do.
  */
 class __NumberStringAttributeConverters_OfLong_Test
-        extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfLong, Long> {
+        extends StringAttributeConverter_Test<__NumberStringAttributeConverters.OfLong, Long> {
 
     __NumberStringAttributeConverters_OfLong_Test() {
         super(__NumberStringAttributeConverters.OfLong.class);

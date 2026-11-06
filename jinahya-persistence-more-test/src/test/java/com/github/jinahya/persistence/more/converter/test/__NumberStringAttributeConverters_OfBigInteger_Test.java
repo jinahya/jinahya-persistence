@@ -10,7 +10,7 @@ import java.util.List;
  * do.
  */
 class __NumberStringAttributeConverters_OfBigInteger_Test
-        extends __StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigInteger, BigInteger> {
+        extends StringAttributeConverter_Test<__NumberStringAttributeConverters.OfBigInteger, BigInteger> {
 
     __NumberStringAttributeConverters_OfBigInteger_Test() {
         super(__NumberStringAttributeConverters.OfBigInteger.class);

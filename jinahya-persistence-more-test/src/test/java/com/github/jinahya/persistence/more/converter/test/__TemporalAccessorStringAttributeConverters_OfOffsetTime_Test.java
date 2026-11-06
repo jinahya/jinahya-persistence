@@ -13,7 +13,7 @@ import java.util.List;
  * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfOffsetTime_Test
-        extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetTime, OffsetTime> {
+        extends StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfOffsetTime, OffsetTime> {
 
     __TemporalAccessorStringAttributeConverters_OfOffsetTime_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfOffsetTime.class);

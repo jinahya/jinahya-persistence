@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class __JoinedStringAttributeConverter<X> implements __StringAttributeConverter<List<X>> {
+public class __JoinedStringAttributeConverter<X> implements StringAttributeConverter<List<X>> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 

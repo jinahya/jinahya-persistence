@@ -20,8 +20,8 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * #L%
  */
 
+import com.github.jinahya.persistence.more.converter.StringAttributeConverter;
 import com.github.jinahya.persistence.more.converter.__ChainingAttributeConverter;
-import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -35,8 +35,8 @@ import java.util.TimeZone;
  * <p>
  * A {@link ZoneId} is not a {@link java.time.temporal.TemporalAccessor}, so this converter sits on none of this
  * package's attribute axes. It implements {@link AttributeConverter AttributeConverter&lt;ZoneId, String&gt;} itself,
- * not the parent's column axis, {@link __StringAttributeConverter}: EclipseLink takes a converter's column type from
- * the type arguments of the interface the class names, and from {@code __StringAttributeConverter<ZoneId>}, whose only
+ * not the parent's column axis, {@link StringAttributeConverter}: EclipseLink takes a converter's column type from
+ * the type arguments of the interface the class names, and from {@code StringAttributeConverter<ZoneId>}, whose only
  * argument is the attribute type, it took {@link ZoneId} for the column, and failed to bind the {@link String} this
  * converter returns ({@code EclipseLink-3002}).
  * <p>
@@ -72,7 +72,7 @@ public class ZoneIdStringAttributeConverter implements AttributeConverter<ZoneId
     @Converter(autoApply = false)
     public static class TimeZoneStringAttributeConverter
             extends __ChainingAttributeConverter<TimeZone, ZoneId, String>
-            implements __StringAttributeConverter<TimeZone> {
+            implements StringAttributeConverter<TimeZone> {
 
         /**
          * Creates a new instance.

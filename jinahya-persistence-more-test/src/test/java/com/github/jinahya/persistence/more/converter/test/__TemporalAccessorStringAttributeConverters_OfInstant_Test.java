@@ -11,7 +11,7 @@ import java.util.List;
  * expected to do.
  */
 class __TemporalAccessorStringAttributeConverters_OfInstant_Test
-        extends __StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfInstant, Instant> {
+        extends StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfInstant, Instant> {
 
     __TemporalAccessorStringAttributeConverters_OfInstant_Test() {
         super(__TemporalAccessorStringAttributeConverters.OfInstant.class);

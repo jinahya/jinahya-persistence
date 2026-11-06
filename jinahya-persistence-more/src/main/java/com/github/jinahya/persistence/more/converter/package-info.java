@@ -4,7 +4,7 @@
  *
  * <h2>Two axes</h2>
  * A converter is pinned by what the column is and by what the attribute is, and the two are separate.
- * {@link com.github.jinahya.persistence.more.converter.__StringAttributeConverter} is the column axis &mdash; an
+ * {@link com.github.jinahya.persistence.more.converter.StringAttributeConverter} is the column axis &mdash; an
  * attribute, whatever it is, in a {@code String} column. The attribute axis is
  * {@link com.github.jinahya.persistence.more.converter.__NumberAttributeConverter} and
  * {@link com.github.jinahya.persistence.more.converter.__BooleanAttributeConverter} &mdash; a number, or a boolean, in

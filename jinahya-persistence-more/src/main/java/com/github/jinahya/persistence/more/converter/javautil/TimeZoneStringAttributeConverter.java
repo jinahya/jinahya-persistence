@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.StringAttributeConverter;
 import com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -41,7 +41,7 @@ import java.util.TimeZone;
  */
 @Deprecated
 @Converter(autoApply = false)
-public class TimeZoneStringAttributeConverter implements __StringAttributeConverter<TimeZone> {
+public class TimeZoneStringAttributeConverter implements StringAttributeConverter<TimeZone> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 

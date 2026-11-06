@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Verifies that a {@link __StringAttributeConverter} nested converter can be registered on a real entity and
+ * Verifies that a {@link StringAttributeConverter} nested converter can be registered on a real entity and
  * instantiated by the persistence provider itself.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __StringAttributeConverter_PersistenceTest {
+class StringAttributeConverter_PersistenceTest {
 
     private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
 

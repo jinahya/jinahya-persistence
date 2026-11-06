@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.converter.javautil;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.StringAttributeConverter;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -74,7 +74,7 @@ import java.util.stream.Collectors;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-public abstract class LocaleStringAttributeConverter implements __StringAttributeConverter<Locale> {
+public abstract class LocaleStringAttributeConverter implements StringAttributeConverter<Locale> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 

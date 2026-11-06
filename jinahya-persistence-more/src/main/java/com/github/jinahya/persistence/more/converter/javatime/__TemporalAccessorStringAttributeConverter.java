@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.converter.javatime;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.__StringAttributeConverter;
+import com.github.jinahya.persistence.more.converter.StringAttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.lang.invoke.MethodHandles;
@@ -67,7 +67,7 @@ import java.util.Objects;
         "java:S101" // Class names should comply with a naming convention
 })
 public abstract class __TemporalAccessorStringAttributeConverter<X extends TemporalAccessor>
-        implements __StringAttributeConverter<X>, __TemporalAccessorAttributeConverter<X, String> {
+        implements StringAttributeConverter<X>, __TemporalAccessorAttributeConverter<X, String> {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
