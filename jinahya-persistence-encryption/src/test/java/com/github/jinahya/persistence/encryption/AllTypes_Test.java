@@ -2,6 +2,7 @@ package com.github.jinahya.persistence.encryption;
 
 import com.github.jinahya.persistence.encryption.examples.AllTypesEntity;
 import com.github.jinahya.persistence.encryption.examples.Color;
+import com.github.jinahya.persistence.shared.__PersistenceProviders;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterAll;
@@ -27,6 +28,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Round-trips one attribute of every supported type through its converter, and checks that every column is binary.
@@ -119,6 +121,8 @@ class AllTypes_Test {
     @DisplayName("an array changed in place: detected on Hibernate ORM, not on EclipseLink; assigned anew, stored")
     @Test
     void arrayInPlace() {
+        assumeFalse(__PersistenceProviders.isWovenByEclipseLink(AllTypesEntity.class),
+                    "woven, a field assigned from outside the entity is not tracked");
         final var id = PersistenceTests.apply(EMF, em -> {
             final var e = filled();
             em.persist(e);
@@ -141,6 +145,8 @@ class AllTypes_Test {
     @DisplayName("a Date changed in place: detected on Hibernate ORM, not on EclipseLink; assigned anew, stored")
     @Test
     void dateInPlace() {
+        assumeFalse(__PersistenceProviders.isWovenByEclipseLink(AllTypesEntity.class),
+                    "woven, a field assigned from outside the entity is not tracked");
         final var id = PersistenceTests.apply(EMF, em -> {
             final var e = filled();
             em.persist(e);

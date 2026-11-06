@@ -1,7 +1,11 @@
 package com.github.jinahya.persistence.test.util.spec;
 
+import com.github.jinahya.persistence.shared.__PersistenceProviders;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Verifies that the Fixture Monkey flavor of {@link com.github.jinahya.object.randomizer.AbstractObjectRandomizer} is
@@ -16,6 +20,12 @@ import org.junit.jupiter.api.Test;
         "java:S101" // Class names should comply with a naming convention
 })
 class _Employee_Randomizer_FixtureMonkey_Test {
+
+    // woven, _Employee carries the members EclipseLink adds, which the engine cannot populate
+    @BeforeEach
+    void assumeNotWoven() {
+        assumeFalse(__PersistenceProviders.isWovenByEclipseLink(_Employee.class), "woven by EclipseLink");
+    }
 
     @DisplayName("get() -> populated, with every excluded attribute left to its owner")
     @Test

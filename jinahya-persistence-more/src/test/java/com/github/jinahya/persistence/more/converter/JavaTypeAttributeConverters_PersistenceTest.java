@@ -20,6 +20,7 @@ package com.github.jinahya.persistence.more.converter;
  * #L%
  */
 
+import com.github.jinahya.persistence.shared.__PersistenceProviders;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterAll;
@@ -37,6 +38,7 @@ import java.util.HexFormat;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Persists the attributes the converters of {@code java} types convert, so that the provider binds the column type each
@@ -125,6 +127,8 @@ class JavaTypeAttributeConverters_PersistenceTest {
     @DisplayName("a changed copy of a bit set, assigned to a managed entity, is stored")
     @Test
     void __bitSetChangedCopy() {
+        assumeFalse(__PersistenceProviders.isWovenByEclipseLink(_ConvertedEntity.class),
+                    "woven, a field assigned from outside the entity is not tracked");
         final var id = persist(e -> e.bitSet = new BitSet());
         try (var em = ENTITY_MANAGER_FACTORY.createEntityManager()) {
             final var tx = em.getTransaction();

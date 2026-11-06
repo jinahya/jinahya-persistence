@@ -5,6 +5,7 @@ import com.github.jinahya.persistence.encryption.examples.PropertyEntity;
 import com.github.jinahya.persistence.encryption.examples.Secret;
 import com.github.jinahya.persistence.encryption.examples.SecretEntity;
 import com.github.jinahya.persistence.encryption.converter.EncryptedStringConverter;
+import com.github.jinahya.persistence.shared.__PersistenceProviders;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -29,6 +30,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
  * Measures, on whichever provider the build runs on, what a converted attribute does across the entity life cycle:
@@ -342,6 +344,8 @@ class EncryptionLifecycle_Test {
         @DisplayName("a changed plaintext is stored as a new ciphertext")
         @Test
         void __changed() {
+            assumeFalse(__PersistenceProviders.isWovenByEclipseLink(SecretEntity.class),
+                        "woven, a field assigned from outside the entity is not tracked");
             final var id = persisted("secret-dave");
             final var before = row(id);
             apply(em -> em.find(SecretEntity.class, id).name = "secret-dave2");
@@ -352,6 +356,8 @@ class EncryptionLifecycle_Test {
         @DisplayName("a plaintext set to null is stored as NULL")
         @Test
         void __nulled() {
+            assumeFalse(__PersistenceProviders.isWovenByEclipseLink(SecretEntity.class),
+                        "woven, a field assigned from outside the entity is not tracked");
             final var id = persisted("secret-erin");
             apply(em -> em.find(SecretEntity.class, id).name = null);
             assertThat(row(id)[1]).isNull();
@@ -361,6 +367,8 @@ class EncryptionLifecycle_Test {
         @DisplayName("an unrelated change: whether the unchanged plaintext is encrypted again is the provider's")
         @Test
         void __unrelated() {
+            assumeFalse(__PersistenceProviders.isWovenByEclipseLink(SecretEntity.class),
+                        "woven, a field assigned from outside the entity is not tracked");
             final var id = persisted("secret-carol");
             final var before = row(id);
             apply(em -> em.find(SecretEntity.class, id).note = "changed");
