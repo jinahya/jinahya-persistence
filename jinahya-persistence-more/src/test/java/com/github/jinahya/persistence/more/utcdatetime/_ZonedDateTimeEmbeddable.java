@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -22,33 +22,14 @@ package com.github.jinahya.persistence.more.javatime;
 
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.Embeddable;
 
 @Access(AccessType.FIELD)
-@Entity
-@Table(name = _OffsetDateTimeEntity.TABLE_NAME)
+@Embeddable
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class _OffsetDateTimeEntity extends __MappedOffsetDateTime {
+public class _ZonedDateTimeEmbeddable extends MappedZonedDateTime {
 
-    static final String TABLE_NAME = "offset_date_time";
-
-    /**
-     * Returns the identifier of this entity.
-     *
-     * @return the identifier of this entity.
-     */
-    public Long getId() {
-        return id;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 }
 

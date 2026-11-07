@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -52,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class ___MappedUtcDateTime_PersistenceTest {
+class _MappedUtcDateTime_PersistenceTest {
 
     private static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getDefault();
 
@@ -62,7 +62,7 @@ class ___MappedUtcDateTime_PersistenceTest {
     static void openEntityManagerFactory() {
         // before the factory is built, so that nothing it caches has seen another zone
         TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
-        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__javaTimePU");
+        ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("__utcDateTimePU");
     }
 
     @AfterAll
@@ -138,8 +138,8 @@ class ___MappedUtcDateTime_PersistenceTest {
         @Test
         void _twoColumns_declaredNames() {
             assertThat(columnNamesOf(_ZonedDateTimeEntity.TABLE_NAME))
-                    .containsExactlyInAnyOrder("id", ___MappedUtcDateTime.COLUMN_NAME_UTC_DATE_TIME,
-                                               __MappedZonedDateTime.COLUMN_NAME_ZONE_ID);
+                    .containsExactlyInAnyOrder("id", _MappedUtcDateTime.COLUMN_NAME_UTC_DATE_TIME,
+                                               MappedZonedDateTime.COLUMN_NAME_ZONE_ID);
         }
 
         @DisplayName("a zoned date-time survives a write and a read, zone and offset and all")
@@ -162,8 +162,8 @@ class ___MappedUtcDateTime_PersistenceTest {
         @Test
         void _twoColumns_declaredNames() {
             assertThat(columnNamesOf(_OffsetDateTimeEntity.TABLE_NAME))
-                    .containsExactlyInAnyOrder("id", ___MappedUtcDateTime.COLUMN_NAME_UTC_DATE_TIME,
-                                               __MappedOffsetDateTime.COLUMN_NAME_ZONE_OFFSET);
+                    .containsExactlyInAnyOrder("id", _MappedUtcDateTime.COLUMN_NAME_UTC_DATE_TIME,
+                                               MappedOffsetDateTime.COLUMN_NAME_ZONE_OFFSET);
         }
 
         @DisplayName("an offset date-time survives a write and a read, offset and all")
@@ -186,7 +186,7 @@ class ___MappedUtcDateTime_PersistenceTest {
      * Both providers carry a {@link LocalDateTime} through a {@link java.sql.Timestamp} in the default zone, where
      * {@code 2026-03-08T02:30} does not exist and becomes {@code 03:30}. H2 itself keeps the value, through
      * {@link java.sql.PreparedStatement#setObject(int, Object) setObject}; the shift is the providers'. These tests
-     * record it, so that a provider which stops doing it is noticed; see {@link ___MappedUtcDateTime}.
+     * record it, so that a provider which stops doing it is noticed; see {@link _MappedUtcDateTime}.
      */
     @Nested
     class Gap {

@@ -115,15 +115,15 @@
       <property name="hibernate.show_sql" value="false"/>
     </properties>
   </persistence-unit>
-  <persistence-unit name="__javaTimePU">
-    <description>Persistence Unit for exercising the java.time mapped superclasses against an in-memory DB
+  <persistence-unit name="__utcDateTimePU">
+    <description>Persistence Unit for exercising the UTC date-time mapped superclasses against an in-memory DB
     </description>
     <provider>${persistence-unit.provider}</provider>
-    <class>com.github.jinahya.persistence.more.javatime._ZonedDateTimeEntity</class>
-    <class>com.github.jinahya.persistence.more.javatime._OffsetDateTimeEntity</class>
-    <class>com.github.jinahya.persistence.more.javatime._ZonedDateTimeEmbeddable</class>
-    <class>com.github.jinahya.persistence.more.javatime._OffsetDateTimeEmbeddable</class>
-    <class>com.github.jinahya.persistence.more.javatime._EventEntity</class>
+    <class>com.github.jinahya.persistence.more.utcdatetime._ZonedDateTimeEntity</class>
+    <class>com.github.jinahya.persistence.more.utcdatetime._OffsetDateTimeEntity</class>
+    <class>com.github.jinahya.persistence.more.utcdatetime._ZonedDateTimeEmbeddable</class>
+    <class>com.github.jinahya.persistence.more.utcdatetime._OffsetDateTimeEmbeddable</class>
+    <class>com.github.jinahya.persistence.more.utcdatetime._EventEntity</class>
     <!-- EclipseLink resolves a @Convert converter against the unit's listed classes; with
          exclude-unlisted-classes it will not find one that is merely referenced. Hibernate does. -->
     <class>com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter</class>
@@ -133,7 +133,7 @@
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
       <property name="jakarta.persistence.jdbc.url"
-                value="jdbc:h2:mem:javatime;database_to_upper=false;MODE=LEGACY"/>
+                value="jdbc:h2:mem:utcdatetime;database_to_upper=false;MODE=LEGACY"/>
       <property name="jakarta.persistence.jdbc.user" value="sa"/>
       <property name="jakarta.persistence.jdbc.password" value="password"/>
       <!-- eclipselink -->

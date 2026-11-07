@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -38,8 +38,8 @@ import java.time.ZoneOffset;
  * The moment is stored as the {@link LocalDateTime} a clock in UTC would read at it, in the
  * {@value #COLUMN_NAME_UTC_DATE_TIME} column. That column is the one to sort, compare and index on: every row is
  * written in the same zone, so the order of its values is the order of the moments. What a subclass adds beside it is
- * whatever rebuilds the value the moment was written as — a zone in {@link __MappedZonedDateTime}, an offset in
- * {@link __MappedOffsetDateTime}.
+ * whatever rebuilds the value the moment was written as — a zone in {@link MappedZonedDateTime}, an offset in
+ * {@link MappedOffsetDateTime}.
  *
  * <h2>Why a column of no zone</h2>
  * A {@link LocalDateTime} maps to the plainest date-time column a database has — {@code TIMESTAMP},
@@ -65,15 +65,15 @@ import java.time.ZoneOffset;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @apiNote The precision of the value read back is the column's. A column of microseconds drops the nanoseconds
  *         a {@link LocalDateTime} can carry, and the moment read back is truncated accordingly.
- * @see __MappedZonedDateTime
- * @see __MappedOffsetDateTime
+ * @see MappedZonedDateTime
+ * @see MappedOffsetDateTime
  */
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class ___MappedUtcDateTime {
+public abstract class _MappedUtcDateTime {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -89,7 +89,7 @@ public abstract class ___MappedUtcDateTime {
     /**
      * Creates a new instance.
      */
-    protected ___MappedUtcDateTime() {
+    protected _MappedUtcDateTime() {
         super();
     }
 
@@ -128,6 +128,13 @@ public abstract class ___MappedUtcDateTime {
      * Returns the moment of this value.
      *
      * @return the moment of this value; {@code null} when the {@code utcDateTime} attribute is {@code null}.
+     * @apiNote This class keeps no zone, so it has no {@code getZonedDateTime()} or {@code getOffsetDateTime()}; a
+     *         subclass which keeps one has its own. To read the moment at a zone or an offset of the caller's
+     *         choosing, ask the instant itself:
+     *         {@snippet :
+     *         ZonedDateTime zonedDateTime = value.getInstant().atZone(zoneId);
+     *         OffsetDateTime offsetDateTime = value.getInstant().atOffset(zoneOffset);
+     *}
      */
     @Transient
     public Instant getInstant() {
@@ -135,6 +142,27 @@ public abstract class ___MappedUtcDateTime {
             return null;
         }
         return utcDateTime.toInstant(ZoneOffset.UTC);
+    }
+
+    /**
+     * Replaces the moment of this value, leaving whatever a subclass keeps beside it — a zone, an offset — as it is.
+     *
+     * @param instant the moment; {@code null} to clear the {@code utcDateTime} attribute.
+     * @apiNote Only the moment of a zoned or an offset date-time passed here is kept; its zone or offset is dropped,
+     *         and a subclass's own zone or offset stays as it was:
+     *         {@snippet :
+     *         value.setInstant(zonedDateTime.toInstant());    // value's zone, if any, unchanged
+     *}
+     *         To replace the zone or the offset too, use the subclass's
+     *         {@link MappedZonedDateTime#setZonedDateTime(java.time.ZonedDateTime) setZonedDateTime} or
+     *         {@link MappedOffsetDateTime#setOffsetDateTime(java.time.OffsetDateTime) setOffsetDateTime}.
+     */
+    public void setInstant(final Instant instant) {
+        if (instant == null) {
+            setUtcDateTime(null);
+            return;
+        }
+        setUtcDateTime(LocalDateTime.ofInstant(instant, ZoneOffset.UTC));
     }
 
     // -----------------------------------------------------------------------------------------------------------------

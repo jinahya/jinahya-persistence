@@ -7,12 +7,12 @@
  * columns of portable types — the moment as a UTC date-time, in a column of no zone, and beside it what rebuilds the
  * value:
  * <ul>
- * <li>{@link com.github.jinahya.persistence.more.javatime.__MappedZonedDateTime} — a zone, for where the place
+ * <li>{@link com.github.jinahya.persistence.more.utcdatetime.MappedZonedDateTime} — a zone, for where the place
  *     matters.
- * <li>{@link com.github.jinahya.persistence.more.javatime.__MappedOffsetDateTime} — an offset, for where the offset
+ * <li>{@link com.github.jinahya.persistence.more.utcdatetime.MappedOffsetDateTime} — an offset, for where the offset
  *     itself is the fact to keep.
  * </ul>
- * Both extend {@link com.github.jinahya.persistence.more.javatime.___MappedUtcDateTime}, which holds the moment, and
+ * Both extend {@link com.github.jinahya.persistence.more.utcdatetime._MappedUtcDateTime}, which holds the moment, and
  * nothing in any of them names a database. Intervals of {@code java.time} values are in
  * {@link com.github.jinahya.persistence.more.temporalinterval}.
  * <p>
@@ -22,7 +22,7 @@
  * {@snippet :
  * @Embeddable
  * @Access(AccessType.FIELD)
- * public class Zoned extends __MappedZonedDateTime {}
+ * public class Zoned extends MappedZonedDateTime {}
  *
  * @Entity
  * public class Order {
@@ -36,7 +36,7 @@
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L

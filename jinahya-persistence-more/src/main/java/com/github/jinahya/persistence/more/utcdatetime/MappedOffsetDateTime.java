@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -36,7 +36,7 @@ import java.time.ZoneOffset;
 /**
  * An abstract mapped superclass for an {@link OffsetDateTime}, kept as a UTC date-time and an offset.
  * <p>
- * The moment is in the {@value ___MappedUtcDateTime#COLUMN_NAME_UTC_DATE_TIME} column, and the offset it was written
+ * The moment is in the {@value _MappedUtcDateTime#COLUMN_NAME_UTC_DATE_TIME} column, and the offset it was written
  * at in the {@value #COLUMN_NAME_ZONE_OFFSET} column, as its {@link ZoneOffset#getId() identifier} — {@code +09:00},
  * or {@code +08:27:52} for an offset of seconds, which some historical ones are. The two rebuild the value exactly,
  * and the local date-time it was written as is the moment plus the offset.
@@ -49,17 +49,17 @@ import java.time.ZoneOffset;
  * {@code +09:00} says what the clock was ahead of UTC by, not where it was: Seoul and Tokyo share it. Nothing here
  * depends on the rules of a zone, which is the point where the offset itself is the fact to keep — a signature, a legal
  * record — and no later change to a time-zone database should be able to move it. Where the place matters, use
- * {@link __MappedZonedDateTime}.
+ * {@link MappedZonedDateTime}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __MappedZonedDateTime
+ * @see MappedZonedDateTime
  */
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedOffsetDateTime extends ___MappedUtcDateTime {
+public abstract class MappedOffsetDateTime extends _MappedUtcDateTime {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -75,7 +75,7 @@ public abstract class __MappedOffsetDateTime extends ___MappedUtcDateTime {
     /**
      * Creates a new instance.
      */
-    protected __MappedOffsetDateTime() {
+    protected MappedOffsetDateTime() {
         super();
     }
 
@@ -108,7 +108,7 @@ public abstract class __MappedOffsetDateTime extends ___MappedUtcDateTime {
         this.zoneOffset = zoneOffset;
     }
 
-    // -------------------------------------------------------------------------------------------------------- derived
+    // --------------------------------------------------------------------------------------------------------- derived
 
     /**
      * Returns this value as an offset date-time.

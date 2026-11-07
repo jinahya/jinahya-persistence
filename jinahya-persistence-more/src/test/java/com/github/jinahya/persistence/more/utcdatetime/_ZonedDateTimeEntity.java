@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -34,7 +34,7 @@ import jakarta.persistence.Table;
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public class _ZonedDateTimeEntity extends __MappedZonedDateTime {
+public class _ZonedDateTimeEntity extends MappedZonedDateTime {
 
     static final String TABLE_NAME = "zoned_date_time";
 

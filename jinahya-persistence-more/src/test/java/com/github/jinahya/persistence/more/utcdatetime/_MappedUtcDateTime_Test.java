@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -40,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class ___MappedUtcDateTime_Test {
+class _MappedUtcDateTime_Test {
 
     @Nested
     class OfZonedDateTime {
@@ -79,6 +80,23 @@ class ___MappedUtcDateTime_Test {
             value.setZonedDateTime(null);
             assertThat(value.getUtcDateTime()).isNull();
             assertThat(value.getZoneId()).isNull();
+        }
+
+        @DisplayName("a new moment keeps the zone, and is read in it")
+        @Test
+        void _setInstant() {
+            final var value = new _ZonedDateTimeEmbeddable();
+            value.setZonedDateTime(ZonedDateTime.of(2026, 9, 20, 10, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+            final var instant = Instant.parse("2026-12-31T15:00:00Z");
+            value.setInstant(instant);
+            assertThat(value.getUtcDateTime()).isEqualTo(LocalDateTime.of(2026, 12, 31, 15, 0));
+            assertThat(value.getInstant()).isEqualTo(instant);
+            assertThat(value.getZoneId()).isEqualTo(ZoneId.of("Asia/Seoul"));
+            assertThat(value.getZonedDateTime())
+                    .isEqualTo(ZonedDateTime.of(2027, 1, 1, 0, 0, 0, 0, ZoneId.of("Asia/Seoul")));
+            value.setInstant(null);
+            assertThat(value.getUtcDateTime()).isNull();
+            assertThat(value.getZoneId()).isEqualTo(ZoneId.of("Asia/Seoul"));
         }
     }
 

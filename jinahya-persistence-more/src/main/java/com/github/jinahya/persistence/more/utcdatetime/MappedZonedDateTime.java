@@ -1,4 +1,4 @@
-package com.github.jinahya.persistence.more.javatime;
+package com.github.jinahya.persistence.more.utcdatetime;
 
 /*-
  * #%L
@@ -37,7 +37,7 @@ import java.time.ZonedDateTime;
 /**
  * An abstract mapped superclass for a {@link ZonedDateTime}, kept as a UTC date-time and a zone.
  * <p>
- * The moment is in the {@value ___MappedUtcDateTime#COLUMN_NAME_UTC_DATE_TIME} column, and the zone it was written in
+ * The moment is in the {@value _MappedUtcDateTime#COLUMN_NAME_UTC_DATE_TIME} column, and the zone it was written in
  * — {@code Asia/Seoul}, not {@code +09:00} — in the {@value #COLUMN_NAME_ZONE_ID} column, as its
  * {@link ZoneId#getId() identifier}. The two together rebuild the value exactly: a moment and a zone name one
  * {@link ZonedDateTime}, offset and all, including which of the two offsets a daylight-saving overlap was written in.
@@ -57,14 +57,14 @@ import java.time.ZonedDateTime;
  * A zone which the running JDK does not know cannot be read back at all; see {@link ZoneIdStringAttributeConverter}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see __MappedOffsetDateTime
+ * @see MappedOffsetDateTime
  */
 @Access(AccessType.FIELD)
 @MappedSuperclass
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention
 })
-public abstract class __MappedZonedDateTime extends ___MappedUtcDateTime {
+public abstract class MappedZonedDateTime extends _MappedUtcDateTime {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -80,7 +80,7 @@ public abstract class __MappedZonedDateTime extends ___MappedUtcDateTime {
     /**
      * Creates a new instance.
      */
-    protected __MappedZonedDateTime() {
+    protected MappedZonedDateTime() {
         super();
     }
 
@@ -113,7 +113,7 @@ public abstract class __MappedZonedDateTime extends ___MappedUtcDateTime {
         this.zoneId = zoneId;
     }
 
-    // -------------------------------------------------------------------------------------------------------- derived
+    // --------------------------------------------------------------------------------------------------------- derived
 
     /**
      * Returns this value as a zoned date-time.
