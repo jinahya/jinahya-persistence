@@ -170,7 +170,7 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 | Holder | Converters |
 | --- | --- |
 | `__NumberStringAttributeConverters` | `BigDecimal`, `BigInteger`, `Byte`, `Short`, `Integer`, `Long`, `Float`, `Double`, each stored as its exact decimal text |
-| `__TemporalAccessorStringAttributeConverters` | the ten `java.time` types with a `parse(CharSequence)`, in ISO-8601 or through a `DateTimeFormatter` |
+| `InstantConverter`, `LocalDateConverter`, `LocalDateTimeConverter`, `LocalTimeConverter`, `OffsetDateTimeConverter`, `OffsetTimeConverter`, `ZonedDateTimeConverter`, `YearConverter`, `YearMonthConverter`, `MonthDayConverter` | one holder per `java.time` type with a `parse(CharSequence)`, whose `OfString` stores it in ISO-8601 or through a `DateTimeFormatter`; `YearConverter` also has `OfShort` and `OfInteger`, for a numeric column such as MySQL's `YEAR` |
 | `__TemporalAccessorTextStringAttributeConverters` | `DayOfWeek` and `Month`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
 | `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
 | `ZoneIdStringAttributeConverter` | a `ZoneId`, stored as its identifier — `Asia/Seoul`, `+09:00` — a concrete converter on its own, with no holder; and, nested in it and built on it, `TimeZoneStringAttributeConverter`, a `java.util.TimeZone` stored as the identifier of its zone; in `…converter.javatime` |
@@ -189,6 +189,10 @@ is split into `…converter.jakartajson`, for `JsonpAttributeConverter`, and `�
 `__StringAttributeConverter` is now `StringAttributeConverter`, in the same package, and its test base in
 `jinahya-persistence-more-test` is now `StringAttributeConverter_Test`; a class which implements or extends either has
 to be renamed accordingly.
+`__TemporalAccessorStringAttributeConverters` is gone: each of its converters is now the `OfString` of a top-level
+holder named after its type, in `…converter.javatime` —
+`…javatime.__TemporalAccessorStringAttributeConverters$OfYearMonth` is now `…javatime.YearMonthConverter$OfString`.
+`YearConverter` also has `OfShort` and `OfInteger`, which store a `Year` as its value in a numeric column.
 New in `…converter.orgw3cdom`: `NodeAttributeConverter`, which stores a DOM `Document`, `DocumentFragment` or
 `Element` as XML text, and reads whatever an XML column holds, a document or content.
 New in `…converter.jakartaxmlbind`: `JaxbAttributeConverter`, which stores any type Jakarta XML Binding maps as XML

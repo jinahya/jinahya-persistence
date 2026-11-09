@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.temporalinterval;
 
-import com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverters.OfYearMonth;
+import com.github.jinahya.persistence.more.converter.javatime.YearMonthConverter;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Convert;
@@ -18,8 +18,8 @@ import jakarta.persistence.Table;
 // restated here: EclipseLink does not apply a @Convert(attributeName) which a mapped superclass declares against an
 // attribute inherited from a higher one. Hibernate does. See __MappedYearMonthInterval.
 @Access(AccessType.FIELD)
-@Convert(attributeName = "intervalStart", converter = OfYearMonth.class)
-@Convert(attributeName = "intervalEnd", converter = OfYearMonth.class)
+@Convert(attributeName = "intervalStart", converter = YearMonthConverter.OfString.class)
+@Convert(attributeName = "intervalEnd", converter = YearMonthConverter.OfString.class)
 @Entity
 @Table(name = _YearMonthIntervalEntity.TABLE_NAME)
 @SuppressWarnings({

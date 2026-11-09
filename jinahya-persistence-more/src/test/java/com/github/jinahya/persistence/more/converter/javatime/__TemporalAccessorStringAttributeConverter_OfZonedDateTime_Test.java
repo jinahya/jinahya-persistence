@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link __TemporalAccessorStringAttributeConverters.OfZonedDateTime}.
+ * Tests for {@link ZonedDateTimeConverter.OfString}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @DisplayName("OfZonedDateTime")
 class __TemporalAccessorStringAttributeConverter_OfZonedDateTime_Test {
 
-    private final __TemporalAccessorStringAttributeConverters.OfZonedDateTime converter =
-            new __TemporalAccessorStringAttributeConverters.OfZonedDateTime();
+    private final ZonedDateTimeConverter.OfString converter =
+            new ZonedDateTimeConverter.OfString();
 
     @DisplayName("null <-> null")
     @Test

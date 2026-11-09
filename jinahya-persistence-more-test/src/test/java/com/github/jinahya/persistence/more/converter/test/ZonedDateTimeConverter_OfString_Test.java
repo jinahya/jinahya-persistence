@@ -1,6 +1,6 @@
 package com.github.jinahya.persistence.more.converter.test;
 
-import com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverters;
+import com.github.jinahya.persistence.more.converter.javatime.ZonedDateTimeConverter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -9,15 +9,15 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
- * Tests {@link __TemporalAccessorStringAttributeConverters.OfZonedDateTime} against what every attribute converter is
+ * Tests {@link ZonedDateTimeConverter.OfString} against what every attribute converter is
  * expected to do.
  */
-class __TemporalAccessorStringAttributeConverters_OfZonedDateTime_Test
+class ZonedDateTimeConverter_OfString_Test
         extends
-        StringAttributeConverter_Test<__TemporalAccessorStringAttributeConverters.OfZonedDateTime, ZonedDateTime> {
+        StringAttributeConverter_Test<ZonedDateTimeConverter.OfString, ZonedDateTime> {
 
-    __TemporalAccessorStringAttributeConverters_OfZonedDateTime_Test() {
-        super(__TemporalAccessorStringAttributeConverters.OfZonedDateTime.class);
+    ZonedDateTimeConverter_OfString_Test() {
+        super(ZonedDateTimeConverter.OfString.class);
     }
 
     @Override

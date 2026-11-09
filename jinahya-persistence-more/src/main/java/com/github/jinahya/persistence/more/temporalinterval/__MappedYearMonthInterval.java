@@ -20,7 +20,7 @@ package com.github.jinahya.persistence.more.temporalinterval;
  * #L%
  */
 
-import com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverters;
+import com.github.jinahya.persistence.more.converter.javatime.YearMonthConverter;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.AttributeOverride;
@@ -74,9 +74,9 @@ import java.time.temporal.TemporalUnit;
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @Entity
  * @Convert(attributeName = "intervalStart", converter =
- *         __TemporalAccessorStringAttributeConverters.OfYearMonth.class)
+ *         YearMonthConverter.OfString.class)
  * @Convert(attributeName = "intervalEnd", converter =
- *         __TemporalAccessorStringAttributeConverters.OfYearMonth.class) public class BillingPeriod extends
+ *         YearMonthConverter.OfString.class) public class BillingPeriod extends
  *         __MappedYearMonthInterval { ... }} The converter also has to be reachable by the persistence unit. Under
  *         {@code <exclude-unlisted-classes>true</exclude-unlisted-classes>} EclipseLink resolves it only against the
  *         unit's listed classes, so it has to be listed there; Hibernate finds one which is merely referenced.
@@ -98,7 +98,7 @@ import java.time.temporal.TemporalUnit;
  *         sort, which is why it keeps a numeric column instead.
  * @see ___DiscreteInterval
  * @see __MappedYearInterval
- * @see __TemporalAccessorStringAttributeConverters.OfYearMonth
+ * @see YearMonthConverter.OfString
  */
 @AttributeOverride(
         name = "intervalStart",
@@ -113,11 +113,11 @@ import java.time.temporal.TemporalUnit;
 )
 @Convert(
         attributeName = "intervalStart",
-        converter = __TemporalAccessorStringAttributeConverters.OfYearMonth.class
+        converter = YearMonthConverter.OfString.class
 )
 @Convert(
         attributeName = "intervalEnd",
-        converter = __TemporalAccessorStringAttributeConverters.OfYearMonth.class
+        converter = YearMonthConverter.OfString.class
 )
 @Access(AccessType.FIELD)
 @MappedSuperclass

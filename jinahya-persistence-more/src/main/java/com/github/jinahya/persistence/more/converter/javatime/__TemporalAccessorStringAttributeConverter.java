@@ -52,6 +52,14 @@ import java.util.Objects;
  * column whose format was decided elsewhere, or a shorter one than the ISO-8601 form. It has to be lossless for the
  * type: whatever the formatter does not write cannot be read back, so a pattern which drops a field the type carries
  * makes the round trip fail, or quietly return a different value.
+ * <p>
+ * The concrete converters are the {@code OfString} of a top-level holder per type &mdash;
+ * {@link InstantConverter.OfString}, {@link YearConverter.OfString}, and so on. Each has two constructors, and only the
+ * no-argument one is ever reached by a persistence provider: a converter is registered by class, and nothing in
+ * {@link jakarta.persistence.Convert @Convert} or in {@code persistence.xml} can pass an argument. The one taking a
+ * {@link DateTimeFormatter} is for holding the converter directly &mdash; composed into another, or delegated to from
+ * one which <em>is</em> registered. Registering a <em>formatted</em> converter means subclassing one of these and
+ * carrying {@link Converter @Converter} on the subclass, which is a constructor and an annotation.
  *
  * @param <X> temporal accessor type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;

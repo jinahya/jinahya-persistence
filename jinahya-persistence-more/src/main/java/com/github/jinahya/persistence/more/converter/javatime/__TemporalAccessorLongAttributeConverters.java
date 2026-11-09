@@ -50,7 +50,7 @@ import java.time.LocalTime;
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  * @see __TemporalAccessorLongAttributeConverter
- * @see __TemporalAccessorStringAttributeConverters
+ * @see __TemporalAccessorStringAttributeConverter
  */
 @SuppressWarnings({
         "java:S101" // Class names should comply with a naming convention

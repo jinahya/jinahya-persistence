@@ -16,8 +16,18 @@
  * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverter} stores a
  * value as the ISO-8601 text its own type reads back, or through a {@link java.time.format.DateTimeFormatter} given to
  * it; {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAmountStringAttributeConverter} does the
- * same for a {@link java.time.Duration} or a {@link java.time.Period}. The concrete converters of each live in
- * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorStringAttributeConverters} and
+ * same for a {@link java.time.Duration} or a {@link java.time.Period}. The concrete converters of the first are the
+ * {@code OfString} of a top-level holder per type &mdash;
+ * {@link com.github.jinahya.persistence.more.converter.javatime.InstantConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.LocalDateConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.LocalDateTimeConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.LocalTimeConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.OffsetDateTimeConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.OffsetTimeConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.ZonedDateTimeConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.YearConverter},
+ * {@link com.github.jinahya.persistence.more.converter.javatime.YearMonthConverter} and
+ * {@link com.github.jinahya.persistence.more.converter.javatime.MonthDayConverter}; those of the second live in
  * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAmountStringAttributeConverters}.
  * <p>
  * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorTextStringAttributeConverter} stores

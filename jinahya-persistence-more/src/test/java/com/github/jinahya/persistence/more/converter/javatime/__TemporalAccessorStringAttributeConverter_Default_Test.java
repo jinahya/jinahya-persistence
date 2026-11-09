@@ -47,22 +47,22 @@ class __TemporalAccessorStringAttributeConverter_Default_Test {
     static Stream<Arguments> nestedConvertersAndValues() {
         final var dateTime = LocalDateTime.of(2026, 9, 19, 11, 22, 33, 123_456_789);
         return Stream.of(
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfInstant(),
+                Arguments.of(new InstantConverter.OfString(),
                              Instant.parse("2026-09-19T11:22:33.123456789Z")),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfLocalDate(),
+                Arguments.of(new LocalDateConverter.OfString(),
                              LocalDate.of(2026, 9, 19)),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfLocalDateTime(), dateTime),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfLocalTime(),
+                Arguments.of(new LocalDateTimeConverter.OfString(), dateTime),
+                Arguments.of(new LocalTimeConverter.OfString(),
                              LocalTime.of(11, 22, 33)),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfOffsetDateTime(),
+                Arguments.of(new OffsetDateTimeConverter.OfString(),
                              OffsetDateTime.of(dateTime, KST)),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfOffsetTime(),
+                Arguments.of(new OffsetTimeConverter.OfString(),
                              OffsetTime.of(LocalTime.of(11, 22, 33), KST)),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfZonedDateTime(),
+                Arguments.of(new ZonedDateTimeConverter.OfString(),
                              ZonedDateTime.of(dateTime, ZoneId.of("Asia/Seoul"))),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfYear(), Year.of(2026)),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfYearMonth(), YearMonth.of(2026, 9)),
-                Arguments.of(new __TemporalAccessorStringAttributeConverters.OfMonthDay(), MonthDay.of(9, 19))
+                Arguments.of(new YearConverter.OfString(), Year.of(2026)),
+                Arguments.of(new YearMonthConverter.OfString(), YearMonth.of(2026, 9)),
+                Arguments.of(new MonthDayConverter.OfString(), MonthDay.of(9, 19))
         );
     }
 
@@ -78,7 +78,7 @@ class __TemporalAccessorStringAttributeConverter_Default_Test {
     @Test
     void __formatter() {
         final var converter =
-                new __TemporalAccessorStringAttributeConverters.OfLocalDate(DateTimeFormatter.BASIC_ISO_DATE);
+                new LocalDateConverter.OfString(DateTimeFormatter.BASIC_ISO_DATE);
         final var value = LocalDate.of(2026, 9, 19);
         final var column = converter.convertToDatabaseColumn(value);
         assertThat(column).isEqualTo("20260919");
@@ -89,7 +89,7 @@ class __TemporalAccessorStringAttributeConverter_Default_Test {
     @Test
     void __lossyFormatter() {
         final var converter =
-                new __TemporalAccessorStringAttributeConverters.OfLocalDateTime(DateTimeFormatter.ISO_LOCAL_DATE);
+                new LocalDateTimeConverter.OfString(DateTimeFormatter.ISO_LOCAL_DATE);
         final var column = converter.convertToDatabaseColumn(LocalDateTime.of(2026, 9, 19, 11, 22, 33));
         assertThat(column).isEqualTo("2026-09-19");
         // the column holds no time at all, so LocalDateTime.from() has nothing to rebuild one out of
@@ -100,7 +100,7 @@ class __TemporalAccessorStringAttributeConverter_Default_Test {
     @DisplayName("what parse throws is thrown unchanged, not wrapped in a reflection exception")
     @Test
     void __parseFailure() {
-        final var converter = new __TemporalAccessorStringAttributeConverters.OfLocalDate();
+        final var converter = new LocalDateConverter.OfString();
         assertThatThrownBy(() -> converter.convertToEntityAttribute("not a date"))
                 .isInstanceOf(DateTimeException.class);
     }
