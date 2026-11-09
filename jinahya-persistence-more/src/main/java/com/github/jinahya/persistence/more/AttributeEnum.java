@@ -49,7 +49,17 @@ public interface AttributeEnum<SELF extends Enum<SELF> & AttributeEnum<SELF, ATT
      * every constant whose stored value should survive a rename.
      *
      * @param <SELF> self type parameter
+     * @see <a href="https://jakarta.ee/specifications/persistence/3.2/jakarta-persistence-spec-3.2#a14720">Jakarta
+     *         Persistence 3.2, 11.1.19. EnumeratedValue Annotation</a>
+     * @see <a href="https://hibernate.atlassian.net/browse/HHH-20410">HHH-20410</a>
+     * @deprecated Jakarta Persistence 3.2 maps an enum to its own string values with no converter: annotate a
+     *         {@code final} {@link String} field of the enum with {@link jakarta.persistence.EnumeratedValue
+     *         EnumeratedValue}. The specification infers {@link jakarta.persistence.EnumType#STRING STRING} for such an
+     *         attribute with no {@link jakarta.persistence.Enumerated Enumerated}, but Hibernate ORM 7 takes it as
+     *         {@link jakarta.persistence.EnumType#ORDINAL ORDINAL} and fails (HHH-20410, fixed in 8.0 only); annotate
+     *         the attribute with {@code @Enumerated(EnumType.STRING)} as well, which works on every provider.
      */
+    @Deprecated
     @SuppressWarnings({
             "java:S114" // Interface names should comply with a naming convention
     })
