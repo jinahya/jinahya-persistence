@@ -18,7 +18,7 @@
 # Usage: ./_mvn_jakarta_ee_11.sh [maven args...]   e.g. ./_mvn_jakarta_ee_11.sh test
 cd "$(dirname "$0")" || exit 1
 
-PROVIDERS='jakarta-ee-11-hibernate-orm jakarta-ee-11-eclipselink'
+PROVIDERS='jakartaee-11-hibernate-orm jakartaee-11-eclipselink'
 
 failed=''
 for provider in $PROVIDERS; do

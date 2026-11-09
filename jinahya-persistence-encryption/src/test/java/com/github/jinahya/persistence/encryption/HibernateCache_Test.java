@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * This is the counterpart of the {@code -hibernate} module's cache test, which measures the opposite for its own
  * mapping: the ciphertext is cached, and a hit decrypts it. Compiled, and run, under the
- * {@code jakarta-ee-11-hibernate-orm} profile only.
+ * {@code jakartaee-11-hibernate-orm} profile only.
  */
 @SuppressWarnings({"java:S101"})
 class HibernateCache_Test {

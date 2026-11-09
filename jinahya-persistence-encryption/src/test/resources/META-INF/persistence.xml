@@ -102,7 +102,7 @@
   </persistence-unit>
   <persistence-unit name="__encryptionHibernatePU">
     <description>Persistence Unit for the Hibernate ORM specific examples (examples.hibernate); used, and compiled,
-      under the jakarta-ee-11-hibernate-orm profile only
+      under the jakartaee-11-hibernate-orm profile only
     </description>
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>com.github.jinahya.persistence.encryption.examples.SecretEntity</class>
@@ -142,7 +142,7 @@
   </persistence-unit>
   <persistence-unit name="__encryptionHibernateCachedPU">
     <description>The second-level cache on, with Hibernate ORM's testing region factory; used, and compiled, under
-      the jakarta-ee-11-hibernate-orm profile only
+      the jakartaee-11-hibernate-orm profile only
     </description>
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>com.github.jinahya.persistence.encryption.examples.hibernate.CachedEntity</class>

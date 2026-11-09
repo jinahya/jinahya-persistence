@@ -18,7 +18,7 @@ and a review of any of the three modules reads the matrix before it reads the co
 | `generic`
 | `jinahya-persistence-encryption`
 | The standard `AttributeConverter` mapping. Its persistence tests run under *both* providers, through the
-  `jakarta-ee-11-hibernate-orm` and `jakarta-ee-11-eclipselink` profiles, so one cell here means two runs. Tests
+  `jakartaee-11-hibernate-orm` and `jakartaee-11-eclipselink` profiles, so one cell here means two runs. Tests
   named `Hibernate*_Test` are excluded on the EclipseLink profile.
 
 | `hibernate`

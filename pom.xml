@@ -88,12 +88,12 @@
          The one thing a profile chooses is WHICH persistence provider is used; see <profiles>. -->
     <persistence.version>3.2</persistence.version>
     <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd</persistence.schemaLocation>
-    <!-- the Jakarta Persistence provider; overridden by jakarta-ee-11-eclipselink -->
+    <!-- the Jakarta Persistence provider; overridden by jakartaee-11-eclipselink -->
     <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
     <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
     <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
     <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
-    <!-- whether EclipseLink weaves the entities as they are loaded; overridden by jakarta-ee-11-eclipselink-weaving,
+    <!-- whether EclipseLink weaves the entities as they are loaded; overridden by jakartaee-11-eclipselink-weaving,
          and handed to the tests as a system property of the same name -->
     <eclipselink.woven>false</eclipselink.woven>
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
@@ -295,7 +295,7 @@
       <!--        <type>pom</type>-->
       <!--        <scope>import</scope>-->
       <!--      </dependency>-->
-      <!-- for the modules which integrate with Hibernate ORM itself; the jakarta-ee-11-hibernate-orm profile adds it to
+      <!-- for the modules which integrate with Hibernate ORM itself; the jakartaee-11-hibernate-orm profile adds it to
            every module's test class path at the same version -->
       <dependency>
         <groupId>org.hibernate.orm</groupId>
@@ -563,9 +563,9 @@
                   <property>persistence-provider-profile.active</property>
                   <message>No persistence provider profile is active in the root POM. Naming any other profile of
                     the root POM on the command line (for example -Pfailsafe) deactivates the activeByDefault
-                    provider profile, and -P!jakarta-ee-11-hibernate-orm removes it outright; the persistence
+                    provider profile, and -P!jakartaee-11-hibernate-orm removes it outright; the persistence
                     units then fail to bootstrap far from the cause. Name a provider together with it:
-                    -Pfailsafe,jakarta-ee-11-hibernate-orm or -Pfailsafe,jakarta-ee-11-eclipselink.</message>
+                    -Pfailsafe,jakartaee-11-hibernate-orm or -Pfailsafe,jakartaee-11-eclipselink.</message>
                 </requireProperty>
               </rules>
             </configuration>
@@ -855,7 +855,7 @@
          <properties>, one per provider. A profile decides only which provider is on the test
          classpath, and which metamodel generator the annotation processor path uses. -->
     <profile>
-      <id>jakarta-ee-11-hibernate-orm</id>
+      <id>jakartaee-11-hibernate-orm</id>
       <!-- https://hibernate.org/orm/releases/ -->
       <!-- Jakarta Persistence 3.2 / Jakarta EE 11; version: version.org.hibernate.orm -->
       <!-- the provider defaults in <properties> are this profile's; it only adds the dependency -->
@@ -878,7 +878,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>jakarta-ee-11-eclipselink</id>
+      <id>jakartaee-11-eclipselink</id>
       <!-- https://eclipse.dev/eclipselink/releases/index.html -->
       <!-- Jakarta Persistence 3.2 / Jakarta EE 11; version: version.org.eclipse.persistence -->
       <properties>
@@ -898,8 +898,8 @@
       </dependencies>
     </profile>
     <profile>
-      <id>jakarta-ee-11-eclipselink-weaving</id>
-      <!-- An add-on to jakarta-ee-11-eclipselink, not a provider: named alone, it hands the agent to a JVM with no
+      <id>jakartaee-11-eclipselink-weaving</id>
+      <!-- An add-on to jakartaee-11-eclipselink, not a provider: named alone, it hands the agent to a JVM with no
            EclipseLink to run it. The EclipseLink jar is itself a Java agent (Premain-Class JavaSECMPInitializerAgent),
            which weaves the entities as they are loaded, so EclipseLink honours LAZY on a basic attribute and on a
            to-one association, and an entity graph naming one is accepted. Nothing on disk is rewritten; the classes

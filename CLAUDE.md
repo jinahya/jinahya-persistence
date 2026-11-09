@@ -28,7 +28,7 @@ from individual artifacts:
   combination can move the platform out from under the implementations. EE 10 support
   was removed; do not reintroduce a platform profile.
 - **There is exactly one profile axis: the persistence provider.**
-  `jakarta-ee-11-hibernate-orm` (active by default) and `jakarta-ee-11-eclipselink` are
+  `jakartaee-11-hibernate-orm` (active by default) and `jakartaee-11-eclipselink` are
   the only implementation profiles, and they choose a provider, never a version. Every
   implementation version — both providers', Hibernate Validator's, Expressly's, Weld's —
   is a single Jakarta EE 11 aligned value in the root `<properties>`.
@@ -50,7 +50,7 @@ Consequences for convergence work:
 - Check convergence against both providers, not just the default:
   `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence` runs each one.
 - Naming a profile on the command line deactivates every `activeByDefault` profile. With
-  the provider as the only axis that is harmless — `-Pjakarta-ee-11-eclipselink` names the
+  the provider as the only axis that is harmless — `-Pjakartaee-11-eclipselink` names the
   one thing the defaults were supplying — but it is also why no other configuration may
   be parked in an `activeByDefault` profile.
 
@@ -76,11 +76,11 @@ Rules:
 
 - The persistence provider is never hard-coded: `persistence-unit.provider` and
   `metamodel.generator.groupId/artifactId/version` default to Hibernate in
-  `<properties>` and are overridden by the `jakarta-ee-11-eclipselink` profile;
+  `<properties>` and are overridden by the `jakartaee-11-eclipselink` profile;
   `persistence.xml` and the annotation processor path read them. Change the profile, not
   the literal provider class.
 - Both persistence providers must stay buildable. A change made for Hibernate has to
-  be checked against EclipseLink and vice versa (`./mvnw -Pjakarta-ee-11-eclipselink test`).
+  be checked against EclipseLink and vice versa (`./mvnw -Pjakartaee-11-eclipselink test`).
 - Hibernate Validator and Expressly move together: validator 8 ↔ expressly 5,
   validator 9 ↔ expressly 6 (the pom records this pairing in comments). Never bump one
   without the other.

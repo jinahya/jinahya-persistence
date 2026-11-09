@@ -74,8 +74,8 @@ jobs:
       fail-fast: false
       matrix:
         provider:
-          - jakarta-ee-11-hibernate-orm
-          - jakarta-ee-11-eclipselink
+          - jakartaee-11-hibernate-orm
+          - jakartaee-11-eclipselink
 
     name: ${{ matrix.provider }}
 

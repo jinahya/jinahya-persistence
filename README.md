@@ -65,8 +65,8 @@ So there is exactly one axis, with two profiles:
 
 | Profile | Provider |
 | --- | --- |
-| `jakarta-ee-11-hibernate-orm` | Hibernate ORM — **active by default** |
-| `jakarta-ee-11-eclipselink` | EclipseLink |
+| `jakartaee-11-hibernate-orm` | Hibernate ORM — **active by default** |
+| `jakartaee-11-eclipselink` | EclipseLink |
 
 Validation (Hibernate Validator + Expressly) and CDI (Weld) have no profiles at all;
 their versions live in the root `<properties>` and move only when the platform does.
@@ -84,7 +84,7 @@ Four EE 11 profiles were removed to get here. `__hibernate-orm-7.2-jakarta-ee-11
 `___hibernate-validator-9.1-jakarta-ee-11` and `___weld-6-jakarta-ee-11` were choices of
 one. All four only ever held versions, which now live in `<properties>`, and the six
 provider × validator combinations they produced collapse to two. The two survivors were
-renamed `jakarta-ee-11-{hibernate-orm,eclipselink}`.
+renamed `jakartaee-11-{hibernate-orm,eclipselink}`.
 
 ### Jakarta EE 12 — next (not adoptable yet)
 

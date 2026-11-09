@@ -65,7 +65,7 @@ an earlier experiment, including reports for a test class no longer in the tree)
 incrementally if you like, but the run you cite in an issue must start from `clean`.
 
 Verify across the matrix the project actually supports. Here that means both persistence
-providers: `./mvnw -o -pl <module> test` and again with `-Pjakarta-ee-11-eclipselink`.
+providers: `./mvnw -o -pl <module> test` and again with `-Pjakartaee-11-eclipselink`.
 Then the full reactor.
 
 XML comments cannot contain `--`. YAML ones can.

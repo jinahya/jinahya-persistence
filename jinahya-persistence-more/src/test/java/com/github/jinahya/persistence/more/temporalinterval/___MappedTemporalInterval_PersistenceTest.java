@@ -56,7 +56,7 @@ class ___MappedTemporalInterval_PersistenceTest {
      *
      * @return {@code true} when the factory was built by EclipseLink.
      * @implNote The factory's own class names the provider: the persistence unit takes its {@code <provider>}
-     *         from the {@code persistence-unit.provider} property, which the {@code __eclipselink-5.0-jakarta-ee-11}
+     *         from the {@code persistence-unit.provider} property, which the {@code jakartaee-11-eclipselink}
      *         profile overrides, so reading it here needs no build plumbing and holds however the profile was
      *         activated.
      */

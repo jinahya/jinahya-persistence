@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Measures a converted attribute through Hibernate ORM's {@code StatelessSession}, which has no persistence context
  * and no dirty checking: the converter runs on insert, on get and on update all the same.
  * <p>
- * Compiled, and run, under the {@code jakarta-ee-11-hibernate-orm} profile only.
+ * Compiled, and run, under the {@code jakartaee-11-hibernate-orm} profile only.
  */
 @SuppressWarnings({"java:S101"})
 class HibernateStateless_Test {
