@@ -25,35 +25,25 @@ import jakarta.persistence.Converter;
 
 import java.lang.invoke.MethodHandles;
 import java.time.DayOfWeek;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.util.Locale;
 
 /**
- * Concrete {@link __TemporalAccessorTextStringAttributeConverter}s, one per {@code java.time} type which is a single
- * named field.
+ * Converters for an entity attribute of {@link DayOfWeek}, one per column type it is kept in.
  * <p>
- * Each converter has two constructors, and only the no-argument one is ever reached by a persistence provider: a
+ * {@link OfString} has two constructors, and only the no-argument one is ever reached by a persistence provider: a
  * converter is registered by class, and nothing in {@link jakarta.persistence.Convert @Convert} or in
  * {@code persistence.xml} can pass an argument. The no-argument one stores the
  * {@link __TemporalAccessorTextStringAttributeConverter#DEFAULT_TEXT_STYLE full standalone} name in
- * {@link __TemporalAccessorTextStringAttributeConverter#DEFAULT_LOCALE English}, never in the default locale. The one
- * taking a {@link TextStyle} and a {@link Locale} is for holding the converter directly &mdash; composed into another,
- * or delegated to from one which <em>is</em> registered. Registering a converter for another language means subclassing
- * one of these and carrying {@link Converter @Converter} on the subclass, which is a constructor and an annotation:
- * {@snippet lang = "java":
+ * {@link __TemporalAccessorTextStringAttributeConverter#DEFAULT_LOCALE English}, never in the default locale; to
+ * register a converter for another language, subclass {@link OfString} and carry {@link Converter @Converter} on the
+ * subclass.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @Converter(autoApply = false) public class KoreanDayOfWeekConverter extends
- *         __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek { public KoreanDayOfWeekConverter() {
- *         super(TextStyle.FULL_STANDALONE, Locale.KOREAN); // 월요일 }}}
  * @see __TemporalAccessorTextStringAttributeConverter
  */
-@SuppressWarnings({
-        "java:S101" // Class names should comply with a naming convention
-})
-public final class __TemporalAccessorTextStringAttributeConverters {
+public final class DayOfWeekConverter {
 
     private static final System.Logger logger = System.getLogger(MethodHandles.lookup().lookupClass().getName());
 
@@ -66,7 +56,7 @@ public final class __TemporalAccessorTextStringAttributeConverters {
      *         {@link DayOfWeek#MONDAY} &mdash; and read back regardless of case.
      */
     @Converter(autoApply = false)
-    public static class OfDayOfWeek extends __TemporalAccessorTextStringAttributeConverter<DayOfWeek>
+    public static class OfString extends __TemporalAccessorTextStringAttributeConverter<DayOfWeek>
             implements AttributeConverter<DayOfWeek, String> {
 
         /**
@@ -76,7 +66,7 @@ public final class __TemporalAccessorTextStringAttributeConverters {
          *         by the persistence provider, and is documented as needing a public no-argument constructor. It also
          *         lets a caller use this converter directly, without subclassing a leaf class.
          */
-        public OfDayOfWeek() {
+        public OfString() {
             this(DEFAULT_TEXT_STYLE, DEFAULT_LOCALE);
         }
 
@@ -91,50 +81,17 @@ public final class __TemporalAccessorTextStringAttributeConverters {
          *         another or delegated to from one which <em>is</em> registered; to register a converter for another
          *         language, subclass and carry {@link Converter @Converter} on the subclass.
          */
-        public OfDayOfWeek(final TextStyle textStyle, final Locale locale) {
+        public OfString(final TextStyle textStyle, final Locale locale) {
             super(DayOfWeek.class, ChronoField.DAY_OF_WEEK, textStyle, locale);
         }
     }
 
-    /**
-     * A converter for an entity attribute of {@link Month}, stored as the name of the month.
-     *
-     * @implSpec With no arguments, a value is stored as its full English name &mdash; {@code "March"} for
-     *         {@link Month#MARCH} &mdash; and read back regardless of case.
-     */
-    @Converter(autoApply = false)
-    public static class OfMonth extends __TemporalAccessorTextStringAttributeConverter<Month>
-            implements AttributeConverter<Month, String> {
-
-        /**
-         * Creates a new instance storing the full English name of the month.
-         */
-        public OfMonth() {
-            this(DEFAULT_TEXT_STYLE, DEFAULT_LOCALE);
-        }
-
-        /**
-         * Creates a new instance storing the name of the month in the specified style and locale.
-         *
-         * @param textStyle the style of the name.
-         * @param locale    the locale of the name.
-         * @apiNote A persistence provider never calls this constructor &mdash; it instantiates a converter
-         *         through the no-argument one, and neither {@link jakarta.persistence.Convert @Convert} nor
-         *         {@code persistence.xml} can pass a locale. Use this to hold the converter directly, composed into
-         *         another or delegated to from one which <em>is</em> registered; to register a converter for another
-         *         language, subclass and carry {@link Converter @Converter} on the subclass.
-         */
-        public OfMonth(final TextStyle textStyle, final Locale locale) {
-            super(Month.class, ChronoField.MONTH_OF_YEAR, textStyle, locale);
-        }
-    }
-
-    // ---------------------------------------------------------------------------------------------------- CONSTRUCTORS
+    // --------------------------------------------------------------------------------------------------- CONSTRUCTORS
 
     /**
-     * Creates a new instance, which is not allowed.
+     * Creates a new instance.
      */
-    private __TemporalAccessorTextStringAttributeConverters() {
+    private DayOfWeekConverter() {
         throw new AssertionError("instantiation is not allowed");
     }
 }

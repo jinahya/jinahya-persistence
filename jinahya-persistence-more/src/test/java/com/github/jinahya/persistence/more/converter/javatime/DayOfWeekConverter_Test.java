@@ -11,7 +11,7 @@ import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek}.
+ * Tests for {@link DayOfWeekConverter.OfString}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -19,10 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __TemporalAccessorTextStringAttributeConverters_OfDayOfWeek_Test {
+class DayOfWeekConverter_Test {
 
-    private final __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek converter =
-            new __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek();
+    private final DayOfWeekConverter.OfString converter =
+            new DayOfWeekConverter.OfString();
 
     @DisplayName("every day is stored as its full English name, and read back")
     @ParameterizedTest

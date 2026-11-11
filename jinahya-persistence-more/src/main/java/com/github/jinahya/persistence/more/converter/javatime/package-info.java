@@ -32,8 +32,9 @@
  * <p>
  * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorTextStringAttributeConverter} stores
  * a {@link java.time.DayOfWeek} or a {@link java.time.Month} as its <em>name</em> in a locale it is given &mdash; never
- * the default one &mdash; and reads it back regardless of case; its concrete converters, which pin English, are in
- * {@link com.github.jinahya.persistence.more.converter.javatime.__TemporalAccessorTextStringAttributeConverters}.
+ * the default one &mdash; and reads it back regardless of case; its concrete converters, which pin English, are the
+ * {@code OfString} of {@link com.github.jinahya.persistence.more.converter.javatime.DayOfWeekConverter} and
+ * {@link com.github.jinahya.persistence.more.converter.javatime.MonthConverter}.
  * <p>
  * {@link com.github.jinahya.persistence.more.converter.javatime.ZoneIdStringAttributeConverter} stores a
  * {@link java.time.ZoneId} as its identifier. A zone is no {@link java.time.temporal.TemporalAccessor}, so the

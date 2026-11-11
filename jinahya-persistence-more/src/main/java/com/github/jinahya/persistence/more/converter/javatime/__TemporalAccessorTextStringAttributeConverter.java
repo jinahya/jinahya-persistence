@@ -48,8 +48,8 @@ import java.util.Objects;
  * The name of a day or a month is a fact about a language, and a column holds the names of exactly one. So a locale is
  * a constructor argument and is never taken from {@link Locale#getDefault()}: a converter which did so would write
  * {@code "Monday"} on one server and {@code "월요일"} on the next, and fail to read on either what the other wrote.
- * {@link #DEFAULT_LOCALE English} is what the registrable converters of
- * {@link __TemporalAccessorTextStringAttributeConverters} pin, because it is the one language a schema is likelier to
+ * {@link #DEFAULT_LOCALE English} is what the registrable converters, {@link DayOfWeekConverter.OfString} and
+ * {@link MonthConverter.OfString}, pin, because it is the one language a schema is likelier to
  * have been spelled in than the server's own.
  *
  * @param <X> temporal accessor type parameter; bounded on {@link TemporalAdjuster} as well, which with
@@ -62,7 +62,8 @@ import java.util.Objects;
  *         locale, and the read is {@code from(TemporalAccessor)} over what the formatter parsed, which both types
  *         declare. {@link Locale#ROOT} is <em>not</em> a neutral choice for this: the JDK's locale data spells the full
  *         forms there as the short ones, {@code "Mon"} and {@code "Jan"}.
- * @see __TemporalAccessorTextStringAttributeConverters
+ * @see DayOfWeekConverter.OfString
+ * @see MonthConverter.OfString
  * @see DayOfWeek#getDisplayName(TextStyle, Locale)
  * @see Month#getDisplayName(TextStyle, Locale)
  */

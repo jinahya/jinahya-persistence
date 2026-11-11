@@ -171,7 +171,7 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 | --- | --- |
 | `__NumberStringAttributeConverters` | `BigDecimal`, `BigInteger`, `Byte`, `Short`, `Integer`, `Long`, `Float`, `Double`, each stored as its exact decimal text |
 | `InstantConverter`, `LocalDateConverter`, `LocalDateTimeConverter`, `LocalTimeConverter`, `OffsetDateTimeConverter`, `OffsetTimeConverter`, `ZonedDateTimeConverter`, `YearConverter`, `YearMonthConverter`, `MonthDayConverter` | one holder per `java.time` type with a `parse(CharSequence)`, whose `OfString` stores it in ISO-8601 or through a `DateTimeFormatter`; `YearConverter` also has `OfShort` and `OfInteger`, for a numeric column such as MySQL's `YEAR` |
-| `__TemporalAccessorTextStringAttributeConverters` | `DayOfWeek` and `Month`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
+| `DayOfWeekConverter`, `MonthConverter` | `DayOfWeek` and `Month`, each through its `OfString`, stored as their *name* — `Monday`, `March` — in a locale the converter names, English by default and never the server's, read back regardless of case |
 | `__TemporalAmountStringAttributeConverters` | `Duration` and `Period` |
 | `ZoneIdStringAttributeConverter` | a `ZoneId`, stored as its identifier — `Asia/Seoul`, `+09:00` — a concrete converter on its own, with no holder; and, nested in it and built on it, `TimeZoneStringAttributeConverter`, a `java.util.TimeZone` stored as the identifier of its zone; in `…converter.javatime` |
 | `__BooleanYnAttributeConverters` | a legacy `'Y'`/`'N'` flag, as a `Character` or a `String`, strict or lenient |
@@ -192,6 +192,8 @@ to be renamed accordingly.
 `__TemporalAccessorStringAttributeConverters` is gone: each of its converters is now the `OfString` of a top-level
 holder named after its type, in `…converter.javatime` —
 `…javatime.__TemporalAccessorStringAttributeConverters$OfYearMonth` is now `…javatime.YearMonthConverter$OfString`.
+`__TemporalAccessorTextStringAttributeConverters` is gone the same way: `…javatime.__TemporalAccessorTextStringAttributeConverters$OfDayOfWeek`
+is now `…javatime.DayOfWeekConverter$OfString`, and `$OfMonth` is now `…javatime.MonthConverter$OfString`.
 `YearConverter` also has `OfShort` and `OfInteger`, which store a `Year` as its value in a numeric column.
 New in `…converter.orgw3cdom`: `NodeAttributeConverter`, which stores a DOM `Document`, `DocumentFragment` or
 `Element` as XML text, and reads whatever an XML column holds, a document or content.
@@ -224,7 +226,7 @@ The `java.time` converters moved to a sub-package of their own, `com.github.jina
 together with the attribute-axis interfaces added for them. A converter named in `persistence.xml` or in `@Convert`
 has to be renamed accordingly — `…more.converter.__TemporalAccessorStringAttributeConverters$OfYearMonth` is now
 `…more.converter.time.__TemporalAccessorStringAttributeConverters$OfYearMonth`. Nothing else in `…converter` moved.
-New in the same package: `__TemporalAccessorTextStringAttributeConverters.OfDayOfWeek` and `.OfMonth`, which store a
+New in the same package: `DayOfWeekConverter.OfString` and `.OfMonth`, which store a
 day or a month as its name in a locale the converter names, English by default and never the server's.
 Also new there: `ZoneIdStringAttributeConverter`, which stores a `ZoneId` as its identifier, and its nested
 `TimeZoneStringAttributeConverter`, which stores a `java.util.TimeZone` as the identifier of its zone.

@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Tests for what {@link __TemporalAccessorTextStringAttributeConverter} itself does, across every converter nested in
- * {@link __TemporalAccessorTextStringAttributeConverters}.
+ * Tests for what {@link __TemporalAccessorTextStringAttributeConverter} itself does, across its concrete converters,
+ * {@link DayOfWeekConverter.OfString} and {@link MonthConverter.OfString}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -37,9 +37,9 @@ class __TemporalAccessorTextStringAttributeConverter_Default_Test {
      */
     static Stream<Arguments> nestedConvertersAndValues() {
         return Stream.of(
-                Arguments.of(new __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek(), DayOfWeek.MONDAY,
+                Arguments.of(new DayOfWeekConverter.OfString(), DayOfWeek.MONDAY,
                              "Monday"),
-                Arguments.of(new __TemporalAccessorTextStringAttributeConverters.OfMonth(), Month.MARCH, "March")
+                Arguments.of(new MonthConverter.OfString(), Month.MARCH, "March")
         );
     }
 
@@ -105,14 +105,14 @@ class __TemporalAccessorTextStringAttributeConverter_Default_Test {
     @DisplayName("a locale, when given, is what names the column, and the standalone form is what it writes")
     @Test
     void __locale() {
-        final var korean = new __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek(
+        final var korean = new DayOfWeekConverter.OfString(
                 TextStyle.FULL_STANDALONE, Locale.KOREAN);
         assertThat(korean.convertToDatabaseColumn(DayOfWeek.FRIDAY)).isEqualTo("금요일");
         assertThat(korean.convertToEntityAttribute("금요일")).isEqualTo(DayOfWeek.FRIDAY);
         assertThatThrownBy(() -> korean.convertToEntityAttribute("Friday"))
                 .isInstanceOf(DateTimeParseException.class);
         // Russian inflects a month inside a date; the standalone form is the bare one
-        final var russian = new __TemporalAccessorTextStringAttributeConverters.OfMonth(
+        final var russian = new MonthConverter.OfString(
                 TextStyle.FULL_STANDALONE, Locale.forLanguageTag("ru"));
         assertThat(russian.convertToDatabaseColumn(Month.MAY)).isEqualTo("май");
         assertThat(russian.convertToEntityAttribute("май")).isEqualTo(Month.MAY);
@@ -121,7 +121,7 @@ class __TemporalAccessorTextStringAttributeConverter_Default_Test {
     @DisplayName("a short style stores the abbreviation")
     @Test
     void __shortStyle() {
-        final var converter = new __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek(
+        final var converter = new DayOfWeekConverter.OfString(
                 TextStyle.SHORT_STANDALONE, Locale.ENGLISH);
         assertThat(converter.convertToDatabaseColumn(DayOfWeek.MONDAY)).isEqualTo("Mon");
         assertThat(converter.convertToEntityAttribute("mon")).isEqualTo(DayOfWeek.MONDAY);
@@ -133,9 +133,9 @@ class __TemporalAccessorTextStringAttributeConverter_Default_Test {
     @DisplayName("a null style or locale is refused at construction")
     @Test
     void __nullArguments() {
-        assertThatThrownBy(() -> new __TemporalAccessorTextStringAttributeConverters.OfDayOfWeek(null, Locale.ENGLISH))
+        assertThatThrownBy(() -> new DayOfWeekConverter.OfString(null, Locale.ENGLISH))
                 .isInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new __TemporalAccessorTextStringAttributeConverters.OfMonth(TextStyle.FULL, null))
+        assertThatThrownBy(() -> new MonthConverter.OfString(TextStyle.FULL, null))
                 .isInstanceOf(NullPointerException.class);
     }
 }

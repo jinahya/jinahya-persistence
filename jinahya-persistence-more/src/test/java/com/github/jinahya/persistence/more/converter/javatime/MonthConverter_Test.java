@@ -11,7 +11,7 @@ import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link __TemporalAccessorTextStringAttributeConverters.OfMonth}.
+ * Tests for {@link MonthConverter.OfString}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
@@ -19,10 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class __TemporalAccessorTextStringAttributeConverters_OfMonth_Test {
+class MonthConverter_Test {
 
-    private final __TemporalAccessorTextStringAttributeConverters.OfMonth converter =
-            new __TemporalAccessorTextStringAttributeConverters.OfMonth();
+    private final MonthConverter.OfString converter =
+            new MonthConverter.OfString();
 
     @DisplayName("every month is stored as its full English name, and read back")
     @ParameterizedTest
