@@ -15,7 +15,7 @@
 # classes which look nothing like the problem. That failure is silent about its cause and reads
 # exactly like the profiles being broken, which they are not.
 #
-# Usage: ./_mvn_jakarta_ee_11.sh [maven args...]   e.g. ./_mvn_jakarta_ee_11.sh test
+# Usage: ./_mvn_jakartaee_11.sh [maven args...]   e.g. ./_mvn_jakartaee_11.sh test
 cd "$(dirname "$0")" || exit 1
 
 PROVIDERS='jakartaee-11-hibernate-orm jakartaee-11-eclipselink'

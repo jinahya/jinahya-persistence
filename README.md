@@ -75,9 +75,9 @@ one per provider. A profile only decides which provider is on the test classpath
 `persistence-unit.provider` goes into `persistence.xml`, and which metamodel generator
 the annotation processor path uses.
 
-`./_mvn_jakarta_ee_11.sh [maven args...]` runs the given build once per provider and
-reports which ones failed — e.g. `./_mvn_jakarta_ee_11.sh test` or
-`./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence`.
+`./_mvn_jakartaee_11.sh [maven args...]` runs the given build once per provider and
+reports which ones failed — e.g. `./_mvn_jakartaee_11.sh test` or
+`./_mvn_jakartaee_11.sh -q enforcer:enforce -Drules=dependencyConvergence`.
 
 Four EE 11 profiles were removed to get here. `__hibernate-orm-7.2-jakarta-ee-11` and
 `___hibernate-validator-9.0-jakarta-ee-11` were second-newest-series version axes;

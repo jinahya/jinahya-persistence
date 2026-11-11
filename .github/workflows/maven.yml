@@ -56,7 +56,7 @@ jobs:
   # implementation is pinned to its single aligned release, so the only thing worth varying is which
   # provider implements Jakarta Persistence. The job above runs exactly one of the two -- whatever is
   # activeByDefault -- so EclipseLink was never exercised anywhere but on a developer's machine, via
-  # _mvn_jakarta_ee_11.sh. This is that script, as a matrix.
+  # _mvn_jakartaee_11.sh. This is that script, as a matrix.
   #
   # Naming any profile on the command line deactivates every activeByDefault profile. That is
   # harmless now that the provider is the only axis: the cell names the provider it wants, and

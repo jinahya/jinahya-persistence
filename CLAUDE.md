@@ -48,7 +48,7 @@ Consequences for convergence work:
   `jakarta.*` API newer or older than the umbrella BOM, the fix is to align the
   provider version with the platform generation — not to override the API version.
 - Check convergence against both providers, not just the default:
-  `./_mvn_jakarta_ee_11.sh -q enforcer:enforce -Drules=dependencyConvergence` runs each one.
+  `./_mvn_jakartaee_11.sh -q enforcer:enforce -Drules=dependencyConvergence` runs each one.
 - Naming a profile on the command line deactivates every `activeByDefault` profile. With
   the provider as the only axis that is harmless — `-Pjakartaee-11-eclipselink` names the
   one thing the defaults were supplying — but it is also why no other configuration may
