@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.jinahya</groupId>
+    <artifactId>jinahya-persistence-11</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jinahya-persistence-utils-11</artifactId>
+
+  <name>${project.artifactId}</name>
+  <description>Utilities for Jakarta Persistence, for Jakarta EE 11 (Jakarta Persistence 3.2)</description>
+
+  <properties>
+    <shared.module>jinahya-persistence-utils</shared.module>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence</module.name>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

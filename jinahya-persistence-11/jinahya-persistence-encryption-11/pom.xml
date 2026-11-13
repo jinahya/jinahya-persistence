@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.jinahya</groupId>
+    <artifactId>jinahya-persistence-11</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jinahya-persistence-encryption-11</artifactId>
+
+  <name>${project.artifactId}</name>
+  <description>Application-level encryption of entity attributes for Jakarta Persistence, for Jakarta EE 11 (Jakarta Persistence 3.2)</description>
+
+  <properties>
+    <shared.module>jinahya-persistence-encryption</shared.module>
+    <!-- the Automatic-Module-Name; the name the module-info draft declares -->
+    <module.name>com.github.jinahya.persistence.encryption</module.name>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- jakarta.enterprise.*; only Injection_Test, which hands a CDI container to the persistence provider. The main
+         sources depend on jakarta.inject alone, so that the converters are injected by any container -->
+    <dependency>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the test persistence unit requests CALLBACK validation; a provider has to be on the test classpath -->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- jakarta.inject.Inject on EncryptedAttributeConverter, its only injection point; understood by CDI and by Spring -->
+    <dependency>
+      <groupId>jakarta.inject</groupId>
+      <artifactId>jakarta.inject-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- org.jboss.weld.environment.se.*; Injection_Test starts a Weld SE container and hands its BeanManager to the
+         persistence provider, so that the converters are injected -->
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- the tests log through it directly -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>${shared.directory}/src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
+  <profiles>
+    <!-- the Hibernate ORM specific examples, and their tests, in src/test/java-hibernate-orm, compile against Hibernate
+         ORM's own annotations; the profiles of the same ids in jinahya-persistence-11 choose the provider -->
+    <profile>
+      <id>hibernate-orm</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <!-- org.hibernate.testing.cache.CachingRegionFactory; HibernateCache_Test turns the second-level cache on -->
+        <dependency>
+          <groupId>org.hibernate.orm</groupId>
+          <artifactId>hibernate-testing</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>eclipselink</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-testCompile</id>
+                <configuration>
+                  <compilerArgs>
+                    <!-- EclipseLink's metamodel generator reads an orm.xml entity twice, and fails on its duplicate
+                         name (callbacks-orm.xml); the metamodel of the test entities is generated from annotations -->
+                    <arg>-Aeclipselink.canonicalmodel.load_xml=false</arg>
+                  </compilerArgs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

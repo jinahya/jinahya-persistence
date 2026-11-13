@@ -7,86 +7,86 @@
 [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence)
 
 
+## Artifacts
+
+Every artifact carries its Jakarta EE generation in its artifactId; use the ones of the generation you run on, and
+never two generations together, since they share their packages. Up to 0.6.x the artifactIds had no suffix
+(`jinahya-persistence-utils`, ...); see [Upgrading to 0.7.0](#upgrading-to-070).
+
+| Artifact | Jakarta EE 11 |
+| --- | --- |
+| Utilities | `io.github.jinahya:jinahya-persistence-utils-11` |
+| More | `io.github.jinahya:jinahya-persistence-more-11` |
+| More, test support | `io.github.jinahya:jinahya-persistence-more-test-11` |
+| Test utilities | `io.github.jinahya:jinahya-persistence-test-utils-11` |
+| Encryption | `io.github.jinahya:jinahya-persistence-encryption-11` |
+| Encryption, Hibernate ORM | `io.github.jinahya:jinahya-persistence-encryption-hibernate-11` |
+| Encryption, EclipseLink | `io.github.jinahya:jinahya-persistence-encryption-eclipselink-11` |
+
+The Jakarta APIs are `provided`: your platform, or your own dependency on a provider, supplies them.
+
+## Layout
+
+```
+pom.xml                                   plugins, and the versions not tied to a generation
+shared/<module>/src/...                   the sources every generation shares
+  src/test/java-<persistence-provider>/   the tests of one provider only (hibernate-orm, eclipselink)
+src/test-shared/java/                     the test sources every module shares (__PersistenceProviders)
+jinahya-persistence-NN/pom.xml            Jakarta EE NN: the platform BOM, the implementations, Java SE, the profiles
+  jinahya-persistence-<module>-NN/        the sources only Jakarta EE NN needs, if any
+```
+
+Each `jinahya-persistence-NN/*` module compiles `shared/<module>/src/...` against its own generation's API, together
+with its own `src/`, which holds only what differs. Resources are taken from both places, too.
+
 ## Jakarta EE alignment
 
-Every spec API in this build comes from a single **Jakarta EE platform umbrella BOM**
-(`jakarta.platform:jakarta.jakartaee-bom`, imported in the root `pom.xml`); only the
-implementations carry their own versions, and each is kept on a series certified for
-that platform generation. Build baseline: Java 25 (`maven.compiler.release`, main
-and test sources alike; the enforcer requires a JDK 25 or newer to build).
+Every version tied to a generation is set in that generation's parent, `jinahya-persistence-NN/pom.xml`, and nowhere
+else: the Jakarta EE BOM (and, through it, every `jakarta.*` API), `persistence.version`, the minimum Java SE, and
+every implementation of a Jakarta specification. Each implementation is kept on the newest release of the series
+aligned with its generation. The root `pom.xml` holds only what is the same for every generation (JUnit, Mockito,
+AssertJ, Lombok, SLF4J, H2, the randomizer engines, the plugins).
 
-Subsections below are ordered by Jakarta EE version.
+Each generation documents its environment and its version alignment in its own `README.md`; update it whenever its
+`pom.xml` changes.
 
-### Jakarta EE 10 — dropped
+| Jakarta EE | Module | Jakarta Persistence | Java SE, minimum | Status |
+| --- | --- | --- | --- | --- |
+| 10 | none | 3.1 | 11 | dropped; see [below](#jakarta-ee-10) |
+| 11 | [`jinahya-persistence-11`](jinahya-persistence-11/README.md) | 3.2 | 17 | current |
+| 12 | none yet | 4.0 | | not released; see [below](#jakarta-ee-12) |
 
-Support for Jakarta EE 10 was removed. It had only ever been half-wired: the
-`_jakarta-ee-10.0.0` profile switched the BOM to 10.0.0 (persistence-api 3.1.0,
-validation-api 3.0.2, cdi-api 4.0.1, el-api 5.0.1), but EclipseLink 4.0.8 was the only
-implementation with a matching profile — every other implementation fell back to its
-EE 11 version, and `-P_jakarta-ee-10.0.0` on its own resolved no persistence provider at
-all. It also declared `persistence.version` 3.0 while EE 10 ships Jakarta Persistence 3.1.
+### Profiles
 
-Removed with it: `_jakarta-ee-10.0.0`, `__eclipselink-4.0.8-jakarta-ee-10`, the
-`_jakarta-ee-11.0.0` profile (its values moved into `<properties>`), and the six empty
-`jakarta-persistence-3.x-{hibernate,eclipselink}` marker profiles, which covered the
-Jakarta EE 9/9.1 and 10 generations and carried no configuration.
-
-### Jakarta EE 11 — current
-
-This is the only supported generation. Its platform values live in the root
-`<properties>` — `version.jakarta.jakartaee-bom` (11.0.0), `persistence.version` (3.2),
-`persistence.schemaLocation` — not in a profile, so no profile combination can move the
-platform out from under the implementations.
-
-| Spec | Version from the EE 11 BOM | Implementation | In this build | Latest released | Status |
-| --- | --- | --- | --- | --- | --- |
-| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | Hibernate ORM (`hibernate-core`) | 7.4.12.Final | 7.4.12.Final | current — latest stable series for JPA 3.2 / EE 11 |
-| Jakarta Persistence 3.2 | `jakarta.persistence-api` 3.2.0 | EclipseLink (`org.eclipse.persistence.jpa`) | 5.0.2 | 5.0.2 | current — 5.0 is certified for JPA 3.2 / EE 11 |
-| Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Hibernate Validator | 9.1.4.Final | 9.1.4.Final | current |
-| Jakarta Expression Language 6.0 | `jakarta.el-api` 6.0.1 | Expressly (required by Hibernate Validator) | 6.0.0 | 6.0.0 | current |
-| Jakarta CDI 4.1 | `jakarta.enterprise.cdi-api` 4.1.0 | Weld, via `weld-junit5` | weld-junit5 5.0.3.Final → weld-se-core 6.0.3.Final | weld-junit5 5.0.3.Final (Weld 6.0.4.Final) | current — `weld-junit5` 5.0.3 pins Weld 6.0.3 |
-| Jakarta JSON Processing 2.1 | `jakarta.json-api` 2.1.3 | Eclipse Parsson (`jinahya-persistence-more` tests only; the API is `provided`) | 1.1.9 | 1.1.9 | current |
-| Jakarta JSON Binding 3.0 | `jakarta.json.bind-api` 3.0.1 | Eclipse Yasson (`jinahya-persistence-more` tests only; the API is `provided`) | 3.0.5 | 3.0.5 | current |
-| Jakarta XML Binding 4.0 | not in the EE 11 BOM; `jakarta.xml.bind-api` 4.0.5, versioned in the root `pom.xml` | GlassFish JAXB runtime (`jaxb-runtime`; `jinahya-persistence-more` tests only; the API is `provided`) | 4.0.9 | 4.0.9 | current — not part of the EE 11 platform |
-
-`version.org.jboss.weld` is the **weld-junit5 (weld-testing)** version, not the Weld
-version: weld-junit5 5.0.x is the Weld 6 / CDI 4.1 line.
-
-#### Profiles
-
-The platform is fixed and so is every implementation version: each implementation is kept
-on the single release aligned with Jakarta EE 11, and the build never tests one
-implementation at two versions — that would exercise the implementation's own release
-history, not this project. What *does* vary is **which** implementation of Jakarta
-Persistence runs, because Hibernate ORM and EclipseLink are two different implementations
-of the same spec and genuinely behave differently.
-
-So there is exactly one axis, with two profiles:
+The generation is a module, not a profile, so a build always builds every generation. The one profile axis is the
+persistence provider, declared by each `jinahya-persistence-NN` parent:
 
 | Profile | Provider |
 | --- | --- |
-| `jakartaee-11-hibernate-orm` | Hibernate ORM — **active by default** |
-| `jakartaee-11-eclipselink` | EclipseLink |
+| `hibernate-orm` | Hibernate ORM — **active by default** |
+| `eclipselink` | EclipseLink |
+| `eclipselink-weaving` | an add-on to `eclipselink`: the EclipseLink agent weaves the entities as they load |
 
-Validation (Hibernate Validator + Expressly) and CDI (Weld) have no profiles at all;
-their versions live in the root `<properties>` and move only when the platform does.
-The profiles choose no versions either — both provider versions are in `<properties>`,
-one per provider. A profile only decides which provider is on the test classpath, which
-`persistence-unit.provider` goes into `persistence.xml`, and which metamodel generator
-the annotation processor path uses.
+`./_mvn.sh [maven args...]` runs the given build once per provider, through `_mvn_hibernate_orm.sh` and
+`_mvn_eclipselink.sh`, and reports which ones failed — e.g. `./_mvn.sh test` or
+`./_mvn.sh -q enforcer:enforce -Drules=dependencyConvergence`.
 
-`./_mvn_jakartaee_11.sh [maven args...]` runs the given build once per provider and
-reports which ones failed — e.g. `./_mvn_jakartaee_11.sh test` or
-`./_mvn_jakartaee_11.sh -q enforcer:enforce -Drules=dependencyConvergence`.
+### Java versions
 
-Four EE 11 profiles were removed to get here. `__hibernate-orm-7.2-jakarta-ee-11` and
-`___hibernate-validator-9.0-jakarta-ee-11` were second-newest-series version axes;
-`___hibernate-validator-9.1-jakarta-ee-11` and `___weld-6-jakarta-ee-11` were choices of
-one. All four only ever held versions, which now live in `<properties>`, and the six
-provider × validator combinations they produced collapse to two. The two survivors were
-renamed `jakartaee-11-{hibernate-orm,eclipselink}`.
+* **Main classes:** each generation compiles them for its Jakarta EE generation's minimum Java SE
+  (`maven.compiler.source` in `jinahya-persistence-NN/pom.xml`), and the enforcer requires a JDK at least that new.
+* **What the main classes need at runtime** (every dependency outside the `test` scope, `provided` included) must run
+  on that minimum, too; each generation enforces it with `enforceBytecodeVersion`.
+* **The build:** one JDK for the whole project, the latest LTS which can still compile for every generation's minimum
+  (now JDK 25). The test classes are compiled for it (`maven.compiler.testSource`), and the enforcer requires it.
 
-### Jakarta EE 12 — next (not adoptable yet)
+### Jakarta EE 10
+
+Dropped: no implementation set that was both complete and maintained could be lined up for it. It had only ever been
+half-wired, as a `_jakarta-ee-10.0.0` profile in which EclipseLink 4.0.8 was the only implementation with a matching
+version. Its six `jakarta-persistence-3.x-{hibernate,eclipselink}` marker profiles went with it.
+
+### Jakarta EE 12
 
 Jakarta EE Platform 12 is **not released**. Its Eclipse project page still carries a
 planned date of 2026-05-31, which has now passed with no release: no
@@ -99,37 +99,45 @@ no platform BOM to move to.
 
 | Spec (EE 12 target) | Latest artifact on Central | Implementation | Latest artifact on Central |
 | --- | --- | --- | --- |
-| Jakarta Persistence 4.0 | `jakarta.persistence-api` 4.0.0-M7 | Hibernate ORM 8.0 (JPA 4.0 / EE 12 / Java 17+) | 8.0.0.Beta1 |
-| Jakarta Persistence 4.0 | — | EclipseLink | no EE 12 line published |
+| Jakarta Persistence 4.0 | `jakarta.persistence-api` 4.0.0-M8 | Hibernate ORM 8.0 (JPA 4.0 / EE 12 / Java 17+) | 8.0.0.CR1 |
+| Jakarta Persistence 4.0 | `jakarta.persistence-api` 4.0.0-M8 | EclipseLink 6.0 | 6.0.0-M1 (milestone) |
 | Jakarta Validation 4.0 | `jakarta.validation-api` 4.0.0-M1 | Hibernate Validator | no EE 12 line published (9.1 is Validation 3.1) |
-| Jakarta CDI 5.0 | `jakarta.enterprise.cdi-api` 5.0.0 (final) | Weld 7 (CDI 5.0) | 7.0.0.CR1 |
+| Jakarta CDI 5.0 | `jakarta.enterprise.cdi-api` 5.0.0 (final) | Weld 7 (CDI 5.0) | 7.0.0.Final |
 | Jakarta Expression Language 6.1 | `jakarta.el-api` 6.1.0-M2 | Expressly | no 6.1 published |
 
-Moving to EE 12 means moving the umbrella BOM and *all* implementations at once, and
-today that is only possible on milestone builds.
+So there is no `jinahya-persistence-12` yet. Adding it means a new generation parent with the umbrella BOM and *all*
+implementations moved at once, and today that is only possible on milestone builds.
 
 *Series excluded as end-of-life or superseded: Hibernate ORM 6.x, 7.0, 7.1 and 7.3;
 Hibernate Validator 8.0 and older; EclipseLink 4.0 and older; Weld 5 and older; and the
 Jakarta EE 9/9.1 and 10 platform generations.*
 
-*Surveyed 2026-09-19 against Maven Central metadata and the upstream release pages
+*Surveyed 2026-11-14 against Maven Central metadata and the upstream release pages
 ([Hibernate ORM](https://hibernate.org/orm/releases/),
 [Hibernate Validator](https://hibernate.org/validator/releases/),
 [EclipseLink](https://eclipse.dev/eclipselink/releases/index.html),
 [Weld](https://weld.cdi-spec.org/get-started/),
 [Jakarta EE Platform 12](https://projects.eclipse.org/projects/ee4j.jakartaee-platform/releases/12)).*
 
+### Adding a generation
+
+1. Copy `jinahya-persistence-NN/` to the new generation, renaming the directories and the artifactIds.
+2. In its `pom.xml`, set `jakartaee`, `maven.compiler.source` (the generation's minimum Java SE), the BOM,
+   `persistence.version`, `persistence.schemaLocation`, and each implementation's version.
+3. Put what differs for the generation in its modules' own `src/`; everything else stays in `shared/`.
+4. Add it to the root `<modules>`, to the table above, and give it a `README.md` of its own.
+
 ## Modules
 
 | Module | What it holds | Depends on (within the reactor) | Maven Central |
 | --- | --- | --- | --- |
-| [`jinahya-persistence-utils`](jinahya-persistence-utils) | Static helpers over the core Jakarta Persistence types: resource-level transaction wrappers, JDBC `Connection` unwrapping, and reflective read/write of a metamodel `Attribute`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-utils)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-utils) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-utils/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-utils) |
-| [`jinahya-persistence-more`](jinahya-persistence-more) | Extended mapping building blocks, in five packages: attribute enums and self-referencing entities; the attribute converters (see [below](#inside-jinahya-persistence-more)); the mapped colour types; and mapped superclasses for temporal intervals and for ordered ranges. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more) |
-| [`jinahya-persistence-encryption`](jinahya-persistence-encryption) | Application-level encryption of entity attributes through standard attribute converters: one `Encrypted<Type>Converter` per supported type, the `EntityEncryptionService` SPI an application implements once, and the fixed encodings. The plaintext is the attribute, the ciphertext is its column. Formerly `jinahya-persistence-crypto`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption) |
-| [`jinahya-persistence-encryption-hibernate`](jinahya-persistence-encryption-hibernate) | Hibernate ORM's own way into `-encryption`: `@Encrypted`, one annotation for every supported type; the service from a persistence unit property; the ciphertext in the second-level cache. Optional. | `-encryption` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-hibernate)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-hibernate) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-hibernate/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-hibernate) |
-| [`jinahya-persistence-encryption-eclipselink`](jinahya-persistence-encryption-eclipselink) | EclipseLink's own way into `-encryption`: one named converter for every supported type, nothing listed; binary DDL; the service from a persistence unit property. Optional. | `-encryption` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-eclipselink)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-eclipselink) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-eclipselink/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-eclipselink) |
-| [`jinahya-persistence-more-test`](jinahya-persistence-more-test) | Abstract JUnit base classes for testing what `-more` defines — attribute converters and attribute enums. Lives in `src/main` so other projects' tests can extend it. | `-more` (`provided`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-test)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-test) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test) |
-| [`jinahya-persistence-test-utils`](jinahya-persistence-test-utils) | Randomizer / instantiator / persister SPIs, with locators, for building entity instances in a test suite. Also `src/main`, for the same reason. | — | not published yet |
+| [`jinahya-persistence-utils-11`](shared/jinahya-persistence-utils) | Static helpers over the core Jakarta Persistence types: resource-level transaction wrappers, JDBC `Connection` unwrapping, and reflective read/write of a metamodel `Attribute`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-utils-11)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-utils-11) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-utils-11/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-utils-11) |
+| [`jinahya-persistence-more-11`](shared/jinahya-persistence-more) | Extended mapping building blocks, in five packages: attribute enums and self-referencing entities; the attribute converters (see [below](#inside-jinahya-persistence-more)); the mapped colour types; and mapped superclasses for temporal intervals and for ordered ranges. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-11)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-11) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-11/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-11) |
+| [`jinahya-persistence-encryption-11`](shared/jinahya-persistence-encryption) | Application-level encryption of entity attributes through standard attribute converters: one `Encrypted<Type>Converter` per supported type, the `EntityEncryptionService` SPI an application implements once, and the fixed encodings. The plaintext is the attribute, the ciphertext is its column. Formerly `jinahya-persistence-crypto`. | — | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-11)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-11) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-11/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-11) |
+| [`jinahya-persistence-encryption-hibernate-11`](shared/jinahya-persistence-encryption-hibernate) | Hibernate ORM's own way into `-encryption`: `@Encrypted`, one annotation for every supported type; the service from a persistence unit property; the ciphertext in the second-level cache. Optional. | `-encryption` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-hibernate-11)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-hibernate-11) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-hibernate-11/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-hibernate-11) |
+| [`jinahya-persistence-encryption-eclipselink-11`](shared/jinahya-persistence-encryption-eclipselink) | EclipseLink's own way into `-encryption`: one named converter for every supported type, nothing listed; binary DDL; the service from a persistence unit property. Optional. | `-encryption` (`compile`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-encryption-eclipselink-11)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-encryption-eclipselink-11) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-encryption-eclipselink-11/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-encryption-eclipselink-11) |
+| [`jinahya-persistence-more-test-11`](shared/jinahya-persistence-more-test) | Abstract JUnit base classes for testing what `-more` defines — attribute converters and attribute enums. Lives in `src/main` so other projects' tests can extend it. | `-more` (`provided`) | [![v](https://img.shields.io/maven-central/v/io.github.jinahya/jinahya-persistence-more-test-11)](https://central.sonatype.com/artifact/io.github.jinahya/jinahya-persistence-more-test-11) [![javadoc](https://javadoc.io/badge2/io.github.jinahya/jinahya-persistence-more-test-11/javadoc.svg)](https://javadoc.io/doc/io.github.jinahya/jinahya-persistence-more-test-11) |
+| [`jinahya-persistence-test-utils-11`](shared/jinahya-persistence-test-utils) | Randomizer / instantiator / persister SPIs, with locators, for building entity instances in a test suite. Also `src/main`, for the same reason. | — | not published yet |
 
 ### Inside `jinahya-persistence-more`
 
@@ -178,6 +186,12 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 
 `AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
 a converter has to name its enum class and that class belongs to the consumer.
+
+#### Upgrading to 0.7.0
+
+Every artifact is now built once per Jakarta EE generation, and carries the generation in its artifactId: replace
+`jinahya-persistence-<module>` with `jinahya-persistence-<module>-11`. The packages and the `Automatic-Module-Name`s are
+unchanged. The main classes are now compiled for Java 17, the minimum of Jakarta EE 11, instead of 21.
 
 #### Upgrading to 0.6.11
 
@@ -274,24 +288,14 @@ Two properties hold across the whole reactor, and are worth keeping that way:
   dependency of every module is `provided`, so adding one of these artifacts to a project pulls in nothing the project
   did not ask for.
 - **Nothing is `runtime`-scoped.** Where a runtime implementation is needed — a persistence provider, a validation
-  provider, a JDBC driver — the module leaves the choice to the consumer, and only the build picks one (see the
-  profiles above).
+  provider, a JDBC driver — the module leaves the choice to the consumer, and only the build picks one (see
+  [Profiles](#profiles)).
 
-Every `jakarta.*` version comes from the `jakarta.jakartaee-bom` umbrella and is therefore absent from the poms; the
-versions below are what the current platform (`11.0.0`) resolves to.
-
-| Module | compile | runtime | provided |
-| --- | --- | --- | --- |
-| `jinahya-persistence-utils` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0 |
-| `jinahya-persistence-more` | — | — | `jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1 |
-| `jinahya-persistence-encryption` | — | — | `jakarta.inject:jakarta.inject-api` 2.0.1<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0 |
-| `jinahya-persistence-encryption-hibernate` | `io.github.jinahya:jinahya-persistence-encryption` | — | `org.hibernate.orm:hibernate-core` 7.4.12.Final<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0 |
-| `jinahya-persistence-encryption-eclipselink` | `io.github.jinahya:jinahya-persistence-encryption` | — | `org.eclipse.persistence:org.eclipse.persistence.core` 5.0.2<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0 |
-| `jinahya-persistence-more-test` | — | — | `io.github.jinahya:jinahya-persistence-more`<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`jakarta.validation:jakarta.validation-api` 3.1.1<br>`org.junit.jupiter:junit-jupiter-api` 5.14.4 |
-| `jinahya-persistence-test-utils` | `io.github.jinahya:jinahya-object-randomizer` 0.0.6 | — | `com.navercorp.fixturemonkey:fixture-monkey` 1.2.3<br>`com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation` 1.2.3<br>`jakarta.persistence:jakarta.persistence-api` 3.2.0<br>`org.instancio:instancio-core` 6.0.1<br>`uk.co.jemos.podam:podam` 8.0.2.RELEASE |
-
-`jakarta.persistence-api` is declared once, in the root pom, and inherited by every module; the rest are declared by
-the module which uses them.
+Every `jakarta.*` version comes from the generation's `jakarta.jakartaee-bom` umbrella and is therefore absent from the
+poms. The dependencies of each artifact, with the versions they resolve to, are tabled in its generation's README; see
+[Runtime dependencies of the artifacts](jinahya-persistence-11/README.md#runtime-dependencies-of-the-artifacts) for
+Jakarta EE 11. `jakarta.persistence-api` is declared once, in each `jinahya-persistence-NN` parent, and inherited by
+its modules; the rest are declared by the module which uses them.
 
 #### Notes on the two test-support modules
 

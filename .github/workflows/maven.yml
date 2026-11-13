@@ -19,65 +19,38 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
-    # The build JDK, not the target. Main sources are compiled with --release 21 (see
-    # maven.compiler.release) so the artifacts stay usable on 21; the TEST sources are
-    # compiled with --release 25 (maven.compiler.testRelease), which a JDK 21 javac cannot
-    # do -- it fails with "release version 25 not supported". Keep this in step with
-    # .java-version and with the enforcer's requireJavaVersion bound in the root pom.
-    - name: Set up JDK 25
-      uses: actions/setup-java@v4
-      with:
-        java-version: '25'
-        distribution: 'temurin'
-        cache: maven
-
-
-#    - name: Build with Maven
-#      run: mvn -B package --file pom.xml
-
-
-    - name: Cache Maven packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-    - name: Build
-      run: mvn -B verify
-
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-#      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
-      uses: advanced-security/maven-dependency-submission-action@v4
-
-  # Both persistence providers. Jakarta EE 11 is the only supported platform generation and every
-  # implementation is pinned to its single aligned release, so the only thing worth varying is which
-  # provider implements Jakarta Persistence. The job above runs exactly one of the two -- whatever is
-  # activeByDefault -- so EclipseLink was never exercised anywhere but on a developer's machine, via
-  # _mvn_jakartaee_11.sh. This is that script, as a matrix.
-  #
-  # Naming any profile on the command line deactivates every activeByDefault profile. That is
-  # harmless now that the provider is the only axis: the cell names the provider it wants, and
-  # nothing else was riding on the defaults.
-  #
-  # `test` rather than `verify`: the convergence enforcer is bound to `validate`, so it runs in every
-  # cell already, and there is nothing at `verify` -- no integration tests exist -- that varies by
-  # provider.
-  providers:
-
-    runs-on: ubuntu-latest
-
+    # one run per persistence provider, each building every Jakarta EE generation (jinahya-persistence-NN); the
+    # generation is a module, not a profile, so only the provider varies, as ./_mvn.sh does locally
     strategy:
       # one broken provider should not hide the state of the other
       fail-fast: false
       matrix:
-        provider:
-          - jakartaee-11-hibernate-orm
-          - jakartaee-11-eclipselink
+        provider: [ hibernate-orm, eclipselink ]
 
-    name: ${{ matrix.provider }}
+    name: build (${{ matrix.provider }})
+
+    steps:
+    - uses: actions/checkout@v4
+    # The build JDK, not the target: each generation compiles its main classes for its own minimum Java SE
+    # (--release 17 for jinahya-persistence-11), and the test classes for 25 (maven.compiler.testRelease), which
+    # only a JDK 25 javac can do. Keep this in step with .java-version and with the enforcer's requireJavaVersion
+    # bound in the root pom.
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        java-version: '25'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B verify -P${{ matrix.provider }}
+
+  # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+  # Submitted once, from the default provider, so the two builds do not overwrite each other's snapshot
+  dependency-graph:
+
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push'
 
     steps:
     - uses: actions/checkout@v4
@@ -87,7 +60,5 @@ jobs:
         java-version: '25'
         distribution: 'temurin'
         cache: maven
-    - name: Test
-      run: >
-        mvn -B test
-        -P${{ matrix.provider }}
+    - name: Update dependency graph
+      uses: advanced-security/maven-dependency-submission-action@v4

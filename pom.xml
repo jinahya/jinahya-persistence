@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" child.project.url.inherit.append.path="false">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -9,13 +9,15 @@
   </parent>
 
   <artifactId>jinahya-persistence</artifactId>
-  <version>0.6.12-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <!--  <version>${revision}</version>-->
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
   <description>Jinahya Persistence</description>
-  <url>https://github.com/jinahya/${project.artifactId}</url>
+  <!-- url, scm, and issueManagement name this repository literally, never ${project.artifactId}, and are inherited
+       unchanged (the inherit.append.path attributes): every module is in this one repository -->
+  <url>https://github.com/jinahya/jinahya-persistence</url>
   <inceptionYear>2025</inceptionYear>
   <organization>
     <name>Jinahya, Inc.</name>
@@ -46,56 +48,42 @@
     </developer>
   </developers>
 
+  <!-- One module per Jakarta EE generation, each the parent of that generation's artifacts, which carry the
+       generation in their artifactIds (jinahya-persistence-utils-11, ...). -->
   <modules>
-    <module>jinahya-persistence-encryption</module>
-    <module>jinahya-persistence-encryption-eclipselink</module>
-    <module>jinahya-persistence-encryption-hibernate</module>
-    <module>jinahya-persistence-more</module>
-    <module>jinahya-persistence-more-test</module>
-    <module>jinahya-persistence-test-utils</module>
-    <module>jinahya-persistence-utils</module>
+    <module>jinahya-persistence-11</module>
   </modules>
 
-  <scm>
-    <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
-    <url>https://github.com/jinahya/${project.artifactId}</url>
-    <tag>0.5.7</tag>
+  <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
+    <connection>scm:git:git@github.com:jinahya/jinahya-persistence.git</connection>
+    <developerConnection>scm:git:git@github.com:jinahya/jinahya-persistence.git</developerConnection>
+    <url>https://github.com/jinahya/jinahya-persistence</url>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/jinahya/${project.artifactId}/issues</url>
+    <url>https://github.com/jinahya/jinahya-persistence/issues</url>
   </issueManagement>
 
   <properties>
     <!-- the Automatic-Module-Name of a module's jar; set by each module, empty (no entry) here -->
     <module.name />
     <!--    <revision>0.3.10-SNAPSHOT</revision>-->
-    <!-- https://endoflife.date/eclipse-temurin -->
-    <!-- https://endoflife.date/amazon-corretto -->
-    <maven.compiler.source>21</maven.compiler.source>
+    <!-- maven.compiler.source, the release of the main classes, is each jinahya-persistence-NN parent's: the minimum
+         Java SE of its Jakarta EE generation, enforced there by the enforce-require-jakartaee-java-version execution -->
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <maven.compiler.release>${maven.compiler.target}</maven.compiler.release>
-    <!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
-<!--    <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>-->
+    <!-- https://endoflife.date/eclipse-temurin -->
+    <!-- the release of the test classes, for every generation; the build JDK must be at least this -->
     <maven.compiler.testSource>25</maven.compiler.testSource>
     <maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
     <maven.compiler.testRelease>${maven.compiler.testSource}</maven.compiler.testRelease>
     <doclint>none</doclint>
-    <!-- Jakarta EE 11 is the only supported platform generation; see README.md.
-         Every implementation below is the single release aligned with that generation: the build
-         does not test an implementation at more than one version, so none of these is a profile.
-         The one thing a profile chooses is WHICH persistence provider is used; see <profiles>. -->
-    <persistence.version>3.2</persistence.version>
-    <persistence.schemaLocation>https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd</persistence.schemaLocation>
-    <!-- the Jakarta Persistence provider; overridden by jakartaee-11-eclipselink -->
-    <persistence-unit.provider>org.hibernate.jpa.HibernatePersistenceProvider</persistence-unit.provider>
-    <metamodel.generator.groupId>org.hibernate.orm</metamodel.generator.groupId>
-    <metamodel.generator.artifactId>hibernate-jpamodelgen</metamodel.generator.artifactId>
-    <metamodel.generator.version>${version.org.hibernate.orm}</metamodel.generator.version>
-    <!-- whether EclipseLink weaves the entities as they are loaded; overridden by jakartaee-11-eclipselink-weaving,
-         and handed to the tests as a system property of the same name -->
-    <eclipselink.woven>false</eclipselink.woven>
+    <!-- each jinahya-persistence-NN/* module, two levels down, sets shared.module to its directory under shared/ -->
+    <shared.directory>${project.basedir}/../../shared/${shared.module}</shared.directory>
+    <!-- The platform (the Jakarta EE BOM), persistence.version, the persistence provider defaults, and every
+         implementation of a Jakarta specification (the persistence providers, Hibernate Validator, Expressly, Weld,
+         Parsson, Yasson, the JAXB runtime) are versioned by each jinahya-persistence-NN parent, never here. -->
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.6.1</version.maven-surefire>
     <!-- https://central.sonatype.com/artifact/com.h2database/h2/versions -->
@@ -109,45 +97,15 @@
          every engine is 'provided' there too, so this brings nothing of its own onto a classpath -->
     <!-- https://central.sonatype.com/artifact/io.github.jinahya/jinahya-object-randomizer/versions -->
     <version.io.github.jinahya.object-randomizer>0.0.7</version.io.github.jinahya.object-randomizer>
-    <!-- https://jakarta.ee/specifications/platform/11/ -->
-    <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
-    <!-- 11.0.0 manages: jakarta.persistence-api 3.2.0, jakarta.validation-api 3.1.1, -->
-    <!--                 jakarta.enterprise.cdi-api 4.1.0, jakarta.el-api 6.0.1 -->
-    <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
+    <!-- byte-buddy is wanted by mockito-core (1.17.7) and by hibernate-core (1.18.14) on the test classpath; pinned to
+         the higher, rather than left to whichever of the two is declared first -->
+    <!-- https://central.sonatype.com/artifact/net.bytebuddy/byte-buddy/versions -->
+    <version.net.bytebuddy>1.18.14</version.net.bytebuddy>
     <!-- https://central.sonatype.com/artifact/nl.jqno.equalsverifier/equalsverifier-nodep/versions -->
     <version.nl.jqno.equalsverifier>4.5.2</version.nl.jqno.equalsverifier>
     <!-- https://github.com/instancio/instancio/releases -->
     <!-- https://central.sonatype.com/artifact/org.instancio/instancio-core/versions -->
     <version.org.instancio>6.2.1</version.org.instancio>
-    <!-- https://github.com/eclipse-ee4j/eclipselink/releases -->
-    <!-- https://eclipse.dev/eclipselink/releases/index.html -->
-    <!-- https://central.sonatype.com/artifact/org.eclipse.persistence/org.eclipse.persistence.jpa/versions -->
-    <version.org.eclipse.persistence>5.0.2</version.org.eclipse.persistence>
-    <!-- Jakarta JSON Processing 2.1 -->
-    <!-- https://central.sonatype.com/artifact/org.eclipse.parsson/parsson/versions -->
-    <version.org.eclipse.parsson>1.1.9</version.org.eclipse.parsson>
-    <!-- Jakarta JSON Binding 3.0 -->
-    <!-- https://central.sonatype.com/artifact/org.eclipse/yasson/versions -->
-    <version.org.eclipse.yasson>3.0.5</version.org.eclipse.yasson>
-    <!-- Jakarta XML Binding 4.0; not in the Jakarta EE 11 platform, so not in its BOM, and versioned here -->
-    <!-- https://central.sonatype.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api/versions -->
-    <version.jakarta.xml.bind-api>4.0.5</version.jakarta.xml.bind-api>
-    <!-- https://central.sonatype.com/artifact/org.glassfish.jaxb/jaxb-runtime/versions -->
-    <version.org.glassfish.jaxb>4.0.9</version.org.glassfish.jaxb>
-    <!-- https://docs.jboss.org/hibernate/validator/9.0/reference/en-US/html_single/#validator-gettingstarted-uel -->
-    <!-- hibernate-validator: 9 / expressly: 6 -->
-    <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly -->
-    <version.org.glassfish.expressly>6.0.0</version.org.glassfish.expressly>
-    <!-- https://hibernate.org/orm/releases/ -->
-    <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-platform/versions -->
-    <version.org.hibernate.orm>7.4.15.Final</version.org.hibernate.orm>
-    <!-- https://hibernate.org/validator/releases/ -->
-    <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
-    <version.org.hibernate.validator>9.1.6.Final</version.org.hibernate.validator>
-    <!-- https://weld.cdi-spec.org/download/ -->
-    <!-- https://central.sonatype.com/artifact/org.jboss.weld/weld-junit5/versions -->
-    <version.org.jboss.weld>5.0.3.Final</version.org.jboss.weld>
-    <version.org.jboss.weld.se>${version.org.jboss.weld}</version.org.jboss.weld.se>
     <!-- https://central.sonatype.com/artifact/org.junit/junit-bom/versions -->
     <version.org.junit>6.1.3</version.org.junit>
     <!-- https://github.com/weld/weld-testing/issues/293 -->
@@ -214,13 +172,14 @@
       <!--        <classifier>jakarta</classifier>-->
       <!--      </dependency>-->
       <dependency>
-        <groupId>jakarta.platform</groupId>
-        <artifactId>jakarta.jakartaee-bom</artifactId>
-        <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
-        <!--        <version>11.0.0</version>-->
-        <version>${version.jakarta.jakartaee-bom}</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>${version.net.bytebuddy}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy-agent</artifactId>
+        <version>${version.net.bytebuddy}</version>
       </dependency>
       <dependency>
         <groupId>nl.jqno.equalsverifier</groupId>
@@ -245,82 +204,6 @@
             <artifactId>byte-buddy</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <!-- for the modules which integrate with EclipseLink itself -->
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.core</artifactId>
-        <version>${version.org.eclipse.persistence}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>${version.org.eclipse.persistence}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-        <version>${version.org.eclipse.persistence}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.parsson</groupId>
-        <artifactId>parsson</artifactId>
-        <version>${version.org.eclipse.parsson}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse</groupId>
-        <artifactId>yasson</artifactId>
-        <version>${version.org.eclipse.yasson}</version>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>${version.jakarta.xml.bind-api}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jaxb</groupId>
-        <artifactId>jaxb-runtime</artifactId>
-        <version>${version.org.glassfish.jaxb}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.expressly</groupId>
-        <artifactId>expressly</artifactId>
-        <!--        <version>5.0.0</version>-->
-        <version>${version.org.glassfish.expressly}</version>
-      </dependency>
-      <!--      <dependency>-->
-      <!--        <groupId>org.hibernate.orm</groupId>-->
-      <!--        <artifactId>hibernate-platform</artifactId>-->
-      <!--        <version>${version.org.hibernate.orm}</version>-->
-      <!--        <type>pom</type>-->
-      <!--        <scope>import</scope>-->
-      <!--      </dependency>-->
-      <!-- for the modules which integrate with Hibernate ORM itself; the jakartaee-11-hibernate-orm profile adds it to
-           every module's test class path at the same version -->
-      <dependency>
-        <groupId>org.hibernate.orm</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>${version.org.hibernate.orm}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate.orm</groupId>
-        <artifactId>hibernate-testing</artifactId>
-        <version>${version.org.hibernate.orm}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator</artifactId>
-        <version>${version.org.hibernate.validator}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate.validator</groupId>
-        <artifactId>hibernate-validator-test-utils</artifactId>
-        <version>${version.org.hibernate.validator}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jboss.weld</groupId>
-        <artifactId>weld-junit5</artifactId>
-        <version>${version.org.jboss.weld}</version>
       </dependency>
       <dependency>
         <groupId>org.instancio</groupId>
@@ -378,13 +261,7 @@
       <artifactId>slf4j-jdk-platform-logging</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- likewise: this is a Jakarta Persistence project, every module compiles against the API and
-         none of them ship it. Version comes from the umbrella BOM -->
-    <dependency>
-      <groupId>jakarta.persistence</groupId>
-      <artifactId>jakarta.persistence-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    <!-- jakarta.persistence-api, at its generation's version, comes from each jinahya-persistence-NN parent -->
     <!--    <dependency>-->
     <!--      <groupId>com.querydsl</groupId>-->
     <!--      <artifactId>querydsl-jpa</artifactId>-->
@@ -394,6 +271,24 @@
   </dependencies>
 
   <build>
+    <!-- the shared resources of a module, then its own; a module which filters its test resources redeclares
+         <testResources> with both directories -->
+    <resources>
+      <resource>
+        <directory>${shared.directory}/src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>${shared.directory}/src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -423,7 +318,8 @@
             <doclint>all</doclint>
             <links>
               <link>https://docs.oracle.com/en/java/javase/${maven.compiler.release}/docs/api/</link>
-              <link>https://jakarta.ee/specifications/platform/11/apidocs/</link>
+              <!-- jakartaee is set by each jinahya-persistence-NN parent -->
+              <link>https://jakarta.ee/specifications/platform/${jakartaee}/apidocs/</link>
               <!-- not pinned to ${version.nl.jqno.equalsverifier}: javadoc.io only hosts
                    an element-list for some releases, and a missing one fails the build -->
               <link>https://javadoc.io/doc/nl.jqno.equalsverifier/equalsverifier/latest/</link>
@@ -497,6 +393,15 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>3.6.3</version>
+        <dependencies>
+          <dependency>
+            <!-- enforceBytecodeVersion, which each jinahya-persistence-NN parent uses -->
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
+            <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/extra-enforcer-rules/versions -->
+            <version>1.12.1</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -505,14 +410,16 @@
             </goals>
             <configuration>
               <rules>
-                <!-- The BUILD JDK. Main sources target 21 via maven.compiler.release, but the test
-                     sources are compiled at release 25, which javac can only do from 25 onwards.
-                     A [21,) bound let a JDK 21 build past this rule and fail much later, deep inside
-                     testCompile, with "release version 25 not supported". Fail here instead, where the
-                     message names the cause. Raise this together with maven.compiler.testRelease,
-                     .java-version, and the JDK in .github/workflows/maven.yml. -->
+                <!-- The BUILD JDK. Main sources target each generation's minimum Java SE via
+                     maven.compiler.release, but the test sources are compiled for maven.compiler.testRelease,
+                     whatever the generation, which javac can only do from that release onwards; a JDK older than
+                     that would fail much later, deep inside testCompile, with "release version 25 not supported".
+                     Fail here instead, where the message names the cause. Raise this together with
+                     maven.compiler.testRelease, .java-version, and the JDK in .github/workflows/maven.yml. -->
                 <requireJavaVersion>
-                  <version>[25,)</version>
+                  <version>[${maven.compiler.testRelease},)</version>
+                  <message>The test classes are compiled for Java ${maven.compiler.testRelease}; build with a JDK
+                    ${maven.compiler.testRelease} or newer.</message>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -541,35 +448,8 @@
               </rules>
             </configuration>
           </execution>
-          <execution>
-            <id>enforce-require-provider-profile</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <!-- The persistence provider comes from an activeByDefault profile, and Maven drops a POM's
-                     activeByDefault profiles as soon as any other profile OF THAT POM is named on the command
-                     line: `-Pfailsafe` alone leaves no provider on the test classpath while
-                     persistence-unit.provider still names Hibernate, and the build then dies much later, in
-                     surefire, with "No Persistence provider for EntityManager named ...". Fail here instead.
-                     The check is on a marker property set only by the two provider profiles of this POM, not
-                     on requireActiveProfile, because that rule matches a profile id wherever it is declared:
-                     jinahya-persistence-encryption carries an activeByDefault profile of the same id, which
-                     `-Pfailsafe` does not deactivate, and which would satisfy the id check while the root's
-                     provider dependencies are missing. -->
-                <requireProperty>
-                  <property>persistence-provider-profile.active</property>
-                  <message>No persistence provider profile is active in the root POM. Naming any other profile of
-                    the root POM on the command line (for example -Pfailsafe) deactivates the activeByDefault
-                    provider profile, and -P!jakartaee-11-hibernate-orm removes it outright; the persistence
-                    units then fail to bootstrap far from the cause. Name a provider together with it:
-                    -Pfailsafe,jakartaee-11-hibernate-orm or -Pfailsafe,jakartaee-11-eclipselink.</message>
-                </requireProperty>
-              </rules>
-            </configuration>
-          </execution>
+          <!-- enforce-require-provider-profile, enforce-require-jakartaee-java-version, and
+               enforce-jakartaee-bytecode-version are each jinahya-persistence-NN parent's -->
         </executions>
       </plugin>
       <plugin>
@@ -579,7 +459,7 @@
         <version>3.16.0</version>
         <configuration>
           <annotationProcessorPaths>
-            <!-- follows the selected persistence provider; see the __* profiles -->
+            <!-- follows the selected persistence provider; see the provider profiles of each jinahya-persistence-NN -->
             <path>
               <groupId>${metamodel.generator.groupId}</groupId>
               <artifactId>${metamodel.generator.artifactId}</artifactId>
@@ -621,18 +501,7 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-aggregate-javadocs</id>
-            <goals>
-              <goal>aggregate-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+      <!-- attach-aggregate-javadocs, the aggregate javadoc of a generation, is each jinahya-persistence-NN parent's -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -647,11 +516,29 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
+          <!-- A jinahya-persistence-NN module holds only what is specific to its generation; everything common to
+               every generation lives once, under shared/<shared.module>/, and is compiled by each module against
+               its own generation's API. A module names its shared directory with the shared.module property. A
+               directory which does not exist is skipped, so create one only when there is a source which needs it.
+               In either place, src/test/java-<persistence-provider> holds the tests of the active provider only.
+               The resources are added by <resources> and <testResources>, below. -->
           <execution>
-            <!-- the test sources every module shares, e.g. __PersistenceProviders; each module compiles them into
-                 its own test classes. maven.multiModuleProjectDirectory is the directory holding .mvn, this one,
-                 wherever the build is started from -->
-            <id>add-shared-test-source</id>
+            <id>add-shared-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${shared.directory}/src/main/java</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- src/test-shared/java holds the test sources every module shares, e.g. __PersistenceProviders; each
+                 module compiles them into its own test classes. maven.multiModuleProjectDirectory is the directory
+                 holding .mvn, this one, wherever the build is started from -->
+            <id>add-shared-and-provider-test-sources</id>
             <phase>generate-test-sources</phase>
             <goals>
               <goal>add-test-source</goal>
@@ -659,6 +546,9 @@
             <configuration>
               <sources>
                 <source>${maven.multiModuleProjectDirectory}/src/test-shared/java</source>
+                <source>${shared.directory}/src/test/java</source>
+                <source>${shared.directory}/src/test/java-${persistence-provider}</source>
+                <source>src/test/java-${persistence-provider}</source>
               </sources>
             </configuration>
           </execution>
@@ -846,69 +736,7 @@
         </plugins>
       </build>
     </profile>
-    <!-- =============================================== persistence provider ================ -->
-    <!-- The only implementation axis in this build. The other specs have a single implementation
-         each (Hibernate Validator + Expressly for Jakarta Validation, Weld for CDI), pinned to their
-         Jakarta EE 11 aligned release in <properties>; there is nothing to choose there, so they
-         have no profiles.
-         These two profiles do not choose a VERSION either: both provider versions live in
-         <properties>, one per provider. A profile decides only which provider is on the test
-         classpath, and which metamodel generator the annotation processor path uses. -->
-    <profile>
-      <id>jakartaee-11-hibernate-orm</id>
-      <!-- https://hibernate.org/orm/releases/ -->
-      <!-- Jakarta Persistence 3.2 / Jakarta EE 11; version: version.org.hibernate.orm -->
-      <!-- the provider defaults in <properties> are this profile's; it only adds the dependency -->
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <!-- the marker the enforce-require-provider-profile execution checks; set only by the two provider
-             profiles of this POM -->
-        <persistence-provider-profile.active>true</persistence-provider-profile.active>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.hibernate.orm</groupId>
-          <artifactId>hibernate-core</artifactId>
-          <!-- https://central.sonatype.com/artifact/org.hibernate.orm/hibernate-core -->
-          <version>${version.org.hibernate.orm}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>jakartaee-11-eclipselink</id>
-      <!-- https://eclipse.dev/eclipselink/releases/index.html -->
-      <!-- Jakarta Persistence 3.2 / Jakarta EE 11; version: version.org.eclipse.persistence -->
-      <properties>
-        <!-- the marker the enforce-require-provider-profile execution checks -->
-        <persistence-provider-profile.active>true</persistence-provider-profile.active>
-        <persistence-unit.provider>org.eclipse.persistence.jpa.PersistenceProvider</persistence-unit.provider>
-        <metamodel.generator.groupId>org.eclipse.persistence</metamodel.generator.groupId>
-        <metamodel.generator.artifactId>org.eclipse.persistence.jpa.modelgen.processor</metamodel.generator.artifactId>
-        <metamodel.generator.version>${version.org.eclipse.persistence}</metamodel.generator.version>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.persistence</groupId>
-          <artifactId>org.eclipse.persistence.jpa</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>jakartaee-11-eclipselink-weaving</id>
-      <!-- An add-on to jakartaee-11-eclipselink, not a provider: named alone, it hands the agent to a JVM with no
-           EclipseLink to run it. The EclipseLink jar is itself a Java agent (Premain-Class JavaSECMPInitializerAgent),
-           which weaves the entities as they are loaded, so EclipseLink honours LAZY on a basic attribute and on a
-           to-one association, and an entity graph naming one is accepted. Nothing on disk is rewritten; the classes
-           under target/ and the jars stay unwoven. jacoco:prepare-agent appends its own agent to the same argLine.
-           It sets no persistence-provider-profile.active, so it does not stand in for a provider profile. -->
-      <properties>
-        <argLine>-javaagent:${settings.localRepository}/org/eclipse/persistence/org.eclipse.persistence.jpa/${version.org.eclipse.persistence}/org.eclipse.persistence.jpa-${version.org.eclipse.persistence}.jar</argLine>
-        <eclipselink.woven>true</eclipselink.woven>
-      </properties>
-    </profile>
+    <!-- The persistence provider profiles, hibernate-orm (active by default), eclipselink, and eclipselink-weaving,
+         are each jinahya-persistence-NN parent's, since only a generation knows the providers' versions. -->
   </profiles>
 </project>
