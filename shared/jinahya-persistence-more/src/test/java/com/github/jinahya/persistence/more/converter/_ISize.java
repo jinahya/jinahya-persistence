@@ -8,7 +8,7 @@ import com.github.jinahya.persistence.more.AttributeEnum;
  *
  * @param <S> self type parameter
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
- * @see AttributeEnumConverter3
+ * @see AttributeEnumConverter
  */
 interface _ISize<S extends Enum<S> & _ISize<S>> extends AttributeEnum.OfString<S> {
 

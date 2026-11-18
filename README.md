@@ -187,6 +187,17 @@ registrable in a persistence unit — live in a `…Converters` holder per famil
 `AttributeEnumConverter` is the exception with a reason: its four nested types are abstract, not registrable, because
 a converter has to name its enum class and that class belongs to the consumer.
 
+#### Upgrading to 0.7.2
+
+`AttributeEnumConverter` also converts an interface, extending `AttributeEnum`, which more than one enum class
+implements; e.g., a library defines an interface and an enum implementing it, and a downstream adds another enum
+implementing the same interface. `OfInteger`, `OfLong` and `OfString` take the enum classes as
+`(enumClass, moreEnumClasses...)`, and `OfNumber` also takes a `List` of them; a subclass which names a single enum
+class compiles unchanged. The sketches `AttributeEnumConverter2` and `AttributeEnumConverter3` are removed, merged
+into it. Two changes break a subclass: the protected field `enumClass` is now `enumClasses`, a `List`, since an
+interface has no single enum class; and the type parameter now erases to `AttributeEnum`, not `Enum`, so a subclass
+compiled against 0.7.1 has to be compiled again.
+
 #### Upgrading to 0.7.0
 
 Every artifact is now built once per Jakarta EE generation, and carries the generation in its artifactId: replace

@@ -13,7 +13,7 @@ public final class _SizeConverters {
      * A converter of {@link _Size} alone.
      */
     @Converter(autoApply = false)
-    public static class OfSize extends AttributeEnumConverter3.OfString<_Size> {
+    public static class OfSize extends AttributeEnumConverter.OfString<_Size> {
 
         public OfSize() {
             super(_Size.class);
@@ -24,7 +24,7 @@ public final class _SizeConverters {
      * A converter of {@link _ISize}, with both {@link _Size} and {@link _ExtendedSize}.
      */
     @Converter(autoApply = false)
-    public static class OfISize extends AttributeEnumConverter3.OfString<_ISize<?>> {
+    public static class OfISize extends AttributeEnumConverter.OfString<_ISize<?>> {
 
         public OfISize() {
             super(_Size.class, _ExtendedSize.class);

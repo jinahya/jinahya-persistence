@@ -259,7 +259,7 @@ public abstract class AttributeEnumConverter_Test<
 
     /**
      * A nested test class for testing
-     * {@link AttributeEnumConverter#convertToDatabaseColumn(Enum) convertToDatabaseColumn(E)}.
+     * {@link AttributeEnumConverter#convertToDatabaseColumn(AttributeEnum) convertToDatabaseColumn(E)}.
      */
     @DisplayName("convertToDatabaseColumn(E)E.attributeValue")
     @Nested

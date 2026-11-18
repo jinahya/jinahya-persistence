@@ -12,14 +12,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * A class for testing {@link AttributeEnumConverter3}.
+ * A class for testing {@link AttributeEnumConverter}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class AttributeEnumConverter3_Test {
+class AttributeEnumConverter_Test {
 
     // a size no converter here lists
     private enum _OtherSize implements _ISize<_OtherSize> {
@@ -63,21 +63,21 @@ class AttributeEnumConverter3_Test {
         private final int attributeValue;
     }
 
-    private static class _LevelConverter extends AttributeEnumConverter3.OfInteger<_Level> {
+    private static class _LevelConverter extends AttributeEnumConverter.OfInteger<_Level> {
 
         _LevelConverter() {
             super(_Level.class);
         }
     }
 
-    private static class _ILevelConverter extends AttributeEnumConverter3.OfInteger<_ILevel<?>> {
+    private static class _ILevelConverter extends AttributeEnumConverter.OfInteger<_ILevel<?>> {
 
         _ILevelConverter() {
             super(_Level.class, _ExtendedLevel.class);
         }
     }
 
-    private static class _ListedISizeConverter extends AttributeEnumConverter3<_ISize<?>, String> {
+    private static class _ListedISizeConverter extends AttributeEnumConverter<_ISize<?>, String> {
 
         _ListedISizeConverter(final List<Class<? extends _ISize<?>>> enumClasses) {
             super(enumClasses, String.class);
@@ -119,7 +119,7 @@ class AttributeEnumConverter3_Test {
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Test
         void _IllegalArgumentException_AnotherType() {
-            final AttributeEnumConverter3 raw = converter;
+            final AttributeEnumConverter raw = converter;
             assertThatThrownBy(() -> raw.convertToEntityAttribute(1))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -225,7 +225,7 @@ class AttributeEnumConverter3_Test {
         @DisplayName("(enumClass, null...) -> NullPointerException")
         @Test
         void _NullPointerException_NullElement() {
-            assertThatThrownBy(() -> new AttributeEnumConverter3.OfString<_ISize<?>>(_Size.class, (Class<_ExtendedSize>) null) {
+            assertThatThrownBy(() -> new AttributeEnumConverter.OfString<_ISize<?>>(_Size.class, (Class<_ExtendedSize>) null) {
             }).isInstanceOf(NullPointerException.class);
         }
     }

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 /**
- * Verifies that {@link AttributeEnumConverter3} converts, through a real persistence provider, an attribute of an
+ * Verifies that {@link AttributeEnumConverter} converts, through a real persistence provider, an attribute of an
  * enum, and another of a shared interface which more than one enum implements.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assumptions.assumeFalse;
 @SuppressWarnings({
         "java:S3577" // Test classes should comply with a naming convention
 })
-class AttributeEnumConverter3_PersistenceTest {
+class AttributeEnumConverter_PersistenceTest {
 
     private static EntityManagerFactory ENTITY_MANAGER_FACTORY;
 

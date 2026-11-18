@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 
 /**
  * An entity with an attribute of an enum, {@link _Size}, and another of a shared interface, {@link _ISize}, so that
- * the provider is what instantiates and applies {@link AttributeEnumConverter3}.
+ * the provider is what instantiates and applies {@link AttributeEnumConverter}.
  *
  * @author Jin Kwon &lt;onacit_at_gmail.com&gt;
  */
