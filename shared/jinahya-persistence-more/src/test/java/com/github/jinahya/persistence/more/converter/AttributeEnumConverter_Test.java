@@ -63,6 +63,80 @@ class AttributeEnumConverter_Test {
         private final int attributeValue;
     }
 
+    private interface _ICode<C extends Enum<C> & _ICode<C>> extends AttributeEnum.OfLong<C> {
+    }
+
+    private enum _Code implements _ICode<_Code> {
+
+        OK(200L),
+
+        NOT_FOUND(404L);
+
+        _Code(final long attributeValue) {
+            this.attributeValue = attributeValue;
+        }
+
+        @Override
+        public Long attributeValue() {
+            return attributeValue;
+        }
+
+        private final long attributeValue;
+    }
+
+    private enum _ExtendedCode implements _ICode<_ExtendedCode> {
+
+        TEAPOT(418L);
+
+        _ExtendedCode(final long attributeValue) {
+            this.attributeValue = attributeValue;
+        }
+
+        @Override
+        public Long attributeValue() {
+            return attributeValue;
+        }
+
+        private final long attributeValue;
+    }
+
+    private interface _IGrade<G extends Enum<G> & _IGrade<G>> extends AttributeEnum.OfNumber<G, Short> {
+    }
+
+    private enum _Grade implements _IGrade<_Grade> {
+
+        A((short) 1),
+
+        B((short) 2);
+
+        _Grade(final short attributeValue) {
+            this.attributeValue = attributeValue;
+        }
+
+        @Override
+        public Short attributeValue() {
+            return attributeValue;
+        }
+
+        private final short attributeValue;
+    }
+
+    private enum _ExtendedGrade implements _IGrade<_ExtendedGrade> {
+
+        F((short) 9);
+
+        _ExtendedGrade(final short attributeValue) {
+            this.attributeValue = attributeValue;
+        }
+
+        @Override
+        public Short attributeValue() {
+            return attributeValue;
+        }
+
+        private final short attributeValue;
+    }
+
     private static class _LevelConverter extends AttributeEnumConverter.OfInteger<_Level> {
 
         _LevelConverter() {
@@ -74,6 +148,41 @@ class AttributeEnumConverter_Test {
 
         _ILevelConverter() {
             super(_Level.class, _ExtendedLevel.class);
+        }
+    }
+
+    private static class _CodeConverter extends AttributeEnumConverter.OfLong<_Code> {
+
+        _CodeConverter() {
+            super(_Code.class);
+        }
+    }
+
+    private static class _ICodeConverter extends AttributeEnumConverter.OfLong<_ICode<?>> {
+
+        _ICodeConverter() {
+            super(_Code.class, _ExtendedCode.class);
+        }
+    }
+
+    private static class _GradeConverter extends AttributeEnumConverter.OfNumber<_Grade, Short> {
+
+        _GradeConverter() {
+            super(Short.class, _Grade.class);
+        }
+    }
+
+    private static class _IGradeConverter extends AttributeEnumConverter.OfNumber<_IGrade<?>, Short> {
+
+        _IGradeConverter() {
+            super(Short.class, _Grade.class, _ExtendedGrade.class);
+        }
+    }
+
+    private static class _ListedIGradeConverter extends AttributeEnumConverter.OfNumber<_IGrade<?>, Short> {
+
+        _ListedIGradeConverter() {
+            super(List.of(_Grade.class, _ExtendedGrade.class), Short.class);
         }
     }
 
@@ -198,6 +307,79 @@ class AttributeEnumConverter_Test {
             Stream.<_ILevel<?>>concat(Stream.of(_Level.values()), Stream.of(_ExtendedLevel.values())).forEach(c -> {
                 assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(c))).isSameAs(c);
             });
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("OfLong")
+    @Nested
+    class OfLongTest {
+
+        @DisplayName("a single enum class; each constant -> its attribute value -> the same constant")
+        @Test
+        void _RoundTrip_Single() {
+            final var converter = new _CodeConverter();
+            for (final var constant : _Code.values()) {
+                assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(constant)))
+                        .isSameAs(constant);
+            }
+        }
+
+        @DisplayName("enum classes of a shared interface; each constant -> its attribute value -> the same constant")
+        @Test
+        void _RoundTrip_Shared() {
+            final var converter = new _ICodeConverter();
+            Stream.<_ICode<?>>concat(Stream.of(_Code.values()), Stream.of(_ExtendedCode.values())).forEach(c -> {
+                assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(c))).isSameAs(c);
+            });
+            assertThat(converter.enumClasses).containsExactly(_Code.class, _ExtendedCode.class);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    @DisplayName("OfNumber")
+    @Nested
+    class OfNumberTest {
+
+        @DisplayName("(numberClass, enumClass); each constant -> its attribute value -> the same constant")
+        @Test
+        void _RoundTrip_Single() {
+            final var converter = new _GradeConverter();
+            for (final var constant : _Grade.values()) {
+                assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(constant)))
+                        .isSameAs(constant);
+            }
+            assertThat(converter.enumClasses).containsExactly(_Grade.class);
+            assertThat(converter.attributeClass).isSameAs(Short.class);
+        }
+
+        @DisplayName("(numberClass, enumClass, moreEnumClasses...); each constant -> its attribute value -> the same constant")
+        @Test
+        void _RoundTrip_Shared() {
+            final var converter = new _IGradeConverter();
+            Stream.<_IGrade<?>>concat(Stream.of(_Grade.values()), Stream.of(_ExtendedGrade.values())).forEach(c -> {
+                assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(c))).isSameAs(c);
+            });
+            assertThat(converter.enumClasses).containsExactly(_Grade.class, _ExtendedGrade.class);
+        }
+
+        @DisplayName("(enumClasses, numberClass); each constant -> its attribute value -> the same constant")
+        @Test
+        void _RoundTrip_Listed() {
+            final var converter = new _ListedIGradeConverter();
+            Stream.<_IGrade<?>>concat(Stream.of(_Grade.values()), Stream.of(_ExtendedGrade.values())).forEach(c -> {
+                assertThat(converter.convertToEntityAttribute(converter.convertToDatabaseColumn(c))).isSameAs(c);
+            });
+            assertThat(converter.enumClasses).containsExactly(_Grade.class, _ExtendedGrade.class);
+        }
+
+        @DisplayName("convertToEntityAttribute(an Integer of a known value) -> IllegalArgumentException")
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        @Test
+        void _IllegalArgumentException_Integer() {
+            final AttributeEnumConverter raw = new _IGradeConverter();
+            assertThatThrownBy(() -> raw.convertToEntityAttribute(1))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

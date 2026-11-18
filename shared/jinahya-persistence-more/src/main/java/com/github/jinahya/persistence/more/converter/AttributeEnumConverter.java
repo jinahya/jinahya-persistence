@@ -126,6 +126,24 @@ public abstract class AttributeEnumConverter<ENUM extends AttributeEnum<? extend
         }
 
         /**
+         * Creates a new instance for the specified number class and enum classes; either a single enum class, or the
+         * enum classes each implementing a shared interface.
+         *
+         * @param numberClass     the number class.
+         * @param enumClass       the first enum class to search.
+         * @param moreEnumClasses the other enum classes, each of {@link E}, to search, in order.
+         * @apiNote The {@code numberClass} comes first, unlike in the other constructors, since the enum classes
+         *         are variable arguments, which have to come last.
+         * @see #enumClasses
+         * @see #attributeClass
+         */
+        @SafeVarargs
+        protected OfNumber(final Class<N> numberClass, final Class<? extends E> enumClass,
+                           final Class<? extends E>... moreEnumClasses) {
+            super(enumClasses(enumClass, moreEnumClasses), numberClass);
+        }
+
+        /**
          * Creates a new instance for the specified enum class and number class.
          *
          * @param enumClass   the enum class.
